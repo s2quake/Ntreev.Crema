@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Commands;
+using Ntreev.Crema.Services;
 using Ntreev.Library;
 using Ntreev.Library.IO;
 using System;
@@ -43,13 +44,25 @@ namespace Ntreev.Crema.ConsoleHost
             this.xmlPath = AppUtility.GetDocumentFilename("configs") + ".xml";
             this.xsdPath = AppUtility.GetDocumentFilename("configs") + ".xsd";
             this.schemaLocation = UriUtility.MakeRelative(this.xmlPath, this.xsdPath);
-            this.Read(this.xmlPath);
+            if (File.Exists(this.xmlPath) == true)
+            {
+                try
+                {
+                    this.Read(this.xmlPath);
+                }
+                catch (Exception e)
+                {
+                    CremaLog.Error(e);
+                }
+            }
         }
 
         public void Write()
         {
             FileUtility.Backup(this.xsdPath);
             FileUtility.Backup(this.xmlPath);
+            FileUtility.Prepare(this.xsdPath);
+            FileUtility.Prepare(this.xmlPath);
             this.WriteSchema(this.xsdPath);
             this.Write(this.xmlPath, this.schemaLocation);
         }

@@ -54,13 +54,6 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.Debug("TypeContext is created.");
         }
 
-        //public void Import(Authentication authentication, CremaDataSet dataSet, string comment)
-        //{
-        //    this.Dispatcher?.VerifyAccess();
-        //    this.CremaHost.DebugMethod(authentication, this, nameof(Import), comment);
-        //    throw new NotImplementedException();
-        //}
-
         public void Dispose()
         {
             var userContext = this.CremaHost.UserContext;
@@ -273,6 +266,24 @@ namespace Ntreev.Crema.Services.Data
         public LogInfo[] GetCategoryLog(string localPath, string revision)
         {
             return this.Repository.GetLog(new string[] { localPath }, revision);
+        }
+
+        public CategoryMetaData[] GetCategoryMetaDatas()
+        {
+            var query = from TypeCategory item in this.Categories
+                        orderby item.Path
+                        select item.MetaData;
+
+            return query.ToArray();
+        }
+
+        public TypeMetaData[] GetTypeMetaDatas()
+        {
+            var query = from Type item in this.Types
+                        orderby item.Path
+                        select item.MetaData;
+
+            return query.ToArray();
         }
 
         public string GenerateCategoryPath(string parentPath, string name)

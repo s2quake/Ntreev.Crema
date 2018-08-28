@@ -34,7 +34,7 @@ namespace Ntreev.Crema.Services.Data
         private Version version;
 
         public DataBaseRepositoryHost(DataBase dataBase, IRepository repository)
-            : base(repository, dataBase.CremaHost.RepositoryDispatcher)
+            : base(repository, null)
         {
             this.dataBase = dataBase;
             this.settings = this.dataBase.GetService(typeof(CremaSettings)) as CremaSettings;

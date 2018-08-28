@@ -55,68 +55,6 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.Debug(Resources.Message_TableContextIsCreated);
         }
 
-        //public void Import(Authentication authentication, CremaDataSet dataSet, string comment)
-        //{
-        //    this.Dispatcher?.VerifyAccess();
-        //    this.CremaHost.DebugMethod(authentication, this, nameof(Import), comment);
-        //    this.ValidateImport(authentication, dataSet, comment);
-        //    var query = from item in dataSet.Tables
-        //                let table = this.Tables[item.Name]
-        //                where table.LockInfo.Path != table.Path
-        //                select table;
-
-        //    var items = query.ToArray();
-        //    var comments = Enumerable.Repeat(comment, items.Length).ToArray();
-        //    foreach (var item in items)
-        //    {
-        //        item.LockInternal(Authentication.System, comment);
-        //    }
-        //    this.InvokeItemsLockedEvent(authentication, items, comments);
-
-        //    try
-        //    {
-        //        var targetSet = this.DataBase.GetDataSet(authentication, items, true);
-        //        foreach (var item in targetSet.Tables)
-        //        {
-        //            var dataTable = dataSet.Tables[item.Name];
-        //            if (dataTable == null)
-        //                continue;
-
-        //            foreach (var row in dataTable.Rows)
-        //            {
-        //                item.ImportRow(row);
-        //            }
-        //            item.ContentsInfo = dataTable.ContentsInfo;
-        //        }
-        //        try
-        //        {
-        //            this.Repository.Modify(targetSet);
-        //            this.Repository.Commit(authentication, comment);
-        //        }
-        //        catch
-        //        {
-        //            this.Repository.Revert();
-        //        }
-
-        //        foreach (var item in items)
-        //        {
-        //            var dataTable = targetSet.Tables[item.Name, item.Category.Path];
-        //            item.UpdateContent(dataTable.TableInfo);
-        //        }
-
-        //        var eventLog = EventLogBuilder.Build(authentication, this, nameof(Import), comment);
-        //        this.OnItemsChanged(new ItemsEventArgs<ITableItem>(Authentication.System, items, targetSet));
-        //    }
-        //    finally
-        //    {
-        //        foreach (var item in items)
-        //        {
-        //            item.UnlockInternal(Authentication.System);
-        //        }
-        //        this.InvokeItemsUnlockedEvent(authentication, items);
-        //    }
-        //}
-
         public void Dispose()
         {
             var userContext = this.CremaHost.UserContext;
@@ -329,6 +267,24 @@ namespace Ntreev.Crema.Services.Data
         public LogInfo[] GetCategoryLog(string localPath, string revision)
         {
             return this.Repository.GetLog(new string[] { localPath }, revision);
+        }
+
+        public CategoryMetaData[] GetCategoryMetaDatas()
+        {
+            var query = from TableCategory item in this.Categories
+                        orderby item.Path
+                        select item.MetaData;
+
+            return query.ToArray();
+        }
+
+        public TableMetaData[] GetTableMetaDatas()
+        {
+            var query = from Table item in this.Tables
+                        orderby item.Path
+                        select item.MetaData;
+
+            return query.ToArray();
         }
 
         public string GenerateCategoryPath(string parentPath, string name)

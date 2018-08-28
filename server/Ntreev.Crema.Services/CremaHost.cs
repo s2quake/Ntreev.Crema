@@ -78,7 +78,6 @@ namespace Ntreev.Crema.Services
                 this.Dispatcher = new CremaDispatcher(this);
             else
                 this.Dispatcher = new CremaDispatcher(this, System.Windows.Threading.Dispatcher.CurrentDispatcher);
-            this.RepositoryDispatcher = new CremaDispatcher(this.repositoryProvider);
             CremaLog.Debug("crema dispatcher initialized.");
         }
 
@@ -310,8 +309,6 @@ namespace Ntreev.Crema.Services
             {
                 throw new InvalidOperationException(Resources.Exception_NotClosed);
             }
-            this.RepositoryDispatcher.Dispose();
-            this.RepositoryDispatcher = null;
             this.Dispatcher.Dispose();
             this.Dispatcher = null;
             this.OnDisposed(EventArgs.Empty);
@@ -368,7 +365,7 @@ namespace Ntreev.Crema.Services
 
         public CremaDispatcher Dispatcher { get; private set; }
 
-        public CremaDispatcher RepositoryDispatcher { get; private set; }
+        //public CremaDispatcher RepositoryDispatcher { get; private set; }
 
         public IObjectSerializer Serializer { get => this.serializer; }
 

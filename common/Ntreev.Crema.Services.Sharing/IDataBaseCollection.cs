@@ -28,40 +28,58 @@ namespace Ntreev.Crema.Services
 {
     public interface IDataBaseCollection : IReadOnlyCollection<IDataBase>, IEnumerable<IDataBase>, IDispatcherObject
     {
+        [DispatcherScope(typeof(ICremaHost))]
         IDataBase AddNewDataBase(Authentication authentication, string dataBaseName, string comment);
 
+        [DispatcherScope(typeof(ICremaHost))]
         bool Contains(string dataBaseName);
 
+        [DispatcherScope(typeof(ICremaHost))]
         IDataBase this[string dataBaseName] { get; }
 
+        [DispatcherScope(typeof(ICremaHost))]
         IDataBase this[Guid dataBaseID] { get; }
 
+        [DispatcherScope(typeof(ICremaHost))]
         event ItemsCreatedEventHandler<IDataBase> ItemsCreated;
 
+        [DispatcherScope(typeof(ICremaHost))]
         event ItemsRenamedEventHandler<IDataBase> ItemsRenamed;
 
+        [DispatcherScope(typeof(ICremaHost))]
         event ItemsDeletedEventHandler<IDataBase> ItemsDeleted;
 
+        [DispatcherScope(typeof(ICremaHost))]
         event ItemsEventHandler<IDataBase> ItemsLoaded;
 
+        [DispatcherScope(typeof(ICremaHost))]
         event ItemsEventHandler<IDataBase> ItemsUnloaded;
 
+        [DispatcherScope(typeof(ICremaHost))]
         event ItemsEventHandler<IDataBase> ItemsResetting;
 
+        [DispatcherScope(typeof(ICremaHost))]
         event ItemsEventHandler<IDataBase> ItemsReset;
 
+        [DispatcherScope(typeof(ICremaHost))]
         event ItemsEventHandler<IDataBase> ItemsAuthenticationEntered;
 
+        [DispatcherScope(typeof(ICremaHost))]
         event ItemsEventHandler<IDataBase> ItemsAuthenticationLeft;
 
+        [DispatcherScope(typeof(ICremaHost))]
         event ItemsEventHandler<IDataBase> ItemsInfoChanged;
 
+        [DispatcherScope(typeof(ICremaHost))]
         event ItemsEventHandler<IDataBase> ItemsStateChanged;
 
+        [DispatcherScope(typeof(ICremaHost))]
         event ItemsEventHandler<IDataBase> ItemsAccessChanged;
 
+        [DispatcherScope(typeof(ICremaHost))]
         event ItemsEventHandler<IDataBase> ItemsLockChanged;
 
+        [DispatcherScope(typeof(ICremaHost))]
         DataBaseCollectionMetaData GetMetaData(Authentication authentication);
     }
 }

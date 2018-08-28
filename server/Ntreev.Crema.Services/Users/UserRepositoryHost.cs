@@ -32,7 +32,7 @@ namespace Ntreev.Crema.Services.Users
         private readonly UserContext userContext;
 
         public UserRepositoryHost(UserContext userContext, IRepository repository)
-            : base(repository, userContext.CremaHost.RepositoryDispatcher)
+            : base(repository, userContext.Dispatcher)
         {
             this.userContext = userContext;
         }

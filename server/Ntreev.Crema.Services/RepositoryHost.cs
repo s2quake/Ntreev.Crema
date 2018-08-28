@@ -31,36 +31,27 @@ namespace Ntreev.Crema.Services
         public RepositoryHost(IRepository repository, CremaDispatcher dispatcher)
         {
             this.Repository = repository;
-            this.Dispatcher = dispatcher;
+            this.Dispatcher = dispatcher ?? new CremaDispatcher(this);
             this.RepositoryPath = repository.BasePath;
         }
 
         public void Add(string path)
         {
-            this.Dispatcher.Invoke(() =>
-            {
-                this.Repository.Add(path);
-            });
+            this.Repository.Add(path);
         }
 
         public void AddRange(string[] paths)
         {
-            this.Dispatcher.Invoke(() =>
+            foreach (var item in paths)
             {
-                foreach (var item in paths)
-                {
-                    this.Repository.Add(item);
-                }
-            });
+                this.Repository.Add(item);
+            }
         }
 
         public void Add(string path, string contents)
         {
             File.WriteAllText(path, contents, Encoding.UTF8);
-            this.Dispatcher.Invoke(() =>
-            {
-                this.Repository.Add(path);
-            });
+            this.Repository.Add(path);
         }
 
         public void Modify(string path, string contents)
@@ -70,87 +61,55 @@ namespace Ntreev.Crema.Services
 
         public void Move(string srcPath, string toPath)
         {
-            this.Dispatcher.Invoke(() =>
-            {
-                this.Repository.Move(srcPath, toPath);
-            });
+            this.Repository.Move(srcPath, toPath);
         }
 
         public void Delete(string path)
         {
-            this.Dispatcher.Invoke(() =>
-            {
-                this.Repository.Delete(path);
-            });
+            this.Repository.Delete(path);
         }
 
         public void DeleteRange(string[] paths)
         {
-            this.Dispatcher.Invoke(() =>
+            foreach (var item in paths)
             {
-                foreach (var item in paths)
-                {
-                    this.Repository.Delete(item);
-                }
-            });
+                this.Repository.Delete(item);
+            }
         }
 
         public void Copy(string srcPath, string toPath)
         {
-            this.Dispatcher.Invoke(() =>
-            {
-                this.Repository.Copy(srcPath, toPath);
-            });
+            this.Repository.Copy(srcPath, toPath);
         }
 
         public void Revert()
         {
-            this.Dispatcher.Invoke(() =>
-            {
-                this.Repository.Revert();
-            });
+            this.Repository.Revert();
         }
-
-        //public void Revert(string revision)
-        //{
-        //    this.Dispatcher.Invoke(() =>
-        //    {
-        //        this.Repository.Revert(revision);
-        //    });
-        //}
 
         public void BeginTransaction(string author, string name)
         {
-            this.Dispatcher.Invoke(() =>
-            {
-                this.Repository.BeginTransaction(author, name);
-            });
+            this.Repository.BeginTransaction(author, name);
         }
 
         public void EndTransaction()
         {
-            this.Dispatcher.Invoke(() =>
-            {
-                this.Repository.EndTransaction();
-            });
+            this.Repository.EndTransaction();
         }
 
         public void CancelTransaction()
         {
-            this.Dispatcher.Invoke(() =>
-            {
-                this.Repository.CancelTransaction();
-            });
+            this.Repository.CancelTransaction();
         }
 
         public Uri GetUri(string path, string revision)
         {
-            return this.Dispatcher.Invoke(() => this.Repository.GetUri(path, revision));
+            return this.Repository.GetUri(path, revision);
         }
 
         public string Export(Uri uri, string exportPath)
         {
-            return this.Dispatcher.Invoke(() => this.Repository.Export(uri, exportPath));
+            return this.Repository.Export(uri, exportPath);
         }
 
         public void Commit(Authentication authentication, string comment, params LogPropertyInfo[] properties)
@@ -163,14 +122,14 @@ namespace Ntreev.Crema.Services
             if (properties != null)
                 propList.AddRange(properties);
 
-            this.Dispatcher.Invoke(() => this.Repository.Commit(authentication.ID, comment, propList.ToArray()));
+            this.Repository.Commit(authentication.ID, comment, propList.ToArray());
 
             this.OnChanged(EventArgs.Empty);
         }
 
         public LogInfo[] GetLog(string[] paths, string revision)
         {
-            return this.Dispatcher.Invoke(() => this.Repository.GetLog(paths, revision));
+            return this.Repository.GetLog(paths, revision);
         }
 
         public string GetDataBaseUri(string repoUri, string itemUri)
@@ -184,7 +143,7 @@ namespace Ntreev.Crema.Services
 
         public RepositoryItem[] Status(params string[] paths)
         {
-            return this.Dispatcher.Invoke(() => this.Repository.Status(paths));
+            return this.Repository.Status(paths);
         }
 
         public void Dispose()
@@ -196,7 +155,7 @@ namespace Ntreev.Crema.Services
 
         public event EventHandler Changed;
 
-        protected CremaDispatcher Dispatcher { get; }
+        public CremaDispatcher Dispatcher { get; }
 
         protected IRepository Repository { get; }
 

@@ -95,8 +95,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Library", "sub-modul
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Library.Commands", "sub-modules\Ntreev.Library.Commands\Ntreev.Library.Commands.Net45\Ntreev.Library.Commands.csproj", "{0D96CC61-6D74-49B4-A558-33AC0DCF8529}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Services.Extensions.Sharing", "common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.shproj", "{97AD6C00-3B71-4E83-97C3-0201BC035471}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Services.Extensions", "server\Ntreev.Crema.Services.Extensions\Ntreev.Crema.Services.Extensions.csproj", "{0261747B-0A44-4FB0-8E27-2CE4BAF2153B}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems*{0261747b-0a44-4fb0-8e27-2ce4baf2153b}*SharedItemsImports = 4
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{04aeb614-3510-4064-99af-0aa807c7f957}*SharedItemsImports = 4
 		common\Ntreev.Crema.Commands.Spreadsheet.Sharing\Ntreev.Crema.Commands.Spreadsheet.Sharing.projitems*{05971a74-2d68-4781-9ceb-df2b48f8ba75}*SharedItemsImports = 13
 		sub-modules\Ntreev.Library.Commands\Ntreev.Library.Commands.AssemblyInfo\Ntreev.Library.Commands.AssemblyInfo.projitems*{0d96cc61-6d74-49b4-a558-33ac0dcf8529}*SharedItemsImports = 4
@@ -119,6 +124,7 @@ Global
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{65ca35f5-a1c3-4f0c-8a02-08157e3f5e21}*SharedItemsImports = 4
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{79aef7d1-93d1-4eeb-b09c-1595c82e7492}*SharedItemsImports = 4
 		sub-modules\Ntreev.Library\Ntreev.Library.AssemblyInfo\Ntreev.Library.AssemblyInfo.projitems*{83f1180f-f170-48cf-be1e-ca60d6851800}*SharedItemsImports = 4
+		common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems*{97ad6c00-3b71-4e83-97c3-0201bc035471}*SharedItemsImports = 13
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{9ed00a26-bf13-4b1f-af6e-3009c666ae15}*SharedItemsImports = 4
 		common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.projitems*{9ed00a26-bf13-4b1f-af6e-3009c666ae15}*SharedItemsImports = 4
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{a41e71c2-33f2-4ebf-b8e9-4050bb6c282d}*SharedItemsImports = 4
@@ -239,6 +245,10 @@ Global
 		{0D96CC61-6D74-49B4-A558-33AC0DCF8529}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D96CC61-6D74-49B4-A558-33AC0DCF8529}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D96CC61-6D74-49B4-A558-33AC0DCF8529}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0261747B-0A44-4FB0-8E27-2CE4BAF2153B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0261747B-0A44-4FB0-8E27-2CE4BAF2153B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0261747B-0A44-4FB0-8E27-2CE4BAF2153B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0261747B-0A44-4FB0-8E27-2CE4BAF2153B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -275,6 +285,8 @@ Global
 		{BA258C01-01C2-415D-8D3F-0B1484ECC765} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
 		{1918437F-4FBF-4731-AC5B-981A4A4CB1F1} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
 		{0D96CC61-6D74-49B4-A558-33AC0DCF8529} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
+		{97AD6C00-3B71-4E83-97C3-0201BC035471} = {F24B626E-02A8-431A-9319-C71D978C7328}
+		{0261747B-0A44-4FB0-8E27-2CE4BAF2153B} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {081892D7-815F-41E8-91E5-C26BA161204B}

@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>97ad6c00-3b71-4e83-97c3-0201bc035471</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Ntreev.Crema.Services.Extensions</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AccessibleDescriptorUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBaseDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBaseDescriptorUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DescriptorBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DescriptorPropertyAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DescriptorPropertyNotifier.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DescriptorTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DomainCategoryDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DomainDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DomainDescriptorUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DomainUserDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DomainUserDescriptorUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IAccessibleDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IDataBaseDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IDescriptorBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IDomainCategoryDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IDomainDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IDomainItemDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IDomainUserDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ILockableDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IPermissionDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITableCategoryDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITableContentDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITableDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITableItemDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITableTemplateDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITypeCategoryDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITypeDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITypeItemDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITypeTemplateDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IUserCategoryDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IUserDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IUserItemDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LockableDescriptorUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PermissionDescriptorUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TableAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TableCategoryDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TableContentDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TableContentDescriptorUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TableDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TableDescriptorUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TableItemDescriptorUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TableTemplateDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeCategoryDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeDescriptorUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeTemplateDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserCategoryDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserDescriptorUtility.cs" />
+  </ItemGroup>
+</Project>

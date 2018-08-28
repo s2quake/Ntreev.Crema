@@ -63,7 +63,6 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost = cremaHost;
             this.cachePath = cremaHost.GetPath(CremaPath.Caches, DataBasesString);
             this.repositoryProvider = cremaHost.RepositoryProvider;
-            this.repositoryDispatcher = cremaHost.RepositoryDispatcher;
             this.remotesPath = cremaHost.GetPath(CremaPath.RepositoryDataBases);
             this.basePath = cremaHost.GetPath(CremaPath.DataBases);
             this.Initialize();

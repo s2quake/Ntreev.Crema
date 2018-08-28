@@ -72,27 +72,35 @@ namespace Ntreev.Crema.Commands.Consoles
         {
             var dataBaseName = this.DataBaseName;
             var dataBasePath = new DataBasePath(path);
-            this.CremaHost.Dispatcher.Invoke(() =>
+
+            if (dataBaseName != string.Empty && dataBasePath.DataBaseName != dataBaseName)
             {
-                if (dataBaseName != string.Empty && dataBasePath.DataBaseName != dataBaseName)
+                var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[dataBaseName]);
+                dataBase.Dispatcher.Invoke(() =>
                 {
-                    var dataBase = this.CremaHost.DataBases[dataBaseName];
                     dataBase.Unloaded -= DataBase_Unloaded;
                     if (dataBase.IsLoaded == true)
                     {
                         dataBase.Leave(authentication);
                     }
-                }
+                });
+            }
 
-                if (dataBasePath.DataBaseName != string.Empty && dataBasePath.DataBaseName != dataBaseName)
+            if (dataBasePath.DataBaseName != string.Empty && dataBasePath.DataBaseName != dataBaseName)
+            {
+                var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[dataBasePath.DataBaseName]);
+                dataBase.Dispatcher.Invoke(() =>
                 {
-                    var dataBase = this.CremaHost.DataBases[dataBasePath.DataBaseName];
                     if (dataBase.IsLoaded == false)
                         dataBase.Load(authentication);
+                });
+                dataBase.Dispatcher.Invoke(() =>
+                {
                     dataBase.Enter(authentication);
                     dataBase.Unloaded += DataBase_Unloaded;
-                }
-            });
+                });
+            }
+
             this.dataBasePath = dataBasePath;
         }
 
