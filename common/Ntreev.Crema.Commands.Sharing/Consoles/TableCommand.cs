@@ -39,13 +39,12 @@ namespace Ntreev.Crema.Commands.Consoles
     [ResourceDescription("Resources", IsShared = true)]
     class TableCommand : ConsoleCommandMethodBase
     {
-        [Import]
-        private Lazy<ICremaHost> cremaHost = null;
+        private readonly ICremaHost cremaHost;
 
         [ImportingConstructor]
-        public TableCommand()
+        public TableCommand(ICremaHost cremaHost)
         {
-
+            this.cremaHost = cremaHost;
         }
 
         public override string[] GetCompletions(CommandMethodDescriptor methodDescriptor, CommandMemberDescriptor memberDescriptor, string find)
@@ -395,48 +394,39 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private ITable GetTable([CommandCompletion(nameof(GetTableNames))]string tableName)
         {
-            var table = this.CremaHost.Dispatcher.Invoke(GetTable);
-            if (table == null)
-                throw new TableNotFoundException(tableName);
-            return table;
-
-            ITable GetTable()
+            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var table = dataBase.Dispatcher.Invoke(() =>
             {
-                var dataBase = this.CremaHost.DataBases[this.Drive.DataBaseName];
                 if (NameValidator.VerifyItemPath(tableName) == true)
                     return dataBase.TableContext[tableName] as ITable;
                 return dataBase.TableContext.Tables[tableName];
-            }
+            });
+            if (table == null)
+                throw new TableNotFoundException(tableName);
+            return table;
         }
 
         private ITableCategory GetCategory(string categoryPath)
         {
-            var category = this.CremaHost.Dispatcher.Invoke(GetCategory);
+            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var category = dataBase.Dispatcher.Invoke(() => dataBase.TableContext.Categories[categoryPath]);
             if (category == null)
                 throw new CategoryNotFoundException(categoryPath);
             return category;
-
-            ITableCategory GetCategory()
-            {
-                var dataBase = this.CremaHost.DataBases[this.Drive.DataBaseName];
-                return dataBase.TableContext.Categories[categoryPath];
-            }
         }
 
         private ITableItem GetTableItem([CommandCompletion(nameof(GetPaths))]string tableItemName)
         {
-            var tableItem = this.CremaHost.Dispatcher.Invoke(GetTableItem);
-            if (tableItem == null)
-                throw new TableNotFoundException(tableItemName);
-            return tableItem;
-
-            ITableItem GetTableItem()
+            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var tableItem = dataBase.Dispatcher.Invoke(() =>
             {
-                var dataBase = this.CremaHost.DataBases[this.Drive.DataBaseName];
                 if (NameValidator.VerifyItemPath(tableItemName) == true || NameValidator.VerifyCategoryPath(tableItemName) == true)
                     return dataBase.TableContext[tableItemName];
                 return dataBase.TableContext.Tables[tableItemName] as ITableItem;
-            }
+            });
+            if (tableItem == null)
+                throw new TableNotFoundException(tableItemName);
+            return tableItem;
         }
 
         private string[] GetTableNames()
@@ -446,9 +436,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private string[] GetTableNames(TagInfo tags, string filterExpress)
         {
-            return this.CremaHost.Dispatcher.Invoke(() =>
+            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            return dataBase.Dispatcher.Invoke(() =>
             {
-                var dataBase = this.CremaHost.DataBases[this.Drive.DataBaseName];
                 var query = from item in dataBase.TableContext.Tables
                             where StringUtility.GlobMany(item.Name, filterExpress)
                             where (item.TableInfo.DerivedTags & tags) == tags
@@ -461,9 +451,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private string[] GetCategoryPaths()
         {
-            return this.CremaHost.Dispatcher.Invoke(() =>
+            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            return dataBase.Dispatcher.Invoke(() =>
             {
-                var dataBase = this.CremaHost.DataBases[this.Drive.DataBaseName];
                 var query = from item in dataBase.TableContext.Categories
                             orderby item.Path
                             select item.Path;
@@ -473,9 +463,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private string[] GetPaths()
         {
-            return this.CremaHost.Dispatcher.Invoke(() =>
+            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            return dataBase.Dispatcher.Invoke(() =>
             {
-                var dataBase = this.CremaHost.DataBases[this.Drive.DataBaseName];
                 var query = from item in dataBase.TableContext.Categories
                             orderby item.Path
                             select item;
@@ -503,7 +493,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private DataBasesConsoleDrive Drive => this.CommandContext.Drive as DataBasesConsoleDrive;
 
-        private ICremaHost CremaHost => this.cremaHost.Value;
+        private ICremaHost CremaHost => this.cremaHost;
 
         #region classes
 

@@ -39,7 +39,6 @@ namespace Ntreev.Crema.Services.Data
         internal const string DataBasesString = "databases";
 
         private readonly IRepositoryProvider repositoryProvider;
-        private readonly CremaDispatcher repositoryDispatcher;
         private readonly string cachePath;
         private readonly string remotesPath;
         private readonly string basePath;
@@ -147,11 +146,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     FileUtility.WriteAllText($"{CremaSchema.MajorVersion}.{CremaSchema.MinorVersion}", dataBasePath, ".version");
                     dataSet.WriteToDirectory(dataBasePath);
-
-                    this.repositoryDispatcher.Invoke(() =>
-                    {
-                        this.repositoryProvider.CreateRepository(authentication, this.remotesPath, dataBasePath, comment);
-                    });
+                    this.repositoryProvider.CreateRepository(authentication, this.remotesPath, dataBasePath, comment);
                 }
                 finally
                 {
@@ -179,10 +174,7 @@ namespace Ntreev.Crema.Services.Data
                 this.Sign(authentication);
                 var dataBaseName = dataBase.Name;
                 var message = EventMessageBuilder.CreateDataBase(authentication, newDataBaseName) + ": " + comment;
-                this.repositoryDispatcher.Invoke(() =>
-                {
-                    this.repositoryProvider.CopyRepository(authentication, this.remotesPath, dataBaseName, newDataBaseName, comment);
-                });
+                this.repositoryProvider.CopyRepository(authentication, this.remotesPath, dataBaseName, newDataBaseName, comment);
                 var newDataBase = new DataBase(this.CremaHost, newDataBaseName);
                 this.AddBase(newDataBase.Name, newDataBase);
                 this.InvokeItemsCreateEvent(authentication, new DataBase[] { newDataBase }, comment);
@@ -202,10 +194,7 @@ namespace Ntreev.Crema.Services.Data
 
             var dataBaseName = dataBase.Name;
             var message = EventMessageBuilder.RenameDataBase(authentication, dataBase.Name, newDataBaseName);
-            this.repositoryDispatcher.Invoke(() =>
-            {
-                this.repositoryProvider.RenameRepository(authentication, this.remotesPath, dataBaseName, newDataBaseName, message);
-            });
+            this.repositoryProvider.RenameRepository(authentication, this.remotesPath, dataBaseName, newDataBaseName, message);
             this.ReplaceKeyBase(dataBaseName, newDataBaseName);
         }
 
@@ -217,10 +206,7 @@ namespace Ntreev.Crema.Services.Data
 
             var dataBaseName = dataBase.Name;
             var message = EventMessageBuilder.DeleteDataBase(authentication, dataBase.Name);
-            this.repositoryDispatcher.Invoke(() =>
-            {
-                this.repositoryProvider.DeleteRepository(authentication, this.remotesPath, dataBaseName, message);
-            });
+            this.repositoryProvider.DeleteRepository(authentication, this.remotesPath, dataBaseName, message);
             this.DeleteCaches(dataBase);
             this.RemoveBase(dataBase.Name);
         }
@@ -232,10 +218,7 @@ namespace Ntreev.Crema.Services.Data
 
             var dataBaseName = dataBase.Name;
             var comment = $"revert to {revision}";
-            this.repositoryDispatcher.Invoke(() =>
-            {
-                this.repositoryProvider.RevertRepository(authentication.ID, this.remotesPath, dataBaseName, revision, comment);
-            });
+            this.repositoryProvider.RevertRepository(authentication.ID, this.remotesPath, dataBaseName, revision, comment);
         }
 
         public DataBaseCollectionMetaData GetMetaData(Authentication authentication)

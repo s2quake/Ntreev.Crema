@@ -121,24 +121,26 @@ namespace Ntreev.Crema.Services.Data
                 var dataSet = this.domain.Source as CremaDataSet;
                 var tables = this.contents.Where(item => item.isModified).Select(item => item.table).ToArray();
                 if (this.domain.IsModified == true)
-                    this.container.InvokeTableEndContentEdit(authentication, this.tables, dataSet);
-                this.domain.Dispatcher.Invoke(() =>
                 {
-                    this.DetachDomainEvent();
-                    this.domain.Dispose(authentication, false);
-                });
-                foreach (var item in this.contents)
-                {
-                    if (item.IsModified == true)
-                        item.table.UpdateContent(item.dataTable.TableInfo);
-                    item.domain = null;
-                    item.isModified = false;
-                    item.dataTable = null;
-                    item.table.SetTableState(TableState.None);
+                    this.container.Dispatcher.Invoke(() => this.container.InvokeTableEndContentEdit(authentication, this.tables, dataSet));
                 }
-                if (tables.Any() == true)
-                    this.container.InvokeTablesContentChangedEvent(authentication, tables, dataSet);
-                this.container.InvokeTablesStateChangedEvent(authentication, this.tables);
+                this.DetachDomainEvent();
+                this.domain.Dispose(authentication, false);
+                this.container.Dispatcher.Invoke(() =>
+                {
+                    foreach (var item in this.contents)
+                    {
+                        if (item.IsModified == true)
+                            item.table.UpdateContent(item.dataTable.TableInfo);
+                        item.domain = null;
+                        item.isModified = false;
+                        item.dataTable = null;
+                        item.table.SetTableState(TableState.None);
+                    }
+                    if (tables.Any() == true)
+                        this.container.InvokeTablesContentChangedEvent(authentication, tables, dataSet);
+                    this.container.InvokeTablesStateChangedEvent(authentication, this.tables);
+                });
             }
 
             public void CancelContent(Authentication authentication)

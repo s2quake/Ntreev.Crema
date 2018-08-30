@@ -35,14 +35,7 @@ namespace Ntreev.Crema.Services.Data
             this.table = table;
         }
 
-        public override object Target
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.table;
-            }
-        }
+        public override object Target => this.table;
 
         public override DomainContext DomainContext => this.table.GetService(typeof(DomainContext)) as DomainContext;
 
@@ -50,9 +43,9 @@ namespace Ntreev.Crema.Services.Data
 
         public override CremaHost CremaHost => this.table.CremaHost;
 
-        public override CremaDispatcher Dispatcher => this.table.Dispatcher;
-
         public override DataBase DataBase => this.table.DataBase;
+
+        public override IDispatcherObject DispatcherObject => this.table;
 
         public override IPermission Permission => this.table;
 
@@ -65,23 +58,29 @@ namespace Ntreev.Crema.Services.Data
 
         protected override void OnEndEdit(Authentication authentication, CremaTemplate template)
         {
-            this.Container.InvokeTableEndTemplateEdit(authentication, this.table, this.TemplateSource);
+            this.table.Dispatcher.Invoke(() => this.Container.InvokeTableEndTemplateEdit(authentication, this.table, this.TemplateSource));
             base.OnEndEdit(authentication, template);
-            this.table.UpdateTemplate(template.TableInfo);
-            this.table.UpdateTags(template.Tags);
-            this.table.UpdateComment(template.Comment);
-            this.table.SetTableState(TableState.None);
+            this.table.Dispatcher.Invoke(() =>
+            {
+                this.table.UpdateTemplate(template.TableInfo);
+                this.table.UpdateTags(template.Tags);
+                this.table.UpdateComment(template.Comment);
+                this.table.SetTableState(TableState.None);
 
-            var items = EnumerableUtility.One(this.table).ToArray();
-            this.Container.InvokeTablesStateChangedEvent(authentication, items);
-            this.Container.InvokeTablesTemplateChangedEvent(authentication, items, this.TemplateSource.TargetTable.DataSet);
+                var items = EnumerableUtility.One(this.table).ToArray();
+                this.Container.InvokeTablesStateChangedEvent(authentication, items);
+                this.Container.InvokeTablesTemplateChangedEvent(authentication, items, this.TemplateSource.TargetTable.DataSet);
+            });
         }
 
         protected override void OnCancelEdit(Authentication authentication)
         {
             base.OnCancelEdit(authentication);
-            this.table.SetTableState(TableState.None);
-            this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table });
+            this.table.Dispatcher.Invoke(() =>
+            {
+                this.table.SetTableState(TableState.None);
+                this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table });
+            });
         }
 
         protected override void OnRestore(Domain domain)
@@ -96,10 +95,7 @@ namespace Ntreev.Crema.Services.Data
             return new CremaTemplate(dataSet.Tables[this.table.Name, this.table.Category.Path]);
         }
 
-        private TableCollection Container
-        {
-            get { return this.table.Container; }
-        }
+        private TableCollection Container => this.table.Container;
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override void OnValidateBeginEdit(Authentication authentication, object target)

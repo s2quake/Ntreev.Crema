@@ -187,6 +187,8 @@ namespace Ntreev.Crema.ServiceModel
             get { return this.owner.ToString(); }
         }
 
+        public object Owner => this.owner;
+
         public static implicit operator Dispatcher(CremaDispatcher dispatcher)
         {
             return dispatcher.dispatcher;

@@ -47,7 +47,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 return new TypeMember(this, this.TypeSource.View.Table);
             }
             catch (Exception e)
@@ -61,7 +61,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.table.RowChanged -= Table_RowChanged;
                 try
                 {
@@ -84,7 +84,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.CremaHost.DebugMethod(authentication, this, nameof(BeginEdit));
                 this.ValidateBeginEdit(authentication);
                 this.Sign(authentication);
@@ -102,7 +102,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.CremaHost.DebugMethod(authentication, this, nameof(EndEdit));
                 this.ValidateEndEdit(authentication);
                 this.Sign(authentication);
@@ -120,7 +120,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.CremaHost.DebugMethod(authentication, this, nameof(CancelEdit));
                 this.ValidateCancelEdit(authentication);
                 this.Sign(authentication);
@@ -159,7 +159,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.domain.Dispatcher.Invoke(() => this.domain.SetProperty(authentication, CremaSchema.TypeName, value));
             }
             catch (Exception e)
@@ -173,7 +173,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.domain.Dispatcher.Invoke(() => this.domain.SetProperty(authentication, CremaSchema.Tags, (string)value));
             }
             catch (Exception e)
@@ -187,7 +187,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.domain.Dispatcher.Invoke(() => this.domain.SetProperty(authentication, CremaSchema.IsFlag, value));
             }
             catch (Exception e)
@@ -201,7 +201,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.domain.Dispatcher.Invoke(() => this.domain.SetProperty(authentication, CremaSchema.Comment, value));
             }
             catch (Exception e)
@@ -219,33 +219,15 @@ namespace Ntreev.Crema.Services.Data
 
         public bool IsNew { get; set; }
 
-        public Domain Domain
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.domain;
-            }
-        }
+        public Domain Domain => this.domain;
 
         public abstract IPermission Permission { get; }
 
-        public int Count
-        {
-            get
-            {
-                if (this.Dispatcher == null)
-                    return 0;
-                this.Dispatcher.VerifyAccess();
-                return this.members.Count;
-            }
-        }
+        public int Count => this.members.Count;
 
         public abstract DomainContext DomainContext { get; }
 
         public abstract string ItemPath { get; }
-
-        public abstract CremaDispatcher Dispatcher { get; }
 
         public abstract CremaHost CremaHost { get; }
 
@@ -253,32 +235,15 @@ namespace Ntreev.Crema.Services.Data
 
         public abstract DataBase DataBase { get; }
 
-        public string TypeName
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.TypeSource.Name;
-            }
-        }
+        public abstract IDispatcherObject DispatcherObject { get; }
 
-        public bool IsFlag
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.TypeSource.IsFlag;
-            }
-        }
+        public CremaDispatcher Dispatcher => this.domain != null ? this.domain.Dispatcher : this.DispatcherObject.Dispatcher;
 
-        public string Comment
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.TypeSource.Comment;
-            }
-        }
+        public string TypeName => this.TypeSource.Name;
+
+        public bool IsFlag => this.TypeSource.IsFlag;
+
+        public string Comment => this.TypeSource.Comment;
 
         public TypeMember this[string memberName]
         {
@@ -289,14 +254,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public bool IsModified
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.isModified;
-            }
-        }
+        public bool IsModified => this.isModified;
 
         public event EventHandler EditBegun
         {
@@ -392,7 +350,7 @@ namespace Ntreev.Crema.Services.Data
             this.table.RowDeleted += Table_RowDeleted;
             this.table.RowChanged += Table_RowChanged;
 
-            this.DomainContext.Domains.Add(authentication, this.domain);
+            this.DomainContext.Domains.Add(authentication, this.domain, this.DataBase);
             this.domain.Dispatcher.Invoke(() =>
             {
                 this.AttachDomainEvent();
@@ -402,11 +360,8 @@ namespace Ntreev.Crema.Services.Data
 
         protected virtual void OnEndEdit(Authentication authentication)
         {
-            this.domain.Dispatcher?.Invoke(() =>
-            {
-                this.DetachDomainEvent();
-                this.domain.Dispose(authentication, false);
-            });
+            this.DetachDomainEvent();
+            this.domain.Dispose(authentication, false);
             this.domain = null;
             if (this.table != null)
             {
@@ -420,11 +375,8 @@ namespace Ntreev.Crema.Services.Data
 
         protected virtual void OnCancelEdit(Authentication authentication)
         {
-            this.domain.Dispatcher?.Invoke(() =>
-            {
-                this.DetachDomainEvent();
-                this.domain.Dispose(authentication, true);
-            });
+            this.DetachDomainEvent();
+            this.domain.Dispose(authentication, true);
             this.domain = null;
             if (this.table != null)
             {
@@ -569,6 +521,13 @@ namespace Ntreev.Crema.Services.Data
             this.domain.RowChanged -= Domain_RowChanged;
             this.domain.RowRemoved -= Domain_RowRemoved;
             this.domain.PropertyChanged -= Domain_PropertyChanged;
+        }
+
+        private void ValidateDispatcher(Authentication authentication)
+        {
+            if (this.Dispatcher == null)
+                throw new InvalidOperationException(Resources.Exception_InvalidObject);
+            this.Dispatcher.VerifyAccess();
         }
 
         #region ITypeTemplate

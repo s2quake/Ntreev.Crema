@@ -18,6 +18,7 @@
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
 using System;
 using System.Data;
@@ -60,7 +61,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 base.SetField(authentication, columnName, value);
             }
             catch (Exception e)
@@ -140,6 +141,13 @@ namespace Ntreev.Crema.Services.Data
 
                 return dataRow.Field<string>(CremaSchema.__ParentID__);
             }
+        }
+
+        private void ValidateDispatcher(Authentication authentication)
+        {
+            if (this.Dispatcher == null)
+                throw new InvalidOperationException(Resources.Exception_InvalidObject);
+            this.Dispatcher.VerifyAccess();
         }
 
         #region ITableRow

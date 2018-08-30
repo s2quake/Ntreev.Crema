@@ -34,6 +34,7 @@ namespace Ntreev.Crema.Services.Data
         public NewTypeTemplate(TypeCategory category)
         {
             this.category = category ?? throw new ArgumentNullException(nameof(category));
+            this.DispatcherObject = category;
             this.category.Attach(this);
             this.IsNew = true;
         }
@@ -66,13 +67,13 @@ namespace Ntreev.Crema.Services.Data
 
         public override string ItemPath => this.category.Path;
 
-        public override CremaDispatcher Dispatcher => this.category?.Dispatcher;
-
         public override CremaHost CremaHost => this.category.CremaHost;
 
         public override DataBase DataBase => this.category.DataBase;
 
         public override IPermission Permission => this.category;
+
+        public override IDispatcherObject DispatcherObject { get; }
 
         public TypeCollection Types => this.category.Context.Types;
 
@@ -84,7 +85,7 @@ namespace Ntreev.Crema.Services.Data
         protected override void OnEndEdit(Authentication authentication)
         {
             base.OnEndEdit(authentication);
-            this.type = this.Types.AddNew(authentication, this.TypeSource);
+            this.type = this.DispatcherObject.Dispatcher.Invoke(() => this.Types.AddNew(authentication, this.TypeSource));
             this.category = null;
         }
 

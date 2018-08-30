@@ -263,24 +263,26 @@ namespace Ntreev.Crema.Services.Data
             get;
         }
 
-        private void DataBase_Loaded(object sender, EventArgs e)
+        private async void DataBase_Loaded(object sender, EventArgs e)
         {
-            this.DataBase.TypeContext.ItemsCreated += TypeContext_ItemCreated;
-            this.DataBase.TypeContext.ItemsRenamed += TypeContext_ItemRenamed;
-            this.DataBase.TypeContext.ItemsMoved += TypeContext_ItemMoved;
-            this.DataBase.TypeContext.ItemsDeleted += TypeContext_ItemDeleted;
-            this.DataBase.TypeContext.ItemsChanged += TypeContext_ItemsChanged;
-
-            this.DataBase.TableContext.ItemsCreated += TableContext_ItemCreated;
-            this.DataBase.TableContext.ItemsRenamed += TableContext_ItemRenamed;
-            this.DataBase.TableContext.ItemsMoved += TableContext_ItemMoved;
-            this.DataBase.TableContext.ItemsDeleted += TableContext_ItemDeleted;
-            this.DataBase.TableContext.ItemsChanged += TableContext_ItemsChanged;
-            this.dataBaseID = this.DataBase.ID;
-
-            if (this.DataBase is DataBase dataBaseInternal)
+            if (sender is DataBase dataBase)
             {
-                this.NoCache = dataBaseInternal.CremaHost.NoCache;
+                await dataBase.Dispatcher.InvokeAsync(() =>
+                {
+                    this.DataBase.TypeContext.ItemsCreated += TypeContext_ItemCreated;
+                    this.DataBase.TypeContext.ItemsRenamed += TypeContext_ItemRenamed;
+                    this.DataBase.TypeContext.ItemsMoved += TypeContext_ItemMoved;
+                    this.DataBase.TypeContext.ItemsDeleted += TypeContext_ItemDeleted;
+                    this.DataBase.TypeContext.ItemsChanged += TypeContext_ItemsChanged;
+
+                    this.DataBase.TableContext.ItemsCreated += TableContext_ItemCreated;
+                    this.DataBase.TableContext.ItemsRenamed += TableContext_ItemRenamed;
+                    this.DataBase.TableContext.ItemsMoved += TableContext_ItemMoved;
+                    this.DataBase.TableContext.ItemsDeleted += TableContext_ItemDeleted;
+                    this.DataBase.TableContext.ItemsChanged += TableContext_ItemsChanged;
+                    this.dataBaseID = this.DataBase.ID;
+                });
+                this.NoCache = dataBase.CremaHost.NoCache;
             }
 
             if (this.NoCache == true)
@@ -303,7 +305,7 @@ namespace Ntreev.Crema.Services.Data
                 Collect(item);
             }
 
-            this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 foreach (var item in domainItems)
                 {
@@ -348,9 +350,15 @@ namespace Ntreev.Crema.Services.Data
 
         private void DataBase_Unloaded(object sender, EventArgs e)
         {
-            var domainContext = this.DataBase.GetService(typeof(IDomainContext)) as IDomainContext;
-            domainContext.Domains.DomainCreated -= Domains_DomainCreated;
-            domainContext.Domains.DomainDeleted -= Domains_DomainDeleted;
+            if (sender is IDataBase dataBase && dataBase.GetService(typeof(IDomainContext)) is IDomainContext domainContext)
+            {
+                domainContext.Dispatcher.Invoke(() =>
+                {
+                    domainContext.Domains.DomainCreated -= Domains_DomainCreated;
+                    domainContext.Domains.DomainDeleted -= Domains_DomainDeleted;
+                });
+            }
+
             this.Dispatcher.InvokeAsync(() =>
             {
                 this.domainItems.Clear();

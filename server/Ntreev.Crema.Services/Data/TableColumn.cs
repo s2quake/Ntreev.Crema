@@ -18,6 +18,7 @@
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
 using System;
 using System.Data;
@@ -51,7 +52,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.Index, value);
             }
             catch (Exception e)
@@ -65,7 +66,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.IsKey, value);
             }
             catch (Exception e)
@@ -79,7 +80,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.IsUnique, value);
             }
             catch (Exception e)
@@ -93,7 +94,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.ColumnName, value);
             }
             catch (Exception e)
@@ -107,7 +108,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.DataType, value);
             }
             catch (Exception e)
@@ -121,7 +122,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.DefaultValue, value);
             }
             catch (Exception e)
@@ -135,7 +136,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.Comment, value);
             }
             catch (Exception e)
@@ -149,7 +150,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.AutoIncrement, value);
             }
             catch (Exception e)
@@ -163,7 +164,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.Tags, value.ToString());
             }
             catch (Exception e)
@@ -177,7 +178,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.ReadOnly, value);
             }
             catch (Exception e)
@@ -191,7 +192,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.AllowNull, value);
             }
             catch (Exception e)
@@ -305,6 +306,13 @@ namespace Ntreev.Crema.Services.Data
         public override DataBase DataBase => this.template.DataBase;
 
         public override CremaHost CremaHost => this.template.CremaHost;
+
+        private void ValidateDispatcher(Authentication authentication)
+        {
+            if (this.Dispatcher == null)
+                throw new InvalidOperationException(Resources.Exception_InvalidObject);
+            this.Dispatcher.VerifyAccess();
+        }
 
         #region ITableTemplate
 

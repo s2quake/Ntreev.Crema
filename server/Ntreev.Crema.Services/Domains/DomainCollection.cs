@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Data;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections;
@@ -171,9 +172,8 @@ namespace Ntreev.Crema.Services.Domains
             domain.Dispatcher.InvokeAsync(() => this.InvokeDomainCreatedEvent(authentication, domain));
         }
 
-        public void Add(Authentication authentication, Domain domain)
+        public void Add(Authentication authentication, Domain domain, DataBase dataBase)
         {
-            var dataBase = this.Context.CremaHost.DataBases[domain.DataBaseID];
             var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
             var category = this.Context.Categories.Prepare(categoryName);
             domain.Category = category;

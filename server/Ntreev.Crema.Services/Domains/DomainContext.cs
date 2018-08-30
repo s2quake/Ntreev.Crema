@@ -100,14 +100,7 @@ namespace Ntreev.Crema.Services.Domains
             };
         }
 
-        public DomainCollection Domains
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Items;
-            }
-        }
+        public DomainCollection Domains => base.Items;
 
         public CremaHost CremaHost { get; }
 
@@ -332,23 +325,9 @@ namespace Ntreev.Crema.Services.Domains
             return this.Contains(itemPath);
         }
 
-        IDomainCollection IDomainContext.Domains
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Domains;
-            }
-        }
+        IDomainCollection IDomainContext.Domains => this.Domains;
 
-        IDomainCategoryCollection IDomainContext.Categories
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        IDomainCategoryCollection IDomainContext.Categories => this.Categories;
 
         IDomainItem IDomainContext.this[string itemPath]
         {
@@ -359,14 +338,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        IDomainCategory IDomainContext.Root
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Root;
-            }
-        }
+        IDomainCategory IDomainContext.Root => this.Root;
 
         #region IEnumerable
 

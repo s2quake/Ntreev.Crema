@@ -55,7 +55,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.CremaHost.DebugMethod(authentication, this, nameof(BeginEdit), this.table);
                 this.ValidateBeginEdit(authentication);
                 this.Sign(authentication);
@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Services.Data
                     var itemPath = string.Join("|", tables.Select(item => item.Path));
                     this.domain = new TableContentDomain(authentication, dataSet, this.table.DataBase, itemPath, this.GetType().Name);
                     this.domain.Host = new TableContentDomainHost(this.Container, this.domain, itemPath);
-                    this.DomainContext.Domains.Add(authentication, this.domain);
+                    this.DomainContext.Domains.Add(authentication, this.domain, this.DataBase);
                 }
                 this.domainHost.BeginContent(authentication);
                 this.domainHost.InvokeEditBegunEvent(EventArgs.Empty);
@@ -82,7 +82,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.CremaHost.DebugMethod(authentication, this, nameof(EndEdit), this.table);
                 this.ValidateEndEdit(authentication);
                 this.Sign(authentication);
@@ -101,7 +101,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.CremaHost.DebugMethod(authentication, this, nameof(CancelEdit), this.table);
                 this.ValidateCancelEdit(authentication);
                 this.Sign(authentication);
@@ -120,7 +120,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.CremaHost.DebugMethod(authentication, this, nameof(EnterEdit), this.table);
                 this.ValidateEnter(authentication);
                 this.Sign(authentication);
@@ -139,7 +139,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.CremaHost.DebugMethod(authentication, this, nameof(LeaveEdit), this.table);
                 this.ValidateLeave(authentication);
                 this.Sign(authentication);
@@ -157,7 +157,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.CremaHost.DebugMethod(authentication, this, nameof(Clear), this.table);
                 var rowInfo = new DomainRowInfo()
                 {
@@ -177,7 +177,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 if (this.domain == null)
                     throw new InvalidOperationException(Resources.Exception_TableIsNotBeingEdited);
                 var view = this.dataTable.DefaultView;
@@ -194,7 +194,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 if (this.domain == null)
                     throw new InvalidOperationException(Resources.Exception_TableIsNotBeingEdited);
                 row.EndNew(authentication);
@@ -315,42 +315,19 @@ namespace Ntreev.Crema.Services.Data
                 throw new NotImplementedException();
         }
 
-        public override Domain Domain
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.domain;
-            }
-        }
+        public override Domain Domain => this.domain;
 
         public IPermission Permission => this.table;
 
-        public Table Table
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.table;
-            }
-        }
+        public Table Table => this.table;
 
         public override CremaHost CremaHost => this.table.CremaHost;
 
         public override DataBase DataBase => this.table.DataBase;
 
-        public override CremaDispatcher Dispatcher => this.table.Dispatcher;
+        public override IDispatcherObject DispatcherObject => this.table;
 
-        public int Count
-        {
-            get
-            {
-                if (this.Dispatcher == null)
-                    return 0;
-                this.Dispatcher?.VerifyAccess();
-                return this.dataTable.Rows.Count;
-            }
-        }
+        public int Count => this.dataTable.Rows.Count;
 
         public override CremaDataTable DataTable => this.dataTable;
 
@@ -370,14 +347,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public bool IsModified
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.isModified;
-            }
-        }
+        public bool IsModified => this.isModified;
 
         public event EventHandler EditBegun
         {

@@ -61,12 +61,15 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
                 if (this.IsLeaveOnly == false)
                 {
                     var authentication = this.CommandContext.GetAuthentication(this);
-                    this.Content.Dispatcher.Invoke(() => this.Content.LeaveEdit(authentication));
-                    var domain = this.Content.Dispatcher.Invoke(() => this.Content.Domain);
-                    if (domain.Dispatcher.Invoke(() => domain.Users.Any()) == false)
+                    var domain = this.Content.Domain;
+                    this.Content.Dispatcher.Invoke(() =>
                     {
-                        this.Content.Dispatcher.Invoke(() => this.Content.EndEdit(authentication));
-                    }
+                        this.Content.LeaveEdit(authentication);
+                        if (domain.Users.Any() == false)
+                        {
+                            this.Content.EndEdit(authentication);
+                        }
+                    });
                 }
 
                 this.CommandContext.Category = null;

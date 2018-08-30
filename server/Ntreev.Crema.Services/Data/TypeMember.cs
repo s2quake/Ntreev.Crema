@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
 using System;
 using System.Collections.Generic;
@@ -52,7 +53,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.Index, value);
             }
             catch (Exception e)
@@ -66,7 +67,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.Name, value);
             }
             catch (Exception e)
@@ -80,7 +81,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.Value, value);
             }
             catch (Exception e)
@@ -94,7 +95,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateDispatcher(authentication);
                 this.SetField(authentication, CremaSchema.Comment, value);
             }
             catch (Exception e)
@@ -145,6 +146,13 @@ namespace Ntreev.Crema.Services.Data
         public override CremaDispatcher Dispatcher => this.template.Dispatcher;
 
         public override CremaHost CremaHost => this.template.CremaHost;
+
+        private void ValidateDispatcher(Authentication authentication)
+        {
+            if (this.Dispatcher == null)
+                throw new InvalidOperationException(Resources.Exception_InvalidObject);
+            this.Dispatcher.VerifyAccess();
+        }
 
         #region ITypeTemplate
 

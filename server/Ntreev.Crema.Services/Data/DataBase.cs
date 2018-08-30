@@ -253,13 +253,13 @@ namespace Ntreev.Crema.Services.Data
                 this.Repository.Changed += Repository_Changed;
                 this.ReadCache();
                 this.AttachDomainHost();
+                this.Dispatcher = this.Repository.Dispatcher;
                 this.metaData.DataBaseState = DataBaseState.IsLoaded;
                 base.DataBaseState = DataBaseState.IsLoaded;
                 base.Load(authentication);
                 base.UpdateLockParent();
                 base.UpdateAccessParent();
                 this.DataBases.InvokeItemsLoadedEvent(authentication, new IDataBase[] { this });
-                this.Dispatcher = this.Repository.Dispatcher;
             }
             catch (Exception e)
             {
@@ -286,12 +286,12 @@ namespace Ntreev.Crema.Services.Data
                 this.Repository.Changed -= Repository_Changed;
                 this.Repository.Dispose();
                 this.Repository = null;
+                this.Dispatcher = this.CremaHost.Dispatcher;
                 this.metaData.DataBaseState = DataBaseState.None;
                 base.DataBaseState = DataBaseState.None;
                 base.Unload(authentication);
                 this.Sign(authentication);
                 this.DataBases.InvokeItemsUnloadedEvent(authentication, new IDataBase[] { this });
-                this.Dispatcher = this.CremaHost.Dispatcher;
             }
             catch (Exception e)
             {
@@ -406,6 +406,7 @@ namespace Ntreev.Crema.Services.Data
                 this.DataBases.InvokeDataBaseRevert(authentication, this, revision);
                 this.Sign(authentication);
                 var repositoryInfo = this.repositoryProvider.GetRepositoryInfo(this.CremaHost.GetPath(CremaPath.RepositoryDataBases), base.Name);
+
                 base.DataBaseInfo = new DataBaseInfo()
                 {
                     ID = repositoryInfo.ID,
@@ -505,7 +506,10 @@ namespace Ntreev.Crema.Services.Data
         public void Dispose()
         {
             if (this.IsLoaded == true)
+            {
                 this.WriteCache();
+                this.Repository.Dispose();
+            }
             this.Dispatcher = null;
             base.DataBaseState = DataBaseState.None;
             this.tableContext = null;
@@ -569,7 +573,6 @@ namespace Ntreev.Crema.Services.Data
                     metaDataList.Add(metaData);
                 }
             }
-            Trace.WriteLine("reset");
             this.DataBases.InvokeItemsResetEvent(authentication, new IDataBase[] { this }, metaDataList.ToArray());
         }
 
@@ -1144,12 +1147,28 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.CremaHost.Debug($"initialize database : {base.Name}");
                 var repositoryInfo = this.repositoryProvider.GetRepositoryInfo(remotePath, base.Name);
+                var itemList = this.repositoryProvider.GetRepositoryItemList(remotePath, this.Name);
+                var categories = from item in itemList
+                                 where item.EndsWith(PathUtility.Separator) == true
+                                 select item;
+                var items = from item in itemList
+                            where item.EndsWith(PathUtility.Separator) == false
+                            where item.StartsWith(PathUtility.Separator + CremaSchema.TypeDirectory + PathUtility.Separator)
+                                  || item.StartsWith(PathUtility.Separator + CremaSchema.TableDirectory + PathUtility.Separator)
+                            select FileUtility.RemoveExtension(item);
+
+                var allItems = items.Distinct()
+                                    .Concat(categories)
+                                    .OrderBy(item => item)
+                                    .ToArray();
+
                 base.DataBaseInfo = new DataBaseInfo()
                 {
                     ID = repositoryInfo.ID,
                     Name = repositoryInfo.Name,
                     Revision = repositoryInfo.Revision,
                     Comment = repositoryInfo.Comment,
+                    Paths = CategoryName.MakeItemList(allItems),
                     CreationInfo = repositoryInfo.CreationInfo,
                     ModificationInfo = repositoryInfo.ModificationInfo,
                 };
@@ -1296,7 +1315,7 @@ namespace Ntreev.Crema.Services.Data
         {
             if (this.Dispatcher == null)
                 throw new InvalidOperationException(Resources.Exception_InvalidObject);
-            this.Dispatcher?.VerifyAccess();
+            this.Dispatcher.VerifyAccess();
         }
 
         private void ValidateEnter(Authentication authentication)

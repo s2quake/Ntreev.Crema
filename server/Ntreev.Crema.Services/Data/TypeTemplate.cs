@@ -36,13 +36,13 @@ namespace Ntreev.Crema.Services.Data
 
         public override string ItemPath => this.type.Path;
 
-        public override CremaDispatcher Dispatcher => this.type.Dispatcher;
-
         public override CremaHost CremaHost => this.type.CremaHost;
 
         public override IType Type => this.type;
 
         public override DataBase DataBase => this.type.DataBase;
+
+        public override IDispatcherObject DispatcherObject => this.type;
 
         public override IPermission Permission => this.type;
 
@@ -80,19 +80,25 @@ namespace Ntreev.Crema.Services.Data
 
         protected override void OnEndEdit(Authentication authentication)
         {
-            this.Container.InvokeTypeEndTemplateEdit(authentication, this.type, this.TypeSource.DataSet);
+            this.Container.Dispatcher.Invoke(() => this.Container.InvokeTypeEndTemplateEdit(authentication, this.type, this.TypeSource.DataSet));
             base.OnEndEdit(authentication);
-            this.type.UpdateTypeInfo(this.TypeSource.TypeInfo);
-            this.type.IsBeingEdited = false;
-            this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
-            this.Container.InvokeTypesChangedEvent(authentication, new Type[] { this.type }, this.TypeSource.DataSet);
+            this.Container.Dispatcher.Invoke(() =>
+            {
+                this.type.UpdateTypeInfo(this.TypeSource.TypeInfo);
+                this.type.IsBeingEdited = false;
+                this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
+                this.Container.InvokeTypesChangedEvent(authentication, new Type[] { this.type }, this.TypeSource.DataSet);
+            });
         }
 
         protected override void OnCancelEdit(Authentication authentication)
         {
             base.OnCancelEdit(authentication);
-            this.type.IsBeingEdited = false;
-            this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
+            this.Container.Dispatcher.Invoke(() =>
+            {
+                this.type.IsBeingEdited = false;
+                this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
+            });
         }
 
         protected override void OnRestore(Domain domain)

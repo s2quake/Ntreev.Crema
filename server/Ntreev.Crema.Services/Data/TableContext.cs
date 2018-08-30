@@ -681,32 +681,11 @@ namespace Ntreev.Crema.Services.Data
             return this.Contains(itemPath);
         }
 
-        ITableCollection ITableContext.Tables
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Tables;
-            }
-        }
+        ITableCollection ITableContext.Tables => this.Tables;
 
-        ITableCategoryCollection ITableContext.Categories
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        ITableCategoryCollection ITableContext.Categories => this.Categories;
 
-        ITableCategory ITableContext.Root
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Root;
-            }
-        }
+        ITableCategory ITableContext.Root => this.Root;
 
         ITableItem ITableContext.this[string itemPath]
         {

@@ -528,95 +528,25 @@ namespace Ntreev.Crema.Services.Data
 
         public DataBase DataBase => this.Context.DataBase;
 
-        public new string Name
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Name;
-            }
-        }
+        public new string Name => base.Name;
 
-        public new string TableName
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.TableName;
-            }
-        }
+        public new string TableName => base.TableName;
 
-        public new string Path
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Path;
-            }
-        }
+        public new string Path => base.Path;
 
-        public new bool IsLocked
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.IsLocked;
-            }
-        }
+        public new bool IsLocked => base.IsLocked;
 
-        public new bool IsPrivate
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.IsPrivate;
-            }
-        }
+        public new bool IsPrivate => base.IsPrivate;
 
-        public new AccessInfo AccessInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.AccessInfo;
-            }
-        }
+        public new AccessInfo AccessInfo => base.AccessInfo;
 
-        public new LockInfo LockInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.LockInfo;
-            }
-        }
+        public new LockInfo LockInfo => base.LockInfo;
 
-        public new TableInfo TableInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.TableInfo;
-            }
-        }
+        public new TableInfo TableInfo => base.TableInfo;
 
-        public new TableState TableState
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.TableState;
-            }
-        }
+        public new TableState TableState => base.TableState;
 
-        public new TagInfo Tags
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Tags;
-            }
-        }
+        public new TagInfo Tags => base.Tags;
 
         public new event EventHandler Renamed
         {
@@ -882,68 +812,19 @@ namespace Ntreev.Crema.Services.Data
             return this.NewChild(authentication);
         }
 
-        ITable ITable.TemplatedParent
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.TemplatedParent;
-            }
-        }
+        ITable ITable.TemplatedParent => this.TemplatedParent;
 
-        ITableCategory ITable.Category
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Category;
-            }
-        }
+        ITableCategory ITable.Category => this.Category;
 
-        ITable ITable.Parent
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        ITable ITable.Parent => this.Parent;
 
-        ITableTemplate ITable.Template
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Template;
-            }
-        }
+        ITableTemplate ITable.Template => this.Template;
 
-        ITableContent ITable.Content
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Content;
-            }
-        }
+        ITableContent ITable.Content => this.Content;
 
-        IContainer<ITable> ITable.Childs
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Childs;
-            }
-        }
+        IContainer<ITable> ITable.Childs => this.Childs;
 
-        IContainer<ITable> ITable.DerivedTables
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.DerivedTables;
-            }
-        }
+        IContainer<ITable> ITable.DerivedTables => this.DerivedTables;
 
         #endregion
 
@@ -953,21 +834,13 @@ namespace Ntreev.Crema.Services.Data
         {
             get
             {
-                this.Dispatcher?.VerifyAccess();
                 if (this.Parent == null)
                     return this.Category;
                 return this.Parent;
             }
         }
 
-        IEnumerable<ITableItem> ITableItem.Childs
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Childs;
-            }
-        }
+        IEnumerable<ITableItem> ITableItem.Childs => this.Childs;
 
         #endregion
 

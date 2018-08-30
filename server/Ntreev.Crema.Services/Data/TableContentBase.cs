@@ -21,6 +21,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Ntreev.Crema.ServiceModel;
+using System;
+using Ntreev.Crema.Services.Properties;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -40,7 +42,7 @@ namespace Ntreev.Crema.Services.Data
 
         public TableRow Find(Authentication authentication, params object[] keys)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
+            this.ValidateDispatcher(authentication);
             var table = this.DataTable.DefaultView.Table;
             var row = table.Rows.Find(keys);
             if (row == null)
@@ -54,7 +56,7 @@ namespace Ntreev.Crema.Services.Data
 
         public TableRow[] Select(Authentication authentication, string filterExpression)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
+            this.ValidateDispatcher(authentication);
             var table = this.DataTable.DefaultView.Table;
             var rows = table.Select(filterExpression);
             foreach (var item in rows)
@@ -90,8 +92,17 @@ namespace Ntreev.Crema.Services.Data
 
         public abstract CremaDataTable DataTable { get; }
 
-        public abstract CremaDispatcher Dispatcher { get; }
-
         public abstract CremaHost CremaHost { get; }
+
+        public abstract IDispatcherObject DispatcherObject { get; }
+
+        public CremaDispatcher Dispatcher => this.Domain != null ? this.Domain.Dispatcher : this.DispatcherObject.Dispatcher;
+
+        protected void ValidateDispatcher(Authentication authentication)
+        {
+            if (this.Dispatcher == null)
+                throw new InvalidOperationException(Resources.Exception_InvalidObject);
+            this.Dispatcher.VerifyAccess();
+        }
     }
 }
