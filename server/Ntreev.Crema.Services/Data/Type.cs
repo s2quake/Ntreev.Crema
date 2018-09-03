@@ -633,23 +633,9 @@ namespace Ntreev.Crema.Services.Data
 
         #region IType
 
-        ITypeCategory IType.Category
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Category;
-            }
-        }
+        ITypeCategory IType.Category => this.Category;
 
-        ITypeTemplate IType.Template
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Template;
-            }
-        }
+        ITypeTemplate IType.Template => this.Template;
 
         IType IType.Copy(Authentication authentication, string newTypeName, string categoryPath)
         {
@@ -660,23 +646,9 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITypeItem
 
-        ITypeItem ITypeItem.Parent
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Category;
-            }
-        }
+        ITypeItem ITypeItem.Parent => this.Category;
 
-        IEnumerable<ITypeItem> ITypeItem.Childs
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return Enumerable.Empty<ITypeItem>();
-            }
-        }
+        IEnumerable<ITypeItem> ITypeItem.Childs => Enumerable.Empty<ITypeItem>();
 
         #endregion
 

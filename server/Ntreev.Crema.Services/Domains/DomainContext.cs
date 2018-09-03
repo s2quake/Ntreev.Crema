@@ -204,11 +204,11 @@ namespace Ntreev.Crema.Services.Domains
                     }
                 }
 
-                this.CremaHost.Debug(string.Format(Resources.Message_RestoreResult_Format, succeededCount, failedCount));
+                this.CremaHost.Info(string.Format(Resources.Message_RestoreResult_Format, succeededCount, failedCount));
             }
             else
             {
-                this.CremaHost.Debug(Resources.Message_NotFoundDomainsToRestore);
+                this.CremaHost.Info(Resources.Message_NotFoundDomainsToRestore);
             }
         }
 
@@ -321,7 +321,6 @@ namespace Ntreev.Crema.Services.Domains
 
         bool IDomainContext.Contains(string itemPath)
         {
-            this.Dispatcher.VerifyAccess();
             return this.Contains(itemPath);
         }
 
@@ -329,14 +328,7 @@ namespace Ntreev.Crema.Services.Domains
 
         IDomainCategoryCollection IDomainContext.Categories => this.Categories;
 
-        IDomainItem IDomainContext.this[string itemPath]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[itemPath] as IDomainItem;
-            }
-        }
+        IDomainItem IDomainContext.this[string itemPath] => this[itemPath] as IDomainItem;
 
         IDomainCategory IDomainContext.Root => this.Root;
 
@@ -344,7 +336,6 @@ namespace Ntreev.Crema.Services.Domains
 
         IEnumerator<IDomainItem> IEnumerable<IDomainItem>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IDomainItem;
@@ -353,7 +344,6 @@ namespace Ntreev.Crema.Services.Domains
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IDomainItem;

@@ -162,7 +162,7 @@ namespace Ntreev.Crema.Services.Data
                 throw;
             }
         }
-        
+
         public void InvokeItemsSetPublicEvent(Authentication authentication, ITableItem[] items)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetPublicEvent), items);
@@ -581,38 +581,6 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        //private void ValidateImport(Authentication authentication, CremaDataSet dataSet, string comment)
-        //{
-        //    if (dataSet == null)
-        //        throw new ArgumentNullException(nameof(dataSet));
-        //    if (dataSet.Tables.Any() == false)
-        //        throw new ArgumentException(Resources.Exception_EmptyDataSetCannotImport, nameof(dataSet));
-        //    if (comment == null)
-        //        throw new ArgumentNullException(nameof(comment));
-        //    if (comment == string.Empty)
-        //        throw new ArgumentException(Resources.Exception_EmptyStringIsNotAllowed);
-        //    var tableList = new List<Table>(dataSet.Tables.Count);
-        //    foreach (var item in dataSet.Tables)
-        //    {
-        //        var table = this.Tables[item.Name];
-        //        if (table == null)
-        //            throw new TableNotFoundException(item.Name);
-        //        tableList.Add(table);
-        //        table.ValidateAccessType(authentication, AccessType.Editor);
-        //        table.ValidateHasNotBeingEditedType();
-        //        table.ValidateNotBeingEdited();
-        //    }
-
-        //    var query = from item in tableList
-        //                where item.LockInfo.Path != item.Path
-        //                select item;
-
-        //    foreach (var item in query)
-        //    {
-        //        item.ValidateLockInternal(authentication);
-        //    }
-        //}
-
         private void Initialize(IEnumerable<TableInfo> tableInfos)
         {
             this.CremaHost.Debug(Resources.Message_LoadTables);
@@ -677,7 +645,6 @@ namespace Ntreev.Crema.Services.Data
 
         bool ITableContext.Contains(string itemPath)
         {
-            this.Dispatcher?.VerifyAccess();
             return this.Contains(itemPath);
         }
 
@@ -687,14 +654,7 @@ namespace Ntreev.Crema.Services.Data
 
         ITableCategory ITableContext.Root => this.Root;
 
-        ITableItem ITableContext.this[string itemPath]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this[itemPath] as ITableItem;
-            }
-        }
+        ITableItem ITableContext.this[string itemPath] => this[itemPath] as ITableItem;
 
         #endregion
 
@@ -702,7 +662,6 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITableItem> IEnumerable<ITableItem>.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as ITableItem;
@@ -711,7 +670,6 @@ namespace Ntreev.Crema.Services.Data
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as ITableItem;

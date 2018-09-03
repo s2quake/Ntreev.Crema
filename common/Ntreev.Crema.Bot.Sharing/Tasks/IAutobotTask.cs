@@ -49,6 +49,8 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 if (autobot.IsOnline == true)
                 {
+                    var cremaHost = autobot.CremaHost;
+                    context.Push(autobot.CremaHost.DataBases);
                     if (RandomUtility.Within(75) == true)
                     {
                         var dataBase = autobot.CremaHost.Dispatcher.Invoke(() => autobot.CremaHost.DataBases.Random());
@@ -56,7 +58,7 @@ namespace Ntreev.Crema.Bot.Tasks
                     }
                     else if (RandomUtility.Within(75) == true)
                     {
-                        var userContext = autobot.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
+                        var userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
                         if (RandomUtility.Within(75) == true)
                         {
                             var user = userContext.Dispatcher.Invoke(() => userContext.Users.Random());
@@ -101,7 +103,7 @@ namespace Ntreev.Crema.Bot.Tasks
             }
         }
 
-        [TaskMethod(Weight = 10)]
+        [TaskMethod(Weight = 30)]
         public void Logout(AutobotBase autobot, TaskContext context)
         {
             if (autobot.IsOnline == true && context.IsCompleted(autobot) == true)
@@ -118,16 +120,24 @@ namespace Ntreev.Crema.Bot.Tasks
 
         }
 
-        [TaskMethod(Weight = 50)]
+        [TaskMethod(Weight = 30)]
         public void AddNewAutoBot(Autobot autobot, TaskContext context)
         {
-            this.Dispatcher.Invoke(() =>
+            var service = autobot.Service;
+            if (Verify())
             {
-                if (autobot.IsOnline == true)
-                {
-                    autobot.Service.AddAutobot(context.Authentication);
-                }
-            });
+                service.Dispatcher.Invoke(() => autobot.Service.AddAutobot(context.Authentication));
+            }
+            bool Verify()
+            {
+                if (context.AllowException == true)
+                    return true;
+                if (autobot.IsOnline == false)
+                    return false;
+                if (context.Authentication.Authority != Authority.Admin)
+                    return false;
+                return true;
+            }
         }
     }
 }

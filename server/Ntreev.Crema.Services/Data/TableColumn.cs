@@ -202,104 +202,27 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public int Index
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<int>(CremaSchema.Index);
-            }
-        }
+        public int Index => this.GetField<int>(CremaSchema.Index);
 
-        public bool IsKey
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<bool>(CremaSchema.IsKey);
-            }
-        }
+        public bool IsKey => this.GetField<bool>(CremaSchema.IsKey);
 
-        public bool IsUnique
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<bool>(CremaSchema.IsUnique);
-            }
-        }
+        public bool IsUnique => this.GetField<bool>(CremaSchema.IsUnique);
 
-        public string Name
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<string>(CremaSchema.ColumnName);
-            }
-        }
+        public string Name => this.GetField<string>(CremaSchema.ColumnName);
 
-        public string DataType
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<string>(CremaSchema.DataType);
-            }
-        }
+        public string DataType => this.GetField<string>(CremaSchema.DataType);
 
-        public string DefaultValue
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<string>(CremaSchema.DefaultValue);
-            }
-        }
+        public string DefaultValue => this.GetField<string>(CremaSchema.DefaultValue);
 
-        public string Comment
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<string>(CremaSchema.Comment);
-            }
-        }
+        public string Comment => this.GetField<string>(CremaSchema.Comment);
 
-        public bool AutoIncrement
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<bool>(CremaSchema.AutoIncrement);
-            }
-        }
+        public bool AutoIncrement => this.GetField<bool>(CremaSchema.AutoIncrement);
 
-        public TagInfo Tags
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return (TagInfo)(this.GetField<string>(CremaSchema.Tags));
-            }
-        }
+        public TagInfo Tags => (TagInfo)(this.GetField<string>(CremaSchema.Tags));
 
-        public bool IsReadOnly
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<bool>(CremaSchema.ReadOnly);
-            }
-        }
+        public bool IsReadOnly => this.GetField<bool>(CremaSchema.ReadOnly);
 
-        public bool AllowNull
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<bool>(CremaSchema.AllowNull);
-            }
-        }
+        public bool AllowNull => this.GetField<bool>(CremaSchema.AllowNull);
 
         public override CremaDispatcher Dispatcher => this.template.Dispatcher;
 
@@ -316,14 +239,7 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITableTemplate
 
-        ITableTemplate ITableColumn.Template
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.template;
-            }
-        }
+        ITableTemplate ITableColumn.Template => this.template;
 
         #endregion
     }

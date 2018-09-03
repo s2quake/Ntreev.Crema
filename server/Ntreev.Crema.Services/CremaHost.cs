@@ -534,14 +534,7 @@ namespace Ntreev.Crema.Services
             this.token = Guid.Empty;
         }
 
-        IDataBaseCollection ICremaHost.DataBases
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.DataBases;
-            }
-        }
+        IDataBaseCollection ICremaHost.DataBases => this.DataBases;
 
         ICremaConfiguration ICremaHost.Configs => this.configs;
 

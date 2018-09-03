@@ -71,7 +71,6 @@ namespace Ntreev.Crema.Services.Data
 
         public IEnumerator<TableRow> GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             if (this.DataTable != null)
             {
                 foreach (DataRow item in this.DataTable.DefaultView.Table.Rows)

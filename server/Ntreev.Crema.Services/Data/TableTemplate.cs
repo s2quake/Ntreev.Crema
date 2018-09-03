@@ -58,9 +58,12 @@ namespace Ntreev.Crema.Services.Data
 
         protected override void OnEndEdit(Authentication authentication, CremaTemplate template)
         {
-            this.table.Dispatcher.Invoke(() => this.Container.InvokeTableEndTemplateEdit(authentication, this.table, this.TemplateSource));
+            this.DispatcherObject.Dispatcher.Invoke(() =>
+            {
+                this.Container.InvokeTableEndTemplateEdit(authentication, this.table, this.TemplateSource);
+            });
             base.OnEndEdit(authentication, template);
-            this.table.Dispatcher.Invoke(() =>
+            this.DispatcherObject.Dispatcher.Invoke(() =>
             {
                 this.table.UpdateTemplate(template.TableInfo);
                 this.table.UpdateTags(template.Tags);
@@ -76,7 +79,7 @@ namespace Ntreev.Crema.Services.Data
         protected override void OnCancelEdit(Authentication authentication)
         {
             base.OnCancelEdit(authentication);
-            this.table.Dispatcher.Invoke(() =>
+            this.DispatcherObject.Dispatcher.Invoke(() =>
             {
                 this.table.SetTableState(TableState.None);
                 this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table });
@@ -144,10 +147,9 @@ namespace Ntreev.Crema.Services.Data
         {
             base.OnValidateCancelEdit(authentication, target);
 
-            if (target == this)
+            if (target == this && this.IsBeingEdited == false)
             {
-                if (this.IsBeingEdited == false)
-                    throw new InvalidOperationException(Resources.Exception_TableTemplateIsNotBeingEdited);
+                throw new InvalidOperationException(Resources.Exception_TableTemplateIsNotBeingEdited);
             }
 
             this.table.ValidateAccessType(authentication, AccessType.Master);

@@ -37,9 +37,9 @@ namespace Ntreev.Crema.Bot.Tasks
         public void InvokeTask(TaskContext context)
         {
             var template = context.Target as ITypeTemplate;
-            template.Dispatcher.Invoke(() =>
+            if (context.IsCompleted(template) == true)
             {
-                if (context.IsCompleted(template) == true)
+                template.Dispatcher.Invoke(() =>
                 {
                     try
                     {
@@ -55,20 +55,23 @@ namespace Ntreev.Crema.Bot.Tasks
                     {
                         template.CancelEdit(context.Authentication);
                     }
+                });
 
-                    context.Pop(template);
-                    context.Complete(context.Target);
+                context.Pop(template);
+                context.Complete(context.Target);
 
-                    bool Verify()
-                    {
-                        if (context.AllowException == true)
-                            return true;
-                        if (template.Count == 0)
-                            return false;
+                bool Verify()
+                {
+                    if (context.AllowException == true)
                         return true;
-                    }
+                    if (template.Count == 0)
+                        return false;
+                    return true;
                 }
-                else
+            }
+            else
+            {
+                template.Dispatcher.Invoke(() =>
                 {
                     if (template.Domain == null)
                     {
@@ -76,6 +79,18 @@ namespace Ntreev.Crema.Bot.Tasks
                             return;
                         template.BeginEdit(context.Authentication);
                     }
+                    bool Verify()
+                    {
+                        if (context.AllowException == true)
+                            return true;
+                        if (this.CanEdit(template) == false)
+                            return false;
+                        return true;
+                    }
+                });
+
+                template.Dispatcher.Invoke(() =>
+                {
                     if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
                     {
                         var member = template.AddNew(context.Authentication);
@@ -87,17 +102,8 @@ namespace Ntreev.Crema.Bot.Tasks
                         var member = template.Random();
                         context.Push(member);
                     }
-
-                    bool Verify()
-                    {
-                        if (context.AllowException == true)
-                            return true;
-                        if (this.CanEdit(template) == false)
-                            return false;
-                        return true;
-                    }
-                }
-            });
+                });
+            }
         }
 
         public Type TargetType

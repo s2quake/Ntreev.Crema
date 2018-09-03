@@ -34,7 +34,6 @@ namespace Ntreev.Crema.Services.Data
         {
             private readonly TableCollection container;
             private readonly TableContent[] contents;
-            private readonly Table[] tables;
             private Domain domain;
 
             public TableContentDomainHost(TableCollection container, Domain domain, string itemPath)
@@ -51,7 +50,7 @@ namespace Ntreev.Crema.Services.Data
                 }
 
                 this.container = container;
-                this.tables = tableList.ToArray();
+                this.Tables = tableList.ToArray();
                 this.contents = tableList.Select(item => item.Content).ToArray();
                 this.domain = domain;
                 foreach (var item in this.contents)
@@ -108,21 +107,21 @@ namespace Ntreev.Crema.Services.Data
                 foreach (var item in this.contents)
                 {
                     item.domain = domain;
-                    item.dataTable = dataSet.Tables[item.table.Name, item.table.Category.Path];
-                    item.table.SetTableState(TableState.IsBeingEdited);
-                    item.isModified = domain.ModifiedTables.Contains(item.dataTable.Name);
+                    item.dataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
+                    item.Table.SetTableState(TableState.IsBeingEdited);
+                    item.IsModified = domain.ModifiedTables.Contains(item.dataTable.Name);
                 }
                 this.domain.Dispatcher.Invoke(this.AttachDomainEvent);
-                this.container.InvokeTablesStateChangedEvent(authentication, this.tables);
+                this.container.InvokeTablesStateChangedEvent(authentication, this.Tables);
             }
 
             public void EndContent(Authentication authentication)
             {
                 var dataSet = this.domain.Source as CremaDataSet;
-                var tables = this.contents.Where(item => item.isModified).Select(item => item.table).ToArray();
+                var tables = this.contents.Where(item => item.IsModified).Select(item => item.Table).ToArray();
                 if (this.domain.IsModified == true)
                 {
-                    this.container.Dispatcher.Invoke(() => this.container.InvokeTableEndContentEdit(authentication, this.tables, dataSet));
+                    this.container.Dispatcher.Invoke(() => this.container.InvokeTableEndContentEdit(authentication, this.Tables, dataSet));
                 }
                 this.DetachDomainEvent();
                 this.domain.Dispose(authentication, false);
@@ -131,33 +130,33 @@ namespace Ntreev.Crema.Services.Data
                     foreach (var item in this.contents)
                     {
                         if (item.IsModified == true)
-                            item.table.UpdateContent(item.dataTable.TableInfo);
+                            item.Table.UpdateContent(item.dataTable.TableInfo);
                         item.domain = null;
-                        item.isModified = false;
+                        item.IsModified = false;
                         item.dataTable = null;
-                        item.table.SetTableState(TableState.None);
+                        item.Table.SetTableState(TableState.None);
                     }
                     if (tables.Any() == true)
                         this.container.InvokeTablesContentChangedEvent(authentication, tables, dataSet);
-                    this.container.InvokeTablesStateChangedEvent(authentication, this.tables);
+                    this.container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
             }
 
             public void CancelContent(Authentication authentication)
             {
-                this.domain.Dispatcher.Invoke(() =>
+                this.DetachDomainEvent();
+                this.domain.Dispose(authentication, true);
+                this.container.Dispatcher.Invoke(() =>
                 {
-                    this.DetachDomainEvent();
-                    this.domain.Dispose(authentication, true);
+                    foreach (var item in this.contents)
+                    {
+                        item.domain = null;
+                        item.IsModified = false;
+                        item.dataTable = null;
+                        item.Table.SetTableState(TableState.None);
+                    }
+                    this.container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
-                foreach (var item in this.contents)
-                {
-                    item.domain = null;
-                    item.isModified = false;
-                    item.dataTable = null;
-                    item.table.SetTableState(TableState.None);
-                }
-                this.container.InvokeTablesStateChangedEvent(authentication, this.tables);
             }
 
             public void EnterContent(Authentication authentication)
@@ -170,69 +169,56 @@ namespace Ntreev.Crema.Services.Data
 
             }
 
-            public Table[] Tables => this.tables;
+            public Table[] Tables { get; }
 
             private void Domain_Deleted(object sender, DomainDeletedEventArgs e)
             {
-                var isCanceled = e.IsCanceled;
-                this.Dispatcher?.InvokeAsync(() =>
+                if (e.IsCanceled == false)
                 {
-                    if (isCanceled == false)
-                    {
-                        this.EndContent(e.Authentication);
-                        this.InvokeEditEndedEvent(e);
-                    }
-                    else
-                    {
-                        this.CancelContent(e.Authentication);
-                        this.InvokeEditCanceledEvent(e);
-                    }
-                });
+                    this.EndContent(e.Authentication);
+                    this.InvokeEditEndedEvent(e);
+                }
+                else
+                {
+                    this.CancelContent(e.Authentication);
+                    this.InvokeEditCanceledEvent(e);
+                }
             }
 
             private void Domain_RowAdded(object sender, DomainRowEventArgs e)
             {
-                this.Dispatcher.InvokeAsync(() =>
+                var query = from row in e.Rows
+                            join content in this.contents on row.TableName equals content.dataTable.Name
+                            select content;
+                foreach (var item in query)
                 {
-                    var query = from row in e.Rows
-                                join content in this.contents on row.TableName equals content.dataTable.Name
-                                select content;
-                    foreach (var item in query)
-                    {
-                        item.isModified = true;
-                        item.OnChanged(e);
-                    }
-                });
+                    item.IsModified = true;
+                    item.OnChanged(e);
+                }
             }
 
             private void Domain_RowChanged(object sender, DomainRowEventArgs e)
             {
-                this.Dispatcher.InvokeAsync(() =>
+                var query = from row in e.Rows
+                            join content in this.contents on row.TableName equals content.dataTable.Name
+                            select content;
+                foreach (var item in query)
                 {
-                    var query = from row in e.Rows
-                                join content in this.contents on row.TableName equals content.dataTable.Name
-                                select content;
-                    foreach (var item in query)
-                    {
-                        item.isModified = true;
-                        item.OnChanged(e);
-                    }
-                });
+                    item.IsModified = true;
+                    item.OnChanged(e);
+                }
             }
 
             private void Domain_RowRemoved(object sender, DomainRowEventArgs e)
             {
-                this.Dispatcher.InvokeAsync(() =>
+                var query = from row in e.Rows
+                            join content in this.contents on row.TableName equals content.dataTable.Name
+                            select content;
+                foreach (var item in query)
                 {
-                    var query = from row in e.Rows
-                                join content in this.contents on row.TableName equals content.dataTable.Name
-                                select content;
-                    foreach (var item in query)
-                    {
-                        item.isModified = true;
-                        item.OnChanged(e);
-                    }
-                });
+                    item.IsModified = true;
+                    item.OnChanged(e);
+                }
             }
 
             private void Domain_PropertyChanged(object sender, DomainPropertyEventArgs e)
@@ -263,18 +249,18 @@ namespace Ntreev.Crema.Services.Data
                 {
                     item.domainHost = this;
                     item.domain = domain;
-                    item.dataTable = dataSet.Tables[item.table.Name, item.table.Category.Path];
-                    item.table.SetTableState(TableState.IsBeingEdited);
-                    item.isModified = domain.ModifiedTables.Contains(item.dataTable.Name);
+                    item.dataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
+                    item.Table.SetTableState(TableState.IsBeingEdited);
+                    item.IsModified = domain.ModifiedTables.Contains(item.dataTable.Name);
                 }
                 this.domain.Dispatcher.Invoke(this.AttachDomainEvent);
-                this.container.InvokeTablesStateChangedEvent(authentication, this.tables);
+                this.container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 this.InvokeEditBegunEvent(EventArgs.Empty);
             }
 
             void IDomainHost.ValidateDelete(Authentication authentication, bool isCanceled)
             {
-                //throw new NotImplementedException();
+                
             }
 
             #endregion

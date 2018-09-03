@@ -80,32 +80,11 @@ namespace Ntreev.Crema.Services.Domains
             return metaData;
         }
 
-        public new DomainUserInfo DomainUserInfo
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.DomainUserInfo;
-            }
-        }
+        public new DomainUserInfo DomainUserInfo => base.DomainUserInfo;
 
-        public new DomainUserState DomainUserState
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.DomainUserState;
-            }
-        }
+        public new DomainUserState DomainUserState => base.DomainUserState;
 
-        public string ID
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.DomainUserInfo.UserID;
-            }
-        }
+        public string ID => base.DomainUserInfo.UserID;
 
         public DomainLocationInfo Location
         {

@@ -47,51 +47,22 @@ namespace Ntreev.Crema.Services.Domains
 
         #region IDomainCategory
 
-        IDomainCategory IDomainCategory.Parent
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        IDomainCategory IDomainCategory.Parent => this.Parent;
 
-        IContainer<IDomain> IDomainCategory.Domains
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Items;
-            }
-        }
+        IContainer<IDomain> IDomainCategory.Domains => this.Items;
 
-        IContainer<IDomainCategory> IDomainCategory.Categories
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        IContainer<IDomainCategory> IDomainCategory.Categories => this.Categories;
 
         #endregion
 
         #region IDomainItem
 
-        IDomainItem IDomainItem.Parent
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        IDomainItem IDomainItem.Parent => this.Parent;
 
         IEnumerable<IDomainItem> IDomainItem.Childs
         {
             get
             {
-                this.Dispatcher.VerifyAccess();
                 foreach (var item in this.Categories)
                 {
                     yield return item;

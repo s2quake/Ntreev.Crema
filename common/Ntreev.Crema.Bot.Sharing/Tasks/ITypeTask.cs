@@ -255,11 +255,11 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod]
         public void SetTags(IType type, TaskContext context)
         {
-            type.Dispatcher.Invoke(() =>
+            var tags = (TagInfo)TagInfoUtility.Names.Random();
+            var template = type.Template;
+            template.Dispatcher.Invoke(() => template.BeginEdit(context.Authentication));
+            template.Dispatcher.Invoke(() =>
             {
-                var tags = (TagInfo)TagInfoUtility.Names.Random();
-                var template = type.Template;
-                template.BeginEdit(context.Authentication);
                 try
                 {
                     template.SetTags(context.Authentication, tags);

@@ -245,14 +245,7 @@ namespace Ntreev.Crema.Services.Data
 
         public string Comment => this.TypeSource.Comment;
 
-        public TypeMember this[string memberName]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.members.FirstOrDefault(item => item.Name == memberName);
-            }
-        }
+        public TypeMember this[string memberName] => this.members.FirstOrDefault(item => item.Name == memberName);
 
         public bool IsModified => this.isModified;
 
@@ -465,44 +458,40 @@ namespace Ntreev.Crema.Services.Data
 
         private void Domain_Deleted(object sender, DomainDeletedEventArgs e)
         {
-            var isCanceled = e.IsCanceled;
-            this.Dispatcher?.InvokeAsync(() =>
+            if (e.IsCanceled == false)
             {
-                if (isCanceled == false)
-                {
-                    this.OnEndEdit(e.Authentication);
-                    this.OnEditEnded(e);
-                }
-                else
-                {
-                    this.OnCancelEdit(e.Authentication);
-                    this.OnEditCanceled(e);
-                }
-            });
+                this.OnEndEdit(e.Authentication);
+                this.OnEditEnded(e);
+            }
+            else
+            {
+                this.OnCancelEdit(e.Authentication);
+                this.OnEditCanceled(e);
+            }
         }
 
         private void Domain_RowAdded(object sender, DomainRowEventArgs e)
         {
             this.isModified = this.domain.IsModified;
-            this.Dispatcher.InvokeAsync(() => this.OnChanged(e));
+            this.OnChanged(e);
         }
 
         private void Domain_RowChanged(object sender, DomainRowEventArgs e)
         {
             this.isModified = this.domain.IsModified;
-            this.Dispatcher.InvokeAsync(() => this.OnChanged(e));
+            this.OnChanged(e);
         }
 
         private void Domain_RowRemoved(object sender, DomainRowEventArgs e)
         {
             this.isModified = this.domain.IsModified;
-            this.Dispatcher.InvokeAsync(() => this.OnChanged(e));
+            this.OnChanged(e);
         }
 
         private void Domain_PropertyChanged(object sender, DomainPropertyEventArgs e)
         {
             this.isModified = this.domain.IsModified;
-            this.Dispatcher.InvokeAsync(() => this.OnChanged(e));
+            this.OnChanged(e);
         }
 
         private void AttachDomainEvent()
@@ -598,13 +587,11 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITypeMember> IEnumerable<ITypeMember>.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.members.GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.members.GetEnumerator();
         }
 

@@ -37,52 +37,52 @@ namespace Ntreev.Crema.Bot.Tasks
         public void InvokeTask(TaskContext context)
         {
             var content = context.Target as ITableContent;
-            content.Dispatcher.Invoke(() =>
+
+            if (context.IsCompleted(content) == true)
             {
-                if (context.IsCompleted(content) == true)
+                var domain = content.Domain;
+                if (domain != null && RandomUtility.Within(50) == true)
                 {
-                    var domain = content.Domain;
-                    if (domain != null && RandomUtility.Within(50) == true)
+                    content.Dispatcher.Invoke(() =>
                     {
-                        var isMember = domain.Dispatcher.Invoke(() =>
-                        {
-                            if (domain.Users.Contains(context.Authentication.ID) == false)
-                                return false;
-                            var user = domain.Users[context.Authentication.ID];
-                            return user.DomainUserState.HasFlag(DomainUserState.Online);
-                        });
+                        if (domain.Users.Contains(context.Authentication.ID) == false)
+                            return;
+                        var user = domain.Users[context.Authentication.ID];
+                        var isMember = user.DomainUserState.HasFlag(DomainUserState.Online);
                         if (isMember == true)
                         {
                             content.LeaveEdit(context.Authentication);
                         }
-                        var isEmpty = domain.Dispatcher.Invoke(() => domain.Users.Any() == false);
-                        if (isEmpty == true)
+                        if (domain.Users.Any() == false)
                         {
                             content.EndEdit(context.Authentication);
                         }
-                    }
-                    context.Pop(content);
-                    context.Complete(context.Target);
+                    });
                 }
-                else
+                context.Pop(content);
+                context.Complete(context.Target);
+            }
+            else
+            {
+                content.Dispatcher.Invoke(() =>
                 {
                     if (content.Domain == null)
                         content.BeginEdit(context.Authentication);
+                });
 
+                content.Dispatcher.Invoke(() =>
+                {
                     var domain = content.Domain;
-                    var isMember = domain.Dispatcher.Invoke(() =>
-                    {
-                        if (domain.Users.Contains(context.Authentication.ID) == false)
-                            return false;
-                        var user = domain.Users[context.Authentication.ID];
-                        return user.DomainUserState.HasFlag(DomainUserState.Online);
-                    });
-                    if (isMember == false)
+                    var user = domain.Users[context.Authentication.ID];
+                    if (user == null || user.DomainUserState.HasFlag(DomainUserState.Online) == false)
                     {
                         content.EnterEdit(context.Authentication);
                     }
+                });
 
-                    if (content.Any() == false || RandomUtility.Within(25) == true)
+                if (content.Any() == false || RandomUtility.Within(25) == true)
+                {
+                    content.Dispatcher.Invoke(() =>
                     {
                         var row = this.AddNewRow(context.Authentication, content);
                         if (row != null)
@@ -91,25 +91,25 @@ namespace Ntreev.Crema.Bot.Tasks
                             context.Push(row);
                             context.State = System.Data.DataRowState.Detached;
                         }
-                    }
-                    else
-                    {
-                        var member = content.Random();
-                        context.Push(member);
-                    }
+                    });
                 }
-            });
+                else
+                {
+                    var member = content.Random();
+                    context.Push(member);
+                }
+            }
         }
 
         private ITableRow AddNewRow(Authentication authentication, ITableContent content)
         {
             var table = content.Table;
-            var parentContent = table.Parent.Content;
-            if (parentContent != null)
+            var parent = table.Parent;
+            if (parent != null)
             {
-                if (parentContent.Any() == false)
+                if (parent.Content.Any() == false)
                     return null;
-                var relationID = parentContent.Random().RelationID;
+                var relationID = parent.Content.Random().RelationID;
                 return content.AddNew(authentication, relationID);
             }
             return content.AddNew(authentication, null);

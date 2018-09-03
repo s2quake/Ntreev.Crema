@@ -46,7 +46,6 @@ namespace Ntreev.Crema.Services.Domains
 
         public bool Contains(string userID)
         {
-            this.Dispatcher.VerifyAccess();
             return base.ContainsKey(userID);
         }
 
@@ -102,36 +101,20 @@ namespace Ntreev.Crema.Services.Domains
                     break;
             }
         }
-        
+
         #region IDomainUserCollection
 
-        IDomainUser IDomainUserCollection.this[string userID]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[userID];
-            }
-        }
+        IDomainUser IDomainUserCollection.this[string userID] => this[userID];
 
-        IDomainUser IDomainUserCollection.Owner
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Owner;
-            }
-        }
+        IDomainUser IDomainUserCollection.Owner => this.Owner;
 
         IEnumerator<IDomainUser> IEnumerable<IDomainUser>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 

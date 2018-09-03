@@ -166,23 +166,9 @@ namespace Ntreev.Crema.Services.Users
 
         public string ItemPath => this.Context.GenerateCategoryPath(base.Path);
 
-        public new string Name
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Name;
-            }
-        }
+        public new string Name => base.Name;
 
-        public new string Path
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Path;
-            }
-        }
+        public new string Path => base.Path;
 
         public new event EventHandler Renamed
         {
@@ -243,51 +229,22 @@ namespace Ntreev.Crema.Services.Users
             return this.AddNewUser(authentication, userID, password, userName, authority);
         }
 
-        IUserCategory IUserCategory.Parent
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        IUserCategory IUserCategory.Parent => this.Parent;
 
-        IContainer<IUser> IUserCategory.Users
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Items;
-            }
-        }
+        IContainer<IUser> IUserCategory.Users => this.Items;
 
-        IContainer<IUserCategory> IUserCategory.Categories
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        IContainer<IUserCategory> IUserCategory.Categories => this.Categories;
 
         #endregion
 
         #region IUserItem
 
-        IUserItem IUserItem.Parent
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        IUserItem IUserItem.Parent => this.Parent;
 
         IEnumerable<IUserItem> IUserItem.Childs
         {
             get
             {
-                this.Dispatcher?.VerifyAccess();
                 foreach (var item in this.Categories)
                 {
                     yield return item;

@@ -563,45 +563,16 @@ namespace Ntreev.Crema.Services.Users
 
         bool IUserContext.Contains(string itemPath)
         {
-            this.Dispatcher.VerifyAccess();
             return this.Contains(itemPath);
         }
 
-        IUserCollection IUserContext.Users
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Users;
-            }
-        }
+        IUserCollection IUserContext.Users => this.Users;
 
-        IUserCategoryCollection IUserContext.Categories
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        IUserCategoryCollection IUserContext.Categories => this.Categories;
 
-        IUserItem IUserContext.this[string itemPath]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[itemPath] as IUserItem;
-            }
-        }
+        IUserItem IUserContext.this[string itemPath] => this[itemPath] as IUserItem;
 
-        IUserCategory IUserContext.Root
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Root;
-            }
-        }
+        IUserCategory IUserContext.Root => this.Root;
 
         #endregion
 
@@ -609,7 +580,6 @@ namespace Ntreev.Crema.Services.Users
 
         IEnumerator<IUserItem> IEnumerable<IUserItem>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IUserItem;
@@ -618,7 +588,6 @@ namespace Ntreev.Crema.Services.Users
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IUserItem;

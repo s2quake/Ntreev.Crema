@@ -1023,23 +1023,9 @@ namespace Ntreev.Crema.Services.Domains
 
         #region IDomain
 
-        IDomainUserCollection IDomain.Users
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Users;
-            }
-        }
+        IDomainUserCollection IDomain.Users => this.Users;
 
-        DomainInfo IDomain.DomainInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.DomainInfo;
-            }
-        }
+        DomainInfo IDomain.DomainInfo => base.DomainInfo;
 
         object IDomain.Host => this.Host;
 
@@ -1047,23 +1033,9 @@ namespace Ntreev.Crema.Services.Domains
 
         #region IDomainItem
 
-        IDomainItem IDomainItem.Parent
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Category;
-            }
-        }
+        IDomainItem IDomainItem.Parent => this.Category;
 
-        IEnumerable<IDomainItem> IDomainItem.Childs
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return Enumerable.Empty<IDomainItem>();
-            }
-        }
+        IEnumerable<IDomainItem> IDomainItem.Childs => Enumerable.Empty<IDomainItem>();
 
         #endregion
 

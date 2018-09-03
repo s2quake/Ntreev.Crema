@@ -246,14 +246,7 @@ namespace Ntreev.Crema.Services.Data
 
         public IObjectSerializer Serializer => this.DataBase.Serializer;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public new int Count => base.Count;
 
         public event ItemsCreatedEventHandler<IType> TypesCreated
         {
@@ -415,18 +408,10 @@ namespace Ntreev.Crema.Services.Data
 
         bool ITypeCollection.Contains(string typeName)
         {
-            this.Dispatcher?.VerifyAccess();
             return this.Contains(typeName);
         }
 
-        IType ITypeCollection.this[string typeName]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this[typeName];
-            }
-        }
+        IType ITypeCollection.this[string typeName] => this[typeName];
 
         #endregion
 
@@ -434,13 +419,11 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<IType> IEnumerable<IType>.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.GetEnumerator();
         }
 

@@ -411,23 +411,9 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public new DataBase this[string dataBaseName]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base[dataBaseName];
-            }
-        }
+        public new DataBase this[string dataBaseName] => base[dataBaseName];
 
-        public DataBase this[Guid dataBaseID]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.FirstOrDefault<DataBase>(item => item.ID == dataBaseID);
-            }
-        }
+        public DataBase this[Guid dataBaseID] => this.FirstOrDefault<DataBase>(item => item.ID == dataBaseID);
 
         public DataBase AddFromPath(string path)
         {
@@ -444,14 +430,7 @@ namespace Ntreev.Crema.Services.Data
 
         public string RemotePath => this.remotesPath;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public new int Count => base.Count;
 
         public event ItemsCreatedEventHandler<IDataBase> ItemsCreated
         {
@@ -858,27 +837,12 @@ namespace Ntreev.Crema.Services.Data
 
         bool IDataBaseCollection.Contains(string dataBaseName)
         {
-            this.Dispatcher.VerifyAccess();
             return this.ContainsKey(dataBaseName);
         }
 
-        IDataBase IDataBaseCollection.this[string dataBaseName]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[dataBaseName];
-            }
-        }
+        IDataBase IDataBaseCollection.this[string dataBaseName] => this[dataBaseName];
 
-        IDataBase IDataBaseCollection.this[Guid dataBaseID]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[dataBaseID];
-            }
-        }
+        IDataBase IDataBaseCollection.this[Guid dataBaseID] => this[dataBaseID];
 
         #endregion
 
@@ -886,13 +850,11 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<IDataBase> IEnumerable<IDataBase>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 

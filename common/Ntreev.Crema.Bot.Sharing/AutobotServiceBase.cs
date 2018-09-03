@@ -32,13 +32,13 @@ namespace Ntreev.Crema.Bot
     public abstract class AutobotServiceBase
     {
         private const string masterBotID = "Smith";
-        private ICremaHost cremaHost;
-        private object lockobj = new object();
-        private IEnumerable<ITaskProvider> taskProviders;
-        private List<AutobotBase> botList = new List<AutobotBase>();
-        private List<Task> taskList = new List<Task>();
-        private bool isPlaying;
+        private readonly ICremaHost cremaHost;
+        private readonly IEnumerable<ITaskProvider> taskProviders;
+        private readonly List<AutobotBase> botList = new List<AutobotBase>();
+        private readonly List<Task> taskList = new List<Task>();
+        //private bool isPlaying;
         //private bool isStopping;
+        private CremaDispatcher dispatcher;
 
         protected AutobotServiceBase(ICremaHost cremaHost, IEnumerable<ITaskProvider> taskProviders)
         {
@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Bot
 
         public void AddAutobot(Authentication authentication, string autobotID, Authority authority)
         {
-            lock (this.lockobj)
+            this.dispatcher.VerifyAccess();
             {
                 var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
 
@@ -88,19 +88,18 @@ namespace Ntreev.Crema.Bot
 
         public void Start(Authentication authentication)
         {
-            lock (this.lockobj)
-            {
-                if (this.isPlaying == true)
-                    return;
-                this.AddAutobot(authentication, masterBotID, Authority.Admin);
-                this.isPlaying = true;
-            }
+            if (this.dispatcher != null)
+                throw new InvalidOperationException();
+
+            this.dispatcher = new CremaDispatcher(this);
+            this.dispatcher.Invoke(() => this.AddAutobot(authentication, masterBotID, Authority.Admin));
         }
 
         public void Stop()
         {
-            if (this.isPlaying == false)
-                return;
+            if (this.dispatcher == null)
+                throw new InvalidOperationException();
+            this.dispatcher.VerifyAccess();
             foreach (var item in this.botList.ToArray())
             {
                 item.Cancel();
@@ -111,12 +110,13 @@ namespace Ntreev.Crema.Bot
                 (item as IDisposable).Dispose();
             }
             this.taskList.Clear();
-            this.isPlaying = false;
+            this.dispatcher.Dispose();
+            this.dispatcher = null;
         }
 
         public bool IsPlaying
         {
-            get { return this.isPlaying; }
+            get { return this.dispatcher != null; }
         }
 
         public ITaskProvider[] TaskProviders
@@ -129,15 +129,20 @@ namespace Ntreev.Crema.Bot
             get; set;
         }
 
+        public CremaDispatcher Dispatcher => this.dispatcher;
+
         protected abstract AutobotBase CreateInstance(string autobotID);
 
         private void CremaHost_Closing(object sender, EventArgs e)
         {
-            foreach (var item in this.botList)
+            this.dispatcher.Invoke(() =>
             {
-                item.Cancel();
-            }
-            Task.WaitAll(this.taskList.ToArray());
+                foreach (var item in this.botList)
+                {
+                    item.Cancel();
+                }
+                Task.WaitAll(this.taskList.ToArray());
+            });
         }
     }
 }

@@ -56,10 +56,7 @@ namespace Ntreev.Crema.Bot
 
         protected override void OnLogout(Authentication authentication)
         {
-            this.cremaHost.Dispatcher.Invoke(() =>
-            {
-                this.cremaHost.Logout(authentication);
-            });
+            this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.Logout(authentication));
         }
     }
 }

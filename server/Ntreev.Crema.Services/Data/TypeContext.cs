@@ -616,45 +616,16 @@ namespace Ntreev.Crema.Services.Data
 
         bool ITypeContext.Contains(string itemPath)
         {
-            this.Dispatcher?.VerifyAccess();
             return this.Contains(itemPath);
         }
 
-        ITypeCollection ITypeContext.Types
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Types;
-            }
-        }
+        ITypeCollection ITypeContext.Types => this.Types;
 
-        ITypeCategoryCollection ITypeContext.Categories
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        ITypeCategoryCollection ITypeContext.Categories => this.Categories;
 
-        ITypeCategory ITypeContext.Root
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Root;
-            }
-        }
+        ITypeCategory ITypeContext.Root => this.Root;
 
-        ITypeItem ITypeContext.this[string itemPath]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this[itemPath] as ITypeItem;
-            }
-        }
+        ITypeItem ITypeContext.this[string itemPath] => this[itemPath] as ITypeItem;
 
         #endregion
 
@@ -662,7 +633,6 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITypeItem> IEnumerable<ITypeItem>.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as ITypeItem;
@@ -671,7 +641,6 @@ namespace Ntreev.Crema.Services.Data
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as ITypeItem;

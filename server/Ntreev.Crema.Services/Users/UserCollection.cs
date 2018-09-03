@@ -304,14 +304,7 @@ namespace Ntreev.Crema.Services.Users
 
         public IObjectSerializer Serializer => this.Context.Serializer;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public new int Count => base.Count;
 
         public event ItemsCreatedEventHandler<IUser> UsersCreated
         {
@@ -571,18 +564,10 @@ namespace Ntreev.Crema.Services.Users
 
         bool IUserCollection.Contains(string userID)
         {
-            this.Dispatcher.VerifyAccess();
             return base.Contains(userID);
         }
 
-        IUser IUserCollection.this[string userID]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[userID];
-            }
-        }
+        IUser IUserCollection.this[string userID] => this[userID];
 
         #endregion
 
@@ -590,13 +575,11 @@ namespace Ntreev.Crema.Services.Users
 
         IEnumerator<IUser> IEnumerable<IUser>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 

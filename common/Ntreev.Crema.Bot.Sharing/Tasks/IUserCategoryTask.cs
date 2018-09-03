@@ -100,6 +100,8 @@ namespace Ntreev.Crema.Bot.Tasks
                     return false;
                 if (category.Path == categoryPath)
                     return false;
+                if (category.Parent.Path == categoryPath)
+                    return false;
                 return true;
             }
         }

@@ -27,24 +27,22 @@ namespace Ntreev.Crema.Services.Data
 {
     class TableRow : DomainBasedRow, ITableRow
     {
-        private readonly TableContentBase content;
-
         public TableRow(TableContentBase content, DataRow row)
             : base(content.Domain, row)
         {
-            this.content = content;
+            this.Content = content;
         }
 
         public TableRow(TableContentBase content, DataTable table)
             : base(content.Domain, table)
         {
-            this.content = content;
+            this.Content = content;
         }
 
         public TableRow(TableContentBase content, DataTable table, string parentID)
             : base(content.Domain, table, parentID)
         {
-            this.content = content;
+            this.Content = content;
         }
 
         public void SetIsEnabled(Authentication authentication, bool value)
@@ -71,59 +69,28 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public object this[string columnName]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.GetField<object>(columnName);
-            }
-        }
+        public object this[string columnName] => base.GetField<object>(columnName);
 
-        public TagInfo Tags
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return (TagInfo)(this.GetField<string>(CremaSchema.Tags));
-            }
-        }
+        public TagInfo Tags => (TagInfo)(this.GetField<string>(CremaSchema.Tags));
 
-        public bool IsEnabled
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<bool>(CremaSchema.Enable);
-            }
-        }
+        public bool IsEnabled => this.GetField<bool>(CremaSchema.Enable);
 
-        public TableContentBase Content
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.content;
-            }
-        }
+        public TableContentBase Content { get; }
 
-        public override DataBase DataBase => this.content.DataBase;
+        public override DataBase DataBase => this.Content.DataBase;
 
-        public override CremaDispatcher Dispatcher => this.content.Dispatcher;
+        public override CremaDispatcher Dispatcher => this.Content.Dispatcher;
 
-        public override CremaHost CremaHost => this.content.CremaHost;
+        public override CremaHost CremaHost => this.Content.CremaHost;
 
         public string RelationID
         {
             get
             {
-                this.Dispatcher?.VerifyAccess();
                 var dataRow = this.Row;
                 var table = dataRow.Table;
-
                 if (table.Columns.Contains(CremaSchema.__RelationID__) == false)
                     return string.Empty;
-
                 return dataRow.Field<string>(CremaSchema.__RelationID__);
             }
         }
@@ -132,13 +99,10 @@ namespace Ntreev.Crema.Services.Data
         {
             get
             {
-                this.Dispatcher?.VerifyAccess();
                 var dataRow = this.Row;
                 var table = dataRow.Table;
-
                 if (table.Columns.Contains(CremaSchema.__ParentID__) == false)
                     return string.Empty;
-
                 return dataRow.Field<string>(CremaSchema.__ParentID__);
             }
         }

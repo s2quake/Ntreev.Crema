@@ -465,59 +465,17 @@ namespace Ntreev.Crema.Services.Data
             this.templateList.Add(template);
         }
 
-        public new string Name
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Name;
-            }
-        }
+        public new string Name => base.Name;
 
-        public new string Path
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Path;
-            }
-        }
+        public new string Path => base.Path;
 
-        public new bool IsLocked
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.IsLocked;
-            }
-        }
+        public new bool IsLocked => base.IsLocked;
 
-        public new bool IsPrivate
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.IsPrivate;
-            }
-        }
+        public new bool IsPrivate => base.IsPrivate;
 
-        public new AccessInfo AccessInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.AccessInfo;
-            }
-        }
+        public new AccessInfo AccessInfo => base.AccessInfo;
 
-        public new LockInfo LockInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.LockInfo;
-            }
-        }
+        public new LockInfo LockInfo => base.LockInfo;
 
         public new event EventHandler Renamed
         {
@@ -631,56 +589,26 @@ namespace Ntreev.Crema.Services.Data
             return this.NewType(authentication);
         }
 
-        ITypeCategory ITypeCategory.Parent
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        ITypeCategory ITypeCategory.Parent => this.Parent;
 
-        IContainer<ITypeCategory> ITypeCategory.Categories
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        IContainer<ITypeCategory> ITypeCategory.Categories => this.Categories;
 
-        IContainer<IType> ITypeCategory.Types
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Types;
-            }
-        }
+        IContainer<IType> ITypeCategory.Types => this.Types;
 
         #endregion
 
         #region ITypeItem
 
-        ITypeItem ITypeItem.Parent
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        ITypeItem ITypeItem.Parent => this.Parent;
 
         IEnumerable<ITypeItem> ITypeItem.Childs
         {
             get
             {
-                this.Dispatcher?.VerifyAccess();
                 foreach (var item in this.Categories)
                 {
                     yield return item;
                 }
-
                 foreach (var item in this.Items)
                 {
                     yield return item;

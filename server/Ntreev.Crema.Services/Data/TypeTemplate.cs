@@ -80,9 +80,12 @@ namespace Ntreev.Crema.Services.Data
 
         protected override void OnEndEdit(Authentication authentication)
         {
-            this.Container.Dispatcher.Invoke(() => this.Container.InvokeTypeEndTemplateEdit(authentication, this.type, this.TypeSource.DataSet));
+            this.DispatcherObject.Dispatcher.Invoke(() =>
+            {
+                this.Container.InvokeTypeEndTemplateEdit(authentication, this.type, this.TypeSource.DataSet);
+            });
             base.OnEndEdit(authentication);
-            this.Container.Dispatcher.Invoke(() =>
+            this.DispatcherObject.Dispatcher.Invoke(() =>
             {
                 this.type.UpdateTypeInfo(this.TypeSource.TypeInfo);
                 this.type.IsBeingEdited = false;
@@ -94,7 +97,7 @@ namespace Ntreev.Crema.Services.Data
         protected override void OnCancelEdit(Authentication authentication)
         {
             base.OnCancelEdit(authentication);
-            this.Container.Dispatcher.Invoke(() =>
+            this.DispatcherObject.Dispatcher.Invoke(() =>
             {
                 this.type.IsBeingEdited = false;
                 this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });

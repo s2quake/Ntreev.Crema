@@ -169,14 +169,7 @@ namespace Ntreev.Crema.Services.Users
 
         public IObjectSerializer Serializer => this.Context.Serializer;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public new int Count => base.Count;
 
         public event ItemsCreatedEventHandler<IUserCategory> CategoriesCreated
         {
@@ -285,27 +278,12 @@ namespace Ntreev.Crema.Services.Users
 
         bool IUserCategoryCollection.Contains(string categoryPath)
         {
-            this.Dispatcher.VerifyAccess();
             return this.Contains(categoryPath);
         }
 
-        IUserCategory IUserCategoryCollection.Root
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Root;
-            }
-        }
+        IUserCategory IUserCategoryCollection.Root => this.Root;
 
-        IUserCategory IUserCategoryCollection.this[string categoryPath]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[categoryPath];
-            }
-        }
+        IUserCategory IUserCategoryCollection.this[string categoryPath] => this[categoryPath];
 
         #endregion
 
@@ -313,13 +291,11 @@ namespace Ntreev.Crema.Services.Users
 
         IEnumerator<IUserCategory> IEnumerable<IUserCategory>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 

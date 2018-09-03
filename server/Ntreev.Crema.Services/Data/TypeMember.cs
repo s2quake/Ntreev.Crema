@@ -105,41 +105,13 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public int Index
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<int>(CremaSchema.Index);
-            }
-        }
+        public int Index => this.GetField<int>(CremaSchema.Index);
 
-        public string Name
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<string>(CremaSchema.Name);
-            }
-        }
+        public string Name => this.GetField<string>(CremaSchema.Name);
 
-        public long Value
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<long>(CremaSchema.Value);
-            }
-        }
+        public long Value => this.GetField<long>(CremaSchema.Value);
 
-        public string Comment
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<string>(CremaSchema.Comment);
-            }
-        }
+        public string Comment => this.GetField<string>(CremaSchema.Comment);
 
         public override DataBase DataBase => this.template.DataBase;
 
@@ -156,14 +128,7 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITypeTemplate
 
-        ITypeTemplate ITypeMember.Template
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.template;
-            }
-        }
+        ITypeTemplate ITypeMember.Template => this.template;
 
         #endregion
     }

@@ -184,7 +184,6 @@ namespace Ntreev.Crema.Services.Domains
 
         public bool Contains(Guid domainID)
         {
-            this.Dispatcher.VerifyAccess();
             return this.Contains(domainID.ToString());
         }
 
@@ -202,27 +201,13 @@ namespace Ntreev.Crema.Services.Domains
             return metaDataList.ToArray();
         }
 
-        public Domain this[Guid domainID]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[domainID.ToString()];
-            }
-        }
+        public Domain this[Guid domainID] => this[domainID.ToString()];
 
         public CremaHost CremaHost => this.Context.CremaHost;
 
         public CremaDispatcher Dispatcher => this.Context.Dispatcher;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public new int Count => base.Count;
 
         public event EventHandler<DomainEventArgs> DomainCreated
         {
@@ -453,13 +438,11 @@ namespace Ntreev.Crema.Services.Domains
 
         IEnumerator<IDomain> IEnumerable<IDomain>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
