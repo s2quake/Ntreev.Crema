@@ -29,11 +29,11 @@ namespace Ntreev.Crema.Services
 {
     public interface ITypeItem : IAccessible, ILockable, IPermission, IServiceProvider, IDispatcherObject, IExtendedProperties
     {
-        void Rename(Authentication authentication, string name);
+        Task RenameAsync(Authentication authentication, string name);
 
-        void Move(Authentication authentication, string parentPath);
+        Task MoveAsync(Authentication authentication, string parentPath);
 
-        void Delete(Authentication authentication);
+        Task DeleteAsync(Authentication authentication);
 
         LogInfo[] GetLog(Authentication authentication, string revision);
 

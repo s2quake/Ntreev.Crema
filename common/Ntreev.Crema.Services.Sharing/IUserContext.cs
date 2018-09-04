@@ -26,11 +26,11 @@ namespace Ntreev.Crema.Services
 {
     public interface IUserContext : IEnumerable<IUserItem>, IServiceProvider, IDispatcherObject
     {
-        UserContextMetaData GetMetaData(Authentication authentication);
+        Task<UserContextMetaData> GetMetaDataAsync(Authentication authentication);
 
-        void NotifyMessage(Authentication authentication, string[] userIDs, string message);
+        Task NotifyMessageAsync(Authentication authentication, string[] userIDs, string message);
 
-        bool Contains(string itemPath);
+        Task<bool> ContainsAsync(string itemPath);
 
         IUserCollection Users { get; }
 
@@ -51,23 +51,23 @@ namespace Ntreev.Crema.Services
         event ItemsEventHandler<IUserItem> ItemsChanged;
 
 #if SERVER
-        Authentication Login(string userID, SecureString password);
+        Task<Authentication> LoginAsync(string userID, SecureString password);
 
-        void Logout(Authentication authentication);
+        Task LogoutAsync(Authentication authentication);
 
-        Authentication Authenticate(Guid authenticationToken);
+        Task<Authentication> AuthenticateAsync(Guid authenticationToken);
 
-        bool IsAuthenticated(string userID);
+        Task<bool> IsAuthenticatedAsync(string userID);
 
-        bool IsOnlineUser(string userID, SecureString password);
+        Task<bool> IsOnlineUserAsync(string userID, SecureString password);
 #endif
     }
 
     public static class IUserContextExtensions
     {
-        public static void NotifyMessage(this IUserContext userContext, Authentication authentication, string message)
+        public static Task NotifyMessageAsync(this IUserContext userContext, Authentication authentication, string message)
         {
-            userContext.NotifyMessage(authentication, new string[] { }, message);
+            return userContext.NotifyMessageAsync(authentication, new string[] { }, message);
         }
     }
 }

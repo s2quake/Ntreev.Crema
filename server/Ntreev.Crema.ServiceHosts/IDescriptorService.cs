@@ -32,7 +32,7 @@ namespace Ntreev.Crema.ServiceHosts
         string GetVersion();
 
         [OperationContract]
-        bool IsOnline(string userID, byte[] password);
+        Task<bool> IsOnlineAsync(string userID, byte[] password);
 
         [OperationContract]
         DataBaseInfo[] GetDataBaseInfos();

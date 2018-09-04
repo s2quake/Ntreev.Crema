@@ -19,6 +19,7 @@ using Ntreev.Crema.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
@@ -26,15 +27,15 @@ namespace Ntreev.Crema.Commands.Consoles
     {
         string[] GetPaths();
 
-        void Create(Authentication authentication, string path, string name);
+        Task CreateAsync(Authentication authentication, string path, string name);
 
-        void Move(Authentication authentication, string path, string newPath);
+        Task MoveAsync(Authentication authentication, string path, string newPath);
 
-        void Delete(Authentication authentication, string path);
+        Task DeleteAsync(Authentication authentication, string path);
 
-        void SetPath(Authentication authentication, string path);
+        Task SetPathAsync(Authentication authentication, string path);
 
-        object GetObject(Authentication authentication, string path);
+        Task<object> GetObjectAsync(Authentication authentication, string path);
 
         string Name { get; }
     }

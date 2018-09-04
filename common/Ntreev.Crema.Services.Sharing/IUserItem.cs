@@ -25,11 +25,11 @@ namespace Ntreev.Crema.Services
 {
     public interface IUserItem : IServiceProvider, IDispatcherObject, IExtendedProperties
     {
-        void Rename(Authentication authentication, string newName);
+        Task RenameAsync(Authentication authentication, string newName);
 
-        void Move(Authentication authentication, string parentPath);
+        Task MoveAsync(Authentication authentication, string parentPath);
 
-        void Delete(Authentication authentication);
+        Task DeleteAsync(Authentication authentication);
 
         string Name { get; }
 

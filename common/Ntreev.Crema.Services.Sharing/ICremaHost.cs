@@ -21,6 +21,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Security;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 namespace Ntreev.Crema.Services
 {
@@ -36,11 +37,11 @@ namespace Ntreev.Crema.Services
         Authority Authority { get; }
 
 #elif SERVER
-        Guid Open();
+        Task<Guid> OpenAsync();
 
-        Authentication Login(string userID, SecureString password);
+        Task<Authentication> LoginAsync(string userID, SecureString password);
 
-        void Logout(Authentication authentication);
+        Task LogoutAsync(Authentication authentication);
 
         string GetPath(CremaPath pathType, params string[] paths);
 
@@ -59,9 +60,9 @@ namespace Ntreev.Crema.Services
 
         void Close(Guid token);
 
-        void Shutdown(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message);
+        Task ShutdownAsync(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message);
 
-        void CancelShutdown(Authentication authentication);
+        Task CancelShutdownAsync(Authentication authentication);
 
         bool IsOpened { get; }
 

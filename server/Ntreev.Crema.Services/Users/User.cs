@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Security;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users
 {
@@ -36,81 +37,27 @@ namespace Ntreev.Crema.Services.Users
 
         }
 
-        public void Rename(Authentication authentication, string newName)
+        public Task RenameAsync(Authentication authentication, string newName)
         {
-            this.Dispatcher?.VerifyAccess();
             throw new NotSupportedException();
         }
 
-        public void Move(Authentication authentication, string categoryPath)
+        public Task MoveAsync(Authentication authentication, string categoryPath)
         {
             try
             {
-                this.Dispatcher?.VerifyAccess();
-                this.CremaHost.DebugMethod(authentication, this, nameof(Move), this, categoryPath);
-                this.ValidateMove(authentication, categoryPath);
-                this.Sign(authentication);
-                var items = EnumerableUtility.One(this).ToArray();
-                var oldPaths = items.Select(item => item.Path).ToArray();
-                var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
-                this.Container.InvokeUserMove(authentication, this, categoryPath);
-                base.Move(authentication, categoryPath);
-                this.Container.InvokeUsersMovedEvent(authentication, items, oldPaths, oldCategoryPaths);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
-
-        public void Delete(Authentication authentication)
-        {
-            try
-            {
-                this.Dispatcher?.VerifyAccess();
-                this.CremaHost.DebugMethod(authentication, this, nameof(Delete), this);
-                this.ValidateDelete(authentication);
-                this.Sign(authentication);
-                var items = EnumerableUtility.One(this).ToArray();
-                var oldPaths = items.Select(item => item.Path).ToArray();
-                var container = this.Container;
-                container.InvokeUserDelete(authentication, this);
-                base.Delete(authentication);
-                container.InvokeUsersDeletedEvent(authentication, items, oldPaths);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
-
-        public Authentication Login(SecureString password)
-        {
-            try
-            {
-                this.Dispatcher?.VerifyAccess();
-                this.CremaHost.DebugMethod(Authentication.System, this, nameof(Login), this);
-                this.ValidateLogin(password);
-
-                var users = new User[] { this };
-                var authentication = new Authentication(new UserAuthenticationProvider(this), Guid.NewGuid());
-                this.Sign(authentication);
-
-                if (this.Authentication != null)
+                return this.Dispatcher.InvokeAsync(() =>
                 {
-                    var message = "다른 기기에서 동일한 아이디로 접속하였습니다.";
-                    var closeInfo = new CloseInfo(CloseReason.Reconnected, message);
-                    this.Authentication.InvokeExpiredEvent(this.ID, message);
-                    this.Container.InvokeUsersLoggedOutEvent(this.Authentication, users, closeInfo);
-                }
-
-                this.Authentication = authentication;
-                this.IsOnline = true;
-                this.Container.InvokeUsersStateChangedEvent(this.Authentication, users);
-                this.Container.InvokeUsersLoggedInEvent(this.Authentication, users);
-                return this.Authentication;
+                    this.CremaHost.DebugMethod(authentication, this, nameof(Move), this, categoryPath);
+                    this.ValidateMove(authentication, categoryPath);
+                    this.Sign(authentication);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var oldPaths = items.Select(item => item.Path).ToArray();
+                    var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
+                    this.Container.InvokeUserMove(authentication, this, categoryPath);
+                    base.Move(authentication, categoryPath);
+                    this.Container.InvokeUsersMovedEvent(authentication, items, oldPaths, oldCategoryPaths);
+                });
             }
             catch (Exception e)
             {
@@ -119,20 +66,22 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public void Logout(Authentication authentication)
+        public Task DeleteAsync(Authentication authentication)
         {
             try
             {
-                this.Dispatcher?.VerifyAccess();
-                this.CremaHost.DebugMethod(authentication, this, nameof(Logout), this);
-                this.ValidateLogout(authentication);
-                this.Sign(authentication);
-                var users = new User[] { this };
-                this.Authentication.InvokeExpiredEvent(authentication.ID, string.Empty);
-                this.Authentication = null;
-                this.IsOnline = false;
-                this.Container.InvokeUsersStateChangedEvent(authentication, users);
-                this.Container.InvokeUsersLoggedOutEvent(authentication, users, CloseInfo.Empty);
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(Delete), this);
+                    this.ValidateDelete(authentication);
+                    this.Sign(authentication);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var oldPaths = items.Select(item => item.Path).ToArray();
+                    var container = this.Container;
+                    container.InvokeUserDelete(authentication, this);
+                    base.Delete(authentication);
+                    container.InvokeUsersDeletedEvent(authentication, items, oldPaths);
+                });
             }
             catch (Exception e)
             {
@@ -141,33 +90,146 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public void Ban(Authentication authentication, string comment)
+        public Task<Authentication> LoginAsync(SecureString password)
         {
             try
             {
-                this.Dispatcher?.VerifyAccess();
-                this.CremaHost.DebugMethod(authentication, this, nameof(Ban), this, comment);
-                this.ValidateBan(authentication, comment);
-                this.Sign(authentication);
-                var users = new User[] { this };
-                var comments = Enumerable.Repeat(comment, users.Length).ToArray();
-                var banInfo = new BanInfo() { Path = this.Path, Comment = comment, SignatureDate = authentication.SignatureDate };
-                var isOnline = this.IsOnline;
-                var userInfo = new UserSerializationInfo(this.SerializationInfo)
+                return this.Dispatcher.InvokeAsync(() =>
                 {
-                    BanInfo = (BanSerializationInfo)banInfo
-                };
-                this.Container.InvokeUserBan(authentication, this, userInfo);
-                base.Ban(authentication, banInfo);
-                this.IsOnline = false;
-                this.Container.InvokeUsersBannedEvent(authentication, users, comments);
-                if (isOnline == true)
+                    this.CremaHost.DebugMethod(Authentication.System, this, nameof(LoginAsync), this);
+                    this.ValidateLogin(password);
+
+                    var users = new User[] { this };
+                    var authentication = new Authentication(new UserAuthenticationProvider(this), Guid.NewGuid());
+                    this.Sign(authentication);
+
+                    if (this.Authentication != null)
+                    {
+                        var message = "다른 기기에서 동일한 아이디로 접속하였습니다.";
+                        var closeInfo = new CloseInfo(CloseReason.Reconnected, message);
+                        this.Authentication.InvokeExpiredEvent(this.ID, message);
+                        this.Container.InvokeUsersLoggedOutEvent(this.Authentication, users, closeInfo);
+                    }
+
+                    this.Authentication = authentication;
+                    this.IsOnline = true;
+                    this.Container.InvokeUsersStateChangedEvent(this.Authentication, users);
+                    this.Container.InvokeUsersLoggedInEvent(this.Authentication, users);
+                    return this.Authentication;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public Task LogoutAsync(Authentication authentication)
+        {
+            try
+            {
+                return this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(LogoutAsync), this);
+                    this.ValidateLogout(authentication);
+                    this.Sign(authentication);
+                    var users = new User[] { this };
+                    this.Authentication.InvokeExpiredEvent(authentication.ID, string.Empty);
+                    this.Authentication = null;
+                    this.IsOnline = false;
+                    this.Container.InvokeUsersStateChangedEvent(authentication, users);
+                    this.Container.InvokeUsersLoggedOutEvent(authentication, users, CloseInfo.Empty);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public Task BanAsync(Authentication authentication, string comment)
+        {
+            try
+            {
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(Ban), this, comment);
+                    this.ValidateBan(authentication, comment);
+                    this.Sign(authentication);
+                    var users = new User[] { this };
+                    var comments = Enumerable.Repeat(comment, users.Length).ToArray();
+                    var banInfo = new BanInfo() { Path = this.Path, Comment = comment, SignatureDate = authentication.SignatureDate };
+                    var isOnline = this.IsOnline;
+                    var userInfo = new UserSerializationInfo(this.SerializationInfo)
+                    {
+                        BanInfo = (BanSerializationInfo)banInfo
+                    };
+                    this.Container.InvokeUserBan(authentication, this, userInfo);
+                    base.Ban(authentication, banInfo);
+                    this.IsOnline = false;
+                    this.Container.InvokeUsersBannedEvent(authentication, users, comments);
+                    if (isOnline == true)
+                    {
+                        this.Authentication.InvokeExpiredEvent(authentication.ID, comment);
+                        this.Authentication = null;
+                        this.Container.InvokeUsersStateChangedEvent(authentication, users);
+                        this.Container.InvokeUsersLoggedOutEvent(authentication, users, new CloseInfo(CloseReason.Banned, comment));
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public Task UnbanAsync(Authentication authentication)
+        {
+            try
+            {
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(Unban), this);
+                    this.ValidateUnban(authentication);
+                    this.Sign(authentication);
+                    var userInfo = new UserSerializationInfo(this.SerializationInfo)
+                    {
+                        BanInfo = (BanSerializationInfo)BanInfo.Empty
+                    };
+                    this.Container.InvokeUserUnban(authentication, this, userInfo);
+                    base.Unban(authentication);
+                    this.Container.InvokeUsersUnbannedEvent(authentication, new User[] { this });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public Task KickAsync(Authentication authentication, string comment)
+        {
+            try
+            {
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(KickAsync), this, comment);
+                    this.ValidateKick(authentication, comment);
+                    this.Sign(authentication);
+                    var users = new User[] { this };
+                    var comments = Enumerable.Repeat(comment, users.Length).ToArray();
+                    this.Container.InvokeUserKick(authentication, this, comment);
+                    this.IsOnline = false;
                     this.Authentication.InvokeExpiredEvent(authentication.ID, comment);
                     this.Authentication = null;
+                    this.Container.InvokeUsersKickedEvent(authentication, users, comments);
                     this.Container.InvokeUsersStateChangedEvent(authentication, users);
-                    this.Container.InvokeUsersLoggedOutEvent(authentication, users, new CloseInfo(CloseReason.Banned, comment));
-                }
+                    this.Container.InvokeUsersLoggedOutEvent(authentication, users, new CloseInfo(CloseReason.Kicked, comment));
+                });
             }
             catch (Exception e)
             {
@@ -176,21 +238,32 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public void Unban(Authentication authentication)
+        public Task ChangeUserInfoAsync(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority)
         {
             try
             {
-                this.Dispatcher?.VerifyAccess();
-                this.CremaHost.DebugMethod(authentication, this, nameof(Unban), this);
-                this.ValidateUnban(authentication);
-                this.Sign(authentication);
-                var userInfo = new UserSerializationInfo(this.SerializationInfo)
+                return this.Dispatcher.InvokeAsync(() =>
                 {
-                    BanInfo = (BanSerializationInfo)BanInfo.Empty
-                };
-                this.Container.InvokeUserUnban(authentication, this, userInfo);
-                base.Unban(authentication);
-                this.Container.InvokeUsersUnbannedEvent(authentication, new User[] { this });
+                    this.CremaHost.DebugMethod(authentication, this, nameof(ChangeUserInfoAsync), this, password, newPassword, userName, authority);
+                    this.ValidateUserInfoChange(authentication, password, newPassword, userName, authority);
+                    this.Sign(authentication);
+                    var serializationInfo = this.SerializationInfo;
+                    if (newPassword != null)
+                        serializationInfo.Password = UserContext.SecureStringToString(newPassword).Encrypt();
+                    if (userName != null)
+                        serializationInfo.Name = userName;
+                    if (authority.HasValue)
+                        serializationInfo.Authority = authority.Value;
+                    if (object.Equals(serializationInfo, this.SerializationInfo) == true)
+                        return;
+                    var items = EnumerableUtility.One(this).ToArray();
+                    serializationInfo.ModificationInfo = new SignatureDate(authentication.ID);
+                    this.Container.InvokeUserChange(authentication, this, serializationInfo);
+                    if (newPassword != null)
+                        this.Password = UserContext.StringToSecureString(serializationInfo.Password);
+                    base.UpdateUserInfo((UserInfo)serializationInfo);
+                    this.Container.InvokeUsersChangedEvent(authentication, items);
+                });
             }
             catch (Exception e)
             {
@@ -199,71 +272,16 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public void Kick(Authentication authentication, string comment)
+        public Task SendMessageAsync(Authentication authentication, string message)
         {
             try
             {
-                this.Dispatcher?.VerifyAccess();
-                this.CremaHost.DebugMethod(authentication, this, nameof(Kick), this, comment);
-                this.ValidateKick(authentication, comment);
-                this.Sign(authentication);
-                var users = new User[] { this };
-                var comments = Enumerable.Repeat(comment, users.Length).ToArray();
-                this.Container.InvokeUserKick(authentication, this, comment);
-                this.IsOnline = false;
-                this.Authentication.InvokeExpiredEvent(authentication.ID, comment);
-                this.Authentication = null;
-                this.Container.InvokeUsersKickedEvent(authentication, users, comments);
-                this.Container.InvokeUsersStateChangedEvent(authentication, users);
-                this.Container.InvokeUsersLoggedOutEvent(authentication, users, new CloseInfo(CloseReason.Kicked, comment));
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
-
-        public void ChangeUserInfo(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority)
-        {
-            try
-            {
-                this.Dispatcher?.VerifyAccess();
-                this.CremaHost.DebugMethod(authentication, this, nameof(Delete), this, password, newPassword, userName, authority);
-                this.ValidateUserInfoChange(authentication, password, newPassword, userName, authority);
-                this.Sign(authentication);
-                var serializationInfo = this.SerializationInfo;
-                if (newPassword != null)
-                    serializationInfo.Password = UserContext.SecureStringToString(newPassword).Encrypt();
-                if (userName != null)
-                    serializationInfo.Name = userName;
-                if (authority.HasValue)
-                    serializationInfo.Authority = authority.Value;
-                if (object.Equals(serializationInfo, this.SerializationInfo) == true)
-                    return;
-                var items = EnumerableUtility.One(this).ToArray();
-                serializationInfo.ModificationInfo = new SignatureDate(authentication.ID);
-                this.Container.InvokeUserChange(authentication, this, serializationInfo);
-                if (newPassword != null)
-                    this.Password = UserContext.StringToSecureString(serializationInfo.Password);
-                base.UpdateUserInfo((UserInfo)serializationInfo);
-                this.Container.InvokeUsersChangedEvent(authentication, items);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
-
-        public void SendMessage(Authentication authentication, string message)
-        {
-            try
-            {
-                this.Dispatcher?.VerifyAccess();
-                this.ValidateSendMessage(authentication, message);
-                this.Sign(authentication);
-                this.Container.InvokeSendMessageEvent(authentication, this, message);
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ValidateSendMessage(authentication, message);
+                    this.Sign(authentication);
+                    this.Container.InvokeSendMessageEvent(authentication, this, message);
+                });
             }
             catch (Exception e)
             {

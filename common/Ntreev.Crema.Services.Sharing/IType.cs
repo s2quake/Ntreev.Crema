@@ -26,11 +26,11 @@ namespace Ntreev.Crema.Services
 {
     public interface IType : IAccessible, ILockable, IPermission, IServiceProvider, IDispatcherObject, IExtendedProperties
     {
-        void Rename(Authentication authentication, string newName);
+        Task RenameAsync(Authentication authentication, string newName);
 
-        void Move(Authentication authentication, string categoryPath);
+        Task MoveAsync(Authentication authentication, string categoryPath);
 
-        void Delete(Authentication authentication);
+        Task DeleteAsync(Authentication authentication);
 
         IType Copy(Authentication authentication, string newTypeName, string categoryPath);
 

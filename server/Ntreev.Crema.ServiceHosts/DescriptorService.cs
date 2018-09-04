@@ -54,14 +54,11 @@ namespace Ntreev.Crema.ServiceHosts
             return AppUtility.ProductVersion.ToString();
         }
 
-        public bool IsOnline(string userID, byte[] password)
+        public Task<bool> IsOnlineAsync(string userID, byte[] password)
         {
             var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            return userContext.Dispatcher.Invoke(() =>
-            {
-                var text = Encoding.UTF8.GetString(password);
-                return userContext.IsOnlineUser(userID, StringUtility.ToSecureString(StringUtility.Decrypt(text, userID)));
-            });
+            var text = Encoding.UTF8.GetString(password);
+            return userContext.IsOnlineUserAsync(userID, StringUtility.ToSecureString(StringUtility.Decrypt(text, userID)));
         }
     }
 }

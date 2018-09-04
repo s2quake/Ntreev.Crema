@@ -32,49 +32,49 @@ namespace Ntreev.Crema.ServiceHosts.Users
     public interface IUserService
     {
         [OperationContract]
-        ResultBase<UserContextMetaData> Subscribe(string userID, byte[] password, string version, string platformID, string culture);
+        Task<ResultBase<UserContextMetaData>> SubscribeAsync(string userID, byte[] password, string version, string platformID, string culture);
 
         [OperationContract]
-        ResultBase Unsubscribe();
+        Task<ResultBase> UnsubscribeAsync();
 
         [OperationContract]
-        ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message);
+        Task<ResultBase> ShutdownAsync(int milliseconds, ShutdownType shutdownType, string message);
 
         [OperationContract]
-        ResultBase CancelShutdown();
+        Task<ResultBase> CancelShutdownAsync();
 
         [OperationContract]
-        ResultBase<UserInfo> NewUser(string userID, string categoryPath, byte[] password, string userName, Authority authority);
+        Task<ResultBase<UserInfo>> NewUserAsync(string userID, string categoryPath, byte[] password, string userName, Authority authority);
 
         [OperationContract]
-        ResultBase NewUserCategory(string categoryPath);
+        Task<ResultBase> NewUserCategoryAsync(string categoryPath);
 
         [OperationContract]
-        ResultBase RenameUserItem(string itemPath, string newName);
+        Task<ResultBase> RenameUserItemAsync(string itemPath, string newName);
 
         [OperationContract]
-        ResultBase MoveUserItem(string itemPath, string parentPath);
+        Task<ResultBase> MoveUserItemAsync(string itemPath, string parentPath);
 
         [OperationContract]
-        ResultBase DeleteUserItem(string itemPath);
+        Task<ResultBase> DeleteUserItemAsync(string itemPath);
 
         [OperationContract]
-        ResultBase<UserInfo> ChangeUserInfo(string userID, byte[] password, byte[] newPassword, string userName, Authority? authority);
+        Task<ResultBase<UserInfo>> ChangeUserInfoAsync(string userID, byte[] password, byte[] newPassword, string userName, Authority? authority);
 
         [OperationContract]
-        ResultBase Kick(string userID, string comment);
+        Task<ResultBase> KickAsync(string userID, string comment);
 
         [OperationContract]
-        ResultBase<BanInfo> Ban(string userID, string comment);
+        Task<ResultBase<BanInfo>> BanAsync(string userID, string comment);
 
         [OperationContract]
-        ResultBase Unban(string userID);
+        Task<ResultBase> UnbanAsync(string userID);
 
         [OperationContract]
-        ResultBase SendMessage(string userID, string message);
+        Task<ResultBase> SendMessageAsync(string userID, string message);
 
         [OperationContract]
-        ResultBase NotifyMessage(string[] userIDs, string message);
+        Task<ResultBase> NotifyMessageAsync(string[] userIDs, string message);
 
         [OperationContract]
         bool IsAlive();

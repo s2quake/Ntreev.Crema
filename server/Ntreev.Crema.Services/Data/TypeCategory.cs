@@ -27,6 +27,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -141,17 +142,20 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void Lock(Authentication authentication, string comment)
+        public async Task LockAsync(Authentication authentication, string comment)
         {
             try
             {
                 this.DataBase.ValidateBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(Lock), this, comment);
-                base.ValidateLock(authentication);
-                this.Sign(authentication);
-                this.Context.InvokeTypeItemLock(authentication, this, comment);
-                base.Lock(authentication, comment);
-                this.Context.InvokeItemsLockedEvent(authentication, new ITypeItem[] { this, }, new string[] { comment });
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(Lock), this, comment);
+                    base.ValidateLock(authentication);
+                    this.Sign(authentication);
+                    base.Lock(authentication, comment);
+                    this.Context.InvokeItemsLockedEvent(authentication, new ITypeItem[] { this, }, new string[] { comment });
+                });
+                
             }
             catch (Exception e)
             {
@@ -160,17 +164,19 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void Unlock(Authentication authentication)
+        public async Task UnlockAsync(Authentication authentication)
         {
             try
             {
                 this.DataBase.ValidateBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(Unlock), this);
-                base.ValidateUnlock(authentication);
-                this.Sign(authentication);
-                this.Context.InvokeTypeItemUnlock(authentication, this);
-                base.Unlock(authentication);
-                this.Context.InvokeItemsUnlockedEvent(authentication, new ITypeItem[] { this });
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(Unlock), this);
+                    base.ValidateUnlock(authentication);
+                    this.Sign(authentication);
+                    base.Unlock(authentication);
+                    this.Context.InvokeItemsUnlockedEvent(authentication, new ITypeItem[] { this });
+                });
             }
             catch (Exception e)
             {
@@ -179,21 +185,24 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void Rename(Authentication authentication, string name)
+        public async Task RenameAsync(Authentication authentication, string name)
         {
             try
             {
                 this.DataBase.ValidateBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(Rename), this, name);
-                base.ValidateRename(authentication, name);
-                this.Sign(authentication);
-                var items = EnumerableUtility.One(this).ToArray();
-                var oldNames = items.Select(item => item.Name).ToArray();
-                var oldPaths = items.Select(item => item.Path).ToArray();
-                var dataSet = this.ReadAllData(authentication, true);
-                this.Container.InvokeCategoryRename(authentication, this, name, dataSet);
-                base.Rename(authentication, name);
-                this.Container.InvokeCategoriesRenamedEvent(authentication, items, oldNames, oldPaths, dataSet);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(Rename), this, name);
+                    base.ValidateRename(authentication, name);
+                    this.Sign(authentication);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var oldNames = items.Select(item => item.Name).ToArray();
+                    var oldPaths = items.Select(item => item.Path).ToArray();
+                    var dataSet = this.ReadAllData(authentication, true);
+                    this.Container.InvokeCategoryRename(authentication, this, name, dataSet);
+                    base.Rename(authentication, name);
+                    this.Container.InvokeCategoriesRenamedEvent(authentication, items, oldNames, oldPaths, dataSet);
+                });
             }
             catch (Exception e)
             {
@@ -202,21 +211,24 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void Move(Authentication authentication, string parentPath)
+        public async Task MoveAsync(Authentication authentication, string parentPath)
         {
             try
             {
                 this.DataBase.ValidateBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(Move), this, parentPath);
-                base.ValidateMove(authentication, parentPath);
-                this.Sign(authentication);
-                var items = EnumerableUtility.One(this).ToArray();
-                var oldPaths = items.Select(item => item.Path).ToArray();
-                var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
-                var dataSet = this.ReadAllData(authentication, true);
-                this.Container.InvokeCategoryMove(authentication, this, parentPath, dataSet);
-                base.Move(authentication, parentPath);
-                this.Container.InvokeCategoriesMovedEvent(authentication, items, oldPaths, oldParentPaths, dataSet);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(Move), this, parentPath);
+                    base.ValidateMove(authentication, parentPath);
+                    this.Sign(authentication);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var oldPaths = items.Select(item => item.Path).ToArray();
+                    var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
+                    var dataSet = this.ReadAllData(authentication, true);
+                    this.Container.InvokeCategoryMove(authentication, this, parentPath, dataSet);
+                    base.Move(authentication, parentPath);
+                    this.Container.InvokeCategoriesMovedEvent(authentication, items, oldPaths, oldParentPaths, dataSet);
+                });
             }
             catch (Exception e)
             {
@@ -225,21 +237,24 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void Delete(Authentication authentication)
+        public async Task DeleteAsync(Authentication authentication)
         {
             try
             {
                 this.DataBase.ValidateBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(Delete), this);
-                base.ValidateDelete(authentication);
-                this.Sign(authentication);
-                var items = EnumerableUtility.One(this).ToArray();
-                var oldPaths = items.Select(item => item.Path).ToArray();
-                var container = this.Container;
-                var dataSet = this.ReadAllData(authentication, true);
-                container.InvokeCategoryDelete(authentication, this, dataSet);
-                base.Delete(authentication);
-                container.InvokeCategoriesDeletedEvent(authentication, items, oldPaths, dataSet);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(Delete), this);
+                    base.ValidateDelete(authentication);
+                    this.Sign(authentication);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var oldPaths = items.Select(item => item.Path).ToArray();
+                    var container = this.Container;
+                    var dataSet = this.ReadAllData(authentication, true);
+                    container.InvokeCategoryDelete(authentication, this, dataSet);
+                    base.Delete(authentication);
+                    container.InvokeCategoriesDeletedEvent(authentication, items, oldPaths, dataSet);
+                });
             }
             catch (Exception e)
             {
@@ -463,6 +478,16 @@ namespace Ntreev.Crema.Services.Data
             template.EditCanceled += (s, e) => this.templateList.Remove(template);
             template.EditEnded += (s, e) => this.templateList.Remove(template);
             this.templateList.Add(template);
+        }
+
+        public void LockInternal(Authentication authentication, string comment)
+        {
+            base.Lock(authentication, comment);
+        }
+
+        public void UnlockInternal(Authentication authentication)
+        {
+            base.Unlock(authentication);
         }
 
         public new string Name => base.Name;

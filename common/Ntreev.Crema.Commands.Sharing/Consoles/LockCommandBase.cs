@@ -33,7 +33,7 @@ using YamlDotNet.Serialization;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
-    abstract class LockCommandBase : ConsoleCommandBase
+    abstract class LockCommandBase : ConsoleCommandAsyncBase
     {
         protected LockCommandBase()
         {

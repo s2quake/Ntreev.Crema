@@ -64,7 +64,7 @@ namespace Ntreev.Crema.Commands.Consoles
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             var user = this.GetUser(authentication, this.UserID);
-            user.Dispatcher.Invoke(() => user.Kick(authentication, this.Message));
+            user.KickAsync(authentication, this.Message).Wait();
         }
     }
 }

@@ -364,7 +364,7 @@ namespace Ntreev.Crema.Services.Random
 
                 var comment = RandomUtility.NextString();
 
-                typeItem.Lock(authentication, comment);
+                typeItem.LockAsync(authentication, comment);
 
                 //Assert.IsTrue(typeItem.IsLocked);
                 //Assert.AreEqual(typeItem.Path, typeItem.LockInfo.Path);
@@ -859,7 +859,7 @@ namespace Ntreev.Crema.Services.Random
                     return;
 
                 var comment = RandomUtility.NextString();
-                tableItem.Lock(authentication, comment);
+                tableItem.LockAsync(authentication, comment);
             });
         }
 

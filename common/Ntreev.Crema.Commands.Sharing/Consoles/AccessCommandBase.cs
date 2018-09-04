@@ -76,7 +76,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
         protected void Invoke(Authentication authentication, IAccessible accessible, Action action)
         {
-            using (UsingDataBase.Set(accessible as IServiceProvider, authentication, true))
+            var task = UsingDataBase.SetAsync(accessible as IServiceProvider, authentication);
+            task.Wait();
+            using (task.Result)
             {
                 if (accessible is IDispatcherObject dispatcherObject)
                 {
@@ -91,7 +93,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
         protected T Invoke<T>(Authentication authentication, IAccessible accessible, Func<T> func)
         {
-            using (UsingDataBase.Set(accessible as IServiceProvider, authentication, true))
+            var task = UsingDataBase.SetAsync(accessible as IServiceProvider, authentication);
+            task.Wait();
+            using (task.Result)
             {
                 if (accessible is IDispatcherObject dispatcherObject)
                 {

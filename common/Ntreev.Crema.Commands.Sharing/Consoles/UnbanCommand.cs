@@ -53,7 +53,7 @@ namespace Ntreev.Crema.Commands.Consoles
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             var user = this.GetUser(authentication, this.UserID);
-            user.Dispatcher.Invoke(() => user.Unban(authentication));
+            user.UnbanAsync(authentication).Wait();
         }
     }
 }

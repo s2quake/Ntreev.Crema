@@ -67,7 +67,7 @@ namespace Ntreev.Crema.Services.Data
             this.Initialize();
         }
         
-        public void RestoreState(CremaSettings settings)
+        public async Task RestoreStateAsync(CremaSettings settings)
         {
             if (settings.NoCache == false)
             {
@@ -78,7 +78,7 @@ namespace Ntreev.Crema.Services.Data
                     {
                         if (stateCaches[$"{item.ID}"].IsLoaded == true)
                         {
-                            item.Load(Authentication.System);
+                            await item.LoadAsync(Authentication.System);
                         }
                     }
                 }
@@ -90,7 +90,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     var dataBase = this[item];
                     if (dataBase.IsLoaded == false)
-                        dataBase.Load(Authentication.System);
+                        await dataBase.LoadAsync(Authentication.System);
                 }
                 else
                 {
@@ -109,10 +109,10 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseUnlock), dataBase);
         }
 
-        public void InvokeDataBaseLoad(Authentication authentication, DataBase dataBase)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseLoad), dataBase);
-        }
+        //public void InvokeDataBaseLoad(Authentication authentication, DataBase dataBase)
+        //{
+        //    this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseLoad), dataBase);
+        //}
 
         public void InvokeDataBaseUnload(Authentication authentication, DataBase dataBase)
         {
@@ -129,33 +129,35 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseReset), dataBase);
         }
 
-        public DataBase CreateDataBase(Authentication authentication, string dataBaseName, string comment)
+        public Task<DataBase> CreateDataBaseAsync(Authentication authentication, string dataBaseName, string comment)
         {
             try
             {
-                this.Dispatcher.VerifyAccess();
-                this.CremaHost.DebugMethod(authentication, this, nameof(CreateDataBase), dataBaseName, comment);
-                this.ValidateCreateDataBase(authentication, dataBaseName);
-                this.Sign(authentication);
-                var dataSet = new CremaDataSet();
-                var tempPath = PathUtility.GetTempPath(true);
-                var dataBasePath = Path.Combine(tempPath, dataBaseName);
-                var message = EventMessageBuilder.CreateDataBase(authentication, dataBaseName) + ": " + comment;
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(CreateDataBaseAsync), dataBaseName, comment);
+                    this.ValidateCreateDataBase(authentication, dataBaseName);
+                    this.Sign(authentication);
+                    var dataSet = new CremaDataSet();
+                    var tempPath = PathUtility.GetTempPath(true);
+                    var dataBasePath = Path.Combine(tempPath, dataBaseName);
+                    var message = EventMessageBuilder.CreateDataBase(authentication, dataBaseName) + ": " + comment;
 
-                try
-                {
-                    FileUtility.WriteAllText($"{CremaSchema.MajorVersion}.{CremaSchema.MinorVersion}", dataBasePath, ".version");
-                    dataSet.WriteToDirectory(dataBasePath);
-                    this.repositoryProvider.CreateRepository(authentication, this.remotesPath, dataBasePath, comment);
-                }
-                finally
-                {
-                    DirectoryUtility.Delete(tempPath);
-                }
-                var dataBase = new DataBase(this.CremaHost, dataBaseName);
-                this.AddBase(dataBase.Name, dataBase);
-                this.InvokeItemsCreateEvent(authentication, new DataBase[] { dataBase }, comment);
-                return dataBase;
+                    try
+                    {
+                        FileUtility.WriteAllText($"{CremaSchema.MajorVersion}.{CremaSchema.MinorVersion}", dataBasePath, ".version");
+                        dataSet.WriteToDirectory(dataBasePath);
+                        this.repositoryProvider.CreateRepository(authentication, this.remotesPath, dataBasePath, comment);
+                    }
+                    finally
+                    {
+                        DirectoryUtility.Delete(tempPath);
+                    }
+                    var dataBase = new DataBase(this.CremaHost, dataBaseName);
+                    this.AddBase(dataBase.Name, dataBase);
+                    this.InvokeItemsCreateEvent(authentication, new DataBase[] { dataBase }, comment);
+                    return dataBase;
+                });
             }
             catch (Exception e)
             {
@@ -164,21 +166,29 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public DataBase CopyDataBase(Authentication authentication, DataBase dataBase, string newDataBaseName, string comment, bool force)
+        public async Task<DataBase> CopyDataBaseAsync(Authentication authentication, DataBase dataBase, string newDataBaseName, string comment, bool force)
         {
             try
             {
-                this.Dispatcher.VerifyAccess();
-                this.CremaHost.DebugMethod(authentication, this, nameof(CopyDataBase), dataBase, newDataBaseName, comment);
-                this.ValidateCopyDataBase(authentication, dataBase, newDataBaseName, force);
-                this.Sign(authentication);
-                var dataBaseName = dataBase.Name;
-                var message = EventMessageBuilder.CreateDataBase(authentication, newDataBaseName) + ": " + comment;
-                this.repositoryProvider.CopyRepository(authentication, this.remotesPath, dataBaseName, newDataBaseName, comment);
-                var newDataBase = new DataBase(this.CremaHost, newDataBaseName);
-                this.AddBase(newDataBase.Name, newDataBase);
-                this.InvokeItemsCreateEvent(authentication, new DataBase[] { newDataBase }, comment);
-                return newDataBase;
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(CopyDataBaseAsync), dataBase, newDataBaseName, comment);
+                    this.ValidateCopyDataBase(authentication, dataBase, newDataBaseName, force);
+                    this.Sign(authentication);
+                });
+                await this.RepositoryDispatcher.InvokeAsync(() =>
+                {
+                    var dataBaseName = dataBase.Name;
+                    var message = EventMessageBuilder.CreateDataBase(authentication, newDataBaseName) + ": " + comment;
+                    this.repositoryProvider.CopyRepository(authentication, this.remotesPath, dataBaseName, newDataBaseName, comment);
+                });
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var newDataBase = new DataBase(this.CremaHost, newDataBaseName);
+                    this.AddBase(newDataBase.Name, newDataBase);
+                    this.InvokeItemsCreateEvent(authentication, new DataBase[] { newDataBase }, comment);
+                    return newDataBase;
+                });
             }
             catch (Exception e)
             {
@@ -221,14 +231,20 @@ namespace Ntreev.Crema.Services.Data
             this.repositoryProvider.RevertRepository(authentication.ID, this.remotesPath, dataBaseName, revision, comment);
         }
 
-        public DataBaseCollectionMetaData GetMetaData(Authentication authentication)
+        public async Task<DataBaseCollectionMetaData> GetMetaDataAsync(Authentication authentication)
         {
             if (authentication == null)
                 throw new ArgumentNullException(nameof(authentication));
-            this.Dispatcher.VerifyAccess();
+
+            var dataBases = await this.Dispatcher.InvokeAsync(() => (from DataBase item in this select item).ToArray());
+            var metaList = new List<DataBaseMetaData>(this.Count);
+            foreach (var item in dataBases)
+            {
+                metaList.Add(await item.GetMetaDataAsync(authentication));
+            }
             return new DataBaseCollectionMetaData()
             {
-                DataBases = (from DataBase item in this select item.GetMetaData(authentication)).ToArray(),
+                DataBases = metaList.ToArray(),
             };
         }
 
@@ -423,6 +439,8 @@ namespace Ntreev.Crema.Services.Data
         }
 
         public CremaDispatcher Dispatcher => this.CremaHost.Dispatcher;
+
+        public CremaDispatcher RepositoryDispatcher => this.CremaHost.RepositoryDispatcher;
 
         public CremaHost CremaHost { get; }
 
@@ -830,14 +848,14 @@ namespace Ntreev.Crema.Services.Data
 
         #region IDataBaseCollection
 
-        IDataBase IDataBaseCollection.AddNewDataBase(Authentication authentication, string dataBaseName, string comment)
+        async Task<IDataBase> IDataBaseCollection.AddNewDataBaseAsync(Authentication authentication, string dataBaseName, string comment)
         {
-            return this.CreateDataBase(authentication, dataBaseName, comment);
+            return await this.CreateDataBaseAsync(authentication, dataBaseName, comment);
         }
 
-        bool IDataBaseCollection.Contains(string dataBaseName)
+        Task<bool> IDataBaseCollection.ContainsAsync(string dataBaseName)
         {
-            return this.ContainsKey(dataBaseName);
+            return this.Dispatcher.InvokeAsync(() => this.ContainsKey(dataBaseName));
         }
 
         IDataBase IDataBaseCollection.this[string dataBaseName] => this[dataBaseName];

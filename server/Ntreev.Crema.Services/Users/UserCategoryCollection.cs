@@ -26,6 +26,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users
 {
@@ -42,14 +43,17 @@ namespace Ntreev.Crema.Services.Users
 
         }
 
-        public UserCategory AddNew(Authentication authentication, string name, string parentPath)
+        public Task<UserCategory> AddNewAsync(Authentication authentication, string name, string parentPath)
         {
-            this.ValidateAddNew(authentication, name, parentPath);
-            this.InvokeCategoryCreate(authentication, name, parentPath);
-            this.Sign(authentication);
-            var category = this.BaseAddNew(name, parentPath, authentication);
-            this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
-            return category;
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                this.ValidateAddNew(authentication, name, parentPath);
+                this.InvokeCategoryCreate(authentication, name, parentPath);
+                this.Sign(authentication);
+                var category = this.BaseAddNew(name, parentPath, authentication);
+                this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
+                return category;
+            });
         }
 
         public void InvokeCategoryCreate(Authentication authentication, string name, string parentPath)

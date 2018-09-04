@@ -29,6 +29,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users
 {
@@ -91,138 +92,152 @@ namespace Ntreev.Crema.Services.Users
             this.OnItemsChanged(new ItemsEventArgs<IUserItem>(authentication, items));
         }
 
-        public Authentication Login(string userID, SecureString password)
+        public async Task<Authentication> LoginAsync(string userID, SecureString password)
         {
             try
             {
-                this.Dispatcher.VerifyAccess();
-                this.ValidateLogin(userID, password);
+                var user = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ValidateLogin(userID, password);
+                    return this.Users[userID];
+                });
+                return await user.LoginAsync(password);
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public async Task LogoutAsync(Authentication authentication)
+        {
+            try
+            {
+                var user = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ValidateLogout(authentication);
+                    return this.Users[authentication.ID];
+                    
+                });
+                await user.LogoutAsync(authentication);
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public Task NotifyMessageAsync(Authentication authentication, string[] userIDs, string message)
+        {
+            try
+            {
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(NotifyMessageAsync), this, userIDs, message);
+                    this.ValidateSendMessage(authentication, userIDs, message);
+                    var users = userIDs == null ? new User[] { } : userIDs.Select(item => this.Users[item]).ToArray();
+                    authentication.Sign();
+                    this.Users.InvokeNotifyMessageEvent(authentication, users, message);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public Task<Authentication> AuthenticateAsync(Guid authenticationToken)
+        {
+            try
+            {
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    var query = from User item in this.Users
+                                let authentication = item.Authentication
+                                where authentication != null && authentication.Token == authenticationToken
+                                select item;
+
+                    if (query.Any() == true)
+                        return query.First().Authentication;
+
+                    if (authenticationToken == Authentication.System.Token)
+                        return Authentication.System;
+
+                    return null;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public Task<bool> IsAuthenticatedAsync(string userID)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.Users.Contains(userID) == false)
+                    return false;
+
                 var user = this.Users[userID];
-                return user.Login(password);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+
+                if (user.IsOnline == false)
+                    return false;
+
+                return user.Authentication != null;
+            });
         }
 
-        public void Logout(Authentication authentication)
+        public Task<bool> IsOnlineUserAsync(string userID, SecureString password)
         {
-            try
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                this.Dispatcher.VerifyAccess();
-                this.ValidateLogout(authentication);
-                var user = this.Users[authentication.ID];
-                user.Logout(authentication);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+                if (this.Users.Contains(userID) == false)
+                    return false;
+
+                var user = this.Users[userID];
+
+                if (user.VerifyPassword(password) == false)
+                    return false;
+
+                return user.IsOnline;
+            });
         }
 
-        public void NotifyMessage(Authentication authentication, string[] userIDs, string message)
+        public Task<UserContextMetaData> GetMetaDataAsync(Authentication authentication)
         {
-            try
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                this.Dispatcher.VerifyAccess();
-                this.CremaHost.DebugMethod(authentication, this, nameof(NotifyMessage), this, userIDs, message);
-                this.ValidateSendMessage(authentication, userIDs, message);
-                var users = userIDs == null ? new User[] { } : userIDs.Select(item => this.Users[item]).ToArray();
-                authentication.Sign();
-                this.Users.InvokeNotifyMessageEvent(authentication, users, message);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
+                var metaData = new UserContextMetaData();
 
-        public Authentication Authenticate(Guid authenticationToken)
-        {
-            try
-            {
-                this.Dispatcher.VerifyAccess();
-                var query = from User item in this.Users
-                            let authentication = item.Authentication
-                            where authentication != null && authentication.Token == authenticationToken
-                            select item;
+                {
+                    var query = from UserCategory item in this.Categories
+                                orderby item.Path
+                                select item.Path;
 
-                if (query.Any() == true)
-                    return query.First().Authentication;
+                    metaData.Categories = query.ToArray();
+                }
 
-                if (authenticationToken == Authentication.System.Token)
-                    return Authentication.System;
+                {
+                    var query = from User item in this.Users
+                                orderby item.Category.Path
+                                select new UserMetaData()
+                                {
+                                    Path = item.Path,
+                                    UserInfo = item.UserInfo,
+                                    UserState = item.UserState,
+                                    BanInfo = item.BanInfo,
+                                };
+                    metaData.Users = query.ToArray();
+                }
 
-                return null;
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
-
-        public bool IsAuthenticated(string userID)
-        {
-            this.Dispatcher.VerifyAccess();
-
-            if (this.Users.Contains(userID) == false)
-                return false;
-
-            var user = this.Users[userID];
-
-            if (user.IsOnline == false)
-                return false;
-
-            return user.Authentication != null;
-        }
-
-        public bool IsOnlineUser(string userID, SecureString password)
-        {
-            this.Dispatcher.VerifyAccess();
-            if (this.Users.Contains(userID) == false)
-                return false;
-
-            var user = this.Users[userID];
-
-            if (user.VerifyPassword(password) == false)
-                return false;
-
-            return user.IsOnline;
-        }
-
-        public UserContextMetaData GetMetaData(Authentication authentication)
-        {
-            this.Dispatcher.VerifyAccess();
-            var metaData = new UserContextMetaData();
-
-            {
-                var query = from UserCategory item in this.Categories
-                            orderby item.Path
-                            select item.Path;
-
-                metaData.Categories = query.ToArray();
-            }
-
-            {
-                var query = from User item in this.Users
-                            orderby item.Category.Path
-                            select new UserMetaData()
-                            {
-                                Path = item.Path,
-                                UserInfo = item.UserInfo,
-                                UserState = item.UserState,
-                                BanInfo = item.BanInfo,
-                            };
-                metaData.Users = query.ToArray();
-            }
-
-            metaData.AuthenticationToken = authentication.Token;
-            return metaData;
+                metaData.AuthenticationToken = authentication.Token;
+                return metaData;
+            });
         }
 
         public static void GenerateDefaultUserInfos(string repositoryPath, IObjectSerializer serializer)
@@ -561,9 +576,9 @@ namespace Ntreev.Crema.Services.Users
 
         #region IUserContext
 
-        bool IUserContext.Contains(string itemPath)
+        Task<bool> IUserContext.ContainsAsync(string itemPath)
         {
-            return this.Contains(itemPath);
+            return this.Dispatcher.InvokeAsync(() => this.Contains(itemPath));
         }
 
         IUserCollection IUserContext.Users => this.Users;

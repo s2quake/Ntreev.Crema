@@ -346,7 +346,10 @@ namespace Ntreev.Crema.Services.Data
 
             foreach (var item in items)
             {
-                item.Lock(authentication, comment);
+                if(item is Table table)
+                    table.LockInternal(authentication, comment);
+                else if (item is TableCategory category)
+                    category.LockInternal(authentication, comment);
             }
 
             authentication.Sign();
@@ -369,7 +372,10 @@ namespace Ntreev.Crema.Services.Data
 
             foreach (var item in items)
             {
-                item.Unlock(authentication);
+                if(item is Table table)
+                    table.UnlockInternal(authentication);
+                else if(item is TableCategory category)
+                    category.UnlockInternal(authentication);
             }
 
             var metaData = EventMetaDataBuilder.Build(items, LockChangeType.Unlock);

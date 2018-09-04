@@ -464,7 +464,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private void Update(Authentication authentication, string[] segments, string path)
         {
-            this.drive.SetPath(authentication, path);
+            this.drive.SetPathAsync(authentication, path);
             this.path = path;
             this.drivePaths[this.drive] = path;
         }

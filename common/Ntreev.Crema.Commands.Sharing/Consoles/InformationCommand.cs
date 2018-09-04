@@ -92,7 +92,7 @@ namespace Ntreev.Crema.Commands.Consoles
         private IInfoProvider GetObject(Authentication authentication, string path)
         {
             var drive = this.CommandContext.Drive;
-            if (drive.GetObject(authentication, path) is IInfoProvider provider)
+            if (drive.GetObjectAsync(authentication, path) is IInfoProvider provider)
             {
                 return provider;
             }

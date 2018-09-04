@@ -61,4 +61,41 @@ namespace Ntreev.Crema.Commands.Consoles
 
         #endregion
     }
+
+    public abstract class ConsoleCommandAsyncBase : CommandAsyncBase, IConsoleCommand
+    {
+        protected ConsoleCommandAsyncBase()
+        {
+
+        }
+
+        protected ConsoleCommandAsyncBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public virtual object Instance
+        {
+            get { return this; }
+        }
+
+        public ConsoleCommandContextBase CommandContext
+        {
+            get;
+            internal set;
+        }
+
+        [Obsolete]
+        public TextWriter Out
+        {
+            get { return this.CommandContext.Out; }
+        }
+
+        #region IConsoleCommand
+
+        ICommand IConsoleCommand.Command => this;
+
+        #endregion
+    }
 }

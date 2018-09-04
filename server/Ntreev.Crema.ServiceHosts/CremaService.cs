@@ -62,17 +62,17 @@ namespace Ntreev.Crema.ServiceHosts
             this.MultiThreading = true;
         }
 
-        public void Open()
+        public async Task OpenAsync()
         {
             this.OnOpening(EventArgs.Empty);
 
             this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
             this.logService = this.cremaHost.GetService(typeof(ILogService)) as ILogService;
 
-            this.token = this.cremaHost.Open();
+            this.token = await this.cremaHost.OpenAsync();
             this.cremaHost.Opened += CremaHost_Opened;
             this.cremaHost.Closing += CremaHost_Closing;
-            CremaService.Dispatcher.Invoke(() =>
+            await CremaService.Dispatcher.InvokeAsync(() =>
             {
                 this.descriptorService = new DescriptorService(this, this.cremaHost);
                 this.descriptorServiceHost = new DescriptorServiceHost(this.cremaHost, this.descriptorService, this.port);

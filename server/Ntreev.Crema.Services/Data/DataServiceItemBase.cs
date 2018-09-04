@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -115,36 +116,36 @@ namespace Ntreev.Crema.Services.Data
             DirectoryUtility.Clean(this.BasePath);
         }
 
-        public void Reset()
+        public async Task ResetAsync()
         {
-            this.DataBase.Dispatcher.Invoke(() =>
+            await this.DataBase.Dispatcher.InvokeAsync(() =>
             {
                 this.DataBase.Loaded -= DataBase_Loaded;
                 this.DataBase.Renamed -= DataBase_Renamed;
                 this.DataBase.Unloaded -= DataBase_Unloaded;
             });
-            var dataSet = this.DataBase.Dispatcher.Invoke(() =>
-            {
+            
                 if (this.DataBase.IsLoaded == false)
-                    this.DataBase.Load(this.Authentication);
-                var contains = this.DataBase.Contains(this.Authentication);
+                    await this.DataBase.LoadAsync(this.Authentication);
+                var contains = await this.DataBase.ContainsAsync(this.Authentication);
                 if (contains == false)
-                    this.DataBase.Enter(this.Authentication);
+                    await this.DataBase.EnterAsync(this.Authentication);
+
+            var dataSet = null as CremaDataSet;
                 try
                 {
-                    return this.DataBase.GetDataSet(this.Authentication, DataSetType.All, null, null);
+                    dataSet = await this.DataBase.GetDataSetAsync(this.Authentication, DataSetType.All, null, null);
                 }
                 finally
                 {
                     if (contains == false)
-                        this.DataBase.Leave(this.Authentication);
+                        await this.DataBase.LeaveAsync(this.Authentication);
                 }
-            });
 
             DirectoryUtility.Delete(this.BasePath);
             this.Serialize(dataSet, this.info.Revision);
             this.initialized = true;
-            this.DataBase.Dispatcher.Invoke(() =>
+            await this.DataBase.Dispatcher.InvokeAsync(() =>
             {
                 this.DataBase.Loaded += DataBase_Loaded;
                 this.DataBase.Renamed += DataBase_Renamed;
@@ -533,7 +534,7 @@ namespace Ntreev.Crema.Services.Data
             this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
         }
 
-        private void Initialize()
+        private async void Initialize()
         {
             this.Dispatcher.CheckAccess();
             var error = false;
@@ -585,15 +586,15 @@ namespace Ntreev.Crema.Services.Data
 
             if (error == true)
             {
-                var result = this.DataBase.Dispatcher.Invoke(() =>
+                var result = await Task.Run(async () =>
                 {
                     var revision = this.DataBase.DataBaseInfo.Revision;
-                    var contains = this.DataBase.Contains(this.Authentication);
+                    var contains = await this.DataBase.ContainsAsync(this.Authentication);
                     if (contains == false)
-                        this.DataBase.Enter(this.Authentication);
-                    var dataSet = this.DataBase.GetDataSet(this.Authentication, DataSetType.All, null, null);
+                        await this.DataBase.EnterAsync(this.Authentication);
+                    var dataSet = await this.DataBase.GetDataSetAsync(this.Authentication, DataSetType.All, null, null);
                     if (contains == false)
-                        this.DataBase.Leave(this.Authentication);
+                        await this.DataBase.LeaveAsync(this.Authentication);
                     return new Tuple<string, CremaDataSet>(revision, dataSet);
                 });
                 this.Serialize(result.Item2, result.Item1);

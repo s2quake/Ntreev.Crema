@@ -13,18 +13,27 @@ namespace Ntreev.Crema.Services.Data
 {
     partial class DataBase
     {
-        public void Import(Authentication authentication, CremaDataSet dataSet, string comment)
+        public async Task ImportAsync(Authentication authentication, CremaDataSet dataSet, string comment)
         {
             try
             {
-                this.Dispatcher?.VerifyAccess();
-                this.CremaHost.DebugMethod(authentication, this, nameof(Import), comment);
-                this.ValidateImport(authentication, dataSet, comment);
-                this.Sign(authentication);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(ImportAsync), comment);
+                    this.ValidateImport(authentication, dataSet, comment);
+                    this.Sign(authentication);
+                    
+                });
+
+
                 var filterExpression = string.Join(";", dataSet.Tables);
-                var targetSet = this.GetDataSet(authentication, null, filterExpression, ReadTypes.OmitContent);
-                this.LockTypes(authentication, targetSet, comment);
-                this.LockTables(authentication, targetSet, comment);
+                var targetSet = await this.GetDataSetAsync(authentication, null, filterExpression, ReadTypes.OmitContent);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.LockTypes(authentication, targetSet, comment);
+                    this.LockTables(authentication, targetSet, comment);
+                });
+
 
                 try
                 {
@@ -60,8 +69,11 @@ namespace Ntreev.Crema.Services.Data
                 }
                 finally
                 {
-                    this.UnlockTypes(authentication, targetSet);
-                    this.UnlockTables(authentication, targetSet);
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.UnlockTypes(authentication, targetSet);
+                        this.UnlockTables(authentication, targetSet);
+                    });
                 }
             }
             catch (Exception e)

@@ -58,32 +58,32 @@ namespace Ntreev.Crema.ServiceHosts.Data
             this.logService.Debug($"{nameof(DataBaseService)} Constructor");
         }
 
-        public ResultBase DefinitionType(LogInfo[] param1, FindResultInfo[] param2)
+        public Task<ResultBase> DefinitionTypeAsync(LogInfo[] param1, FindResultInfo[] param2)
         {
-            return new ResultBase();
+            return Task.Run(() => new ResultBase());
         }
 
-        public ResultBase<DataBaseMetaData> Subscribe(Guid authenticationToken, string dataBaseName)
+        public async Task<ResultBase<DataBaseMetaData>> SubscribeAsync(Guid authenticationToken, string dataBaseName)
         {
             var result = new ResultBase<DataBaseMetaData>();
             try
             {
-                this.userContext.Dispatcher.Invoke(() =>
+                this.authentication = await this.userContext.AuthenticateAsync(authenticationToken);
+                this.authentication.AddRef(this);
+                this.OwnerID = this.authentication.ID;
+                await this.userContext.Dispatcher.InvokeAsync(() =>
                 {
-                    this.authentication = this.userContext.Authenticate(authenticationToken);
-                    this.authentication.AddRef(this);
-                    this.OwnerID = this.authentication.ID;
                     this.userContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
                 });
-                result.Value = this.cremaHost.Dispatcher.Invoke(() =>
+                await this.cremaHost.Dispatcher.InvokeAsync(() =>
                 {
                     this.dataBase = this.cremaHost.DataBases[dataBaseName];
                     this.dataBaseName = dataBaseName;
-                    this.dataBase.Enter(this.authentication);
-                    this.AttachEventHandlers();
-                    this.logService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(Subscribe)} : {dataBaseName}");
-                    return this.dataBase.GetMetaData(this.authentication);
                 });
+                await this.dataBase.EnterAsync(this.authentication);
+                this.AttachEventHandlers();
+                this.logService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(SubscribeAsync)} : {dataBaseName}");
+                result.Value = await this.dataBase.GetMetaDataAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -95,25 +95,27 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return result;
         }
 
-        public ResultBase Unsubscribe()
+        public async Task<ResultBase> UnsubscribeAsync()
         {
             var result = new ResultBase();
             try
             {
-                this.cremaHost.Dispatcher.Invoke(() =>
+                await this.cremaHost.Dispatcher.InvokeAsync(() =>
                 {
                     this.DetachEventHandlers();
-                    this.dataBase?.Leave(this.authentication);
-                    this.dataBase = null;
+                    
                 });
-                this.userContext.Dispatcher.Invoke(() =>
+                await this.dataBase?.LeaveAsync(this.authentication);
+                this.dataBase = null;
+                await this.userContext.Dispatcher.InvokeAsync(() =>
                 {
                     this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                    this.authentication.RemoveRef(this);
-                    this.authentication = null;
+                    
                 });
+                this.authentication.RemoveRef(this);
+                this.authentication = null;
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-                this.logService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(Unsubscribe)} : {this.dataBaseName}");
+                this.logService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(UnsubscribeAsync)} : {this.dataBaseName}");
             }
             catch (Exception e)
             {
@@ -122,37 +124,70 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return result;
         }
 
-        public ResultBase<DataBaseMetaData> GetMetaData()
+        public async Task<ResultBase<DataBaseMetaData>> GetMetaDataAsync()
         {
-            return this.Invoke(() =>
+            var result = new ResultBase<DataBaseMetaData>();
+            try
             {
-                return this.dataBase.GetMetaData(this.authentication);
-            });
+                result.Value = await this.dataBase.GetMetaDataAsync(this.authentication);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public ResultBase<CremaDataSet> GetDataSet(DataSetType dataSetType, string filterExpression, string revision)
+        public async Task<ResultBase<CremaDataSet>> GetDataSetAsync(DataSetType dataSetType, string filterExpression, string revision)
         {
-            return this.InvokeImmediately(() =>
+            var result = new ResultBase<CremaDataSet>();
+            try
             {
-                return this.dataBase.GetDataSet(this.authentication, dataSetType, filterExpression, revision);
-            });
+                result.Value = await this.dataBase.GetDataSetAsync(this.authentication, dataSetType, filterExpression, revision);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public ResultBase ImportDataSet(CremaDataSet dataSet, string comment)
+        public async Task<ResultBase> ImportDataSet(CremaDataSet dataSet, string comment)
         {
-            return this.Invoke(() =>
+            var result = new ResultBase();
+            try
             {
-                this.dataBase.Dispatcher.Invoke(() => this.dataBase.Import(this.authentication, dataSet, comment));
-            });
+                await this.dataBase.ImportAsync(this.authentication, dataSet, comment);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public ResultBase NewTableCategory(string categoryPath)
+        public async Task<ResultBase> NewTableCategoryAsync(string categoryPath)
         {
-            return this.Invoke(() =>
+            var result = new ResultBase();
+            try
             {
                 var categoryName = new Ntreev.Library.ObjectModel.CategoryName(categoryPath);
-                var category = this.GetTableCategory(categoryName.ParentPath);
+                var category = await this.GetTableCategoryAsync(categoryName.ParentPath);
                 category.AddNewCategory(this.authentication, categoryName.Name);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
+
+            return this.Invoke(() =>
+            {
+                
             });
         }
 
@@ -1013,12 +1048,15 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return table;
         }
 
-        private ITableCategory GetTableCategory(string categoryPath)
+        private Task<ITableCategory> GetTableCategoryAsync(string categoryPath)
         {
-            var category = this.TableContext.Categories[categoryPath];
-            if (category == null)
-                throw new CategoryNotFoundException(categoryPath);
-            return category;
+            return this.dataBase.Dispatcher.InvokeAsync(() =>
+            {
+                var category = this.TableContext.Categories[categoryPath];
+                if (category == null)
+                    throw new CategoryNotFoundException(categoryPath);
+                return category;
+            });
         }
 
         private ITableContext TableContext => this.dataBase.TableContext;

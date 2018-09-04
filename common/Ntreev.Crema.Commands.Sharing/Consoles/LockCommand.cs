@@ -82,7 +82,7 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             var lockable = this.GetObject(authentication, this.GetAbsolutePath(this.Path));
@@ -99,7 +99,7 @@ namespace Ntreev.Crema.Commands.Consoles
                 {
                     throw new ArgumentException($"'{this.GetDescriptor(nameof(this.Message)).DisplayPattern}' 가 필요합니다.");
                 }
-                this.Invoke(authentication, lockable, () => lockable.Lock(authentication, this.Message));
+                await lockable.LockAsync(authentication, this.Message);
             }
         }
     }

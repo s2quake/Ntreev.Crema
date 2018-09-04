@@ -60,31 +60,28 @@ namespace Ntreev.Crema.ServiceHosts.Users
             return new ResultBase();
         }
 
-        public ResultBase<UserContextMetaData> Subscribe(string userID, byte[] password, string version, string platformID, string culture)
+        public async Task<ResultBase<UserContextMetaData>> SubscribeAsync(string userID, byte[] password, string version, string platformID, string culture)
         {
             var result = new ResultBase<UserContextMetaData>();
             try
             {
-                result.Value = this.userContext.Dispatcher.Invoke(() =>
+                var serverVersion = typeof(ICremaHost).Assembly.GetName().Version;
+                var clientVersion = new Version(version);
+
+                if (clientVersion < serverVersion)
+                    throw new ArgumentException(Resources.Exception_LowerVersion, nameof(version));
+
+                this.authentication = await this.userContext.LoginAsync(userID, ToSecureString(userID, password));
+                this.authentication.AddRef(this, (a) =>
                 {
-                    var serverVersion = typeof(ICremaHost).Assembly.GetName().Version;
-                    var clientVersion = new Version(version);
-
-                    if (clientVersion < serverVersion)
-                        throw new ArgumentException(Resources.Exception_LowerVersion, nameof(version));
-
-                    this.authentication = this.userContext.Login(userID, ToSecureString(userID, password));
-                    this.authentication.AddRef(this, (a) =>
-                    {
-                        this.userContext.Dispatcher.Invoke(() => this.userContext.Logout(a));
-                    });
-
-                    this.OwnerID = this.authentication.ID;
-                    this.AttachEventHandlers();
-                    this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(Subscribe)}");
-
-                    return this.userContext.GetMetaData(this.authentication);
+                    this.userContext.LogoutAsync(a).Wait();
                 });
+
+                this.OwnerID = this.authentication.ID;
+                this.AttachEventHandlers();
+                this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(SubscribeAsync)}");
+
+                result.Value = await this.userContext.GetMetaDataAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -95,31 +92,25 @@ namespace Ntreev.Crema.ServiceHosts.Users
             return result;
         }
 
-        private void AuthenticationUtility_Disconnected(object sender, EventArgs e)
+        private async void AuthenticationUtility_Disconnected(object sender, EventArgs e)
         {
             var authentication = sender as Authentication;
             if (this.authentication != null && this.authentication == authentication)
             {
-                this.userContext.Dispatcher.Invoke(() =>
-                {
-                    this.userContext.Logout(this.authentication);
-                });
+                await this.userContext.LogoutAsync(this.authentication);
             }
         }
 
-        public ResultBase Unsubscribe()
+        public async Task<ResultBase> UnsubscribeAsync()
         {
             var result = new ResultBase();
             try
             {
-                this.userContext.Dispatcher.Invoke(() =>
-                {
-                    this.DetachEventHandlers();
-                    this.authentication.RemoveRef(this);
-                    this.userContext.Logout(this.authentication);
-                    this.authentication = null;
-                    this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(Unsubscribe)}");
-                });
+                await this.userContext.Dispatcher.InvokeAsync(this.DetachEventHandlers);
+                this.authentication.RemoveRef(this);
+                await this.userContext.LogoutAsync(this.authentication);
+                this.authentication = null;
+                this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(UnsubscribeAsync)}");
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
             }
             catch (Exception e)
@@ -129,12 +120,12 @@ namespace Ntreev.Crema.ServiceHosts.Users
             return result;
         }
 
-        public ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message)
+        public async Task<ResultBase> ShutdownAsync(int milliseconds, ShutdownType shutdownType, string message)
         {
             var result = new ResultBase();
             try
             {
-                this.cremaHost.Shutdown(this.authentication, milliseconds, shutdownType, message);
+                await this.cremaHost.ShutdownAsync(this.authentication, milliseconds, shutdownType, message);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -144,12 +135,12 @@ namespace Ntreev.Crema.ServiceHosts.Users
             return result;
         }
 
-        public ResultBase CancelShutdown()
+        public async Task<ResultBase> CancelShutdownAsync()
         {
             var result = new ResultBase();
             try
             {
-                this.cremaHost.CancelShutdown(this.authentication);
+                await this.cremaHost.CancelShutdownAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -159,108 +150,185 @@ namespace Ntreev.Crema.ServiceHosts.Users
             return result;
         }
 
-        public ResultBase<UserInfo> NewUser(string userID, string categoryPath, byte[] password, string userName, Authority authority)
+        public async Task<ResultBase<UserInfo>> NewUserAsync(string userID, string categoryPath, byte[] password, string userName, Authority authority)
         {
-            return this.Invoke(() =>
+            var result = new ResultBase<UserInfo>();
+            try
             {
-                var category = this.GetCategory(categoryPath);
-                var user = category.AddNewUser(this.authentication, userID, ToSecureString(userID, password), userName, authority);
-                return user.UserInfo;
-            });
+                var category = await this.GetCategoryAsync(categoryPath);
+                var user = await category.AddNewUserAsync(this.authentication, userID, ToSecureString(userID, password), userName, authority);
+                result.Value = user.UserInfo;
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public ResultBase NewUserCategory(string categoryPath)
+        public async Task<ResultBase> NewUserCategoryAsync(string categoryPath)
         {
-            return this.Invoke(() =>
+            var result = new ResultBase();
+            try
             {
                 var categoryName = new Ntreev.Library.ObjectModel.CategoryName(categoryPath);
-                var category = this.GetCategory(categoryName.ParentPath);
-                category.AddNewCategory(this.authentication, categoryName.Name);
-            });
+                var category = await this.GetCategoryAsync(categoryName.ParentPath);
+                await category.AddNewCategoryAsync(this.authentication, categoryName.Name);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public ResultBase RenameUserItem(string itemPath, string newName)
+        public async Task<ResultBase> RenameUserItemAsync(string itemPath, string newName)
         {
-            return this.Invoke(() =>
+            var result = new ResultBase();
+            try
             {
-                var item = this.GetUserItem(itemPath);
-                item.Rename(this.authentication, newName);
-            });
+                var item = await this.GetUserItemAsync(itemPath);
+                await item.RenameAsync(this.authentication, newName);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public ResultBase MoveUserItem(string itemPath, string parentPath)
+        public async Task<ResultBase> MoveUserItemAsync(string itemPath, string parentPath)
         {
-            return this.Invoke(() =>
+            var result = new ResultBase();
+            try
             {
-                var item = this.GetUserItem(itemPath);
-                item.Move(this.authentication, parentPath);
-            });
+                var item = await this.GetUserItemAsync(itemPath);
+                await item.MoveAsync(this.authentication, parentPath);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public ResultBase DeleteUserItem(string itemPath)
+        public async Task<ResultBase> DeleteUserItemAsync(string itemPath)
         {
-            return this.Invoke(() =>
+            var result = new ResultBase();
+            try
             {
-                var item = this.GetUserItem(itemPath);
-                item.Delete(this.authentication);
-            });
+                var item = await this.GetUserItemAsync(itemPath);
+                await item.DeleteAsync(this.authentication);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public ResultBase<UserInfo> ChangeUserInfo(string userID, byte[] password, byte[] newPassword, string userName, Authority? authority)
+        public async Task<ResultBase<UserInfo>> ChangeUserInfoAsync(string userID, byte[] password, byte[] newPassword, string userName, Authority? authority)
         {
-            return this.Invoke(() =>
+            var result = new ResultBase<UserInfo>();
+            try
             {
-                var user = this.GetUser(userID);
                 var p1 = password == null ? null : ToSecureString(userID, password);
                 var p2 = newPassword == null ? null : ToSecureString(userID, newPassword);
-                user.ChangeUserInfo(this.authentication, p1, p2, userName, authority);
-                return user.UserInfo;
-            });
+                var user = await this.GetUserAsync(userID);
+                await user.ChangeUserInfoAsync(this.authentication, p1, p2, userName, authority);
+                result.Value = await user.Dispatcher.InvokeAsync(() => user.UserInfo);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public ResultBase Kick(string userID, string comment)
+        public async Task<ResultBase> KickAsync(string userID, string comment)
         {
-            return this.Invoke(() =>
+            var result = new ResultBase();
+            try
             {
-                var user = this.GetUser(userID);
-                user.Kick(this.authentication, comment);
-            });
+                var user = await this.GetUserAsync(userID);
+                await user.KickAsync(this.authentication, comment);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public ResultBase<BanInfo> Ban(string userID, string comment)
+        public async Task<ResultBase<BanInfo>> BanAsync(string userID, string comment)
         {
-            return this.Invoke(() =>
+            var result = new ResultBase<BanInfo>();
+            try
             {
-                var user = this.GetUser(userID);
-                user.Ban(this.authentication, comment);
-                return user.BanInfo;
-            });
+                var user = await this.GetUserAsync(userID);
+                await user.BanAsync(this.authentication, comment);
+                result.Value = await user.Dispatcher.InvokeAsync(() => user.BanInfo);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public ResultBase Unban(string userID)
+        public async Task<ResultBase> UnbanAsync(string userID)
         {
-            return this.Invoke(() =>
+            var result = new ResultBase();
+            try
             {
-                var user = this.GetUser(userID);
-                user.Unban(this.authentication);
-            });
+                var user = await this.GetUserAsync(userID);
+                await user.UnbanAsync(this.authentication);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public ResultBase SendMessage(string userID, string message)
+        public async Task<ResultBase> SendMessageAsync(string userID, string message)
         {
-            return this.Invoke(() =>
+            var result = new ResultBase();
+            try
             {
-                var user = this.GetUser(userID);
-                user.SendMessage(this.authentication, message);
-            });
+                var user = await this.GetUserAsync(userID);
+                await user.SendMessageAsync(this.authentication, message);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public ResultBase NotifyMessage(string[] userIDs, string message)
+        public async Task<ResultBase> NotifyMessageAsync(string[] userIDs, string message)
         {
-            return this.Invoke(() =>
+            var result = new ResultBase();
+            try
             {
-                this.userContext.NotifyMessage(this.authentication, userIDs, message);
-            });
+                await this.userContext.NotifyMessageAsync(this.authentication, userIDs, message);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
         public bool IsAlive()
@@ -511,28 +579,37 @@ namespace Ntreev.Crema.ServiceHosts.Users
             return result;
         }
 
-        private IUserItem GetUserItem(string itemPath)
+        private Task<IUserItem> GetUserItemAsync(string itemPath)
         {
-            var item = this.userContext[itemPath];
-            if (item == null)
-                throw new ItemNotFoundException(itemPath);
-            return item;
+            return this.userContext.Dispatcher.InvokeAsync(() =>
+            {
+                var item = this.userContext[itemPath];
+                if (item == null)
+                    throw new ItemNotFoundException(itemPath);
+                return item;
+            });
         }
 
-        private IUser GetUser(string userID)
+        private Task<IUser> GetUserAsync(string userID)
         {
-            var user = this.userContext.Users[userID];
-            if (user == null)
-                throw new UserNotFoundException(userID);
-            return user;
+            return this.userContext.Dispatcher.InvokeAsync(() =>
+            {
+                var user = this.userContext.Users[userID];
+                if (user == null)
+                    throw new UserNotFoundException(userID);
+                return user;
+            });
         }
 
-        private IUserCategory GetCategory(string categoryPath)
+        private Task<IUserCategory> GetCategoryAsync(string categoryPath)
         {
-            var category = this.userContext.Categories[categoryPath];
-            if (category == null)
-                throw new CategoryNotFoundException(categoryPath);
-            return category;
+            return this.userContext.Dispatcher.InvokeAsync(() =>
+            {
+                var category = this.userContext.Categories[categoryPath];
+                if (category == null)
+                    throw new CategoryNotFoundException(categoryPath);
+                return category;
+            });
         }
 
         #region ICremaServiceItem

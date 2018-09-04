@@ -29,6 +29,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Security;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace Ntreev.Crema.Services
@@ -41,7 +42,7 @@ namespace Ntreev.Crema.Services
         private IEnumerable<IPlugin> plugins;
 
         [Import]
-        private IServiceProvider container = null;
+        private readonly IServiceProvider container = null;
         private CremaSettings settings;
         private readonly IRepositoryProvider repositoryProvider;
         private readonly IObjectSerializer serializer;
@@ -52,7 +53,7 @@ namespace Ntreev.Crema.Services
         private ShutdownTimer shutdownTimer;
 
         [ImportMany]
-        private IEnumerable<IConfigurationPropertyProvider> propertiesProviders = null;
+        private readonly IEnumerable<IConfigurationPropertyProvider> propertiesProviders = null;
 
         [ImportingConstructor]
         public CremaHost(CremaSettings settings,
@@ -78,6 +79,7 @@ namespace Ntreev.Crema.Services
                 this.Dispatcher = new CremaDispatcher(this);
             else
                 this.Dispatcher = new CremaDispatcher(this, System.Windows.Threading.Dispatcher.CurrentDispatcher);
+            this.RepositoryDispatcher = new CremaDispatcher(this.RepositoryProvider);
             CremaLog.Debug("crema dispatcher initialized.");
         }
 
@@ -122,12 +124,12 @@ namespace Ntreev.Crema.Services
             return null;
         }
 
-        public void Open()
+        public Task OpenAsync()
         {
             try
             {
                 this.OnOpening(EventArgs.Empty);
-                this.Dispatcher.Invoke(() =>
+                return this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Info(Resources.Message_ProgramInfo, AppUtility.ProductName, AppUtility.ProductVersion);
                     this.Info("Repository module : {0}", this.settings.RepositoryModule);
@@ -155,7 +157,7 @@ namespace Ntreev.Crema.Services
                         this.Info("Plugin : {0}", item.Name);
                     }
 
-                    this.Dispatcher.InvokeAsync(() => this.DataBases.RestoreState(this.settings));
+                    this.Dispatcher.InvokeAsync(async () => await this.DataBases.RestoreStateAsync(this.settings));
 
                     GC.Collect();
                     this.Info("Crema module has been started.");
@@ -212,31 +214,34 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        public void Shutdown(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message)
+        public Task ShutdownAsync(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message)
         {
-            this.DebugMethod(authentication, this, nameof(Shutdown), this, milliseconds, shutdownType, message);
-            this.ValidateShutdown(authentication, milliseconds);
-
             try
             {
-                if (string.IsNullOrEmpty(message) == false)
-                    this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.NotifyMessage(Authentication.System, message));
-
-                if (this.shutdownTimer == null)
+                return this.Dispatcher.InvokeAsync(async () =>
                 {
-                    this.shutdownTimer = new ShutdownTimer()
+                    this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, shutdownType, message);
+                    this.ValidateShutdown(authentication, milliseconds);
+
+                    if (string.IsNullOrEmpty(message) == false)
+                        await this.UserContext.NotifyMessageAsync(Authentication.System, message);
+
+                    if (this.shutdownTimer == null)
                     {
-                        Interval = 1000,
-                    };
-                    this.shutdownTimer.Elapsed += ShutdownTimer_Elapsed;
-                }
+                        this.shutdownTimer = new ShutdownTimer()
+                        {
+                            Interval = 1000,
+                        };
+                        this.shutdownTimer.Elapsed += ShutdownTimer_Elapsed;
+                    }
 
-                var dateTime = DateTime.Now.AddMilliseconds(milliseconds);
-                this.shutdownTimer.DateTime = dateTime;
-                this.shutdownTimer.ShutdownType = shutdownType;
-                this.shutdownTimer.Start();
-                if (milliseconds >= 1000)
-                    this.SendShutdownMessage((dateTime - DateTime.Now) + new TimeSpan(0, 0, 0, 0, 500), true);
+                    var dateTime = DateTime.Now.AddMilliseconds(milliseconds);
+                    this.shutdownTimer.DateTime = dateTime;
+                    this.shutdownTimer.ShutdownType = shutdownType;
+                    this.shutdownTimer.Start();
+                    if (milliseconds >= 1000)
+                        this.SendShutdownMessage((dateTime - DateTime.Now) + new TimeSpan(0, 0, 0, 0, 500), true);
+                });
             }
             catch (Exception e)
             {
@@ -245,21 +250,23 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        public void CancelShutdown(Authentication authentication)
+        public async Task CancelShutdownAsync(Authentication authentication)
         {
-            this.DebugMethod(authentication, this, nameof(CancelShutdown), this);
-            this.ValidateCancelShutdown(authentication);
-
             try
             {
-                if (this.shutdownTimer != null)
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.shutdownTimer.Elapsed -= ShutdownTimer_Elapsed;
-                    this.shutdownTimer.Stop();
-                    this.shutdownTimer.Dispose();
-                    this.shutdownTimer = null;
-                    this.Info($"[{authentication}] Shutdown cancelled.");
-                }
+                    this.DebugMethod(authentication, this, nameof(CancelShutdownAsync), this);
+                    this.ValidateCancelShutdown(authentication);
+                    if (this.shutdownTimer != null)
+                    {
+                        this.shutdownTimer.Elapsed -= ShutdownTimer_Elapsed;
+                        this.shutdownTimer.Stop();
+                        this.shutdownTimer.Dispose();
+                        this.shutdownTimer = null;
+                        this.Info($"[{authentication}] Shutdown cancelled.");
+                    }
+                });
             }
             catch (Exception e)
             {
@@ -268,14 +275,14 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        public Authentication Login(string userID, SecureString password)
+        public Task<Authentication> LoginAsync(string userID, SecureString password)
         {
-            return this.UserContext.Dispatcher.Invoke(() => this.UserContext.Login(userID, password));
+            return this.UserContext.LoginAsync(userID, password);
         }
 
-        public void Logout(Authentication authentication)
+        public Task LogoutAsync(Authentication authentication)
         {
-            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Logout(authentication));
+            return this.UserContext.LogoutAsync(authentication);
         }
 
         public void Debug(object message)
@@ -365,7 +372,7 @@ namespace Ntreev.Crema.Services
 
         public CremaDispatcher Dispatcher { get; private set; }
 
-        //public CremaDispatcher RepositoryDispatcher { get; private set; }
+        public CremaDispatcher RepositoryDispatcher { get; private set; }
 
         public IObjectSerializer Serializer { get => this.serializer; }
 
@@ -423,30 +430,30 @@ namespace Ntreev.Crema.Services
             {
                 if (timeSpan.TotalSeconds >= 3600)
                 {
-                    this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.NotifyMessage(Authentication.System, $"crema shuts down after about {timeSpan.Hours} hours."));
+                    this.UserContext.NotifyMessageAsync(Authentication.System, $"crema shuts down after about {timeSpan.Hours} hours.");
                 }
                 else if (timeSpan.TotalSeconds >= 60)
                 {
-                    this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.NotifyMessage(Authentication.System, $"crema shuts down after about {timeSpan.Minutes} minutes."));
+                    this.UserContext.NotifyMessageAsync(Authentication.System, $"crema shuts down after about {timeSpan.Minutes} minutes.");
                 }
                 else
                 {
-                    this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.NotifyMessage(Authentication.System, $"crema shuts down after about {timeSpan.Seconds} seconds."));
+                    this.UserContext.NotifyMessageAsync(Authentication.System, $"crema shuts down after about {timeSpan.Seconds} seconds.");
                 }
             }
             else
             {
                 if (timeSpan.TotalSeconds % 3600 == 0)
                 {
-                    this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.NotifyMessage(Authentication.System, $"crema shuts down after {timeSpan.Hours} hours."));
+                    this.UserContext.NotifyMessageAsync(Authentication.System, $"crema shuts down after {timeSpan.Hours} hours.");
                 }
                 else if (timeSpan.TotalSeconds % 60 == 0)
                 {
-                    this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.NotifyMessage(Authentication.System, $"crema shuts down after {timeSpan.Minutes} minutes."));
+                    this.UserContext.NotifyMessageAsync(Authentication.System, $"crema shuts down after {timeSpan.Minutes} minutes.");
                 }
                 else if (timeSpan.TotalSeconds == 30 || timeSpan.TotalSeconds == 15 || timeSpan.TotalSeconds == 10 || timeSpan.TotalSeconds <= 5)
                 {
-                    this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.NotifyMessage(Authentication.System, $"crema shuts down after {timeSpan.Seconds} seconds."));
+                    this.UserContext.NotifyMessageAsync(Authentication.System, $"crema shuts down after {timeSpan.Seconds} seconds.");
                 }
             }
         }
@@ -466,7 +473,7 @@ namespace Ntreev.Crema.Services
             if (isRestart == true)
             {
                 this.settings.NoCache = shutdownType.HasFlag(ShutdownType.NoCache);
-                this.Open();
+                this.OpenAsync();
             }
         }
 
@@ -519,9 +526,9 @@ namespace Ntreev.Crema.Services
 
         #region ICremaHost
 
-        Guid ICremaHost.Open()
+        async Task<Guid> ICremaHost.OpenAsync()
         {
-            this.Open();
+            await this.OpenAsync();
             this.token = Guid.NewGuid();
             return this.token;
         }

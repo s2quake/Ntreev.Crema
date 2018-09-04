@@ -51,99 +51,97 @@ namespace Ntreev.Crema.Commands.Consoles
         [CommandMethod]
         [CommandMethodProperty(nameof(IsOnline), nameof(IsBanned))]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
-        public void List()
+        public async Task ListAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var metaItems = this.UserContext.Dispatcher.Invoke(() =>
-            {
-                var query = from item in this.UserContext.GetMetaData(authentication).Users
-                            let userID = item.UserInfo.ID
-                            orderby userID
-                            where StringUtility.GlobMany(userID, FilterProperties.FilterExpression)
-                            where this.IsOnline == false || item.UserState == UserState.Online
-                            where this.IsBanned == false || item.BanInfo.Path == item.Path
-                            select new TerminalUserItem(userID, item.BanInfo, item.UserState);
+            var metaData = await this.UserContext.GetMetaDataAsync(authentication);
+            var query = from item in metaData.Users
+                        let userID = item.UserInfo.ID
+                        orderby userID
+                        where StringUtility.GlobMany(userID, FilterProperties.FilterExpression)
+                        where this.IsOnline == false || item.UserState == UserState.Online
+                        where this.IsBanned == false || item.BanInfo.Path == item.Path
+                        select new TerminalUserItem(userID, item.BanInfo, item.UserState);
 
-                return query.ToArray();
-            });
+            var metaItems = query.ToArray();
             this.CommandContext.WriteList(metaItems);
         }
 
         [CommandMethod]
         [CommandMethodProperty(nameof(Message))]
-        public void Kick([CommandCompletion(nameof(GetOnlineUserIDs))]string userID)
+        public async Task KickAsync([CommandCompletion(nameof(GetOnlineUserIDs))]string userID)
         {
-            var user = this.GetUser(userID);
+            var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
-            user.Dispatcher.Invoke(() => user.Kick(authentication, this.Message));
+            await user.KickAsync(authentication, this.Message);
         }
 
         [CommandMethod]
         [CommandMethodProperty(nameof(Message))]
-        public void Ban([CommandCompletion(nameof(GetUnbannedUserIDs))]string userID)
+        public async Task BanAsync([CommandCompletion(nameof(GetUnbannedUserIDs))]string userID)
         {
-            var user = this.GetUser(userID);
+            var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
-            user.Dispatcher.Invoke(() => user.Ban(authentication, this.Message));
+            await user.BanAsync(authentication, this.Message);
         }
 
         [CommandMethod]
-        public void Unban([CommandCompletion(nameof(GetBannedUserIDs))]string userID)
+        public async Task UnbanAsync([CommandCompletion(nameof(GetBannedUserIDs))]string userID)
         {
-            var user = this.GetUser(userID);
+            var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
-            user.Dispatcher.Invoke(() => user.Unban(authentication));
+            await user.UnbanAsync(authentication);
         }
 
         [CommandMethod]
-        public void Password([CommandCompletion(nameof(GetUserIDs))]string userID)
+        public async Task PasswordAsync([CommandCompletion(nameof(GetUserIDs))]string userID)
         {
-            var user = this.GetUser(userID);
+            var user = await this.GetUserAsync(userID);
             var password1 = this.CommandContext.ReadSecureString("Password1:");
             var password2 = this.CommandContext.ReadSecureString("Password2:");
             ConsoleCommandContextBase.Validate(password1, password2);
             var authentication = this.CommandContext.GetAuthentication(this);
-            user.Dispatcher.Invoke(() => user.ChangeUserInfo(authentication, null, password1, null, null));
+            await user.ChangeUserInfoAsync(authentication, null, password1, null, null);
         }
 
         [CommandMethod]
-        public void Rename([CommandCompletion(nameof(GetUser))]string userID, string newName = null)
+        public async Task RenameAsync([CommandCompletion(nameof(GetUserIDs))]string userID, string newName = null)
         {
-            var user = this.GetUser(userID);
+            var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
             var newValue = newName ?? this.CommandContext.ReadString("NewName:");
-            user.Dispatcher.Invoke(() => user.ChangeUserInfo(authentication, null, null, newValue, null));
+            await user.ChangeUserInfoAsync(authentication, null, null, newValue, null);
         }
 
         [CommandMethod]
-        public void Move([CommandCompletion(nameof(GetUser))]string userID, string categoryPath)
+        public async Task MoveAsync([CommandCompletion(nameof(GetUserIDs))]string userID, string categoryPath)
         {
-            var user = this.GetUser(userID);
+            var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
-            user.Dispatcher.Invoke(() => user.Move(authentication, categoryPath));
+            await user.MoveAsync(authentication, categoryPath);
         }
 
         [CommandMethod("authority")]
-        public void SetAuthority([CommandCompletion(nameof(GetUser))]string userID, Authority authority)
+        public async Task SetAuthorityAsync([CommandCompletion(nameof(GetUserIDs))]string userID, Authority authority)
         {
-            var user = this.GetUser(userID);
+            var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
-            user.Dispatcher.Invoke(() => user.ChangeUserInfo(authentication, null, null, null, authority));
+            await user.ChangeUserInfoAsync(authentication, null, null, null, authority);
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public void Info([CommandCompletion(nameof(GetUser))]string userID)
+        public async Task InfoAsync([CommandCompletion(nameof(GetUserIDs))]string userID)
         {
-            var user = this.GetUser(userID);
-            var userInfo = user.Dispatcher.Invoke(() => user.UserInfo);
+            var user = await this.GetUserAsync(userID);
+            var userInfo = await user.Dispatcher.InvokeAsync(() => user.UserInfo);
             this.CommandContext.WriteObject(userInfo.ToDictionary(), FormatProperties.Format);
         }
 
         [ConsoleModeOnly]
         [CommandMethod]
         [CommandMethodProperty(nameof(CategoryPath))]
-        public void Create()
+        public async Task CreateAsync()
         {
             var schema = JsonSchemaUtility.CreateSchema(typeof(JsonUserInfo));
             schema.SetEnums(nameof(JsonUserInfo.CategoryPath), this.GetCategoryPaths());
@@ -153,35 +151,32 @@ namespace Ntreev.Crema.Commands.Consoles
             if (JsonEditorHost.TryEdit(ref userInfo, schema) == false)
                 return;
 
-            var category = this.GetCategory(this.CategoryPath ?? this.CommandContext.Path);
+            var category = await this.GetCategoryAsync(this.CategoryPath ?? this.CommandContext.Path);
             var userID = userInfo.UserID;
             var password = StringUtility.ToSecureString(userInfo.Password);
             var userName = userInfo.UserName;
             var authority = (Authority)Enum.Parse(typeof(Authority), userInfo.Authority);
             var authentication = this.CommandContext.GetAuthentication(this);
-            category.Dispatcher.Invoke(() => category.AddNewUser(authentication, userID, password, userName, authority));
+            await category.AddNewUserAsync(authentication, userID, password, userName, authority);
         }
 
         [CommandMethod]
-        public void Delete([CommandCompletion(nameof(GetUser))]string userID)
+        public async Task DeleteAsync([CommandCompletion(nameof(GetUserIDs))]string userID)
         {
-            var user = this.GetUser(userID);
+            var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
             if (this.CommandContext.ConfirmToDelete() == true)
             {
-                user.Dispatcher.Invoke(() => user.Delete(authentication));
+                await user.DeleteAsync(authentication);
             }
         }
 
         [CommandMethod("message")]
-        public void SendMessage([CommandCompletion(nameof(GetUser))]string userID, string message)
+        public async Task SendMessageAsync([CommandCompletion(nameof(GetUserIDs))]string userID, string message)
         {
-            this.UserContext.Dispatcher.Invoke(() =>
-            {
-                var user = this.GetUser(userID);
-                var authentication = this.CommandContext.GetAuthentication(this);
-                user.SendMessage(authentication, message);
-            });
+            var user = await this.GetUserAsync(userID);
+            var authentication = this.CommandContext.GetAuthentication(this);
+            await user.SendMessageAsync(authentication, message);
         }
 
         [CommandProperty("online", 'o')]
@@ -216,20 +211,26 @@ namespace Ntreev.Crema.Commands.Consoles
             get { return this.cremaHost.GetService(typeof(IUserContext)) as IUserContext; }
         }
 
-        private IUser GetUser(string userID)
+        private Task<IUser> GetUserAsync(string userID)
         {
-            var user = this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users[userID]);
-            if (user == null)
-                throw new UserNotFoundException(userID);
-            return user;
+            return this.UserContext.Dispatcher.InvokeAsync(() =>
+            {
+                var user = this.UserContext.Users[userID];
+                if (user == null)
+                    throw new UserNotFoundException(userID);
+                return user;
+            });
         }
 
-        private IUserCategory GetCategory(string categoryPath)
+        private Task<IUserCategory> GetCategoryAsync(string categoryPath)
         {
-            var category = this.UserContext.Dispatcher.Invoke(() => this.UserContext.Categories[categoryPath]);
-            if (category == null)
-                throw new CategoryNotFoundException(categoryPath);
-            return category;
+            return this.UserContext.Dispatcher.InvokeAsync(() =>
+            {
+                var category = this.UserContext.Categories[categoryPath];
+                if (category == null)
+                    throw new CategoryNotFoundException(categoryPath);
+                return category;
+            });
         }
 
         private string[] GetUserIDs()

@@ -61,15 +61,15 @@ namespace Ntreev.Crema.Services.Data
             userContext.Dispatcher.Invoke(() => userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
         }
 
-        public void InvokeTypeItemLock(Authentication authentication, ITypeItem typeItem, string comment)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeItemLock), typeItem, comment);
-        }
+        //public void InvokeTypeItemLock(Authentication authentication, ITypeItem typeItem, string comment)
+        //{
+        //    this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeItemLock), typeItem, comment);
+        //}
 
-        public void InvokeTypeItemUnlock(Authentication authentication, ITypeItem typeItem)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeItemUnlock), typeItem);
-        }
+        //public void InvokeTypeItemUnlock(Authentication authentication, ITypeItem typeItem)
+        //{
+        //    this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeItemUnlock), typeItem);
+        //}
 
         public void InvokeTypeItemSetPublic(Authentication authentication, ITypeItem typeItem)
         {
@@ -354,7 +354,10 @@ namespace Ntreev.Crema.Services.Data
 
             foreach (var item in items)
             {
-                item.Unlock(authentication);
+                if (item is Type type)
+                    type.UnlockInternal(authentication);
+                else if (item is TypeCategory category)
+                    category.UnlockInternal(authentication);
             }
 
             authentication.Sign();

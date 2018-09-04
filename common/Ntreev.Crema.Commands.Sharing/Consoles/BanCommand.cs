@@ -88,7 +88,7 @@ namespace Ntreev.Crema.Commands.Consoles
                 {
                     throw new ArgumentException($"'{this.GetDescriptor(nameof(this.Message)).DisplayPattern}' 가 필요합니다.");
                 }
-                user.Dispatcher.Invoke(() => user.Ban(authentication, this.Message));
+                user.BanAsync(authentication, this.Message).Wait();
             }
         }
     }

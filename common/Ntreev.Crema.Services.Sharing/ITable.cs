@@ -29,23 +29,23 @@ namespace Ntreev.Crema.Services
 {
     public interface ITable : IAccessible, ILockable, IPermission, IServiceProvider, IDispatcherObject, IExtendedProperties
     {
-        void Rename(Authentication authentication, string newName);
+        Task RenameAsync(Authentication authentication, string newName);
 
-        void Move(Authentication authentication, string categoryPath);
+        Task MoveAsync(Authentication authentication, string categoryPath);
 
-        void Delete(Authentication authentication);
+        Task DeleteAsync(Authentication authentication);
 
-        ITable Copy(Authentication authentication, string newTableName, string categoryPath, bool copyContent);
+        Task<ITable> CopyAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent);
 
-        ITable Inherit(Authentication authentication, string newTableName, string categoryPath, bool copyContent);
+        Task<ITable> InheritAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent);
 
-        ITableTemplate NewTable(Authentication authentication);
+        Task<ITableTemplate> NewTableAsync(Authentication authentication);
 
-        CremaDataSet GetDataSet(Authentication authentication, string revision);
+        Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision);
 
-        LogInfo[] GetLog(Authentication authentication, string revision);
+        Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision);
 
-        FindResultInfo[] Find(Authentication authentication, string text, FindOptions options);
+        Task<FindResultInfo[]> FindAsync(Authentication authentication, string text, FindOptions options);
 
         ITable Parent { get; }
 

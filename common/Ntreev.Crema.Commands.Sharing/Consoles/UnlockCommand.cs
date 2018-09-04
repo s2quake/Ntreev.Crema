@@ -69,12 +69,11 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        protected override void OnExecute()
+        protected override Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             var lockable = this.GetObject(authentication, this.GetAbsolutePath(this.Path));
-
-            this.Invoke(authentication, lockable, () => lockable.Unlock(authentication));
+            return lockable.UnlockAsync(authentication);
         }
     }
 }
