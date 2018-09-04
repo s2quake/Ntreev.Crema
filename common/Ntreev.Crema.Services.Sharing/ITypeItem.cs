@@ -35,11 +35,11 @@ namespace Ntreev.Crema.Services
 
         Task DeleteAsync(Authentication authentication);
 
-        LogInfo[] GetLog(Authentication authentication, string revision);
+        Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision);
 
-        FindResultInfo[] Find(Authentication authentication, string text, FindOptions options);
+        Task<FindResultInfo[]> FindAsync(Authentication authentication, string text, FindOptions options);
 
-        CremaDataSet GetDataSet(Authentication authentication, string revision);
+        Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision);
 
         string Name { get; }
 

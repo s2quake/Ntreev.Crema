@@ -29,25 +29,25 @@ namespace Ntreev.Crema.Services
 {
     public interface IDomain : IServiceProvider, IDispatcherObject, IExtendedProperties
     {
-        void Delete(Authentication authentication, bool isCancel);
+        Task DeleteAsync(Authentication authentication, bool isCancel);
 
-        void BeginUserEdit(Authentication authentication, DomainLocationInfo location);
+        Task BeginUserEditAsync(Authentication authentication, DomainLocationInfo location);
 
-        void EndUserEdit(Authentication authentication);
+        Task EndUserEditAsync(Authentication authentication);
 
-        DomainRowInfo[] NewRow(Authentication authentication, DomainRowInfo[] rows);
+        Task<DomainRowInfo[]> NewRowAsync(Authentication authentication, DomainRowInfo[] rows);
 
-        DomainRowInfo[] SetRow(Authentication authentication, DomainRowInfo[] rows);
+        Task<DomainRowInfo[]> SetRowAsync(Authentication authentication, DomainRowInfo[] rows);
 
-        void RemoveRow(Authentication authentication, DomainRowInfo[] rows);
+        Task RemoveRowAsync(Authentication authentication, DomainRowInfo[] rows);
 
-        void SetProperty(Authentication authentication, string propertyName, object value);
+        Task SetPropertyAsync(Authentication authentication, string propertyName, object value);
 
-        void SetUserLocation(Authentication authentication, DomainLocationInfo location);
+        Task SetUserLocationAsync(Authentication authentication, DomainLocationInfo location);
 
-        DomainUserInfo Kick(Authentication authentication, string userID, string comment);
+        Task<DomainUserInfo> KickAsync(Authentication authentication, string userID, string comment);
 
-        void SetOwner(Authentication authentication, string userID);
+        Task SetOwnerAsync(Authentication authentication, string userID);
 
         Guid ID { get; }
 
@@ -83,6 +83,6 @@ namespace Ntreev.Crema.Services
 
         event EventHandler<DomainDeletedEventArgs> Deleted;
 
-        DomainMetaData GetMetaData(Authentication authentication);
+        Task<DomainMetaData> GetMetaDataAsync(Authentication authentication);
     }
 }

@@ -20,16 +20,17 @@ using Ntreev.Library.ObjectModel;
 using Ntreev.Crema.ServiceModel;
 using System.Collections.Specialized;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
     public interface IDomainCollection : IReadOnlyCollection<IDomain>, IEnumerable<IDomain>, INotifyCollectionChanged, IServiceProvider, IDispatcherObject
     {
-        bool Contains(Guid domainID);
+        Task<bool> ContainsAsync(Guid domainID);
 
         IDomain this[Guid domainID] { get; }
 
-        DomainMetaData[] GetMetaData(Authentication authentication);
+        Task<DomainMetaData[]> GetMetaDataAsync(Authentication authentication);
 
         event EventHandler<DomainEventArgs> DomainCreated;
 

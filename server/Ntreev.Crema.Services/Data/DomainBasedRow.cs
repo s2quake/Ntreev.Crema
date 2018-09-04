@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -53,17 +54,16 @@ namespace Ntreev.Crema.Services.Data
                 this.fields[CremaSchema.__ParentID__] = parentID;
         }
 
-        public void Delete(Authentication authentication)
+        public Task DeleteAsync(Authentication authentication)
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                if (this.Row == null)
-                    throw new InvalidOperationException();
-                this.domain.Dispatcher.Invoke(() =>
+                return this.Dispatcher.InvokeAsync(async () =>
                 {
+                    if (this.Row == null)
+                        throw new InvalidOperationException();
                     var keys = this.Row.GetKeys();
-                    this.domain.RemoveRow(authentication, this.table.TableName, keys);
+                    await this.domain.RemoveRowAsync(authentication, this.table.TableName, keys);
                 });
             }
             catch (Exception e)
@@ -73,17 +73,20 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void EndNew(Authentication authentication)
+        public Task EndNewAsync(Authentication authentication)
         {
             try
             {
-                if (this.Row != null)
-                    throw new InvalidOperationException();
+                return this.Dispatcher.InvokeAsync(async () =>
+                {
+                    if (this.Row != null)
+                        throw new InvalidOperationException();
 
-                var fields = this.fields.Values.ToArray();
-                var keys = this.domain.Dispatcher.Invoke(() => this.domain.NewRow(authentication, this.table.TableName, fields));
-                this.Row = this.table.Rows.Find(keys);
-                this.fields = null;
+                    var fields = this.fields.Values.ToArray();
+                    var keys = await this.domain.NewRowAsync(authentication, this.table.TableName, fields);
+                    this.Row = this.table.Rows.Find(keys);
+                    this.fields = null;
+                });
             }
             catch (Exception e)
             {
@@ -111,25 +114,25 @@ namespace Ntreev.Crema.Services.Data
             return this.Row.Field<T>(columnName);
         }
 
-        protected void SetField<T>(Authentication authentication, string columnName, T value)
+        protected Task SetFieldAsync<T>(Authentication authentication, string columnName, T value)
         {
-            if (this.fields != null)
+            return this.Dispatcher.InvokeAsync(async () =>
             {
-                if (this.fields.ContainsKey(columnName) == false)
-                    throw new KeyNotFoundException(columnName);
-                this.fields[columnName] = value;
-            }
-            else
-            {
-                this.domain.Dispatcher.Invoke(() =>
+                if (this.fields != null)
+                {
+                    if (this.fields.ContainsKey(columnName) == false)
+                        throw new KeyNotFoundException(columnName);
+                    this.fields[columnName] = value;
+                }
+                else
                 {
                     var keys = this.Row.GetKeys();
                     var fields = new object[this.table.Columns.Count];
                     var column = this.table.Columns[columnName];
                     fields[column.Ordinal] = value;
-                    this.domain.SetRow(authentication, this.table.TableName, keys, fields);
-                });
-            }
+                    await this.domain.SetRowAsync(authentication, this.table.TableName, keys, fields);
+                }
+            });
         }
 
         private void Backup(DataRow row)

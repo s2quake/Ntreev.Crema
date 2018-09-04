@@ -16,21 +16,22 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Threading.Tasks;
 using Ntreev.Crema.ServiceModel;
 
 namespace Ntreev.Crema.Services
 {
     public interface IDomainUser : IServiceProvider, IDispatcherObject, IExtendedProperties
     {
-        void BeginEdit(Authentication authentication, DomainLocationInfo location);
+        Task BeginEditAsync(Authentication authentication, DomainLocationInfo location);
 
-        void EndEdit(Authentication authentication);
+        Task EndEditAsync(Authentication authentication);
 
-        void SetLocation(Authentication authentication, DomainLocationInfo location);
+        Task SetLocationAsync(Authentication authentication, DomainLocationInfo location);
 
-        void Kick(Authentication authentication, string comment);
+        Task KickAsync(Authentication authentication, string comment);
 
-        void SetOwner(Authentication authentication);
+        Task SetOwnerAsync(Authentication authentication);
 
         string ID { get; }
 

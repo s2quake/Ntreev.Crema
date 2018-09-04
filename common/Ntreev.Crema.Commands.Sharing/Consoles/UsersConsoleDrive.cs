@@ -24,6 +24,7 @@ using System.Text;
 using Ntreev.Library.IO;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library.ObjectModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
@@ -46,14 +47,14 @@ namespace Ntreev.Crema.Commands.Consoles
             return this.UserContext.Dispatcher.Invoke(() => this.UserContext.Select(item => item.Path).ToArray());
         }
 
-        public override object GetObject(Authentication authentication, string path)
+        public override async Task<object> GetObjectAsync(Authentication authentication, string path)
         {
-            return this.GetObject(path);
+            return await this.GetObjectAsync(path);
         }
 
-        public IUser GetUser(string userID)
+        public Task<IUser> GetUserAsync(string userID)
         {
-            return this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users[userID]);
+            return this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users[userID]);
         }
 
         public string[] GetUserList()
@@ -61,30 +62,25 @@ namespace Ntreev.Crema.Commands.Consoles
             return this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.Select(item => item.ID).ToArray());
         }
 
-        protected override void OnCreate(Authentication authentication, string path, string name)
+        protected override async Task OnCreateAsync(Authentication authentication, string path, string name)
         {
-            var category = this.GetObject(path) as IUserCategory;
-            this.UserContext.Dispatcher.Invoke(Create);
-
-            void Create()
-            {
-                if (category == null)
-                    throw new CategoryNotFoundException(path);
-                category.AddNewCategory(authentication, name);
-            }
+            var category = await this.GetObjectAsync(path) as IUserCategory;
+            if (category == null)
+                throw new CategoryNotFoundException(path);
+            await category.AddNewCategoryAsync(authentication, name);
         }
 
-        protected override void OnMove(Authentication authentication, string path, string newPath)
+        protected override async Task OnMoveAsync(Authentication authentication, string path, string newPath)
         {
-            var sourceObject = this.GetObject(path);
+            var sourceObject = await this.GetObjectAsync(path);
 
             if (sourceObject is IUser sourceUser)
             {
-                this.MoveUser(authentication, sourceUser, newPath);
+                await this.MoveUserAsync(authentication, sourceUser, newPath);
             }
             else if (sourceObject is IUserCategory sourceUserCategory)
             {
-                this.MoveUserCategory(authentication, sourceUserCategory, newPath);
+                await this.MoveUserCategoryAsync(authentication, sourceUserCategory, newPath);
             }
             else
             {
@@ -92,104 +88,85 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        protected override void OnDelete(Authentication authentication, string path)
+        protected override async Task OnDeleteAsync(Authentication authentication, string path)
         {
-            var userItem = this.GetObject(path) as IUserItem;
-            this.UserContext.Dispatcher.Invoke(Delete);
-
-            void Delete()
-            {
-                if(userItem == null)
-                    throw new ItemNotFoundException(path);
-                userItem.Delete(authentication);
-            }
+            var userItem = await this.GetObjectAsync(path) as IUserItem;
+            if (userItem == null)
+                throw new ItemNotFoundException(path);
+            await userItem.DeleteAsync(authentication);
         }
 
-        protected override void OnSetPath(Authentication authentication, string path)
+        protected override Task OnSetPathAsync(Authentication authentication, string path)
         {
-            this.path = path;
+            return Task.Run(() =>
+            {
+                this.path = path;
+            });
         }
         
-        private void MoveUserCategory(Authentication authentication, IUserCategory sourceCategory, string destPath)
+        private async Task MoveUserCategoryAsync(Authentication authentication, IUserCategory sourceCategory, string destPath)
         {
-            var destObject = this.GetObject(destPath);
-            this.UserContext.Dispatcher.Invoke(MoveUserCategory);
+            var destObject = await this.GetObjectAsync(destPath);
+            //var dataBase = sourceCategory.GetService(typeof(IDataBase)) as IDataBase;
+            var users = sourceCategory.GetService(typeof(IUserCollection)) as IUserCollection;
 
-            void MoveUserCategory()
+            //if (destPath.DataBaseName != dataBase.Name)
+            //    throw new InvalidOperationException($"cannot move to : {destPath}");
+            //if (destPath.Context != CremaSchema.UserDirectory)
+            //    throw new InvalidOperationException($"cannot move to : {destPath}");
+            if (destObject is IUser)
+                throw new InvalidOperationException($"cannot move to : {destPath}");
+
+            if (destObject is IUserCategory destCategory)
             {
-                //var dataBase = sourceCategory.GetService(typeof(IDataBase)) as IDataBase;
-                var users = sourceCategory.GetService(typeof(IUserCollection)) as IUserCollection;
-
-                //if (destPath.DataBaseName != dataBase.Name)
-                //    throw new InvalidOperationException($"cannot move to : {destPath}");
-                //if (destPath.Context != CremaSchema.UserDirectory)
-                //    throw new InvalidOperationException($"cannot move to : {destPath}");
-                if (destObject is IUser)
+                if (sourceCategory.Parent != destCategory)
+                    await sourceCategory.MoveAsync(authentication, destCategory.Path);
+            }
+            else
+            {
+                if (NameValidator.VerifyCategoryPath(destPath) == true)
                     throw new InvalidOperationException($"cannot move to : {destPath}");
-
-                if (destObject is IUserCategory destCategory)
-                {
-                    if (sourceCategory.Parent != destCategory)
-                        sourceCategory.Move(authentication, destCategory.Path);
-                }
-                else
-                {
-                    if (NameValidator.VerifyCategoryPath(destPath) == true)
-                        throw new InvalidOperationException($"cannot move to : {destPath}");
-                    var itemName = new ItemName(destPath);
-                    var categories = sourceCategory.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-                    if (categories.Contains(itemName.CategoryPath) == false)
-                        throw new InvalidOperationException($"cannot move to : {destPath}");
-                    if (sourceCategory.Name != itemName.Name && users.Contains(itemName.Name) == true)
-                        throw new InvalidOperationException($"cannot move to : {destPath}");
-                    if (sourceCategory.Parent.Path != itemName.CategoryPath)
-                        sourceCategory.Move(authentication, itemName.CategoryPath);
-                    if (sourceCategory.Name != itemName.Name)
-                        sourceCategory.Rename(authentication, itemName.Name);
-                }
+                var itemName = new ItemName(destPath);
+                var categories = sourceCategory.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+                if (categories.Contains(itemName.CategoryPath) == false)
+                    throw new InvalidOperationException($"cannot move to : {destPath}");
+                if (sourceCategory.Name != itemName.Name && users.Contains(itemName.Name) == true)
+                    throw new InvalidOperationException($"cannot move to : {destPath}");
+                if (sourceCategory.Parent.Path != itemName.CategoryPath)
+                    await sourceCategory.MoveAsync(authentication, itemName.CategoryPath);
+                if (sourceCategory.Name != itemName.Name)
+                    await sourceCategory.RenameAsync(authentication, itemName.Name);
             }
         }
 
-        private void MoveUser(Authentication authentication, IUser sourceUser, string destPath)
+        private async Task MoveUserAsync(Authentication authentication, IUser sourceUser, string destPath)
         {
-            var destObject = this.GetObject(destPath);
-            this.UserContext.Dispatcher.Invoke(MoveUser);
+            var destObject = await this.GetObjectAsync(destPath);
+            var users = sourceUser.GetService(typeof(IUserCollection)) as IUserCollection;
 
-            void MoveUser()
+            if (destObject is IUserCategory destCategory)
             {
-                var users = sourceUser.GetService(typeof(IUserCollection)) as IUserCollection;
-
-                //if (destPath.DataBaseName != dataBase.Name)
-                //    throw new InvalidOperationException($"cannot move to : {destPath}");
-                //if (destPath.Context != CremaSchema.UserDirectory)
-                //    throw new InvalidOperationException($"cannot move to : {destPath}");
-                //if (destObject is IUser)
-                //    throw new InvalidOperationException($"cannot move to : {destPath}");
-
-                if (destObject is IUserCategory destCategory)
-                {
-                    if (sourceUser.Category != destCategory)
-                        sourceUser.Move(authentication, destCategory.Path);
-                }
-                else
-                {
-                    if (NameValidator.VerifyCategoryPath(destPath) == true)
-                        throw new InvalidOperationException($"cannot move to : {destPath}");
-                    var itemName = new ItemName(destPath);
-                    var categories = sourceUser.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-                    if (categories.Contains(itemName.CategoryPath) == false)
-                        throw new InvalidOperationException($"cannot move to : {destPath}");
-                    if (sourceUser.ID != itemName.Name)
-                        throw new InvalidOperationException($"cannot move to : {destPath}");
-                    if (sourceUser.Category.Path != itemName.CategoryPath)
-                        sourceUser.Move(authentication, itemName.CategoryPath);
-                }
-            };
+                if (sourceUser.Category != destCategory)
+                    await sourceUser.MoveAsync(authentication, destCategory.Path);
+            }
+            else
+            {
+                if (NameValidator.VerifyCategoryPath(destPath) == true)
+                    throw new InvalidOperationException($"cannot move to : {destPath}");
+                var itemName = new ItemName(destPath);
+                var categories = sourceUser.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+                if (categories.Contains(itemName.CategoryPath) == false)
+                    throw new InvalidOperationException($"cannot move to : {destPath}");
+                if (sourceUser.ID != itemName.Name)
+                    throw new InvalidOperationException($"cannot move to : {destPath}");
+                if (sourceUser.Category.Path != itemName.CategoryPath)
+                    await sourceUser.MoveAsync(authentication, itemName.CategoryPath);
+            }
         }
 
-        private IUserItem GetObject(string path)
+        private Task<IUserItem> GetObjectAsync(string path)
         {
-            return this.UserContext.Dispatcher.Invoke(GetObject);
+            return this.UserContext.Dispatcher.InvokeAsync(GetObject);
 
             IUserItem GetObject()
             {

@@ -26,15 +26,15 @@ namespace Ntreev.Crema.Services
 {
     public interface IAccessible
     {
-        void SetPublic(Authentication authentication);
+        Task SetPublicAsync(Authentication authentication);
 
-        void SetPrivate(Authentication authentication);
+        Task SetPrivateAsync(Authentication authentication);
 
-        void AddAccessMember(Authentication authentication, string memberID, AccessType accessType);
+        Task AddAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType);
 
-        void SetAccessMember(Authentication authentication, string memberID, AccessType accessType);
+        Task SetAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType);
 
-        void RemoveAccessMember(Authentication authentication, string memberID);
+        Task RemoveAccessMemberAsync(Authentication authentication, string memberID);
 
         AccessInfo AccessInfo { get; }
     }

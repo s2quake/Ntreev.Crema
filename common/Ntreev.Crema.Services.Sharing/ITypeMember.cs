@@ -20,20 +20,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
     public interface ITypeMember: IDispatcherObject
     {
-        void Delete(Authentication authentication);
+        Task DeleteAsync(Authentication authentication);
 
-        void SetIndex(Authentication authentication, int value);
+        Task SetIndexAsync(Authentication authentication, int value);
 
-        void SetName(Authentication authentication, string value);
+        Task SetNameAsync(Authentication authentication, string value);
 
-        void SetValue(Authentication authentication, long value);
+        Task SetValueAsync(Authentication authentication, long value);
 
-        void SetComment(Authentication authentication, string value);
+        Task SetCommentAsync(Authentication authentication, string value);
 
         int Index { get; }
 

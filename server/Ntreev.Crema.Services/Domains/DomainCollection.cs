@@ -23,6 +23,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains
 {
@@ -182,20 +183,18 @@ namespace Ntreev.Crema.Services.Domains
             domain.Dispatcher.InvokeAsync(() => this.InvokeDomainCreatedEvent(authentication, domain));
         }
 
-        public bool Contains(Guid domainID)
+        public Task<bool> ContainsAsync(Guid domainID)
         {
-            return this.Contains(domainID.ToString());
+            return this.Dispatcher.InvokeAsync(() => this.Contains(domainID.ToString()));
         }
 
-        public DomainMetaData[] GetMetaData(Authentication authentication)
+        public async Task<DomainMetaData[]> GetMetaDataAsync(Authentication authentication)
         {
-            this.Dispatcher.VerifyAccess();
-
-            var domains = this.ToArray<Domain>();
+            var domains = await this.Dispatcher.InvokeAsync(() => this.ToArray<Domain>());
             var metaDataList = new List<DomainMetaData>(domains.Length);
             foreach (var item in domains)
             {
-                var metaData = item.Dispatcher.Invoke(() => item.GetMetaData(authentication));
+                var metaData = await item.GetMetaDataAsync(authentication);
                 metaDataList.Add(metaData);
             }
             return metaDataList.ToArray();

@@ -23,6 +23,7 @@ using Ntreev.Library;
 using System;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -45,15 +46,14 @@ namespace Ntreev.Crema.Services.Data
                         select item.Field<string>(CremaSchema.ColumnName);
 
             var newName = NameUtility.GenerateNewName("Column", query);
-            this.SetField(null, CremaSchema.ColumnName, newName);
+            this.SetFieldAsync(null, CremaSchema.ColumnName, newName);
         }
 
-        public void SetIndex(Authentication authentication, int value)
+        public Task SetIndexAsync(Authentication authentication, int value)
         {
             try
             {
-                this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.Index, value);
+                return this.SetFieldAsync(authentication, CremaSchema.Index, value);
             }
             catch (Exception e)
             {
@@ -62,12 +62,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetIsKey(Authentication authentication, bool value)
+        public Task SetIsKeyAsync(Authentication authentication, bool value)
         {
             try
             {
-                this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.IsKey, value);
+                return this.SetFieldAsync(authentication, CremaSchema.IsKey, value);
             }
             catch (Exception e)
             {
@@ -76,12 +75,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetIsUnique(Authentication authentication, bool value)
+        public Task SetIsUniqueAsync(Authentication authentication, bool value)
         {
             try
             {
-                this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.IsUnique, value);
+                return this.SetFieldAsync(authentication, CremaSchema.IsUnique, value);
             }
             catch (Exception e)
             {
@@ -90,12 +88,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetName(Authentication authentication, string value)
+        public Task SetNameAsync(Authentication authentication, string value)
         {
             try
             {
                 this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.ColumnName, value);
+                return this.SetFieldAsync(authentication, CremaSchema.ColumnName, value);
             }
             catch (Exception e)
             {
@@ -104,12 +102,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetDataType(Authentication authentication, string value)
+        public Task SetDataTypeAsync(Authentication authentication, string value)
         {
             try
             {
                 this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.DataType, value);
+                return this.SetFieldAsync(authentication, CremaSchema.DataType, value);
             }
             catch (Exception e)
             {
@@ -118,12 +116,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetDefaultValue(Authentication authentication, string value)
+        public Task SetDefaultValueAsync(Authentication authentication, string value)
         {
             try
             {
                 this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.DefaultValue, value);
+                return this.SetFieldAsync(authentication, CremaSchema.DefaultValue, value);
             }
             catch (Exception e)
             {
@@ -132,12 +130,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetComment(Authentication authentication, string value)
+        public Task SetCommentAsync(Authentication authentication, string value)
         {
             try
             {
                 this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.Comment, value);
+                return this.SetFieldAsync(authentication, CremaSchema.Comment, value);
             }
             catch (Exception e)
             {
@@ -146,12 +144,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetAutoIncrement(Authentication authentication, bool value)
+        public Task SetAutoIncrementAsync(Authentication authentication, bool value)
         {
             try
             {
                 this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.AutoIncrement, value);
+                return this.SetFieldAsync(authentication, CremaSchema.AutoIncrement, value);
             }
             catch (Exception e)
             {
@@ -160,12 +158,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetTags(Authentication authentication, TagInfo value)
+        public Task SetTagsAsync(Authentication authentication, TagInfo value)
         {
             try
             {
                 this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.Tags, value.ToString());
+                return this.SetFieldAsync(authentication, CremaSchema.Tags, value.ToString());
             }
             catch (Exception e)
             {
@@ -174,12 +172,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetIsReadOnly(Authentication authentication, bool value)
+        public Task SetIsReadOnlyAsync(Authentication authentication, bool value)
         {
             try
             {
                 this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.ReadOnly, value);
+                return this.SetFieldAsync(authentication, CremaSchema.ReadOnly, value);
             }
             catch (Exception e)
             {
@@ -188,12 +186,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetAllowNull(Authentication authentication, bool value)
+        public Task SetAllowNullAsync(Authentication authentication, bool value)
         {
             try
             {
                 this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.AllowNull, value);
+                return this.SetFieldAsync(authentication, CremaSchema.AllowNull, value);
             }
             catch (Exception e)
             {

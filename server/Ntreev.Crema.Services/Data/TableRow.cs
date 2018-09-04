@@ -22,6 +22,7 @@ using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
 using System;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -45,22 +46,21 @@ namespace Ntreev.Crema.Services.Data
             this.Content = content;
         }
 
-        public void SetIsEnabled(Authentication authentication, bool value)
+        public Task SetIsEnabledAsync(Authentication authentication, bool value)
         {
-            this.SetField(authentication, CremaSchema.Enable, value);
+            return this.SetFieldAsync(authentication, CremaSchema.Enable, value);
         }
 
-        public void SetTags(Authentication authentication, TagInfo value)
+        public Task SetTagsAsync(Authentication authentication, TagInfo value)
         {
-            this.SetField(authentication, CremaSchema.Tags, value.ToString());
+            return this.SetFieldAsync(authentication, CremaSchema.Tags, value.ToString());
         }
 
-        public void SetField(Authentication authentication, string columnName, object value)
+        public Task SetFieldAsync(Authentication authentication, string columnName, object value)
         {
             try
             {
-                this.ValidateDispatcher(authentication);
-                base.SetField(authentication, columnName, value);
+                return base.SetFieldAsync(authentication, columnName, value);
             }
             catch (Exception e)
             {

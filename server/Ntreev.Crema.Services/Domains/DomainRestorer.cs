@@ -26,6 +26,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Ntreev.Crema.Services.Domains
@@ -56,7 +57,7 @@ namespace Ntreev.Crema.Services.Domains
             this.workingPath = workingPath;
         }
 
-        public static void Restore(Authentication authentication, DomainContext domainContext, string workingPath)
+        public static async Task RestoreAsync(Authentication authentication, DomainContext domainContext, string workingPath)
         {
             using (var restorer = new DomainRestorer(authentication, domainContext, workingPath))
             {
@@ -64,7 +65,7 @@ namespace Ntreev.Crema.Services.Domains
                 restorer.CollectCompletedActions();
                 restorer.CollectPostedActions();
                 restorer.CollectAuthentications();
-                restorer.RestoreDomain();
+                await restorer.RestoreDomainAsync();
             }
         }
 
@@ -120,12 +121,12 @@ namespace Ntreev.Crema.Services.Domains
             this.authentications = users.ToDictionary(item => item.ID);
         }
 
-        private void RestoreDomain()
+        private async Task RestoreDomainAsync()
         {
             var dummyHost = new DummyDomainHost(this.domain);
             this.domain.Host = dummyHost;
-            this.domain.Dispatcher.Invoke(() =>
-            {
+            //this.domain.Dispatcher.Invoke(() =>
+            //{
                 this.domain.Logger.IsEnabled = false;
 
                 foreach (var item in this.actionList)
@@ -142,35 +143,35 @@ namespace Ntreev.Crema.Services.Domains
 
                         if (item is NewRowAction newRowAction)
                         {
-                            this.domain.NewRow(authentication, newRowAction.Rows);
+                            await this.domain.NewRowAsync(authentication, newRowAction.Rows);
                         }
                         else if (item is RemoveRowAction removeRowAction)
                         {
-                            this.domain.RemoveRow(authentication, removeRowAction.Rows);
+                            await this.domain.RemoveRowAsync(authentication, removeRowAction.Rows);
                         }
                         else if (item is SetRowAction setRowAction)
                         {
-                            this.domain.SetRow(authentication, setRowAction.Rows);
+                            await this.domain.SetRowAsync(authentication, setRowAction.Rows);
                         }
                         else if (item is SetPropertyAction setPropertyAction)
                         {
-                            this.domain.SetProperty(authentication, setPropertyAction.PropertyName, setPropertyAction.Value);
+                            await this.domain.SetPropertyAsync(authentication, setPropertyAction.PropertyName, setPropertyAction.Value);
                         }
                         else if (item is JoinAction joinAction)
                         {
-                            this.domain.AddUser(authentication, joinAction.AccessType);
+                            await this.domain.AddUserAsync(authentication, joinAction.AccessType);
                         }
                         else if (item is DisjoinAction disjoinAction)
                         {
-                            this.domain.RemoveUser(authentication);
+                            await this.domain.RemoveUserAsync(authentication);
                         }
                         else if (item is KickAction kickAction)
                         {
-                            this.domain.Kick(authentication, kickAction.TargetID, kickAction.Comment);
+                            await this.domain.KickAsync(authentication, kickAction.TargetID, kickAction.Comment);
                         }
                         else if (item is SetOwnerAction setOwnerAction)
                         {
-                            this.domain.SetOwner(authentication, setOwnerAction.TargetID);
+                            await this.domain.SetOwnerAsync(authentication, setOwnerAction.TargetID);
                         }
                         else
                         {
@@ -187,7 +188,7 @@ namespace Ntreev.Crema.Services.Domains
 
                 this.domain.Logger.ID = this.postedList.Count;
                 this.domain.Logger.IsEnabled = true;
-            });
+            //});
             this.domain.Host = null;
         }
 

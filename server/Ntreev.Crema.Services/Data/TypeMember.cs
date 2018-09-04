@@ -46,15 +46,14 @@ namespace Ntreev.Crema.Services.Data
                         select item.Field<string>(CremaSchema.Name);
 
             var newName = NameUtility.GenerateNewName("Type", query);
-            this.SetField(null, CremaSchema.Name, newName);
+            this.SetFieldAsync(null, CremaSchema.Name, newName);
         }
 
-        public void SetIndex(Authentication authentication, int value)
+        public Task SetIndexAsync(Authentication authentication, int value)
         {
             try
             {
-                this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.Index, value);
+                return this.SetFieldAsync(authentication, CremaSchema.Index, value);
             }
             catch (Exception e)
             {
@@ -63,12 +62,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetName(Authentication authentication, string value)
+        public Task SetNameAsync(Authentication authentication, string value)
         {
             try
             {
-                this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.Name, value);
+                return this.SetFieldAsync(authentication, CremaSchema.Name, value);
             }
             catch (Exception e)
             {
@@ -77,12 +75,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetValue(Authentication authentication, long value)
+        public Task SetValueAsync(Authentication authentication, long value)
         {
             try
             {
-                this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.Value, value);
+                return this.SetFieldAsync(authentication, CremaSchema.Value, value);
             }
             catch (Exception e)
             {
@@ -91,12 +88,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetComment(Authentication authentication, string value)
+        public Task SetCommentAsync(Authentication authentication, string value)
         {
             try
             {
-                this.ValidateDispatcher(authentication);
-                this.SetField(authentication, CremaSchema.Comment, value);
+                return this.SetFieldAsync(authentication, CremaSchema.Comment, value);
             }
             catch (Exception e)
             {

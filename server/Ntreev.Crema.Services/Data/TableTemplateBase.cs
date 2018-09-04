@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -55,21 +56,23 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void EndNew(Authentication authentication, TableColumn column)
+        public Task EndNewAsync(Authentication authentication, TableColumn column)
         {
             try
             {
-                this.ValidateDispatcher(authentication);
-                this.table.RowChanged -= Table_RowChanged;
-                try
+                return this.Dispatcher.InvokeAsync(async () =>
                 {
-                    column.EndNew(authentication);
-                    this.columns.Add(column);
-                }
-                finally
-                {
-                    this.table.RowChanged += Table_RowChanged;
-                }
+                    this.table.RowChanged -= Table_RowChanged;
+                    try
+                    {
+                        await column.EndNewAsync(authentication);
+                        this.columns.Add(column);
+                    }
+                    finally
+                    {
+                        this.table.RowChanged += Table_RowChanged;
+                    }
+                });
             }
             catch (Exception e)
             {

@@ -27,25 +27,25 @@ namespace Ntreev.Crema.Services
 {
     public interface ITableContent : IEnumerable<ITableRow>, IDispatcherObject
     {
-        void BeginEdit(Authentication authentication);
+        Task BeginEditAsync(Authentication authentication);
 
-        void EndEdit(Authentication authentication);
+        Task EndEditAsync(Authentication authentication);
 
-        void CancelEdit(Authentication authentication);
+        Task CancelEditAsync(Authentication authentication);
 
-        void EnterEdit(Authentication authentication);
+        Task EnterEditAsync(Authentication authentication);
 
-        void LeaveEdit(Authentication authentication);
+        Task LeaveEditAsync(Authentication authentication);
 
-        void Clear(Authentication authentication);
+        Task ClearAsync(Authentication authentication);
 
-        ITableRow AddNew(Authentication authentication, string relationID);
+        Task<ITableRow> AddNewAsync(Authentication authentication, string relationID);
 
-        void EndNew(Authentication authentication, ITableRow row);
+        Task EndNewAsync(Authentication authentication, ITableRow row);
 
-        ITableRow Find(Authentication authentication, params object[] keys);
+        Task<ITableRow> FindAsync(Authentication authentication, params object[] keys);
 
-        ITableRow[] Select(Authentication authentication, string filterExpression);
+        Task<ITableRow[]> SelectAsync(Authentication authentication, string filterExpression);
 
         IDomain Domain { get; }
 

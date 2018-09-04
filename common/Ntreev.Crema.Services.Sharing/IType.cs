@@ -32,13 +32,13 @@ namespace Ntreev.Crema.Services
 
         Task DeleteAsync(Authentication authentication);
 
-        IType Copy(Authentication authentication, string newTypeName, string categoryPath);
+        Task<IType> CopyAsync(Authentication authentication, string newTypeName, string categoryPath);
 
-        CremaDataSet GetDataSet(Authentication authentication, string revision);
+        Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision);
 
-        LogInfo[] GetLog(Authentication authentication, string revision);
+        Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision);
 
-        FindResultInfo[] Find(Authentication authentication, string text, FindOptions options);
+        Task<FindResultInfo[]> FindAsync(Authentication authentication, string text, FindOptions options);
 
         string Name { get; }
 

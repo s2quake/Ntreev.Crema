@@ -22,6 +22,7 @@ using Ntreev.Crema.Services.Properties;
 using Ntreev.Library.IO;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -55,17 +56,20 @@ namespace Ntreev.Crema.Services.Data
 
         }
 
-        public void Commit(Authentication authentication)
+        public Task CommitAsync(Authentication authentication)
         {
             try
             {
-                this.ValidateCommit(authentication);
-                this.dataBase.VerifyAccess(authentication);
-                this.Sign(authentication);
-                this.repository.EndTransaction();
-                this.authentication.Expired -= Authentication_Expired;
-                this.isDisposed = true;
-                this.OnDisposed(EventArgs.Empty);
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ValidateCommit(authentication);
+                    this.dataBase.VerifyAccess(authentication);
+                    this.Sign(authentication);
+                    this.repository.EndTransaction();
+                    this.authentication.Expired -= Authentication_Expired;
+                    this.isDisposed = true;
+                    this.OnDisposed(EventArgs.Empty);
+                });
             }
             catch (Exception e)
             {
@@ -74,19 +78,22 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void Rollback(Authentication authentication)
+        public Task RollbackAsync(Authentication authentication)
         {
             try
             {
-                this.ValidateRollback(authentication);
-                this.dataBase.VerifyAccess(authentication);
-                this.Sign(authentication);
-                this.dataBase.ResettingDataBase(authentication);
-                this.RollbackDomains(authentication);
-                this.dataBase.ResetDataBase(authentication, this.typeInfos, this.tableInfos);
-                this.authentication.Expired -= Authentication_Expired;
-                this.isDisposed = true;
-                this.OnDisposed(EventArgs.Empty);
+                return this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.ValidateRollback(authentication);
+                    this.dataBase.VerifyAccess(authentication);
+                    this.Sign(authentication);
+                    this.dataBase.ResettingDataBase(authentication);
+                    await this.RollbackDomainsAsync(authentication);
+                    this.dataBase.ResetDataBase(authentication, this.typeInfos, this.tableInfos);
+                    this.authentication.Expired -= Authentication_Expired;
+                    this.isDisposed = true;
+                    this.OnDisposed(EventArgs.Empty);
+                });
             }
             catch (Exception e)
             {
@@ -109,10 +116,7 @@ namespace Ntreev.Crema.Services.Data
         private async void Authentication_Expired(object sender, EventArgs e)
         {
             this.authentication.Expired -= Authentication_Expired;
-            await this.dataBase.Dispatcher.InvokeAsync(() =>
-            {
-                this.Rollback(this.authentication);
-            });
+            await this.RollbackAsync(this.authentication);
         }
 
         private void Sign(Authentication authentication)
@@ -127,7 +131,7 @@ namespace Ntreev.Crema.Services.Data
                 DirectoryUtility.Copy(this.domainPath, this.transactionPath);
         }
 
-        private void RollbackDomains(Authentication authentication)
+        private async Task RollbackDomainsAsync(Authentication authentication)
         {
             this.repository.CancelTransaction();
 
@@ -135,7 +139,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (DirectoryUtility.Exists(this.transactionPath) == true)
                     DirectoryUtility.Copy(this.transactionPath, this.domainPath);
-                domainContext.Restore(authentication, this.dataBase);
+                await domainContext.RestoreAsync(authentication, this.dataBase);
                 DirectoryUtility.Delete(this.transactionPath);
             }
             else

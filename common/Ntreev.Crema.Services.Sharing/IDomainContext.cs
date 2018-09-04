@@ -23,9 +23,9 @@ using System.Collections.Generic;
 
 namespace Ntreev.Crema.Services
 {
-    public interface IDomainContext : IEnumerable<IDomainItem>, IServiceProvider
+    public interface IDomainContext : IEnumerable<IDomainItem>, IServiceProvider, IDispatcherObject
     {
-        bool Contains(string itemPath);
+        Task<bool> ContainsAsync(string itemPath);
 
         IDomainCategoryCollection Categories { get; }
 
@@ -35,8 +35,6 @@ namespace Ntreev.Crema.Services
 
         IDomainItem this[string itemPath] { get; }
 
-        CremaDispatcher Dispatcher { get; }
-
         event ItemsCreatedEventHandler<IDomainItem> ItemsCreated;
 
         event ItemsRenamedEventHandler<IDomainItem> ItemsRenamed;
@@ -45,6 +43,6 @@ namespace Ntreev.Crema.Services
 
         event ItemsDeletedEventHandler<IDomainItem> ItemsDeleted;
 
-        DomainContextMetaData GetMetaData(Authentication authentication);
+        Task<DomainContextMetaData> GetMetaDataAsync(Authentication authentication);
     }
 }

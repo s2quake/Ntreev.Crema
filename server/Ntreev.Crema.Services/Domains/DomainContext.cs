@@ -89,15 +89,17 @@ namespace Ntreev.Crema.Services.Domains
             return this.CremaHost.GetService(serviceType);
         }
 
-        public DomainContextMetaData GetMetaData(Authentication authentication)
+        public async Task<DomainContextMetaData> GetMetaDataAsync(Authentication authentication)
         {
-            this.Dispatcher.VerifyAccess();
-
-            return new DomainContextMetaData()
+            var domains = await this.Domains.GetMetaDataAsync(authentication);
+            return await this.Dispatcher.InvokeAsync(() =>
             {
-                DomainCategories = this.Categories.GetMetaData(authentication),
-                Domains = this.Domains.GetMetaData(authentication),
-            };
+                return new DomainContextMetaData()
+                {
+                    DomainCategories = this.Categories.GetMetaData(authentication),
+                    Domains = domains,
+                };
+            });
         }
 
         public DomainCollection Domains => base.Items;
@@ -166,7 +168,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public void Restore(Authentication authentication, DataBase dataBase)
+        public async Task RestoreAsync(Authentication authentication, DataBase dataBase)
         {
             var succeededCount = 0;
             var failedCount = 0;
@@ -192,7 +194,7 @@ namespace Ntreev.Crema.Services.Domains
                     var domainID = Guid.Parse(Path.GetFileName(item));
                     try
                     {
-                        DomainRestorer.Restore(authentication, this, item);
+                        await DomainRestorer.RestoreAsync(authentication, this, item);
                         this.CremaHost.Debug(Resources.Message_DomainIsRestored_Format, domainID);
                         succeededCount++;
                     }
@@ -319,9 +321,9 @@ namespace Ntreev.Crema.Services.Domains
 
         #region IDomainContext
 
-        bool IDomainContext.Contains(string itemPath)
+        Task<bool> IDomainContext.ContainsAsync(string itemPath)
         {
-            return this.Contains(itemPath);
+            return this.Dispatcher.InvokeAsync(() => this.Contains(itemPath));
         }
 
         IDomainCollection IDomainContext.Domains => this.Domains;

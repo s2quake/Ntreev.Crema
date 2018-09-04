@@ -21,18 +21,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ITableRow
+    public interface ITableRow : IDispatcherObject
     {
-        void Delete(Authentication authentication);
+        Task DeleteAsync(Authentication authentication);
 
-        void SetIsEnabled(Authentication authentication, bool value);
+        Task SetIsEnabledAsync(Authentication authentication, bool value);
 
-        void SetTags(Authentication authentication, TagInfo value);
+        Task SetTagsAsync(Authentication authentication, TagInfo value);
 
-        void SetField(Authentication authentication, string columnName, object field);
+        Task SetFieldAsync(Authentication authentication, string columnName, object field);
 
         object this[string columnName] { get; }
 
@@ -45,7 +46,5 @@ namespace Ntreev.Crema.Services
         string RelationID { get; }
 
         string ParentID { get; }
-
-        CremaDispatcher Dispatcher { get; }
     }
 }

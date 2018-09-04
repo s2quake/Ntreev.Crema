@@ -19,13 +19,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
     public interface ITransaction : IDispatcherObject
     {
-        void Commit(Authentication authentication);
+        Task CommitAsync(Authentication authentication);
 
-        void Rollback(Authentication authentication);
+        Task RollbackAsync(Authentication authentication);
     }
 }

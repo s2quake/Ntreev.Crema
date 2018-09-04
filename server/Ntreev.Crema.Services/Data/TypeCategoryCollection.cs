@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -44,18 +45,20 @@ namespace Ntreev.Crema.Services.Data
 
         }
 
-        public TypeCategory AddNew(Authentication authentication, string name, string parentPath)
+        public Task<TypeCategory> AddNewAsync(Authentication authentication, string name, string parentPath)
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                this.ValidateAddNew(authentication, name, parentPath);
-                this.Sign(authentication);
-                this.InvokeCategoryCreate(authentication, name, parentPath);
-                var category = this.BaseAddNew(name, parentPath, authentication);
-                var items = EnumerableUtility.One(category).ToArray();
-                this.InvokeCategoriesCreatedEvent(authentication, items);
-                return category;
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ValidateAddNew(authentication, name, parentPath);
+                    this.Sign(authentication);
+                    this.InvokeCategoryCreate(authentication, name, parentPath);
+                    var category = this.BaseAddNew(name, parentPath, authentication);
+                    var items = EnumerableUtility.One(category).ToArray();
+                    this.InvokeCategoriesCreatedEvent(authentication, items);
+                    return category;
+                });
             }
             catch (Exception e)
             {

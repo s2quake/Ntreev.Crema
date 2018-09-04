@@ -47,17 +47,19 @@ namespace Ntreev.Crema.Services.Data
             return base.GetAccessType(authentication);
         }
 
-        public void SetPublic(Authentication authentication)
+        public Task SetPublicAsync(Authentication authentication)
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(SetPublic), this);
-                base.ValidateSetPublic(authentication);
-                this.Sign(authentication);
-                this.Context.InvokeTypeItemSetPublic(authentication, this);
-                base.SetPublic(authentication);
-                this.Context.InvokeItemsSetPublicEvent(authentication, new ITypeItem[] { this });
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetPublic), this);
+                    base.ValidateSetPublic(authentication);
+                    this.Sign(authentication);
+                    this.Context.InvokeTypeItemSetPublic(authentication, this);
+                    base.SetPublic(authentication);
+                    this.Context.InvokeItemsSetPublicEvent(authentication, new ITypeItem[] { this });
+                });
             }
             catch (Exception e)
             {
@@ -66,17 +68,19 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetPrivate(Authentication authentication)
+        public Task SetPrivateAsync(Authentication authentication)
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivate), this);
-                base.ValidateSetPrivate(authentication);
-                this.Sign(authentication);
-                this.Context.InvokeTypeItemSetPrivate(authentication, this, AccessInfo.Empty);
-                base.SetPrivate(authentication);
-                this.Context.InvokeItemsSetPrivateEvent(authentication, new ITypeItem[] { this });
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivate), this);
+                    base.ValidateSetPrivate(authentication);
+                    this.Sign(authentication);
+                    this.Context.InvokeTypeItemSetPrivate(authentication, this, AccessInfo.Empty);
+                    base.SetPrivate(authentication);
+                    this.Context.InvokeItemsSetPrivateEvent(authentication, new ITypeItem[] { this });
+                });
             }
             catch (Exception e)
             {
@@ -85,17 +89,19 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void AddAccessMember(Authentication authentication, string memberID, AccessType accessType)
+        public Task AddAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType)
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMember), this, memberID, accessType);
-                base.ValidateAddAccessMember(authentication, memberID, accessType);
-                this.Sign(authentication);
-                this.Context.InvokeTypeItemAddAccessMember(authentication, this, this.AccessInfo, memberID, accessType);
-                base.AddAccessMember(authentication, memberID, accessType);
-                this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMember), this, memberID, accessType);
+                    base.ValidateAddAccessMember(authentication, memberID, accessType);
+                    this.Sign(authentication);
+                    this.Context.InvokeTypeItemAddAccessMember(authentication, this, this.AccessInfo, memberID, accessType);
+                    base.AddAccessMember(authentication, memberID, accessType);
+                    this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
+                });
             }
             catch (Exception e)
             {
@@ -104,17 +110,19 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void SetAccessMember(Authentication authentication, string memberID, AccessType accessType)
+        public Task SetAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType)
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMember), this, memberID, accessType);
-                base.ValidateSetAccessMember(authentication, memberID, accessType);
-                this.Sign(authentication);
-                this.Context.InvokeTypeItemSetAccessMember(authentication, this, this.AccessInfo, memberID, accessType);
-                base.SetAccessMember(authentication, memberID, accessType);
-                this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMember), this, memberID, accessType);
+                    base.ValidateSetAccessMember(authentication, memberID, accessType);
+                    this.Sign(authentication);
+                    this.Context.InvokeTypeItemSetAccessMember(authentication, this, this.AccessInfo, memberID, accessType);
+                    base.SetAccessMember(authentication, memberID, accessType);
+                    this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
+                });
             }
             catch (Exception e)
             {
@@ -123,17 +131,19 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void RemoveAccessMember(Authentication authentication, string memberID)
+        public Task RemoveAccessMemberAsync(Authentication authentication, string memberID)
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMember), this, memberID);
-                base.ValidateRemoveAccessMember(authentication, memberID);
-                this.Sign(authentication);
-                this.Context.InvokeTypeItemRemoveAccessMember(authentication, this, this.AccessInfo, memberID);
-                base.RemoveAccessMember(authentication, memberID);
-                this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID });
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMember), this, memberID);
+                    base.ValidateRemoveAccessMember(authentication, memberID);
+                    this.Sign(authentication);
+                    this.Context.InvokeTypeItemRemoveAccessMember(authentication, this, this.AccessInfo, memberID);
+                    base.RemoveAccessMember(authentication, memberID);
+                    this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID });
+                });
             }
             catch (Exception e)
             {
@@ -263,12 +273,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public TypeCategory AddNewCategory(Authentication authentication, string name)
+        public Task<TypeCategory> AddNewCategoryAsync(Authentication authentication, string name)
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                return this.Container.AddNew(authentication, name, base.Path);
+                return this.Container.AddNewAsync(authentication, name, base.Path);
             }
             catch (Exception e)
             {
@@ -277,14 +286,13 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public NewTypeTemplate NewType(Authentication authentication)
+        public async Task<NewTypeTemplate> NewTypeAsync(Authentication authentication)
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(NewType), this);
-                var template = new NewTypeTemplate(this);
-                template.BeginEdit(authentication);
+                this.CremaHost.DebugMethod(authentication, this, nameof(NewTypeAsync), this);
+                var template = await this.Dispatcher.InvokeAsync(() => new NewTypeTemplate(this));
+                await template.BeginEditAsync(authentication);
                 return template;
             }
             catch (Exception e)
@@ -294,53 +302,59 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public CremaDataSet GetDataSet(Authentication authentication, string revision)
+        public Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision)
         {
             try
             {
-                this.DataBase.ValidateAsyncBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSet), this, revision);
-                this.ValidateAccessType(authentication, AccessType.Guest);
-                this.Sign(authentication);
-                return this.Repository.GetTypeCategoryData(this.Serializer, this.ItemPath, revision);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
-
-        public LogInfo[] GetLog(Authentication authentication, string revision)
-        {
-            try
-            {
-                this.DataBase.ValidateAsyncBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(GetLog), this);
-                this.ValidateAccessType(authentication, AccessType.Guest);
-                this.Sign(authentication);
-                return this.Context.GetCategoryLog(this.ItemPath, revision);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
-
-        public FindResultInfo[] Find(Authentication authentication, string text, FindOptions options)
-        {
-            try
-            {
-                this.DataBase.ValidateAsyncBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(Find), this, text, options);
-                this.ValidateAccessType(authentication, AccessType.Guest);
-                this.Sign(authentication);
-                if (this.GetService(typeof(DataFindService)) is DataFindService service)
+                this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, revision);
+                return this.Dispatcher.InvokeAsync(()=>
                 {
-                    return service.Dispatcher.Invoke(() => service.FindFromType(this.DataBase.ID, new string[] { base.Path }, text, options));
-                }
-                throw new NotImplementedException();
+                    this.ValidateAccessType(authentication, AccessType.Guest);
+                    this.Sign(authentication);
+                    return this.Repository.GetTypeCategoryData(this.Serializer, this.ItemPath, revision);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision)
+        {
+            try
+            {
+                this.CremaHost.DebugMethod(authentication, this, nameof(GetLogAsync), this);
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ValidateAccessType(authentication, AccessType.Guest);
+                    this.Sign(authentication);
+                    return this.Context.GetCategoryLog(this.ItemPath, revision);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public Task<FindResultInfo[]> FindAsync(Authentication authentication, string text, FindOptions options)
+        {
+            try
+            {
+                this.CremaHost.DebugMethod(authentication, this, nameof(FindAsync), this, text, options);
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ValidateAccessType(authentication, AccessType.Guest);
+                    this.Sign(authentication);
+                    if (this.GetService(typeof(DataFindService)) is DataFindService service)
+                    {
+                        return service.Dispatcher.Invoke(() => service.FindFromType(this.DataBase.ID, new string[] { base.Path }, text, options));
+                    }
+                    throw new NotImplementedException();
+                });
             }
             catch (Exception e)
             {
@@ -604,14 +618,14 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITypeCategory
 
-        ITypeCategory ITypeCategory.AddNewCategory(Authentication authentication, string name)
+        async Task<ITypeCategory> ITypeCategory.AddNewCategoryAsync(Authentication authentication, string name)
         {
-            return this.AddNewCategory(authentication, name);
+            return await this.AddNewCategoryAsync(authentication, name);
         }
 
-        ITypeTemplate ITypeCategory.NewType(Authentication authentication)
+        async Task<ITypeTemplate> ITypeCategory.NewTypeAsync(Authentication authentication)
         {
-            return this.NewType(authentication);
+            return await this.NewTypeAsync(authentication);
         }
 
         ITypeCategory ITypeCategory.Parent => this.Parent;

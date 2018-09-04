@@ -21,30 +21,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
     public interface ITypeTemplate : IEnumerable<ITypeMember>, IDispatcherObject
     {
-        void BeginEdit(Authentication authentication);
+        Task BeginEditAsync(Authentication authentication);
 
-        void EndEdit(Authentication authentication);
+        Task EndEditAsync(Authentication authentication);
 
-        void CancelEdit(Authentication authentication);
+        Task CancelEditAsync(Authentication authentication);
 
-        void SetTypeName(Authentication authentication, string value);
+        Task SetTypeNameAsync(Authentication authentication, string value);
 
-        void SetIsFlag(Authentication authentication, bool value);
+        Task SetIsFlagAsync(Authentication authentication, bool value);
 
-        void SetTags(Authentication authentication, TagInfo tags);
+        Task SetTagsAsync(Authentication authentication, TagInfo tags);
 
-        void SetComment(Authentication authentication, string value);
+        Task SetCommentAsync(Authentication authentication, string value);
 
-        ITypeMember AddNew(Authentication authentication);
+        Task<ITypeMember> AddNewAsync(Authentication authentication);
 
-        void EndNew(Authentication authentication, ITypeMember member);
+        Task EndNewAsync(Authentication authentication, ITypeMember member);
 
-        bool Contains(string memberName);
+        Task<bool> ContainsAsync(string memberName);
 
         IDomain Domain { get; }
 

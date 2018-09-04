@@ -36,15 +36,15 @@ namespace Ntreev.Crema.Services
 
         Task DeleteAsync(Authentication authentication);
 
-        ITypeCategory AddNewCategory(Authentication authentication, string name);
+        Task<ITypeCategory> AddNewCategoryAsync(Authentication authentication, string name);
 
-        ITypeTemplate NewType(Authentication authentication);
+        Task<ITypeTemplate> NewTypeAsync(Authentication authentication);
 
-        CremaDataSet GetDataSet(Authentication authentication, string revision);
+        Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision);
 
-        LogInfo[] GetLog(Authentication authentication, string revision);
+        Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision);
 
-        FindResultInfo[] Find(Authentication authentication, string text, FindOptions options);
+        Task<FindResultInfo[]> FindAsync(Authentication authentication, string text, FindOptions options);
 
         string Name { get; }
 

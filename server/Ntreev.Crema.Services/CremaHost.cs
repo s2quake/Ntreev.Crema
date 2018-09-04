@@ -144,7 +144,7 @@ namespace Ntreev.Crema.Services
                     {
                         foreach (var item in this.DataBases)
                         {
-                            this.DomainContext.Restore(Authentication.System, item);
+                            await this.DomainContext.RestoreAsync(Authentication.System, item);
                         }
                     }
 
