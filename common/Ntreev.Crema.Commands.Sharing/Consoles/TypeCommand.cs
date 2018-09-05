@@ -52,12 +52,12 @@ namespace Ntreev.Crema.Commands.Consoles
         [ConsoleModeOnly]
         [CommandMethod]
         [CommandMethodProperty(nameof(CategoryPath))]
-        public void Create()
+        public async Task CreateAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var category = this.GetCategory(this.CategoryPath ?? this.GetCurrentDirectory());
+            var category = await this.GetCategoryAsync(this.CategoryPath ?? this.GetCurrentDirectory());
             var typeNames = this.GetTypeNames();
-            var template = category.Dispatcher.Invoke(() => category.NewType(authentication));
+            var template = await category.NewTypeAsync(authentication);
             var typeName = NameUtility.GenerateNewName("Type", typeNames);
             var typeInfo = JsonTypeInfo.Default;
             typeInfo.TypeName = typeName;
@@ -69,51 +69,45 @@ namespace Ntreev.Crema.Commands.Consoles
                 if (this.CommandContext.ReadYesOrNo($"do you want to create type '{typeInfo.TypeName}'?") == false)
                     return;
 
-                template.Dispatcher.Invoke(() =>
+                await template.SetTypeNameAsync(authentication, typeInfo.TypeName);
+                await template.SetIsFlagAsync(authentication, typeInfo.IsFlag);
+                await template.SetCommentAsync(authentication, typeInfo.Comment);
+                foreach (var item in typeInfo.Members)
                 {
-                    template.SetTypeName(authentication, typeInfo.TypeName);
-                    template.SetIsFlag(authentication, typeInfo.IsFlag);
-                    template.SetComment(authentication, typeInfo.Comment);
-                    foreach (var item in typeInfo.Members)
-                    {
-                        var member = template.AddNew(authentication);
-                        member.SetName(authentication, item.Name);
-                        member.SetValue(authentication, item.Value);
-                        member.SetComment(authentication, item.Comment);
-                        template.EndNew(authentication, member);
-                    }
-                    template.EndEdit(authentication);
-                    template = null;
-                });
+                    var member = await template.AddNewAsync(authentication);
+                    await member.SetNameAsync(authentication, item.Name);
+                    await member.SetValueAsync(authentication, item.Value);
+                    await member.SetCommentAsync(authentication, item.Comment);
+                    await template.EndNewAsync(authentication, member);
+                }
+                await template.EndEditAsync(authentication);
+                template = null;
             }
             finally
             {
                 if (template != null)
                 {
-                    template.Dispatcher.Invoke(() => template.CancelEdit(authentication));
+                    await template.CancelEditAsync(authentication);
                 }
             }
         }
 
         [ConsoleModeOnly]
         [CommandMethod]
-        public void Edit([CommandCompletion(nameof(GetTypeNames))]string typeName)
+        public async Task EditAsync([CommandCompletion(nameof(GetTypeNames))]string typeName)
         {
-            var type = this.GetType(typeName);
+            var type = await this.GetTypeAsync(typeName);
             var template = type.Dispatcher.Invoke(() => type.Template);
             var domain = template.Dispatcher.Invoke(() => template.Domain);
             var authentication = this.CommandContext.GetAuthentication(this);
             var contains = domain == null ? false : domain.Dispatcher.Invoke(() => domain.Users.Contains(authentication.ID));
 
-            template.Dispatcher.Invoke(() =>
-            {
-                if (contains == false)
-                    template.BeginEdit(authentication);
-            });
+            if (contains == false)
+                await template.BeginEditAsync(authentication);
 
             try
             {
-                if (TemplateEditor.Edit(template, authentication) == true)
+                if (await TemplateEditor.EditAsync(template, authentication) == true)
                 {
                     template = null;
                 }
@@ -122,88 +116,85 @@ namespace Ntreev.Crema.Commands.Consoles
             {
                 if (template != null)
                 {
-                    template.Dispatcher.Invoke(() => template.CancelEdit(authentication));
+                    await template.CancelEditAsync(authentication);
                 }
             }
         }
 
         [CommandMethod]
-        public void Rename([CommandCompletion(nameof(GetTypeNames))]string typeName, string newTypeName)
+        public async Task RenameAsync([CommandCompletion(nameof(GetTypeNames))]string typeName, string newTypeName)
         {
-            var type = this.GetType(typeName);
+            var type = await this.GetTypeAsync(typeName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            type.Dispatcher.Invoke(() => type.Rename(authentication, newTypeName));
+            await type.RenameAsync(authentication, newTypeName);
         }
 
         [CommandMethod]
-        public void Move([CommandCompletion(nameof(GetTypeNames))]string typeName, [CommandCompletion(nameof(GetCategoryPaths))]string categoryPath)
+        public async Task MoveAsync([CommandCompletion(nameof(GetTypeNames))]string typeName, [CommandCompletion(nameof(GetCategoryPaths))]string categoryPath)
         {
-            var type = this.GetType(typeName);
+            var type = await this.GetTypeAsync(typeName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            type.Dispatcher.Invoke(() => type.Move(authentication, categoryPath));
+            await type.MoveAsync(authentication, categoryPath);
         }
 
         [CommandMethod]
-        public void Delete([CommandCompletion(nameof(GetTypeNames))]string typeName)
+        public async Task DeleteAsync([CommandCompletion(nameof(GetTypeNames))]string typeName)
         {
-            var type = this.GetType(typeName);
+            var type = await this.GetTypeAsync(typeName);
             var authentication = this.CommandContext.GetAuthentication(this);
             if (this.CommandContext.ConfirmToDelete() == true)
             {
-                type.Dispatcher.Invoke(() => type.Delete(authentication));
+                await type.DeleteAsync(authentication);
             }
         }
 
         [CommandMethod]
-        public void SetTags([CommandCompletion(nameof(GetTypeNames))]string typeName, string tags)
+        public async Task SetTagsAsync([CommandCompletion(nameof(GetTypeNames))]string typeName, string tags)
         {
-            var type = this.GetType(typeName);
+            var type = await this.GetTypeAsync(typeName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            type.Dispatcher.Invoke(() =>
+            var template = type.Template;
+            await template.BeginEditAsync(authentication);
+            try
             {
-                var template = type.Template;
-                template.BeginEdit(authentication);
-                try
-                {
-                    template.SetTags(authentication, (TagInfo)tags);
-                    template.EndEdit(authentication);
-                }
-                catch
-                {
-                    template.CancelEdit(authentication);
-                    throw;
-                }
-            });
+                await template.SetTagsAsync(authentication, (TagInfo)tags);
+                await template.EndEditAsync(authentication);
+            }
+            catch
+            {
+                await template.CancelEditAsync(authentication);
+                throw;
+            }
         }
 
         [CommandMethod]
         [CommandMethodProperty(nameof(CategoryPath))]
-        public void Copy([CommandCompletion(nameof(GetTypeNames))]string typeName, string newTypeName)
+        public async Task CopyAsync([CommandCompletion(nameof(GetTypeNames))]string typeName, string newTypeName)
         {
-            var type = this.GetType(typeName);
+            var type = await this.GetTypeAsync(typeName);
             var categoryPath = this.CategoryPath ?? this.GetCurrentDirectory();
             var authentication = this.CommandContext.GetAuthentication(this);
-            type.Dispatcher.Invoke(() => type.Copy(authentication, newTypeName, categoryPath));
+            await type.CopyAsync(authentication, newTypeName, categoryPath);
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public void View([CommandCompletion(nameof(GetPaths))]string typeItemName, string revision = null)
+        public async Task ViewAsync([CommandCompletion(nameof(GetPaths))]string typeItemName, string revision = null)
         {
-            var typeItem = this.GetTypeItem(typeItemName);
+            var typeItem = await this.GetTypeItemAsync(typeItemName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            var dataSet = typeItem.Dispatcher.Invoke(() => typeItem.GetDataSet(authentication, revision));
+            var dataSet = await typeItem.GetDataSetAsync(authentication, revision);
             var props = dataSet.ToDictionary(false, true);
             this.CommandContext.WriteObject(props, FormatProperties.Format);
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public void Log([CommandCompletion(nameof(GetPaths))]string typeItemName, string revision = null)
+        public async Task LogAsync([CommandCompletion(nameof(GetPaths))]string typeItemName, string revision = null)
         {
-            var typeItem = this.GetTypeItem(typeItemName);
+            var typeItem = await this.GetTypeItemAsync(typeItemName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            var logs = typeItem.Dispatcher.Invoke(() => typeItem.GetLog(authentication, revision));
+            var logs = await typeItem.GetLogAsync(authentication, revision);
 
             foreach (var item in logs)
             {
@@ -223,9 +214,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public void Info([CommandCompletion(nameof(GetTypeNames))]string typeName)
+        public async Task InfoAsync([CommandCompletion(nameof(GetTypeNames))]string typeName)
         {
-            var type = this.GetType(typeName);
+            var type = await this.GetTypeAsync(typeName);
             var typeInfo = type.Dispatcher.Invoke(() => type.TypeInfo);
             this.CommandContext.WriteObject(typeInfo.ToDictionary(), FormatProperties.Format);
         }
@@ -239,10 +230,10 @@ namespace Ntreev.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.Drive is DataBasesConsoleDrive drive && drive.DataBaseName != string.Empty;
 
-        private IType GetType(string typeName)
+        private async Task<IType> GetTypeAsync(string typeName)
         {
-            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
-            var type = dataBase.Dispatcher.Invoke(() =>
+            var dataBase = await this.CremaHost.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var type = await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 if (NameValidator.VerifyItemPath(typeName) == true)
                     return dataBase.TypeContext[typeName] as IType;
@@ -253,19 +244,19 @@ namespace Ntreev.Crema.Commands.Consoles
             return type;
         }
 
-        private ITypeCategory GetCategory(string categoryPath)
+        private async Task<ITypeCategory> GetCategoryAsync(string categoryPath)
         {
-            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
-            var category = dataBase.Dispatcher.Invoke(() => dataBase.TypeContext.Categories[categoryPath]);
+            var dataBase = await this.CremaHost.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var category = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TypeContext.Categories[categoryPath]);
             if (category == null)
                 throw new CategoryNotFoundException(categoryPath);
             return category;
         }
 
-        private ITypeItem GetTypeItem([CommandCompletion(nameof(GetPaths))]string typeItemName)
+        private async Task<ITypeItem> GetTypeItemAsync([CommandCompletion(nameof(GetPaths))]string typeItemName)
         {
-            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
-            var typeItem = dataBase.Dispatcher.Invoke(() =>
+            var dataBase = await this.CremaHost.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var typeItem = await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 if (NameValidator.VerifyItemPath(typeItemName) == true || NameValidator.VerifyCategoryPath(typeItemName) == true)
                     return dataBase.TypeContext[typeItemName];

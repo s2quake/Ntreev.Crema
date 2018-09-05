@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var tableInfo = this.Content.Dispatcher.Invoke(() => this.Content.Table.TableInfo);
             var keys = tableInfo.Columns.Where(item => item.IsKey).ToArray();
@@ -72,7 +72,7 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
 
             var fields = new JsonPropertiesInfo();
             var authentication = this.CommandContext.GetAuthentication(this);
-            var tableRow = this.Content.Dispatcher.Invoke(() => this.Content.Find(authentication, fieldList.ToArray()));
+            var tableRow = await this.Content.FindAsync(authentication, fieldList.ToArray());
 
             this.Content.Dispatcher.Invoke(() =>
             {
@@ -88,28 +88,25 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
             if (result == null)
                 return;
 
-            this.Content.Dispatcher.Invoke(() =>
+            foreach (var item in fields)
             {
-                foreach (var item in fields)
+                if (result.ContainsKey(item.Key) == false)
                 {
-                    if (result.ContainsKey(item.Key) == false)
-                    {
-                        tableRow.SetField(authentication, item.Key, DBNull.Value);
-                    }
+                    await tableRow.SetFieldAsync(authentication, item.Key, DBNull.Value);
                 }
+            }
 
-                foreach (var item in result)
-                {
-                    if (tableInfo.Columns.Any(i => i.Name == item.Key) == false)
-                        continue;
-                    var value1 = tableRow[item.Key];
-                    var value2 = item.Value;
-                    if (object.Equals(value1, value2) == true)
-                        continue;
-                   
-                    tableRow.SetField(authentication, item.Key, item.Value);
-                }
-            });
+            foreach (var item in result)
+            {
+                if (tableInfo.Columns.Any(i => i.Name == item.Key) == false)
+                    continue;
+                var value1 = tableRow[item.Key];
+                var value2 = item.Value;
+                if (object.Equals(value1, value2) == true)
+                    continue;
+
+                await tableRow.SetFieldAsync(authentication, item.Key, item.Value);
+            }
         }
 
         public override string[] GetCompletions(CommandCompletionContext completionContext)

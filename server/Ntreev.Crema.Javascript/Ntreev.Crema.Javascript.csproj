@@ -50,8 +50,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Consoles\RunCommand.cs" />
-    <Compile Include="Methods\LoginMethod.cs" />
-    <Compile Include="Methods\LogoutMethod.cs" />
+    <None Include="Methods\LoginMethod.cs" />
+    <None Include="Methods\LogoutMethod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptContext.cs" />
     <Compile Include="ScriptMethodContext.cs" />

@@ -27,6 +27,7 @@ using System.Text.RegularExpressions;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
@@ -68,7 +69,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         public string ItemPath => this.dataBasePath?.ItemPath ?? string.Empty;
 
-        protected override void OnSetPath(Authentication authentication, string path)
+        protected override async Task OnSetPathAsync(Authentication authentication, string path)
         {
             var dataBaseName = this.DataBaseName;
             var dataBasePath = new DataBasePath(path);
@@ -76,27 +77,24 @@ namespace Ntreev.Crema.Commands.Consoles
             if (dataBaseName != string.Empty && dataBasePath.DataBaseName != dataBaseName)
             {
                 var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[dataBaseName]);
-                dataBase.Dispatcher.Invoke(() =>
+                await dataBase.Dispatcher.InvokeAsync(() =>
                 {
                     dataBase.Unloaded -= DataBase_Unloaded;
-                    if (dataBase.IsLoaded == true)
-                    {
-                        dataBase.Leave(authentication);
-                    }
                 });
+                if (dataBase.IsLoaded == true)
+                {
+                    await dataBase.LeaveAsync(authentication);
+                }
             }
 
             if (dataBasePath.DataBaseName != string.Empty && dataBasePath.DataBaseName != dataBaseName)
             {
                 var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[dataBasePath.DataBaseName]);
-                dataBase.Dispatcher.Invoke(() =>
+                if (dataBase.IsLoaded == false)
+                    await dataBase.LoadAsync(authentication);
+                await dataBase.EnterAsync(authentication);
+                await dataBase.Dispatcher.InvokeAsync(() =>
                 {
-                    if (dataBase.IsLoaded == false)
-                        dataBase.Load(authentication);
-                });
-                dataBase.Dispatcher.Invoke(() =>
-                {
-                    dataBase.Enter(authentication);
                     dataBase.Unloaded += DataBase_Unloaded;
                 });
             }
@@ -104,39 +102,30 @@ namespace Ntreev.Crema.Commands.Consoles
             this.dataBasePath = dataBasePath;
         }
 
-        protected override void OnCreate(Authentication authentication, string path, string name)
+        protected override async Task OnCreateAsync(Authentication authentication, string path, string name)
         {
-            var target = this.GetObject(authentication, path);
+            var target = await this.GetObjectAsync(authentication, path);
 
             if (target is ITableCategory tableCategory)
             {
-                this.CremaHost.Dispatcher.Invoke(() =>
+                var dataBase = tableCategory.GetService(typeof(IDataBase)) as IDataBase;
+                using (await DataBaseUsing.SetAsync(dataBase, authentication))
                 {
-                    var dataBase = tableCategory.GetService(typeof(IDataBase)) as IDataBase;
-                    using (DataBaseUsing.Set(dataBase, authentication))
-                    {
-                        tableCategory.AddNewCategory(authentication, name);
-                    }
-                });
+                    await tableCategory.AddNewCategoryAsync(authentication, name);
+                }
             }
             else if (target is ITypeCategory typeCategory)
             {
-                this.CremaHost.Dispatcher.Invoke(() =>
+                var dataBase = typeCategory.GetService(typeof(IDataBase)) as IDataBase;
+                using (await DataBaseUsing.SetAsync(dataBase, authentication))
                 {
-                    var dataBase = typeCategory.GetService(typeof(IDataBase)) as IDataBase;
-                    using (DataBaseUsing.Set(dataBase, authentication))
-                    {
-                        typeCategory.AddNewCategory(authentication, name);
-                    }
-                });
+                    await typeCategory.AddNewCategoryAsync(authentication, name);
+                }
             }
             else if (path == PathUtility.Separator)
             {
                 var comment = this.CommandContext.ReadString("comment:");
-                this.CremaHost.Dispatcher.Invoke(() =>
-                {
-                    this.CremaHost.DataBases.AddNewDataBase(authentication, name, comment);
-                });
+                await this.CremaHost.DataBases.AddNewDataBaseAsync(authentication, name, comment);
             }
             else
             {
@@ -147,29 +136,29 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        protected override void OnMove(Authentication authentication, string path, string newPath)
+        protected override async Task OnMoveAsync(Authentication authentication, string path, string newPath)
         {
-            var sourceObject = this.GetObject(authentication, path);
+            var sourceObject = await this.GetObjectAsync(authentication, path);
 
             if (sourceObject is IType sourceType)
             {
-                this.MoveType(authentication, sourceType, newPath);
+                await this.MoveTypeAsync(authentication, sourceType, newPath);
             }
             else if (sourceObject is ITypeCategory sourceTypeCategory)
             {
-                this.MoveTypeCategory(authentication, sourceTypeCategory, newPath);
+                await this.MoveTypeCategoryAsync(authentication, sourceTypeCategory, newPath);
             }
             else if (sourceObject is ITable sourceTable)
             {
-                this.MoveTable(authentication, sourceTable, newPath);
+                await this.MoveTableAsync(authentication, sourceTable, newPath);
             }
             else if (sourceObject is ITableCategory sourceTableCategory)
             {
-                this.MoveTableCategory(authentication, sourceTableCategory, newPath);
+                await this.MoveTableCategoryAsync(authentication, sourceTableCategory, newPath);
             }
             else if (sourceObject is IDataBase dataBase)
             {
-                this.MoveDataBase(authentication, dataBase, newPath);
+                await this.MoveDataBaseAsync(authentication, dataBase, newPath);
             }
             else
             {
@@ -177,279 +166,244 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        protected override void OnDelete(Authentication authentication, string path)
+        protected override async Task OnDeleteAsync(Authentication authentication, string path)
         {
-            var target = this.GetObject(authentication, path);
-            this.CremaHost.Dispatcher.Invoke(Delete);
-
-            void Delete()
+            var target = await this.GetObjectAsync(authentication, path);
+            if (target is IDataBase)
             {
-                if (target is IDataBase)
+                var dataBase = target as IDataBase;
+             await    dataBase.DeleteAsync(authentication);
+            }
+            else if (target is ITableItem tableItem)
+            {
+                var dataBase = tableItem.GetService(typeof(IDataBase)) as IDataBase;
+                using (await DataBaseUsing.SetAsync(dataBase, authentication))
                 {
-                    var dataBase = target as IDataBase;
-                    dataBase.Delete(authentication);
+                    await tableItem.DeleteAsync(authentication);
                 }
-                else if (target is ITableItem tableItem)
+            }
+            else if (target is ITypeItem typeItem)
+            {
+                var dataBase = typeItem.GetService(typeof(IDataBase)) as IDataBase;
+                using (await DataBaseUsing.SetAsync(dataBase, authentication))
                 {
-                    var dataBase = tableItem.GetService(typeof(IDataBase)) as IDataBase;
-                    using (DataBaseUsing.Set(dataBase, authentication))
-                    {
-                        tableItem.Delete(authentication);
-                    }
+                    await typeItem.DeleteAsync(authentication);
                 }
-                else if (target is ITypeItem typeItem)
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+        }
+
+        private async Task MoveTypeCategoryAsync(Authentication authentication, ITypeCategory sourceCategory, string newPath)
+        {
+            var destPath = new DataBasePath(newPath);
+            var destObject = await this.GetObjectAsync(authentication, destPath.Path);
+            var dataBase = sourceCategory.GetService(typeof(IDataBase)) as IDataBase;
+            var types = sourceCategory.GetService(typeof(ITypeCollection)) as ITypeCollection;
+
+            if (destPath.DataBaseName != dataBase.Name)
+                throw new InvalidOperationException($"cannot move to : {destPath}");
+            if (destPath.Context != CremaSchema.TypeDirectory)
+                throw new InvalidOperationException($"cannot move to : {destPath}");
+            if (destObject is IType)
+                throw new InvalidOperationException($"cannot move to : {destPath}");
+
+            using (await DataBaseUsing.SetAsync(dataBase, authentication))
+            {
+                if (destObject is ITypeCategory destCategory)
                 {
-                    var dataBase = typeItem.GetService(typeof(IDataBase)) as IDataBase;
-                    using (DataBaseUsing.Set(dataBase, authentication))
-                    {
-                        typeItem.Delete(authentication);
-                    }
+                    if (sourceCategory.Parent != destCategory)
+                        await sourceCategory.MoveAsync(authentication, destCategory.Path);
                 }
                 else
                 {
-                    throw new InvalidOperationException();
+                    if (NameValidator.VerifyCategoryPath(destPath.ItemPath) == true)
+                        throw new InvalidOperationException($"cannot move to : {destPath}");
+                    var itemName = new ItemName(destPath.ItemPath);
+                    var categories = sourceCategory.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
+                    if (categories.Contains(itemName.CategoryPath) == false)
+                        throw new InvalidOperationException($"cannot move to : {destPath}");
+                    if (sourceCategory.Name != itemName.Name && types.Contains(itemName.Name) == true)
+                        throw new InvalidOperationException($"cannot move to : {destPath}");
+                    if (sourceCategory.Parent.Path != itemName.CategoryPath)
+                        await sourceCategory.MoveAsync(authentication, itemName.CategoryPath);
+                    if (sourceCategory.Name != itemName.Name)
+                        await sourceCategory.RenameAsync(authentication, itemName.Name);
                 }
             }
         }
 
-        private void MoveTypeCategory(Authentication authentication, ITypeCategory sourceCategory, string newPath)
+        private async Task MoveTypeAsync(Authentication authentication, IType sourceType, string newPath)
         {
             var destPath = new DataBasePath(newPath);
-            var destObject = this.GetObject(authentication, destPath.Path);
-            this.CremaHost.Dispatcher.Invoke(MoveTypeCategory);
+            var destObject = await this.GetObjectAsync(authentication, destPath.Path);
+            var dataBase = sourceType.GetService(typeof(IDataBase)) as IDataBase;
+            var types = sourceType.GetService(typeof(ITypeCollection)) as ITypeCollection;
 
-            void MoveTypeCategory()
+            if (destPath.DataBaseName != dataBase.Name)
+                throw new InvalidOperationException($"cannot move to : {destPath}");
+            if (destPath.Context != CremaSchema.TypeDirectory)
+                throw new InvalidOperationException($"cannot move to : {destPath}");
+            if (destObject is IType)
+                throw new InvalidOperationException($"cannot move to : {destPath}");
+
+            using (await DataBaseUsing.SetAsync(dataBase, authentication))
             {
-                var dataBase = sourceCategory.GetService(typeof(IDataBase)) as IDataBase;
-                var types = sourceCategory.GetService(typeof(ITypeCollection)) as ITypeCollection;
-
-                if (destPath.DataBaseName != dataBase.Name)
-                    throw new InvalidOperationException($"cannot move to : {destPath}");
-                if (destPath.Context != CremaSchema.TypeDirectory)
-                    throw new InvalidOperationException($"cannot move to : {destPath}");
-                if (destObject is IType)
-                    throw new InvalidOperationException($"cannot move to : {destPath}");
-
-                using (DataBaseUsing.Set(dataBase, authentication))
+                if (destObject is ITypeCategory destCategory)
                 {
-                    if (destObject is ITypeCategory destCategory)
-                    {
-                        if (sourceCategory.Parent != destCategory)
-                            sourceCategory.Move(authentication, destCategory.Path);
-                    }
-                    else
-                    {
-                        if (NameValidator.VerifyCategoryPath(destPath.ItemPath) == true)
-                            throw new InvalidOperationException($"cannot move to : {destPath}");
-                        var itemName = new ItemName(destPath.ItemPath);
-                        var categories = sourceCategory.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
-                        if (categories.Contains(itemName.CategoryPath) == false)
-                            throw new InvalidOperationException($"cannot move to : {destPath}");
-                        if (sourceCategory.Name != itemName.Name && types.Contains(itemName.Name) == true)
-                            throw new InvalidOperationException($"cannot move to : {destPath}");
-                        if (sourceCategory.Parent.Path != itemName.CategoryPath)
-                            sourceCategory.Move(authentication, itemName.CategoryPath);
-                        if (sourceCategory.Name != itemName.Name)
-                            sourceCategory.Rename(authentication, itemName.Name);
-                    }
+                    if (sourceType.Category != destCategory)
+                        await sourceType.MoveAsync(authentication, destCategory.Path);
+                }
+                else
+                {
+                    if (NameValidator.VerifyCategoryPath(destPath.ItemPath) == true)
+                        throw new InvalidOperationException($"cannot move to : {destPath}");
+                    var itemName = new ItemName(destPath.ItemPath);
+                    var categories = sourceType.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
+                    if (categories.Contains(itemName.CategoryPath) == false)
+                        throw new InvalidOperationException($"cannot move to : {destPath}");
+                    if (sourceType.Name != itemName.Name && types.Contains(itemName.Name) == true)
+                        throw new InvalidOperationException($"cannot move to : {destPath}");
+                    if (sourceType.Category.Path != itemName.CategoryPath)
+                        await sourceType.MoveAsync(authentication, itemName.CategoryPath);
+                    if (sourceType.Name != itemName.Name)
+                        await sourceType.RenameAsync(authentication, itemName.Name);
                 }
             }
         }
 
-        private void MoveType(Authentication authentication, IType sourceType, string newPath)
+        private async Task MoveTableCategoryAsync(Authentication authentication, ITableCategory sourceCategory, string newPath)
         {
             var destPath = new DataBasePath(newPath);
-            var destObject = this.GetObject(authentication, destPath.Path);
-            this.CremaHost.Dispatcher.Invoke(MoveType);
+            var destObject = await this.GetObjectAsync(authentication, destPath.Path);
+            var dataBase = sourceCategory.GetService(typeof(IDataBase)) as IDataBase;
+            var tables = sourceCategory.GetService(typeof(ITableCollection)) as ITableCollection;
 
-            void MoveType()
+            if (destPath.DataBaseName != dataBase.Name)
+                throw new InvalidOperationException($"cannot move to : {destPath}");
+            if (destPath.Context != CremaSchema.TableDirectory)
+                throw new InvalidOperationException($"cannot move to : {destPath}");
+            if (destObject is ITable)
+                throw new InvalidOperationException($"cannot move to : {destPath}");
+
+            using (await DataBaseUsing.SetAsync(dataBase, authentication))
             {
-                var dataBase = sourceType.GetService(typeof(IDataBase)) as IDataBase;
-                var types = sourceType.GetService(typeof(ITypeCollection)) as ITypeCollection;
-
-                if (destPath.DataBaseName != dataBase.Name)
-                    throw new InvalidOperationException($"cannot move to : {destPath}");
-                if (destPath.Context != CremaSchema.TypeDirectory)
-                    throw new InvalidOperationException($"cannot move to : {destPath}");
-                if (destObject is IType)
-                    throw new InvalidOperationException($"cannot move to : {destPath}");
-
-                using (DataBaseUsing.Set(dataBase, authentication))
+                if (destObject is ITableCategory destCategory)
                 {
-                    if (destObject is ITypeCategory destCategory)
-                    {
-                        if (sourceType.Category != destCategory)
-                            sourceType.Move(authentication, destCategory.Path);
-                    }
-                    else
-                    {
-                        if (NameValidator.VerifyCategoryPath(destPath.ItemPath) == true)
-                            throw new InvalidOperationException($"cannot move to : {destPath}");
-                        var itemName = new ItemName(destPath.ItemPath);
-                        var categories = sourceType.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
-                        if (categories.Contains(itemName.CategoryPath) == false)
-                            throw new InvalidOperationException($"cannot move to : {destPath}");
-                        if (sourceType.Name != itemName.Name && types.Contains(itemName.Name) == true)
-                            throw new InvalidOperationException($"cannot move to : {destPath}");
-                        if (sourceType.Category.Path != itemName.CategoryPath)
-                            sourceType.Move(authentication, itemName.CategoryPath);
-                        if (sourceType.Name != itemName.Name)
-                            sourceType.Rename(authentication, itemName.Name);
-                    }
+                    if (sourceCategory.Parent != destCategory)
+                        await sourceCategory.MoveAsync(authentication, destCategory.Path);
                 }
-            };
-        }
-
-        private void MoveTableCategory(Authentication authentication, ITableCategory sourceCategory, string newPath)
-        {
-            var destPath = new DataBasePath(newPath);
-            var destObject = this.GetObject(authentication, destPath.Path);
-            this.CremaHost.Dispatcher.Invoke(MoveTableCategory);
-
-            void MoveTableCategory()
-            {
-                var dataBase = sourceCategory.GetService(typeof(IDataBase)) as IDataBase;
-                var tables = sourceCategory.GetService(typeof(ITableCollection)) as ITableCollection;
-
-                if (destPath.DataBaseName != dataBase.Name)
-                    throw new InvalidOperationException($"cannot move to : {destPath}");
-                if (destPath.Context != CremaSchema.TableDirectory)
-                    throw new InvalidOperationException($"cannot move to : {destPath}");
-                if (destObject is ITable)
-                    throw new InvalidOperationException($"cannot move to : {destPath}");
-
-                using (DataBaseUsing.Set(dataBase, authentication))
+                else
                 {
-                    if (destObject is ITableCategory destCategory)
-                    {
-                        if (sourceCategory.Parent != destCategory)
-                            sourceCategory.Move(authentication, destCategory.Path);
-                    }
-                    else
-                    {
-                        if (NameValidator.VerifyCategoryPath(destPath.ItemPath) == true)
-                            throw new InvalidOperationException($"cannot move to : {destPath}");
-                        var itemName = new ItemName(destPath.ItemPath);
-                        var categories = sourceCategory.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
-                        if (categories.Contains(itemName.CategoryPath) == false)
-                            throw new InvalidOperationException($"cannot move to : {destPath}");
-                        if (sourceCategory.Name != itemName.Name && tables.Contains(itemName.Name) == true)
-                            throw new InvalidOperationException($"cannot move to : {destPath}");
-                        if (sourceCategory.Parent.Path != itemName.CategoryPath)
-                            sourceCategory.Move(authentication, itemName.CategoryPath);
-                        if (sourceCategory.Name != itemName.Name)
-                            sourceCategory.Rename(authentication, itemName.Name);
-                    }
+                    if (NameValidator.VerifyCategoryPath(destPath.ItemPath) == true)
+                        throw new InvalidOperationException($"cannot move to : {destPath}");
+                    var itemName = new ItemName(destPath.ItemPath);
+                    var categories = sourceCategory.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
+                    if (categories.Contains(itemName.CategoryPath) == false)
+                        throw new InvalidOperationException($"cannot move to : {destPath}");
+                    if (sourceCategory.Name != itemName.Name && tables.Contains(itemName.Name) == true)
+                        throw new InvalidOperationException($"cannot move to : {destPath}");
+                    if (sourceCategory.Parent.Path != itemName.CategoryPath)
+                        await sourceCategory.MoveAsync(authentication, itemName.CategoryPath);
+                    if (sourceCategory.Name != itemName.Name)
+                        await sourceCategory.RenameAsync(authentication, itemName.Name);
                 }
             }
         }
 
-        private void MoveTable(Authentication authentication, ITable sourceTable, string newPath)
+        private async Task MoveTableAsync(Authentication authentication, ITable sourceTable, string newPath)
         {
             var destPath = new DataBasePath(newPath);
-            var destObject = this.GetObject(authentication, destPath.Path);
-            this.CremaHost.Dispatcher.Invoke(MoveTable);
+            var destObject = await this.GetObjectAsync(authentication, destPath.Path);
+            var dataBase = sourceTable.GetService(typeof(IDataBase)) as IDataBase;
+            var tables = sourceTable.GetService(typeof(ITableCollection)) as ITableCollection;
 
-            void MoveTable()
+            if (destPath.DataBaseName != dataBase.Name)
+                throw new InvalidOperationException($"cannot move to : {destPath}");
+            if (destPath.Context != CremaSchema.TableDirectory)
+                throw new InvalidOperationException($"cannot move to : {destPath}");
+            if (destObject is ITable)
+                throw new InvalidOperationException($"cannot move to : {destPath}");
+
+            using (await DataBaseUsing.SetAsync(dataBase, authentication))
             {
-                var dataBase = sourceTable.GetService(typeof(IDataBase)) as IDataBase;
-                var tables = sourceTable.GetService(typeof(ITableCollection)) as ITableCollection;
-
-                if (destPath.DataBaseName != dataBase.Name)
-                    throw new InvalidOperationException($"cannot move to : {destPath}");
-                if (destPath.Context != CremaSchema.TableDirectory)
-                    throw new InvalidOperationException($"cannot move to : {destPath}");
-                if (destObject is ITable)
-                    throw new InvalidOperationException($"cannot move to : {destPath}");
-
-                using (DataBaseUsing.Set(dataBase, authentication))
+                if (destObject is ITableCategory destCategory)
                 {
-                    if (destObject is ITableCategory destCategory)
-                    {
-                        if (sourceTable.Category != destCategory)
-                            sourceTable.Move(authentication, destCategory.Path);
-                    }
-                    else
-                    {
-                        if (NameValidator.VerifyCategoryPath(destPath.ItemPath) == true)
-                            throw new InvalidOperationException($"cannot move to : {destPath}");
-                        var itemName = new ItemName(destPath.ItemPath);
-                        var categories = sourceTable.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
-                        if (categories.Contains(itemName.CategoryPath) == false)
-                            throw new InvalidOperationException($"cannot move to : {destPath}");
-                        if (sourceTable.Name != itemName.Name && tables.Contains(itemName.Name) == true)
-                            throw new InvalidOperationException($"cannot move to : {destPath}");
-                        if (sourceTable.Category.Path != itemName.CategoryPath)
-                            sourceTable.Move(authentication, itemName.CategoryPath);
-                        if (sourceTable.Name != itemName.Name)
-                            sourceTable.Rename(authentication, itemName.Name);
-                    }
+                    if (sourceTable.Category != destCategory)
+                        await sourceTable.MoveAsync(authentication, destCategory.Path);
                 }
-            };
-        }
-
-        private void MoveDataBase(Authentication authentication, IDataBase dataBase, string newPath)
-        {
-            this.CremaHost.Dispatcher.Invoke(MoveDataBase);
-
-            void MoveDataBase()
-            {
-                if (NameValidator.VerifyCategoryPath(newPath) == true)
-                    throw new InvalidOperationException($"cannot move {dataBase} to : {newPath}");
-                var itemName = new ItemName(newPath);
-                if (itemName.CategoryPath != PathUtility.Separator)
-                    throw new InvalidOperationException($"cannot move {dataBase} to : {newPath}");
-
-                dataBase.Rename(authentication, itemName.Name);
+                else
+                {
+                    if (NameValidator.VerifyCategoryPath(destPath.ItemPath) == true)
+                        throw new InvalidOperationException($"cannot move to : {destPath}");
+                    var itemName = new ItemName(destPath.ItemPath);
+                    var categories = sourceTable.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
+                    if (categories.Contains(itemName.CategoryPath) == false)
+                        throw new InvalidOperationException($"cannot move to : {destPath}");
+                    if (sourceTable.Name != itemName.Name && tables.Contains(itemName.Name) == true)
+                        throw new InvalidOperationException($"cannot move to : {destPath}");
+                    if (sourceTable.Category.Path != itemName.CategoryPath)
+                        await sourceTable.MoveAsync(authentication, itemName.CategoryPath);
+                    if (sourceTable.Name != itemName.Name)
+                        await sourceTable.RenameAsync(authentication, itemName.Name);
+                }
             }
         }
 
-        public override object GetObject(Authentication authentication, string path)
+        private Task MoveDataBaseAsync(Authentication authentication, IDataBase dataBase, string newPath)
         {
-            return this.CremaHost.Dispatcher.Invoke(GetObject);
+            if (NameValidator.VerifyCategoryPath(newPath) == true)
+                throw new InvalidOperationException($"cannot move {dataBase} to : {newPath}");
+            var itemName = new ItemName(newPath);
+            if (itemName.CategoryPath != PathUtility.Separator)
+                throw new InvalidOperationException($"cannot move {dataBase} to : {newPath}");
 
-            object GetObject()
+            return dataBase.RenameAsync(authentication, itemName.Name);
+        }
+
+        public override async Task<object> GetObjectAsync(Authentication authentication, string path)
+        {
+            var dataBasePath = new DataBasePath(path);
+
+            if (dataBasePath.DataBaseName == string.Empty)
+                return null;
+
+            var dataBase = this.CremaHost.DataBases[dataBasePath.DataBaseName];
+            if (dataBase == null)
+                throw new DataBaseNotFoundException(dataBasePath.DataBaseName);
+
+            if (dataBasePath.Context == string.Empty)
+                return dataBase;
+
+            if (dataBasePath.ItemPath == string.Empty)
+                return null;
+
+            if (dataBase.IsLoaded == false)
+                await dataBase.LoadAsync(authentication);
+
+            if (dataBasePath.Context == CremaSchema.TableDirectory)
             {
-                var dataBasePath = new DataBasePath(path);
-
-                if (dataBasePath.DataBaseName == string.Empty)
-                    return null;
-
-                var dataBase = this.CremaHost.DataBases[dataBasePath.DataBaseName];
-                if (dataBase == null)
-                    throw new DataBaseNotFoundException(dataBasePath.DataBaseName);
-
-                if (dataBasePath.Context == string.Empty)
-                    return dataBase;
-
-                if (dataBasePath.ItemPath == string.Empty)
-                    return null;
-
-                if (dataBase.IsLoaded == false)
-                    dataBase.Load(authentication);
-
-                if (dataBasePath.Context == CremaSchema.TableDirectory)
-                {
-                    if (NameValidator.VerifyCategoryPath(dataBasePath.ItemPath) == true)
-                        return dataBase.TableContext[dataBasePath.ItemPath];
-                    var item = dataBase.TableContext[dataBasePath.ItemPath + PathUtility.Separator];
-                    if (item != null)
-                        return item;
+                if (NameValidator.VerifyCategoryPath(dataBasePath.ItemPath) == true)
                     return dataBase.TableContext[dataBasePath.ItemPath];
-                }
-                else if (dataBasePath.Context == CremaSchema.TypeDirectory)
-                    {
-                    if (NameValidator.VerifyCategoryPath(dataBasePath.ItemPath) == true)
-                        return dataBase.TypeContext[dataBasePath.ItemPath];
-                    var item = dataBase.TypeContext[dataBasePath.ItemPath + PathUtility.Separator];
-                    if (item != null)
-                        return item;
+                var item = dataBase.TableContext[dataBasePath.ItemPath + PathUtility.Separator];
+                if (item != null)
+                    return item;
+                return dataBase.TableContext[dataBasePath.ItemPath];
+            }
+            else if (dataBasePath.Context == CremaSchema.TypeDirectory)
+            {
+                if (NameValidator.VerifyCategoryPath(dataBasePath.ItemPath) == true)
                     return dataBase.TypeContext[dataBasePath.ItemPath];
-                }
-                else
-                {
-                    return null;
-                }
+                var item = dataBase.TypeContext[dataBasePath.ItemPath + PathUtility.Separator];
+                if (item != null)
+                    return item;
+                return dataBase.TypeContext[dataBasePath.ItemPath];
+            }
+            else
+            {
+                return null;
             }
         }
 

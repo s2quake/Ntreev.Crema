@@ -72,10 +72,10 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var user = this.GetUser(authentication, this.UserID);
+            var user = await this.GetUserAsync(authentication, this.UserID);
             if (this.Information == true)
             {
                 var banInfo = user.Dispatcher.Invoke(() => user.BanInfo);
@@ -88,7 +88,7 @@ namespace Ntreev.Crema.Commands.Consoles
                 {
                     throw new ArgumentException($"'{this.GetDescriptor(nameof(this.Message)).DisplayPattern}' 가 필요합니다.");
                 }
-                user.BanAsync(authentication, this.Message).Wait();
+                await user.BanAsync(authentication, this.Message);
             }
         }
     }

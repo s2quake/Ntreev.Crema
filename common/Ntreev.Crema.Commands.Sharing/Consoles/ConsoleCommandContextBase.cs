@@ -58,6 +58,10 @@ namespace Ntreev.Crema.Commands.Consoles
                 {
                     command.CommandContext = this;
                 }
+                else if (item is ConsoleCommandAsyncBase asyncCommand)
+                {
+                    asyncCommand.CommandContext = this;
+                }
                 else if (item is ConsoleCommandMethodBase commandMethod)
                 {
                     commandMethod.CommandContext = this;

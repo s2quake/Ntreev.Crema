@@ -83,7 +83,7 @@ namespace Ntreev.Crema.Commands.Consoles
             var sourceLocalPath = this.CommandContext.GetAbsolutePath(sourcePath);
             var destLocalPath = this.CommandContext.GetAbsolutePath(destPath);
             var authentication = this.CommandContext.GetAuthentication(this);
-            root.Move(authentication, sourceLocalPath, destLocalPath);
+            root.MoveAsync(authentication, sourceLocalPath, destLocalPath).Wait();
         }
     }
 }

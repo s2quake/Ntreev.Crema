@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Commands.Consoles
     [Export(typeof(IConsoleCommand))]
     [ResourceDescription("Resources", IsShared = true)]
     [CommandStaticProperty(typeof(FormatProperties))]
-    class StateCommand : ConsoleCommandBase
+    class StateCommand : ConsoleCommandAsyncBase
     {
         [Import]
         private Lazy<ICremaHost> cremaHost = null;
@@ -80,19 +80,19 @@ namespace Ntreev.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.IsOnline;
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             var drive = this.CommandContext.Drive;
-            var provider = this.GetObject(authentication, this.AbsolutePath);
+            var provider = await this.GetObjectAsync(authentication, this.AbsolutePath);
             var info = this.Invoke(provider, () => provider.State);
             this.CommandContext.WriteObject(info, FormatProperties.Format);
         }
 
-        private IStateProvider GetObject(Authentication authentication, string path)
+        private async Task<IStateProvider> GetObjectAsync(Authentication authentication, string path)
         {
             var drive = this.CommandContext.Drive as DataBasesConsoleDrive;
-            if (drive.GetObject(authentication, path) is IStateProvider provider)
+            if (await drive.GetObjectAsync(authentication, path) is IStateProvider provider)
             {
                 return provider;
             }

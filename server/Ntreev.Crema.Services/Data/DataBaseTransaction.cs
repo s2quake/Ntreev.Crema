@@ -89,7 +89,7 @@ namespace Ntreev.Crema.Services.Data
                     this.Sign(authentication);
                     this.dataBase.ResettingDataBase(authentication);
                     await this.RollbackDomainsAsync(authentication);
-                    this.dataBase.ResetDataBase(authentication, this.typeInfos, this.tableInfos);
+                    await this.dataBase.ResetDataBase(authentication, this.typeInfos, this.tableInfos);
                     this.authentication.Expired -= Authentication_Expired;
                     this.isDisposed = true;
                     this.OnDisposed(EventArgs.Empty);

@@ -57,33 +57,31 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             this.logService.Debug($"{nameof(DomainService)} Constructor");
         }
 
-        public ResultBase<DomainContextMetaData> Subscribe(Guid authenticationToken)
+        public async Task<ResultBase<DomainContextMetaData>> SubscribeAsync(Guid authenticationToken)
         {
             var result = new ResultBase<DomainContextMetaData>();
             try
             {
-                this.userContext.Dispatcher.Invoke(() =>
+                this.authentication = await this.userContext.AuthenticateAsync(authenticationToken);
+                this.authentication.AddRef(this);
+                this.OwnerID = this.authentication.ID;
+                await this.userContext.Dispatcher.InvokeAsync(() =>
                 {
-                    this.authentication = this.userContext.Authenticate(authenticationToken);
-                    this.authentication.AddRef(this);
-                    this.OwnerID = this.authentication.ID;
                     this.userContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
                 });
-                result.Value = this.domainContext.Dispatcher.Invoke(() =>
-                {
-                    this.AttachEventHandlers();
-                    this.logService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(Subscribe)}");
+                await this.domainContext.Dispatcher.InvokeAsync(() => this.AttachEventHandlers());
+                this.logService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(SubscribeAsync)}");
 
-                    var metaData = this.domainContext.GetMetaData(this.authentication);
-                    foreach (var item in metaData.Domains)
+                var metaData = await this.domainContext.GetMetaDataAsync(this.authentication);
+                foreach (var item in metaData.Domains)
+                {
+                    if (item.Users.Any(i => i.DomainUserInfo.UserID == this.OwnerID) == true)
                     {
-                        if (item.Users.Any(i => i.DomainUserInfo.UserID == this.OwnerID) == true)
-                        {
-                            this.domains.Add(item.DomainID);
-                        }
+                        this.domains.Add(item.DomainID);
                     }
-                    return metaData;
-                });
+                }
+
+                result.Value = metaData;
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -93,23 +91,20 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return result;
         }
 
-        public ResultBase Unsubscribe()
+        public async Task<ResultBase> UnsubscribeAsync()
         {
             var result = new ResultBase();
             try
             {
-                this.domainContext.Dispatcher.Invoke(() =>
-                {
-                    this.DetachEventHandlers();
-                });
-                this.userContext.Dispatcher.Invoke(() =>
+                await this.domainContext.Dispatcher.InvokeAsync(() => this.DetachEventHandlers());
+                await this.userContext.Dispatcher.InvokeAsync(() =>
                 {
                     this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                    this.authentication.RemoveRef(this);
-                    this.authentication = null;
                 });
+                this.authentication.RemoveRef(this);
+                this.authentication = null;
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-                this.logService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(Unsubscribe)}");
+                this.logService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(UnsubscribeAsync)}");
             }
             catch (Exception e)
             {
@@ -118,12 +113,12 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return result;
         }
 
-        public ResultBase<DomainContextMetaData> GetMetaData()
+        public async Task<ResultBase<DomainContextMetaData>> GetMetaDataAsync()
         {
             var result = new ResultBase<DomainContextMetaData>();
             try
             {
-                result.Value = this.domainContext.Dispatcher.Invoke(() => this.domainContext.GetMetaData(this.authentication));
+                result.Value = await this.domainContext.GetMetaDataAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -133,84 +128,164 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return result;
         }
 
-        public ResultBase<DomainRowInfo[]> SetRow(Guid domainID, DomainRowInfo[] rows)
+        public async Task<ResultBase<DomainRowInfo[]>> SetRowAsync(Guid domainID, DomainRowInfo[] rows)
         {
-            return this.Invoke(domainID, (domain) =>
+            var result = new ResultBase<DomainRowInfo[]>();
+            try
             {
-                return domain.SetRow(this.authentication, rows);
-            });
+                var domain = await this.GetDomainAsync(domainID);
+                result.Value = await domain.SetRowAsync(this.authentication, rows);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault(e);
+            }
+            return result;
         }
 
-        public ResultBase SetProperty(Guid domainID, string propertyName, object value)
+        public async Task<ResultBase> SetPropertyAsync(Guid domainID, string propertyName, object value)
         {
-            return this.Invoke(domainID, (domain) =>
+            var result = new ResultBase();
+            try
             {
-                domain.SetProperty(this.authentication, propertyName, value);
-            });
+                var domain = await this.GetDomainAsync(domainID);
+                await domain.SetPropertyAsync(this.authentication, propertyName, value);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault(e);
+            }
+            return result;
         }
 
-        public ResultBase BeginUserEdit(Guid domainID, DomainLocationInfo location)
+        public async Task<ResultBase> BeginUserEditAsync(Guid domainID, DomainLocationInfo location)
         {
-            return this.Invoke(domainID, (domain) =>
+            var result = new ResultBase();
+            try
             {
-                domain.BeginUserEdit(this.authentication, location);
-            });
+                var domain = await this.GetDomainAsync(domainID);
+                await domain.BeginUserEditAsync(this.authentication, location);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault(e);
+            }
+            return result;
         }
 
-        public ResultBase EndUserEdit(Guid domainID)
+        public async Task<ResultBase> EndUserEditAsync(Guid domainID)
         {
-            return this.Invoke(domainID, (domain) =>
+            var result = new ResultBase();
+            try
             {
-                domain.EndUserEdit(this.authentication);
-            });
+                var domain = await this.GetDomainAsync(domainID);
+                await domain.EndUserEditAsync(this.authentication);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault(e);
+            }
+            return result;
         }
 
-        public ResultBase<DomainUserInfo> Kick(Guid domainID, string userID, string comment)
+        public async Task<ResultBase<DomainUserInfo>> KickAsync(Guid domainID, string userID, string comment)
         {
-            return this.Invoke(domainID, (domain) =>
+            var result = new ResultBase<DomainUserInfo>();
+            try
             {
-                return domain.Kick(this.authentication, userID, comment);
-            });
+                var domain = await this.GetDomainAsync(domainID);
+                result.Value = await domain.KickAsync(this.authentication, userID, comment);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault(e);
+            }
+            return result;
         }
 
-        public ResultBase SetOwner(Guid domainID, string userID)
+        public async Task<ResultBase> SetOwnerAsync(Guid domainID, string userID)
         {
-            return this.Invoke(domainID, (domain) =>
+            var result = new ResultBase();
+            try
             {
-                domain.SetOwner(this.authentication, userID);
-            });
+                var domain = await this.GetDomainAsync(domainID);
+                await domain.SetOwnerAsync(this.authentication, userID);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault(e);
+            }
+            return result;
         }
 
-        public ResultBase SetUserLocation(Guid domainID, DomainLocationInfo location)
+        public async Task<ResultBase> SetUserLocationAsync(Guid domainID, DomainLocationInfo location)
         {
-            return this.Invoke(domainID, (domain) =>
+            var result = new ResultBase();
+            try
             {
-                domain.SetUserLocation(this.authentication, location);
-            });
+                var domain = await this.GetDomainAsync(domainID);
+                await domain.SetUserLocationAsync(this.authentication, location);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault(e);
+            }
+            return result;
         }
 
-        public ResultBase<DomainRowInfo[]> NewRow(Guid domainID, DomainRowInfo[] rows)
+        public async Task<ResultBase<DomainRowInfo[]>> NewRowAsync(Guid domainID, DomainRowInfo[] rows)
         {
-            return this.Invoke(domainID, (domain) =>
+            var result = new ResultBase<DomainRowInfo[]>();
+            try
             {
-                return domain.NewRow(this.authentication, rows);
-            });
+                var domain = await this.GetDomainAsync(domainID);
+                await domain.NewRowAsync(this.authentication, rows);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault(e);
+            }
+            return result;
         }
 
-        public ResultBase RemoveRow(Guid domainID, DomainRowInfo[] rows)
+        public async Task<ResultBase> RemoveRowAsync(Guid domainID, DomainRowInfo[] rows)
         {
-            return this.Invoke(domainID, (domain) =>
+            var result = new ResultBase();
+            try
             {
-                domain.RemoveRow(this.authentication, rows);
-            });
+                var domain = await this.GetDomainAsync(domainID);
+                await domain.RemoveRowAsync(this.authentication, rows);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault(e);
+            }
+            return result;
         }
 
-        public ResultBase DeleteDomain(Guid domainID, bool force)
+        public async Task<ResultBase> DeleteDomainAsync(Guid domainID, bool force)
         {
-            return this.Invoke(domainID, (domain) =>
+            var result = new ResultBase();
+            try
             {
-                domain.Delete(this.authentication, force);
-            });
+                var domain = await this.GetDomainAsync(domainID);
+                await domain.DeleteAsync(this.authentication, force);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault(e);
+            }
+            return result;
         }
 
         public bool IsAlive()
@@ -239,7 +314,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
                 {
                     if (this.authentication.RemoveRef(this) == 0)
                     {
-                        this.userContext.Logout(this.authentication);
+                        this.userContext.LogoutAsync(this.authentication).Wait();
                     }
                     this.authentication = null;
                 }
@@ -251,9 +326,12 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             this.Callback.OnServiceClosed(signatureDate, closeInfo);
         }
 
-        private IDomain GetDomain(Guid domainID)
+        private async Task<IDomain> GetDomainAsync(Guid domainID)
         {
-            return this.domainContext.Dispatcher.Invoke(() => this.domainContext.Domains[domainID]);
+            var domain = await this.domainContext.Dispatcher.InvokeAsync(() => this.domainContext.Domains[domainID]);
+            if (domain == null)
+                throw new DomainNotFoundException(domainID);
+            return domain;
         }
 
         private void AttachEventHandlers()
@@ -475,41 +553,41 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             }
         }
 
-        private ResultBase<T> Invoke<T>(Guid domainID, Func<IDomain, T> func)
-        {
-            var result = new ResultBase<T>();
-            try
-            {
-                var domain = this.GetDomain(domainID);
-                if (domain == null)
-                    throw new DomainNotFoundException(domainID);
-                result.Value = domain.Dispatcher.Invoke(() => func(domain));
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
-            return result;
-        }
+        //private async Task<ResultBase<T>> Invoke<T>Async(Guid domainID, Func<IDomain, T> func)
+        //{
+        //    var result = new ResultBase<T>();
+        //    try
+        //    {
+        //        var domain = this.GetDomain(domainID);
+        //        if (domain == null)
+        //            throw new DomainNotFoundException(domainID);
+        //        result.Value = domain.Dispatcher.Invoke(() => func(domain));
+        //        result.SignatureDate = this.authentication.SignatureDate;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+        //    }
+        //    return result;
+        //}
 
-        private ResultBase Invoke(Guid domainID, Action<IDomain> action)
-        {
-            var result = new ResultBase();
-            try
-            {
-                var domain = this.GetDomain(domainID);
-                if (domain == null)
-                    throw new DomainNotFoundException(domainID);
-                domain.Dispatcher.Invoke(() => action(domain));
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
-            return result;
-        }
+        //private async Task<ResultBase> InvokeAsync(Guid domainID, Action<IDomain> action)
+        //{
+        //    var result = new ResultBase();
+        //    try
+        //    {
+        //        var domain = this.GetDomain(domainID);
+        //        if (domain == null)
+        //            throw new DomainNotFoundException(domainID);
+        //        domain.Dispatcher.Invoke(() => action(domain));
+        //        result.SignatureDate = this.authentication.SignatureDate;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+        //    }
+        //    return result;
+        //}
 
         #region ICremaServiceItem
 

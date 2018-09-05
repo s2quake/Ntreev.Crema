@@ -59,78 +59,72 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(MessageProperties))]
-        public void Create(string dataBaseName)
+        public Task CreateAsync(string dataBaseName)
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            this.dataBases.Dispatcher.Invoke(() =>
-            {
-                this.dataBases.AddNewDataBase(authentication, dataBaseName, MessageProperties.Message);
-            });
+            return this.dataBases.AddNewDataBaseAsync(authentication, dataBaseName, MessageProperties.Message);
         }
 
         [CommandMethod]
-        public void Rename([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName, string newDataBaseName)
+        public Task RenameAsync([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName, string newDataBaseName)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            dataBase.Dispatcher.Invoke(() =>
-            {
-                dataBase.Rename(authentication, newDataBaseName);
-            });
+            return dataBase.RenameAsync(authentication, newDataBaseName);
         }
 
         [CommandMethod]
-        public void Delete([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName)
+        public async Task DeleteAsync([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
             if (this.CommandContext.ConfirmToDelete() == true)
             {
-                dataBase.Dispatcher.Invoke(() => dataBase.Delete(authentication));
+                await dataBase.DeleteAsync(authentication);
             }
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(MessageProperties))]
         [CommandMethodProperty(nameof(Force))]
-        public void Copy([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName, string newDataBaseName)
+        public async Task CopyAsync([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName, string newDataBaseName)
         {
             var dataBase = GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            dataBase.Dispatcher.Invoke(() => dataBase.Copy(authentication, newDataBaseName, MessageProperties.Message, this.Force));
+            await dataBase.CopyAsync(authentication, newDataBaseName, MessageProperties.Message, this.Force);
         }
 
         [CommandMethod]
-        public void Load([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName)
+        public async Task LoadAsync([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            dataBase.Dispatcher.Invoke(() => dataBase.Load(authentication));
+            await dataBase.LoadAsync(authentication);
         }
 
         [CommandMethod]
-        public void Unload([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName)
+        public async Task UnloadAsync([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            dataBase.Dispatcher.Invoke(() => dataBase.Unload(authentication));
+            await dataBase.UnloadAsync(authentication);
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(MessageProperties))]
-        public void Lock([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName)
+        public async Task LockAsync([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            dataBase.Dispatcher.Invoke(() => dataBase.Lock(authentication, MessageProperties.Message));
+            await dataBase.LockAsync(authentication, MessageProperties.Message);
         }
 
         [CommandMethod]
-        public void Unlock([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName)
+        public async Task UnlockAsync([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            dataBase.Dispatcher.Invoke(() => dataBase.Unlock(authentication));
+            await dataBase.UnlockAsync(authentication);
         }
 
         [CommandMethod]
@@ -159,21 +153,21 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public void Revert([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName, string revision)
+        public async Task RevertAsync([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName, string revision)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            dataBase.Dispatcher.Invoke(() => dataBase.Revert(authentication, revision));
+            await dataBase.RevertAsync(authentication, revision);
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(LogProperties))]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public void Log([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName, string revision = null)
+        public async Task LogAsync([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName, string revision = null)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            var logs = dataBase.Dispatcher.Invoke(() => dataBase.GetLog(authentication, revision));
+            var logs = await dataBase.GetLogAsync(authentication, revision);
 
             foreach (var item in logs)
             {
@@ -186,11 +180,11 @@ namespace Ntreev.Crema.Commands.Consoles
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
         [CommandMethodStaticProperty(typeof(DataSetTypeProperties))]
-        public void View([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName, string revision = null)
+        public async Task ViewAsync([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName, string revision = null)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            var dataSet = dataBase.GetDataSet(authentication, DataSetTypeProperties.DataSetType, FilterProperties.FilterExpression, revision);
+            var dataSet = await dataBase.GetDataSetAsync(authentication, DataSetTypeProperties.DataSetType, FilterProperties.FilterExpression, revision);
             var props = dataSet.ToDictionary(DataSetTypeProperties.TableOnly == true, DataSetTypeProperties.TypeOnly == true);
             this.CommandContext.WriteObject(props, FormatProperties.Format);
         }

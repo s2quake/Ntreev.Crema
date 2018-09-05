@@ -571,7 +571,7 @@ namespace Ntreev.Crema.Services.Data
                 var domains = domainContext.Domains.Where<Domain>(item => item.DataBaseID == this.ID).ToArray();
                 foreach (var item in domains)
                 {
-                    item.Dispatcher.Invoke(() => item.Delete(authentication, true));
+                    item.Dispatcher.Invoke(() => item.DeleteAsync(authentication, true));
                 }
 
                 this.typeContext?.Dispose();
@@ -586,7 +586,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void ResetDataBase(Authentication authentication, IEnumerable<TypeInfo> typeInfos, IEnumerable<TableInfo> tableInfos)
+        public async Task ResetDataBase(Authentication authentication, IEnumerable<TypeInfo> typeInfos, IEnumerable<TableInfo> tableInfos)
         {
             this.Sign(authentication);
             this.DataBases.InvokeDataBaseReset(authentication, this);
@@ -613,7 +613,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (item.DomainInfo.DataBaseID == this.ID)
                 {
-                    var metaData = item.Dispatcher.Invoke(() => item.GetMetaData(authentication));
+                    var metaData = await item.GetMetaDataAsync(authentication);
                     metaDataList.Add(metaData);
                 }
             }

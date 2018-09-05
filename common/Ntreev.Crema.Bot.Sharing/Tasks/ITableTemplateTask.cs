@@ -34,7 +34,7 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     public class ITableTemplateTask : ITaskProvider
     {
-        public void InvokeTask(TaskContext context)
+        public Task InvokeAsync(TaskContext context)
         {
             var template = context.Target as ITableTemplate;
             template.Dispatcher.Invoke(() =>

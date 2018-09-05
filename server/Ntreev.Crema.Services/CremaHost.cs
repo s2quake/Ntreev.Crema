@@ -42,7 +42,7 @@ namespace Ntreev.Crema.Services
         private IEnumerable<IPlugin> plugins;
 
         [Import]
-        private readonly IServiceProvider container = null;
+        private IServiceProvider container = null;
         private CremaSettings settings;
         private readonly IRepositoryProvider repositoryProvider;
         private readonly IObjectSerializer serializer;
@@ -53,7 +53,7 @@ namespace Ntreev.Crema.Services
         private ShutdownTimer shutdownTimer;
 
         [ImportMany]
-        private readonly IEnumerable<IConfigurationPropertyProvider> propertiesProviders = null;
+        private IEnumerable<IConfigurationPropertyProvider> propertiesProviders = null;
 
         [ImportingConstructor]
         public CremaHost(CremaSettings settings,
@@ -124,12 +124,12 @@ namespace Ntreev.Crema.Services
             return null;
         }
 
-        public Task OpenAsync()
+        public async Task OpenAsync()
         {
             try
             {
                 this.OnOpening(EventArgs.Empty);
-                return this.Dispatcher.InvokeAsync(() =>
+                await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.Info(Resources.Message_ProgramInfo, AppUtility.ProductName, AppUtility.ProductVersion);
                     this.Info("Repository module : {0}", this.settings.RepositoryModule);
@@ -157,7 +157,7 @@ namespace Ntreev.Crema.Services
                         this.Info("Plugin : {0}", item.Name);
                     }
 
-                    this.Dispatcher.InvokeAsync(async () => await this.DataBases.RestoreStateAsync(this.settings));
+                    this.Dispatcher.InvokeAsync(() => this.DataBases.RestoreStateAsync(this.settings));
 
                     GC.Collect();
                     this.Info("Crema module has been started.");

@@ -67,7 +67,7 @@ namespace Ntreev.Crema.Services.Data
             this.Initialize();
         }
         
-        public async Task RestoreStateAsync(CremaSettings settings)
+        public async void RestoreStateAsync(CremaSettings settings)
         {
             if (settings.NoCache == false)
             {

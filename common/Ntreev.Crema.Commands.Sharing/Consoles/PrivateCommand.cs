@@ -115,22 +115,22 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var accessible = this.GetObject(authentication, this.Path);
+            var accessible = await this.GetObjectAsync(authentication, this.Path);
 
             if (this.MemberIDToAdd != string.Empty)
             {
-                this.Invoke(authentication, accessible, () => accessible.AddAccessMember(authentication, this.MemberIDToAdd, this.AccessType));
+                await accessible.AddAccessMemberAsync(authentication, this.MemberIDToAdd, this.AccessType);
             }
             else if (this.MemberIDToSet != string.Empty)
             {
-                this.Invoke(authentication, accessible, () => accessible.SetAccessMember(authentication, this.MemberIDToSet, this.AccessType));
+                await accessible.SetAccessMemberAsync(authentication, this.MemberIDToSet, this.AccessType);
             }
             else if (this.MemberIDToRemove != string.Empty)
             {
-                this.Invoke(authentication, accessible, () => accessible.RemoveAccessMember(authentication, this.MemberIDToRemove));
+                await accessible.RemoveAccessMemberAsync(authentication, this.MemberIDToRemove);
             }
             else if (this.Information == true)
             {
@@ -139,7 +139,7 @@ namespace Ntreev.Crema.Commands.Consoles
             }
             else
             {
-                this.Invoke(authentication, accessible, () => accessible.SetPrivate(authentication));
+                await accessible.SetPrivateAsync(authentication);
             }
         }
     }

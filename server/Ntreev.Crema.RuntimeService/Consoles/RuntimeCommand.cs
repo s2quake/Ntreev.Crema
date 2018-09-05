@@ -43,7 +43,7 @@ namespace Ntreev.Crema.RuntimeService.Consoles
         }
 
         [CommandMethod]
-        public void Reset(string dataBaseName)
+        public async Task ResetAsync(string dataBaseName)
         {
             var dataBaseID = this.CremaHost.Dispatcher.Invoke(() =>
             {
@@ -54,10 +54,7 @@ namespace Ntreev.Crema.RuntimeService.Consoles
             });
 
             var serviceItem = this.RuntimeService.GetServiceItem(dataBaseID);
-            serviceItem.Dispatcher.Invoke(() =>
-            {
-                serviceItem.Reset();
-            });
+            await serviceItem.ResetAsync();
         }
 
         [CommandMethod]

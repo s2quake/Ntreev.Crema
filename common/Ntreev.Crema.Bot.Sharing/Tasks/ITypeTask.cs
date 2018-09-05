@@ -34,7 +34,7 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     public class ITypeTask : ITaskProvider
     {
-        public void InvokeTask(TaskContext context)
+        public async Task InvokeAsync(TaskContext context)
         {
             var type = context.Target as IType;
             if (context.IsCompleted(type) == true)

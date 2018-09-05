@@ -42,12 +42,12 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
 
         public ITableTemplate Template { get => this.CommandContext.Template; }
 
-        protected override void OnExecute()
+        protected override Task OnExecuteAsync()
         {
-            var domain = this.Template.Dispatcher.Invoke(() => this.Template.Domain);
+            var domain = this.Template.Domain;
             var template = domain.Source as CremaTemplate;
 
-            this.Template.Dispatcher.Invoke(() => this.Draw(template));
+            return this.Template.Dispatcher.InvokeAsync(() => this.Draw(template));
         }
 
         private void Draw(CremaTemplate template)

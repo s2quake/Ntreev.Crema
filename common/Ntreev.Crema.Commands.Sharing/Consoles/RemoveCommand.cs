@@ -76,7 +76,7 @@ namespace Ntreev.Crema.Commands.Consoles
             if (this.CommandContext.ConfirmToDelete() == false)
                 return;
             var authentication = this.CommandContext.GetAuthentication(this);
-            drive.Delete(authentication, absolutePath);
+            drive.DeleteAsync(authentication, absolutePath).Wait();
         }
     }
 }

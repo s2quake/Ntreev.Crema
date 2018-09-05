@@ -35,7 +35,7 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     class ITypeMemberTask : ITaskProvider
     {
-        public void InvokeTask(TaskContext context)
+        public Task InvokeAsync(TaskContext context)
         {
             var member = context.Target as ITypeMember;
             member.Dispatcher.Invoke(() =>

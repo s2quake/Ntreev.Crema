@@ -33,7 +33,7 @@ using YamlDotNet.Serialization;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
-    abstract class AccessCommandBase : ConsoleCommandBase
+    abstract class AccessCommandBase : ConsoleCommandAsyncBase
     {
         protected AccessCommandBase()
         {
@@ -63,11 +63,11 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        protected IAccessible GetObject(Authentication authentication, string path)
+        protected async Task<IAccessible> GetObjectAsync(Authentication authentication, string path)
         {
             var absolutePath = this.GetAbsolutePath(path);
             var drive = this.CommandContext.Drive as DataBasesConsoleDrive;
-            if (drive.GetObject(authentication, absolutePath) is IAccessible accessible)
+            if (await drive.GetObjectAsync(authentication, absolutePath) is IAccessible accessible)
             {
                 return accessible;
             }

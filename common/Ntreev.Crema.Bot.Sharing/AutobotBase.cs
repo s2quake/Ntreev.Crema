@@ -155,7 +155,7 @@ namespace Ntreev.Crema.Bot
                 {
                     if (this.cancelTokenSource.IsCancellationRequested == true)
                         break;
-                    taskProvider.InvokeTask(this.taskContext);
+                    taskProvider.InvokeAsync(this.taskContext);
                 }
                 catch
                 {

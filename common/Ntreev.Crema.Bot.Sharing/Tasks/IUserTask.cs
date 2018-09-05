@@ -45,13 +45,14 @@ namespace Ntreev.Crema.Bot.Tasks
             this.cremaHost.Closed += CremaHost_Closed;
         }
 
-        public void InvokeTask(TaskContext context)
+        public Task InvokeAsync(TaskContext context)
         {
             var user = context.Target as IUser;
             if (context.IsCompleted(user) == true)
             {
                 context.Pop(user);
             }
+            return Task.Delay(0);
         }
 
         public Type TargetType
@@ -65,15 +66,15 @@ namespace Ntreev.Crema.Bot.Tasks
         }
 
         [TaskMethod]
-        public void Move(IUser user, TaskContext context)
+        public Task MoveAsync(IUser user, TaskContext context)
         {
-            user.Dispatcher.Invoke(() =>
+            return user.Dispatcher.InvokeAsync(async () =>
             {
                 var categories = user.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
                 var categoryPath = categories.Random().Path;
                 if (Verify(categoryPath) == false)
                     return;
-                user.Move(context.Authentication, categoryPath);
+                await user.MoveAsync(context.Authentication, categoryPath);
             });
 
             bool Verify(string categoryPath)
@@ -105,7 +106,7 @@ namespace Ntreev.Crema.Bot.Tasks
         }
 
         [TaskMethod]
-        public void SendMessage(IUser user, TaskContext context)
+        public Task SendMessageAsync(IUser user, TaskContext context)
         {
             user.Dispatcher.Invoke(() =>
             {

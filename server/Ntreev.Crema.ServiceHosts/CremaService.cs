@@ -106,12 +106,12 @@ namespace Ntreev.Crema.ServiceHosts
             this.OnClosed(EventArgs.Empty);
         }
 
-        public void Restart()
+        public async Task RestartAsync()
         {
             this.StopServices();
             this.cremaHost.Dispatcher.Invoke(() => this.CremaHost.Close(this.token));
             this.cremaHost.SaveConfigs();
-            this.token = this.cremaHost.Dispatcher.Invoke(() => this.CremaHost.Open());
+            this.token = await this.CremaHost.OpenAsync();
             this.StartServices();
         }
 

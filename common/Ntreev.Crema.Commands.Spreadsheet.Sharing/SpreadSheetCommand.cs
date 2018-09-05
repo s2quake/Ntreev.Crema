@@ -62,13 +62,13 @@ namespace Ntreev.Crema.Commands.Spreadsheet
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         [CommandMethodStaticProperty(typeof(DataSetTypeProperties))]
         [CommandMethodProperty(nameof(DataBase), nameof(OmitAttribute), nameof(OmitSignatureDate), nameof(Revision), nameof(SaveEach), nameof(IsForce))]
-        public void Export(string filename)
+        public async Task ExportAsync(string filename)
         {
             this.ValidateExport(filename);
             var authentication = this.CommandContext.GetAuthentication(this);
             var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.DataBase]);
             var revision = dataBase.Dispatcher.Invoke(() => this.Revision ?? dataBase.DataBaseInfo.Revision);
-            var dataSet = dataBase.Dispatcher.Invoke(() => dataBase.GetDataSet(authentication, DataSetTypeProperties.DataSetType, FilterProperties.FilterExpression, revision));
+            var dataSet = await dataBase.GetDataSetAsync(authentication, DataSetTypeProperties.DataSetType, FilterProperties.FilterExpression, revision);
             var settings = new SpreadsheetWriterSettings()
             {
                 OmitAttribute = this.OmitAttribute,
@@ -90,7 +90,7 @@ namespace Ntreev.Crema.Commands.Spreadsheet
         [CommandMethod]
         [CommandMethodProperty(nameof(Message))]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
-        public void Import(string filename)
+        public async Task ImportAsync(string filename)
         {
             var path = Path.GetFullPath(Path.Combine(this.CommandContext.BaseDirectory, filename));
             var sheetNames = SpreadsheetReader.ReadTableNames(path);
@@ -104,9 +104,9 @@ namespace Ntreev.Crema.Commands.Spreadsheet
                         select sheet;
             var filterExpression = string.Join(";", query);
             var revision = dataBase.Dispatcher.Invoke(() => dataBase.DataBaseInfo.Revision);
-            var dataSet = dataBase.Dispatcher.Invoke(() => dataBase.GetDataSet(authentication, DataSetType.OmitContent, filterExpression, revision));
+            var dataSet = await dataBase.GetDataSetAsync(authentication, DataSetType.OmitContent, filterExpression, revision);
             this.ReadDataSet(dataSet, path);
-            dataBase.Dispatcher.Invoke(() => dataBase.Import(authentication, dataSet, this.Message));
+            await dataBase.ImportAsync(authentication, dataSet, this.Message);
             this.CommandContext.WriteLine($"importing data has been completed.");
         }
 

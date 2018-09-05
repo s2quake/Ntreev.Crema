@@ -32,13 +32,14 @@ using Ntreev.Crema.ConsoleHost.Commands.Consoles;
 using System.Collections.Generic;
 using Ntreev.Crema.Javascript;
 using Ntreev.Library.IO;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ConsoleHost.Commands
 {
     [Export(typeof(ICommand))]
     [Export]
     [ResourceDescription]
-    class RunCommand : CommandBase
+    class RunCommand : CommandAsyncBase
     {
         private readonly CremaApplication application;
         private string repositoryModule;
@@ -160,7 +161,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
         }
 #endif
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             CremaLog.Verbose = this.Verbose ? LogVerbose.Debug : LogVerbose.Info;
             this.application.BasePath = this.Path;
@@ -172,11 +173,11 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             this.application.ValidationMode = this.ValidationMode;
 #endif
             this.application.Port = this.Port;
-            this.application.Open();
+            await this.application.OpenAsync();
             Console.Title = $"{this.application.BasePath} --port {this.application.Port}";
             var cremaHost = this.application.GetService(typeof(ICremaHost)) as ICremaHost;
             cremaHost.Closed += CremaHost_Closed;
-            this.Wait(cremaHost);
+            await this.WaitAsync(cremaHost);
             Console.WriteLine(Resources.StoppingServer);
             this.application.Close();
             Console.WriteLine(Resources.ServerHasBeenStopped);
@@ -190,13 +191,13 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             }
         }
 
-        private void Wait(ICremaHost cremaHost)
+        private async Task WaitAsync(ICremaHost cremaHost)
         {
             if (this.IsPromptMode == true)
             {
                 var terminal = this.application.GetService(typeof(ConsoleTerminal)) as ConsoleTerminal;
 #if DEBUG
-                terminal.Start(this.LoginAuthentication);
+                await terminal.StartAsync(this.LoginAuthentication);
 #else
                 terminal.Start();
 #endif

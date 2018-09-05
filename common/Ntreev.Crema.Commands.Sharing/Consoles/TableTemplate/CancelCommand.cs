@@ -43,13 +43,13 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var terminal = new Terminal();
             var key = terminal.ReadKey("cancel template edit. do you proceed?(Y/N)", ConsoleKey.Y, ConsoleKey.N);
             if (key == ConsoleKey.Y)
             {
-                this.Template.Dispatcher.Invoke(() => this.Template.CancelEdit(this.Authentication));
+                await this.Template.CancelEditAsync(this.Authentication);
                 this.CloseAction?.Invoke();
             }
         }

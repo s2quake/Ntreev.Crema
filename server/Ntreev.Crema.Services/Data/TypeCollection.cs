@@ -25,6 +25,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -69,22 +70,25 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Type Copy(Authentication authentication, string typeName, string newTypeName, string categoryPath)
+        public Task<Type> CopyAsync(Authentication authentication, string typeName, string newTypeName, string categoryPath)
         {
             try
             {
-                this.CremaHost.DebugMethod(authentication, this, nameof(TypeCollection.Copy), typeName, newTypeName, categoryPath);
-                this.ValidateCopy(authentication, typeName, newTypeName);
-                var type = this[typeName];
-                var dataSet = type.ReadData(authentication);
-                var dataType = dataSet.Types[type.Name, type.Category.Path];
-                var itemName = new ItemName(categoryPath, newTypeName);
-                var newDataType = dataType.Copy(itemName);
-                this.InvokeTypeCreate(authentication, newTypeName, dataSet);
-                var newType = this.BaseAddNew(newTypeName, categoryPath, authentication);
-                newType.Initialize(newDataType.TypeInfo);
-                this.InvokeTypesCreatedEvent(authentication, new Type[] { newType }, dataSet);
-                return newType;
+                this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), typeName, newTypeName, categoryPath);
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ValidateCopy(authentication, typeName, newTypeName);
+                    var type = this[typeName];
+                    var dataSet = type.ReadData(authentication);
+                    var dataType = dataSet.Types[type.Name, type.Category.Path];
+                    var itemName = new ItemName(categoryPath, newTypeName);
+                    var newDataType = dataType.Copy(itemName);
+                    this.InvokeTypeCreate(authentication, newTypeName, dataSet);
+                    var newType = this.BaseAddNew(newTypeName, categoryPath, authentication);
+                    newType.Initialize(newDataType.TypeInfo);
+                    this.InvokeTypesCreatedEvent(authentication, new Type[] { newType }, dataSet);
+                    return newType;
+                });
             }
             catch (Exception e)
             {

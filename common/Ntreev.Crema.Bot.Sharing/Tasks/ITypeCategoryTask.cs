@@ -23,6 +23,7 @@ using Ntreev.Library.Random;
 using System;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Bot.Tasks
 {
@@ -31,7 +32,7 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     public class ITypeCategoryTask : ITaskProvider
     {
-        public void InvokeTask(TaskContext context)
+        public Task InvokeAsync(TaskContext context)
         {
             var category = context.Target as ITypeCategory;
             category.Dispatcher.Invoke(() =>

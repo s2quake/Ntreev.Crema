@@ -270,68 +270,64 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Type Copy(Authentication authentication, string newTypeName, string categoryPath)
+        public Task<Type> CopyAsync(Authentication authentication, string newTypeName, string categoryPath)
         {
-            try
-            {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(Copy), this, newTypeName, categoryPath);
-                return this.Container.Copy(authentication, base.Name, newTypeName, categoryPath);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.Container.CopyAsync(authentication, base.Name, newTypeName, categoryPath);
         }
 
-        public CremaDataSet GetDataSet(Authentication authentication, string revision)
+        public Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision)
         {
             try
             {
-                this.DataBase.ValidateAsyncBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSet), this, revision);
-                this.ValidateAccessType(authentication, AccessType.Guest);
-                this.Sign(authentication);
-                return this.Repository.GetTypeData(this.Serializer, this.ItemPath, revision);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
-
-        public LogInfo[] GetLog(Authentication authentication, string revision)
-        {
-            try
-            {
-                this.DataBase.ValidateAsyncBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(GetLog), this);
-                this.ValidateAccessType(authentication, AccessType.Guest);
-                this.Sign(authentication);
-                return this.Context.GetTypeLog(this.ItemPath, revision);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
-
-        public FindResultInfo[] Find(Authentication authentication, string text, FindOptions options)
-        {
-            try
-            {
-                this.DataBase.ValidateAsyncBeginInDataBase(authentication);
-                this.CremaHost.DebugMethod(authentication, this, nameof(Find), this, text, options);
-                this.ValidateAccessType(authentication, AccessType.Guest);
-                this.Sign(authentication);
-                if (this.GetService(typeof(DataFindService)) is DataFindService service)
+                this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, revision);
+                return this.Dispatcher.InvokeAsync(() =>
                 {
-                    return service.Dispatcher.Invoke(() => service.FindFromType(this.DataBase.ID, new string[] { base.Path }, text, options));
-                }
-                throw new NotImplementedException();
+                    this.ValidateAccessType(authentication, AccessType.Guest);
+                    this.Sign(authentication);
+                    return this.Repository.GetTypeData(this.Serializer, this.ItemPath, revision);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision)
+        {
+            try
+            {
+                this.CremaHost.DebugMethod(authentication, this, nameof(GetLogAsync), this);
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ValidateAccessType(authentication, AccessType.Guest);
+                    this.Sign(authentication);
+                    return this.Context.GetTypeLog(this.ItemPath, revision);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public Task<FindResultInfo[]> FindAsync(Authentication authentication, string text, FindOptions options)
+        {
+            try
+            {
+                this.CremaHost.DebugMethod(authentication, this, nameof(FindAsync), this, text, options);
+                return this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ValidateAccessType(authentication, AccessType.Guest);
+                    this.Sign(authentication);
+                    if (this.GetService(typeof(DataFindService)) is DataFindService service)
+                    {
+                        return service.Dispatcher.Invoke(() => service.FindFromType(this.DataBase.ID, new string[] { base.Path }, text, options));
+                    }
+                    throw new NotImplementedException();
+                });
             }
             catch (Exception e)
             {
@@ -658,14 +654,14 @@ namespace Ntreev.Crema.Services.Data
 
         #region IType
 
+        async Task<IType> IType.CopyAsync(Authentication authentication, string newTypeName, string categoryPath)
+        {
+            return await this.CopyAsync(authentication, newTypeName, categoryPath);
+        }
+
         ITypeCategory IType.Category => this.Category;
 
         ITypeTemplate IType.Template => this.Template;
-
-        IType IType.Copy(Authentication authentication, string newTypeName, string categoryPath)
-        {
-            return this.Copy(authentication, newTypeName, categoryPath);
-        }
 
         #endregion
 

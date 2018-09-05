@@ -57,7 +57,7 @@ namespace Ntreev.Crema.Javascript
             return this.authentication;
         }
 
-        public string Login(string userID, string password)
+        public async Task<string> LoginAsync(string userID, string password)
         {
             if (this.authentication != null)
                 throw new Exception("이미 로그인되어 있습니다.");
@@ -65,12 +65,12 @@ namespace Ntreev.Crema.Javascript
                 throw new ArgumentNullException(nameof(userID));
             if (password == null)
                 throw new ArgumentNullException(nameof(password));
-            this.authentication = this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.Login(userID, StringUtility.ToSecureString(password)));
+            this.authentication = await this.cremaHost.LoginAsync(userID, StringUtility.ToSecureString(password));
             this.token = $"{Guid.NewGuid()}";
             return this.token;
         }
 
-        public void Logout(string token)
+        public async Task LogoutAsync(string token)
         {
             if (token == null)
                 throw new ArgumentNullException(nameof(token));
@@ -78,14 +78,14 @@ namespace Ntreev.Crema.Javascript
                 throw new ArgumentException("token is not valid.", nameof(token));
             if (this.Properties.ContainsKey(LoginKey) == false)
                 throw new InvalidOperationException("this method is invalid operation");
-            this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.Logout(this.authentication));
+            await this.cremaHost.LogoutAsync(this.authentication);
             this.authentication = null;
             this.token = null;
         }
 
-        public void Logout()
+        public Task LogoutAsync()
         {
-            this.Logout(this.token);
+            return this.LogoutAsync(this.token);
         }
 
         public IDictionary<object, object> Properties => this;

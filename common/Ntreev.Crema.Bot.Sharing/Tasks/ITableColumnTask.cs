@@ -35,7 +35,7 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     public class ITableColumnTask : ITaskProvider
     {
-        public void InvokeTask(TaskContext context)
+        public Task InvokeAsync(TaskContext context)
         {
             var column = context.Target as ITableColumn;
             if (context.IsCompleted(column) == true)

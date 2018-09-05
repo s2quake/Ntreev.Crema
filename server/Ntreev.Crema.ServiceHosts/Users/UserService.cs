@@ -350,7 +350,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
                     this.DetachEventHandlers();
                     if (this.authentication.RemoveRef(this) == 0)
                     {
-                        this.userContext.Logout(this.authentication);
+                        this.userContext.LogoutAsync(this.authentication).Wait();
                     }
                     this.authentication = null;
                 }

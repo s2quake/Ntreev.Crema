@@ -43,7 +43,7 @@ namespace Ntreev.Crema.Bot.Tasks
             this.dispatcher = new CremaDispatcher(this, System.Windows.Threading.Dispatcher.CurrentDispatcher);
         }
 
-        public void InvokeTask(TaskContext context)
+        public async Task InvokeAsync(TaskContext context)
         {
             if (context.Target is AutobotBase autobot)
             {
@@ -53,7 +53,7 @@ namespace Ntreev.Crema.Bot.Tasks
                     context.Push(autobot.CremaHost.DataBases);
                     if (RandomUtility.Within(75) == true)
                     {
-                        var dataBase = autobot.CremaHost.Dispatcher.Invoke(() => autobot.CremaHost.DataBases.Random());
+                        var dataBase = await autobot.CremaHost.Dispatcher.InvokeAsync(() => autobot.CremaHost.DataBases.Random());
                         context.Push(dataBase);
                     }
                     else if (RandomUtility.Within(75) == true)
@@ -61,12 +61,12 @@ namespace Ntreev.Crema.Bot.Tasks
                         var userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
                         if (RandomUtility.Within(75) == true)
                         {
-                            var user = userContext.Dispatcher.Invoke(() => userContext.Users.Random());
+                            var user = await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Random());
                             context.Push(user);
                         }
                         else
                         {
-                            var category = userContext.Dispatcher.Invoke(() => userContext.Categories.Random());
+                            var category = await userContext.Dispatcher.InvokeAsync(() => userContext.Categories.Random());
                             context.Push(category);
                         }
                     }

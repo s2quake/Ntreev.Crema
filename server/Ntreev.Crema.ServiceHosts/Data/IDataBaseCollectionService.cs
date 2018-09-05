@@ -35,67 +35,67 @@ namespace Ntreev.Crema.ServiceHosts.Data
         /// 특정 타입의 배열 형식이 메소드의 인자로 설정되지 않으면 반환값으로 사용될때 클라이언트의 코드에서 재사용되지 않고 임시 코드가 생성됨
         /// </summary>
         [OperationContract]
-        ResultBase DefinitionType(LogInfo[] param1);
+        Task<ResultBase> DefinitionTypeAsync(LogInfo[] param1);
 
         [OperationContract]
-        ResultBase<DataBaseCollectionMetaData> Subscribe(Guid authenticationToken);
+        Task<ResultBase<DataBaseCollectionMetaData>> SubscribeAsync(Guid authenticationToken);
 
         [OperationContract]
-        ResultBase Unsubscribe();
+        Task<ResultBase> UnsubscribeAsync();
 
         [OperationContract]
-        ResultBase SetPublic(string dataBaseName);
+        Task<ResultBase> SetPublicAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase<AccessInfo> SetPrivate(string dataBaseName);
+        Task<ResultBase<AccessInfo>> SetPrivateAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase<AccessMemberInfo> AddAccessMember(string dataBaseName, string memberID, AccessType accessType);
+        Task<ResultBase<AccessMemberInfo>> AddAccessMemberAsync(string dataBaseName, string memberID, AccessType accessType);
 
         [OperationContract]
-        ResultBase<AccessMemberInfo> SetAccessMember(string dataBaseName, string memberID, AccessType accessType);
+        Task<ResultBase<AccessMemberInfo>> SetAccessMemberAsync(string dataBaseName, string memberID, AccessType accessType);
 
         [OperationContract]
-        ResultBase RemoveAccessMember(string dataBaseName, string memberID);
+        Task<ResultBase> RemoveAccessMemberAsync(string dataBaseName, string memberID);
 
         [OperationContract]
-        ResultBase<LockInfo> Lock(string dataBaseName, string comment);
+        Task<ResultBase<LockInfo>> LockAsync(string dataBaseName, string comment);
 
         [OperationContract]
-        ResultBase Unlock(string dataBaseName);
+        Task<ResultBase> UnlockAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase Load(string dataBaseName);
+        Task<ResultBase> LoadAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase Unload(string dataBaseName);
+        Task<ResultBase> UnloadAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase<DataBaseInfo> Create(string dataBaseName, string comment);
+        Task<ResultBase<DataBaseInfo>> CreateAsync(string dataBaseName, string comment);
 
         [OperationContract]
-        ResultBase<DataBaseInfo> Copy(string dataBaseName, string newDataBaseName, string comment, bool force);
+        Task<ResultBase<DataBaseInfo>> CopyAsync(string dataBaseName, string newDataBaseName, string comment, bool force);
 
         [OperationContract]
-        ResultBase Rename(string dataBaseName, string newDataBaseName);
+        Task<ResultBase> RenameAsync(string dataBaseName, string newDataBaseName);
 
         [OperationContract]
-        ResultBase Delete(string dataBaseName);
+        Task<ResultBase> DeleteAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase<LogInfo[]> GetLog(string dataBaseName, string revision);
+        Task<ResultBase<LogInfo[]>> GetLogAsync(string dataBaseName, string revision);
 
         [OperationContract]
-        ResultBase<DataBaseInfo> Revert(string dataBaseName, string revision);
+        Task<ResultBase<DataBaseInfo>> RevertAsync(string dataBaseName, string revision);
 
         [OperationContract]
-        ResultBase BeginTransaction(string dataBaseName);
+        Task<ResultBase> BeginTransactionAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase EndTransaction(string dataBaseName);
+        Task<ResultBase> EndTransactionAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase CancelTransaction(string dataBaseName);
+        Task<ResultBase> CancelTransactionAsync(string dataBaseName);
 
         [OperationContract]
         bool IsAlive();

@@ -53,7 +53,7 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var leave = this.IsSilent == true || this.IsLeaveOnly == true || this.CommandContext.ReadYesOrNo("leave content edit. do you proceed?");
             if (leave == true)
@@ -62,14 +62,12 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
                 {
                     var authentication = this.CommandContext.GetAuthentication(this);
                     var domain = this.Content.Domain;
-                    this.Content.Dispatcher.Invoke(() =>
+                    await this.Content.LeaveEditAsync(authentication);
+                    var isAny = this.Content.Dispatcher.Invoke(() => domain.Users.Any());
+                    if (isAny == false)
                     {
-                        this.Content.LeaveEdit(authentication);
-                        if (domain.Users.Any() == false)
-                        {
-                            this.Content.EndEdit(authentication);
-                        }
-                    });
+                        await this.Content.EndEditAsync(authentication);
+                    }
                 }
 
                 this.CommandContext.Category = null;

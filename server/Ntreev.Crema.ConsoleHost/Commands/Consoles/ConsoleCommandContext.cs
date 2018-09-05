@@ -56,32 +56,32 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
             this.BaseDirectory = cremaHost.GetPath(CremaPath.Documents);
         }
 
-        public void Login(string userID, SecureString password)
+        public async Task LoginAsync(string userID, SecureString password)
         {
             if (this.authentication != null)
                 throw new Exception("이미 로그인되어 있습니다.");
-            this.authentication = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.Login(userID, password));
+            this.authentication = await this.CremaHost.LoginAsync(userID, password);
             this.authentication.Expired += (s, e) => this.authentication = null;
             this.Initialize(authentication);
         }
 
 #if DEBUG
-        public void Login(string userID, string password)
+        public Task LoginAsync(string userID, string password)
         {
             var secureString = new SecureString();
             foreach (var item in password)
             {
                 secureString.AppendChar(item);
             }
-            this.Login(userID, secureString);
+            return this.LoginAsync(userID, secureString);
         }
 #endif
 
-        public void Logout()
+        public async Task LogoutAsync()
         {
             if (this.authentication == null)
                 throw new Exception("로그인되어 있지 않습니다.");
-            this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.Logout(this.authentication));
+            await this.CremaHost.LogoutAsync(this.authentication);
             this.authentication = null;
             this.Release();
         }

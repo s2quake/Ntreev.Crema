@@ -33,7 +33,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceDescription("Resources", IsShared = true)]
-    class LoginCommand : ConsoleCommandBase
+    class LoginCommand : ConsoleCommandAsyncBase
     {
         public LoginCommand()
             : base("login")
@@ -59,13 +59,13 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
 
         public new ConsoleCommandContext CommandContext => base.CommandContext as ConsoleCommandContext;
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             try
             {
                 var userID = this.UserID == string.Empty ? this.CommandContext.ReadString("UserID:") : this.UserID;
                 var password = this.Password == string.Empty ? this.CommandContext.ReadSecureString("Password:") : StringUtility.ToSecureString(this.Password);
-                this.CommandContext.Login(userID, password);
+                await this.CommandContext.LoginAsync(userID, password);
             }
             catch (OperationCanceledException e)
             {

@@ -15,10 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
@@ -31,64 +33,33 @@ namespace Ntreev.Crema.Commands.Consoles
             this.action = action;
         }
 
-        public static DataBaseUsing Set(IDataBase dataBase, Authentication authentication)
+        public static async Task<DataBaseUsing> SetAsync(ICremaHost cremaHost, string dataBaseName, Authentication authentication)
         {
-            return Set(dataBase, authentication, false);
+            var dataBase = await cremaHost.Dispatcher.InvokeAsync(() => cremaHost.DataBases[dataBaseName]);
+            if (dataBase == null)
+                throw new DataBaseNotFoundException(dataBaseName);
+
+            return await SetAsync(dataBase, authentication);
         }
 
-        public static DataBaseUsing Set(IDataBase dataBase, Authentication authentication, bool dispatch)
+        public static async Task<DataBaseUsing> SetAsync(IDataBase dataBase, Authentication authentication)
         {
-            Load();
-            var contains = Contains();
-            Enter();
-            return new DataBaseUsing(Leave);
-
-            void Load()
-            {
-                if (dispatch == true)
-                {
-                    dataBase.Dispatcher.Invoke(() =>
-                    {
-                        if (dataBase.IsLoaded == false)
-                            dataBase.Load(authentication);
-                    });
-                }
-                else if (dataBase.IsLoaded == false)
-                {
-                    dataBase.Load(authentication);
-                }
-            }
-
-            bool Contains()
-            {
-                if (dispatch == true)
-                    return dataBase.Dispatcher.Invoke(() => dataBase.Contains(authentication));
-                else
-                    return dataBase.Contains(authentication);
-            }
-
-            void Enter()
-            {
-                if (contains == false)
-                {
-                    if (dispatch == true)
-                        dataBase.Dispatcher.Invoke(() => dataBase.Enter(authentication));
-                    else
-                        dataBase.Enter(authentication);
-                }
-            }
-
-            void Leave()
-            {
-                if (contains == false)
-                {
-                    if (dispatch == true)
-                        dataBase.Dispatcher.Invoke(() => dataBase.Leave(authentication));
-                    else
-                        dataBase.Leave(authentication);
-                }
-            }
+            if (dataBase.IsLoaded == false)
+                await dataBase.LoadAsync(authentication);
+            if (await dataBase.ContainsAsync(authentication) == false)
+                await dataBase.EnterAsync(authentication);
+            return new DataBaseUsing(() => dataBase.LeaveAsync(authentication).Wait()) { DataBase = dataBase };
         }
+
+        public static Task<DataBaseUsing> SetAsync(IServiceProvider serviceProvider, Authentication authentication)
+        {
+            if (serviceProvider == null)
+                throw new ArgumentNullException(nameof(serviceProvider));
+
+            return SetAsync(serviceProvider.GetService(typeof(IDataBase)) as IDataBase, authentication);
+        }
+
+        public IDataBase DataBase { get; private set; }
 
         #region IDisposable
 

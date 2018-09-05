@@ -49,11 +49,11 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var user = this.GetUser(authentication, this.UserID);
-            user.UnbanAsync(authentication).Wait();
+            var user = await this.GetUserAsync(authentication, this.UserID);
+            await user.UnbanAsync(authentication);
         }
     }
 }

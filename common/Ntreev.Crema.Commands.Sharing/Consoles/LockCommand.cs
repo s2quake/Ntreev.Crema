@@ -85,7 +85,7 @@ namespace Ntreev.Crema.Commands.Consoles
         protected override async Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var lockable = this.GetObject(authentication, this.GetAbsolutePath(this.Path));
+            var lockable = await this.GetObjectAsync(authentication, this.GetAbsolutePath(this.Path));
 
             if (this.Information == true)
             {

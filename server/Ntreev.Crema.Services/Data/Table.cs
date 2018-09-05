@@ -312,18 +312,18 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task<NewTableTemplate> NewChildAsync(Authentication authentication)
+        public async Task<NewTableTemplate> NewChildAsync(Authentication authentication)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                this.CremaHost.DebugMethod(authentication, this, nameof(NewChildAsync), this);
+                var template = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(NewChildAsync), this);
                     this.ValidateNewChild(authentication);
-                    var template = new NewTableTemplate(this);
-                    template.BeginEdit(authentication);
-                    return template;
+                    return new NewTableTemplate(this);
                 });
+                await template.BeginEditAsync(authentication);
+                return template;
             }
             catch (Exception e)
             {

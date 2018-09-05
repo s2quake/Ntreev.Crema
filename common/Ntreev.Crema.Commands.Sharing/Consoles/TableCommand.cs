@@ -32,6 +32,7 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
@@ -53,92 +54,89 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public void Rename([CommandCompletion(nameof(GetTableNames))]string tableName, string newTableName)
+        public async Task RenameAsync([CommandCompletion(nameof(GetTableNames))]string tableName, string newTableName)
         {
-            var table = this.GetTable(tableName);
+            var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            table.Dispatcher.Invoke(() => table.Rename(authentication, newTableName));
+            await table.RenameAsync(authentication, newTableName);
         }
 
         [CommandMethod]
-        public void Move([CommandCompletion(nameof(GetTableNames))]string tableName, [CommandCompletion(nameof(GetCategoryPaths))]string categoryPath)
+        public async Task MoveAsync([CommandCompletion(nameof(GetTableNames))]string tableName, [CommandCompletion(nameof(GetCategoryPaths))]string categoryPath)
         {
-            var table = this.GetTable(tableName);
+            var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            table.Dispatcher.Invoke(() => table.Move(authentication, categoryPath));
+            await table.MoveAsync(authentication, categoryPath);
         }
 
         [CommandMethod]
-        public void Delete([CommandCompletion(nameof(GetTableNames))]string tableName)
+        public async Task DeleteAsync([CommandCompletion(nameof(GetTableNames))]string tableName)
         {
-            var table = this.GetTable(tableName);
+            var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
             if (this.CommandContext.ConfirmToDelete() == true)
             {
-                table.Dispatcher.Invoke(() => table.Delete(authentication));
+                await table.DeleteAsync(authentication);
             }
         }
 
         [CommandMethod]
-        public void SetTags([CommandCompletion(nameof(GetTableNames))]string tableName, string tags)
+        public async Task SetTagsAsync([CommandCompletion(nameof(GetTableNames))]string tableName, string tags)
         {
-            var table = this.GetTable(tableName);
+            var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            table.Dispatcher.Invoke(() =>
+            var template = table.Template;
+            await template.BeginEditAsync(authentication);
+            try
             {
-                var template = table.Template;
-                template.BeginEdit(authentication);
-                try
-                {
-                    template.SetTags(authentication, (TagInfo)tags);
-                    template.EndEdit(authentication);
-                }
-                catch
-                {
-                    template.CancelEdit(authentication);
-                    throw;
-                }
-            });
+                await template.SetTagsAsync(authentication, (TagInfo)tags);
+                await template.EndEditAsync(authentication);
+            }
+            catch
+            {
+                await template.CancelEditAsync(authentication);
+                throw;
+            }
         }
 
         [CommandMethod]
         [CommandMethodProperty(nameof(CategoryPath), nameof(CopyContent))]
-        public void Copy([CommandCompletion(nameof(GetTableNames))]string tableName, string newTableName)
+        public async Task CopyAsync([CommandCompletion(nameof(GetTableNames))]string tableName, string newTableName)
         {
-            var table = this.GetTable(tableName);
+            var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
             var categoryPath = this.CategoryPath ?? this.GetCurrentDirectory();
-            table.Dispatcher.Invoke(() => table.Copy(authentication, newTableName, categoryPath, this.CopyContent));
+            await table.CopyAsync(authentication, newTableName, categoryPath, this.CopyContent);
         }
 
         [CommandMethod]
         [CommandMethodProperty(nameof(CategoryPath), nameof(CopyContent))]
-        public void Inherit([CommandCompletion(nameof(GetTableNames))]string tableName, string newTableName)
+        public async Task InheritAsync([CommandCompletion(nameof(GetTableNames))]string tableName, string newTableName)
         {
-            var table = this.GetTable(tableName);
+            var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
             var categoryPath = this.CategoryPath ?? this.GetCurrentDirectory();
-            table.Dispatcher.Invoke(() => table.Inherit(authentication, newTableName, categoryPath, this.CopyContent));
+            await table.InheritAsync(authentication, newTableName, categoryPath, this.CopyContent);
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public void View([CommandCompletion(nameof(GetPaths))]string tableItemName, string revision = null)
+        public async Task ViewAsync([CommandCompletion(nameof(GetPaths))]string tableItemName, string revision = null)
         {
-            var tableItem = this.GetTableItem(tableItemName);
+            var tableItem = await this.GetTableItemAsync(tableItemName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            var dataSet = tableItem.Dispatcher.Invoke(() => tableItem.GetDataSet(authentication, revision));
+            var dataSet = await tableItem.GetDataSetAsync(authentication, revision);
             var props = dataSet.ToDictionary(true, false);
             this.CommandContext.WriteObject(props, FormatProperties.Format);
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public void Log([CommandCompletion(nameof(GetPaths))]string tableItemName, string revision = null)
+        public async Task LogAsync([CommandCompletion(nameof(GetPaths))]string tableItemName, string revision = null)
         {
-            var tableItem = this.GetTableItem(tableItemName);
+            var tableItem = await this.GetTableItemAsync(tableItemName);
             var authentication = this.CommandContext.GetAuthentication(this);
-            var logs = tableItem.Dispatcher.Invoke(() => tableItem.GetLog(authentication, revision));
+            var logs = await tableItem.GetLogAsync(authentication, revision);
 
             foreach (var item in logs)
             {
@@ -158,9 +156,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public void Info([CommandCompletion(nameof(GetTableNames))]string tableName)
+        public async Task InfoAsync([CommandCompletion(nameof(GetTableNames))]string tableName)
         {
-            var table = this.GetTable(tableName);
+            var table = await this.GetTableAsync(tableName);
             var tableInfo = table.Dispatcher.Invoke(() => table.TableInfo);
             var props = tableInfo.ToDictionary(true);
             this.CommandContext.WriteObject(props, FormatProperties.Format);
@@ -169,9 +167,9 @@ namespace Ntreev.Crema.Commands.Consoles
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public void ColumnList([CommandCompletion(nameof(GetTableNames))]string tableName)
+        public async Task ColumnList([CommandCompletion(nameof(GetTableNames))]string tableName)
         {
-            var table = this.GetTable(tableName);
+            var table = await this.GetTableAsync(tableName);
             var tableInfo = table.Dispatcher.Invoke(() => table.TableInfo);
             var columnList = tableInfo.Columns.Where(item => StringUtility.GlobMany(item.Name, FilterProperties.FilterExpression))
                                               .Select(item => new ColumnItem(item)).ToArray();
@@ -181,9 +179,9 @@ namespace Ntreev.Crema.Commands.Consoles
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
-        public void ColumnInfo([CommandCompletion(nameof(GetTableNames))]string tableName)
+        public async Task ColumnInfo([CommandCompletion(nameof(GetTableNames))]string tableName)
         {
-            var table = this.GetTable(tableName);
+            var table = await this.GetTableAsync(tableName);
             var tableInfo = table.Dispatcher.Invoke(() => table.TableInfo);
             var columns = new Dictionary<string, object>(tableInfo.Columns.Length);
             foreach (var item in tableInfo.Columns)
@@ -199,11 +197,11 @@ namespace Ntreev.Crema.Commands.Consoles
         [ConsoleModeOnly]
         [CommandMethod]
         [CommandMethodProperty(nameof(ParentPath))]
-        public void Create()
+        public async Task CreateAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             var tableNames = this.GetTableNames();
-            var template = CreateTemplate();
+            var template = await CreateTemplateAsync();
 
             var dataTypes = template.Dispatcher.Invoke(() => template.SelectableTypes);
             var tableName = template.Dispatcher.Invoke(() => template.TableName);
@@ -224,32 +222,32 @@ namespace Ntreev.Crema.Commands.Consoles
                 if (this.CommandContext.ReadYesOrNo($"do you want to create table '{tableInfo.TableName}'?") == false)
                     return;
 
-                template.Dispatcher.Invoke(SetData);
+                await SetDataAsync();
                 template = null;
             }
             finally
             {
                 if (template != null)
                 {
-                    template.Dispatcher.Invoke(() => template.CancelEdit(authentication));
+                    await template.CancelEditAsync(authentication);
                 }
             }
 
-            ITableTemplate CreateTemplate()
+            async Task<ITableTemplate> CreateTemplateAsync()
             {
                 if (this.ParentPath == string.Empty)
                 {
-                    var category = this.GetCategory(this.GetCurrentDirectory());
-                    return category.Dispatcher.Invoke(() => category.NewTable(authentication));
+                    var category = await this.GetCategoryAsync(this.GetCurrentDirectory());
+                    return await category.NewTableAsync(authentication);
                 }
                 else if (NameValidator.VerifyCategoryPath(this.ParentPath) == true)
                 {
-                    var category = this.GetCategory(this.ParentPath);
-                    return category.Dispatcher.Invoke(() => category.NewTable(authentication));
+                    var category = await this.GetCategoryAsync(this.ParentPath);
+                    return await category.NewTableAsync(authentication);
                 }
-                else if (this.GetTable(this.ParentPath) is ITable table)
+                else if (this.GetTableAsync(this.ParentPath) is ITable table)
                 {
-                    return table.Dispatcher.Invoke(() => table.NewTable(authentication));
+                    return await table.NewTableAsync(authentication);
                 }
                 else
                 {
@@ -257,85 +255,73 @@ namespace Ntreev.Crema.Commands.Consoles
                 }
             }
 
-            void SetData()
+            async Task SetDataAsync()
             {
-                template.SetTableName(authentication, tableInfo.TableName);
-                template.SetTags(authentication, (TagInfo)tableInfo.Tags);
-                template.SetComment(authentication, tableInfo.Comment);
+                await template.SetTableNameAsync(authentication, tableInfo.TableName);
+                await template.SetTagsAsync(authentication, (TagInfo)tableInfo.Tags);
+                await template.SetCommentAsync(authentication, tableInfo.Comment);
                 foreach (var item in tableInfo.Columns)
                 {
-                    var column = template.AddNew(authentication);
-                    column.SetName(authentication, item.Name);
-                    column.SetIsKey(authentication, item.IsKey);
-                    column.SetComment(authentication, item.Comment);
-                    column.SetDataType(authentication, item.DataType);
-                    column.SetIsUnique(authentication, item.IsUnique);
-                    column.SetAutoIncrement(authentication, item.AutoIncrement);
-                    column.SetDefaultValue(authentication, item.DefaultValue);
-                    column.SetTags(authentication, (TagInfo)item.Tags);
-                    column.SetIsReadOnly(authentication, item.IsReadOnly);
-                    template.EndNew(authentication, column);
+                    var column = await template.AddNewAsync(authentication);
+                    await column.SetNameAsync(authentication, item.Name);
+                    await column.SetIsKeyAsync(authentication, item.IsKey);
+                    await column.SetCommentAsync(authentication, item.Comment);
+                    await column.SetDataTypeAsync(authentication, item.DataType);
+                    await column.SetIsUniqueAsync(authentication, item.IsUnique);
+                    await column.SetAutoIncrementAsync(authentication, item.AutoIncrement);
+                    await column.SetDefaultValueAsync(authentication, item.DefaultValue);
+                    await column.SetTagsAsync(authentication, (TagInfo)item.Tags);
+                    await column.SetIsReadOnlyAsync(authentication, item.IsReadOnly);
+                    await template.EndNewAsync(authentication, column);
                 }
-                template.EndEdit(authentication);
+                await template.EndEditAsync(authentication);
             }
         }
 
         [ConsoleModeOnly]
         [CommandMethod]
-        public void EditTemplate([CommandCompletion(nameof(GetTableNames))]string tableName)
+        public async Task EditTemplateAsync([CommandCompletion(nameof(GetTableNames))]string tableName)
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var table = this.GetTable(tableName);
+            var table = await this.GetTableAsync(tableName);
             var template = table.Dispatcher.Invoke(() => table.Template);
             var domain = template.Dispatcher.Invoke(() => template.Domain);
             var contains = domain == null ? false : domain.Dispatcher.Invoke(() => domain.Users.Contains(authentication.ID));
 
-            template.Dispatcher.Invoke(() =>
-            {
-                if (contains == false)
-                    template.BeginEdit(authentication);
-            });
+            if (contains == false)
+                await template.BeginEditAsync(authentication);
 
-            if (TemplateEditor.EditColumns(template, authentication) == false)
+            if (await TemplateEditor.EditColumnsAsync(template, authentication) == false)
             {
-                template.Dispatcher.Invoke(() => template.CancelEdit(authentication));
+                await template.CancelEditAsync(authentication);
             }
             else
             {
-                template.Dispatcher.Invoke(() =>
+                try
                 {
-                    try
-                    {
-                        template.EndEdit(authentication);
-                    }
-                    catch
-                    {
-                        template.CancelEdit(authentication);
-                        throw;
-                    }
-                });
+                    await template.EndEditAsync(authentication);
+                }
+                catch
+                {
+                    await template.CancelEditAsync(authentication);
+                    throw;
+                }
             }
         }
 
         [ConsoleModeOnly]
         [CommandMethod]
-        public void Edit([CommandCompletion(nameof(GetTableNames))]string tableName)
+        public async Task EditAsync([CommandCompletion(nameof(GetTableNames))]string tableName)
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var table = this.GetTable(tableName);
+            var table = await this.GetTableAsync(tableName);
             var content = table.Dispatcher.Invoke(() => table.Content);
-            var domain = content.Dispatcher.Invoke(() =>
-            {
-                if (content.Domain == null)
-                    content.BeginEdit(authentication);
-                return content.Domain;
-            });
+            if (content.Domain == null)
+                await content.BeginEditAsync(authentication);
+            var domain = content.Domain;
             var contains = domain.Dispatcher.Invoke(() => domain.Users.Contains(authentication.ID));
-            content.Dispatcher.Invoke(() =>
-            {
-                if (contains == false)
-                    content.EnterEdit(authentication);
-            });
+            if (contains == false)
+                await content.EnterEditAsync(authentication);
             domain.Dispatcher.Invoke(() => domain.UserRemoved += Domain_UserRemoved);
 
             this.CommandContext.Category = nameof(ITableContent);
@@ -392,10 +378,10 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        private ITable GetTable([CommandCompletion(nameof(GetTableNames))]string tableName)
+        private async Task<ITable> GetTableAsync(string tableName)
         {
-            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
-            var table = dataBase.Dispatcher.Invoke(() =>
+            var dataBase = await this.CremaHost.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var table = await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 if (NameValidator.VerifyItemPath(tableName) == true)
                     return dataBase.TableContext[tableName] as ITable;
@@ -406,19 +392,19 @@ namespace Ntreev.Crema.Commands.Consoles
             return table;
         }
 
-        private ITableCategory GetCategory(string categoryPath)
+        private async Task<ITableCategory> GetCategoryAsync(string categoryPath)
         {
-            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
-            var category = dataBase.Dispatcher.Invoke(() => dataBase.TableContext.Categories[categoryPath]);
+            var dataBase = await this.CremaHost.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var category = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TableContext.Categories[categoryPath]);
             if (category == null)
                 throw new CategoryNotFoundException(categoryPath);
             return category;
         }
 
-        private ITableItem GetTableItem([CommandCompletion(nameof(GetPaths))]string tableItemName)
+        private async Task<ITableItem> GetTableItemAsync(string tableItemName)
         {
-            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
-            var tableItem = dataBase.Dispatcher.Invoke(() =>
+            var dataBase = await this.CremaHost.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var tableItem = await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 if (NameValidator.VerifyItemPath(tableItemName) == true || NameValidator.VerifyCategoryPath(tableItemName) == true)
                     return dataBase.TableContext[tableItemName];

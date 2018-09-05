@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using Ntreev.Crema.Services.Random;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Bot.Tasks
 {
@@ -34,7 +35,7 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     class ITableContentTask : ITaskProvider
     {
-        public void InvokeTask(TaskContext context)
+        public Task InvokeAsync(TaskContext context)
         {
             var content = context.Target as ITableContent;
 

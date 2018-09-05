@@ -24,12 +24,13 @@ using System.Text;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library;
 using Ntreev.Crema.Data;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles.TableTemplate
 {
     static class TemplateEditor
     {
-        public static bool EditColumns(ITableTemplate template, Authentication authentication)
+        public static async Task<bool> EditColumnsAsync(ITableTemplate template, Authentication authentication)
         {
             var columnCount = template.Dispatcher.Invoke(() => template.Count);
             var dataTypes = template.Dispatcher.Invoke(() => template.SelectableTypes);
@@ -77,14 +78,14 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
                 columns = editor.Read<JsonColumnInfos>();
             }
 
-            template.Dispatcher.Invoke(() =>
-            {
+            //template.Dispatcher.Invoke(() =>
+            //{
                 foreach (var item in idToColumn.Keys.ToArray())
                 {
                     if (columns.Items.Any(i => i.ID == item) == false)
                     {
                         var column = idToColumn[item];
-                        column.Delete(authentication);
+                        await column.DeleteAsync(authentication);
                         idToColumn.Remove(item);
                     }
                 }
@@ -94,9 +95,9 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
                     var item = columns.Items[i];
                     if (item.ID == Guid.Empty)
                     {
-                        var column = template.AddNew(authentication);
-                        item = InitializeFields(authentication, item, column);
-                        template.EndNew(authentication, column);
+                        var column = await template.AddNewAsync(authentication);
+                        item = await InitializeFieldsAsync(authentication, item, column);
+                        await template.EndNewAsync(authentication, column);
                         item.ID = Guid.NewGuid();
                         idToColumn.Add(item.ID, column);
                         columns.Items[i] = item;
@@ -104,7 +105,7 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
                     else if (idToColumn.ContainsKey(item.ID) == true)
                     {
                         var column = idToColumn[item.ID];
-                        SetFields(authentication, item, column);
+                    await SetFieldsAsync(authentication, item, column);
                     }
                     else
                     {
@@ -116,47 +117,47 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
                 {
                     var item = columns.Items[i];
                     var column = idToColumn[item.ID];
-                    column.SetIndex(authentication, i);
+                    await column.SetIndexAsync(authentication, i);
                 }
-            });
+            //});
 
             return true;
         }
 
-        private static JsonColumnInfos.ItemInfo InitializeFields(Authentication authentication, JsonColumnInfos.ItemInfo item, ITableColumn column)
+        private static async Task<JsonColumnInfos.ItemInfo> InitializeFieldsAsync(Authentication authentication, JsonColumnInfos.ItemInfo item, ITableColumn column)
         {
-            column.SetName(authentication, item.Name);
-            column.SetDataType(authentication, item.DataType);
-            column.SetComment(authentication, item.Comment);
-            column.SetTags(authentication, (TagInfo)item.Tags);
-            column.SetIsReadOnly(authentication, item.IsReadOnly);
-            column.SetIsUnique(authentication, item.IsUnique);
-            column.SetAutoIncrement(authentication, item.AutoIncrement);
-            column.SetDefaultValue(authentication, item.DefaultValue);
-            column.SetAllowNull(authentication, !item.DisallowNull);
+            await column.SetNameAsync(authentication, item.Name);
+            await column.SetDataTypeAsync(authentication, item.DataType);
+            await column.SetCommentAsync(authentication, item.Comment);
+            await column.SetTagsAsync(authentication, (TagInfo)item.Tags);
+            await column.SetIsReadOnlyAsync(authentication, item.IsReadOnly);
+            await column.SetIsUniqueAsync(authentication, item.IsUnique);
+            await column.SetAutoIncrementAsync(authentication, item.AutoIncrement);
+            await column.SetDefaultValueAsync(authentication, item.DefaultValue);
+            await column.SetAllowNullAsync(authentication, !item.DisallowNull);
             return item;
         }
 
-        private static void SetFields(Authentication authentication, JsonColumnInfos.ItemInfo item, ITableColumn column)
+        private static async Task SetFieldsAsync(Authentication authentication, JsonColumnInfos.ItemInfo item, ITableColumn column)
         {
             if (column.Name != item.Name)
-                column.SetName(authentication, item.Name);
+                await column.SetNameAsync(authentication, item.Name);
             if (column.DataType != item.DataType)
-                column.SetDataType(authentication, item.DataType);
+                await column.SetDataTypeAsync(authentication, item.DataType);
             if (column.Comment != item.Comment)
-                column.SetComment(authentication, item.Comment);
+                await column.SetCommentAsync(authentication, item.Comment);
             if (column.Tags != (TagInfo)item.Tags)
-                column.SetTags(authentication, (TagInfo)item.Tags);
+                await column.SetTagsAsync(authentication, (TagInfo)item.Tags);
             if (column.IsReadOnly != item.IsReadOnly)
-                column.SetIsReadOnly(authentication, item.IsReadOnly);
+                await column.SetIsReadOnlyAsync(authentication, item.IsReadOnly);
             if (column.IsUnique != item.IsUnique)
-                column.SetIsUnique(authentication, item.IsUnique);
+                await column.SetIsUniqueAsync(authentication, item.IsUnique);
             if (column.AutoIncrement != item.AutoIncrement)
-                column.SetAutoIncrement(authentication, item.AutoIncrement);
+                await column.SetAutoIncrementAsync(authentication, item.AutoIncrement);
             if (column.DefaultValue != item.DefaultValue)
-                column.SetDefaultValue(authentication, item.DefaultValue);
+                await column.SetDefaultValueAsync(authentication, item.DefaultValue);
             if (column.AllowNull != !item.DisallowNull)
-                column.SetAllowNull(authentication, !item.DisallowNull);
+                await column.SetAllowNullAsync(authentication, !item.DisallowNull);
         }
     }
 }

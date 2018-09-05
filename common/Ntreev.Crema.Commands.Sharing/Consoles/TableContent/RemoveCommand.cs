@@ -86,9 +86,9 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
-            var tableInfo = this.Content.Dispatcher.Invoke(() => this.Content.Table.TableInfo);
+            var tableInfo = await this.Content.Dispatcher.InvokeAsync(() => this.Content.Table.TableInfo);
             var keys = tableInfo.Columns.Where(item => item.IsKey).ToArray();
             var schema = this.CreateSchema(tableInfo.Columns);
 
@@ -103,13 +103,13 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
             }
 
             var authentication = this.CommandContext.GetAuthentication(this);
-            var tableRow = this.Content.Dispatcher.Invoke(() => this.Content.Find(authentication, fieldList.ToArray()));
+            var tableRow = await this.Content.FindAsync(authentication, fieldList.ToArray());
 
             var terminal = new Terminal();
             if (terminal.ReadString("type 'remove':") != "remove")
                 return;
 
-            this.Content.Dispatcher.Invoke(() => { tableRow.Delete(authentication); });
+            await tableRow.DeleteAsync(authentication);
         }
     }
 }

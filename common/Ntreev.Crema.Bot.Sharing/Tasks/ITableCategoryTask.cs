@@ -35,7 +35,7 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     public class ITableCategoryTask : ITaskProvider
     {
-        public void InvokeTask(TaskContext context)
+        public Task InvokeAsync(TaskContext context)
         {
             var category = context.Target as ITableCategory;
             category.Dispatcher.Invoke(() =>

@@ -35,7 +35,7 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     public class IDataBaseTask : ITaskProvider, IConfigurationPropertyProvider
     {
-        public void InvokeTask(TaskContext context)
+        public Task InvokeAsync(TaskContext context)
         {
             var dataBase = context.Target as IDataBase;
             dataBase.Dispatcher.Invoke(() =>

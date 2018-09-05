@@ -46,15 +46,15 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodProperty(nameof(DomainID), nameof(DataBaseName))]
-        public void Delete()
+        public Task DeleteAsync()
         {
             if (this.DataBaseName == null)
             {
-                this.Delete(this.DomainID);
+                return this.DeleteAsync(this.DomainID);
             }
             else
             {
-                this.DeleteDomains(this.DataBaseName);
+                return this.DeleteDomainsAsync(this.DataBaseName);
             }
         }
 
@@ -86,7 +86,7 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        private void Delete(string domainID)
+        private Task DeleteAsync(string domainID)
         {
             var domain = this.GetDomain(Guid.Parse(domainID));
             var dataBase = this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases.FirstOrDefault(item => item.ID == domain.DataBaseID));
@@ -96,10 +96,10 @@ namespace Ntreev.Crema.Commands.Consoles
                 throw new ArgumentException($"'{dataBase}' database is not loaded.");
 
             var authentication = this.CommandContext.GetAuthentication(this);
-            domain.Dispatcher.Invoke(() => domain.Delete(authentication, this.IsCancelled));
+            return domain.DeleteAsync(authentication, this.IsCancelled);
         }
 
-        private void DeleteDomains(string dataBaseName)
+        private async Task DeleteDomainsAsync(string dataBaseName)
         {
             var dataBase = this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases[dataBaseName]);
             if (dataBase == null)
@@ -114,7 +114,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
             foreach (var item in domains)
             {
-                item.Dispatcher.Invoke(() => item.Delete(authentication, this.IsCancelled));
+                await item.DeleteAsync(authentication, this.IsCancelled);
             }
         }
 

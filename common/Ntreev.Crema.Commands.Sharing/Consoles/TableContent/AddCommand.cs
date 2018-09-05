@@ -48,9 +48,9 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
 
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
-            var tableInfo = this.Content.Dispatcher.Invoke(() => this.Content.Table.TableInfo);
+            var tableInfo = await this.Content.Dispatcher.InvokeAsync(() => this.Content.Table.TableInfo);
             var schema = new JSchema();
 
             foreach (var item in tableInfo.Columns)
@@ -68,7 +68,7 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
 
             var fields = new JsonPropertiesInfo();
             var authentication = this.CommandContext.GetAuthentication(this);
-            var tableRow = this.Content.Dispatcher.Invoke(() => this.Content.AddNew(authentication, null));
+            var tableRow = await this.Content.AddNewAsync(authentication, null);
 
             this.Content.Dispatcher.Invoke(() =>
             {
@@ -84,19 +84,16 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
             if (result == null)
                 return;
 
-            this.Content.Dispatcher.Invoke(() =>
+            foreach (var item in result)
             {
-                foreach (var item in result)
-                {
-                    if (tableInfo.Columns.Any(i => i.Name == item.Key) == false)
-                        continue;
-                    if (item.Value == null)
-                        continue;
-                    tableRow.SetField(authentication, item.Key, item.Value);
-                }
+                if (tableInfo.Columns.Any(i => i.Name == item.Key) == false)
+                    continue;
+                if (item.Value == null)
+                    continue;
+                await tableRow.SetFieldAsync(authentication, item.Key, item.Value);
+            }
 
-                this.Content.EndNew(authentication, tableRow);
-            });
+            await this.Content.EndNewAsync(authentication, tableRow);
 
             JsonPropertiesInfo GetResult()
             {

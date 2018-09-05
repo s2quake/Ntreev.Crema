@@ -25,6 +25,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Bot.Tasks
 {
@@ -40,7 +41,7 @@ namespace Ntreev.Crema.Bot.Tasks
 
         }
 
-        public void InvokeTask(TaskContext context)
+        public Task InvokeAsync(TaskContext context)
         {
             var dataBases = context.Target as IDataBaseCollection;
             if (context.IsCompleted(dataBases) == true)
@@ -51,16 +52,17 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 context.Complete(dataBases);
             }
+            return Task.Delay(0);
         }
 
         public Type TargetType => typeof(IDataBaseCollection);
 
         [TaskMethod(Weight = 10)]
-        public void AddNewDataBase(IDataBaseCollection dataBases, TaskContext context)
+        public async Task AddNewDataBaseAsync(IDataBaseCollection dataBases, TaskContext context)
         {
             var dataBaseName = RandomUtility.NextIdentifier();
             var comment = RandomUtility.NextString();
-            dataBases.Dispatcher.Invoke(() => dataBases.AddNewDataBase(context.Authentication, dataBaseName, comment));
+            await dataBases.AddNewDataBaseAsync(context.Authentication, dataBaseName, comment);
         }
 
         [ConfigurationProperty(ScopeType = typeof(ICremaConfiguration))]

@@ -44,12 +44,12 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
 
         }
 
-        protected override void OnExecute()
+        protected override Task OnExecuteAsync()
         {
-            var domain = this.Content.Dispatcher.Invoke(() => this.Content.Domain);
+            var domain = this.Content.Domain;
             var tableName = this.Content.Dispatcher.Invoke(() => this.Content.Table.Name);
 
-            this.Content.Dispatcher.Invoke(() =>
+            return this.Content.Dispatcher.InvokeAsync(() =>
             {
                 var dataSet = domain.Source as CremaDataSet;
                 var dataTable = dataSet.Tables[tableName];

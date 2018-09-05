@@ -33,43 +33,43 @@ namespace Ntreev.Crema.ServiceHosts.Domains
     public interface IDomainService
     {
         [OperationContract]
-        ResultBase<DomainContextMetaData> Subscribe(Guid authenticationToken);
+        Task<ResultBase<DomainContextMetaData>> SubscribeAsync(Guid authenticationToken);
 
         [OperationContract]
-        ResultBase Unsubscribe();
+        Task<ResultBase> UnsubscribeAsync();
 
         [OperationContract]
-        ResultBase<DomainContextMetaData> GetMetaData();
+        Task<ResultBase<DomainContextMetaData>> GetMetaDataAsync();
 
         [OperationContract]
-        ResultBase SetUserLocation(Guid domainID, DomainLocationInfo location);
+        Task<ResultBase> SetUserLocationAsync(Guid domainID, DomainLocationInfo location);
 
         [OperationContract]
-        ResultBase<DomainRowInfo[]> NewRow(Guid domainID, DomainRowInfo[] rows);
+        Task<ResultBase<DomainRowInfo[]>> NewRowAsync(Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
-        ResultBase RemoveRow(Guid domainID, DomainRowInfo[] rows);
+        Task<ResultBase> RemoveRowAsync(Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
-        ResultBase<DomainRowInfo[]> SetRow(Guid domainID, DomainRowInfo[] rows);
+        Task<ResultBase<DomainRowInfo[]>> SetRowAsync(Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
-        ResultBase SetProperty(Guid domainID, string propertyName, object value);
+        Task<ResultBase> SetPropertyAsync(Guid domainID, string propertyName, object value);
 
         [OperationContract]
-        ResultBase BeginUserEdit(Guid domainID, DomainLocationInfo location);
+        Task<ResultBase> BeginUserEditAsync(Guid domainID, DomainLocationInfo location);
 
         [OperationContract]
-        ResultBase EndUserEdit(Guid domainID);
+        Task<ResultBase> EndUserEditAsync(Guid domainID);
 
         [OperationContract]
-        ResultBase<DomainUserInfo> Kick(Guid domainID, string userID, string comment);
+        Task<ResultBase<DomainUserInfo>> KickAsync(Guid domainID, string userID, string comment);
 
         [OperationContract]
-        ResultBase SetOwner(Guid domainID, string userID);
+        Task<ResultBase> SetOwnerAsync(Guid domainID, string userID);
 
         [OperationContract]
-        ResultBase DeleteDomain(Guid domainID, bool force);
+        Task<ResultBase> DeleteDomainAsync(Guid domainID, bool force);
 
         [OperationContract]
         bool IsAlive();
