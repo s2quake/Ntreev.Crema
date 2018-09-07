@@ -202,9 +202,9 @@ namespace Ntreev.Crema.Repository.Git
                     this.repositoryInfo.ModificationInfo = new SignatureDate(author, log.CommitDate);
 
                     this.SetNotes(properties);
-                    this.Pull();
-                    this.Push();
-                    this.PushNotes();
+                    //this.Pull();
+                    //this.Push();
+                    //this.PushNotes();
                 }
                 else
                 {

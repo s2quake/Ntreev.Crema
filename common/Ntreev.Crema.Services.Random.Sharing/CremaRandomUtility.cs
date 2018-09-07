@@ -34,116 +34,115 @@ namespace Ntreev.Crema.Services.Random
     {
         private static TagInfo[] tags = new TagInfo[] { TagInfo.All, TagInfoUtility.Server, TagInfoUtility.Client, TagInfo.Unused };
 
-        public static void Generate(this IDataBase dataBase, Authentication authentication, int tryCount)
+        public static async Task GenerateAsync(this IDataBase dataBase, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
                 if (RandomUtility.Within(50) == true)
-                    dataBase.TypeContext.Generate(authentication);
+                    await dataBase.TypeContext.GenerateAsync(authentication);
                 else
-                    dataBase.TableContext.Generate(authentication);
+                    await dataBase.TableContext.GenerateAsync(authentication);
             }
         }
 
-        public static void Generate(this IUserContext context, Authentication authentication)
+        public static async Task GenerateAsync(this IUserContext context, Authentication authentication)
         {
             if (RandomUtility.Within(25) == true)
-                context.GenerateCategory(authentication);
+                await context.GenerateCategoryAsync(authentication);
             else
-                context.GenerateUser(authentication);
+                await context.GenerateUserAsync(authentication);
         }
 
-        public static void Generate(this IUserContext context, Authentication authentication, int tryCount)
+        public static async Task GenerateAsync(this IUserContext context, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                context.Generate(authentication);
+                await context.GenerateAsync(authentication);
             }
         }
 
-        public static void Generate(this ITypeContext context, Authentication authentication)
+        public static Task GenerateAsync(this ITypeContext context, Authentication authentication)
         {
             if (RandomUtility.Within(25) == true)
-                context.AddRandomCategory(authentication);
+                return context.AddRandomCategoryAsync(authentication);
             else
-                context.AddRandomType(authentication);
+                return context.AddRandomTypeAsync(authentication);
         }
 
-        public static void Generate(this ITypeContext context, Authentication authentication, int tryCount)
+        public static async Task GenerateAsync(this ITypeContext context, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                context.Generate(authentication);
+                await context.GenerateAsync(authentication);
             }
         }
 
-        public static void Generate(this ITableContext context, Authentication authentication)
+        public static async Task GenerateAsync(this ITableContext context, Authentication authentication)
         {
             if (RandomUtility.Within(25) == true)
-                context.GenerateCategory(authentication);
+                await context.GenerateCategoryAsync(authentication);
             else
-                context.GenerateTable(authentication);
+                await context.GenerateTableAsync(authentication);
         }
 
-        public static void Generate(this ITableContext context, Authentication authentication, int tryCount)
+        public static async Task GenerateAsync(this ITableContext context, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                context.Generate(authentication);
+                await context.GenerateAsync(authentication);
             }
         }
 
-        public static void GenerateCategories(this IUserContext context, Authentication authentication, int tryCount)
+        public static async Task GenerateCategoriesAsync(this IUserContext context, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                context.GenerateCategory(authentication);
+                await context.GenerateCategoryAsync(authentication);
             }
         }
 
-        public static bool GenerateCategory(this IUserContext context, Authentication authentication)
+        public static async Task<bool> GenerateCategoryAsync(this IUserContext context, Authentication authentication)
         {
             if (RandomUtility.Within(50) == true)
             {
-                context.Root.AddNewCategory(authentication, RandomUtility.NextIdentifier());
+                await context.Root.AddNewCategoryAsync(authentication, RandomUtility.NextIdentifier());
             }
             else
             {
                 var category = context.Categories.Random();
                 if (GetLevel(category, (i) => i.Parent) > 4)
                     return false;
-                category.AddNewCategory(authentication, RandomUtility.NextIdentifier());
+                await category.AddNewCategoryAsync(authentication, RandomUtility.NextIdentifier());
             }
             return true;
         }
 
-        public static void GenerateUsers(this IUserContext context, Authentication authentication, int tryCount)
+        public static async Task GenerateUsersAsync(this IUserContext context, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                context.GenerateUser(authentication);
+                await context.GenerateUserAsync(authentication);
             }
         }
 
-        public static bool GenerateUser(this IUserContext context, Authentication authentication)
+        public static async Task<bool> GenerateUserAsync(this IUserContext context, Authentication authentication)
         {
             var category = context.Categories.Random();
             var newID = NameUtility.GenerateNewName("Test", context.Users.Select(item => item.ID).ToArray());
             var newName = newID.Replace("Test", "테스트");
-            category.AddNewUser(authentication, newID, null, newName, Authority.Member);
-
+            await category.AddNewUserAsync(authentication, newID, null, newName, Authority.Member);
             return true;
         }
 
-        public static void GenerateCategories(this ITableContext context, Authentication authentication, int tryCount)
+        public static async Task GenerateCategoriesAsync(this ITableContext context, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                context.GenerateCategory(authentication);
+                await context.GenerateCategoryAsync(authentication);
             }
         }
 
-        public static bool GenerateCategory(this ITableContext context, Authentication authentication)
+        public static async Task<bool> GenerateCategoryAsync(this ITableContext context, Authentication authentication)
         {
             var categoryName = RandomUtility.NextIdentifier();
             var category = RandomUtility.Within(50) == true ? context.Root : context.Categories.Random();
@@ -157,63 +156,63 @@ namespace Ntreev.Crema.Services.Random
             if (category.Categories.ContainsKey(categoryName) == true)
                 return false;
 
-            category.AddNewCategory(authentication, categoryName);
+            await category.AddNewCategoryAsync(authentication, categoryName);
 
             return true;
         }
 
-        public static void GenerateTables(this ITableContext context, Authentication authentication, int tryCount)
+        public static async Task GenerateTablesAsync(this ITableContext context, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                context.GenerateTable(authentication);
+                await context.GenerateTableAsync(authentication);
             }
         }
 
-        public static void GenerateTable(this ITableContext context, Authentication authentication)
+        public static async Task GenerateTableAsync(this ITableContext context, Authentication authentication)
         {
             if (RandomUtility.Within(25) == true)
-                InheritTable(context, authentication);
+                await InheritTableAsync(context, authentication);
             else if (RandomUtility.Within(25) == true)
-                CopyTable(context, authentication);
+                await CopyTableAsync(context, authentication);
             else
-                CreateTable(context, authentication);
+                await CreateTableAsync(context, authentication);
         }
 
-        public static void CreateTable(this ITableContext context, Authentication authentication)
+        public static async Task CreateTableAsync(this ITableContext context, Authentication authentication)
         {
             var category = context.Categories.Random();
 
-            var template = category.NewTable(authentication);
-            GenerateColumns(template, authentication, RandomUtility.Next(3, 10));
+            var template = await category.NewTableAsync(authentication);
+            await GenerateColumnsAsync(template, authentication, RandomUtility.Next(3, 10));
             if (RandomUtility.Within(25) == true)
-                template.SetComment(authentication, RandomUtility.NextString());
-            template.EndEdit(authentication);
+                await template.SetCommentAsync(authentication, RandomUtility.NextString());
+            await template.EndEditAsync(authentication);
 
             var tables = template.Target as ITable[];
             var table = tables.First();
 
             while (RandomUtility.Within(10))
             {
-                var childTemplate = table.NewTable(authentication);
-                GenerateColumns(childTemplate, authentication, RandomUtility.Next(3, 10));
-                childTemplate.EndEdit(authentication);
+                var childTemplate = await table.NewTableAsync(authentication);
+                await GenerateColumnsAsync(childTemplate, authentication, RandomUtility.Next(3, 10));
+                await childTemplate.EndEditAsync(authentication);
             }
 
             var content = table.Content;
-            content.EnterEdit(authentication);
+            await content.EnterEditAsync(authentication);
 
-            GenerateRows(content, authentication, RandomUtility.Next(10, 100));
+            await GenerateRowsAsync(content, authentication, RandomUtility.Next(10, 100));
 
             foreach (var item in table.Childs)
             {
-                GenerateRows(item.Content, authentication, RandomUtility.Next(10, 100));
+                await GenerateRowsAsync(item.Content, authentication, RandomUtility.Next(10, 100));
             }
 
-            content.LeaveEdit(authentication);
+            await content.LeaveEditAsync(authentication);
         }
 
-        public static void InheritTable(this ITableContext context, Authentication authentication)
+        public static async Task InheritTableAsync(this ITableContext context, Authentication authentication)
         {
             var category = context.Categories.Random();
             var table = context.Tables.RandomOrDefault();
@@ -221,10 +220,10 @@ namespace Ntreev.Crema.Services.Random
             if (table == null)
                 return;
 
-            table.Inherit(authentication, "Table_" + RandomUtility.NextIdentifier(), category.Path, RandomUtility.NextBoolean());
+            await table.InheritAsync(authentication, "Table_" + RandomUtility.NextIdentifier(), category.Path, RandomUtility.NextBoolean());
         }
 
-        public static void CopyTable(this ITableContext context, Authentication authentication)
+        public static async Task CopyTableAsync(this ITableContext context, Authentication authentication)
         {
             var category = context.Categories.Random();
             var table = context.Tables.RandomOrDefault();
@@ -232,68 +231,68 @@ namespace Ntreev.Crema.Services.Random
             if (table == null)
                 return;
 
-            table.Copy(authentication, "Table_" + RandomUtility.NextIdentifier(), category.Path, RandomUtility.NextBoolean());
+            await table.CopyAsync(authentication, "Table_" + RandomUtility.NextIdentifier(), category.Path, RandomUtility.NextBoolean());
         }
 
-        public static void GenerateColumns(this ITableTemplate template, Authentication authentication, int tryCount)
+        public static async Task GenerateColumnsAsync(this ITableTemplate template, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                CreateColumn(template, authentication);
+                await CreateColumnAsync(template, authentication);
             }
         }
 
-        public static bool CreateColumn(this ITableTemplate template, Authentication authentication)
+        public static async Task<bool> CreateColumnAsync(this ITableTemplate template, Authentication authentication)
         {
             var columnName = RandomUtility.NextIdentifier();
 
-            if (template.Contains(columnName) == true)
+            if (await template.ContainsAsync(columnName) == true)
                 return false;
 
-            var column = template.AddNew(authentication);
-            column.SetName(authentication, columnName);
+            var column = await template.AddNewAsync(authentication);
+            await column.SetNameAsync(authentication, columnName);
 
             if (template.PrimaryKey.Any() == false)
             {
-                column.SetIsKey(authentication, true);
+                await column.SetIsKeyAsync(authentication, true);
             }
             else if (template.Count == 0 && RandomUtility.Within(10))
             {
-                column.SetIsKey(authentication, true);
-                column.SetIsUnique(authentication, RandomUtility.Within(75));
+                await column.SetIsKeyAsync(authentication, true);
+                await column.SetIsUniqueAsync(authentication, RandomUtility.Within(75));
             }
 
             if (RandomUtility.Within(75) == true)
             {
-                column.SetTags(authentication, TagInfo.All);
+                await column.SetTagsAsync(authentication, TagInfo.All);
             }
             else
             {
-                column.SetTags(authentication, tags.Random());
+                await column.SetTagsAsync(authentication, tags.Random());
             }
 
             if (RandomUtility.Within(75) == true)
             {
-                column.SetDataType(authentication, CremaDataTypeUtility.GetBaseTypeNames().Random());
+                await column.SetDataTypeAsync(authentication, CremaDataTypeUtility.GetBaseTypeNames().Random());
             }
             else
             {
-                column.SetDataType(authentication, template.SelectableTypes.Random());
+                await column.SetDataTypeAsync(authentication, template.SelectableTypes.Random());
             }
 
             if (RandomUtility.Within(25) == true)
             {
-                column.SetComment(authentication, RandomUtility.NextString());
+                await column.SetCommentAsync(authentication, RandomUtility.NextString());
             }
 
             if (CremaDataTypeUtility.CanUseAutoIncrement(column.DataType) == true)
             {
-                column.SetAutoIncrement(authentication, RandomUtility.NextBoolean());
+                await column.SetAutoIncrementAsync(authentication, RandomUtility.NextBoolean());
             }
 
             try
             {
-                template.EndNew(authentication, column);
+                await template.EndNewAsync(authentication, column);
             }
             catch
             {
@@ -302,7 +301,7 @@ namespace Ntreev.Crema.Services.Random
             return true;
         }
 
-        public static bool ChangeColumn(this ITableTemplate template, Authentication authentication)
+        public static async Task<bool> ChangeColumnAsync(this ITableTemplate template, Authentication authentication)
         {
             var column = template.RandomOrDefault();
 
@@ -311,27 +310,27 @@ namespace Ntreev.Crema.Services.Random
 
             if (RandomUtility.Within(25) == true)
             {
-                column.SetName(authentication, RandomUtility.NextIdentifier());
+                await column.SetNameAsync(authentication, RandomUtility.NextIdentifier());
             }
 
             if (RandomUtility.Within(75) == true)
             {
-                column.SetTags(authentication, TagInfo.All);
+                await column.SetTagsAsync(authentication, TagInfo.All);
             }
             else
             {
-                column.SetTags(authentication, tags.Random());
+                await column.SetTagsAsync(authentication, tags.Random());
             }
 
             if (RandomUtility.Within(25) == true)
             {
-                column.SetComment(authentication, RandomUtility.NextString());
+                await column.SetCommentAsync(authentication, RandomUtility.NextString());
             }
 
             return true;
         }
 
-        public static bool DeleteColumn(this ITableTemplate template, Authentication authentication)
+        public static async Task<bool> DeleteColumnAsync(this ITableTemplate template, Authentication authentication)
         {
             var column = template.RandomOrDefault();
 
@@ -340,7 +339,7 @@ namespace Ntreev.Crema.Services.Random
 
             try
             {
-                column.Delete(authentication);
+                await column.DeleteAsync(authentication);
             }
             catch
             {
@@ -349,25 +348,25 @@ namespace Ntreev.Crema.Services.Random
             return true;
         }
 
-        public static void EditRandom(this ITableTemplate template, Authentication authentication, int tryCount)
+        public static async Task EditRandomAsync(this ITableTemplate template, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
                 if (RandomUtility.Within(40) == true)
-                    CreateColumn(template, authentication);
+                    await CreateColumnAsync(template, authentication);
                 else if (RandomUtility.Within(50) == true)
-                    ChangeColumn(template, authentication);
+                    await ChangeColumnAsync(template, authentication);
                 else if (RandomUtility.Within(25) == true)
-                    DeleteColumn(template, authentication);
+                    await DeleteColumnAsync(template, authentication);
             }
         }
 
-        public static void EditRandom(this ITableContent content, Authentication authentication)
+        public static Task EditRandomAsync(this ITableContent content, Authentication authentication)
         {
-            EditRandom(content, authentication, 1);
+            return EditRandomAsync(content, authentication, 1);
         }
 
-        public static void EditRandom(this ITableContent content, Authentication authentication, int tryCount)
+        public static async Task EditRandomAsync(this ITableContent content, Authentication authentication, int tryCount)
         {
             var failedCount = 0;
             for (var i = 0; i < tryCount; i++)
@@ -375,11 +374,11 @@ namespace Ntreev.Crema.Services.Random
                 try
                 {
                     if (RandomUtility.Within(10) == true || content.Count < 5)
-                        CreateRow(content, authentication);
+                        await CreateRowAsync(content, authentication);
                     else if (RandomUtility.Within(75) == true)
-                        ChangeRow(content, authentication);
+                        await ChangeRowAsync(content, authentication);
                     else if (RandomUtility.Within(10) == true)
-                        DeleteRow(content, authentication);
+                        await DeleteRowAsync(content, authentication);
                 }
                 catch
                 {
@@ -390,7 +389,7 @@ namespace Ntreev.Crema.Services.Random
             }
         }
 
-        public static void CreateRow(this ITableContent content, Authentication authentication)
+        public static async Task CreateRowAsync(this ITableContent content, Authentication authentication)
         {
             var table = content.Table;
             var parentContent = table.Parent.Content;
@@ -401,7 +400,7 @@ namespace Ntreev.Crema.Services.Random
                 relationID = parentContent.Random().RelationID;
             }
 
-            var row = content.AddNew(authentication, relationID);
+            var row = await content.AddNewAsync(authentication, relationID);
 
             var types = table.GetService(typeof(ITypeCollection)) as ITypeCollection;
             foreach (var item in table.TableInfo.Columns)
@@ -414,18 +413,18 @@ namespace Ntreev.Crema.Services.Random
 
             if (RandomUtility.Within(25) == true)
             {
-                row.SetTags(authentication, tags.Random());
+                await row.SetTagsAsync(authentication, tags.Random());
             }
 
             if (RandomUtility.Within(25) == true)
             {
-                row.SetIsEnabled(authentication, RandomUtility.NextBoolean());
+                await row.SetIsEnabledAsync(authentication, RandomUtility.NextBoolean());
             }
 
-            content.EndNew(authentication, row);
+            await content.EndNewAsync(authentication, row);
         }
 
-        public static void ChangeRow(this ITableContent content, Authentication authentication)
+        public static async Task ChangeRowAsync(this ITableContent content, Authentication authentication)
         {
             var table = content.Table;
             var row = content.RandomOrDefault();
@@ -437,11 +436,11 @@ namespace Ntreev.Crema.Services.Random
 
             if (RandomUtility.Within(5) == true)
             {
-                row.SetTags(authentication, tags.Random());
+                await row.SetTagsAsync(authentication, tags.Random());
             }
             else if (RandomUtility.Within(5) == true)
             {
-                row.SetIsEnabled(authentication, RandomUtility.NextBoolean());
+                await row.SetIsEnabledAsync(authentication, RandomUtility.NextBoolean());
             }
             else
             {
@@ -450,21 +449,21 @@ namespace Ntreev.Crema.Services.Random
             }
         }
 
-        public static void DeleteRow(this ITableContent content, Authentication authentication)
+        public static async Task DeleteRowAsync(this ITableContent content, Authentication authentication)
         {
             var row = content.RandomOrDefault();
             if (row == null)
                 return;
 
-            row.Delete(authentication);
+            await row.DeleteAsync(authentication);
         }
 
-        public static void GenerateRows(this ITableContent content, Authentication authentication, int tryCount)
+        public static async Task GenerateRowsAsync(this ITableContent content, Authentication authentication, int tryCount)
         {
             int failedCount = 0;
             for (var i = 0; i < tryCount; i++)
             {
-                if (GenerateRow(content, authentication) == true)
+                if (await GenerateRowAsync(content, authentication) == true)
                     continue;
 
                 failedCount++;
@@ -473,25 +472,25 @@ namespace Ntreev.Crema.Services.Random
             }
         }
 
-        public static bool GenerateRow(this ITableContent content, Authentication authentication)
+        public static async Task<bool> GenerateRowAsync(this ITableContent content, Authentication authentication)
         {
-            var row = NewRandomRow(content, authentication);
+            var row = await NewRandomRowAsync(content, authentication);
 
             if (FillFields(row, authentication) == true)
             {
                 if (RandomUtility.Within(25) == true)
                 {
-                    row.SetTags(authentication, tags.Random());
+                    await row.SetTagsAsync(authentication, tags.Random());
                 }
 
                 if (RandomUtility.Within(25) == true)
                 {
-                    row.SetIsEnabled(authentication, RandomUtility.NextBoolean());
+                    await row.SetIsEnabledAsync(authentication, RandomUtility.NextBoolean());
                 }
 
                 try
                 {
-                    content.EndNew(authentication, row);
+                    await content.EndNewAsync(authentication, row);
                     return true;
                 }
                 catch
@@ -541,7 +540,7 @@ namespace Ntreev.Crema.Services.Random
             return false;
         }
 
-        public static ITableRow NewRandomRow(this ITableContent content, Authentication authentication)
+        public static async Task<ITableRow> NewRandomRowAsync(this ITableContent content, Authentication authentication)
         {
             var table = content.Table;
             var parentContent = table.Parent.Content;
@@ -550,9 +549,9 @@ namespace Ntreev.Crema.Services.Random
                 var parentRow = parentContent.Random();
                 if (parentRow == null)
                     return null;
-                return content.AddNew(authentication, parentRow.RelationID);
+                return await content.AddNewAsync(authentication, parentRow.RelationID);
             }
-            return content.AddNew(authentication, null);
+            return await content.AddNewAsync(authentication, null);
         }
 
         public static ITable RandomSample(this ITableCollection tables)

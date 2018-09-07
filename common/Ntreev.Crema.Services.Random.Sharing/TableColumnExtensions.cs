@@ -23,33 +23,34 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using Ntreev.Library.ObjectModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Random
 {
     public static class TableColumnExtensions
     {
-        public static void InitializeRandom(this ITableColumn tableColumn, Authentication authentication)
+        public static async Task InitializeRandomAsync(this ITableColumn tableColumn, Authentication authentication)
         {
             var template = tableColumn.Template;
             var table = tableColumn.Template.Target;
 
             if (RandomUtility.Within(75) == true)
             {
-                tableColumn.SetDataType(authentication, CremaDataTypeUtility.GetBaseTypeNames().Random(item => item != typeof(bool).GetTypeName()));
+                await tableColumn.SetDataTypeAsync(authentication, CremaDataTypeUtility.GetBaseTypeNames().Random(item => item != typeof(bool).GetTypeName()));
             }
             else 
             {
-                tableColumn.SetDataType(authentication, template.SelectableTypes.Random());
+                await tableColumn.SetDataTypeAsync(authentication, template.SelectableTypes.Random());
             }
 
             if (template.Count == 0)
             {
-                tableColumn.SetIsKey(authentication, true);
+                await tableColumn.SetIsKeyAsync(authentication, true);
             }
             else if (RandomUtility.Within(10) && tableColumn.DataType != typeof(bool).GetTypeName())
             {
-                tableColumn.SetIsKey(authentication, true);
-                tableColumn.SetIsUnique(authentication, RandomUtility.Within(75));
+                await tableColumn.SetIsKeyAsync(authentication, true);
+                await tableColumn.SetIsUniqueAsync(authentication, RandomUtility.Within(75));
             }
 
             if (RandomUtility.Within(25) && tableColumn.DataType != typeof(bool).GetTypeName())
@@ -57,70 +58,70 @@ namespace Ntreev.Crema.Services.Random
                 var unique = RandomUtility.Within(75);
                 if (unique != false || template.PrimaryKey.Count() != 1)
                 {
-                    tableColumn.SetIsUnique(authentication, unique);
+                    await tableColumn.SetIsUniqueAsync(authentication, unique);
                 }
             }
 
             if (RandomUtility.Within(25) == true)
             {
-                tableColumn.SetComment(authentication, RandomUtility.NextString());
+                await tableColumn.SetCommentAsync(authentication, RandomUtility.NextString());
             }
 
             if (RandomUtility.Within(25) == true)
             {
-                tableColumn.SetDefaultValue(authentication, tableColumn.GetRandomString());
+                await tableColumn.SetDefaultValueAsync(authentication, await tableColumn.GetRandomStringAsync());
             }
 
             if (CremaDataTypeUtility.CanUseAutoIncrement(tableColumn.DataType) == true && tableColumn.DefaultValue == null)
             {
-                tableColumn.SetAutoIncrement(authentication, RandomUtility.NextBoolean());
+                await tableColumn.SetAutoIncrementAsync(authentication, RandomUtility.NextBoolean());
             }
 
             if (RandomUtility.Within(5) == true)
             {
-                tableColumn.SetIsReadOnly(authentication, true);
+                await tableColumn.SetIsReadOnlyAsync(authentication, true);
             }
         }
 
-        public static void ModifyRandomValue(this ITableColumn tableColumn, Authentication authentication)
+        public static async Task ModifyRandomValueAsync(this ITableColumn tableColumn, Authentication authentication)
         {
             if (RandomUtility.Within(75) == true)
             {
-                SetRandomName(tableColumn, authentication);
+                await SetRandomNameAsync(tableColumn, authentication);
             }
             else if (RandomUtility.Within(75) == true)
             {
-                SetRandomValue(tableColumn, authentication);
+                await SetRandomValueAsync(tableColumn, authentication);
             }
             else
             {
-                SetRandomComment(tableColumn, authentication);
+                await SetRandomCommentAsync(tableColumn, authentication);
             }
         }
 
-        public static void ExecuteRandomTask(this ITableColumn tableColumn, Authentication authentication)
+        public static async Task ExecuteRandomTaskAsync(this ITableColumn tableColumn, Authentication authentication)
         {
             if (RandomUtility.Within(75) == true)
             {
-                SetRandomName(tableColumn, authentication);
+                await SetRandomNameAsync(tableColumn, authentication);
             }
             else if (RandomUtility.Within(75) == true)
             {
-                SetRandomValue(tableColumn, authentication);
+                await SetRandomValueAsync(tableColumn, authentication);
             }
             else
             {
-                SetRandomComment(tableColumn, authentication);
+                await SetRandomCommentAsync(tableColumn, authentication);
             }
         }
 
-        public static void SetRandomName(this ITableColumn tableColumn, Authentication authentication)
+        public static Task SetRandomNameAsync(this ITableColumn tableColumn, Authentication authentication)
         {
             var newName = RandomUtility.NextIdentifier();
-            tableColumn.SetName(authentication, newName);
+            return tableColumn.SetNameAsync(authentication, newName);
         }
 
-        public static void SetRandomValue(this ITableColumn tableColumn, Authentication authentication)
+        public static async Task SetRandomValueAsync(this ITableColumn tableColumn, Authentication authentication)
         {
             //if (tableColumn.Template.IsFlag == true)
             //{
@@ -130,21 +131,22 @@ namespace Ntreev.Crema.Services.Random
             //{
             //    tableColumn.SetValue(authentication, RandomUtility.NextLong(long.MaxValue));
             //}
+            await Task.Delay(0);
         }
 
-        public static void SetRandomComment(this ITableColumn tableColumn, Authentication authentication)
+        public static async Task SetRandomCommentAsync(this ITableColumn tableColumn, Authentication authentication)
         {
             if (RandomUtility.Within(50) == true)
             {
-                tableColumn.SetComment(authentication, RandomUtility.NextString());
+                await tableColumn.SetCommentAsync(authentication, RandomUtility.NextString());
             }
             else
             {
-                tableColumn.SetComment(authentication, string.Empty);
+                await tableColumn.SetCommentAsync(authentication, string.Empty);
             }
         }
 
-        public static string GetRandomString(this ITableColumn tableColumn)
+        public static async Task<string> GetRandomStringAsync(this ITableColumn tableColumn)
         {
             if (tableColumn.DefaultValue != null && RandomUtility.Next(3) == 0)
             {
@@ -163,7 +165,7 @@ namespace Ntreev.Crema.Services.Random
                     var domain = template.Domain;
                     var typeContext = domain.GetService(typeof(ITypeContext)) as ITypeContext;
                     var type = typeContext.Types[dataType];
-                    return type.GetRandomString();
+                    return await type.GetRandomStringAsync();
                 }
                 else
                 {

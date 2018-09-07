@@ -49,7 +49,7 @@ namespace Ntreev.Crema.Services.Test.DispatcherTest
                 dataBase.Load(authentication);
                 dataBase.Enter(authentication);
                 dataBase.TypeContext.AddRandomItems(authentication);
-                dataBase.TableContext.AddRandomItems(authentication);
+                dataBase.TableContext.AddRandomItemsAsync(authentication);
                 table = dataBase.TableContext.Tables.Random(item => item.TemplatedParent == null);
                 table.Template.BeginEdit(authentication);
                 domain = table.Template.Domain;

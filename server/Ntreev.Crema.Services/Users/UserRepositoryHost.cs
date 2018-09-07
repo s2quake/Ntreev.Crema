@@ -24,6 +24,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Users.Serializations;
+using Ntreev.Library;
 
 namespace Ntreev.Crema.Services.Users
 {
@@ -32,19 +33,28 @@ namespace Ntreev.Crema.Services.Users
         private readonly UserContext userContext;
 
         public UserRepositoryHost(UserContext userContext, IRepository repository)
-            : base(repository, userContext.Dispatcher)
+            : base(repository, null)
         {
             this.userContext = userContext;
         }
 
-        public void MoveCategory(Authentication authentication, UserCategory category, string newCategoryPath)
+        public void CreateCategory(Authentication authentication, string itemPath)
         {
-            var categoryPath = category.Path;
-            var query = from User item in this.userContext.Users
-                        where item.Category.Path.StartsWith(category.Path)
-                        select item.SerializationInfo;
+            var parentItemPath = Path.GetDirectoryName(itemPath);
+            if (Directory.Exists(parentItemPath) == false)
+                throw new DirectoryNotFoundException();
+            Directory.CreateDirectory(itemPath);
+            this.Add(itemPath);
+        }
 
-            var users = query.ToArray();
+        public void RenameCategory(Authentication authentication, UserSerializationInfo[] users, string categoryPath, string newCategoryPath)
+        {
+            var itemPath1 = this.userContext.GenerateCategoryPath(categoryPath);
+            var itemPath2 = this.userContext.GenerateCategoryPath(newCategoryPath);
+
+            if (Directory.Exists(itemPath1) == false)
+                throw new DirectoryNotFoundException();
+
             for (var i = 0; i < users.Length; i++)
             {
                 var item = users[i];
@@ -54,20 +64,17 @@ namespace Ntreev.Crema.Services.Users
                 item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
                 this.Serializer.Serialize(itemPath, item, ObjectSerializerSettings.Empty);
             }
-
-            var itemPath1 = category.ItemPath;
-            var itemPath2 = this.userContext.GenerateCategoryPath(newCategoryPath);
             this.Move(itemPath1, itemPath2);
         }
 
-        public void RenameCategory(Authentication authentication, UserCategory category, string newCategoryPath)
+        public void MoveCategory(Authentication authentication, UserSerializationInfo[] users, string categoryPath, string newCategoryPath)
         {
-            var categoryPath = category.Path;
-            var query = from User item in this.userContext.Users
-                        where item.Category.Path.StartsWith(category.Path)
-                        select item.SerializationInfo;
+            var itemPath1 = this.userContext.GenerateCategoryPath(categoryPath);
+            var itemPath2 = this.userContext.GenerateCategoryPath(newCategoryPath);
 
-            var users = query.ToArray();
+            if (Directory.Exists(itemPath1) == false)
+                throw new DirectoryNotFoundException();
+
             for (var i = 0; i < users.Length; i++)
             {
                 var item = users[i];
@@ -77,46 +84,57 @@ namespace Ntreev.Crema.Services.Users
                 item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
                 this.Serializer.Serialize(itemPath, item, ObjectSerializerSettings.Empty);
             }
-
-            var itemPath1 = category.ItemPath;
-            var itemPath2 = this.userContext.GenerateCategoryPath(newCategoryPath);
             this.Move(itemPath1, itemPath2);
         }
 
         public void CreateUser(UserSerializationInfo userInfo)
         {
             var itemPath = this.userContext.GenerateUserPath(userInfo.CategoryPath, userInfo.ID);
+            var directoryPath = Path.GetDirectoryName(itemPath);
+            if (Directory.Exists(directoryPath) == false)
+                throw new DirectoryNotFoundException();
+            var files = this.userContext.GetFiles(itemPath);
+            if (files.Any() == true)
+                throw new IOException();
+
             var itemPaths = this.Serializer.Serialize(itemPath, userInfo, ObjectSerializerSettings.Empty);
             this.AddRange(itemPaths);
         }
 
-        public void MoveUser(Authentication authentication, User user, string categoryPath)
+        public void MoveUser(SignatureDate signatureDate, string itemPath, UserSerializationInfo serializationInfo, string categoryItemPath)
         {
-            var itemPath = user.ItemPath;
-            var userSerializationInfo = new UserSerializationInfo(user.SerializationInfo)
-            {
-                CategoryPath = categoryPath,
-                ModificationInfo = authentication.SignatureDate
-            };
+            var directoryPath = Path.GetDirectoryName(itemPath);
+            if (Directory.Exists(directoryPath) == false)
+                throw new DirectoryNotFoundException();
+            if (Directory.Exists(categoryItemPath) == false)
+                throw new DirectoryNotFoundException();
 
-            this.Serializer.Serialize(itemPath, userSerializationInfo, ObjectSerializerSettings.Empty);
-            this.MoveRepositoryPath(userSerializationInfo, user);
+            this.Serializer.Serialize(itemPath, serializationInfo, ObjectSerializerSettings.Empty);
+            this.MoveRepositoryPath(serializationInfo, itemPath);
         }
 
-        public void DeleteUser(Authentication authentication, User user)
+        public void DeleteUser(string itemPath)
         {
-            this.DeleteRepositoryPath(user);
+            var files = this.userContext.GetFiles(itemPath);
+            if (files.Any() == false)
+                throw new FileNotFoundException();
+            this.DeleteRange(files);
         }
 
-        public void ModifyUser(Authentication authentication, User user, UserSerializationInfo userSerializationInfo)
+        public void ModifyUser(string itemPath, UserSerializationInfo serializationInfo)
         {
-            var itemPath = user.ItemPath;
-            this.Serializer.Serialize(itemPath, userSerializationInfo, ObjectSerializerSettings.Empty);
+            var directoryPath = Path.GetDirectoryName(itemPath);
+            if (Directory.Exists(directoryPath) == false)
+                throw new DirectoryNotFoundException();
+            var files = this.userContext.GetFiles(itemPath);
+            if (files.Any() == false)
+                throw new FileNotFoundException();
+            this.Serializer.Serialize(itemPath, serializationInfo, ObjectSerializerSettings.Empty);
         }
 
-        private void MoveRepositoryPath(UserSerializationInfo userSerializationInfo, User user)
+        private void MoveRepositoryPath(UserSerializationInfo userSerializationInfo, string itemPath)
         {
-            var files = this.userContext.GetFiles(user.ItemPath);
+            var files = this.userContext.GetFiles(itemPath);
 
             for (var i = 0; i < files.Length; i++)
             {
@@ -125,12 +143,6 @@ namespace Ntreev.Crema.Services.Users
                 var path2 = this.userContext.GeneratePath(userSerializationInfo.CategoryPath + userSerializationInfo.ID) + extension;
                 this.Move(path1, path2);
             }
-        }
-
-        private void DeleteRepositoryPath(User user)
-        {
-            var files = this.userContext.GetFiles(user.ItemPath);
-            this.DeleteRange(files);
         }
 
         private IObjectSerializer Serializer => this.userContext.Serializer;

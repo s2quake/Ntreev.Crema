@@ -34,45 +34,42 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     public class ITableTemplateTask : ITaskProvider
     {
-        public Task InvokeAsync(TaskContext context)
+        public async Task InvokeAsync(TaskContext context)
         {
             var template = context.Target as ITableTemplate;
-            template.Dispatcher.Invoke(() =>
+            if (context.IsCompleted(template) == true)
             {
-                if (context.IsCompleted(template) == true)
+                try
                 {
-                    try
+                    if (Verify() == true)
                     {
-                        if (Verify() == true)
-                        {
-                            template.EndEdit(context.Authentication);
-                        }
+                        await template.EndEditAsync(context.Authentication);
                     }
-                    catch
-                    {
-                        template.CancelEdit(context.Authentication);
-                    }
+                }
+                catch
+                {
+                    await template.CancelEditAsync(context.Authentication);
+                }
 
-                    context.Pop(template);
-                    context.Complete(context.Target);
+                context.Pop(template);
+                context.Complete(context.Target);
+            }
+            else
+            {
+                if (template.Domain == null)
+                    await template.BeginEditAsync(context.Authentication);
+                if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
+                {
+                    var column = await template.AddNewAsync(context.Authentication);
+                    context.Push(column);
+                    context.State = System.Data.DataRowState.Detached;
                 }
                 else
                 {
-                    if (template.Domain == null)
-                        template.BeginEdit(context.Authentication);
-                    if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
-                    {
-                        var column = template.AddNew(context.Authentication);
-                        context.Push(column);
-                        context.State = System.Data.DataRowState.Detached;
-                    }
-                    else
-                    {
-                        var member = template.Random();
-                        context.Push(member);
-                    }
+                    var member = template.Random();
+                    context.Push(member);
                 }
-            });
+            }
 
             bool Verify()
             {
@@ -97,33 +94,24 @@ namespace Ntreev.Crema.Bot.Tasks
         }
 
         [TaskMethod(Weight = 10)]
-        public void SetTableName(ITableTemplate template, TaskContext context)
+        public async Task SetTableNameAsync(ITableTemplate template, TaskContext context)
         {
-            template.Dispatcher.Invoke(() =>
-            {
-                var tableName = RandomUtility.NextIdentifier();
-                template.SetTableName(context.Authentication, tableName);
-            });
+            var tableName = RandomUtility.NextIdentifier();
+            await template.SetTableNameAsync(context.Authentication, tableName);
         }
 
         [TaskMethod(Weight = 10)]
-        public void SetTags(ITableTemplate template, TaskContext context)
+        public async Task SetTagsAsync(ITableTemplate template, TaskContext context)
         {
-            template.Dispatcher.Invoke(() =>
-            {
-                var tags = (TagInfo)TagInfoUtility.Names.Random();
-                template.SetTags(context.Authentication, tags);
-            });
+            var tags = (TagInfo)TagInfoUtility.Names.Random();
+            await template.SetTagsAsync(context.Authentication, tags);
         }
 
         [TaskMethod(Weight = 10)]
-        public void SetComment(ITableTemplate template, TaskContext context)
+        public async Task SetCommentAsync(ITableTemplate template, TaskContext context)
         {
-            template.Dispatcher.Invoke(() =>
-            {
-                var comment = RandomUtility.NextString();
-                template.SetComment(context.Authentication, comment);
-            });
+            var comment = RandomUtility.NextString();
+            await template.SetCommentAsync(context.Authentication, comment);
         }
     }
 }

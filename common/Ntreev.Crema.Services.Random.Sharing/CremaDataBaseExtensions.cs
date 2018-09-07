@@ -155,7 +155,7 @@ namespace Ntreev.Crema.Services.Random
                     var newID = string.Format("Admin_{0}", identifier);
                     var newName = string.Format("관리자_{0}", identifier);
 
-                    category.AddNewUser(authentication, newID, null, newName, Authority.Admin);
+                    category.AddNewUserAsync(authentication, newID, null, newName, Authority.Admin);
                 }
                 else if (authority == Authority.Member)
                 {
@@ -182,7 +182,7 @@ namespace Ntreev.Crema.Services.Random
             {
                 var typeContext = dataBase.TypeContext;
                 var category = typeContext.Categories.RandomOrDefault();
-                typeContext.AddRandomType(authentication);
+                typeContext.AddRandomTypeAsync(authentication);
             });
         }
 
@@ -602,7 +602,7 @@ namespace Ntreev.Crema.Services.Random
 
                 try
                 {
-                    template.EditRandom(authentication, RandomUtility.Next(5, 10));
+                    template.EditRandomAsync(authentication, RandomUtility.Next(5, 10));
                     template.EndEdit(authentication);
                 }
                 catch
@@ -631,7 +631,7 @@ namespace Ntreev.Crema.Services.Random
 
                 try
                 {
-                    contents.Random().EditRandom(authentication, RandomUtility.Next(1000));
+                    contents.Random().EditRandomAsync(authentication, RandomUtility.Next(1000));
                     content.LeaveEdit(authentication);
                 }
                 catch
@@ -693,7 +693,7 @@ namespace Ntreev.Crema.Services.Random
 
                 var content = table.Content;
                 var contents = EnumerableUtility.Friends(table, table.Childs).Select(item => item.Content);
-                contents.Random().EditRandom(authentication, 1);
+                contents.Random().EditRandomAsync(authentication, 1);
             });
         }
 
@@ -731,7 +731,7 @@ namespace Ntreev.Crema.Services.Random
             dataBase.Dispatcher.Invoke(() =>
             {
                 var tableContext = dataBase.TableContext;
-                tableContext.GenerateCategory(authentication);
+                tableContext.GenerateCategoryAsync(authentication);
             });
         }
 

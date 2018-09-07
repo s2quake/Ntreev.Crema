@@ -31,7 +31,11 @@ namespace Ntreev.Crema.Services
             this.itemName = itemName;
             try
             {
-                this.Read(this.itemName + ".xml");
+                var filename = this.itemName + ".xml";
+                if (File.Exists(filename) == true)
+                {
+                    this.Read(filename);
+                }
             }
             catch (Exception e)
             {

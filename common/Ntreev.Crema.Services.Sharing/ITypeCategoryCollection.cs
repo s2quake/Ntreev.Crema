@@ -24,7 +24,7 @@ using System.Text;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ITypeCategoryCollection : IReadOnlyCollection<ITypeCategory>, IEnumerable<ITypeCategory>, INotifyCollectionChanged, IServiceProvider
+    public interface ITypeCategoryCollection : IReadOnlyCollection<ITypeCategory>, IEnumerable<ITypeCategory>, IServiceProvider, IDispatcherObject
     {
         bool Contains(string categoryPath);
 

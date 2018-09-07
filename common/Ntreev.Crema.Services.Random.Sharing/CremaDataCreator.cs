@@ -23,97 +23,93 @@ using System.Text;
 using Ntreev.Library;
 using Ntreev.Crema.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Random
 {
     public static class CremaDataCreator
     {
-        public static void CreateStandard(this IDataBase dataBase, Authentication authentication)
+        public static async Task CreateStandardAsync(this IDataBase dataBase, Authentication authentication)
         {
-            dataBase.Dispatcher.Invoke(() =>
-            {
-                var tableContext = dataBase.TableContext;
-                tableContext.Root.AddNewCategory(authentication, "All");
-                tableContext.Root.AddNewCategory(authentication, "Client");
-                tableContext.Root.AddNewCategory(authentication, "Server");
-                tableContext.Root.AddNewCategory(authentication, "None");
-
-                //CreateTable(authentication, allCategory, "table_all", TagInfo.All);
-            });
+            var tableContext = dataBase.TableContext;
+            await tableContext.Root.AddNewCategoryAsync(authentication, "All");
+            await tableContext.Root.AddNewCategoryAsync(authentication, "Client");
+            await tableContext.Root.AddNewCategoryAsync(authentication, "Server");
+            await tableContext.Root.AddNewCategoryAsync(authentication, "None");
         }
 
-        private static void CreateTable(Authentication authentication, ITableCategory category, string name, TagInfo tags)
+        private static async Task CreateTableAsync(Authentication authentication, ITableCategory category, string name, TagInfo tags)
         {
-            var template = category.NewTable(authentication);
+            var template = await category.NewTableAsync(authentication);
 
-            template.SetTableName(authentication, name);
-            template.SetTags(authentication, tags);
-            template.SetComment(authentication, $"table-{tags}");
+            await template.SetTableNameAsync(authentication, name);
+            await template.SetTagsAsync(authentication, tags);
+            await template.SetCommentAsync(authentication, $"table-{tags}");
 
-            var key = template.AddNew(authentication);
-            key.SetName(authentication, "key_column");
-            key.SetIsKey(authentication, true);
-            template.EndNew(authentication, key);
+            var key = await template.AddNewAsync(authentication);
+            await key.SetNameAsync(authentication, "key_column");
+            await key.SetIsKeyAsync(authentication, true);
+            await template.EndNewAsync(authentication, key);
 
-            var all = template.AddNew(authentication);
-            all.SetName(authentication, "all_column");
-            template.EndNew(authentication, all);
+            var all = await template.AddNewAsync(authentication);
+            await all.SetNameAsync(authentication, "all_column");
+            await template.EndNewAsync(authentication, all);
 
-            var server = template.AddNew(authentication);
-            server.SetName(authentication, "server_column");
-            template.EndNew(authentication, server);
+            var server = await template.AddNewAsync(authentication);
+            await server.SetNameAsync(authentication, "server_column");
+            await template.EndNewAsync(authentication, server);
 
-            var client = template.AddNew(authentication);
-            client.SetName(authentication, "client_column");
-            template.EndNew(authentication, client);
+            var client = await template.AddNewAsync(authentication);
+            await client.SetNameAsync(authentication, "client_column");
+            await template.EndNewAsync(authentication, client);
 
-            var none = template.AddNew(authentication);
-            none.SetName(authentication, "none_column");
-            template.EndNew(authentication, none);
+            var none = await template.AddNewAsync(authentication);
+            await none.SetNameAsync(authentication, "none_column");
+            await template.EndNewAsync(authentication, none);
 
-            template.EndEdit(authentication);
+            await template.EndEditAsync(authentication);
 
             if (template.Target is ITable[] tables)
             {
                 var table = tables.First();
 
-                CreateTable(authentication, table, "child_all", TagInfoUtility.All);
-                CreateTable(authentication, table, "child_server", TagInfoUtility.Server);
-                CreateTable(authentication, table, "child_client", TagInfoUtility.Client);
-                CreateTable(authentication, table, "child_none", TagInfoUtility.Unused);
+                await CreateTableAsync(authentication, table, "child_all", TagInfoUtility.All);
+                await CreateTableAsync(authentication, table, "child_server", TagInfoUtility.Server);
+                await CreateTableAsync(authentication, table, "child_client", TagInfoUtility.Client);
+                await CreateTableAsync(authentication, table, "child_none", TagInfoUtility.Unused);
             }
         }
 
-        private static void CreateTable(Authentication authentication, ITable table, string name, TagInfo tags)
+        private static async Task CreateTableAsync(Authentication authentication, ITable table, string name, TagInfo tags)
         {
-            var template = table.NewTable(authentication);
+            var template = await table.NewTableAsync(authentication);
 
-            template.SetTableName(authentication, name);
-            template.SetTags(authentication, tags);
-            template.SetComment(authentication, $"table-{tags}");
+            await template.SetTableNameAsync(authentication, name);
+            await template.SetTagsAsync(authentication, tags);
+            await template.SetCommentAsync(authentication, $"table-{tags}");
 
-            var key = template.AddNew(authentication);
-            key.SetName(authentication, "key_column");
-            key.SetIsKey(authentication, true);
-            template.EndNew(authentication, key);
+            var key = await template.AddNewAsync(authentication);
+            await key.SetNameAsync(authentication, "key_column");
+            await key.SetIsKeyAsync(authentication, true);
+            await template.EndNewAsync(authentication, key);
 
-            var all = template.AddNew(authentication);
-            all.SetName(authentication, "all_column");
-            template.EndNew(authentication, all);
+            var all = await template.AddNewAsync(authentication);
+            await all.SetNameAsync(authentication, "all_column");
+            await template.EndNewAsync(authentication, all);
 
-            var server = template.AddNew(authentication);
-            server.SetName(authentication, "server_column");
-            template.EndNew(authentication, server);
+            var server = await template.AddNewAsync(authentication);
+            await server.SetNameAsync(authentication, "server_column");
+            await template.EndNewAsync(authentication, server);
 
-            var client = template.AddNew(authentication);
-            client.SetName(authentication, "client_column");
-            template.EndNew(authentication, client);
+            var client = await template.AddNewAsync(authentication);
+            await client.SetNameAsync(authentication, "client_column");
+            await template.EndNewAsync(authentication, client);
 
-            var none = template.AddNew(authentication);
-            none.SetName(authentication, "none_column");
-            template.EndNew(authentication, none);
+            var none = await template.AddNewAsync(authentication);
+            await none.SetNameAsync(authentication, "none_column");
+            await template.EndNewAsync(authentication, none);
 
-            template.EndEdit(authentication);
+            await template.EndEditAsync(authentication);
         }
     }
 }

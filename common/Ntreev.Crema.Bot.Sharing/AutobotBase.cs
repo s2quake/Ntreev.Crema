@@ -31,19 +31,19 @@ using System.Security;
 
 namespace Ntreev.Crema.Bot
 {
-    public abstract class AutobotBase : IDisposable
+    public abstract class AutobotBase
     {
         private readonly static object error = new object();
         private readonly string autobotID;
         private readonly TaskContext taskContext = new TaskContext();
-        private CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
         private IEnumerable<ITaskProvider> taskProviders;
 
         public AutobotBase(string autobotID)
         {
             this.autobotID = autobotID;
             this.MinSleepTime = 1;
-            this.MaxSleepTime = 10;
+            this.MaxSleepTime = 1000;
         }
 
         public void Cancel()
@@ -51,19 +51,16 @@ namespace Ntreev.Crema.Bot
             this.cancelTokenSource.Cancel();
         }
 
-        public Authentication Login()
+        public async Task LoginAsync()
         {
-            this.taskContext.Authentication = this.OnLogin();
-            //this.taskContext.Authentication.Expired += (s, e) =>
-            //{
-            //    this.taskContext.Authentication = null;
-            //};
-            return this.taskContext.Authentication;
+            var authentication = await this.OnLoginAsync();
+            authentication.Expired += Authentication_Expired;
+            this.taskContext.Authentication = authentication;
         }
 
-        public void Logout()
+        public async Task LogoutAsync()
         {
-            this.OnLogout(this.taskContext.Authentication);
+            await this.OnLogoutAsync(this.taskContext.Authentication);
             this.taskContext.Authentication = null;
         }
 
@@ -117,9 +114,9 @@ namespace Ntreev.Crema.Bot
             this.Disposed?.Invoke(this, e);
         }
 
-        protected abstract Authentication OnLogin();
+        protected abstract Task<Authentication> OnLoginAsync();
 
-        protected abstract void OnLogout(Authentication authentication);
+        protected abstract Task OnLogoutAsync(Authentication authentication);
 
         private void InvokeTask(MethodInfo method, ITaskProvider taskProvider, object target)
         {
@@ -127,7 +124,11 @@ namespace Ntreev.Crema.Bot
             {
                 if (method != null)
                 {
-                    method.Invoke(taskProvider, new object[] { target, this.taskContext });
+                    var result = method.Invoke(taskProvider, new object[] { target, this.taskContext });
+                    if (result is Task task)
+                    {
+                        task.Wait();
+                    }
                 }
             }
             catch
@@ -142,34 +143,43 @@ namespace Ntreev.Crema.Bot
 
         private void Execute(IEnumerable<ITaskProvider> taskProviders)
         {
-            while (this.cancelTokenSource.IsCancellationRequested == false)
+            try
             {
-                if (this.taskContext.Target == null)
+                while (this.cancelTokenSource.IsCancellationRequested == false)
                 {
-                    this.taskContext.Push(this);
-                }
+                    if (this.taskContext.Target == null)
+                    {
+                        this.taskContext.Push(this);
+                    }
 
-                var taskProvider = RandomTaskProvider(this.taskContext.Target);
+                    var taskProvider = RandomTaskProvider(this.taskContext.Target);
 
-                try
-                {
-                    if (this.cancelTokenSource.IsCancellationRequested == true)
-                        break;
-                    taskProvider.InvokeAsync(this.taskContext);
-                }
-                catch
-                {
-                    this.taskContext.Complete(this.taskContext.Target);
-                    continue;
-                }
+                    try
+                    {
+                        if (this.cancelTokenSource.IsCancellationRequested == true)
+                            break;
+                        var task = taskProvider.InvokeAsync(this.taskContext);
+                        task.Wait();
+                    }
+                    catch
+                    {
+                        this.taskContext.Complete(this.taskContext.Target);
+                        continue;
+                    }
 
-                if (this.taskContext.Target != null && taskProvider.TargetType.IsAssignableFrom(this.taskContext.Target.GetType()) == true)
-                {
-                    var method = RandomMethod(taskProvider);
-                    if (this.cancelTokenSource.IsCancellationRequested == true)
-                        break;
-                    this.InvokeTask(method, taskProvider, this.taskContext.Target);
+                    if (this.taskContext.Target != null && taskProvider.TargetType.IsAssignableFrom(this.taskContext.Target.GetType()) == true)
+                    {
+                        var method = RandomMethod(taskProvider);
+                        if (this.cancelTokenSource.IsCancellationRequested == true)
+                            break;
+                        this.InvokeTask(method, taskProvider, this.taskContext.Target);
+                    }
                 }
+                this.OnDisposed(EventArgs.Empty);
+            }
+            catch
+            {
+                int qwer = 0;
             }
         }
 
@@ -184,7 +194,7 @@ namespace Ntreev.Crema.Bot
                 if (methodInfo.IsStatic == true)
                     return false;
 
-                if (methodInfo.ReturnType != typeof(void))
+                if (methodInfo.ReturnType != typeof(void) && methodInfo.ReturnType != typeof(Task))
                     return false;
 
                 var attr = methodInfo.GetCustomAttribute<TaskMethodAttribute>();
@@ -222,13 +232,9 @@ namespace Ntreev.Crema.Bot
             }
         }
 
-        #region IDisposable
-
-        void IDisposable.Dispose()
+        private void Authentication_Expired(object sender, EventArgs e)
         {
-            this.OnDisposed(EventArgs.Empty);
+            this.taskContext.Authentication = null;
         }
-
-        #endregion
     }
 }

@@ -33,9 +33,9 @@ namespace Ntreev.Crema.Services.Users
     {
         public async Task RenameAsync(Authentication authentication, string name)
         {
-            try
+            await await this.Dispatcher.InvokeAsync(async () =>
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                try
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
                     this.ValidateRename(authentication, name);
@@ -43,23 +43,23 @@ namespace Ntreev.Crema.Services.Users
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
-                    this.Container.InvokeCategoryRename(authentication, this, name);
+                    await this.Container.InvokeCategoryRenameAsync(authentication, this, name);
                     base.Name = name;
                     this.Container.InvokeCategoriesRenamedEvent(authentication, items, oldNames, oldPaths);
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+                }
+                catch (Exception e)
+                {
+                    this.CremaHost.Error(e);
+                    throw;
+                }
+            });
         }
 
         public async Task MoveAsync(Authentication authentication, string parentPath)
         {
-            try
+            await await this.Dispatcher.InvokeAsync(async () =>
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                try
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, parentPath);
                     this.ValidateMove(authentication, parentPath);
@@ -67,23 +67,23 @@ namespace Ntreev.Crema.Services.Users
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
-                    this.Container.InvokeCategoryMove(authentication, this, parentPath);
+                    await this.Container.InvokeCategoryMoveAsync(authentication, this, parentPath);
                     this.Parent = this.Container[parentPath];
                     this.Container.InvokeCategoriesMovedEvent(authentication, items, oldPaths, oldParentPaths);
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+                }
+                catch (Exception e)
+                {
+                    this.CremaHost.Error(e);
+                    throw;
+                }
+            });
         }
 
         public async Task DeleteAsync(Authentication authentication)
         {
-            try
+            await await this.Dispatcher.InvokeAsync(async () =>
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                try
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     this.ValidateDelete(authentication);
@@ -91,16 +91,16 @@ namespace Ntreev.Crema.Services.Users
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var container = this.Container;
-                    container.InvokeCategoryDelete(authentication, this);
+                    await container.InvokeCategoryDeleteAsync(authentication, this);
                     this.Dispose();
                     container.InvokeCategoriesDeletedEvent(authentication, items, oldPaths);
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+                }
+                catch (Exception e)
+                {
+                    this.CremaHost.Error(e);
+                    throw;
+                }
+            });
         }
 
         public Task<UserCategory> AddNewCategoryAsync(Authentication authentication, string name)

@@ -57,10 +57,11 @@ namespace Ntreev.Crema.Services.Users
 
         public async Task<User> AddNewAsync(Authentication authentication, string userID, string categoryPath, SecureString password, string userName, Authority authority)
         {
-            return await this.Dispatcher.InvokeAsync(() =>
+            return await await this.Dispatcher.InvokeAsync(async () =>
             {
                 this.ValidateUserCreate(authentication, userID, categoryPath, password);
                 this.Sign(authentication);
+                var category = this.GetCategory(categoryPath);
                 var designedInfo = new SignatureDate(authentication.ID, DateTime.UtcNow);
                 var userInfo = new UserSerializationInfo()
                 {
@@ -72,8 +73,7 @@ namespace Ntreev.Crema.Services.Users
                     CreationInfo = designedInfo,
                     ModificationInfo = designedInfo,
                 };
-
-                this.InvokeUserCreate(authentication, userInfo);
+                await this.InvokeUserCreateAsync(authentication, userInfo);
                 var user = this.BaseAddNew(userID, categoryPath, null);
                 user.Initialize((UserInfo)userInfo, BanInfo.Empty);
                 user.Password = UserContext.StringToSecureString(userInfo.Password);
@@ -82,19 +82,22 @@ namespace Ntreev.Crema.Services.Users
             });
         }
 
-        public void InvokeUserCreate(Authentication authentication, UserSerializationInfo userInfo)
+        public Task InvokeUserCreateAsync(Authentication authentication, UserSerializationInfo userInfo)
         {
             var message = EventMessageBuilder.CreateUser(authentication, userInfo.ID, userInfo.Name);
-            try
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.CreateUser(userInfo);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    this.Repository.CreateUser(userInfo);
+                    this.Repository.Commit(authentication, message);
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public void InvokeUserRename(Authentication authentication, User user, string newName)
@@ -102,79 +105,128 @@ namespace Ntreev.Crema.Services.Users
             throw new NotImplementedException();
         }
 
-        public void InvokeUserMove(Authentication authentication, User user, string categoryPath)
+        public Task<SignatureDate> InvokeUserMoveAsync(Authentication authentication, User user, string categoryPath)
         {
             var message = EventMessageBuilder.MoveUser(authentication, user.ID, user.UserName, user.Category.Path, categoryPath);
-            try
+            var serializationInfo = user.SerializationInfo;
+            var itemPath = user.ItemPath;
+            var categoryItemPath = this.Context.GenerateCategoryPath(categoryPath);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.MoveUser(authentication, user, categoryPath);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    serializationInfo.CategoryPath = categoryPath;
+                    serializationInfo.ModificationInfo = signatureDate;
+                    this.Repository.MoveUser(signatureDate, itemPath, serializationInfo, categoryItemPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeUserDelete(Authentication authentication, User user)
+        public Task<SignatureDate> InvokeUserDeleteAsync(Authentication authentication, User user)
         {
             var message = EventMessageBuilder.DeleteUser(authentication, user.ID);
-            try
+            var itemPath = user.ItemPath;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.DeleteUser(authentication, user);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.DeleteUser(itemPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeUserChange(Authentication authentication, User user, UserSerializationInfo userInfo)
+        public Task<UserSerializationInfo> InvokeUserChangeAsync(Authentication authentication, User user, SecureString password, SecureString newPassword, string userName, Authority? authority)
         {
-            var message = EventMessageBuilder.ChangeUserInfo(authentication, userInfo.ID, userInfo.Name);
-            try
+            var message = EventMessageBuilder.ChangeUserInfo(authentication, user.ID, user.Name);
+            var itemPath = user.ItemPath;
+            var serializationInfo = user.SerializationInfo;
+            if (newPassword != null)
+                serializationInfo.Password = UserContext.SecureStringToString(newPassword).Encrypt();
+            if (userName != null)
+                serializationInfo.Name = userName;
+            if (authority.HasValue)
+                serializationInfo.Authority = authority.Value;
+
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.ModifyUser(authentication, user, userInfo);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    serializationInfo.ModificationInfo = signatureDate;
+                    this.Repository.ModifyUser(itemPath, serializationInfo);
+                    this.Repository.Commit(authentication, message);
+                    return serializationInfo;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeUserBan(Authentication authentication, User user, UserSerializationInfo userSerializationInfo)
+        public Task<BanInfo> InvokeUserBanAsync(Authentication authentication, User user, string comment)
         {
-            var message = EventMessageBuilder.BanUser(authentication, user.ID, user.UserName, userSerializationInfo.BanInfo.Comment);
-            try
+            var message = EventMessageBuilder.BanUser(authentication, user.ID, user.UserName, comment);
+            var itemPath = user.ItemPath;
+            var banInfo = new BanInfo() { Path = user.Path, Comment = comment };
+            var serializationInfo = user.SerializationInfo;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.ModifyUser(authentication, user, userSerializationInfo);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    banInfo.SignatureDate = signatureDate;
+                    serializationInfo.BanInfo = (BanSerializationInfo)banInfo;
+                    this.Repository.ModifyUser(itemPath, serializationInfo);
+                    this.Repository.Commit(authentication, message);
+                    return banInfo;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeUserUnban(Authentication authentication, User user, UserSerializationInfo userSerializationInfo)
+        public Task<SignatureDate> InvokeUserUnbanAsync(Authentication authentication, User user)
         {
             var message = EventMessageBuilder.UnbanUser(authentication, user.ID, user.UserName);
-            try
+            var itemPath = user.ItemPath;
+            var serializationInfo = user.SerializationInfo;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.ModifyUser(authentication, user, userSerializationInfo);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    serializationInfo.BanInfo = (BanSerializationInfo)BanInfo.Empty;
+                    this.Repository.ModifyUser(itemPath, serializationInfo);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public void InvokeUserKick(Authentication authentication, User user, string comment)

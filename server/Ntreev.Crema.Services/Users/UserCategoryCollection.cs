@@ -43,85 +43,107 @@ namespace Ntreev.Crema.Services.Users
 
         }
 
-        public Task<UserCategory> AddNewAsync(Authentication authentication, string name, string parentPath)
+        public async Task<UserCategory> AddNewAsync(Authentication authentication, string name, string parentPath)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            return await await this.Dispatcher.InvokeAsync(AddNew);
+
+            async Task<UserCategory> AddNew()
             {
                 this.ValidateAddNew(authentication, name, parentPath);
-                this.InvokeCategoryCreate(authentication, name, parentPath);
+                await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
                 this.Sign(authentication);
                 var category = this.BaseAddNew(name, parentPath, authentication);
                 this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
                 return category;
-            });
+            }
         }
 
-        public void InvokeCategoryCreate(Authentication authentication, string name, string parentPath)
+        public Task InvokeCategoryCreateAsync(Authentication authentication, string name, string parentPath)
         {
             var categoryName = new CategoryName(parentPath, name);
             var itemPath = this.Context.GenerateCategoryPath(parentPath, name);
             var message = EventMessageBuilder.CreateUserCategory(authentication, categoryName);
-            try
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                Directory.CreateDirectory(itemPath);
-                this.Repository.Add(itemPath);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                DirectoryUtility.Delete(itemPath);
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    this.Repository.CreateCategory(authentication, itemPath);
+                    this.Repository.Commit(authentication, message);
+                }
+                catch
+                {
+                    DirectoryUtility.Delete(itemPath);
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeCategoryRename(Authentication authentication, UserCategory category, string name)
+        public Task InvokeCategoryRenameAsync(Authentication authentication, UserCategory category, string name)
         {
-            var categoryName = new CategoryName(category.Path) { Name = name, };
+            var categoryPath = category.Path;
+            var newCategoryName = new CategoryName(category.Path) { Name = name, };
             var message = EventMessageBuilder.RenameUserCategory(authentication, category.Path, name);
-            try
+            var query = from User item in this.Context.Users
+                        where item.Category.Path.StartsWith(category.Path)
+                        select item.SerializationInfo;
+            var users = query.ToArray();
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                
-                this.Repository.RenameCategory(authentication, category, categoryName);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    this.Repository.RenameCategory(authentication, users, categoryPath, newCategoryName);
+                    this.Repository.Commit(authentication, message);
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeCategoryMove(Authentication authentication, UserCategory category, string parentPath)
+        public Task InvokeCategoryMoveAsync(Authentication authentication, UserCategory category, string parentPath)
         {
-            var categoryName = new CategoryName(parentPath, category.Name);
+            var categoryPath = category.Path;
+            var newCategoryName = new CategoryName(parentPath, category.Name);
             var message = EventMessageBuilder.MoveUserCategory(authentication, category.Path, category.Parent.Path, parentPath);
-            try
+            var query = from User item in this.Context.Users
+                        where item.Category.Path.StartsWith(category.Path)
+                        select item.SerializationInfo;
+            var users = query.ToArray();
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                
-                this.Repository.MoveCategory(authentication, category, categoryName);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    this.Repository.MoveCategory(authentication, users, categoryPath, newCategoryName);
+                    this.Repository.Commit(authentication, message);
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeCategoryDelete(Authentication authentication, UserCategory category)
+        public Task InvokeCategoryDeleteAsync(Authentication authentication, UserCategory category)
         {
             var message = EventMessageBuilder.DeleteUserCategory(authentication, category.Path);
-            try
+            var itemPath = category.ItemPath;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Delete(category.ItemPath);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    this.Repository.Delete(itemPath);
+                    this.Repository.Commit(authentication, message);
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public void InvokeCategoriesCreatedEvent(Authentication authentication, UserCategory[] categories)

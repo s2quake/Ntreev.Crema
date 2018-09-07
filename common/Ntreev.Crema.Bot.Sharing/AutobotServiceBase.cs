@@ -25,6 +25,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Security;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Bot
@@ -34,11 +35,7 @@ namespace Ntreev.Crema.Bot
         private const string masterBotID = "Smith";
         private readonly ICremaHost cremaHost;
         private readonly IEnumerable<ITaskProvider> taskProviders;
-        private readonly List<AutobotBase> botList = new List<AutobotBase>();
-        private readonly List<Task> taskList = new List<Task>();
-        //private bool isPlaying;
-        //private bool isStopping;
-        private CremaDispatcher dispatcher;
+        private readonly Dictionary<string, AutobotBase> botByID = new Dictionary<string, AutobotBase>();
 
         protected AutobotServiceBase(ICremaHost cremaHost, IEnumerable<ITaskProvider> taskProviders)
         {
@@ -47,77 +44,93 @@ namespace Ntreev.Crema.Bot
             this.taskProviders = taskProviders;
         }
 
-        public void AddAutobot(Authentication authentication, string autobotID)
+        public async Task CreateAutobotAsync(Authentication authentication, string autobotID)
         {
-            this.AddAutobot(authentication, autobotID, RandomUtility.NextEnum<Authority>());
-        }
+            if (this.IsPlaying == false || this.IsClosing == true)
+                throw new InvalidOperationException();
 
-        public void AddAutobot(Authentication authentication, string autobotID, Authority authority)
-        {
-            this.dispatcher.VerifyAccess();
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-
-                if (this.botList.Any(item => item.AutobotID == autobotID) == true)
-                    return;
-
-                userContext.Dispatcher.Invoke(() =>
-                {
-                    if (userContext.Categories.Contains("/autobots/") == false)
-                    {
-                        userContext.Root.AddNewCategory(authentication, "autobots");
-                    }
-
-                    if (userContext.Users.Contains(autobotID) == false)
-                    {
-                        userContext.Categories["/autobots/"].AddNewUser(authentication, autobotID, StringUtility.ToSecureString("1111"), autobotID, authority);
-                    }
-                });
+                if (this.botByID.ContainsKey(autobotID) == true)
+                    throw new InvalidOperationException();
 
                 var autobot = this.CreateInstance(autobotID);
                 autobot.AllowException = this.AllowException;
-                this.botList.Add(autobot);
-                this.taskList.Add(autobot.ExecuteAsync(this.taskProviders));
+                this.botByID.Add(autobotID, autobot);
+                autobot.Disposed += Autobot_Disposed;
+                autobot.ExecuteAsync(this.taskProviders);
+            });
+        }
+
+        public async Task StartAsync(Authentication authentication)
+        {
+            if (this.IsPlaying == true || this.IsClosing == true)
+                throw new InvalidOperationException();
+
+            this.IsPlaying = true;
+            var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            if (await userContext.Dispatcher.InvokeAsync(() => userContext.Categories.Contains("/autobots/")) == false)
+            {
+                await userContext.Root.AddNewCategoryAsync(authentication, "autobots");
+            }
+            if (await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Contains(masterBotID)) == false)
+            {
+                var category = userContext.Categories["/autobots/"];
+                await category.AddNewUserAsync(authentication, masterBotID, StringUtility.ToSecureString("1111"), masterBotID, Authority.Admin);
+            }
+
+
+            var autobotIDList = new List<string>();
+
+            for (var i = 0; i < 3; i++)
+            {
+                var autobotID = $"Autobot{RandomUtility.Next(1000)}";
+                var authority = RandomUtility.NextEnum<Authority>();
+                //var authentication = context.Authentication;
+                //var userContext = autobot.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
+                if (await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Contains(autobotID)) == false)
+                {
+                    var category = userContext.Categories["/autobots/"];
+                    await category.AddNewUserAsync(authentication, autobotID, StringUtility.ToSecureString("1111"), autobotID, authority);
+                }
+                autobotIDList.Add(autobotID);
+            }
+
+            this.Dispatcher = new CremaDispatcher(this);
+            await this.CreateAutobotAsync(authentication, masterBotID);
+            foreach (var item in autobotIDList)
+            {
+                await this.CreateAutobotAsync(authentication, item);
             }
         }
 
-        public void AddAutobot(Authentication authentication)
+        public async Task StopAsync()
         {
-            this.AddAutobot(authentication, $"Autobot{RandomUtility.Next(1000)}");
-        }
-
-        public void Start(Authentication authentication)
-        {
-            if (this.dispatcher != null)
+            if (this.IsPlaying == false || this.IsClosing == true)
                 throw new InvalidOperationException();
 
-            this.dispatcher = new CremaDispatcher(this);
-            this.dispatcher.Invoke(() => this.AddAutobot(authentication, masterBotID, Authority.Admin));
-        }
-
-        public void Stop()
-        {
-            if (this.dispatcher == null)
-                throw new InvalidOperationException();
-            this.dispatcher.VerifyAccess();
-            foreach (var item in this.botList.ToArray())
+            this.IsPlaying = false;
+            this.IsClosing = true;
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Dispatcher.Dispose();
+                this.Dispatcher = null;
+            });
+            foreach (var item in this.botByID.Values)
             {
                 item.Cancel();
             }
-            Task.WaitAll(this.taskList.ToArray());
-            foreach (var item in this.botList.ToArray())
+            while (this.botByID.Any())
             {
-                (item as IDisposable).Dispose();
+                Thread.Sleep(1);
             }
-            this.taskList.Clear();
-            this.dispatcher.Dispose();
-            this.dispatcher = null;
+            this.botByID.Clear();
+            this.IsClosing = false;
         }
 
-        public bool IsPlaying
-        {
-            get { return this.dispatcher != null; }
-        }
+        public bool IsPlaying { get; private set; }
+
+        public bool IsClosing { get; private set; }
 
         public ITaskProvider[] TaskProviders
         {
@@ -129,20 +142,24 @@ namespace Ntreev.Crema.Bot
             get; set;
         }
 
-        public CremaDispatcher Dispatcher => this.dispatcher;
+        public CremaDispatcher Dispatcher { get; private set; }
 
         protected abstract AutobotBase CreateInstance(string autobotID);
 
+        private void Autobot_Disposed(object sender, EventArgs e)
+        {
+            if (sender is AutobotBase autobot)
+            {
+                lock (this.botByID)
+                {
+                    this.botByID.Remove(autobot.AutobotID);
+                }
+            }
+        }
+
         private void CremaHost_Closing(object sender, EventArgs e)
         {
-            this.dispatcher.Invoke(() =>
-            {
-                foreach (var item in this.botList)
-                {
-                    item.Cancel();
-                }
-                Task.WaitAll(this.taskList.ToArray());
-            });
+            this.StopAsync().Wait();
         }
     }
 }

@@ -20,83 +20,84 @@ using Ntreev.Library.Random;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Random
 {
     public static class TypeMemberExtensions
     {
-        public static void InitializeRandom(this ITypeMember typeMember, Authentication authentication)
+        public static async Task InitializeRandomAsync(this ITypeMember typeMember, Authentication authentication)
         {
             if (typeMember.Template.IsFlag == true)
-                typeMember.SetValue(authentication, RandomUtility.NextBit());
+                await typeMember.SetValueAsync(authentication, RandomUtility.NextBit());
             else if (RandomUtility.Within(95) == true)
-                typeMember.SetValue(authentication, (long)typeMember.Template.Count);
+                await typeMember.SetValueAsync(authentication, (long)typeMember.Template.Count);
             else
-                typeMember.SetValue(authentication, RandomUtility.NextLong(long.MaxValue));
+                await typeMember.SetValueAsync(authentication, RandomUtility.NextLong(long.MaxValue));
 
             if (RandomUtility.Within(50) == true)
-                typeMember.SetComment(authentication, RandomUtility.NextString());
+                await typeMember.SetCommentAsync(authentication, RandomUtility.NextString());
         }
 
-        public static void ModifyRandomValue(this ITypeMember typeMember, Authentication authentication)
+        public static async Task ModifyRandomValueAsync(this ITypeMember typeMember, Authentication authentication)
         {
             if (RandomUtility.Within(75) == true)
             {
-                SetRandomName(typeMember, authentication);
+                await SetRandomNameAsync(typeMember, authentication);
             }
             else if (RandomUtility.Within(75) == true)
             {
-                SetRandomValue(typeMember, authentication);
+                await SetRandomValueAsync(typeMember, authentication);
             }
             else
             {
-                SetRandomComment(typeMember, authentication);
+                await SetRandomCommentAsync(typeMember, authentication);
             }
         }
 
-        public static void ExecuteRandomTask(this ITypeMember typeMember, Authentication authentication)
+        public static async Task ExecuteRandomTaskAsync(this ITypeMember typeMember, Authentication authentication)
         {
             if (RandomUtility.Within(75) == true)
             {
-                SetRandomName(typeMember, authentication);
+                await SetRandomNameAsync(typeMember, authentication);
             }
             else if (RandomUtility.Within(75) == true)
             {
-                SetRandomValue(typeMember, authentication);
+                await SetRandomValueAsync(typeMember, authentication);
             }
             else
             {
-                SetRandomComment(typeMember, authentication);
+                await SetRandomCommentAsync(typeMember, authentication);
             }
         }
 
-        public static void SetRandomName(this ITypeMember typeMember, Authentication authentication)
+        public static async Task SetRandomNameAsync(this ITypeMember typeMember, Authentication authentication)
         {
             var newName = RandomUtility.NextIdentifier();
-            typeMember.SetName(authentication, newName);
+            await typeMember.SetNameAsync(authentication, newName);
         }
 
-        public static void SetRandomValue(this ITypeMember typeMember, Authentication authentication)
+        public static async Task SetRandomValueAsync(this ITypeMember typeMember, Authentication authentication)
         {
             if (typeMember.Template.IsFlag == true)
             {
-                typeMember.SetValue(authentication, RandomUtility.NextBit());
+                await typeMember.SetValueAsync(authentication, RandomUtility.NextBit());
             }
             else
             {
-                typeMember.SetValue(authentication, RandomUtility.NextLong(long.MaxValue));
+                await typeMember.SetValueAsync(authentication, RandomUtility.NextLong(long.MaxValue));
             }
         }
 
-        public static void SetRandomComment(this ITypeMember typeMember, Authentication authentication)
+        public static async Task SetRandomCommentAsync(this ITypeMember typeMember, Authentication authentication)
         {
             if (RandomUtility.Within(50) == true)
             {
-                typeMember.SetComment(authentication, RandomUtility.NextString());
+                await typeMember.SetCommentAsync(authentication, RandomUtility.NextString());
             }
             else
             {
-                typeMember.SetComment(authentication, string.Empty);
+                await typeMember.SetCommentAsync(authentication, string.Empty);
             }
         }
     }

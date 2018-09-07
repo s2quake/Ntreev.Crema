@@ -36,15 +36,9 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass(Weight = 10)]
     public class IUserCategoryTask : ITaskProvider
     {
-        private readonly ICremaHost cremaHost;
-        private IUserContext userContext;
-
-        [ImportingConstructor]
-        public IUserCategoryTask(ICremaHost cremaHost)
+        public IUserCategoryTask()
         {
-            this.cremaHost = cremaHost;
-            this.cremaHost.Opened += CremaHost_Opened;
-            this.cremaHost.Closed += CremaHost_Closed;
+
         }
 
         public async Task InvokeAsync(TaskContext context)
@@ -54,6 +48,7 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 context.Pop(category);
             }
+            await Task.Delay(0);
         }
 
         public Type TargetType
@@ -108,31 +103,25 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (EnumerableUtility.Descendants<IUserItem, IUser>(category as IUserItem, item => item.Childs).Any() == true)
                     return;
             }
-            category.Delete(context.Authentication);
+            await category.DeleteAsync(context.Authentication);
             context.Complete(category);
         }
 
         [TaskMethod(Weight = 10)]
-        public void AddNewCategory(IUserCategory category, TaskContext context)
+        public async Task AddNewCategoryAsync(IUserCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
-            {
-                var categoryName = RandomUtility.NextIdentifier();
-                category.AddNewCategory(context.Authentication, categoryName);
-            });
+            var categoryName = RandomUtility.NextIdentifier();
+            await category.AddNewCategoryAsync(context.Authentication, categoryName);
         }
 
         [TaskMethod]
-        public void AddNewUser(IUserCategory category, TaskContext context)
+        public async Task AddNewUserAsync(IUserCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
-            {
-                var index = RandomUtility.Next(int.MaxValue);
-                var authority = RandomUtility.NextEnum<Authority>();
-                var userID = $"{authority.ToString().ToLower()}_bot_{index}";
-                var userName = "봇" + index;
-                category.AddNewUser(context.Authentication, userID, ToSecureString("1111"), userName, authority);
-            });
+            var index = RandomUtility.Next(int.MaxValue);
+            var authority = RandomUtility.NextEnum<Authority>();
+            var userID = $"{authority.ToString().ToLower()}_bot_{index}";
+            var userName = "봇" + index;
+            await category.AddNewUserAsync(context.Authentication, userID, ToSecureString("1111"), userName, authority);
         }
 
         private static SecureString ToSecureString(string value)
@@ -143,16 +132,6 @@ namespace Ntreev.Crema.Bot.Tasks
                 secureString.AppendChar(item);
             }
             return secureString;
-        }
-
-        private void CremaHost_Opened(object sender, EventArgs e)
-        {
-            this.userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-        }
-
-        private void CremaHost_Closed(object sender, EventArgs e)
-        {
-            this.userContext = null;
         }
     }
 }

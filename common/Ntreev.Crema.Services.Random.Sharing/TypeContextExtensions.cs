@@ -23,6 +23,7 @@ using Ntreev.Library.Random;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Random
 {
@@ -36,70 +37,70 @@ namespace Ntreev.Crema.Services.Random
             MaxTypeCategoryCount = 20;
         }
 
-        public static void AddRandomItems(this ITypeContext typeContext, Authentication authentication)
+        public static async Task AddRandomItemsAsync(this ITypeContext typeContext, Authentication authentication)
         {
-            AddRandomCategories(typeContext, authentication);
-            AddRandomTypes(typeContext, authentication);
+            await AddRandomCategoriesAsync(typeContext, authentication);
+            await AddRandomTypesAsync(typeContext, authentication);
         }
 
-        public static void AddRandomCategories(this ITypeContext typeContext, Authentication authentication)
+        public static Task AddRandomCategoriesAsync(this ITypeContext typeContext, Authentication authentication)
         {
-            AddRandomCategories(typeContext, authentication, RandomUtility.Next(MinTypeCategoryCount, MaxTypeCategoryCount));
+            return AddRandomCategoriesAsync(typeContext, authentication, RandomUtility.Next(MinTypeCategoryCount, MaxTypeCategoryCount));
         }
 
-        public static void AddRandomCategories(this ITypeContext typeContext, Authentication authentication, int tryCount)
+        public static async Task AddRandomCategoriesAsync(this ITypeContext typeContext, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                typeContext.AddRandomCategory(authentication);
+                await typeContext.AddRandomCategoryAsync(authentication);
             }
         }
 
-        public static ITypeCategory AddRandomCategory(this ITypeCategory category, Authentication authentication)
+        public static Task<ITypeCategory> AddRandomCategoryAsync(this ITypeCategory category, Authentication authentication)
         {
             var categoryName = RandomUtility.NextIdentifier();
-            return category.AddNewCategory(authentication, categoryName);
+            return category.AddNewCategoryAsync(authentication, categoryName);
         }
 
-        public static ITypeCategory AddRandomCategory(this ITypeContext typeContext, Authentication authentication)
+        public static Task<ITypeCategory> AddRandomCategoryAsync(this ITypeContext typeContext, Authentication authentication)
         {
             if (RandomUtility.Within(33) == true)
             {
-                return typeContext.Root.AddRandomCategory(authentication);
+                return typeContext.Root.AddRandomCategoryAsync(authentication);
             }
             else
             {
                 var category = typeContext.Categories.Random();
                 if (GetLevel(category, (i) => i.Parent) > 4)
                     return null;
-                return category.AddRandomCategory(authentication);
+                return category.AddRandomCategoryAsync(authentication);
             }
         }
 
-        public static void AddRandomTypes(this ITypeContext typeContext, Authentication authentication)
+        public static Task AddRandomTypesAsync(this ITypeContext typeContext, Authentication authentication)
         {
-            AddRandomTypes(typeContext, authentication, RandomUtility.Next(MinTypeCount, MaxTypeCount));
+            return AddRandomTypesAsync(typeContext, authentication, RandomUtility.Next(MinTypeCount, MaxTypeCount));
         }
 
-        public static void AddRandomTypes(this ITypeContext typeContext, Authentication authentication, int tryCount)
+        public static async Task AddRandomTypesAsync(this ITypeContext typeContext, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                AddRandomType(typeContext, authentication);
+                await AddRandomTypeAsync(typeContext, authentication);
             }
         }
 
-        public static IType AddRandomType(this ITypeContext typeContext, Authentication authentication)
+        public static Task<IType> AddRandomTypeAsync(this ITypeContext typeContext, Authentication authentication)
         {
             var category = typeContext.Categories.Random();
-            return AddRandomType(category, authentication);
+            return AddRandomTypeAsync(category, authentication);
         }
 
-        public static IType AddRandomType(this ITypeCategory category, Authentication authentication)
+        public static async Task<IType> AddRandomTypeAsync(this ITypeCategory category, Authentication authentication)
         {
-            var template = category.NewType(authentication);
-            template.InitializeRandom(authentication);
-            template.EndEdit(authentication);
+            var template = await category.NewTypeAsync(authentication);
+            await template.InitializeRandomAsync(authentication);
+            await template.EndEditAsync(authentication);
             return template.Type;
         }
 

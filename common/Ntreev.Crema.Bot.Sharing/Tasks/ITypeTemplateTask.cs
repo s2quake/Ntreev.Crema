@@ -34,28 +34,25 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     class ITypeTemplateTask : ITaskProvider
     {
-        public Task InvokeAsync(TaskContext context)
+        public async Task InvokeAsync(TaskContext context)
         {
             var template = context.Target as ITypeTemplate;
             if (context.IsCompleted(template) == true)
             {
-                template.Dispatcher.Invoke(() =>
+                try
                 {
-                    try
+                    if (template.Domain != null)
                     {
-                        if (template.Domain != null)
-                        {
-                            if (Verify() == true)
-                                template.EndEdit(context.Authentication);
-                            else
-                                template.CancelEdit(context.Authentication);
-                        }
+                        if (Verify() == true)
+                            await template.EndEditAsync(context.Authentication);
+                        else
+                            await template.CancelEditAsync(context.Authentication);
                     }
-                    catch
-                    {
-                        template.CancelEdit(context.Authentication);
-                    }
-                });
+                }
+                catch
+                {
+                    await template.CancelEditAsync(context.Authentication);
+                }
 
                 context.Pop(template);
                 context.Complete(context.Target);
@@ -71,38 +68,32 @@ namespace Ntreev.Crema.Bot.Tasks
             }
             else
             {
-                template.Dispatcher.Invoke(() =>
+                if (template.Domain == null)
                 {
-                    if (template.Domain == null)
-                    {
-                        if (Verify() == false)
-                            return;
-                        template.BeginEdit(context.Authentication);
-                    }
-                    bool Verify()
-                    {
-                        if (context.AllowException == true)
-                            return true;
-                        if (this.CanEdit(template) == false)
-                            return false;
+                    if (Verify() == false)
+                        return;
+                    await template.BeginEditAsync(context.Authentication);
+                }
+                bool Verify()
+                {
+                    if (context.AllowException == true)
                         return true;
-                    }
-                });
+                    if (this.CanEdit(template) == false)
+                        return false;
+                    return true;
+                }
 
-                template.Dispatcher.Invoke(() =>
+                if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
                 {
-                    if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
-                    {
-                        var member = template.AddNew(context.Authentication);
-                        context.Push(member);
-                        context.State = System.Data.DataRowState.Detached;
-                    }
-                    else
-                    {
-                        var member = template.Random();
-                        context.Push(member);
-                    }
-                });
+                    var member = template.AddNewAsync(context.Authentication);
+                    context.Push(member);
+                    context.State = System.Data.DataRowState.Detached;
+                }
+                else
+                {
+                    var member = template.Random();
+                    context.Push(member);
+                }
             }
         }
 
@@ -117,33 +108,24 @@ namespace Ntreev.Crema.Bot.Tasks
         }
 
         [TaskMethod(Weight = 10)]
-        public void SetTypeName(ITypeTemplate template, TaskContext context)
+        public async Task SetTypeNameAsync(ITypeTemplate template, TaskContext context)
         {
-            template.Dispatcher.Invoke(() =>
-            {
-                var tableName = RandomUtility.NextIdentifier();
-                template.SetTypeName(context.Authentication, tableName);
-            });
+            var tableName = RandomUtility.NextIdentifier();
+            await template.SetTypeNameAsync(context.Authentication, tableName);
         }
 
         [TaskMethod(Weight = 10)]
-        public void SetIsFlag(ITypeTemplate template, TaskContext context)
+        public async Task SetIsFlagAsync(ITypeTemplate template, TaskContext context)
         {
-            template.Dispatcher.Invoke(() =>
-            {
-                var isFlag = RandomUtility.NextBoolean();
-                template.SetIsFlag(context.Authentication, isFlag);
-            });
+            var isFlag = RandomUtility.NextBoolean();
+            await template.SetIsFlagAsync(context.Authentication, isFlag);
         }
 
         [TaskMethod(Weight = 10)]
-        public void SetComment(ITypeTemplate template, TaskContext context)
+        public async Task SetCommentAsync(ITypeTemplate template, TaskContext context)
         {
-            template.Dispatcher.Invoke(() =>
-            {
-                var comment = RandomUtility.NextString();
-                template.SetComment(context.Authentication, comment);
-            });
+            var comment = RandomUtility.NextString();
+            await template.SetCommentAsync(context.Authentication, comment);
         }
 
         private bool CanEdit(ITypeTemplate template)

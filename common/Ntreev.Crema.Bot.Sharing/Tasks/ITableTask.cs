@@ -183,7 +183,7 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 1)]
         public async Task DeleteAsync(ITable table, TaskContext context)
         {
-            
+            await Task.Delay(0);
         }
 
         [TaskMethod]

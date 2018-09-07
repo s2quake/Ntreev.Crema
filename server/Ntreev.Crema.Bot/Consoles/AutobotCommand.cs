@@ -42,16 +42,16 @@ namespace Ntreev.Crema.Bot.Consoles
         }
 
         [CommandMethod]
-        public void Start()
+        public async Task StartAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            this.AutobotService.Start(authentication);
+            await this.AutobotService.StartAsync(authentication);
         }
 
         [CommandMethod]
-        public void Stop()
+        public async Task StopAsync()
         {
-            this.AutobotService.Stop();
+            await this.AutobotService.StopAsync();
         }
 
         public override bool IsEnabled
@@ -66,11 +66,11 @@ namespace Ntreev.Crema.Bot.Consoles
 
         protected override bool IsMethodEnabled(CommandMethodDescriptor descriptor)
         {
-            if (descriptor.DescriptorName == nameof(Start))
+            if (descriptor.DescriptorName == nameof(StartAsync))
             {
                 return this.autobotService.Value.IsPlaying == false;
             }
-            else if (descriptor.DescriptorName == nameof(Stop))
+            else if (descriptor.DescriptorName == nameof(StopAsync))
             {
                 return this.autobotService.Value.IsPlaying == true;
             }

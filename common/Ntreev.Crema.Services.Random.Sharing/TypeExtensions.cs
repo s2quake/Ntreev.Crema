@@ -20,19 +20,22 @@ using Ntreev.Library.Random;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Random
 {
     public static class TypeExtensions
     {
-        public static string GetRandomString(this IType type)
+        public static async Task<string> GetRandomStringAsync(this IType type)
         {
+            var typeInfo = await type.Dispatcher.InvokeAsync(() => type.TypeInfo);
             return type.TypeInfo.Members.Random().Name;
         }
 
-        public static object GetRandomValue(this IType type)
+        public static async Task<object> GetRandomValueAsync(this IType type)
         {
-            return type.TypeInfo.Members.Random().Name;
+            var typeInfo = await type.Dispatcher.InvokeAsync(() => type.TypeInfo);
+            return typeInfo.Members.Random().Name;
         }
     }
 }

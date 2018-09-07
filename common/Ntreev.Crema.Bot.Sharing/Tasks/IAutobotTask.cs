@@ -34,13 +34,9 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     class IAutobotTask : ITaskProvider
     {
-        private readonly CremaDispatcher dispatcher;
-
-        private Dictionary<Authentication, AutobotBase> autobots = new Dictionary<Authentication, AutobotBase>();
-
         public IAutobotTask()
         {
-            this.dispatcher = new CremaDispatcher(this, System.Windows.Threading.Dispatcher.CurrentDispatcher);
+
         }
 
         public async Task InvokeAsync(TaskContext context)
@@ -50,13 +46,15 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (autobot.IsOnline == true)
                 {
                     var cremaHost = autobot.CremaHost;
-                    context.Push(autobot.CremaHost.DataBases);
-                    if (RandomUtility.Within(75) == true)
-                    {
-                        var dataBase = await autobot.CremaHost.Dispatcher.InvokeAsync(() => autobot.CremaHost.DataBases.Random());
-                        context.Push(dataBase);
-                    }
-                    else if (RandomUtility.Within(75) == true)
+                    //context.Push(autobot.CremaHost.DataBases);
+                    //if (RandomUtility.Within(75) == true)
+                    //{
+                    //    var dataBase = await autobot.CremaHost.Dispatcher.InvokeAsync(() => autobot.CremaHost.DataBases.Random());
+                    //    context.Push(dataBase);
+                    //}
+                    //else if (RandomUtility.Within(75) == true)
+
+                    if (RandomUtility.Within(25) == true && autobot.AutobotID == "Smith")
                     {
                         var userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
                         if (RandomUtility.Within(75) == true)
@@ -64,80 +62,71 @@ namespace Ntreev.Crema.Bot.Tasks
                             var user = await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Random());
                             context.Push(user);
                         }
-                        else
-                        {
-                            var category = await userContext.Dispatcher.InvokeAsync(() => userContext.Categories.Random());
-                            context.Push(category);
-                        }
+                        //else
+                        //{
+                        //    var category = await userContext.Dispatcher.InvokeAsync(() => userContext.Categories.Random());
+                        //    context.Push(category);
+                        //}
                     }
-                    else if (RandomUtility.Within(10) == true)
-                    {
-                        var dataBase = autobot.CremaHost.Dispatcher.Invoke(() => autobot.CremaHost.DataBases);
-                        context.Push(dataBase);
-                    }
+                    //else if (RandomUtility.Within(10) == true)
+                    //{
+                    //    var dataBase = autobot.CremaHost.Dispatcher.Invoke(() => autobot.CremaHost.DataBases);
+                    //    context.Push(dataBase);
+                    //}
                 }
             }
         }
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.dispatcher; }
-        }
+        public Type TargetType => typeof(AutobotBase);
 
-        public Type TargetType
-        {
-            get { return typeof(AutobotBase); }
-        }
-
-        public bool IsEnabled
-        {
-            get { return true; }
-        }
+        public bool IsEnabled => true;
 
         [TaskMethod]
-        public void Login(AutobotBase autobot, TaskContext context)
+        public async Task LoginAsync(AutobotBase autobot, TaskContext context)
         {
             if (autobot.IsOnline == false)
             {
-                this.autobots[autobot.Login()] = autobot;
+                await autobot.LoginAsync();
             }
         }
 
         [TaskMethod(Weight = 30)]
-        public void Logout(AutobotBase autobot, TaskContext context)
+        public async Task LogoutAsync(AutobotBase autobot, TaskContext context)
         {
             if (autobot.IsOnline == true && context.IsCompleted(autobot) == true)
             {
-                var authentication = context.Authentication;
-                autobot.Logout();
-                this.autobots.Remove(authentication);
+                await autobot.LogoutAsync();
             }
         }
 
         [TaskMethod]
-        public void Wait(AutobotBase autobot, TaskContext context)
+        public async Task WaitAsync(AutobotBase autobot, TaskContext context)
         {
-
+            var sleep = RandomUtility.Next(autobot.MinSleepTime, autobot.MaxSleepTime);
+            await Task.Delay(sleep);
         }
 
-        [TaskMethod(Weight = 30)]
-        public void AddNewAutoBot(Autobot autobot, TaskContext context)
+        [TaskMethod(Weight = 10)]
+        public async Task CreateAutobotAsync(Autobot autobot, TaskContext context)
         {
-            var service = autobot.Service;
-            if (Verify())
+            if (context.AllowException == false)
             {
-                service.Dispatcher.Invoke(() => autobot.Service.AddAutobot(context.Authentication));
-            }
-            bool Verify()
-            {
-                if (context.AllowException == true)
-                    return true;
                 if (autobot.IsOnline == false)
-                    return false;
+                    return;
                 if (context.Authentication.Authority != Authority.Admin)
-                    return false;
-                return true;
+                    return;
             }
+            var autobotID = $"Autobot{RandomUtility.Next(1000)}";
+            var authority = RandomUtility.NextEnum<Authority>();
+            var authentication = context.Authentication;
+            var userContext = autobot.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            if (await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Contains(autobotID)) == false)
+            {
+                var category = userContext.Categories["/autobots/"];
+                await category.AddNewUserAsync(authentication, autobotID, StringUtility.ToSecureString("1111"), autobotID, authority);
+            }
+
+            await autobot.Service.CreateAutobotAsync(context.Authentication, autobotID);
         }
     }
 }

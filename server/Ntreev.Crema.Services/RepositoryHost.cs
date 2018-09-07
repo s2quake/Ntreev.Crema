@@ -123,7 +123,6 @@ namespace Ntreev.Crema.Services
                 propList.AddRange(properties);
 
             this.Repository.Commit(authentication.ID, comment, propList.ToArray());
-
             this.OnChanged(EventArgs.Empty);
         }
 

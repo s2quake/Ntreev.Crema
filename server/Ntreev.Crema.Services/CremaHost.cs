@@ -316,6 +316,8 @@ namespace Ntreev.Crema.Services
             {
                 throw new InvalidOperationException(Resources.Exception_NotClosed);
             }
+            this.RepositoryDispatcher.Dispose();
+            this.RepositoryDispatcher = null;
             this.Dispatcher.Dispose();
             this.Dispatcher = null;
             this.OnDisposed(EventArgs.Empty);

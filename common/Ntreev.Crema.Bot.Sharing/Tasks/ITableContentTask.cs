@@ -35,7 +35,7 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     class ITableContentTask : ITaskProvider
     {
-        public Task InvokeAsync(TaskContext context)
+        public async Task InvokeAsync(TaskContext context)
         {
             var content = context.Target as ITableContent;
 
@@ -44,55 +44,43 @@ namespace Ntreev.Crema.Bot.Tasks
                 var domain = content.Domain;
                 if (domain != null && RandomUtility.Within(50) == true)
                 {
-                    content.Dispatcher.Invoke(() =>
+                    if (domain.Users.Contains(context.Authentication.ID) == false)
+                        return;
+                    var user = domain.Users[context.Authentication.ID];
+                    var isMember = user.DomainUserState.HasFlag(DomainUserState.Online);
+                    if (isMember == true)
                     {
-                        if (domain.Users.Contains(context.Authentication.ID) == false)
-                            return;
-                        var user = domain.Users[context.Authentication.ID];
-                        var isMember = user.DomainUserState.HasFlag(DomainUserState.Online);
-                        if (isMember == true)
-                        {
-                            content.LeaveEdit(context.Authentication);
-                        }
-                        if (domain.Users.Any() == false)
-                        {
-                            content.EndEdit(context.Authentication);
-                        }
-                    });
+                        await content.LeaveEditAsync(context.Authentication);
+                    }
+                    if (domain.Users.Any() == false)
+                    {
+                        await content.EndEditAsync(context.Authentication);
+                    }
                 }
                 context.Pop(content);
                 context.Complete(context.Target);
             }
             else
             {
-                content.Dispatcher.Invoke(() =>
-                {
-                    if (content.Domain == null)
-                        content.BeginEdit(context.Authentication);
-                });
+                if (content.Domain == null)
+                    await content.BeginEditAsync(context.Authentication);
 
-                content.Dispatcher.Invoke(() =>
+                var domain = content.Domain;
+                var user = domain.Users[context.Authentication.ID];
+                if (user == null || user.DomainUserState.HasFlag(DomainUserState.Online) == false)
                 {
-                    var domain = content.Domain;
-                    var user = domain.Users[context.Authentication.ID];
-                    if (user == null || user.DomainUserState.HasFlag(DomainUserState.Online) == false)
-                    {
-                        content.EnterEdit(context.Authentication);
-                    }
-                });
+                    await content.EnterEditAsync(context.Authentication);
+                }
 
                 if (content.Any() == false || RandomUtility.Within(25) == true)
                 {
-                    content.Dispatcher.Invoke(() =>
+                    var row = await this.AddNewRowAsync(context.Authentication, content);
+                    if (row != null)
                     {
-                        var row = this.AddNewRow(context.Authentication, content);
-                        if (row != null)
-                        {
-                            row.InitializeRandom(context.Authentication);
-                            context.Push(row);
-                            context.State = System.Data.DataRowState.Detached;
-                        }
-                    });
+                        await row.InitializeRandomAsync(context.Authentication);
+                        context.Push(row);
+                        context.State = System.Data.DataRowState.Detached;
+                    }
                 }
                 else
                 {
@@ -102,7 +90,7 @@ namespace Ntreev.Crema.Bot.Tasks
             }
         }
 
-        private ITableRow AddNewRow(Authentication authentication, ITableContent content)
+        private async Task<ITableRow> AddNewRowAsync(Authentication authentication, ITableContent content)
         {
             var table = content.Table;
             var parent = table.Parent;
@@ -111,9 +99,9 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (parent.Content.Any() == false)
                     return null;
                 var relationID = parent.Content.Random().RelationID;
-                return content.AddNew(authentication, relationID);
+                return await content.AddNewAsync(authentication, relationID);
             }
-            return content.AddNew(authentication, null);
+            return await content.AddNewAsync(authentication, null);
         }
 
         public Type TargetType

@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Ntreev.Library;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Random
 {
@@ -34,31 +35,31 @@ namespace Ntreev.Crema.Services.Random
 
         }
 
-        public static void InitializeRandomItems(this IDataBase dataBase, Authentication authentication)
+        public static Task InitializeRandomItemsAsync(this IDataBase dataBase, Authentication authentication)
         {
-            InitializeRandomItems(dataBase, authentication, false);
+            return InitializeRandomItemsAsync(dataBase, authentication, false);
         }
 
-        public static void InitializeRandomItems(this IDataBase dataBase, Authentication authentication, bool transaction)
+        public static async Task InitializeRandomItemsAsync(this IDataBase dataBase, Authentication authentication, bool transaction)
         {
             if (transaction == true)
-                InitializeRandomItemsTransaction(dataBase, authentication);
+                await InitializeRandomItemsTransactionAsync(dataBase, authentication);
             else
-                InitializeRandomItemsStandard(dataBase, authentication);
+                await InitializeRandomItemsStandardAsync(dataBase, authentication);
         }
 
-        private static void InitializeRandomItemsTransaction(this IDataBase dataBase, Authentication authentication)
+        private static async Task InitializeRandomItemsTransactionAsync(this IDataBase dataBase, Authentication authentication)
         {
-            var trans = dataBase.BeginTransaction(authentication);
-            dataBase.TypeContext.AddRandomItems(authentication);
-            dataBase.TableContext.AddRandomItems(authentication);
-            trans.Commit(authentication);
+            var trans = await dataBase.BeginTransactionAsync(authentication);
+            await dataBase.TypeContext.AddRandomItemsAsync(authentication);
+            await dataBase.TableContext.AddRandomItemsAsync(authentication);
+            await trans.CommitAsync(authentication);
         }
 
-        private static void InitializeRandomItemsStandard(this IDataBase dataBase, Authentication authentication)
+        private static async Task InitializeRandomItemsStandardAsync(this IDataBase dataBase, Authentication authentication)
         {
-            dataBase.TypeContext.AddRandomItems(authentication);
-            dataBase.TableContext.AddRandomItems(authentication);
+            await dataBase.TypeContext.AddRandomItemsAsync(authentication);
+            await dataBase.TableContext.AddRandomItemsAsync(authentication);
         }
     }
 }

@@ -49,14 +49,14 @@ namespace Ntreev.Crema.Bot
 
         public override AutobotServiceBase Service => this.service;
 
-        protected override Authentication OnLogin()
+        protected override Task<Authentication> OnLoginAsync()
         {
-            return this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.Login(this.AutobotID, this.password));
+            return this.cremaHost.LoginAsync(this.AutobotID, this.password);
         }
 
-        protected override void OnLogout(Authentication authentication)
+        protected override Task OnLogoutAsync(Authentication authentication)
         {
-            this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.Logout(authentication));
+            return this.cremaHost.LogoutAsync(authentication);
         }
     }
 }

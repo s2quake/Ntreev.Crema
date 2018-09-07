@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Ntreev.Library;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Random
 {
@@ -35,47 +36,47 @@ namespace Ntreev.Crema.Services.Random
             MaxColumnCount = 20;
         }
 
-        public static void InitializeRandom(this ITableTemplate template, Authentication authentication)
+        public static async Task InitializeRandomAsync(this ITableTemplate template, Authentication authentication)
         {
             var tableName = RandomUtility.NextIdentifier();
-            template.SetTableName(authentication, tableName);
+            await template.SetTableNameAsync(authentication, tableName);
             if (RandomUtility.Within(50) == true)
-                template.SetTags(authentication, (TagInfo)TagInfoUtility.Names.Random());
+                await template.SetTagsAsync(authentication, (TagInfo)TagInfoUtility.Names.Random());
             if (RandomUtility.Within(50) == true)
-                template.SetComment(authentication, RandomUtility.NextString());
-            template.AddRandomColumns(authentication);
+                await template.SetCommentAsync(authentication, RandomUtility.NextString());
+            await template.AddRandomColumnsAsync(authentication);
         }
 
-        public static ITableColumn AddRandomColumn(this ITableTemplate template, Authentication authentication)
+        public static async Task<ITableColumn> AddRandomColumnAsync(this ITableTemplate template, Authentication authentication)
         {
-            var column = template.AddNew(authentication);
-            column.InitializeRandom(authentication);
-            template.EndNew(authentication, column);
+            var column = await template.AddNewAsync(authentication);
+            await column.InitializeRandomAsync(authentication);
+            await template.EndNewAsync(authentication, column);
             return column;
         }
 
-        public static void RemoveRandomColumn(this ITableTemplate template, Authentication authentication)
+        public static async Task RemoveRandomColumnAsync(this ITableTemplate template, Authentication authentication)
         {
             var column = template.RandomOrDefault();
-            column?.Delete(authentication);
+            await column?.DeleteAsync(authentication);
         }
 
-        public static void ModifyRandomColumn(this ITableTemplate template, Authentication authentication)
+        public static async Task ModifyRandomColumnAsync(this ITableTemplate template, Authentication authentication)
         {
             var column = template.RandomOrDefault();
-            column?.ModifyRandomValue(authentication);
+            await column?.ModifyRandomValueAsync(authentication);
         }
 
-        public static void AddRandomColumns(this ITableTemplate template, Authentication authentication)
+        public static Task AddRandomColumnsAsync(this ITableTemplate template, Authentication authentication)
         {
-            AddRandomColumns(template, authentication, RandomUtility.Next(MinColumnCount, MaxColumnCount));
+            return AddRandomColumnsAsync(template, authentication, RandomUtility.Next(MinColumnCount, MaxColumnCount));
         }
 
-        public static void AddRandomColumns(this ITableTemplate template, Authentication authentication, int tryCount)
+        public static async Task AddRandomColumnsAsync(this ITableTemplate template, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                AddRandomColumn(template, authentication);
+                await AddRandomColumnAsync(template, authentication);
             }
         }
 

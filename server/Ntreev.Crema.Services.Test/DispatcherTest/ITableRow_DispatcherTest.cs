@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Services.Test.DispatcherTest
                 content.BeginEdit(authentication);
                 content.EnterEdit(authentication);
                 if (content.Count == 0)
-                    content.AddRandomRows(authentication);
+                    content.AddRandomRowsAsync(authentication);
                 row = content.Random();
             });
         }

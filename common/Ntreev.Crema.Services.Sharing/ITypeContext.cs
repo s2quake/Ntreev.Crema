@@ -23,7 +23,7 @@ using System.Collections.Generic;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ITypeContext : IEnumerable<ITypeItem>, IServiceProvider
+    public interface ITypeContext : IEnumerable<ITypeItem>, IServiceProvider, IDispatcherObject
     {
         bool Contains(string itemPath);
 
