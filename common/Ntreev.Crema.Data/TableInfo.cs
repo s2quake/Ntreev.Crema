@@ -63,6 +63,8 @@ namespace Ntreev.Crema.Data
         [DataMember]
         public string CategoryPath { get; set; }
 
+        public string Path => this.CategoryPath + this.Name;
+
         public string ParentName
         {
             get { return CremaDataTable.GetParentName(this.Name); }

@@ -415,14 +415,17 @@ namespace Ntreev.Crema.Services.Users
             this.Dispatcher.Dispose();
         }
 
-        public new void Clear()
+        public Task ClearAsync()
         {
-            foreach (var item in this.Users)
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                if (item.Authentication != null)
-                    item.Authentication.InvokeExpiredEvent(Authentication.System.ID);
-            }
-            base.Clear();
+                foreach (var item in this.Users)
+                {
+                    if (item.Authentication != null)
+                        item.Authentication.InvokeExpiredEvent(Authentication.System.ID);
+                }
+                base.Clear();
+            });
         }
 
         public UserRepositoryHost Repository { get; }

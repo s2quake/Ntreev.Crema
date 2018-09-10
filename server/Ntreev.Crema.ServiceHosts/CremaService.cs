@@ -84,7 +84,7 @@ namespace Ntreev.Crema.ServiceHosts
             this.OnOpened(EventArgs.Empty);
         }
 
-        public void Close()
+        public async Task CloseAsync()
         {
             this.OnClosing(EventArgs.Empty);
             this.StopServices();
@@ -99,7 +99,7 @@ namespace Ntreev.Crema.ServiceHosts
             {
                 this.cremaHost.Opened -= CremaHost_Opened;
                 this.cremaHost.Closing -= CremaHost_Closing;
-                this.cremaHost.Close(this.token);
+                await this.cremaHost.CloseAsync(this.token);
                 this.cremaHost.SaveConfigs();
             }
             this.token = Guid.Empty;
@@ -109,7 +109,7 @@ namespace Ntreev.Crema.ServiceHosts
         public async Task RestartAsync()
         {
             this.StopServices();
-            this.cremaHost.Dispatcher.Invoke(() => this.CremaHost.Close(this.token));
+            await this.CremaHost.CloseAsync(this.token);
             this.cremaHost.SaveConfigs();
             this.token = await this.CremaHost.OpenAsync();
             this.StartServices();

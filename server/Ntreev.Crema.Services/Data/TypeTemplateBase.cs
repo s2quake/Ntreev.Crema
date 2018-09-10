@@ -105,16 +105,16 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task EndEditAsync(Authentication authentication)
+        public async Task EndEditAsync(Authentication authentication)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync));
                     this.ValidateEndEdit(authentication);
                     this.Sign(authentication);
-                    this.OnEndEdit(authentication);
+                    await this.OnEndEditAsync(authentication);
                     this.OnEditEnded(EventArgs.Empty);
                 });
             }
@@ -357,7 +357,7 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        protected virtual void OnEndEdit(Authentication authentication)
+        protected virtual async Task OnEndEditAsync(Authentication authentication)
         {
             this.DetachDomainEvent();
             this.domain.Dispose(authentication, false);
@@ -370,6 +370,7 @@ namespace Ntreev.Crema.Services.Data
             this.isModified = false;
             this.table = null;
             this.members.Clear();
+            await Task.Delay(0);
         }
 
         protected virtual void OnCancelEdit(Authentication authentication)
@@ -462,11 +463,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        private void Domain_Deleted(object sender, DomainDeletedEventArgs e)
+        private async void Domain_Deleted(object sender, DomainDeletedEventArgs e)
         {
             if (e.IsCanceled == false)
             {
-                this.OnEndEdit(e.Authentication);
+                await this.OnEndEditAsync(e.Authentication);
                 this.OnEditEnded(e);
             }
             else

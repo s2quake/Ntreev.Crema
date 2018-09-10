@@ -58,7 +58,7 @@ namespace Ntreev.Crema.Services
 
         void SaveConfigs();
 
-        void Close(Guid token);
+        Task CloseAsync(Guid token);
 
         Task ShutdownAsync(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message);
 

@@ -215,7 +215,6 @@ namespace Ntreev.Crema.Services.Users
                     this.Sign(authentication);
                     var users = new User[] { this };
                     var comments = Enumerable.Repeat(comment, users.Length).ToArray();
-                    this.Container.InvokeUserKick(authentication, this, comment);
                     this.IsOnline = false;
                     this.Authentication.InvokeExpiredEvent(authentication.ID, comment);
                     this.Authentication = null;

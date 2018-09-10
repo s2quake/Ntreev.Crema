@@ -37,11 +37,13 @@ namespace Ntreev.Crema.Services
 
         public void Add(string path)
         {
+            this.Dispatcher.VerifyAccess();
             this.Repository.Add(path);
         }
 
         public void AddRange(string[] paths)
         {
+            this.Dispatcher.VerifyAccess();
             foreach (var item in paths)
             {
                 this.Repository.Add(item);
@@ -50,27 +52,32 @@ namespace Ntreev.Crema.Services
 
         public void Add(string path, string contents)
         {
+            this.Dispatcher.VerifyAccess();
             File.WriteAllText(path, contents, Encoding.UTF8);
             this.Repository.Add(path);
         }
 
         public void Modify(string path, string contents)
         {
+            this.Dispatcher.VerifyAccess();
             File.WriteAllText(path, contents, Encoding.UTF8);
         }
 
         public void Move(string srcPath, string toPath)
         {
+            this.Dispatcher.VerifyAccess();
             this.Repository.Move(srcPath, toPath);
         }
 
         public void Delete(string path)
         {
+            this.Dispatcher.VerifyAccess();
             this.Repository.Delete(path);
         }
 
         public void DeleteRange(string[] paths)
         {
+            this.Dispatcher.VerifyAccess();
             foreach (var item in paths)
             {
                 this.Repository.Delete(item);
@@ -79,26 +86,31 @@ namespace Ntreev.Crema.Services
 
         public void Copy(string srcPath, string toPath)
         {
+            this.Dispatcher.VerifyAccess();
             this.Repository.Copy(srcPath, toPath);
         }
 
         public void Revert()
         {
+            this.Dispatcher.VerifyAccess();
             this.Repository.Revert();
         }
 
         public void BeginTransaction(string author, string name)
         {
+            this.Dispatcher.VerifyAccess();
             this.Repository.BeginTransaction(author, name);
         }
 
         public void EndTransaction()
         {
+            this.Dispatcher.VerifyAccess();
             this.Repository.EndTransaction();
         }
 
         public void CancelTransaction()
         {
+            this.Dispatcher.VerifyAccess();
             this.Repository.CancelTransaction();
         }
 
@@ -114,6 +126,7 @@ namespace Ntreev.Crema.Services
 
         public void Commit(Authentication authentication, string comment, params LogPropertyInfo[] properties)
         {
+            this.Dispatcher.VerifyAccess();
             var propList = new List<LogPropertyInfo>
             {
                 new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion},
@@ -142,6 +155,7 @@ namespace Ntreev.Crema.Services
 
         public RepositoryItem[] Status(params string[] paths)
         {
+            this.Dispatcher.VerifyAccess();
             return this.Repository.Status(paths);
         }
 

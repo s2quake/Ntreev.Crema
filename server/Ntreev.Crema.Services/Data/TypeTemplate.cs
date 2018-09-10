@@ -20,6 +20,7 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Crema.Services.Properties;
 using System;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -78,13 +79,13 @@ namespace Ntreev.Crema.Services.Data
             this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
         }
 
-        protected override void OnEndEdit(Authentication authentication)
+        protected override async Task OnEndEditAsync(Authentication authentication)
         {
             this.DispatcherObject.Dispatcher.Invoke(() =>
             {
                 this.Container.InvokeTypeEndTemplateEdit(authentication, this.type, this.TypeSource.DataSet);
             });
-            base.OnEndEdit(authentication);
+            await base.OnEndEditAsync(authentication);
             this.DispatcherObject.Dispatcher.Invoke(() =>
             {
                 this.type.UpdateTypeInfo(this.TypeSource.TypeInfo);

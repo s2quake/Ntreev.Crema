@@ -45,17 +45,24 @@ namespace Ntreev.Crema.Services.Users
 
         public async Task<UserCategory> AddNewAsync(Authentication authentication, string name, string parentPath)
         {
-            return await await this.Dispatcher.InvokeAsync(AddNew);
-
-            async Task<UserCategory> AddNew()
+            return await await this.Dispatcher.InvokeAsync(async () =>
             {
-                this.ValidateAddNew(authentication, name, parentPath);
-                await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
-                this.Sign(authentication);
-                var category = this.BaseAddNew(name, parentPath, authentication);
-                this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
-                return category;
-            }
+                try
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);
+                    this.ValidateAddNew(authentication, name, parentPath);
+                    await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
+                    this.Sign(authentication);
+                    var category = this.BaseAddNew(name, parentPath, authentication);
+                    this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
+                    return category;
+                }
+                catch (Exception e)
+                {
+                    this.CremaHost.Error(e);
+                    throw;
+                }
+            });
         }
 
         public Task InvokeCategoryCreateAsync(Authentication authentication, string name, string parentPath)

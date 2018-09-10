@@ -29,6 +29,7 @@ using System.Collections.Specialized;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 #pragma warning disable 0612
 
@@ -96,17 +97,28 @@ namespace Ntreev.Crema.Services.Data
             return this[newTableName];
         }
 
-        public Table Copy(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
+        public async Task<Table> CopyAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
         {
-            this.ValidateCopy(authentication, table, newTableName, categoryPath, copyContent);
-            this.Sign(authentication);
-            var dataSet = table.ReadData(authentication);
-            var dataTable = dataSet.Tables[table.Name, table.Category.Path];
-            var itemName = new ItemName(categoryPath, newTableName);
-            var newDataTable = dataTable.Copy(itemName, copyContent);
-            newDataTable.CategoryPath = categoryPath;
-            this.AddNew(authentication, dataSet);
-            return this[newTableName];
+            try
+            {
+                return await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.ValidateCopy(authentication, table, newTableName, categoryPath, copyContent);
+                    this.Sign(authentication);
+                    var dataSet = table.ReadData(authentication);
+                    var dataTable = dataSet.Tables[table.Name, table.Category.Path];
+                    var itemName = new ItemName(categoryPath, newTableName);
+                    var newDataTable = dataTable.Copy(itemName, copyContent);
+                    newDataTable.CategoryPath = categoryPath;
+                    this.AddNew(authentication, dataSet);
+                    return this[newTableName];
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public object GetService(System.Type serviceType)
@@ -129,49 +141,70 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void InvokeTableRename(Authentication authentication, Table table, string newName, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTableRenameAsync(Authentication authentication, Table table, string newName, CremaDataSet dataSet)
         {
             var message = EventMessageBuilder.RenameTable(authentication, table.Name, newName);
-            try
+            var dataBaseSet = new DataBaseSet(table.DataBase, dataSet);
+            var tablePath = table.Path;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.RenameTable(dataSet, table, newName);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.RenameTable(dataBaseSet, tablePath, newName);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeTableMove(Authentication authentication, Table table, string newCategoryPath, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTableMoveAsync(Authentication authentication, Table table, string newCategoryPath, CremaDataSet dataSet)
         {
             var message = EventMessageBuilder.MoveTable(authentication, table.Name, newCategoryPath, table.Category.Path);
-            try
+            var dataBaseSet = new DataBaseSet(table.DataBase, dataSet);
+            var tablePath = table.Path;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.MoveTable(dataSet, table, newCategoryPath);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.MoveTable(dataBaseSet, tablePath, newCategoryPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeTableDelete(Authentication authentication, Table table, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTableDeleteAsync(Authentication authentication, Table table, CremaDataSet dataSet)
         {
             var message = EventMessageBuilder.DeleteTable(authentication, table.Name);
-            try
+            var dataBaseSet = new DataBaseSet(table.DataBase, dataSet);
+            var tablePath = table.Path;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.DeleteTable(dataSet, table);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.DeleteTable(dataBaseSet, tablePath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public void InvokeTableEndContentEdit(Authentication authentication, Table[] tables, CremaDataSet dataSet)

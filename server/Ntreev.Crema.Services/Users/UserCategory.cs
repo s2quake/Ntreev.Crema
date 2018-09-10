@@ -105,15 +105,7 @@ namespace Ntreev.Crema.Services.Users
 
         public Task<UserCategory> AddNewCategoryAsync(Authentication authentication, string name)
         {
-            try
-            {
-                return this.Container.AddNewAsync(authentication, name, base.Path);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.Container.AddNewAsync(authentication, name, base.Path);
         }
 
         public Task<User> AddNewUserAsync(Authentication authentication, string userID, SecureString password, string userName, Authority authority)

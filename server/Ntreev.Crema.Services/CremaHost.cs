@@ -44,8 +44,6 @@ namespace Ntreev.Crema.Services
         [Import]
         private IServiceProvider container = null;
         private CremaSettings settings;
-        private readonly IRepositoryProvider repositoryProvider;
-        private readonly IObjectSerializer serializer;
         private readonly string databasesPath;
         private readonly string usersPath;
         private readonly LogService log;
@@ -63,8 +61,8 @@ namespace Ntreev.Crema.Services
             CremaLog.Debug("crema instance created.");
             this.settings = settings;
             this.BasePath = settings.BasePath;
-            this.repositoryProvider = repositoryProviders.First(item => item.Name == this.settings.RepositoryModule);
-            this.serializer = serializers.First(item => item.Name == this.settings.FileType);
+            this.RepositoryProvider = repositoryProviders.First(item => item.Name == this.settings.RepositoryModule);
+            this.Serializer = serializers.First(item => item.Name == this.settings.FileType);
             this.databasesPath = this.settings.RepositoryDataBasesUrl;
             this.usersPath = this.settings.RepositoryUsersUrl;
 
@@ -128,16 +126,16 @@ namespace Ntreev.Crema.Services
         {
             try
             {
-                this.OnOpening(EventArgs.Empty);
                 await this.Dispatcher.InvokeAsync(async () =>
                 {
+                    this.OnOpening(EventArgs.Empty);
                     this.Info(Resources.Message_ProgramInfo, AppUtility.ProductName, AppUtility.ProductVersion);
                     this.Info("Repository module : {0}", this.settings.RepositoryModule);
                     this.Info(Resources.Message_ServiceStart);
                     this.configs = new CremaConfiguration(Path.Combine(this.BasePath, "configs"), this.propertiesProviders);
                     this.UserContext = new UserContext(this);
                     this.UserContext.Dispatcher.Invoke(() => this.UserContext.Initialize());
-                    this.DataBases = new DataBaseCollection(this, this.repositoryProvider);
+                    this.DataBases = new DataBaseCollection(this, this.RepositoryProvider);
                     this.DomainContext = new DomainContext(this, this.UserContext);
 
                     if (this.settings.NoCache == false)
@@ -157,11 +155,10 @@ namespace Ntreev.Crema.Services
                         this.Info("Plugin : {0}", item.Name);
                     }
 
-                    this.Dispatcher.InvokeAsync(() => this.DataBases.RestoreStateAsync(this.settings));
-
                     GC.Collect();
                     this.Info("Crema module has been started.");
                     this.OnOpened(EventArgs.Empty);
+                    this.DataBases.RestoreStateAsync(this.settings);
                 });
             }
             catch (Exception e)
@@ -184,18 +181,18 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        public void Close(CloseReason reason, string message)
+        public async Task CloseAsync(CloseReason reason, string message)
         {
             try
             {
-                this.OnClosing(EventArgs.Empty);
-                this.Dispatcher.Invoke(() =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
+                    this.OnClosing(EventArgs.Empty);
                     foreach (var item in this.plugins.Reverse())
                     {
                         item.Release();
                     }
-                    this.UserContext.Dispatcher.Invoke(() => this.UserContext.Clear());
+                    await this.UserContext.ClearAsync();
                     this.UserContext.Dispose();
                     this.UserContext = null;
                     this.DomainContext.Dispose();
@@ -352,7 +349,7 @@ namespace Ntreev.Crema.Services
             throw new NotImplementedException();
         }
 
-        public IRepositoryProvider RepositoryProvider => this.repositoryProvider;
+        public IRepositoryProvider RepositoryProvider { get; }
 
         public string BasePath { get; }
 
@@ -376,7 +373,7 @@ namespace Ntreev.Crema.Services
 
         public CremaDispatcher RepositoryDispatcher { get; private set; }
 
-        public IObjectSerializer Serializer { get => this.serializer; }
+        public IObjectSerializer Serializer { get; }
 
         public event EventHandler Opening;
 
@@ -460,7 +457,7 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        private void Shutdown(ShutdownType shutdownType)
+        private async void Shutdown(ShutdownType shutdownType)
         {
             if (this.shutdownTimer != null)
             {
@@ -471,11 +468,11 @@ namespace Ntreev.Crema.Services
             }
 
             var isRestart = shutdownType.HasFlag(ShutdownType.Restart);
-            this.Close(isRestart ? CloseReason.Restart : CloseReason.Shutdown, string.Empty);
+            await this.CloseAsync(isRestart ? CloseReason.Restart : CloseReason.Shutdown, string.Empty);
             if (isRestart == true)
             {
                 this.settings.NoCache = shutdownType.HasFlag(ShutdownType.NoCache);
-                this.OpenAsync();
+                await this.OpenAsync();
             }
         }
 
@@ -535,11 +532,11 @@ namespace Ntreev.Crema.Services
             return this.token;
         }
 
-        void ICremaHost.Close(Guid token)
+        async Task ICremaHost.CloseAsync(Guid token)
         {
             if (this.token != token)
                 throw new InvalidOperationException(Resources.Exception_InvalidToken);
-            this.Close(CloseReason.None, string.Empty);
+            await this.CloseAsync(CloseReason.None, string.Empty);
             this.token = Guid.Empty;
         }
 

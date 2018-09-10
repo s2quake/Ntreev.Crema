@@ -116,7 +116,7 @@ namespace Ntreev.Crema.WindowsServiceHost
         {
             base.OnStop();
             CremaLog.Debug("service close");
-            this.cremaService.Close();
+            this.cremaService.CloseAsync();
             CremaLog.Debug("service closed.");
         }
 

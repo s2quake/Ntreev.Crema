@@ -767,6 +767,8 @@ namespace Ntreev.Crema.Data
             set => this.InternalObject.CategoryPath = value;
         }
 
+        public string Path => this.CategoryPath + this.Name;
+
         public string TemplateNamespace => this.InternalObject.TemplateNamespace;
 
         public CremaDataTable TemplatedParent

@@ -46,7 +46,7 @@ namespace Ntreev.Crema.Services.Data
         private TypeContext typeContext;
         private TableContext tableContext;
         private UserContext userContext;
-        private CremaDataSet dataSetCache;
+        private CremaDataSet dataSet;
         private DataBaseMetaData metaData;
         private AuthenticationInfo[] authenticationInfos;
 
@@ -254,7 +254,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 var repositorySetting = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(Load), this);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(LoadAsync), this);
                     this.ValidateLoad(authentication);
                     this.Sign(authentication);
                     return new RepositorySettings()
@@ -270,10 +270,10 @@ namespace Ntreev.Crema.Services.Data
                 {
                     return new DataBaseRepositoryHost(this, this.repositoryProvider.CreateInstance(repositorySetting));
                 }); 
-                await this.Dispatcher.InvokeAsync(() =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.Repository.Changed += Repository_Changed;
-                    this.ReadCache();
+                    await this.ReadCacheAsync();
                     this.AttachDomainHost();
                     this.metaData.DataBaseState = DataBaseState.IsLoaded;
                     base.DataBaseState = DataBaseState.IsLoaded;
@@ -586,7 +586,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task ResetDataBase(Authentication authentication, IEnumerable<TypeInfo> typeInfos, IEnumerable<TableInfo> tableInfos)
+        public async Task ResetDataBaseAsync(Authentication authentication, IEnumerable<TypeInfo> typeInfos, IEnumerable<TableInfo> tableInfos)
         {
             this.Sign(authentication);
             this.DataBases.InvokeDataBaseReset(authentication, this);
@@ -1150,7 +1150,7 @@ namespace Ntreev.Crema.Services.Data
             FileUtility.Delete(itemPaths);
         }
 
-        private void ReadCache()
+        private async Task ReadCacheAsync()
         {
             if (this.CremaHost.NoCache == false)
             {
@@ -1162,7 +1162,7 @@ namespace Ntreev.Crema.Services.Data
                         var dataInfo = (DataBaseDataSerializationInfo)this.Serializer.Deserialize(itemPath, typeof(DataBaseDataSerializationInfo), DataBaseDataSerializationInfo.Settings);
                         if (this.Repository.RepositoryInfo.Revision == dataInfo.Revision)
                         {
-                            this.ResetDataBase(Authentication.System, dataInfo.TypeInfos, dataInfo.TableInfos);
+                            await this.ResetDataBaseAsync(Authentication.System, dataInfo.TypeInfos, dataInfo.TableInfos);
                             return;
                         }
                     }
@@ -1176,13 +1176,12 @@ namespace Ntreev.Crema.Services.Data
 
             {
                 this.CremaHost.Debug($"begin read database : '{this.Name}'");
-                var dataSet = CremaDataSet.ReadFromDirectory(this.BasePath);
+                this.dataSet = CremaDataSet.ReadFromDirectory(this.BasePath);
                 this.CremaHost.Debug($"end read database : '{this.Name}'");
 
                 var typeInfos = dataSet.Types.Select(item => item.TypeInfo);
                 var tableInfos = dataSet.Tables.Select(item => item.TableInfo);
-                this.ResetDataBase(Authentication.System, typeInfos, tableInfos);
-                this.dataSetCache = dataSet;
+                await this.ResetDataBaseAsync(Authentication.System, typeInfos, tableInfos);
             }
         }
 
@@ -1247,7 +1246,7 @@ namespace Ntreev.Crema.Services.Data
                 TypesHashValue = CremaDataSet.GenerateHashValue((from Type item in this.TypeContext.Types select item.TypeInfo).ToArray()),
                 TablesHashValue = CremaDataSet.GenerateHashValue((from Table item in this.TableContext.Tables select item.TableInfo).ToArray()),
             };
-            this.dataSetCache = null;
+            this.dataSet = null;
             this.metaData.TypeCategories = this.typeContext.GetCategoryMetaDatas();
             this.metaData.Types = this.typeContext.GetTypeMetaDatas();
             this.metaData.TableCategories = this.tableContext.GetCategoryMetaDatas();

@@ -179,7 +179,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             cremaHost.Closed += CremaHost_Closed;
             await this.WaitAsync(cremaHost);
             Console.WriteLine(Resources.StoppingServer);
-            this.application.Close();
+            await this.application.CloseAsync();
             Console.WriteLine(Resources.ServerHasBeenStopped);
         }
 

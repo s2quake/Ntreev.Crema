@@ -23,6 +23,7 @@ using Ntreev.Library;
 using System;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -82,10 +83,10 @@ namespace Ntreev.Crema.Services.Data
             base.OnBeginEdit(authentication);
         }
 
-        protected override void OnEndEdit(Authentication authentication)
+        protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            base.OnEndEdit(authentication);
-            this.type = this.DispatcherObject.Dispatcher.Invoke(() => this.Types.AddNew(authentication, this.TypeSource));
+            await base.OnEndEditAsync(authentication);
+            this.type = await this.Types.AddNewAsync(authentication, this.TypeSource);
             this.category = null;
         }
 

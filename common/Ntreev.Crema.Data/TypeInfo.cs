@@ -65,6 +65,8 @@ namespace Ntreev.Crema.Data
             get; set;
         }
 
+        public string Path => this.CategoryPath + this.Name;
+
         public override bool Equals(object obj)
         {
             if (obj is TypeInfo == false)

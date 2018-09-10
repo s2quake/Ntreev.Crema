@@ -159,7 +159,8 @@ namespace Ntreev.Crema.Bot
 
         private void CremaHost_Closing(object sender, EventArgs e)
         {
-            this.StopAsync().Wait();
+            if (this.IsPlaying == true)
+                this.StopAsync().Wait();
         }
     }
 }

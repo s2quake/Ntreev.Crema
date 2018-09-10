@@ -57,7 +57,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublic), this);
                     base.ValidateSetPublic(authentication);
                     this.Sign(authentication);
-                    this.Context.InvokeTableItemSetPublic(authentication, this);
+                    this.Context.InvokeTableItemSetPublicAsync(authentication, this);
                     base.SetPublic(authentication);
                     this.Context.InvokeItemsSetPublicEvent(authentication, new ITableItem[] { this });
                 });
@@ -69,16 +69,16 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task SetPrivateAsync(Authentication authentication)
+        public async Task SetPrivateAsync(Authentication authentication)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivate), this);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
                     base.ValidateSetPrivate(authentication);
-                    this.Sign(authentication);
-                    this.Context.InvokeTableItemSetPrivate(authentication, this, AccessInfo.Empty);
+                    var accessInfo = await this.Context.InvokeTableItemSetPrivateAsync(authentication, this);
+                    this.Sign(authentication, accessInfo.SignatureDate);
                     base.SetPrivate(authentication);
                     this.Context.InvokeItemsSetPrivateEvent(authentication, new ITableItem[] { this });
                 });
@@ -90,16 +90,16 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task AddAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType)
+        public async Task AddAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMember), this, memberID, accessType);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMemberAsync), this, memberID, accessType);
                     base.ValidateAddAccessMember(authentication, memberID, accessType);
-                    this.Sign(authentication);
-                    this.Context.InvokeTableItemAddAccessMember(authentication, this, this.AccessInfo, memberID, accessType);
+                    var accessInfo = await this.Context.InvokeTableItemAddAccessMemberAsync(authentication, this, this.AccessInfo, memberID, accessType);
+                    this.Sign(authentication, accessInfo.SignatureDate);
                     base.AddAccessMember(authentication, memberID, accessType);
                     this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
                 });
@@ -111,16 +111,16 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task SetAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType)
+        public async Task SetAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMember), this, memberID, accessType);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
                     base.ValidateSetAccessMember(authentication, memberID, accessType);
-                    this.Sign(authentication);
-                    this.Context.InvokeTableItemSetAccessMember(authentication, this, this.AccessInfo, memberID, accessType);
+                    var accessInfo = await this.Context.InvokeTableItemSetAccessMemberAsync(authentication, this, this.AccessInfo, memberID, accessType);
+                    this.Sign(authentication, accessInfo.SignatureDate);
                     base.SetAccessMember(authentication, memberID, accessType);
                     this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
                 });
@@ -132,16 +132,16 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task RemoveAccessMemberAsync(Authentication authentication, string memberID)
+        public async Task RemoveAccessMemberAsync(Authentication authentication, string memberID)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMember), this, memberID);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
                     base.ValidateRemoveAccessMember(authentication, memberID);
-                    this.Sign(authentication);
-                    this.Context.InvokeTableItemRemoveAccessMember(authentication, this, this.AccessInfo, memberID);
+                    var accessInfo = await this.Context.InvokeTableItemRemoveAccessMemberAsync(authentication, this, this.AccessInfo, memberID);
+                    this.Sign(authentication, accessInfo.SignatureDate);
                     base.RemoveAccessMember(authentication, memberID);
                     this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID });
                 });
@@ -160,10 +160,9 @@ namespace Ntreev.Crema.Services.Data
                 this.DataBase.ValidateBeginInDataBase(authentication);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(Lock), this, comment);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(LockAsync), this, comment);
                     base.ValidateLock(authentication);
                     this.Sign(authentication);
-                    this.Context.InvokeTableItemLock(authentication, this, comment);
                     base.Lock(authentication, comment);
                     this.Context.InvokeItemsLockedEvent(authentication, new ITableItem[] { this }, new string[] { comment });
                 });
@@ -182,10 +181,9 @@ namespace Ntreev.Crema.Services.Data
                 this.DataBase.ValidateBeginInDataBase(authentication);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(Unlock), this);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(UnlockAsync), this);
                     base.ValidateUnlock(authentication);
                     this.Sign(authentication);
-                    this.Context.InvokeTableItemUnlock(authentication, this);
                     base.Unlock(authentication);
                     this.Context.InvokeItemsUnlockedEvent(authentication, new ITableItem[] { this });
                 });
@@ -554,6 +552,11 @@ namespace Ntreev.Crema.Services.Data
         private void Sign(Authentication authentication)
         {
             authentication.Sign();
+        }
+
+        private void Sign(Authentication authentication, SignatureDate signatureDate)
+        {
+            authentication.Sign(signatureDate.DateTime);
         }
 
         #region ITableCategory

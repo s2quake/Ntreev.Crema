@@ -516,8 +516,7 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        public string Path => this.CategoryPath + this.TypeName;
-
+        public string Path => this.CategoryPath + this.Name;
 
         public string Namespace => this.InternalObject.Namespace;
 

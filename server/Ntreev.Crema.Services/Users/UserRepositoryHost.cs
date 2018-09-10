@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Users.Serializations;
 using Ntreev.Library;
+using Ntreev.Library.IO;
 
 namespace Ntreev.Crema.Services.Users
 {
@@ -40,8 +41,8 @@ namespace Ntreev.Crema.Services.Users
 
         public void CreateCategory(Authentication authentication, string itemPath)
         {
-            var parentItemPath = Path.GetDirectoryName(itemPath);
-            if (Directory.Exists(parentItemPath) == false)
+            var parentItemPath = PathUtility.GetDirectoryName(itemPath);
+            if (DirectoryUtility.Exists(parentItemPath) == false)
                 throw new DirectoryNotFoundException();
             Directory.CreateDirectory(itemPath);
             this.Add(itemPath);
@@ -52,7 +53,7 @@ namespace Ntreev.Crema.Services.Users
             var itemPath1 = this.userContext.GenerateCategoryPath(categoryPath);
             var itemPath2 = this.userContext.GenerateCategoryPath(newCategoryPath);
 
-            if (Directory.Exists(itemPath1) == false)
+            if (DirectoryUtility.Exists(itemPath1) == false)
                 throw new DirectoryNotFoundException();
 
             for (var i = 0; i < users.Length; i++)
@@ -72,7 +73,7 @@ namespace Ntreev.Crema.Services.Users
             var itemPath1 = this.userContext.GenerateCategoryPath(categoryPath);
             var itemPath2 = this.userContext.GenerateCategoryPath(newCategoryPath);
 
-            if (Directory.Exists(itemPath1) == false)
+            if (DirectoryUtility.Exists(itemPath1) == false)
                 throw new DirectoryNotFoundException();
 
             for (var i = 0; i < users.Length; i++)
@@ -91,7 +92,7 @@ namespace Ntreev.Crema.Services.Users
         {
             var itemPath = this.userContext.GenerateUserPath(userInfo.CategoryPath, userInfo.ID);
             var directoryPath = Path.GetDirectoryName(itemPath);
-            if (Directory.Exists(directoryPath) == false)
+            if (DirectoryUtility.Exists(directoryPath) == false)
                 throw new DirectoryNotFoundException();
             var files = this.userContext.GetFiles(itemPath);
             if (files.Any() == true)
@@ -104,13 +105,22 @@ namespace Ntreev.Crema.Services.Users
         public void MoveUser(SignatureDate signatureDate, string itemPath, UserSerializationInfo serializationInfo, string categoryItemPath)
         {
             var directoryPath = Path.GetDirectoryName(itemPath);
-            if (Directory.Exists(directoryPath) == false)
+            if (DirectoryUtility.Exists(directoryPath) == false)
                 throw new DirectoryNotFoundException();
-            if (Directory.Exists(categoryItemPath) == false)
+            if (DirectoryUtility.Exists(categoryItemPath) == false)
                 throw new DirectoryNotFoundException();
+            var files = this.userContext.GetFiles(itemPath);
+            if (files.Any() == false)
+                throw new FileNotFoundException();
 
-            this.Serializer.Serialize(itemPath, serializationInfo, ObjectSerializerSettings.Empty);
-            this.MoveRepositoryPath(serializationInfo, itemPath);
+            files = this.Serializer.Serialize(itemPath, serializationInfo, ObjectSerializerSettings.Empty);
+            for (var i = 0; i < files.Length; i++)
+            {
+                var path1 = files[i];
+                var extension = Path.GetExtension(path1);
+                var path2 = this.userContext.GeneratePath(serializationInfo.CategoryPath + serializationInfo.ID) + extension;
+                this.Move(path1, path2);
+            }
         }
 
         public void DeleteUser(string itemPath)
@@ -124,7 +134,7 @@ namespace Ntreev.Crema.Services.Users
         public void ModifyUser(string itemPath, UserSerializationInfo serializationInfo)
         {
             var directoryPath = Path.GetDirectoryName(itemPath);
-            if (Directory.Exists(directoryPath) == false)
+            if (DirectoryUtility.Exists(directoryPath) == false)
                 throw new DirectoryNotFoundException();
             var files = this.userContext.GetFiles(itemPath);
             if (files.Any() == false)

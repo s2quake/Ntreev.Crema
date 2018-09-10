@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -62,105 +63,117 @@ namespace Ntreev.Crema.Services.Data
             userContext.Dispatcher.Invoke(() => userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
         }
 
-        public void InvokeTableItemLock(Authentication authentication, ITableItem tableItem, string comment)
+        public Task<SignatureDate> InvokeTableItemSetPublicAsync(Authentication authentication, ITableItem tableItem)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemLock), tableItem, comment);
-        }
-
-        public void InvokeTableItemUnlock(Authentication authentication, ITableItem tableItem)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemUnlock), tableItem);
-        }
-
-        public void InvokeTableItemSetPublic(Authentication authentication, ITableItem tableItem)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemSetPublic), tableItem);
             var message = EventMessageBuilder.SetPublicTableItem(authentication, tableItem.Path);
-            try
+            var itemPath = this.GeneratePath(tableItem.Path);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                var itemPath = this.GeneratePath(tableItem.Path);
-                var itemPaths = this.Serializer.GetPath(itemPath, typeof(AccessSerializationInfo), AccessSerializationInfo.Settings);
-                this.Repository.DeleteRange(itemPaths);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    var itemPaths = this.Serializer.GetPath(itemPath, typeof(AccessSerializationInfo), AccessSerializationInfo.Settings);
+                    this.Repository.DeleteRange(itemPaths);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeTableItemSetPrivate(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo)
+        public Task<AccessInfo> InvokeTableItemSetPrivateAsync(Authentication authentication, ITableItem tableItem)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemSetPrivate), tableItem);
             var message = EventMessageBuilder.SetPrivateTableItem(authentication, tableItem.Path);
-            try
+            var typeName = tableItem.GetType().Name;
+            var itemPath = this.GeneratePath(tableItem.Path);
+            var accessInfo = AccessInfo.Empty;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                accessInfo.SetPrivate(tableItem.GetType().Name, authentication.SignatureDate);
-                var itemPath = this.GeneratePath(tableItem.Path);
-                var itemPaths = this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
-                this.Repository.AddRange(itemPaths);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    accessInfo.SetPrivate(typeName, signatureDate);
+                    var itemPaths = this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
+                    this.Repository.AddRange(itemPaths);
+                    this.Repository.Commit(authentication, message);
+                    return accessInfo;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeTableItemAddAccessMember(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID, AccessType accessType)
+        public Task<AccessInfo> InvokeTableItemAddAccessMemberAsync(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID, AccessType accessType)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemAddAccessMember), tableItem, memberID, accessType);
             var message = EventMessageBuilder.AddAccessMemberToTableItem(authentication, tableItem.Path, memberID, accessType);
-            try
+            var itemPath = this.GeneratePath(tableItem.Path);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                accessInfo.Add(authentication.SignatureDate, memberID, accessType);
-                var itemPath = this.GeneratePath(tableItem.Path);
-                this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    accessInfo.Add(signatureDate, memberID, accessType);
+                    this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
+                    this.Repository.Commit(authentication, message);
+                    return accessInfo;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeTableItemSetAccessMember(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID, AccessType accessType)
+        public Task<AccessInfo> InvokeTableItemSetAccessMemberAsync(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID, AccessType accessType)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemSetAccessMember), tableItem, memberID, accessType);
             var message = EventMessageBuilder.SetAccessMemberOfTableItem(authentication, tableItem.Path, memberID, accessType);
-            try
+            var itemPath = this.GeneratePath(tableItem.Path);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                accessInfo.Set(authentication.SignatureDate, memberID, accessType);
-                var itemPath = this.GeneratePath(tableItem.Path);
-                this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    accessInfo.Set(signatureDate, memberID, accessType);
+                    this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
+                    this.Repository.Commit(authentication, message);
+                    return accessInfo;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeTableItemRemoveAccessMember(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID)
+        public Task<AccessInfo> InvokeTableItemRemoveAccessMemberAsync(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemRemoveAccessMember), tableItem, memberID);
             var message = EventMessageBuilder.RemoveAccessMemberFromTableItem(authentication, tableItem.Path, memberID);
-            try
+            var itemPath = this.GeneratePath(tableItem.Path);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                accessInfo.Remove(authentication.SignatureDate, memberID);
-                var itemPath = this.GeneratePath(tableItem.Path);
-                this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    accessInfo.Remove(signatureDate, memberID);
+                    this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
+                    this.Repository.Commit(authentication, message);
+                    return accessInfo;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public void InvokeItemsSetPublicEvent(Authentication authentication, ITableItem[] items)

@@ -102,7 +102,7 @@ namespace Ntreev.Crema.Services.Test
 #if SERVER
             cremaHost.Logout(authentication);
 #endif
-            cremaHost.Close(token);
+            cremaHost.CloseAsync(token);
             authenticationToToken.Remove(authentication);
         }
     }

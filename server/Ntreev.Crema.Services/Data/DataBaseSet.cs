@@ -32,23 +32,32 @@ namespace Ntreev.Crema.Services.Data
     class DataBaseSet
     {
         private readonly DataBase dataBase;
-        private readonly Dictionary<CremaDataType, Type> types = new Dictionary<CremaDataType, Type>();
-        private readonly Dictionary<CremaDataTable, Table> tables = new Dictionary<CremaDataTable, Table>();
+        private readonly List<CremaDataType> types = new List<CremaDataType>();
+        private readonly List<CremaDataTable> tables = new List<CremaDataTable>();
 
-        private DataBaseSet(DataBase dataBase, CremaDataSet dataSet)
+        public DataBaseSet(DataBase dataBase, CremaDataSet dataSet)
         {
             this.dataBase = dataBase;
 
             foreach (var item in dataSet.Types)
             {
+                this.types.Add(item);
                 var type = dataBase.TypeContext.Types[item.Name, item.CategoryPath];
-                this.types.Add(item, type);
+                if (type != null)
+                {
+                    item.ExtendedProperties[typeof(TypeInfo)] = type.TypeInfo;
+                }
             }
 
             foreach (var item in dataSet.Tables)
             {
+                this.tables.Add(item);
                 var table = dataBase.TableContext.Tables[item.Name, item.CategoryPath];
-                this.tables.Add(item, table);
+                if (table != null)
+                {
+                    item.ExtendedProperties[typeof(TableInfo)] = table.TableInfo;
+                    item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] = table.TemplatedParent?.TableInfo;
+                }
             }
         }
 
@@ -57,12 +66,12 @@ namespace Ntreev.Crema.Services.Data
             var dataBaseSet = new DataBaseSet(category.DataBase, dataSet);
             foreach (var item in dataBaseSet.types)
             {
-                var dataType = item.Key;
-                var type = item.Value;
-                if (type.Path.StartsWith(category.Path) == false)
+                var typeInfo = (TypeInfo)item.ExtendedProperties[typeof(TypeInfo)];
+                var typePath = typeInfo.CategoryPath + typeInfo.Name;
+                if (typePath.StartsWith(category.Path) == false)
                     continue;
 
-                dataType.CategoryPath = Regex.Replace(dataType.CategoryPath, "^" + category.Path, newCategoryPath);
+                item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + category.Path, newCategoryPath);
             }
 
             dataBaseSet.Serialize();
@@ -77,14 +86,14 @@ namespace Ntreev.Crema.Services.Data
             var dataBaseSet = new DataBaseSet(category.DataBase, dataSet);
             foreach (var item in dataBaseSet.tables)
             {
-                var dataTable = item.Key;
-                var table = item.Value;
-                if (table.Path.StartsWith(category.Path) == false)
+                var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
+                var tablePath = tableInfo.CategoryPath + tableInfo.Name;
+                if (tablePath.StartsWith(category.Path) == false)
                     continue;
-                if (table.Parent != null)
+                if (tableInfo.ParentName != string.Empty)
                     continue;
 
-                dataTable.CategoryPath = Regex.Replace(dataTable.CategoryPath, "^" + category.Path, newCategoryPath);
+                item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + category.Path, newCategoryPath);
             }
 
             dataBaseSet.Serialize();
@@ -94,37 +103,33 @@ namespace Ntreev.Crema.Services.Data
             dataBaseSet.Repository.Move(itemPath1, itemPath2);
         }
 
-        public static void CreateType(CremaDataSet dataSet, DataBase dataBase)
+        public void CreateType()
         {
-            var dataBaseSet = new DataBaseSet(dataBase, dataSet);
-            dataBaseSet.Serialize();
-            dataBaseSet.AddTypesRepositoryPath();
+            this.Serialize();
+            this.AddTypesRepositoryPath();
         }
 
-        public static void RenameType(CremaDataSet dataSet, Type type, string typeName)
+        public void RenameType(string typePath, string typeName)
         {
-            var dataBaseSet = new DataBaseSet(type.DataBase, dataSet);
-            var dataType = dataBaseSet.types.First(item => item.Value == type).Key;
+            var dataType = this.types.First(item => item.Path == typePath);
             dataType.TypeName = typeName;
-            dataBaseSet.Serialize();
-            dataBaseSet.MoveTypesRepositoryPath();
+            this.Serialize();
+            this.MoveTypesRepositoryPath();
         }
 
-        public static void MoveType(CremaDataSet dataSet, Type type, string categoryPath)
+        public void MoveType(string typePath, string categoryPath)
         {
-            var dataBaseSet = new DataBaseSet(type.DataBase, dataSet);
-            var dataType = dataBaseSet.types.First(item => item.Value == type).Key;
+            var dataType = this.types.First(item => item.Path == typePath);
             dataType.CategoryPath = categoryPath;
-            dataBaseSet.Serialize();
-            dataBaseSet.MoveTypesRepositoryPath();
+            this.Serialize();
+            this.MoveTypesRepositoryPath();
         }
 
-        public static void DeleteType(CremaDataSet dataSet, Type type)
+        public void DeleteType(string typePath)
         {
-            var dataBaseSet = new DataBaseSet(type.DataBase, dataSet);
-            var dataType = dataBaseSet.types.First(item => item.Value == type).Key;
-            dataSet.Types.Remove(dataType);
-            dataBaseSet.DeleteTypesRepositoryPath();
+            var dataType = this.types.First(item => item.Path == typePath);
+            this.types.Remove(dataType);
+            this.DeleteTypesRepositoryPath();
         }
 
         public static void ModifyType(CremaDataSet dataSet, Type type)
@@ -133,13 +138,13 @@ namespace Ntreev.Crema.Services.Data
             dataBaseSet.Serialize();
         }
 
-        public static void SetTypeTags(CremaDataSet dataSet, Type type, TagInfo tags)
-        {
-            var dataBaseSet = new DataBaseSet(type.DataBase, dataSet);
-            var dataType = dataBaseSet.types.First(item => item.Value == type).Key;
-            dataType.Tags = tags;
-            dataBaseSet.Serialize();
-        }
+        //public static void SetTypeTags(CremaDataSet dataSet, Type type, TagInfo tags)
+        //{
+        //    var dataBaseSet = new DataBaseSet(type.DataBase, dataSet);
+        //    var dataType = dataBaseSet.types.First(item => item.Value == type).Key;
+        //    dataType.Tags = tags;
+        //    dataBaseSet.Serialize();
+        //}
 
         public static void CreateTable(CremaDataSet dataSet, DataBase dataBase)
         {
@@ -148,46 +153,43 @@ namespace Ntreev.Crema.Services.Data
             dataBaseSet.AddTablesRepositoryPath();
         }
 
-        public static void RenameTable(CremaDataSet dataSet, Table table, string tableName)
+        public void RenameTable(string tablePath, string tableName)
         {
-            var dataBaseSet = new DataBaseSet(table.DataBase, dataSet);
-            var dataTable = dataBaseSet.tables.First(item => item.Value == table).Key;
+            var dataTable = this.tables.First(item => item.Path == tablePath);
             dataTable.TableName = tableName;
-            dataBaseSet.Serialize();
-            dataBaseSet.MoveTablesRepositoryPath();
+            this.Serialize();
+            this.MoveTablesRepositoryPath();
         }
 
-        public static void MoveTable(CremaDataSet dataSet, Table table, string categoryPath)
+        public void MoveTable(string tablePath, string categoryPath)
         {
-            var dataBaseSet = new DataBaseSet(table.DataBase, dataSet);
-            var dataTable = dataBaseSet.tables.First(item => item.Value == table).Key;
+            var dataTable = this.tables.First(item => item.Path == tablePath);
             dataTable.CategoryPath = categoryPath;
-            dataBaseSet.Serialize();
-            dataBaseSet.MoveTablesRepositoryPath();
+            this.Serialize();
+            this.MoveTablesRepositoryPath();
         }
 
-        public static void SetTableTags(CremaDataSet dataSet, Table table, TagInfo tags)
-        {
-            var dataBaseSet = new DataBaseSet(table.DataBase, dataSet);
-            var dataTable = dataBaseSet.tables.First(item => item.Value == table).Key;
-            dataTable.Tags = tags;
-            dataBaseSet.Serialize();
-        }
+        //public static void SetTableTags(CremaDataSet dataSet, Table table, TagInfo tags)
+        //{
+        //    var dataBaseSet = new DataBaseSet(table.DataBase, dataSet);
+        //    var dataTable = dataBaseSet.tables.First(item => item.Value == table).Key;
+        //    dataTable.Tags = tags;
+        //    dataBaseSet.Serialize();
+        //}
 
-        public static void SetTableComment(CremaDataSet dataSet, Table table, string comment)
-        {
-            var dataBaseSet = new DataBaseSet(table.DataBase, dataSet);
-            var dataTable = dataBaseSet.tables.First(item => item.Value == table).Key;
-            dataTable.Comment = comment;
-            dataBaseSet.Serialize();
-        }
+        //public static void SetTableComment(CremaDataSet dataSet, Table table, string comment)
+        //{
+        //    var dataBaseSet = new DataBaseSet(table.DataBase, dataSet);
+        //    var dataTable = dataBaseSet.tables.First(item => item.Value == table).Key;
+        //    dataTable.Comment = comment;
+        //    dataBaseSet.Serialize();
+        //}
 
-        public static void DeleteTable(CremaDataSet dataSet, Table table)
+        public void DeleteTable(string tablePath)
         {
-            var dataBaseSet = new DataBaseSet(table.DataBase, dataSet);
-            var dataTable = dataBaseSet.tables.First(item => item.Value == table).Key;
-            dataSet.Tables.Remove(dataTable);
-            dataBaseSet.DeleteTablesRepositoryPath();
+            var dataTable = this.tables.First(item => item.Path == tablePath);
+            this.tables.Remove(dataTable);
+            this.DeleteTablesRepositoryPath();
         }
 
         public static void ModifyTable(CremaDataSet dataSet, Table table)
@@ -212,37 +214,44 @@ namespace Ntreev.Crema.Services.Data
             var typeContext = this.dataBase.TypeContext;
             foreach (var item in this.types)
             {
-                var dataType = item.Key;
-                var type = item.Value;
-                if (type != null)
+                if (item.ExtendedProperties.ContainsKey(typeof(TypeInfo)) == true)
                 {
-                    var itemPath = typeContext.GenerateTypePath(type.Category.Path, type.Name);
-                    this.Serializer.Serialize(itemPath, dataType, ObjectSerializerSettings.Empty);
+                    var typeInfo = (TypeInfo)item.ExtendedProperties[typeof(TypeInfo)];
+                    var typePath = typeInfo.CategoryPath + typeInfo.Name;
+                    var itemPath = typeContext.GeneratePath(typePath);
+                    this.Serializer.Serialize(itemPath, item, ObjectSerializerSettings.Empty);
                 }
                 else
                 {
-                    var itemPath = typeContext.GenerateTypePath(dataType.CategoryPath, dataType.Name);
-                    this.Serializer.Serialize(itemPath, dataType, ObjectSerializerSettings.Empty);
+                    var itemPath = typeContext.GenerateTypePath(item.CategoryPath, item.Name);
+                    this.Serializer.Serialize(itemPath, item, ObjectSerializerSettings.Empty);
                 }
             }
 
             var tableContext = this.dataBase.TableContext;
             foreach (var item in this.tables)
             {
-                var dataTable = item.Key;
-                var table = item.Value;
-
-                if (table != null)
+                if (item.ExtendedProperties.ContainsKey(typeof(TableInfo)) == true)
                 {
-                    var itemPath = tableContext.GenerateTablePath(table.Category.Path, table.Name);
-                    var props = new CremaDataTableSerializerSettings(table.ItemPath, table.TemplatedParent?.ItemPath);
-                    this.Serializer.Serialize(itemPath, dataTable, props);
+                    var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
+                    var tablePath = tableInfo.CategoryPath + tableInfo.Name;
+                    var itemPath = tableContext.GeneratePath(tablePath);
+                    if (item.ExtendedProperties.ContainsKey(nameof(TableInfo.TemplatedParent)) == true)
+                    {
+                        var templateInfo = (TableInfo)item.ExtendedProperties[nameof(TableInfo.TemplatedParent)];
+                        var templatedItemPath = tableContext.GeneratePath(templateInfo.CategoryPath + templateInfo.Name);
+                    }
+                    else
+                    {
+                        var props = new CremaDataTableSerializerSettings(itemPath, null);
+                        this.Serializer.Serialize(itemPath, item, props);
+                    }
                 }
                 else
                 {
-                    var itemPath = tableContext.GenerateTablePath(dataTable.CategoryPath, dataTable.Name);
-                    var props = new CremaDataTableSerializerSettings(dataTable.Namespace, dataTable.TemplateNamespace);
-                    this.Serializer.Serialize(itemPath, dataTable, props);
+                    var itemPath = tableContext.GenerateTablePath(item.CategoryPath, item.Name);
+                    var props = new CremaDataTableSerializerSettings(item.Namespace, item.TemplateNamespace);
+                    this.Serializer.Serialize(itemPath, item, props);
                 }
             }
         }
@@ -251,12 +260,10 @@ namespace Ntreev.Crema.Services.Data
         {
             foreach (var item in this.types)
             {
-                var dataType = item.Key;
-                var type = item.Value;
-                if (type != null)
+                if (item.ExtendedProperties.ContainsKey(typeof(TypeInfo)) == true)
                     continue;
 
-                this.AddRepositoryPath(dataType);
+                this.AddRepositoryPath(item);
             }
         }
 
@@ -264,16 +271,11 @@ namespace Ntreev.Crema.Services.Data
         {
             foreach (var item in this.types)
             {
-                var dataType = item.Key;
-                var type = item.Value;
-
-                var path1 = type.Path;
-                var path2 = dataType.CategoryPath + dataType.Name;
-
-                if (path1 == path2)
+                var typeInfo = (TypeInfo)item.ExtendedProperties[typeof(TypeInfo)];
+                if (typeInfo.Path == item.Path)
                     continue;
 
-                this.MoveRepositoryPath(dataType, type);
+                this.MoveRepositoryPath(item, typeInfo.Path);
             }
         }
 
@@ -281,13 +283,11 @@ namespace Ntreev.Crema.Services.Data
         {
             foreach (var item in this.types)
             {
-                var dataType = item.Key;
-                var type = item.Value;
-
-                if (dataType.DataSet != null)
+                var typeInfo = (TypeInfo)item.ExtendedProperties[typeof(TypeInfo)];
+                if (item.DataSet != null)
                     continue;
 
-                this.DeleteRepositoryPath(dataType, type);
+                this.DeleteRepositoryPath(item, typeInfo.Path);
             }
         }
 
@@ -295,12 +295,10 @@ namespace Ntreev.Crema.Services.Data
         {
             foreach (var item in this.tables)
             {
-                var dataTable = item.Key;
-                var table = item.Value;
-                if (table != null)
+                if (item.ExtendedProperties.ContainsKey(typeof(TableInfo)) == true)
                     continue;
 
-                this.AddRepositoryPath(dataTable);
+                this.AddRepositoryPath(item);
             }
         }
 
@@ -308,16 +306,11 @@ namespace Ntreev.Crema.Services.Data
         {
             foreach (var item in this.tables)
             {
-                var dataTable = item.Key;
-                var table = item.Value;
-
-                var path1 = table.Path;
-                var path2 = dataTable.CategoryPath + dataTable.Name;
-
-                if (path1 == path2)
+                var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
+                if (tableInfo.Path == item.Path)
                     continue;
 
-                this.MoveRepositoryPath(dataTable, table);
+                this.MoveRepositoryPath(item, tableInfo.Path);
             }
         }
 
@@ -325,13 +318,11 @@ namespace Ntreev.Crema.Services.Data
         {
             foreach (var item in this.tables)
             {
-                var dataTable = item.Key;
-                var table = item.Value;
-
-                if (dataTable.DataSet != null)
+                var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
+                if (item.DataSet != null)
                     continue;
 
-                this.DeleteRepositoryPath(dataTable, table);
+                this.DeleteRepositoryPath(item, tableInfo.Path);
             }
         }
 
@@ -369,10 +360,10 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        private void MoveRepositoryPath(CremaDataType dataType, Type type)
+        private void MoveRepositoryPath(CremaDataType dataType, string typePath)
         {
-            var context = type.Context;
-            var files = context.GetFiles(type.ItemPath);
+            var itemPath = this.dataBase.TypeContext.GeneratePath(typePath);
+            var files = this.dataBase.TypeContext.GetFiles(itemPath);
 
             for (var i = 0; i < files.Length; i++)
             {
@@ -383,10 +374,10 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        private void DeleteRepositoryPath(CremaDataType dataType, Type type)
+        private void DeleteRepositoryPath(CremaDataType dataType, string typePath)
         {
-            var context = type.Context;
-            var files = context.GetFiles(type.ItemPath);
+            var itemPath = this.dataBase.TypeContext.GeneratePath(typePath);
+            var files = this.dataBase.TypeContext.GetFiles(itemPath);
             this.Repository.DeleteRange(files);
         }
 
@@ -424,10 +415,10 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        private void MoveRepositoryPath(CremaDataTable dataTable, Table table)
+        private void MoveRepositoryPath(CremaDataTable dataTable, string tablePath)
         {
-            var context = table.Context;
-            var files = context.GetFiles(table.ItemPath);
+            var itemPath = this.dataBase.TableContext.GeneratePath(tablePath);
+            var files = this.dataBase.TableContext.GetFiles(itemPath);
 
             for (var i = 0; i < files.Length; i++)
             {
@@ -438,10 +429,10 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        private void DeleteRepositoryPath(CremaDataTable dataTable, Table table)
+        private void DeleteRepositoryPath(CremaDataTable dataTable, string tablePath)
         {
-            var context = table.Context;
-            var files = context.GetFiles(table.ItemPath);
+            var itemPath = this.dataBase.TableContext.GeneratePath(tablePath);
+            var files = this.dataBase.TableContext.GetFiles(itemPath);
             this.Repository.DeleteRange(files);
         }
 

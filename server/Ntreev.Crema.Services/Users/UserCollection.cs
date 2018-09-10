@@ -162,7 +162,6 @@ namespace Ntreev.Crema.Services.Users
                 serializationInfo.Name = userName;
             if (authority.HasValue)
                 serializationInfo.Authority = authority.Value;
-
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
@@ -227,11 +226,6 @@ namespace Ntreev.Crema.Services.Users
                     throw;
                 }
             });
-        }
-
-        public void InvokeUserKick(Authentication authentication, User user, string comment)
-        {
-
         }
 
         public void InvokeUsersCreatedEvent(Authentication authentication, User[] users)
