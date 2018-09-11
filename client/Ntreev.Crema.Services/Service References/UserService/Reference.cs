@@ -18,50 +18,98 @@ namespace Ntreev.Crema.Services.UserService {
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/Subscribe", ReplyAction="http://www.ntreev.com/IUserService/SubscribeResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserContextMetaData> Subscribe(string userID, byte[] password, string version, string platformID, string culture);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/Subscribe", ReplyAction="http://www.ntreev.com/IUserService/SubscribeResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserContextMetaData>> SubscribeAsync(string userID, byte[] password, string version, string platformID, string culture);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/Unsubscribe", ReplyAction="http://www.ntreev.com/IUserService/UnsubscribeResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Unsubscribe();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/Unsubscribe", ReplyAction="http://www.ntreev.com/IUserService/UnsubscribeResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> UnsubscribeAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/Shutdown", ReplyAction="http://www.ntreev.com/IUserService/ShutdownResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Shutdown(int milliseconds, Ntreev.Crema.ServiceModel.ShutdownType shutdownType, string message);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/Shutdown", ReplyAction="http://www.ntreev.com/IUserService/ShutdownResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> ShutdownAsync(int milliseconds, Ntreev.Crema.ServiceModel.ShutdownType shutdownType, string message);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/CancelShutdown", ReplyAction="http://www.ntreev.com/IUserService/CancelShutdownResponse")]
         Ntreev.Crema.ServiceModel.ResultBase CancelShutdown();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/CancelShutdown", ReplyAction="http://www.ntreev.com/IUserService/CancelShutdownResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> CancelShutdownAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/NewUser", ReplyAction="http://www.ntreev.com/IUserService/NewUserResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserInfo> NewUser(string userID, string categoryPath, byte[] password, string userName, Ntreev.Crema.ServiceModel.Authority authority);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/NewUser", ReplyAction="http://www.ntreev.com/IUserService/NewUserResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserInfo>> NewUserAsync(string userID, string categoryPath, byte[] password, string userName, Ntreev.Crema.ServiceModel.Authority authority);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/NewUserCategory", ReplyAction="http://www.ntreev.com/IUserService/NewUserCategoryResponse")]
         Ntreev.Crema.ServiceModel.ResultBase NewUserCategory(string categoryPath);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/NewUserCategory", ReplyAction="http://www.ntreev.com/IUserService/NewUserCategoryResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> NewUserCategoryAsync(string categoryPath);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/RenameUserItem", ReplyAction="http://www.ntreev.com/IUserService/RenameUserItemResponse")]
         Ntreev.Crema.ServiceModel.ResultBase RenameUserItem(string itemPath, string newName);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/RenameUserItem", ReplyAction="http://www.ntreev.com/IUserService/RenameUserItemResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> RenameUserItemAsync(string itemPath, string newName);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/MoveUserItem", ReplyAction="http://www.ntreev.com/IUserService/MoveUserItemResponse")]
         Ntreev.Crema.ServiceModel.ResultBase MoveUserItem(string itemPath, string parentPath);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/MoveUserItem", ReplyAction="http://www.ntreev.com/IUserService/MoveUserItemResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> MoveUserItemAsync(string itemPath, string parentPath);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/DeleteUserItem", ReplyAction="http://www.ntreev.com/IUserService/DeleteUserItemResponse")]
         Ntreev.Crema.ServiceModel.ResultBase DeleteUserItem(string itemPath);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/DeleteUserItem", ReplyAction="http://www.ntreev.com/IUserService/DeleteUserItemResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> DeleteUserItemAsync(string itemPath);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/ChangeUserInfo", ReplyAction="http://www.ntreev.com/IUserService/ChangeUserInfoResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserInfo> ChangeUserInfo(string userID, byte[] password, byte[] newPassword, string userName, System.Nullable<Ntreev.Crema.ServiceModel.Authority> authority);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/ChangeUserInfo", ReplyAction="http://www.ntreev.com/IUserService/ChangeUserInfoResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserInfo>> ChangeUserInfoAsync(string userID, byte[] password, byte[] newPassword, string userName, System.Nullable<Ntreev.Crema.ServiceModel.Authority> authority);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/Kick", ReplyAction="http://www.ntreev.com/IUserService/KickResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Kick(string userID, string comment);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/Kick", ReplyAction="http://www.ntreev.com/IUserService/KickResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> KickAsync(string userID, string comment);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/Ban", ReplyAction="http://www.ntreev.com/IUserService/BanResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.BanInfo> Ban(string userID, string comment);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/Ban", ReplyAction="http://www.ntreev.com/IUserService/BanResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.BanInfo>> BanAsync(string userID, string comment);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/Unban", ReplyAction="http://www.ntreev.com/IUserService/UnbanResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Unban(string userID);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/Unban", ReplyAction="http://www.ntreev.com/IUserService/UnbanResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> UnbanAsync(string userID);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/SendMessage", ReplyAction="http://www.ntreev.com/IUserService/SendMessageResponse")]
         Ntreev.Crema.ServiceModel.ResultBase SendMessage(string userID, string message);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/SendMessage", ReplyAction="http://www.ntreev.com/IUserService/SendMessageResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> SendMessageAsync(string userID, string message);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/NotifyMessage", ReplyAction="http://www.ntreev.com/IUserService/NotifyMessageResponse")]
         Ntreev.Crema.ServiceModel.ResultBase NotifyMessage(string[] userIDs, string message);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/NotifyMessage", ReplyAction="http://www.ntreev.com/IUserService/NotifyMessageResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> NotifyMessageAsync(string[] userIDs, string message);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/IsAlive", ReplyAction="http://www.ntreev.com/IUserService/IsAliveResponse")]
         bool IsAlive();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/IsAlive", ReplyAction="http://www.ntreev.com/IUserService/IsAliveResponse")]
+        System.Threading.Tasks.Task<bool> IsAliveAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -139,64 +187,128 @@ namespace Ntreev.Crema.Services.UserService {
             return base.Channel.Subscribe(userID, password, version, platformID, culture);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserContextMetaData>> SubscribeAsync(string userID, byte[] password, string version, string platformID, string culture) {
+            return base.Channel.SubscribeAsync(userID, password, version, platformID, culture);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase Unsubscribe() {
             return base.Channel.Unsubscribe();
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> UnsubscribeAsync() {
+            return base.Channel.UnsubscribeAsync();
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase Shutdown(int milliseconds, Ntreev.Crema.ServiceModel.ShutdownType shutdownType, string message) {
             return base.Channel.Shutdown(milliseconds, shutdownType, message);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> ShutdownAsync(int milliseconds, Ntreev.Crema.ServiceModel.ShutdownType shutdownType, string message) {
+            return base.Channel.ShutdownAsync(milliseconds, shutdownType, message);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase CancelShutdown() {
             return base.Channel.CancelShutdown();
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> CancelShutdownAsync() {
+            return base.Channel.CancelShutdownAsync();
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserInfo> NewUser(string userID, string categoryPath, byte[] password, string userName, Ntreev.Crema.ServiceModel.Authority authority) {
             return base.Channel.NewUser(userID, categoryPath, password, userName, authority);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserInfo>> NewUserAsync(string userID, string categoryPath, byte[] password, string userName, Ntreev.Crema.ServiceModel.Authority authority) {
+            return base.Channel.NewUserAsync(userID, categoryPath, password, userName, authority);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase NewUserCategory(string categoryPath) {
             return base.Channel.NewUserCategory(categoryPath);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> NewUserCategoryAsync(string categoryPath) {
+            return base.Channel.NewUserCategoryAsync(categoryPath);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase RenameUserItem(string itemPath, string newName) {
             return base.Channel.RenameUserItem(itemPath, newName);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> RenameUserItemAsync(string itemPath, string newName) {
+            return base.Channel.RenameUserItemAsync(itemPath, newName);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase MoveUserItem(string itemPath, string parentPath) {
             return base.Channel.MoveUserItem(itemPath, parentPath);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> MoveUserItemAsync(string itemPath, string parentPath) {
+            return base.Channel.MoveUserItemAsync(itemPath, parentPath);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase DeleteUserItem(string itemPath) {
             return base.Channel.DeleteUserItem(itemPath);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> DeleteUserItemAsync(string itemPath) {
+            return base.Channel.DeleteUserItemAsync(itemPath);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserInfo> ChangeUserInfo(string userID, byte[] password, byte[] newPassword, string userName, System.Nullable<Ntreev.Crema.ServiceModel.Authority> authority) {
             return base.Channel.ChangeUserInfo(userID, password, newPassword, userName, authority);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserInfo>> ChangeUserInfoAsync(string userID, byte[] password, byte[] newPassword, string userName, System.Nullable<Ntreev.Crema.ServiceModel.Authority> authority) {
+            return base.Channel.ChangeUserInfoAsync(userID, password, newPassword, userName, authority);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase Kick(string userID, string comment) {
             return base.Channel.Kick(userID, comment);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> KickAsync(string userID, string comment) {
+            return base.Channel.KickAsync(userID, comment);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.BanInfo> Ban(string userID, string comment) {
             return base.Channel.Ban(userID, comment);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.BanInfo>> BanAsync(string userID, string comment) {
+            return base.Channel.BanAsync(userID, comment);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase Unban(string userID) {
             return base.Channel.Unban(userID);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> UnbanAsync(string userID) {
+            return base.Channel.UnbanAsync(userID);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase SendMessage(string userID, string message) {
             return base.Channel.SendMessage(userID, message);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> SendMessageAsync(string userID, string message) {
+            return base.Channel.SendMessageAsync(userID, message);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase NotifyMessage(string[] userIDs, string message) {
             return base.Channel.NotifyMessage(userIDs, message);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> NotifyMessageAsync(string[] userIDs, string message) {
+            return base.Channel.NotifyMessageAsync(userIDs, message);
+        }
+        
         public bool IsAlive() {
             return base.Channel.IsAlive();
+        }
+        
+        public System.Threading.Tasks.Task<bool> IsAliveAsync() {
+            return base.Channel.IsAliveAsync();
         }
     }
 }

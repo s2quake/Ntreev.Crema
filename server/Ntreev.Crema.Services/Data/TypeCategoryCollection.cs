@@ -45,15 +45,15 @@ namespace Ntreev.Crema.Services.Data
 
         }
 
-        public Task<TypeCategory> AddNewAsync(Authentication authentication, string name, string parentPath)
+        public async Task<TypeCategory> AddNewAsync(Authentication authentication, string name, string parentPath)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                return await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.ValidateAddNew(authentication, name, parentPath);
-                    this.Sign(authentication);
-                    this.InvokeCategoryCreate(authentication, name, parentPath);
+                    var signatureDate = await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
+                    this.Sign(authentication, signatureDate);
                     var category = this.BaseAddNew(name, parentPath, authentication);
                     var items = EnumerableUtility.One(category).ToArray();
                     this.InvokeCategoriesCreatedEvent(authentication, items);
@@ -72,23 +72,28 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public void InvokeCategoryCreate(Authentication authentication, string name, string parentPath)
+        public Task<SignatureDate> InvokeCategoryCreateAsync(Authentication authentication, string name, string parentPath)
         {
             var categoryName = new CategoryName(parentPath, name);
             var itemPath = this.Context.GenerateCategoryPath(parentPath, name);
             var message = EventMessageBuilder.CreateTypeCategory(authentication, categoryName);
-            try
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                Directory.CreateDirectory(itemPath);
-                this.Repository.Add(itemPath);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                DirectoryUtility.Delete(itemPath);
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    Directory.CreateDirectory(itemPath);
+                    this.Repository.Add(itemPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    DirectoryUtility.Delete(itemPath);
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public Task<SignatureDate> InvokeCategoryRenameAsync(Authentication authentication, TypeCategory category, string name, CremaDataSet dataSet)
@@ -299,6 +304,11 @@ namespace Ntreev.Crema.Services.Data
         private void Sign(Authentication authentication)
         {
             authentication.Sign();
+        }
+
+        private void Sign(Authentication authentication, SignatureDate signatureDate)
+        {
+            authentication.Sign(signatureDate.DateTime);
         }
 
         private void ValidateAddNew(Authentication authentication, string name, string parentPath)

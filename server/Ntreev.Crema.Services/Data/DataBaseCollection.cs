@@ -99,35 +99,35 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void InvokeDataBaseLock(Authentication authentication, DataBase dataBase, string comment)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseLock), dataBase, comment);
-        }
+        //public void InvokeDataBaseLock(Authentication authentication, DataBase dataBase, string comment)
+        //{
+        //    this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseLock), dataBase, comment);
+        //}
 
-        public void InvokeDataBaseUnlock(Authentication authentication, DataBase dataBase)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseUnlock), dataBase);
-        }
+        //public void InvokeDataBaseUnlock(Authentication authentication, DataBase dataBase)
+        //{
+        //    this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseUnlock), dataBase);
+        //}
 
         //public void InvokeDataBaseLoad(Authentication authentication, DataBase dataBase)
         //{
         //    this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseLoad), dataBase);
         //}
 
-        public void InvokeDataBaseUnload(Authentication authentication, DataBase dataBase)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseUnload), dataBase);
-        }
+        //public void InvokeDataBaseUnload(Authentication authentication, DataBase dataBase)
+        //{
+        //    this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseUnload), dataBase);
+        //}
 
-        public void InvokeDataBaseResetting(Authentication authentication, DataBase dataBase)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseResetting), dataBase);
-        }
+        //public void InvokeDataBaseResetting(Authentication authentication, DataBase dataBase)
+        //{
+        //    this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseResetting), dataBase);
+        //}
 
-        public void InvokeDataBaseReset(Authentication authentication, DataBase dataBase)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseReset), dataBase);
-        }
+        //public void InvokeDataBaseReset(Authentication authentication, DataBase dataBase)
+        //{
+        //    this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseReset), dataBase);
+        //}
 
         public Task<DataBase> CreateDataBaseAsync(Authentication authentication, string dataBaseName, string comment)
         {

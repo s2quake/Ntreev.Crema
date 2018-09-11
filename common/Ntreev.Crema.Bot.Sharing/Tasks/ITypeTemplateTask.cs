@@ -85,7 +85,7 @@ namespace Ntreev.Crema.Bot.Tasks
 
                 if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
                 {
-                    var member = template.AddNewAsync(context.Authentication);
+                    var member = await template.AddNewAsync(context.Authentication);
                     context.Push(member);
                     context.State = System.Data.DataRowState.Detached;
                 }

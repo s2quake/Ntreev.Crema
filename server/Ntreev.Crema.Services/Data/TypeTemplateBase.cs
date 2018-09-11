@@ -42,11 +42,11 @@ namespace Ntreev.Crema.Services.Data
         private EventHandler editCanceled;
         private EventHandler changed;
 
-        public Task<TypeMember> AddNewAsync(Authentication authentication)
+        public async Task<TypeMember> AddNewAsync(Authentication authentication)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
                     return new TypeMember(this, this.TypeSource.View.Table);
                 });
@@ -166,54 +166,22 @@ namespace Ntreev.Crema.Services.Data
 
         public Task SetTypeNameAsync(Authentication authentication, string value)
         {
-            try
-            {
-                return this.domain.SetPropertyAsync(authentication, CremaSchema.TypeName, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domain.SetPropertyAsync(authentication, CremaSchema.TypeName, value);
         }
 
         public Task SetTagsAsync(Authentication authentication, TagInfo value)
         {
-            try
-            {
-                return this.domain.SetPropertyAsync(authentication, CremaSchema.Tags, (string)value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domain.SetPropertyAsync(authentication, CremaSchema.Tags, (string)value);
         }
 
         public Task SetIsFlagAsync(Authentication authentication, bool value)
         {
-            try
-            {
-                return this.domain.SetPropertyAsync(authentication, CremaSchema.IsFlag, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domain.SetPropertyAsync(authentication, CremaSchema.IsFlag, value);
         }
 
         public Task SetCommentAsync(Authentication authentication, string value)
         {
-            try
-            {
-                return this.domain.SetPropertyAsync(authentication, CremaSchema.Comment, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domain.SetPropertyAsync(authentication, CremaSchema.Comment, value);
         }
 
         public Task<bool> ContainsAsync(string memberName)
@@ -542,23 +510,9 @@ namespace Ntreev.Crema.Services.Data
             await this.EndNewAsync(authentication, member as TypeMember);
         }
 
-        IType ITypeTemplate.Type
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Type;
-            }
-        }
+        IType ITypeTemplate.Type => this.Type;
 
-        IDomain ITypeTemplate.Domain
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Domain;
-            }
-        }
+        IDomain ITypeTemplate.Domain => this.Domain;
 
         ITypeMember ITypeTemplate.this[string columnName]
         {

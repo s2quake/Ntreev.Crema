@@ -126,7 +126,7 @@ namespace Ntreev.Crema.Services
         {
             try
             {
-                await this.Dispatcher.InvokeAsync(async () =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.OnOpening(EventArgs.Empty);
                     this.Info(Resources.Message_ProgramInfo, AppUtility.ProductName, AppUtility.ProductVersion);
@@ -211,11 +211,11 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        public Task ShutdownAsync(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message)
+        public async Task ShutdownAsync(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(async () =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, shutdownType, message);
                     this.ValidateShutdown(authentication, milliseconds);

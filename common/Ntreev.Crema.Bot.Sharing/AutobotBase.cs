@@ -31,7 +31,7 @@ using System.Security;
 
 namespace Ntreev.Crema.Bot
 {
-    public abstract class AutobotBase
+    public abstract class AutobotBase : IServiceProvider
     {
         private readonly static object error = new object();
         private readonly string autobotID;
@@ -43,7 +43,7 @@ namespace Ntreev.Crema.Bot
         {
             this.autobotID = autobotID;
             this.MinSleepTime = 1;
-            this.MaxSleepTime = 1000;
+            this.MaxSleepTime = 10;
         }
 
         public void Cancel()
@@ -84,11 +84,6 @@ namespace Ntreev.Crema.Bot
             get { return this.autobotID; }
         }
 
-        public abstract ICremaHost CremaHost
-        {
-            get;
-        }
-
         public abstract AutobotServiceBase Service
         {
             get;
@@ -100,11 +95,13 @@ namespace Ntreev.Crema.Bot
             set { this.taskContext.AllowException = value; }
         }
 
-        public Task ExecuteAsync(IEnumerable<ITaskProvider> taskProviders)
+        public abstract object GetService(Type serviceType);
+
+        public async Task ExecuteAsync(IEnumerable<ITaskProvider> taskProviders)
         {
             this.taskProviders = taskProviders;
             this.taskContext.Push(this);
-            return Task.Run(() => this.Execute(taskProviders));
+            await Task.Run(async () => await this.Execute(taskProviders));
         }
 
         public event EventHandler Disposed;
@@ -141,12 +138,15 @@ namespace Ntreev.Crema.Bot
             }
         }
 
-        private void Execute(IEnumerable<ITaskProvider> taskProviders)
+        private async Task Execute(IEnumerable<ITaskProvider> taskProviders)
         {
             try
             {
                 while (this.cancelTokenSource.IsCancellationRequested == false)
                 {
+                    var sleep = RandomUtility.Next(this.MinSleepTime, this.MaxSleepTime);
+                    Thread.Sleep(sleep);
+
                     if (this.taskContext.Target == null)
                     {
                         this.taskContext.Push(this);
@@ -175,11 +175,15 @@ namespace Ntreev.Crema.Bot
                         this.InvokeTask(method, taskProvider, this.taskContext.Target);
                     }
                 }
+                if (this.taskContext.Authentication != null)
+                {
+                    await this.OnLogoutAsync(this.taskContext.Authentication);
+                }
                 this.OnDisposed(EventArgs.Empty);
             }
-            catch
+            catch (Exception e)
             {
-                int qwer = 0;
+                CremaLog.Fatal(e);
             }
         }
 

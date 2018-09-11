@@ -42,11 +42,11 @@ namespace Ntreev.Crema.Services.Data
         private EventHandler editCanceled;
         private EventHandler changed;
 
-        public Task<TableColumn> AddNewAsync(Authentication authentication)
+        public async Task<TableColumn> AddNewAsync(Authentication authentication)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
                     return new TableColumn(this, this.TemplateSource.View.Table);
                 });
@@ -58,11 +58,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task EndNewAsync(Authentication authentication, TableColumn column)
+        public async Task EndNewAsync(Authentication authentication, TableColumn column)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(async () =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.table.RowChanged -= Table_RowChanged;
                     try
@@ -107,9 +107,9 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync));
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync));
                     this.ValidateEndEdit(authentication);
                     this.Sign(authentication);
                     await this.OnEndEditAsync(authentication, this.TemplateSource);
@@ -127,9 +127,9 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync));
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync));
                     this.ValidateCancelEdit(authentication);
                     this.Sign(authentication);
                     await this.OnCancelEditAsync(authentication);
@@ -145,41 +145,17 @@ namespace Ntreev.Crema.Services.Data
 
         public Task SetTableNameAsync(Authentication authentication, string value)
         {
-            try
-            {
-                return this.domain.SetPropertyAsync(authentication, CremaSchema.TableName, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domain.SetPropertyAsync(authentication, CremaSchema.TableName, value);
         }
 
         public Task SetTagsAsync(Authentication authentication, TagInfo value)
         {
-            try
-            {
-                return this.domain.SetPropertyAsync(authentication, CremaSchema.Tags, (string)value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domain.SetPropertyAsync(authentication, CremaSchema.Tags, (string)value);
         }
 
         public Task SetCommentAsync(Authentication authentication, string value)
         {
-            try
-            {
-                return this.domain.SetPropertyAsync(authentication, CremaSchema.Comment, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domain.SetPropertyAsync(authentication, CremaSchema.Comment, value);
         }
 
         public Task<bool> ContainsAsync(string columnName)
@@ -209,7 +185,7 @@ namespace Ntreev.Crema.Services.Data
 
         public abstract IDispatcherObject DispatcherObject { get; }
 
-        public CremaDispatcher Dispatcher => this.domain != null ? this.domain.Dispatcher : this.DispatcherObject.Dispatcher;
+        public CremaDispatcher Dispatcher => this.DispatcherObject.Dispatcher;
 
         public string TableName => this.TemplateSource.TableName;
 

@@ -57,7 +57,7 @@ namespace Ntreev.Crema.Services.Data
             return this.BaseAddNew(name, categoryPath, authentication);
         }
 
-        public Table[] AddNew(Authentication authentication, CremaDataSet dataSet)
+        public async Task<Table[]> AddNewAsync(Authentication authentication, CremaDataSet dataSet)
         {
             var query = from item in dataSet.Tables
                         where this.Contains(item.Name) == false
@@ -70,7 +70,7 @@ namespace Ntreev.Crema.Services.Data
                 this.ValidateAddNew(item.Name, item.CategoryPath, authentication);
             }
             var tableList = new List<Table>(tables.Length);
-            this.InvokeTableCreate(authentication, tables.Select(item => item.Name).ToArray(), dataSet, null);
+            await this.InvokeTableCreateAsync(authentication, tables.Select(item => item.Name).ToArray(), dataSet, null);
             foreach (var item in tables)
             {
                 var table = this.AddNew(authentication, item.Name, item.CategoryPath);
@@ -97,7 +97,7 @@ namespace Ntreev.Crema.Services.Data
                     var itemName = new ItemName(categoryPath, newTableName);
                     var newDataTable = dataTable.Inherit(itemName, copyContent);
                     newDataTable.CategoryPath = categoryPath;
-                    this.AddNew(authentication, dataSet);
+                    await this.AddNewAsync(authentication, dataSet);
                     return this[newTableName];
                 });
             }
@@ -121,7 +121,7 @@ namespace Ntreev.Crema.Services.Data
                     var itemName = new ItemName(categoryPath, newTableName);
                     var newDataTable = dataTable.Copy(itemName, copyContent);
                     newDataTable.CategoryPath = categoryPath;
-                    this.AddNew(authentication, dataSet);
+                    await this.AddNewAsync(authentication, dataSet);
                     return this[newTableName];
                 });
             }
@@ -137,25 +137,31 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public void InvokeTableCreate(Authentication authentication, string[] tableNames, CremaDataSet dataSet, Table sourceTable)
+        public Task<SignatureDate> InvokeTableCreateAsync(Authentication authentication, string[] tableNames, CremaDataSet dataSet, Table sourceTable)
         {
             var message = EventMessageBuilder.CreateTable(authentication, tableNames);
-            try
+            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.CreateTable(dataSet);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.CreateTable(dataBaseSet);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public Task<SignatureDate> InvokeTableRenameAsync(Authentication authentication, Table table, string newName, CremaDataSet dataSet)
         {
             var message = EventMessageBuilder.RenameTable(authentication, table.Name, newName);
-            var dataBaseSet = new DataBaseSet(table.DataBase, dataSet);
+            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
             var tablePath = table.Path;
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
@@ -177,7 +183,7 @@ namespace Ntreev.Crema.Services.Data
         public Task<SignatureDate> InvokeTableMoveAsync(Authentication authentication, Table table, string newCategoryPath, CremaDataSet dataSet)
         {
             var message = EventMessageBuilder.MoveTable(authentication, table.Name, newCategoryPath, table.Category.Path);
-            var dataBaseSet = new DataBaseSet(table.DataBase, dataSet);
+            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
             var tablePath = table.Path;
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
@@ -199,7 +205,7 @@ namespace Ntreev.Crema.Services.Data
         public Task<SignatureDate> InvokeTableDeleteAsync(Authentication authentication, Table table, CremaDataSet dataSet)
         {
             var message = EventMessageBuilder.DeleteTable(authentication, table.Name);
-            var dataBaseSet = new DataBaseSet(table.DataBase, dataSet);
+            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
             var tablePath = table.Path;
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {

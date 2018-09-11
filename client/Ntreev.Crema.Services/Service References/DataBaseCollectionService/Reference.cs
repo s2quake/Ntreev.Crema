@@ -18,68 +18,134 @@ namespace Ntreev.Crema.Services.DataBaseCollectionService {
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/DefinitionType", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/DefinitionTypeResponse")]
         Ntreev.Crema.ServiceModel.ResultBase DefinitionType(Ntreev.Crema.ServiceModel.LogInfo[] param1);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/DefinitionType", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/DefinitionTypeResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> DefinitionTypeAsync(Ntreev.Crema.ServiceModel.LogInfo[] param1);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Subscribe", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/SubscribeResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseCollectionMetaData> Subscribe(System.Guid authenticationToken);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Subscribe", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/SubscribeResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseCollectionMetaData>> SubscribeAsync(System.Guid authenticationToken);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Unsubscribe", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/UnsubscribeResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Unsubscribe();
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Unsubscribe", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/UnsubscribeResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> UnsubscribeAsync();
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/SetPublic", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/SetPublicResponse")]
         Ntreev.Crema.ServiceModel.ResultBase SetPublic(string dataBaseName);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/SetPublic", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/SetPublicResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> SetPublicAsync(string dataBaseName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/SetPrivate", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/SetPrivateResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.AccessInfo> SetPrivate(string dataBaseName);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/SetPrivate", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/SetPrivateResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.AccessInfo>> SetPrivateAsync(string dataBaseName);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/AddAccessMember", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/AddAccessMemberResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.AccessMemberInfo> AddAccessMember(string dataBaseName, string memberID, Ntreev.Crema.ServiceModel.AccessType accessType);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/AddAccessMember", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/AddAccessMemberResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.AccessMemberInfo>> AddAccessMemberAsync(string dataBaseName, string memberID, Ntreev.Crema.ServiceModel.AccessType accessType);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/SetAccessMember", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/SetAccessMemberResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.AccessMemberInfo> SetAccessMember(string dataBaseName, string memberID, Ntreev.Crema.ServiceModel.AccessType accessType);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/SetAccessMember", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/SetAccessMemberResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.AccessMemberInfo>> SetAccessMemberAsync(string dataBaseName, string memberID, Ntreev.Crema.ServiceModel.AccessType accessType);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/RemoveAccessMember", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/RemoveAccessMemberResponse")]
         Ntreev.Crema.ServiceModel.ResultBase RemoveAccessMember(string dataBaseName, string memberID);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/RemoveAccessMember", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/RemoveAccessMemberResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> RemoveAccessMemberAsync(string dataBaseName, string memberID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Lock", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/LockResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.LockInfo> Lock(string dataBaseName, string comment);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Lock", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/LockResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.LockInfo>> LockAsync(string dataBaseName, string comment);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Unlock", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/UnlockResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Unlock(string dataBaseName);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Unlock", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/UnlockResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> UnlockAsync(string dataBaseName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Load", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/LoadResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Load(string dataBaseName);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Load", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/LoadResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> LoadAsync(string dataBaseName);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Unload", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/UnloadResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Unload(string dataBaseName);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Unload", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/UnloadResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> UnloadAsync(string dataBaseName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Create", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/CreateResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo> Create(string dataBaseName, string comment);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Create", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/CreateResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo>> CreateAsync(string dataBaseName, string comment);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Copy", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/CopyResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo> Copy(string dataBaseName, string newDataBaseName, string comment, bool force);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Copy", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/CopyResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo>> CopyAsync(string dataBaseName, string newDataBaseName, string comment, bool force);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Rename", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/RenameResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Rename(string dataBaseName, string newDataBaseName);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Rename", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/RenameResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> RenameAsync(string dataBaseName, string newDataBaseName);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Delete", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/DeleteResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Delete(string dataBaseName);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Delete", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/DeleteResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> DeleteAsync(string dataBaseName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/GetLog", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/GetLogResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.LogInfo[]> GetLog(string dataBaseName, string revision);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/GetLog", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/GetLogResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.LogInfo[]>> GetLogAsync(string dataBaseName, string revision);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Revert", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/RevertResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo> Revert(string dataBaseName, string revision);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/Revert", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/RevertResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo>> RevertAsync(string dataBaseName, string revision);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/BeginTransaction", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/BeginTransactionResponse")]
         Ntreev.Crema.ServiceModel.ResultBase BeginTransaction(string dataBaseName);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/BeginTransaction", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/BeginTransactionResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> BeginTransactionAsync(string dataBaseName);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/EndTransaction", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/EndTransactionResponse")]
         Ntreev.Crema.ServiceModel.ResultBase EndTransaction(string dataBaseName);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/EndTransaction", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/EndTransactionResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> EndTransactionAsync(string dataBaseName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/CancelTransaction", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/CancelTransactionResponse")]
         Ntreev.Crema.ServiceModel.ResultBase CancelTransaction(string dataBaseName);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/CancelTransaction", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/CancelTransactionResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> CancelTransactionAsync(string dataBaseName);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/IsAlive", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/IsAliveResponse")]
         bool IsAlive();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseCollectionService/IsAlive", ReplyAction="http://www.ntreev.com/IDataBaseCollectionService/IsAliveResponse")]
+        System.Threading.Tasks.Task<bool> IsAliveAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -161,88 +227,176 @@ namespace Ntreev.Crema.Services.DataBaseCollectionService {
             return base.Channel.DefinitionType(param1);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> DefinitionTypeAsync(Ntreev.Crema.ServiceModel.LogInfo[] param1) {
+            return base.Channel.DefinitionTypeAsync(param1);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseCollectionMetaData> Subscribe(System.Guid authenticationToken) {
             return base.Channel.Subscribe(authenticationToken);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseCollectionMetaData>> SubscribeAsync(System.Guid authenticationToken) {
+            return base.Channel.SubscribeAsync(authenticationToken);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase Unsubscribe() {
             return base.Channel.Unsubscribe();
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> UnsubscribeAsync() {
+            return base.Channel.UnsubscribeAsync();
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase SetPublic(string dataBaseName) {
             return base.Channel.SetPublic(dataBaseName);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> SetPublicAsync(string dataBaseName) {
+            return base.Channel.SetPublicAsync(dataBaseName);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.AccessInfo> SetPrivate(string dataBaseName) {
             return base.Channel.SetPrivate(dataBaseName);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.AccessInfo>> SetPrivateAsync(string dataBaseName) {
+            return base.Channel.SetPrivateAsync(dataBaseName);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.AccessMemberInfo> AddAccessMember(string dataBaseName, string memberID, Ntreev.Crema.ServiceModel.AccessType accessType) {
             return base.Channel.AddAccessMember(dataBaseName, memberID, accessType);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.AccessMemberInfo>> AddAccessMemberAsync(string dataBaseName, string memberID, Ntreev.Crema.ServiceModel.AccessType accessType) {
+            return base.Channel.AddAccessMemberAsync(dataBaseName, memberID, accessType);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.AccessMemberInfo> SetAccessMember(string dataBaseName, string memberID, Ntreev.Crema.ServiceModel.AccessType accessType) {
             return base.Channel.SetAccessMember(dataBaseName, memberID, accessType);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.AccessMemberInfo>> SetAccessMemberAsync(string dataBaseName, string memberID, Ntreev.Crema.ServiceModel.AccessType accessType) {
+            return base.Channel.SetAccessMemberAsync(dataBaseName, memberID, accessType);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase RemoveAccessMember(string dataBaseName, string memberID) {
             return base.Channel.RemoveAccessMember(dataBaseName, memberID);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> RemoveAccessMemberAsync(string dataBaseName, string memberID) {
+            return base.Channel.RemoveAccessMemberAsync(dataBaseName, memberID);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.LockInfo> Lock(string dataBaseName, string comment) {
             return base.Channel.Lock(dataBaseName, comment);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.LockInfo>> LockAsync(string dataBaseName, string comment) {
+            return base.Channel.LockAsync(dataBaseName, comment);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase Unlock(string dataBaseName) {
             return base.Channel.Unlock(dataBaseName);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> UnlockAsync(string dataBaseName) {
+            return base.Channel.UnlockAsync(dataBaseName);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase Load(string dataBaseName) {
             return base.Channel.Load(dataBaseName);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> LoadAsync(string dataBaseName) {
+            return base.Channel.LoadAsync(dataBaseName);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase Unload(string dataBaseName) {
             return base.Channel.Unload(dataBaseName);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> UnloadAsync(string dataBaseName) {
+            return base.Channel.UnloadAsync(dataBaseName);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo> Create(string dataBaseName, string comment) {
             return base.Channel.Create(dataBaseName, comment);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo>> CreateAsync(string dataBaseName, string comment) {
+            return base.Channel.CreateAsync(dataBaseName, comment);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo> Copy(string dataBaseName, string newDataBaseName, string comment, bool force) {
             return base.Channel.Copy(dataBaseName, newDataBaseName, comment, force);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo>> CopyAsync(string dataBaseName, string newDataBaseName, string comment, bool force) {
+            return base.Channel.CopyAsync(dataBaseName, newDataBaseName, comment, force);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase Rename(string dataBaseName, string newDataBaseName) {
             return base.Channel.Rename(dataBaseName, newDataBaseName);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> RenameAsync(string dataBaseName, string newDataBaseName) {
+            return base.Channel.RenameAsync(dataBaseName, newDataBaseName);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase Delete(string dataBaseName) {
             return base.Channel.Delete(dataBaseName);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> DeleteAsync(string dataBaseName) {
+            return base.Channel.DeleteAsync(dataBaseName);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.LogInfo[]> GetLog(string dataBaseName, string revision) {
             return base.Channel.GetLog(dataBaseName, revision);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.LogInfo[]>> GetLogAsync(string dataBaseName, string revision) {
+            return base.Channel.GetLogAsync(dataBaseName, revision);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo> Revert(string dataBaseName, string revision) {
             return base.Channel.Revert(dataBaseName, revision);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo>> RevertAsync(string dataBaseName, string revision) {
+            return base.Channel.RevertAsync(dataBaseName, revision);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase BeginTransaction(string dataBaseName) {
             return base.Channel.BeginTransaction(dataBaseName);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> BeginTransactionAsync(string dataBaseName) {
+            return base.Channel.BeginTransactionAsync(dataBaseName);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase EndTransaction(string dataBaseName) {
             return base.Channel.EndTransaction(dataBaseName);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> EndTransactionAsync(string dataBaseName) {
+            return base.Channel.EndTransactionAsync(dataBaseName);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase CancelTransaction(string dataBaseName) {
             return base.Channel.CancelTransaction(dataBaseName);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> CancelTransactionAsync(string dataBaseName) {
+            return base.Channel.CancelTransactionAsync(dataBaseName);
+        }
+        
         public bool IsAlive() {
             return base.Channel.IsAlive();
+        }
+        
+        public System.Threading.Tasks.Task<bool> IsAliveAsync() {
+            return base.Channel.IsAliveAsync();
         }
     }
 }

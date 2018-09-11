@@ -232,6 +232,13 @@ namespace Ntreev.Crema.Bot.Tasks
         public async Task AddNewCategoryAsync(ITypeCategory category, TaskContext context)
         {
             var categoryNanme = RandomUtility.NextIdentifier();
+            if (context.AllowException == false)
+            {
+                if (category.Parent == null)
+                    return;
+                if (category.GetAccessType(context.Authentication) < AccessType.Master)
+                    return;
+            }
             await category.AddNewCategoryAsync(context.Authentication, categoryNanme);
         }
 

@@ -143,11 +143,10 @@ namespace Ntreev.Crema.Services.Data
         //    dataBaseSet.Serialize();
         //}
 
-        public static void CreateTable(CremaDataSet dataSet, DataBase dataBase)
+        public void CreateTable()
         {
-            var dataBaseSet = new DataBaseSet(dataBase, dataSet);
-            dataBaseSet.Serialize();
-            dataBaseSet.AddTablesRepositoryPath();
+            this.Serialize();
+            this.AddTablesRepositoryPath();
         }
 
         public void RenameTable(string tablePath, string tableName)
@@ -227,7 +226,7 @@ namespace Ntreev.Crema.Services.Data
                     var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
                     var tablePath = tableInfo.CategoryPath + tableInfo.Name;
                     var itemPath = tableContext.GeneratePath(tablePath);
-                    if (item.ExtendedProperties.ContainsKey(nameof(TableInfo.TemplatedParent)) == true)
+                    if (item.ExtendedProperties.ContainsKey(nameof(TableInfo.TemplatedParent)) == true && item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] != null)
                     {
                         var templateInfo = (TableInfo)item.ExtendedProperties[nameof(TableInfo.TemplatedParent)];
                         var templatedItemPath = tableContext.GeneratePath(templateInfo.CategoryPath + templateInfo.Name);

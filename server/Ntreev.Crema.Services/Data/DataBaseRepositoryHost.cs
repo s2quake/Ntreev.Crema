@@ -253,9 +253,9 @@ namespace Ntreev.Crema.Services.Data
         //    DataBaseSet.SetTypeTags(dataSet, type, tags);
         //}
 
-        public void CreateTable(CremaDataSet dataSet)
+        public void CreateTable(DataBaseSet dataBaseSet)
         {
-            DataBaseSet.CreateTable(dataSet, this.dataBase);
+            dataBaseSet.CreateTable();
         }
 
         public void RenameTable(DataBaseSet dataBaseSet, string tablePath, string tableName)

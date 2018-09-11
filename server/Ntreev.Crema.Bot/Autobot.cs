@@ -45,7 +45,10 @@ namespace Ntreev.Crema.Bot
             this.password = password;
         }
 
-        public override ICremaHost CremaHost => this.cremaHost;
+        public override object GetService(Type serviceType)
+        {
+            return this.cremaHost.GetService(serviceType);
+        }
 
         public override AutobotServiceBase Service => this.service;
 

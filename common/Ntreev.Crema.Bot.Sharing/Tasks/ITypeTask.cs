@@ -187,7 +187,7 @@ namespace Ntreev.Crema.Bot.Tasks
             await type.DeleteAsync(context.Authentication);
         }
 
-        [TaskMethod]
+        //[TaskMethod]
         public async Task SetTagsAsync(IType type, TaskContext context)
         {
             var tags = (TagInfo)TagInfoUtility.Names.Random();

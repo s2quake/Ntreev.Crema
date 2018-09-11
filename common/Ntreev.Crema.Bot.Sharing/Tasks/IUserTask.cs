@@ -46,7 +46,7 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 context.Pop(user);
             }
-            else if(RandomUtility.Within(50) == true)
+            else if (RandomUtility.Within(50) == true)
             {
                 context.Complete(user);
             }

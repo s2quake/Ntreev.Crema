@@ -127,12 +127,12 @@ namespace Ntreev.Crema.Services.Data
             if (this.parent is TableCategory category)
             {
                 var tables = category.GetService(typeof(TableCollection)) as TableCollection;
-                this.tables = this.DispatcherObject.Dispatcher.Invoke(() => tables.AddNew(authentication, template.TargetTable.DataSet.Copy()));
+                this.tables = await tables.AddNewAsync(authentication, template.TargetTable.DataSet.Copy());
             }
             else if (this.parent is Table table)
             {
                 var tables = table.GetService(typeof(TableCollection)) as TableCollection;
-                this.tables = this.DispatcherObject.Dispatcher.Invoke(() => tables.AddNew(authentication, template.TargetTable.DataSet.Copy()));
+                this.tables = await tables.AddNewAsync(authentication, template.TargetTable.DataSet.Copy());
             }
             this.parent = null;
         }
