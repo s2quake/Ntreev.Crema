@@ -54,11 +54,11 @@ namespace Ntreev.Crema.Services.Data
                 this.fields[CremaSchema.__ParentID__] = parentID;
         }
 
-        public Task DeleteAsync(Authentication authentication)
+        public async Task DeleteAsync(Authentication authentication)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(async () =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     if (this.Row == null)
                         throw new InvalidOperationException();
@@ -73,11 +73,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task EndNewAsync(Authentication authentication)
+        public async Task EndNewAsync(Authentication authentication)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(async () =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     if (this.Row != null)
                         throw new InvalidOperationException();
@@ -114,9 +114,9 @@ namespace Ntreev.Crema.Services.Data
             return this.Row.Field<T>(columnName);
         }
 
-        protected Task SetFieldAsync<T>(Authentication authentication, string columnName, T value)
+        protected async Task SetFieldAsync<T>(Authentication authentication, string columnName, T value)
         {
-            return this.Dispatcher.InvokeAsync(async () =>
+            await await this.Dispatcher.InvokeAsync(async () =>
             {
                 if (this.fields != null)
                 {

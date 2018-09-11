@@ -61,46 +61,44 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public static void SetTypeCategoryPath(CremaDataSet dataSet, TypeCategory category, string newCategoryPath)
+        public void SetTypeCategoryPath(string categoryPath, string newCategoryPath)
         {
-            var dataBaseSet = new DataBaseSet(category.DataBase, dataSet);
-            foreach (var item in dataBaseSet.types)
+            foreach (var item in this.types)
             {
                 var typeInfo = (TypeInfo)item.ExtendedProperties[typeof(TypeInfo)];
                 var typePath = typeInfo.CategoryPath + typeInfo.Name;
-                if (typePath.StartsWith(category.Path) == false)
+                if (typePath.StartsWith(categoryPath) == false)
                     continue;
 
-                item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + category.Path, newCategoryPath);
+                item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
             }
 
-            dataBaseSet.Serialize();
+            this.Serialize();
 
-            var itemPath1 = category.ItemPath;
-            var itemPath2 = dataBaseSet.dataBase.TypeContext.GenerateCategoryPath(newCategoryPath);
-            dataBaseSet.Repository.Move(itemPath1, itemPath2);
+            var itemPath1 = this.dataBase.TypeContext.GenerateCategoryPath(categoryPath);
+            var itemPath2 = this.dataBase.TypeContext.GenerateCategoryPath(newCategoryPath);
+            this.Repository.Move(itemPath1, itemPath2);
         }
 
-        public static void SetTableCategoryPath(CremaDataSet dataSet, TableCategory category, string newCategoryPath)
+        public void SetTableCategoryPath(string categoryPath, string newCategoryPath)
         {
-            var dataBaseSet = new DataBaseSet(category.DataBase, dataSet);
-            foreach (var item in dataBaseSet.tables)
+            foreach (var item in this.tables)
             {
                 var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
                 var tablePath = tableInfo.CategoryPath + tableInfo.Name;
-                if (tablePath.StartsWith(category.Path) == false)
+                if (tablePath.StartsWith(categoryPath) == false)
                     continue;
                 if (tableInfo.ParentName != string.Empty)
                     continue;
 
-                item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + category.Path, newCategoryPath);
+                item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
             }
 
-            dataBaseSet.Serialize();
+            this.Serialize();
 
-            var itemPath1 = category.ItemPath;
-            var itemPath2 = dataBaseSet.dataBase.TableContext.GenerateCategoryPath(newCategoryPath);
-            dataBaseSet.Repository.Move(itemPath1, itemPath2);
+            var itemPath1 = this.dataBase.TableContext.GenerateCategoryPath(categoryPath);
+            var itemPath2 = this.dataBase.TableContext.GenerateCategoryPath(newCategoryPath);
+            this.Repository.Move(itemPath1, itemPath2);
         }
 
         public void CreateType()
@@ -132,10 +130,9 @@ namespace Ntreev.Crema.Services.Data
             this.DeleteTypesRepositoryPath();
         }
 
-        public static void ModifyType(CremaDataSet dataSet, Type type)
+        public void ModifyType()
         {
-            var dataBaseSet = new DataBaseSet(type.DataBase, dataSet);
-            dataBaseSet.Serialize();
+            this.Serialize();
         }
 
         //public static void SetTypeTags(CremaDataSet dataSet, Type type, TagInfo tags)
@@ -192,15 +189,9 @@ namespace Ntreev.Crema.Services.Data
             this.DeleteTablesRepositoryPath();
         }
 
-        public static void ModifyTable(CremaDataSet dataSet, Table table)
+        public void ModifyTable()
         {
-            ModifyTable(dataSet, table.DataBase);
-        }
-
-        public static void ModifyTable(CremaDataSet dataSet, DataBase dataBase)
-        {
-            var dataBaseSet = new DataBaseSet(dataBase, dataSet);
-            dataBaseSet.Serialize();
+            this.Serialize();
         }
 
         public static void Modify(CremaDataSet dataSet, DataBase dataBase)

@@ -100,7 +100,7 @@ namespace Ntreev.Crema.Services.Data
 
         public abstract IDispatcherObject DispatcherObject { get; }
 
-        public CremaDispatcher Dispatcher => this.Domain != null ? this.Domain.Dispatcher : this.DispatcherObject.Dispatcher;
+        public CremaDispatcher Dispatcher => this.DispatcherObject.Dispatcher;
 
         protected void ValidateDispatcher(Authentication authentication)
         {

@@ -46,7 +46,12 @@ namespace Ntreev.Crema.Services.Data
                         select item.Field<string>(CremaSchema.ColumnName);
 
             var newName = NameUtility.GenerateNewName("Column", query);
-            this.SetFieldAsync(null, CremaSchema.ColumnName, newName);
+            Initialize();
+
+            async void Initialize()
+            {
+                await this.SetFieldAsync(null, CremaSchema.ColumnName, newName);
+            }
         }
 
         public Task SetIndexAsync(Authentication authentication, int value)
@@ -92,7 +97,6 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.ValidateDispatcher(authentication);
                 return this.SetFieldAsync(authentication, CremaSchema.ColumnName, value);
             }
             catch (Exception e)
@@ -106,7 +110,6 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.ValidateDispatcher(authentication);
                 return this.SetFieldAsync(authentication, CremaSchema.DataType, value);
             }
             catch (Exception e)
@@ -120,7 +123,6 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.ValidateDispatcher(authentication);
                 return this.SetFieldAsync(authentication, CremaSchema.DefaultValue, value);
             }
             catch (Exception e)
@@ -134,7 +136,6 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.ValidateDispatcher(authentication);
                 return this.SetFieldAsync(authentication, CremaSchema.Comment, value);
             }
             catch (Exception e)
@@ -148,7 +149,6 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.ValidateDispatcher(authentication);
                 return this.SetFieldAsync(authentication, CremaSchema.AutoIncrement, value);
             }
             catch (Exception e)
@@ -162,7 +162,6 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.ValidateDispatcher(authentication);
                 return this.SetFieldAsync(authentication, CremaSchema.Tags, value.ToString());
             }
             catch (Exception e)
@@ -176,7 +175,6 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.ValidateDispatcher(authentication);
                 return this.SetFieldAsync(authentication, CremaSchema.ReadOnly, value);
             }
             catch (Exception e)
@@ -190,7 +188,6 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.ValidateDispatcher(authentication);
                 return this.SetFieldAsync(authentication, CremaSchema.AllowNull, value);
             }
             catch (Exception e)

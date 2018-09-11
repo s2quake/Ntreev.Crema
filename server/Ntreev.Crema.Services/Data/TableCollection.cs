@@ -84,17 +84,28 @@ namespace Ntreev.Crema.Services.Data
             return tableList.ToArray();
         }
 
-        public Table Inherit(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
+        public async Task<Table> Inherit(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
         {
-            this.ValidateInherit(authentication, table, newTableName, categoryPath, copyContent);
-            this.Sign(authentication);
-            var dataSet = table.ReadData(authentication);
-            var dataTable = dataSet.Tables[table.Name, table.Category.Path];
-            var itemName = new ItemName(categoryPath, newTableName);
-            var newDataTable = dataTable.Inherit(itemName, copyContent);
-            newDataTable.CategoryPath = categoryPath;
-            this.AddNew(authentication, dataSet);
-            return this[newTableName];
+            try
+            {
+                return await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.ValidateInherit(authentication, table, newTableName, categoryPath, copyContent);
+                    this.Sign(authentication);
+                    var dataSet = await table.ReadDataAsync(authentication);
+                    var dataTable = dataSet.Tables[table.Name, table.Category.Path];
+                    var itemName = new ItemName(categoryPath, newTableName);
+                    var newDataTable = dataTable.Inherit(itemName, copyContent);
+                    newDataTable.CategoryPath = categoryPath;
+                    this.AddNew(authentication, dataSet);
+                    return this[newTableName];
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public async Task<Table> CopyAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
@@ -105,7 +116,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.ValidateCopy(authentication, table, newTableName, categoryPath, copyContent);
                     this.Sign(authentication);
-                    var dataSet = table.ReadData(authentication);
+                    var dataSet = await table.ReadDataAsync(authentication);
                     var dataTable = dataSet.Tables[table.Name, table.Category.Path];
                     var itemName = new ItemName(categoryPath, newTableName);
                     var newDataTable = dataTable.Copy(itemName, copyContent);
@@ -207,36 +218,47 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public void InvokeTableEndContentEdit(Authentication authentication, Table[] tables, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTableEndContentEditAsync(Authentication authentication, Table[] tables, CremaDataSet dataSet)
         {
             var message = EventMessageBuilder.ChangeTableContent(authentication, tables);
-            try
+            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.ModifyTable(dataSet, this.DataBase);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.ModifyTable(dataBaseSet);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeTableEndTemplateEdit(Authentication authentication, Table table, CremaTemplate template)
+        public Task<SignatureDate> InvokeTableEndTemplateEditAsync(Authentication authentication, Table table, CremaTemplate template)
         {
-            var dataTable = template.TargetTable;
-            var dataSet = dataTable.DataSet;
             var message = EventMessageBuilder.ChangeTableTemplate(authentication, table.Name);
-            try
+            var dataSet = template.TargetTable.DataSet;
+            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.ModifyTable(dataSet, table);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.ModifyTable(dataBaseSet);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public void InvokeTablesCreatedEvent(Authentication authentication, Table[] tables, CremaDataSet dataSet)

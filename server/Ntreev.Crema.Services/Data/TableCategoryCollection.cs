@@ -45,18 +45,27 @@ namespace Ntreev.Crema.Services.Data
 
         }
 
-        public Task<TableCategory> AddNewAsync(Authentication authentication, string name, string parentPath)
+        public async Task<TableCategory> AddNewAsync(Authentication authentication, string name, string parentPath)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            try
             {
-                this.ValidateAddNew(authentication, name, parentPath);
-                this.Sign(authentication);
-                this.InvokeCategoryCreate(authentication, name, parentPath);
-                var category = this.BaseAddNew(name, parentPath, authentication);
-                var items = EnumerableUtility.One(category).ToArray();
-                this.InvokeCategoriesCreatedEvent(authentication, items);
-                return category;
-            });
+                return await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);
+                    this.ValidateAddNew(authentication, name, parentPath);
+                    var sianatureDate = await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
+                    this.Sign(authentication, sianatureDate);
+                    var category = this.BaseAddNew(name, parentPath, authentication);
+                    var items = EnumerableUtility.One(category).ToArray();
+                    this.InvokeCategoriesCreatedEvent(authentication, items);
+                    return category;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public object GetService(System.Type serviceType)
@@ -64,70 +73,95 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public void InvokeCategoryCreate(Authentication authentication, string name, string parentPath)
+        public Task<SignatureDate> InvokeCategoryCreateAsync(Authentication authentication, string name, string parentPath)
         {
             var categoryName = new CategoryName(parentPath, name);
             var itemPath = this.Context.GenerateCategoryPath(parentPath, name);
             var message = EventMessageBuilder.CreateTableCategory(authentication, categoryName);
-            try
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                Directory.CreateDirectory(itemPath);
-                this.Repository.Add(itemPath);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                DirectoryUtility.Delete(itemPath);
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    Directory.CreateDirectory(itemPath);
+                    this.Repository.Add(itemPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    DirectoryUtility.Delete(itemPath);
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeCategoryRename(Authentication authentication, TableCategory category, string name, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeCategoryRenameAsync(Authentication authentication, TableCategory category, string name, CremaDataSet dataSet)
         {
-            var categoryName = new CategoryName(category.Path) { Name = name };
-            var message = EventMessageBuilder.RenameTableCategory(authentication, category.Path, categoryName);
-            try
+            var newCategoryPath = new CategoryName(category.Path) { Name = name };
+            var message = EventMessageBuilder.RenameTableCategory(authentication, category.Path, newCategoryPath);
+            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+            var categoryPath = category.Path;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.RenameTableCategory(dataSet, category, categoryName);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.RenameTableCategory(dataBaseSet, categoryPath, newCategoryPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeCategoryMove(Authentication authentication, TableCategory category, string parentPath, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeCategoryMoveAsync(Authentication authentication, TableCategory category, string parentPath, CremaDataSet dataSet)
         {
-            var categoryName = new CategoryName(parentPath, category.Name);
+            var newCategoryPath = new CategoryName(parentPath, category.Name);
             var message = EventMessageBuilder.MoveTableCategory(authentication, category.Path, category.Parent.Path, parentPath);
-            try
+            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+            var categoryPath = category.Path;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.MoveTableCategory(dataSet, category, categoryName);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.MoveTableCategory(dataBaseSet, categoryPath, newCategoryPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeCategoryDelete(Authentication authentication, TableCategory category)
+        public Task<SignatureDate> InvokeCategoryDeleteAsync(Authentication authentication, TableCategory category)
         {
             var message = EventMessageBuilder.DeleteTableCategory(authentication, category.Path);
-            try
+            var itemPath = category.ItemPath;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Delete(category.ItemPath);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.Delete(itemPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public void InvokeCategoriesCreatedEvent(Authentication authentication, TableCategory[] categories)
@@ -278,6 +312,11 @@ namespace Ntreev.Crema.Services.Data
         private void Sign(Authentication authentication)
         {
             authentication.Sign();
+        }
+
+        private void Sign(Authentication authentication, SignatureDate signatureDate)
+        {
+            authentication.Sign(signatureDate.DateTime);
         }
 
         private void ValidateAddNew(Authentication authentication, string name, string parentPath)

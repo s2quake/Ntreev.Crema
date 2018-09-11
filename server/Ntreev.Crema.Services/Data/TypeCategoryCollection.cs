@@ -91,36 +91,50 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void InvokeCategoryRename(Authentication authentication, TypeCategory category, string name, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeCategoryRenameAsync(Authentication authentication, TypeCategory category, string name, CremaDataSet dataSet)
         {
-            var categoryName = new CategoryName(category.Path) { Name = name, };
-            var message = EventMessageBuilder.RenameTypeCategory(authentication, category.Path, categoryName);
-            try
+            var newCategoryPath = new CategoryName(category.Path) { Name = name, };
+            var message = EventMessageBuilder.RenameTypeCategory(authentication, category.Path, newCategoryPath);
+            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+            var categoryPath = category.Path;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.RenameTypeCategory(dataSet, category, categoryName);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.RenameTypeCategory(dataBaseSet, categoryPath, newCategoryPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeCategoryMove(Authentication authentication, TypeCategory category, string parentPath, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeCategoryMoveAsync(Authentication authentication, TypeCategory category, string parentPath, CremaDataSet dataSet)
         {
-            var categoryName = new CategoryName(parentPath, category.Name);
+            var newCategoryPath = new CategoryName(parentPath, category.Name);
             var message = EventMessageBuilder.MoveTypeCategory(authentication, category.Path, category.Parent.Path, parentPath);
-            try
+            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+            var categoryPath = category.Path;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.MoveTypeCategory(dataSet, category, categoryName);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.MoveTypeCategory(dataBaseSet, categoryPath, newCategoryPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public void InvokeCategoryDelete(Authentication authentication, TypeCategory category, CremaDataSet dataSet)

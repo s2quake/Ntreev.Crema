@@ -46,7 +46,12 @@ namespace Ntreev.Crema.Services.Data
                         select item.Field<string>(CremaSchema.Name);
 
             var newName = NameUtility.GenerateNewName("Type", query);
-            this.SetFieldAsync(null, CremaSchema.Name, newName);
+            Initialize();
+
+            async void Initialize()
+            {
+                await this.SetFieldAsync(null, CremaSchema.Name, newName);
+            }
         }
 
         public Task SetIndexAsync(Authentication authentication, int value)

@@ -71,38 +71,29 @@ namespace Ntreev.Crema.Services.Data
             this.type.ValidateAccessType(authentication, AccessType.Master);
         }
 
-        protected override void OnBeginEdit(Authentication authentication)
+        protected override async Task OnBeginEditAsync(Authentication authentication)
         {
-            this.Container.InvokeTypeBeginTemplateEdit(authentication, this.type);
-            base.OnBeginEdit(authentication);
+            await base.OnBeginEditAsync(authentication);
             this.type.IsBeingEdited = true;
             this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
         }
 
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            this.DispatcherObject.Dispatcher.Invoke(() =>
-            {
-                this.Container.InvokeTypeEndTemplateEdit(authentication, this.type, this.TypeSource.DataSet);
-            });
+            await this.Container.InvokeTypeEndTemplateEditAsync(authentication, this.type.Name, this.TypeSource.DataSet);
             await base.OnEndEditAsync(authentication);
-            this.DispatcherObject.Dispatcher.Invoke(() =>
-            {
-                this.type.UpdateTypeInfo(this.TypeSource.TypeInfo);
-                this.type.IsBeingEdited = false;
-                this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
-                this.Container.InvokeTypesChangedEvent(authentication, new Type[] { this.type }, this.TypeSource.DataSet);
-            });
+            var items = new Type[] { this.type };
+            this.type.UpdateTypeInfo(this.TypeSource.TypeInfo);
+            this.type.IsBeingEdited = false;
+            this.Container.InvokeTypesStateChangedEvent(authentication, items);
+            this.Container.InvokeTypesChangedEvent(authentication, items, this.TypeSource.DataSet);
         }
 
-        protected override void OnCancelEdit(Authentication authentication)
+        protected override async Task OnCancelEditAsync(Authentication authentication)
         {
-            base.OnCancelEdit(authentication);
-            this.DispatcherObject.Dispatcher.Invoke(() =>
-            {
-                this.type.IsBeingEdited = false;
-                this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
-            });
+            await base.OnCancelEditAsync(authentication);
+            this.type.IsBeingEdited = false;
+            this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
         }
 
         protected override void OnRestore(Domain domain)

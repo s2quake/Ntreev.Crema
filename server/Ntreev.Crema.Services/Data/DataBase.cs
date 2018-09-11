@@ -58,6 +58,7 @@ namespace Ntreev.Crema.Services.Data
         public DataBase(CremaHost cremaHost, string name)
         {
             this.CremaHost = cremaHost;
+            this.Dispatcher = cremaHost.Dispatcher;
             this.repositoryProvider = cremaHost.RepositoryProvider;
             this.serializer = cremaHost.Serializer;
             base.Name = name;
@@ -71,6 +72,7 @@ namespace Ntreev.Crema.Services.Data
             : this(cremaHost, name)
         {
             this.CremaHost = cremaHost;
+            this.Dispatcher = cremaHost.Dispatcher;
             this.repositoryProvider = cremaHost.RepositoryProvider;
             this.serializer = cremaHost.Serializer;
             base.Name = name;
@@ -252,12 +254,12 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                var repositorySetting = await this.Dispatcher.InvokeAsync(() =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(LoadAsync), this);
                     this.ValidateLoad(authentication);
                     this.Sign(authentication);
-                    return new RepositorySettings()
+                    var repositorySetting = new RepositorySettings()
                     {
                         BasePath = this.DataBases.RemotePath,
                         RepositoryName = this.Name,
@@ -265,22 +267,18 @@ namespace Ntreev.Crema.Services.Data
                         TransactionPath = this.CremaHost.GetPath(CremaPath.Transactions, $"{this.ID}"),
                         LogService = this.CremaHost,
                     };
-                });
-                this.Repository = await Task.Run(() =>
-                {
-                    return new DataBaseRepositoryHost(this, this.repositoryProvider.CreateInstance(repositorySetting));
-                }); 
-                await await this.Dispatcher.InvokeAsync(async () =>
-                {
+                    this.Repository = await Task.Run(() => new DataBaseRepositoryHost(this, this.repositoryProvider.CreateInstance(repositorySetting)));
                     this.Repository.Changed += Repository_Changed;
                     await this.ReadCacheAsync();
                     this.AttachDomainHost();
+                    this.Dispatcher = new CremaDispatcher(this);
                     this.metaData.DataBaseState = DataBaseState.IsLoaded;
                     base.DataBaseState = DataBaseState.IsLoaded;
                     base.Load(authentication);
                     base.UpdateLockParent();
                     base.UpdateAccessParent();
                     this.DataBases.InvokeItemsLoadedEvent(authentication, new IDataBase[] { this });
+                    
                 });
             }
             catch (Exception e)
@@ -309,11 +307,14 @@ namespace Ntreev.Crema.Services.Data
                     this.Repository.Changed -= Repository_Changed;
                     this.Repository.Dispose();
                     this.Repository = null;
+                    this.Dispatcher.Dispose(false);
+                    this.Dispatcher = this.CremaHost.Dispatcher;
                     this.metaData.DataBaseState = DataBaseState.None;
                     base.DataBaseState = DataBaseState.None;
                     base.Unload(authentication);
                     this.Sign(authentication);
                     this.DataBases.InvokeItemsUnloadedEvent(authentication, new IDataBase[] { this });
+                    
                 });
             }
             catch (Exception e)
@@ -746,7 +747,7 @@ namespace Ntreev.Crema.Services.Data
 
         public TypeContext TypeContext => this.typeContext;
 
-        public CremaDispatcher Dispatcher => this.CremaHost.Dispatcher;
+        public CremaDispatcher Dispatcher { get; private set; }
 
         public IObjectSerializer Serializer => this.serializer;
 

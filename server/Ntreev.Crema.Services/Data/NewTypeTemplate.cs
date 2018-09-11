@@ -78,9 +78,9 @@ namespace Ntreev.Crema.Services.Data
 
         public TypeCollection Types => this.category.Context.Types;
 
-        protected override void OnBeginEdit(Authentication authentication)
+        protected override Task OnBeginEditAsync(Authentication authentication)
         {
-            base.OnBeginEdit(authentication);
+            return base.OnBeginEditAsync(authentication);
         }
 
         protected override async Task OnEndEditAsync(Authentication authentication)
@@ -90,9 +90,9 @@ namespace Ntreev.Crema.Services.Data
             this.category = null;
         }
 
-        protected override void OnCancelEdit(Authentication authentication)
+        protected override async Task OnCancelEditAsync(Authentication authentication)
         {
-            base.OnCancelEdit(authentication);
+            await base.OnCancelEditAsync(authentication);
             this.category = null;
         }
 

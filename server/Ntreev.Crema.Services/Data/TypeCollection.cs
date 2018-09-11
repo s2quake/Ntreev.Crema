@@ -56,7 +56,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 return await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNew), dataType.Name, dataType.CategoryPath);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), dataType.Name, dataType.CategoryPath);
                     this.ValidateAddNew(dataType.Name, dataType.CategoryPath, authentication);
                     var signatureDate = await this.InvokeTypeCreateAsync(authentication, dataType.Name, dataType.DataSet);
                     this.Sign(authentication, signatureDate);
@@ -194,24 +194,25 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public void InvokeTypeBeginTemplateEdit(Authentication authentication, Type type)
+        public Task<SignatureDate> InvokeTypeEndTemplateEditAsync(Authentication authentication, string typeName, CremaDataSet dataSet)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeBeginTemplateEdit), type);
-        }
-
-        public void InvokeTypeEndTemplateEdit(Authentication authentication, Type type, CremaDataSet dataSet)
-        {
-            var message = EventMessageBuilder.ChangeTypeTemplate(authentication, type.Name);
-            try
+            var message = EventMessageBuilder.ChangeTypeTemplate(authentication, typeName);
+            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.ModifyType(dataSet, type);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.ModifyType(dataBaseSet);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public void InvokeTypesCreatedEvent(Authentication authentication, Type[] types, CremaDataSet dataSet)

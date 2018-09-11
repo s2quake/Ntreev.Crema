@@ -49,25 +49,25 @@ namespace Ntreev.Crema.Services.Data
             return this.Table.ToString();
         }
 
-        public Task BeginEditAsync(Authentication authentication)
+        public async Task BeginEditAsync(Authentication authentication)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync), this.Table);
                     this.ValidateBeginEdit(authentication);
                     this.Sign(authentication);
                     if (this.domain == null)
                     {
-                        var dataSet = this.Table.ReadEditableData(authentication);
+                        var dataSet = await this.Table.ReadEditableDataAsync(authentication);
                         var tables = this.Table.GetRelations();
                         var itemPath = string.Join("|", tables.Select(item => item.Path));
                         this.domain = new TableContentDomain(authentication, dataSet, this.Table.DataBase, itemPath, this.GetType().Name);
                         this.domain.Host = new TableContentDomainHost(this.Container, this.domain, itemPath);
                         this.DomainContext.Domains.Add(authentication, this.domain, this.DataBase);
                     }
-                    this.domainHost.BeginContent(authentication);
+                    await this.domainHost.BeginContentAsync(authentication);
                     this.domainHost.InvokeEditBegunEvent(EventArgs.Empty);
                 });
             }
@@ -78,16 +78,16 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task EndEditAsync(Authentication authentication)
+        public async Task EndEditAsync(Authentication authentication)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync), this.Table);
                     this.ValidateEndEdit(authentication);
                     this.Sign(authentication);
-                    this.domainHost.EndContent(authentication);
+                    await this.domainHost.EndContentAsync(authentication);
                     this.domainHost.InvokeEditEndedEvent(EventArgs.Empty);
                     this.domainHost = null;
                 });
@@ -99,16 +99,16 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task CancelEditAsync(Authentication authentication)
+        public async Task CancelEditAsync(Authentication authentication)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync), this.Table);
                     this.ValidateCancelEdit(authentication);
                     this.Sign(authentication);
-                    this.domainHost.CancelContent(authentication);
+                    await this.domainHost.CancelContentAsync(authentication);
                     this.domainHost.InvokeEditCanceledEvent(EventArgs.Empty);
                     this.domainHost = null;
                 });
@@ -120,11 +120,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task EnterEditAsync(Authentication authentication)
+        public async Task EnterEditAsync(Authentication authentication)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(async () =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EnterEditAsync), this.Table);
                     this.ValidateEnter(authentication);
@@ -141,11 +141,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task LeaveEditAsync(Authentication authentication)
+        public async Task LeaveEditAsync(Authentication authentication)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(async () =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(LeaveEditAsync), this.Table);
                     this.ValidateLeave(authentication);
@@ -161,17 +161,20 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task ClearAsync(Authentication authentication)
+        public async Task ClearAsync(Authentication authentication)
         {
             try
             {
-                this.CremaHost.DebugMethod(authentication, this, nameof(ClearAsync), this.Table);
-                var rowInfo = new DomainRowInfo()
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    TableName = this.Table.Name,
-                    Keys = DomainRowInfo.ClearKey,
-                };
-                return this.domain.RemoveRowAsync(authentication, new DomainRowInfo[] { rowInfo });
+                    this.CremaHost.DebugMethod(authentication, this, nameof(ClearAsync), this.Table);
+                    var rowInfo = new DomainRowInfo()
+                    {
+                        TableName = this.Table.Name,
+                        Keys = DomainRowInfo.ClearKey,
+                    };
+                    await this.domain.RemoveRowAsync(authentication, new DomainRowInfo[] { rowInfo });
+                });
             }
             catch (Exception e)
             {
@@ -180,11 +183,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task<TableRow> AddNewAsync(Authentication authentication, string relationID)
+        public async Task<TableRow> AddNewAsync(Authentication authentication, string relationID)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
                     if (this.domain == null)
                         throw new InvalidOperationException(Resources.Exception_TableIsNotBeingEdited);
@@ -199,11 +202,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task EndNewAsync(Authentication authentication, TableRow row)
+        public async Task EndNewAsync(Authentication authentication, TableRow row)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(async () =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     if (this.domain == null)
                         throw new InvalidOperationException(Resources.Exception_TableIsNotBeingEdited);

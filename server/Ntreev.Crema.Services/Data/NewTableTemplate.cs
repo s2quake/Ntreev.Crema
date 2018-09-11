@@ -23,6 +23,7 @@ using Ntreev.Library;
 using System;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -115,14 +116,14 @@ namespace Ntreev.Crema.Services.Data
 
         public override IDispatcherObject DispatcherObject { get; }
 
-        protected override void OnBeginEdit(Authentication authentication)
+        protected override async Task OnBeginEditAsync(Authentication authentication)
         {
-            base.OnBeginEdit(authentication);
+            await base.OnBeginEditAsync(authentication);
         }
 
-        protected override void OnEndEdit(Authentication authentication, CremaTemplate template)
+        protected override async Task OnEndEditAsync(Authentication authentication, CremaTemplate template)
         {
-            base.OnEndEdit(authentication, template);
+            await base.OnEndEditAsync(authentication, template);
             if (this.parent is TableCategory category)
             {
                 var tables = category.GetService(typeof(TableCollection)) as TableCollection;
@@ -136,25 +137,25 @@ namespace Ntreev.Crema.Services.Data
             this.parent = null;
         }
 
-        protected override void OnCancelEdit(Authentication authentication)
+        protected override async Task OnCancelEditAsync(Authentication authentication)
         {
-            base.OnCancelEdit(authentication);
+            await base.OnCancelEditAsync(authentication);
             this.parent = null;
         }
 
-        protected override CremaTemplate CreateSource(Authentication authentication)
+        protected override async Task<CremaTemplate> CreateSourceAsync(Authentication authentication)
         {
             if (this.parent is TableCategory category)
             {
                 var typeContext = category.GetService(typeof(TypeContext)) as TypeContext;
-                var dataSet = typeContext.Root.ReadData(authentication, true);
+                var dataSet = await typeContext.Root.ReadDataAsync(authentication, true);
                 var newName = NameUtility.GenerateNewName(nameof(Target), category.Context.Tables.Select((Table item) => item.Name));
                 var templateSource = CremaTemplate.Create(dataSet, newName, category.Path);
                 return templateSource;
             }
             else if (this.parent is Table table)
             {
-                var dataSet = table.ReadAll(authentication, true);
+                var dataSet = await table.ReadAllAsync(authentication, true);
                 var dataTable = dataSet.Tables[table.Name, table.Category.Path];
                 return CremaTemplate.Create(dataTable);
             }
