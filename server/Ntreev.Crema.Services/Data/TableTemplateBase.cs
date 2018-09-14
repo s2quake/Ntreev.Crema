@@ -91,7 +91,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync));
                     this.ValidateBeginEdit(authentication);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     await this.OnBeginEditAsync(authentication);
                     this.OnEditBegun(EventArgs.Empty);
                 });
@@ -111,7 +111,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync));
                     this.ValidateEndEdit(authentication);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     await this.OnEndEditAsync(authentication, this.TemplateSource);
                     this.OnEditEnded(EventArgs.Empty);
                 });
@@ -131,7 +131,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync));
                     this.ValidateCancelEdit(authentication);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     await this.OnCancelEditAsync(authentication);
                     this.OnEditCanceled(EventArgs.Empty);
                 });
@@ -308,22 +308,17 @@ namespace Ntreev.Crema.Services.Data
             this.table.RowDeleted += Table_RowDeleted;
             this.table.RowChanged += Table_RowChanged;
 
-            this.DomainContext.Domains.Add(authentication, this.domain, this.DataBase);
-            this.domain.Dispatcher.Invoke(() =>
-            {
-                this.AttachDomainEvent();
-                this.domain.AddUserAsync(authentication, DomainAccessType.ReadWrite);
-            });
+            this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
+            await this.domain.AddUserAsync(authentication, DomainAccessType.ReadWrite);
+            await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
         }
 
         protected virtual async Task OnEndEditAsync(Authentication authentication, CremaTemplate template)
         {
-            await this.domain.Dispatcher.InvokeAsync(() =>
-            {
-                this.DetachDomainEvent();
-                this.domain.Dispose(authentication, false);
-                this.domain = null;
-            });
+            await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+            await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false);
+            this.domain = null;
+
             if (this.table != null)
             {
                 this.table.RowDeleted -= Table_RowDeleted;
@@ -336,12 +331,10 @@ namespace Ntreev.Crema.Services.Data
 
         protected virtual async Task OnCancelEditAsync(Authentication authentication)
         {
-            await this.domain.Dispatcher.InvokeAsync(() =>
-            {
-                this.DetachDomainEvent();
-                this.domain.Dispose(authentication, true);
-                this.domain = null;
-            });
+            await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+            await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true);
+            this.domain = null;
+
             if (this.table != null)
             {
                 this.table.RowDeleted -= Table_RowDeleted;

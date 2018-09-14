@@ -37,8 +37,6 @@ namespace Ntreev.Crema.Services.Users
         IUserContext, IServiceProvider, IDisposable
     {
         private readonly string remotePath;
-        private readonly string basePath;
-        private readonly IObjectSerializer serializer;
 
         private ItemsCreatedEventHandler<IUserItem> itemsCreated;
         private ItemsRenamedEventHandler<IUserItem> itemsRenamed;
@@ -52,14 +50,14 @@ namespace Ntreev.Crema.Services.Users
             this.CremaHost.Debug(Resources.Message_UserContextInitialize);
 
             this.remotePath = cremaHost.GetPath(CremaPath.RepositoryUsers);
-            this.basePath = cremaHost.GetPath(CremaPath.Users);
-            this.serializer = cremaHost.Serializer;
+            this.BasePath = cremaHost.GetPath(CremaPath.Users);
+            this.Serializer = cremaHost.Serializer;
 
             this.Repository = new UserRepositoryHost(this, this.CremaHost.RepositoryProvider.CreateInstance(new RepositorySettings()
             {
                 BasePath = this.remotePath,
                 RepositoryName = string.Empty,
-                WorkingPath = this.basePath,
+                WorkingPath = this.BasePath,
                 LogService = this.CremaHost
             }));
 
@@ -353,7 +351,7 @@ namespace Ntreev.Crema.Services.Users
         public string GenerateCategoryPath(string categoryPath)
         {
             NameValidator.ValidateCategoryPath(categoryPath);
-            var baseUri = new Uri(this.basePath);
+            var baseUri = new Uri(this.BasePath);
             var uri = new Uri(baseUri + categoryPath);
             return uri.LocalPath;
         }
@@ -386,7 +384,7 @@ namespace Ntreev.Crema.Services.Users
             var directories = DirectoryUtility.GetAllDirectories(this.BasePath, "*", true);
             foreach (var item in directories)
             {
-                var relativeUri = UriUtility.MakeRelativeOfDirectory(this.basePath, item);
+                var relativeUri = UriUtility.MakeRelativeOfDirectory(this.BasePath, item);
                 var segments = StringUtility.Split(relativeUri, PathUtility.SeparatorChar, true);
                 var categoryName = CategoryName.Create(relativeUri);
                 this.Categories.Prepare(categoryName);
@@ -398,7 +396,7 @@ namespace Ntreev.Crema.Services.Users
             {
                 var userInfo = (UserSerializationInfo)this.Serializer.Deserialize(item, typeof(UserSerializationInfo), settings);
                 var directory = Path.GetDirectoryName(item);
-                var relativeUri = UriUtility.MakeRelativeOfDirectory(this.basePath, item);
+                var relativeUri = UriUtility.MakeRelativeOfDirectory(this.BasePath, item);
                 var segments = StringUtility.Split(relativeUri, PathUtility.SeparatorChar, true);
                 var itemName = ItemName.Create(segments);
                 var user = this.Users.AddNew(userInfo.ID, itemName.CategoryPath);
@@ -430,7 +428,7 @@ namespace Ntreev.Crema.Services.Users
 
         public UserRepositoryHost Repository { get; }
 
-        public string BasePath => this.basePath;
+        public string BasePath { get; }
 
         public UserCollection Users => this.Items;
 
@@ -438,7 +436,7 @@ namespace Ntreev.Crema.Services.Users
 
         public CremaDispatcher Dispatcher { get; }
 
-        public IObjectSerializer Serializer => this.serializer;
+        public IObjectSerializer Serializer { get; }
 
         public event ItemsCreatedEventHandler<IUserItem> ItemsCreated
         {

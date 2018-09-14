@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Services.Users
             return await await this.Dispatcher.InvokeAsync(async () =>
             {
                 this.ValidateUserCreate(authentication, userID, categoryPath, password);
-                this.Sign(authentication);
+                this.CremaHost.Sign(authentication);
                 var category = this.GetCategory(categoryPath);
                 var designedInfo = new SignatureDate(authentication.ID, DateTime.UtcNow);
                 var userInfo = new UserSerializationInfo()
@@ -603,11 +603,6 @@ namespace Ntreev.Crema.Services.Users
             if (NameValidator.VerifyName(name) == false)
                 return false;
             return IdentifierValidator.Verify(name);
-        }
-
-        private void Sign(Authentication authentication)
-        {
-            authentication.Sign();
         }
 
         #region IUserCollection

@@ -42,21 +42,21 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 context.Pop(dataBase);
             }
-            else
+            else 
             {
-                //if (await dataBase.ContainsAsync(context.Authentication) == true)
-                //{
-                //    if (RandomUtility.Within(35) == true)
-                //    {
-                //        var typeItem = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TypeContext.Random());
-                //        context.Push(typeItem);
-                //    }
-                //    else
-                //    {
-                //        var tableItem = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TableContext.Random());
-                //        context.Push(tableItem);
-                //    }
-                //}
+                if (await dataBase.ContainsAsync(context.Authentication) == true)
+                {
+                    if (RandomUtility.Within(35) == true)
+                    {
+                        var typeItem = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TypeContext.Random());
+                        context.Push(typeItem);
+                    }
+                    //else
+                    //{
+                    //    var tableItem = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TableContext.Random());
+                    //    context.Push(tableItem);
+                    //}
+                }
             }
         }
 

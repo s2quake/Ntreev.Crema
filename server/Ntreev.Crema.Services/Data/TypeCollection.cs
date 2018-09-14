@@ -59,7 +59,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), dataType.Name, dataType.CategoryPath);
                     this.ValidateAddNew(dataType.Name, dataType.CategoryPath, authentication);
                     var signatureDate = await this.InvokeTypeCreateAsync(authentication, dataType.Name, dataType.DataSet);
-                    this.Sign(authentication, signatureDate);
+                    this.CremaHost.Sign(authentication, signatureDate);
                     var type = this.BaseAddNew(dataType.Name, dataType.CategoryPath, authentication);
                     type.Initialize(dataType.TypeInfo);
                     this.InvokeTypesCreatedEvent(authentication, new Type[] { type }, dataType.DataSet);
@@ -82,12 +82,12 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), typeName, newTypeName, categoryPath);
                     this.ValidateCopy(authentication, typeName, newTypeName);
                     var type = this[typeName];
-                    var dataSet = type.ReadData(authentication);
+                    var dataSet = await type.ReadDataAsync(authentication);
                     var dataType = dataSet.Types[type.Name, type.Category.Path];
                     var itemName = new ItemName(categoryPath, newTypeName);
                     var newDataType = dataType.Copy(itemName);
                     var signatureDate = await this.InvokeTypeCreateAsync(authentication, newTypeName, dataSet);
-                    this.Sign(authentication, signatureDate);
+                    this.CremaHost.Sign(authentication, signatureDate);
                     var newType = this.BaseAddNew(newTypeName, categoryPath, authentication);
                     newType.Initialize(newDataType.TypeInfo);
                     this.InvokeTypesCreatedEvent(authentication, new Type[] { newType }, dataSet);
@@ -115,7 +115,7 @@ namespace Ntreev.Crema.Services.Data
                 try
                 {
                     var signatureDate = authentication.Sign();
-                    this.Repository.CreateType(dataBaseSet);
+                    this.Repository.CreateType(dataBaseSet, typeName);
                     this.Repository.Commit(authentication, message);
                     return signatureDate;
                 }
@@ -434,16 +434,6 @@ namespace Ntreev.Crema.Services.Data
 
             if (this.Contains(newTypeName) == true)
                 throw new ArgumentException(Resources.Exception_SameTypeNameExist, nameof(newTypeName));
-        }
-
-        private void Sign(Authentication authentication)
-        {
-            authentication.Sign();
-        }
-
-        private void Sign(Authentication authentication, SignatureDate signatureDate)
-        {
-            authentication.Sign(signatureDate.DateTime);
         }
 
         #region ITypeCollection

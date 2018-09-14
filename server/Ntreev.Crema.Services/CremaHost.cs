@@ -321,6 +321,16 @@ namespace Ntreev.Crema.Services
             CremaLog.Release();
         }
 
+        public void Sign(Authentication authentication)
+        {
+            authentication.Sign();
+        }
+
+        public void Sign(Authentication authentication, SignatureDate signatureDate)
+        {
+            authentication.Sign(signatureDate.DateTime);
+        }
+
         public string GetPath(CremaPath pathType, params string[] paths)
         {
             switch (pathType)

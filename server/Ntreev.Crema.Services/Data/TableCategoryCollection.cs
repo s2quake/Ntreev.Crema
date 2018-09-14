@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);
                     this.ValidateAddNew(authentication, name, parentPath);
                     var sianatureDate = await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
-                    this.Sign(authentication, sianatureDate);
+                    this.CremaHost.Sign(authentication, sianatureDate);
                     var category = this.BaseAddNew(name, parentPath, authentication);
                     var items = EnumerableUtility.One(category).ToArray();
                     this.InvokeCategoriesCreatedEvent(authentication, items);
@@ -90,7 +90,8 @@ namespace Ntreev.Crema.Services.Data
                 }
                 catch
                 {
-                    DirectoryUtility.Delete(itemPath);
+                    if (Directory.Exists(itemPath) == true)
+                        Directory.Delete(itemPath, true);
                     this.Repository.Revert();
                     throw;
                 }
@@ -307,16 +308,6 @@ namespace Ntreev.Crema.Services.Data
         protected virtual void OnCategoriesDeleted(ItemsDeletedEventArgs<ITableCategory> e)
         {
             this.categoriesDeleted?.Invoke(this, e);
-        }
-
-        private void Sign(Authentication authentication)
-        {
-            authentication.Sign();
-        }
-
-        private void Sign(Authentication authentication, SignatureDate signatureDate)
-        {
-            authentication.Sign(signatureDate.DateTime);
         }
 
         private void ValidateAddNew(Authentication authentication, string name, string parentPath)

@@ -22,6 +22,7 @@ using Ntreev.Library;
 using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 
@@ -32,6 +33,9 @@ namespace Ntreev.Crema.Services.Data
         private readonly DataBase dataBase;
         private readonly CremaSettings settings;
         private Version version;
+        private readonly HashSet<string> types = new HashSet<string>();
+        private readonly HashSet<string> typesToAdd = new HashSet<string>();
+        private readonly HashSet<string> typesToRemove = new HashSet<string>();
 
         public DataBaseRepositoryHost(DataBase dataBase, IRepository repository)
             : base(repository, null)
@@ -40,8 +44,24 @@ namespace Ntreev.Crema.Services.Data
             this.settings = this.dataBase.GetService(typeof(CremaSettings)) as CremaSettings;
         }
 
+        protected override void OnReverted()
+        {
+            base.OnReverted();
+            this.typesToAdd.Clear();
+            this.typesToRemove.Clear();
+        }
+
+        public void Initialize()
+        {
+            foreach (var item in this.dataBase.TypeContext.Types)
+            {
+                this.types.Add(item.Name);
+            }
+        }
+
         public void Commit(Authentication authentication, string comment)
         {
+            this.Dispatcher.VerifyAccess();
             var props = new List<LogPropertyInfo>
             {
                 //new LogPropertyInfo() { Key = LogPropertyInfo.BranchRevisionKey, Value = $"{this.RepositoryInfo.BranchRevision}"},
@@ -63,7 +83,27 @@ namespace Ntreev.Crema.Services.Data
                 }
             }
 #endif
-            base.Commit(authentication, comment, props.ToArray());
+            try
+            {
+                base.Commit(authentication, comment, props.ToArray());
+                foreach (var item in this.typesToRemove)
+                {
+                    this.types.Remove(item);
+                }
+                foreach (var item in this.typesToAdd)
+                {
+                    this.types.Add(item);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                this.typesToAdd.Clear();
+                this.typesToRemove.Clear();
+            }
         }
 
         public CremaDataSet GetTypeData(IObjectSerializer serializer, string itemPath, string revision)
@@ -203,6 +243,17 @@ namespace Ntreev.Crema.Services.Data
             return null;
         }
 
+        public void CreateTypeCategory(string itemPath)
+        {
+            var directoryName = PathUtility.GetDirectoryName(itemPath);
+            if (Directory.Exists(directoryName) == false)
+                throw new DirectoryNotFoundException();
+            if (Directory.Exists(itemPath) == true)
+                throw new IOException();
+            Directory.CreateDirectory(itemPath);
+            this.Add(itemPath);
+        }
+
         public void RenameTypeCategory(DataBaseSet dataBaseSet, string categoryPath, string newCategoryPath)
         {
             dataBaseSet.SetTypeCategoryPath(categoryPath, newCategoryPath);
@@ -223,13 +274,20 @@ namespace Ntreev.Crema.Services.Data
             dataBaseSet.SetTableCategoryPath(categoryPath, newCategoryPath);
         }
 
-        public void CreateType(DataBaseSet dataBaseSet)
+        public void CreateType(DataBaseSet dataBaseSet, string typeName)
         {
+            if (this.types.Contains(typeName) || this.typesToAdd.Contains(typeName))
+                throw new Exception("123");
+            this.typesToAdd.Add(typeName);
             dataBaseSet.CreateType();
         }
 
         public void RenameType(DataBaseSet dataBaseSet, string typePath, string typeName)
         {
+            if (this.types.Contains(typeName) || this.typesToAdd.Contains(typeName))
+                throw new Exception("123");
+            this.typesToAdd.Add(typeName);
+            this.typesToRemove.Add(Path.GetFileName(typePath));
             dataBaseSet.RenameType(typePath, typeName);
         }
 
@@ -240,6 +298,7 @@ namespace Ntreev.Crema.Services.Data
 
         public void DeleteType(DataBaseSet dataBaseSet, string typePath)
         {
+            this.typesToRemove.Add(Path.GetFileName(typePath));
             dataBaseSet.DeleteType(typePath);
         }
 
@@ -247,11 +306,6 @@ namespace Ntreev.Crema.Services.Data
         {
             dataBaseSet.ModifyType();
         }
-
-        //public void SetTypeTags(CremaDataSet dataSet, Type type, TagInfo tags)
-        //{
-        //    DataBaseSet.SetTypeTags(dataSet, type, tags);
-        //}
 
         public void CreateTable(DataBaseSet dataBaseSet)
         {
@@ -277,16 +331,6 @@ namespace Ntreev.Crema.Services.Data
         {
             dataBaseSet.ModifyType();
         }
-
-        //public void SetTableTags(CremaDataSet dataSet, Table table, TagInfo tags)
-        //{
-        //    DataBaseSet.SetTableTags(dataSet, table, tags);
-        //}
-
-        //public void SetTableComment(CremaDataSet dataSet, Table table, string comment)
-        //{
-        //    DataBaseSet.SetTableComment(dataSet, table, comment);
-        //}
 
         public void Modify(CremaDataSet dataSet)
         {

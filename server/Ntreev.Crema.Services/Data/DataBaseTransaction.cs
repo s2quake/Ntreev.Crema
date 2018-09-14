@@ -64,7 +64,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.ValidateCommit(authentication);
                     this.dataBase.VerifyAccess(authentication);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     this.repository.EndTransaction();
                     this.authentication.Expired -= Authentication_Expired;
                     this.isDisposed = true;
@@ -86,7 +86,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.ValidateRollback(authentication);
                     this.dataBase.VerifyAccess(authentication);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     this.dataBase.ResettingDataBase(authentication);
                     await this.RollbackDomainsAsync(authentication);
                     await this.dataBase.ResetDataBaseAsync(authentication, this.typeInfos, this.tableInfos);
@@ -117,11 +117,6 @@ namespace Ntreev.Crema.Services.Data
         {
             this.authentication.Expired -= Authentication_Expired;
             await this.RollbackAsync(this.authentication);
-        }
-
-        private void Sign(Authentication authentication)
-        {
-            authentication.Sign();
         }
 
         private void CopyDomains(Authentication authentication)

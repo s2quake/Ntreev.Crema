@@ -56,54 +56,22 @@ namespace Ntreev.Crema.Services.Data
 
         public Task SetIndexAsync(Authentication authentication, int value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.Index, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Index, value);
         }
 
         public Task SetNameAsync(Authentication authentication, string value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.Name, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Name, value);
         }
 
         public Task SetValueAsync(Authentication authentication, long value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.Value, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Value, value);
         }
 
         public Task SetCommentAsync(Authentication authentication, string value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.Comment, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Comment, value);
         }
 
         public int Index => this.GetField<int>(CremaSchema.Index);

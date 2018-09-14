@@ -32,8 +32,10 @@ namespace Ntreev.Crema.Services.Data
 {
     abstract class TypeTemplateBase : ITypeTemplate, IDomainHost
     {
+        private static readonly object lockobj = new object();
         private TypeDomain domain;
         private DataTable table;
+        private bool isRunning;
 
         private readonly List<TypeMember> members = new List<TypeMember>();
 
@@ -48,6 +50,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
                     return new TypeMember(this, this.TypeSource.View.Table);
                 });
             }
@@ -91,7 +94,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync));
                     this.ValidateBeginEdit(authentication);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     await this.OnBeginEditAsync(authentication);
                     this.OnEditBegun(EventArgs.Empty);
                 });
@@ -107,11 +110,14 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                if (this.IsRunning == true)
+                    throw new Exception("123");
+                this.IsRunning = true;
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync));
                     this.ValidateEndEdit(authentication);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     await this.OnEndEditAsync(authentication);
                     this.OnEditEnded(EventArgs.Empty);
                 });
@@ -121,17 +127,24 @@ namespace Ntreev.Crema.Services.Data
                 this.CremaHost.Error(e);
                 throw;
             }
+            finally
+            {
+                this.IsRunning = false;
+            }
         }
 
         public async Task CancelEditAsync(Authentication authentication)
         {
             try
             {
+                if (this.IsRunning == true)
+                    throw new Exception("123");
+                this.IsRunning = true;
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync));
                     this.ValidateCancelEdit(authentication);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     await this.OnCancelEditAsync(authentication);
                     this.OnEditCanceled(EventArgs.Empty);
                 });
@@ -141,6 +154,17 @@ namespace Ntreev.Crema.Services.Data
                 this.CremaHost.Error(e);
                 throw;
             }
+            finally
+            {
+                this.IsRunning = false;
+            }
+        }
+
+        public void ValidateAddNew(Authentication authentication)
+        {
+            if (this.domain != null)
+                throw new InvalidOperationException(Resources.Exception_ItIsAlreadyBeingEdited);
+            this.OnValidateAddNew(authentication, this);
         }
 
         public void ValidateBeginEdit(Authentication authentication)
@@ -159,7 +183,7 @@ namespace Ntreev.Crema.Services.Data
 
         public void ValidateCancelEdit(Authentication authentication)
         {
-            if (this.domain == null)
+            if (this.domain == null || this.domain.Dispatcher == null)
                 throw new InvalidOperationException(Resources.Exception_TypeIsNotBeingEdited);
             this.OnValidateCancelEdit(authentication, this);
         }
@@ -299,7 +323,7 @@ namespace Ntreev.Crema.Services.Data
 
         protected virtual async Task OnBeginEditAsync(Authentication authentication)
         {
-            this.TypeSource = this.CreateSource(authentication);
+            this.TypeSource = await this.CreateSourceAsync(authentication);
             this.domain = new TypeDomain(authentication, this.TypeSource, this.DataBase, this.ItemPath, this.GetType().Name)
             {
                 IsNew = this.IsNew,
@@ -315,19 +339,19 @@ namespace Ntreev.Crema.Services.Data
             this.table.RowDeleted += Table_RowDeleted;
             this.table.RowChanged += Table_RowChanged;
 
-            this.DomainContext.Domains.Add(authentication, this.domain, this.DataBase);
-            await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
+            await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
             await this.domain.AddUserAsync(authentication, DomainAccessType.ReadWrite);
+            await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
         }
 
         protected virtual async Task OnEndEditAsync(Authentication authentication)
         {
-            await this.domain.Dispatcher.InvokeAsync(() =>
+            if (this.domain != null)
             {
-                this.DetachDomainEvent();
-                this.domain.Dispose(authentication, false);
+                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false);
                 this.domain = null;
-            });
+            }
             if (this.table != null)
             {
                 this.table.RowDeleted -= Table_RowDeleted;
@@ -340,12 +364,12 @@ namespace Ntreev.Crema.Services.Data
 
         protected virtual async Task OnCancelEditAsync(Authentication authentication)
         {
-            await this.domain.Dispatcher.InvokeAsync(() =>
+            if (this.domain != null)
             {
-                this.DetachDomainEvent();
-                this.domain.Dispose(authentication, true);
+                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true);
                 this.domain = null;
-            });
+            }
             if (this.table != null)
             {
                 this.table.RowDeleted -= Table_RowDeleted;
@@ -390,6 +414,12 @@ namespace Ntreev.Crema.Services.Data
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public virtual void OnValidateAddNew(Authentication authentication, object target)
+        {
+
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void OnValidateBeginEdit(Authentication authentication, object target)
         {
 
@@ -410,7 +440,7 @@ namespace Ntreev.Crema.Services.Data
 
         protected CremaDataType TypeSource { get; private set; }
 
-        protected abstract CremaDataType CreateSource(Authentication authentication);
+        protected abstract Task<CremaDataType> CreateSourceAsync(Authentication authentication);
 
         protected void Sign(Authentication authentication)
         {
@@ -469,13 +499,19 @@ namespace Ntreev.Crema.Services.Data
             await this.Dispatcher.InvokeAsync(() => this.OnChanged(e));
         }
 
+        int refcount;
         private void AttachDomainEvent()
         {
+            if (refcount != 0)
+            {
+                int qwer = 0;
+            }
             this.domain.Deleted += Domain_Deleted;
             this.domain.RowAdded += Domain_RowAdded;
             this.domain.RowChanged += Domain_RowChanged;
             this.domain.RowRemoved += Domain_RowRemoved;
             this.domain.PropertyChanged += Domain_PropertyChanged;
+            refcount++;
         }
 
         private void DetachDomainEvent()
@@ -485,6 +521,11 @@ namespace Ntreev.Crema.Services.Data
             this.domain.RowChanged -= Domain_RowChanged;
             this.domain.RowRemoved -= Domain_RowRemoved;
             this.domain.PropertyChanged -= Domain_PropertyChanged;
+            if (refcount != 1)
+            {
+                int qwer = 0;
+            }
+            refcount--;
         }
 
         private void ValidateDispatcher(Authentication authentication)
@@ -492,6 +533,24 @@ namespace Ntreev.Crema.Services.Data
             if (this.Dispatcher == null)
                 throw new InvalidOperationException(Resources.Exception_InvalidObject);
             this.Dispatcher.VerifyAccess();
+        }
+
+        private bool IsRunning
+        {
+            get
+            {
+                lock (lockobj)
+                {
+                    return this.isRunning;
+                }
+            }
+            set
+            {
+                lock (lockobj)
+                {
+                    this.isRunning = value;
+                }
+            }
         }
 
         #region ITypeTemplate

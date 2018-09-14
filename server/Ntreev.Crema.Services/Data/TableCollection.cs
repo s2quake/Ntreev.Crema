@@ -91,7 +91,7 @@ namespace Ntreev.Crema.Services.Data
                 return await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.ValidateInherit(authentication, table, newTableName, categoryPath, copyContent);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     var dataSet = await table.ReadDataAsync(authentication);
                     var dataTable = dataSet.Tables[table.Name, table.Category.Path];
                     var itemName = new ItemName(categoryPath, newTableName);
@@ -115,7 +115,7 @@ namespace Ntreev.Crema.Services.Data
                 return await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.ValidateCopy(authentication, table, newTableName, categoryPath, copyContent);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     var dataSet = await table.ReadDataAsync(authentication);
                     var dataTable = dataSet.Tables[table.Name, table.Category.Path];
                     var itemName = new ItemName(categoryPath, newTableName);
@@ -494,11 +494,6 @@ namespace Ntreev.Crema.Services.Data
         protected override Table NewItem(params object[] args)
         {
             return new Table();
-        }
-
-        private void Sign(Authentication authentication)
-        {
-            authentication.Sign();
         }
 
         private void ValidateInherit(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyXml)

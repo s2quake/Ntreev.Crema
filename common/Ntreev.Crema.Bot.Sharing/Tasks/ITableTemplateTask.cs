@@ -57,17 +57,23 @@ namespace Ntreev.Crema.Bot.Tasks
             else
             {
                 if (template.Domain == null)
+                {
                     await template.BeginEditAsync(context.Authentication);
-                if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
-                {
-                    var column = await template.AddNewAsync(context.Authentication);
-                    context.Push(column);
-                    context.State = System.Data.DataRowState.Detached;
                 }
-                else
+
+                if (await template.Domain.Dispatcher.InvokeAsync(() => template.Domain.Users.Contains(context.Authentication.ID)) == true)
                 {
-                    var member = template.Random();
-                    context.Push(member);
+                    if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
+                    {
+                        var column = await template.AddNewAsync(context.Authentication);
+                        context.Push(column);
+                        context.State = System.Data.DataRowState.Detached;
+                    }
+                    else
+                    {
+                        var member = template.Random();
+                        context.Push(member);
+                    }
                 }
             }
 

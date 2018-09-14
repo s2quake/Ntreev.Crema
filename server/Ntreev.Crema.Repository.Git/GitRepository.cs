@@ -191,8 +191,8 @@ namespace Ntreev.Crema.Repository.Git
                 if (items.Length != 0)
                 {
                     var authorValue = new GitAuthor(author);
-                    GitConfig.SetValue("user.email", authorValue.Email == string.Empty ? "<>" : authorValue.Email);
-                    GitConfig.SetValue("user.name", authorValue.Name);
+                    GitConfig.SetValue(this.repositoryPath, "user.email", authorValue.Email == string.Empty ? "<>" : authorValue.Email);
+                    GitConfig.SetValue(this.repositoryPath, "user.name", authorValue.Name);
 
                     var commitCommand = new GitCommitCommand(this.repositoryPath, author, comment);
                     var result = commitCommand.Run(this.logService);

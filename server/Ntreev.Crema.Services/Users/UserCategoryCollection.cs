@@ -52,7 +52,7 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);
                     this.ValidateAddNew(authentication, name, parentPath);
                     await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     var category = this.BaseAddNew(name, parentPath, authentication);
                     this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
                     return category;
@@ -300,11 +300,6 @@ namespace Ntreev.Crema.Services.Users
                 throw new PermissionDeniedException();
 
             base.ValidateAddNew(name, parentPath, null);
-        }
-
-        private void Sign(Authentication authentication)
-        {
-            authentication.Sign();
         }
 
         #region IUserCategoryCollection

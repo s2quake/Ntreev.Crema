@@ -141,7 +141,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginUserEditAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateBeginUserEdit(authentication, location);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     this.InvokeBeginUserEdit(authentication, location, out var domainUser);
                     this.OnUserChanged(new DomainUserEventArgs(authentication, this, domainUser));
                     this.Container.InvokeDomainUserChangedEvent(authentication, this, domainUser);
@@ -162,7 +162,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndUserEditAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateEndUserEdit(authentication);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     this.InvokeEndUserEdit(authentication, out var domainUser);
                     this.OnUserChanged(new DomainUserEventArgs(authentication, this, domainUser));
                     this.Container.InvokeDomainUserChangedEvent(authentication, this, domainUser);
@@ -183,7 +183,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(NewRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateNewRow(authentication, rows);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     this.Logger.NewRow(authentication, rows);
                     this.InvokeNewRow(authentication, ref rows);
                     this.data = null;
@@ -212,7 +212,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateSetRow(authentication, rows);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     this.Logger.SetRow(authentication, rows);
                     this.InvokeSetRow(authentication, ref rows);
                     this.data = null;
@@ -241,7 +241,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateRemoveRow(authentication, rows);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     this.Logger.RemoveRow(authentication, rows);
                     this.InvokeRemoveRow(authentication, rows);
                     this.data = null;
@@ -269,7 +269,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPropertyAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, propertyName, value);
                     this.ValidateSetProperty(authentication, propertyName, value);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     this.Logger.SetProperty(authentication, propertyName, value);
                     this.InvokeSetProperty(authentication, propertyName, value);
                     this.data = null;
@@ -297,7 +297,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetUserLocationAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateSetLocation(authentication, location);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     this.InvokeSetUserLocation(authentication, location, out var domainUser);
                     this.OnUserChanged(new DomainUserEventArgs(authentication, this, domainUser));
                     this.Container.InvokeDomainUserChangedEvent(authentication, this, domainUser);
@@ -318,7 +318,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(KickAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, userID, comment);
                     this.ValidateKick(authentication, userID, comment);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     this.Logger.Kick(authentication, userID, comment);
                     this.InvokeKick(authentication, userID, comment, out var domainUser, out var removeInfo);
                     this.Users.Remove(userID);
@@ -343,7 +343,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetOwnerAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, userID);
                     this.ValidateSetOwner(authentication, userID);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     this.Logger.SetOwner(authentication, userID);
                     this.InvokeSetOwner(authentication, userID, out var oldOwner, out var newOwner);
                     this.Users.Owner = newOwner;
@@ -398,17 +398,16 @@ namespace Ntreev.Crema.Services.Domains
             this.Dispose();
         }
 
+        //public void Initialize()
+        //{
+        //    this.Dispatcher = new CremaDispatcher(this);
+        //    this.Logger = new DomainLogger(this.Context.Serializer, this);
+        //}
+
         public void Dispose(Authentication authentication, bool isCanceled)
         {
-            this.Dispatcher.VerifyAccess();
-            var container = this.Container;
-            this.Dispatcher.Dispose();
-            this.Dispatcher = null;
-            this.Logger?.Dispose(true);
-            this.Logger = null;
-            this.Dispose();
+            base.Dispose();
             this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
-            container.InvokeDomainDeletedEvent(authentication, this, isCanceled);
         }
 
         public void Attach(Authentication authentication)
@@ -439,7 +438,7 @@ namespace Ntreev.Crema.Services.Domains
             {
                 this.CremaHost.DebugMethod(authentication, this, nameof(AddUserAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, accessType);
                 this.ValidateAdd(authentication);
-                this.Sign(authentication);
+                this.CremaHost.Sign(authentication);
                 this.Logger.Join(authentication, accessType);
                 this.InvokeAddUser(authentication, accessType, out var domainUser);
                 this.Users.Add(domainUser);
@@ -455,7 +454,7 @@ namespace Ntreev.Crema.Services.Domains
             {
                 this.CremaHost.DebugMethod(authentication, this, nameof(RemoveUserAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                 this.ValidateRemove(authentication);
-                this.Sign(authentication);
+                this.CremaHost.Sign(authentication);
                 this.Logger.Disjoin(authentication, RemoveInfo.Empty);
                 this.InvokeRemoveUser(authentication, out var domainUser, out var isMaster);
                 this.Users.Remove(authentication.ID);
@@ -646,8 +645,12 @@ namespace Ntreev.Crema.Services.Domains
             }
             remove
             {
-                this.Dispatcher?.VerifyAccess();
+                this.Dispatcher.VerifyAccess();
                 this.deleted -= value;
+                if (this.deleted != null)
+                {
+                    int qwer = 0;
+                }
             }
         }
 
@@ -999,11 +1002,6 @@ namespace Ntreev.Crema.Services.Domains
         private DateTime GetTime()
         {
             return DateTime.UtcNow;
-        }
-
-        private void Sign(Authentication authentication)
-        {
-            this.Sign(authentication, false);
         }
 
         private void Sign(Authentication authentication, bool defaultProvider)

@@ -82,7 +82,7 @@ namespace Ntreev.Crema.Bot
 
             var autobotIDList = new List<string>();
 
-            for (var i = 0; i < 3; i++)
+            for (var i = 0; i < 0; i++)
             {
                 var autobotID = $"Autobot{RandomUtility.Next(1000)}";
                 var authority = RandomUtility.NextEnum<Authority>();

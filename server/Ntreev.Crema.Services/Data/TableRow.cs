@@ -58,15 +58,7 @@ namespace Ntreev.Crema.Services.Data
 
         public Task SetFieldAsync(Authentication authentication, string columnName, object value)
         {
-            try
-            {
-                return base.SetFieldAsync(authentication, columnName, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return base.SetFieldAsync(authentication, columnName, value);
         }
 
         public object this[string columnName] => base.GetField<object>(columnName);

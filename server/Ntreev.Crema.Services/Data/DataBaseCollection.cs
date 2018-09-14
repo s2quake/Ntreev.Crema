@@ -137,7 +137,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CreateDataBaseAsync), dataBaseName, comment);
                     this.ValidateCreateDataBase(authentication, dataBaseName);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     var dataSet = new CremaDataSet();
                     var tempPath = PathUtility.GetTempPath(true);
                     var dataBasePath = Path.Combine(tempPath, dataBaseName);
@@ -174,7 +174,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyDataBaseAsync), dataBase, newDataBaseName, comment);
                     this.ValidateCopyDataBase(authentication, dataBase, newDataBaseName, force);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                 });
                 await this.RepositoryDispatcher.InvokeAsync(() =>
                 {
@@ -839,11 +839,6 @@ namespace Ntreev.Crema.Services.Data
                 else
                     this.AddBase(item, new DataBase(this.CremaHost, item, caches[item]));
             }
-        }
-
-        private void Sign(Authentication authentication)
-        {
-            authentication.Sign();
         }
 
         #region IDataBaseCollection

@@ -56,145 +56,57 @@ namespace Ntreev.Crema.Services.Data
 
         public Task SetIndexAsync(Authentication authentication, int value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.Index, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Index, value);
         }
 
         public Task SetIsKeyAsync(Authentication authentication, bool value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.IsKey, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.IsKey, value);
         }
 
         public Task SetIsUniqueAsync(Authentication authentication, bool value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.IsUnique, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.IsUnique, value);
         }
 
         public Task SetNameAsync(Authentication authentication, string value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.ColumnName, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.ColumnName, value);
         }
 
         public Task SetDataTypeAsync(Authentication authentication, string value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.DataType, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.DataType, value);
         }
 
         public Task SetDefaultValueAsync(Authentication authentication, string value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.DefaultValue, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.DefaultValue, value);
         }
 
         public Task SetCommentAsync(Authentication authentication, string value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.Comment, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Comment, value);
         }
 
         public Task SetAutoIncrementAsync(Authentication authentication, bool value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.AutoIncrement, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.AutoIncrement, value);
         }
 
         public Task SetTagsAsync(Authentication authentication, TagInfo value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.Tags, value.ToString());
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Tags, value.ToString());
         }
 
         public Task SetIsReadOnlyAsync(Authentication authentication, bool value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.ReadOnly, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.ReadOnly, value);
         }
 
         public Task SetAllowNullAsync(Authentication authentication, bool value)
         {
-            try
-            {
-                return this.SetFieldAsync(authentication, CremaSchema.AllowNull, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.AllowNull, value);
         }
 
         public int Index => this.GetField<int>(CremaSchema.Index);

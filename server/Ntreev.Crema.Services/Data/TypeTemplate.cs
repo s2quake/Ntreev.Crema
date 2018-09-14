@@ -50,8 +50,7 @@ namespace Ntreev.Crema.Services.Data
         public override void OnValidateBeginEdit(Authentication authentication, object target)
         {
             base.OnValidateBeginEdit(authentication, target);
-
-            this.type.ValidateNotBeingEdited();
+            this.type.ValidateIsNotBeingEdited();
             this.type.ValidateAccessType(authentication, AccessType.Master);
             this.type.ValidateUsingTables(authentication);
         }
@@ -59,7 +58,7 @@ namespace Ntreev.Crema.Services.Data
         public override void OnValidateEndEdit(Authentication authentication, object target)
         {
             base.OnValidateEndEdit(authentication, target);
-
+            this.type.ValidateIsBeingEdited();
             if (this.TypeSource == null)
                 throw new InvalidOperationException(Resources.Exception_CannotEndEdit);
             this.type.ValidateUsingTables(authentication);
@@ -68,13 +67,14 @@ namespace Ntreev.Crema.Services.Data
         public override void OnValidateCancelEdit(Authentication authentication, object target)
         {
             base.OnValidateCancelEdit(authentication, target);
+            this.type.ValidateIsBeingEdited();
             this.type.ValidateAccessType(authentication, AccessType.Master);
         }
 
         protected override async Task OnBeginEditAsync(Authentication authentication)
         {
-            await base.OnBeginEditAsync(authentication);
             this.type.IsBeingEdited = true;
+            await base.OnBeginEditAsync(authentication);
             this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
         }
 
@@ -102,9 +102,9 @@ namespace Ntreev.Crema.Services.Data
             base.OnRestore(domain);
         }
 
-        protected override CremaDataType CreateSource(Authentication authentication)
+        protected override async Task<CremaDataType> CreateSourceAsync(Authentication authentication)
         {
-            var dataSet = this.type.ReadAllData(authentication);
+            var dataSet = await this.type.ReadAllDataAsync(authentication);
             return dataSet.Types[this.type.Name, this.type.Category.Path];
         }
 

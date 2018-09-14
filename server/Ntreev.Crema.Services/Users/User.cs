@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Services.Users
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
                     var signatureDate = await this.Container.InvokeUserMoveAsync(authentication, this, categoryPath);
-                    this.Sign(authentication, signatureDate);
+                    this.CremaHost.Sign(authentication, signatureDate);
                     base.Move(authentication, categoryPath);
                     this.Container.InvokeUsersMovedEvent(authentication, items, oldPaths, oldCategoryPaths);
                 }
@@ -74,12 +74,12 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     this.ValidateDelete(authentication);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var container = this.Container;
                     var signatureDate = await container.InvokeUserDeleteAsync(authentication, this);
-                    this.Sign(authentication, signatureDate);
+                    this.CremaHost.Sign(authentication, signatureDate);
                     base.Delete(authentication);
                     container.InvokeUsersDeletedEvent(authentication, items, oldPaths);
                 }
@@ -102,7 +102,7 @@ namespace Ntreev.Crema.Services.Users
 
                     var users = new User[] { this };
                     var authentication = new Authentication(new UserAuthenticationProvider(this), Guid.NewGuid());
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
 
                     if (this.Authentication != null)
                     {
@@ -134,7 +134,7 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(LogoutAsync), this);
                     this.ValidateLogout(authentication);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     var users = new User[] { this };
                     this.Authentication.InvokeExpiredEvent(authentication.ID, string.Empty);
                     this.Authentication = null;
@@ -163,7 +163,7 @@ namespace Ntreev.Crema.Services.Users
                     var comments = Enumerable.Repeat(comment, users.Length).ToArray();
                     var isOnline = this.IsOnline;
                     var banInfo = await this.Container.InvokeUserBanAsync(authentication, this, comment);
-                    this.Sign(authentication, banInfo.SignatureDate);
+                    this.CremaHost.Sign(authentication, banInfo.SignatureDate);
                     base.Ban(authentication, banInfo);
                     this.IsOnline = false;
                     this.Container.InvokeUsersBannedEvent(authentication, users, comments);
@@ -192,7 +192,7 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnbanAsync), this);
                     this.ValidateUnban(authentication);
                     var signatureDate = await this.Container.InvokeUserUnbanAsync(authentication, this);
-                    this.Sign(authentication, signatureDate);
+                    this.CremaHost.Sign(authentication, signatureDate);
                     base.Unban(authentication);
                     this.Container.InvokeUsersUnbannedEvent(authentication, new User[] { this });
                 }
@@ -212,7 +212,7 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(KickAsync), this, comment);
                     this.ValidateKick(authentication, comment);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     var users = new User[] { this };
                     var comments = Enumerable.Repeat(comment, users.Length).ToArray();
                     this.IsOnline = false;
@@ -238,10 +238,10 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(ChangeUserInfoAsync), this, password, newPassword, userName, authority);
                     this.ValidateUserInfoChange(authentication, password, newPassword, userName, authority);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     var items = EnumerableUtility.One(this).ToArray();
                     var serializationInfo = await this.Container.InvokeUserChangeAsync(authentication, this, password, newPassword, userName, authority);
-                    this.Sign(authentication, serializationInfo.ModificationInfo);
+                    this.CremaHost.Sign(authentication, serializationInfo.ModificationInfo);
                     if (newPassword != null)
                         this.Password = UserContext.StringToSecureString(serializationInfo.Password);
                     base.UpdateUserInfo((UserInfo)serializationInfo);
@@ -262,7 +262,7 @@ namespace Ntreev.Crema.Services.Users
                 try
                 {
                     this.ValidateSendMessage(authentication, message);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     this.Container.InvokeSendMessageEvent(authentication, this, message);
                 }
                 catch (Exception e)
@@ -552,16 +552,6 @@ namespace Ntreev.Crema.Services.Users
                 throw new InvalidOperationException(Resources.Exception_OfflineUserCannotKicked);
             if (authentication.ID == this.ID)
                 throw new PermissionDeniedException(Resources.Exception_CannotKickYourself);
-        }
-
-        private void Sign(Authentication authentication)
-        {
-            authentication.Sign();
-        }
-
-        private void Sign(Authentication authentication, SignatureDate signatureDate)
-        {
-            authentication.Sign(signatureDate.DateTime);
         }
 
         #region IUser

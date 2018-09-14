@@ -21,7 +21,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(ImportAsync), comment);
                     this.ValidateImport(authentication, dataSet, comment);
-                    this.Sign(authentication);
+                    this.CremaHost.Sign(authentication);
                     
                 });
 

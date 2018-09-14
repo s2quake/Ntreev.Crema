@@ -49,8 +49,11 @@ namespace Ntreev.Crema.Bot.Tasks
                     //context.Push(autobot.CremaHost.DataBases);
                     if (RandomUtility.Within(75) == true)
                     {
-                        //var dataBase = await autobot.CremaHost.Dispatcher.InvokeAsync(() => autobot.CremaHost.DataBases.Random());
-                        //context.Push(dataBase);
+                        if (autobot.GetService(typeof(ICremaHost)) is ICremaHost cremaHost)
+                        {
+                            var dataBase = await cremaHost.Dispatcher.InvokeAsync(() => cremaHost.DataBases.Random());
+                            context.Push(dataBase);
+                        }
                     }
                     //else if (RandomUtility.Within(75) == true)
                     if (RandomUtility.Within(75) == true)
@@ -111,7 +114,7 @@ namespace Ntreev.Crema.Bot.Tasks
         //    await Task.Delay(sleep);
         //}
 
-        [TaskMethod(Weight = 10)]
+        //[TaskMethod(Weight = 10)]
         public async Task CreateAutobotAsync(Autobot autobot, TaskContext context)
         {
             if (context.AllowException == false)

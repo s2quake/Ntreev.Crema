@@ -94,6 +94,7 @@ namespace Ntreev.Crema.Services
         {
             this.Dispatcher.VerifyAccess();
             this.Repository.Revert();
+            this.OnReverted();
         }
 
         public void BeginTransaction(string author, string name)
@@ -179,6 +180,11 @@ namespace Ntreev.Crema.Services
         protected void OnChanged(EventArgs e)
         {
             this.Changed?.Invoke(this, e);
+        }
+
+        protected virtual void OnReverted()
+        {
+
         }
     }
 }

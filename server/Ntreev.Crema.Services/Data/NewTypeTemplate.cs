@@ -85,8 +85,8 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            await base.OnEndEditAsync(authentication);
             this.type = await this.Types.AddNewAsync(authentication, this.TypeSource);
+            await base.OnEndEditAsync(authentication);
             this.category = null;
         }
 
@@ -96,10 +96,10 @@ namespace Ntreev.Crema.Services.Data
             this.category = null;
         }
 
-        protected override CremaDataType CreateSource(Authentication authentication)
+        protected override async Task<CremaDataType> CreateSourceAsync(Authentication authentication)
         {
             var typeName = NameUtility.GenerateNewName(nameof(Type), this.Types.Select((Type item) => item.Name).ToArray());
-            var dataSet = CremaDataSet.Create(new SignatureDateProvider(authentication.ID));
+            var dataSet = await Task.Run(() => CremaDataSet.Create(new SignatureDateProvider(authentication.ID)));
             var dataType = dataSet.Types.Add();
             dataType.TypeName = typeName;
             dataType.CategoryPath = this.category.Path;

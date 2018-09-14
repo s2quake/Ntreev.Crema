@@ -116,23 +116,31 @@ namespace Ntreev.Crema.Services.Data
 
         protected async Task SetFieldAsync<T>(Authentication authentication, string columnName, T value)
         {
-            await await this.Dispatcher.InvokeAsync(async () =>
+            try
             {
-                if (this.fields != null)
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    if (this.fields.ContainsKey(columnName) == false)
-                        throw new KeyNotFoundException(columnName);
-                    this.fields[columnName] = value;
-                }
-                else
-                {
-                    var keys = this.Row.GetKeys();
-                    var fields = new object[this.table.Columns.Count];
-                    var column = this.table.Columns[columnName];
-                    fields[column.Ordinal] = value;
-                    await this.domain.SetRowAsync(authentication, this.table.TableName, keys, fields);
-                }
-            });
+                    if (this.fields != null)
+                    {
+                        if (this.fields.ContainsKey(columnName) == false)
+                            throw new KeyNotFoundException(columnName);
+                        this.fields[columnName] = value;
+                    }
+                    else
+                    {
+                        var keys = this.Row.GetKeys();
+                        var fields = new object[this.table.Columns.Count];
+                        var column = this.table.Columns[columnName];
+                        fields[column.Ordinal] = value;
+                        await this.domain.SetRowAsync(authentication, this.table.TableName, keys, fields);
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         private void Backup(DataRow row)

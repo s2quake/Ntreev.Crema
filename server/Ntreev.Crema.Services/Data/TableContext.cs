@@ -373,7 +373,7 @@ namespace Ntreev.Crema.Services.Data
         {
             this.Dispatcher?.VerifyAccess();
             this.ValidateUnlockItems(authentication, userID);
-            this.Sign(authentication);
+            this.CremaHost.Sign(authentication);
             var query = from ITableItem item in this
                         let lockInfo = item.LockInfo
                         where lockInfo.IsLocked == true && lockInfo.IsInherited == false && lockInfo.IsOwner(userID)
@@ -641,11 +641,6 @@ namespace Ntreev.Crema.Services.Data
                 }
             }
             this.CremaHost.Debug(Resources.Message_TableLoadingIsCompleted);
-        }
-
-        private void Sign(Authentication authentication)
-        {
-            authentication.Sign();
         }
 
         private ITableItem GetTableItemByItemPath(string itemPath)

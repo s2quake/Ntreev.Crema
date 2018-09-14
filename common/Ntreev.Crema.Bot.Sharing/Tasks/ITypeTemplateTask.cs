@@ -36,6 +36,7 @@ namespace Ntreev.Crema.Bot.Tasks
     {
         public async Task InvokeAsync(TaskContext context)
         {
+            var authentication = context.Authentication;
             var template = context.Target as ITypeTemplate;
             if (context.IsCompleted(template) == true)
             {
@@ -73,6 +74,15 @@ namespace Ntreev.Crema.Bot.Tasks
                     if (Verify() == false)
                         return;
                     await template.BeginEditAsync(context.Authentication);
+                }
+                else
+                {
+                    var domain = template.Domain;
+                    if (await domain.Dispatcher.InvokeAsync(() => domain.Users.Contains(authentication.ID)) == false)
+                    {
+                        context.Pop(template);
+                        return;
+                    }
                 }
                 bool Verify()
                 {

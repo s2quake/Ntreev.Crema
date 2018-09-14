@@ -43,11 +43,21 @@ namespace Ntreev.Crema.Bot.Tasks
             }
             else if (categories.Count < RandomUtility.Next(Math.Max(10, categories.Count + 1)))
             {
+                if (context.AllowException == false)
+                {
+                    if (await category.Dispatcher.InvokeAsync(() => category.GetAccessType(context.Authentication)) < AccessType.Master)
+                        return;
+                }
                 await this.AddNewCategoryAsync(category, context);
                 context.Complete(category);
             }
             else if (types.Count < RandomUtility.Next(Math.Max(10, types.Count + 1)))
             {
+                if (context.AllowException == false)
+                {
+                    if (await category.Dispatcher.InvokeAsync(() => category.GetAccessType(context.Authentication)) < AccessType.Master)
+                        return;
+                }
                 var template = await category.NewTypeAsync(context.Authentication);
                 context.Push(template);
             }
@@ -106,9 +116,18 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 10)]
         public async Task LockAsync(ITypeCategory category, TaskContext context)
         {
-            if (category.Parent == null)
-                return;
             var comment = RandomUtility.NextString();
+            if (context.AllowException == false)
+            {
+                if (category.Parent == null)
+                    return;
+                if (string.IsNullOrEmpty(comment) == true)
+                    return;
+                var lockInfo = await category.Dispatcher.InvokeAsync(() => category.LockInfo);
+                if (lockInfo.IsLocked == true || lockInfo.IsInherited == true)
+                    return;
+            }
+            
             await category.LockAsync(context.Authentication, comment);
         }
 
@@ -119,8 +138,10 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 if (category.Parent == null)
                     return;
-                if (category.IsLocked == false)
+                var lockInfo = await category.Dispatcher.InvokeAsync(() => category.LockInfo);
+                if (lockInfo.IsLocked == false || lockInfo.IsInherited == true)
                     return;
+                
             }
             await category.UnlockAsync(context.Authentication);
         }
@@ -135,7 +156,7 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (category.IsPrivate == false)
                     return;
             }
-            category.SetPublicAsync(context.Authentication);
+            await category.SetPublicAsync(context.Authentication);
         }
 
         [TaskMethod(Weight = 10)]
@@ -216,7 +237,11 @@ namespace Ntreev.Crema.Bot.Tasks
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
             if (context.AllowException == false)
             {
-                if (category.Parent == null || category.Path == categoryPath)
+                if (category.Parent == null)
+                    return;
+                if (category.Parent.Path == categoryPath)
+                    return;
+                if (category.Path == categoryPath)
                     return;
             }
             await category.MoveAsync(context.Authentication, categoryPath);
@@ -234,8 +259,6 @@ namespace Ntreev.Crema.Bot.Tasks
             var categoryNanme = RandomUtility.NextIdentifier();
             if (context.AllowException == false)
             {
-                if (category.Parent == null)
-                    return;
                 if (category.GetAccessType(context.Authentication) < AccessType.Master)
                     return;
             }
@@ -245,6 +268,11 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 10)]
         public async Task NewTypeAsync(ITypeCategory category, TaskContext context)
         {
+            if (context.AllowException == false)
+            {
+                if (await category.Dispatcher.InvokeAsync(() => category.GetAccessType(context.Authentication)) < AccessType.Master)
+                    return;
+            }
             var template = await category.NewTypeAsync(context.Authentication);
             context.Push(template);
         }

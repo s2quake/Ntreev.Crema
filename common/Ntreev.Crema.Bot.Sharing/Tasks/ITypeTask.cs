@@ -100,7 +100,8 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 if (string.IsNullOrEmpty(comment) == true)
                     return;
-                if (await type.Dispatcher.InvokeAsync(() => type.IsLocked) == true)
+                var lockInfo = await type.Dispatcher.InvokeAsync(() => type.LockInfo);
+                if (lockInfo.IsLocked == true || lockInfo.IsInherited == true)
                     return;
             }
             await type.LockAsync(context.Authentication, comment);
@@ -111,7 +112,8 @@ namespace Ntreev.Crema.Bot.Tasks
         {
             if (context.AllowException == false)
             {
-                if (await type.Dispatcher.InvokeAsync(() => type.IsLocked) == false)
+                var lockInfo = await type.Dispatcher.InvokeAsync(() => type.LockInfo);
+                if (lockInfo.IsLocked == false || lockInfo.IsInherited == true)
                     return;
             }
             await type.UnlockAsync(context.Authentication);
