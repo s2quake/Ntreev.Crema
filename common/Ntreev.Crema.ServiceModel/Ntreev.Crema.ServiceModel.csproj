@@ -61,6 +61,7 @@
     <Compile Include="AuthenticationType.cs" />
     <Compile Include="Authority.cs" />
     <Compile Include="DataSetType.cs" />
+    <Compile Include="DispatcherExpiredException.cs" />
     <Compile Include="DispatcherScopeAttribute.cs" />
     <Compile Include="DomainFieldInfo.cs" />
     <Compile Include="DomainUserBase.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="BanChangeType.cs" />
     <Compile Include="DomainAccessType.cs" />
     <Compile Include="DomainUserMetaData.cs" />
+    <Compile Include="ItemAlreadyExistsException.cs" />
     <Compile Include="LockChangeType.cs" />
     <Compile Include="MessageType.cs" />
     <Compile Include="Properties\EventResources.Designer.cs">

@@ -88,5 +88,14 @@ namespace Ntreev.Crema.ServiceModel
             };
             return props;
         }
+
+        public static readonly UserInfo Empty = new UserInfo()
+        {
+            ID = string.Empty,
+            Name = string.Empty,
+            CategoryName = string.Empty,
+            CreationInfo = SignatureDate.Empty,
+            ModificationInfo = SignatureDate.Empty
+        };
     }
 }

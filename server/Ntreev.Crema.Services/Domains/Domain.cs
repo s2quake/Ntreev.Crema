@@ -110,6 +110,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
+                this.ValidateExpired();
                 return this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, isCanceled);
@@ -137,6 +138,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
+                this.ValidateExpired();
                 return this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginUserEditAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
@@ -158,6 +160,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
+                this.ValidateExpired();
                 return this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndUserEditAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
@@ -179,6 +182,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
+                this.ValidateExpired();
                 return this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(NewRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
@@ -208,6 +212,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
+                this.ValidateExpired();
                 return this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
@@ -237,6 +242,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
+                this.ValidateExpired();
                 return this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
@@ -265,6 +271,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
+                this.ValidateExpired();
                 return this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPropertyAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, propertyName, value);
@@ -293,6 +300,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
+                this.ValidateExpired();
                 return this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetUserLocationAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
@@ -314,6 +322,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
+                this.ValidateExpired();
                 return this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(KickAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, userID, comment);
@@ -339,6 +348,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
+                this.ValidateExpired();
                 return this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetOwnerAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, userID);
@@ -366,6 +376,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public Task<DomainMetaData> GetMetaDataAsync(Authentication authentication)
         {
+            this.ValidateExpired();
             return this.Dispatcher.InvokeAsync(() =>
             {
                 var metaData = new DomainMetaData()

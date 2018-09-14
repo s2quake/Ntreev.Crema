@@ -36,6 +36,7 @@ namespace Ntreev.Crema.Bot.Tasks
     {
         public async Task InvokeAsync(TaskContext context)
         {
+            var authentication = context.Authentication;
             var template = context.Target as ITableTemplate;
             if (context.IsCompleted(template) == true)
             {

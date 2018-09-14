@@ -33,6 +33,11 @@ namespace Ntreev.Crema.Services.Data
             this.type = type;
         }
 
+        public override AccessType GetAccessType(Authentication authentication)
+        {
+            return this.type.GetAccessType(authentication);
+        }
+
         public override DomainContext DomainContext => this.type.GetService(typeof(DomainContext)) as DomainContext;
 
         public override string ItemPath => this.type.Path;
@@ -73,8 +78,8 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task OnBeginEditAsync(Authentication authentication)
         {
-            this.type.IsBeingEdited = true;
             await base.OnBeginEditAsync(authentication);
+            this.type.IsBeingEdited = true;
             this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
         }
 

@@ -40,6 +40,11 @@ namespace Ntreev.Crema.Services.Data
             this.IsNew = true;
         }
 
+        public override AccessType GetAccessType(Authentication authentication)
+        {
+            return this.category.GetAccessType(authentication);
+        }
+
         public override void OnValidateBeginEdit(Authentication authentication, object target)
         {
             base.OnValidateBeginEdit(authentication, target);

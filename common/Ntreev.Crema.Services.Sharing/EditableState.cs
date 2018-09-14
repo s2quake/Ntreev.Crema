@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library;
+using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,55 +26,13 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ITypeTemplate : IEnumerable<ITypeMember>, IDispatcherObject, IPermission
+    [Flags]
+    public enum EditableState
     {
-        Task BeginEditAsync(Authentication authentication);
+        None = 0,
 
-        Task EndEditAsync(Authentication authentication);
+        IsBeingEdited = 1,
 
-        Task CancelEditAsync(Authentication authentication);
-
-        Task SetTypeNameAsync(Authentication authentication, string value);
-
-        Task SetIsFlagAsync(Authentication authentication, bool value);
-
-        Task SetTagsAsync(Authentication authentication, TagInfo tags);
-
-        Task SetCommentAsync(Authentication authentication, string value);
-
-        Task<ITypeMember> AddNewAsync(Authentication authentication);
-
-        Task EndNewAsync(Authentication authentication, ITypeMember member);
-
-        Task<bool> ContainsAsync(string memberName);
-
-        IDomain Domain { get; }
-
-        IType Type { get; }
-
-        int Count { get; }
-
-        ITypeMember this[string memberName] { get; }
-
-        string TypeName { get; }
-
-        bool IsFlag { get; }
-
-        string Comment { get; }
-
-        bool IsNew { get; }
-
-        bool IsModified { get; }
-
-        EditableState EditableState { get; }
-
-        event EventHandler EditBegun;
-
-        event EventHandler EditEnded;
-
-        event EventHandler EditCanceled;
-
-        event EventHandler Changed;
-
+        Running = 2,
     }
 }

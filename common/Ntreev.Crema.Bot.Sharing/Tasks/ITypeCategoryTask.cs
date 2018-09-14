@@ -221,10 +221,13 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 25)]
         public async Task RenameAsync(ITypeCategory category, TaskContext context)
         {
+            var authentication = context.Authentication;
             var categoryName = RandomUtility.NextIdentifier();
             if (context.AllowException == false)
             {
                 if (category.Parent == null)
+                    return;
+                if (await category.Dispatcher.InvokeAsync(() => category.VerifyAccessType(authentication, AccessType.Master)) == false)
                     return;
             }
             await category.RenameAsync(context.Authentication, categoryName);
@@ -233,6 +236,7 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 25)]
         public async Task MoveAsync(ITypeCategory category, TaskContext context)
         {
+            var authentication = context.Authentication;
             var categories = category.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
             if (context.AllowException == false)
@@ -242,6 +246,8 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (category.Parent.Path == categoryPath)
                     return;
                 if (category.Path == categoryPath)
+                    return;
+                if (await category.Dispatcher.InvokeAsync(() => category.VerifyAccessType(authentication, AccessType.Master)) == false)
                     return;
             }
             await category.MoveAsync(context.Authentication, categoryPath);

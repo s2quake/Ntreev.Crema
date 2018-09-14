@@ -42,9 +42,10 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 try
                 {
-                    if (template.Domain != null)
+                    var editableState = await template.Dispatcher.InvokeAsync(() => template.EditableState);
+                    if (editableState == EditableState.IsBeingEdited)
                     {
-                        if (Verify() == true)
+                        if (template.Count > 0)
                             await template.EndEditAsync(context.Authentication);
                         else
                             await template.CancelEditAsync(context.Authentication);
@@ -52,30 +53,29 @@ namespace Ntreev.Crema.Bot.Tasks
                 }
                 catch
                 {
-                    await template.CancelEditAsync(context.Authentication);
+                    if (template.EditableState == EditableState.IsBeingEdited)
+                        await template.CancelEditAsync(context.Authentication);
                 }
 
                 context.Pop(template);
                 context.Complete(context.Target);
-
-                bool Verify()
-                {
-                    if (context.AllowException == true)
-                        return true;
-                    if (template.Count == 0)
-                        return false;
-                    return true;
-                }
             }
             else
             {
-                if (template.Domain == null)
+                var editableState = await template.Dispatcher.InvokeAsync(() => template.EditableState);
+                if (editableState == EditableState.None)
                 {
-                    if (Verify() == false)
-                        return;
-                    await template.BeginEditAsync(context.Authentication);
+                    try
+                    {
+                        await template.BeginEditAsync(context.Authentication);
+                    }
+                    catch
+                    {
+                        context.Pop(template);
+                        throw;
+                    }
                 }
-                else
+                else if (editableState == EditableState.IsBeingEdited)
                 {
                     var domain = template.Domain;
                     if (await domain.Dispatcher.InvokeAsync(() => domain.Users.Contains(authentication.ID)) == false)
@@ -84,13 +84,9 @@ namespace Ntreev.Crema.Bot.Tasks
                         return;
                     }
                 }
-                bool Verify()
+                else
                 {
-                    if (context.AllowException == true)
-                        return true;
-                    if (this.CanEdit(template) == false)
-                        return false;
-                    return true;
+                    return;
                 }
 
                 if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
@@ -120,6 +116,12 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 10)]
         public async Task SetTypeNameAsync(ITypeTemplate template, TaskContext context)
         {
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
+            {
+                if (template.EditableState != EditableState.IsBeingEdited)
+                    return;
+            }
             var tableName = RandomUtility.NextIdentifier();
             await template.SetTypeNameAsync(context.Authentication, tableName);
         }
@@ -127,6 +129,12 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 10)]
         public async Task SetIsFlagAsync(ITypeTemplate template, TaskContext context)
         {
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
+            {
+                if (template.EditableState != EditableState.IsBeingEdited)
+                    return;
+            }
             var isFlag = RandomUtility.NextBoolean();
             await template.SetIsFlagAsync(context.Authentication, isFlag);
         }
@@ -134,6 +142,12 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 10)]
         public async Task SetCommentAsync(ITypeTemplate template, TaskContext context)
         {
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
+            {
+                if (template.EditableState != EditableState.IsBeingEdited)
+                    return;
+            }
             var comment = RandomUtility.NextString();
             await template.SetCommentAsync(context.Authentication, comment);
         }

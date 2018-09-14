@@ -277,7 +277,7 @@ namespace Ntreev.Crema.Services.Data
         public void CreateType(DataBaseSet dataBaseSet, string typeName)
         {
             if (this.types.Contains(typeName) || this.typesToAdd.Contains(typeName))
-                throw new Exception("123");
+                throw new ItemAlreadyExistsException(typeName);
             this.typesToAdd.Add(typeName);
             dataBaseSet.CreateType();
         }
@@ -285,7 +285,7 @@ namespace Ntreev.Crema.Services.Data
         public void RenameType(DataBaseSet dataBaseSet, string typePath, string typeName)
         {
             if (this.types.Contains(typeName) || this.typesToAdd.Contains(typeName))
-                throw new Exception("123");
+                throw new ItemAlreadyExistsException(typeName);
             this.typesToAdd.Add(typeName);
             this.typesToRemove.Add(Path.GetFileName(typePath));
             dataBaseSet.RenameType(typePath, typeName);

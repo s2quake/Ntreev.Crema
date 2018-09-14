@@ -47,6 +47,9 @@ namespace Ntreev.Crema.ServiceModel
         [IgnoreDataMember]
         public DateTime DateTime { get { return this.SignatureDate.DateTime; } }
 
+        [IgnoreDataMember]
+        public bool IsBanned { get { return this.Path != string.Empty; } }
+
         public static bool operator ==(BanInfo x, BanInfo y)
         {
             return ((x.Path == y.Path) &&

@@ -94,6 +94,12 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 if (autobot.IsOnline == true)
                     return;
+                if (autobot.GetService(typeof(IUserContext)) is IUserContext userContext)
+                {
+                    var banInfo = await userContext.Dispatcher.InvokeAsync(() => userContext.Users[autobot.AutobotID].BanInfo);
+                    if (banInfo.IsBanned == true)
+                        return;
+                }
             }
             await autobot.LoginAsync();
         }
@@ -114,7 +120,7 @@ namespace Ntreev.Crema.Bot.Tasks
         //    await Task.Delay(sleep);
         //}
 
-        //[TaskMethod(Weight = 10)]
+        [TaskMethod(Weight = 10)]
         public async Task CreateAutobotAsync(Autobot autobot, TaskContext context)
         {
             if (context.AllowException == false)

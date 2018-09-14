@@ -145,7 +145,7 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
             }
             var userContext = type.GetService(typeof(IUserContext)) as IUserContext;
-            var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Select(item => item.Path).Random());
+            var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Random().ID);
             var accessType = RandomUtility.NextEnum<AccessType>();
             await type.AddAccessMemberAsync(context.Authentication, memberID, accessType);
         }
@@ -159,7 +159,7 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
             }
             var userContext = type.GetService(typeof(IUserContext)) as IUserContext;
-            var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Select(item => item.Path).Random());
+            var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Random().ID);
             await type.RemoveAccessMemberAsync(context.Authentication, memberID);
         }
 
