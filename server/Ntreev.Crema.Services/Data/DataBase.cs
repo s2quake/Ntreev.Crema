@@ -90,7 +90,7 @@ namespace Ntreev.Crema.Services.Data
 
         public AccessType GetAccessType(Authentication authentication)
         {
-            this.ValidateBeginInDataBase(authentication);
+            this.ValidateExpired();
             return base.GetAccessType(authentication);
         }
 
@@ -98,6 +98,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
@@ -120,6 +121,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
@@ -142,6 +144,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMemberAsync), this, memberID, accessType);
@@ -164,6 +167,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
@@ -186,6 +190,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
@@ -252,6 +257,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(LoadAsync), this);
@@ -265,7 +271,8 @@ namespace Ntreev.Crema.Services.Data
                         TransactionPath = this.CremaHost.GetPath(CremaPath.Transactions, $"{this.ID}"),
                         LogService = this.CremaHost,
                     };
-                    this.Repository = await Task.Run(() => new DataBaseRepositoryHost(this, this.repositoryProvider.CreateInstance(repositorySetting)));
+                    var repository = await Task.Run(() => this.repositoryProvider.CreateInstance(repositorySetting));
+                    this.Repository = new DataBaseRepositoryHost(this, repository);
                     this.Repository.Changed += Repository_Changed;
                     await this.ReadCacheAsync();
                     this.Repository.Initialize();
@@ -291,6 +298,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnloadAsync), this);
@@ -326,6 +334,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.ValidateEnter(authentication);
@@ -345,6 +354,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.ValidateLeave(authentication);
@@ -364,6 +374,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var oldName = base.Name;
@@ -386,6 +397,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(Delete), this);
@@ -415,6 +427,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 var remotePath = this.CremaHost.GetPath(CremaPath.RepositoryDataBases);
                 var logs = await this.CremaHost.RepositoryDispatcher.InvokeAsync(() =>
                 {
@@ -433,6 +446,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RevertAsync), this, revision);
@@ -468,6 +482,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ValidateBeginTransaction(authentication);
@@ -497,28 +512,27 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void ValidateBeginInDataBase(Authentication authentication)
-        {
-            this.ValidateDispatcher();
-            authentication.Verify();
-            if (authentication != Authentication.System && this.authentications.Contains(authentication) == false)
-                throw new InvalidOperationException(Resources.Exception_NotInDataBase);
-        }
+        //public void ValidateBeginInDataBase(Authentication authentication)
+        //{
+        //    this.ValidateDispatcher();
+        //    authentication.Verify();
+        //    if (authentication != Authentication.System && this.authentications.Contains(authentication) == false)
+        //        throw new InvalidOperationException(Resources.Exception_NotInDataBase);
+        //}
 
-        public void ValidateAsyncBeginInDataBase(Authentication authentication)
-        {
-            if (this.Dispatcher == null)
-                throw new InvalidOperationException(Resources.Exception_InvalidObject);
-            if (authentication != Authentication.System && this.authentications.Contains(authentication) == false)
-                throw new InvalidOperationException(Resources.Exception_NotInDataBase);
-        }
+        //public void ValidateAsyncBeginInDataBase(Authentication authentication)
+        //{
+        //    if (this.Dispatcher == null)
+        //        throw new InvalidOperationException(Resources.Exception_InvalidObject);
+        //    if (authentication != Authentication.System && this.authentications.Contains(authentication) == false)
+        //        throw new InvalidOperationException(Resources.Exception_NotInDataBase);
+        //}
 
         public void ValidateGetDataSet(Authentication authentication)
         {
             if (this.IsLoaded == false)
                 throw new NotImplementedException();
             this.VerifyAccessType(authentication, AccessType.Guest);
-            this.ValidateAsyncBeginInDataBase(authentication);
         }
 
         public bool VerifyAccess(Authentication authentication)

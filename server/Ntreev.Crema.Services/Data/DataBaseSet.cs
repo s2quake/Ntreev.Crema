@@ -32,12 +32,15 @@ namespace Ntreev.Crema.Services.Data
     class DataBaseSet
     {
         private readonly DataBase dataBase;
+        private readonly CremaDataSet dataSet;
         private readonly List<CremaDataType> types = new List<CremaDataType>();
         private readonly List<CremaDataTable> tables = new List<CremaDataTable>();
 
         public DataBaseSet(DataBase dataBase, CremaDataSet dataSet)
         {
-            this.dataBase = dataBase;
+            this.dataBase = dataBase ?? throw new ArgumentNullException(nameof(dataBase));
+            this.dataSet = dataSet ?? throw new ArgumentNullException(nameof(dataSet));
+            this.dataBase.Dispatcher.VerifyAccess();
 
             foreach (var item in dataSet.Types)
             {
@@ -77,55 +80,13 @@ namespace Ntreev.Crema.Services.Data
                 if (typeInfo.Path.StartsWith(categoryPath) == false)
                     continue;
 
-                this.ValidateExists(item);
+                this.ValidateTypeExists(item.Path);
                 item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
-                this.ValidateNotExists(item);
+                this.ValidateTypeNotExists(item.Path);
             }
 
             this.Serialize();
             this.Repository.Move(itemPath1, itemPath2);
-        }
-
-        private void ValidateExists(CremaDataType dataType)
-        {
-            var itemPath = this.TypeContext.GenerateTypePath(dataType.CategoryPath, dataType.Name);
-            var files = this.Serializer.GetPath(itemPath, dataType.GetType(), ObjectSerializerSettings.Empty);
-            foreach (var item in files)
-            {
-                if (File.Exists(item) == false)
-                    throw new FileNotFoundException();
-            }
-        }
-
-        private void ValidateTypeExists(string typeItemPath)
-        {
-            var files = this.Serializer.GetPath(typeItemPath, typeof(CremaDataType), ObjectSerializerSettings.Empty);
-            foreach (var item in files)
-            {
-                if (File.Exists(item) == false)
-                    throw new FileNotFoundException();
-            }
-        }
-
-        private void ValidateNotExists(CremaDataType dataType)
-        {
-            var itemPath = this.TypeContext.GenerateTypePath(dataType.CategoryPath, dataType.Name);
-            var files = this.Serializer.GetPath(itemPath, dataType.GetType(), ObjectSerializerSettings.Empty);
-            foreach (var item in files)
-            {
-                if (File.Exists(item) == true)
-                    throw new FileNotFoundException();
-            }
-        }
-
-        private void ValidateTypeNotExists(string typeItemPath)
-        {
-            var files = this.Serializer.GetPath(typeItemPath, typeof(CremaDataType), ObjectSerializerSettings.Empty);
-            foreach (var item in files)
-            {
-                if (File.Exists(item) == true)
-                    throw new FileNotFoundException();
-            }
         }
 
         public void SetTableCategoryPath(string categoryPath, string newCategoryPath)
@@ -158,9 +119,9 @@ namespace Ntreev.Crema.Services.Data
         public void RenameType(string typePath, string typeName)
         {
             var dataType = this.types.First(item => item.Path == typePath);
-            this.ValidateExists(dataType);
+            this.ValidateTypeExists(dataType.Path);
             dataType.TypeName = typeName;
-            this.ValidateNotExists(dataType);
+            this.ValidateTypeNotExists(dataType.Path);
             this.Serialize();
             this.MoveTypesRepositoryPath();
         }
@@ -168,9 +129,9 @@ namespace Ntreev.Crema.Services.Data
         public void MoveType(string typePath, string categoryPath)
         {
             var dataType = this.types.First(item => item.Path == typePath);
-            this.ValidateExists(dataType);
+            this.ValidateTypeExists(dataType.Path);
             dataType.CategoryPath = categoryPath;
-            this.ValidateNotExists(dataType);
+            this.ValidateTypeNotExists(dataType.Path);
             this.Serialize();
             this.MoveTypesRepositoryPath();
         }
@@ -180,7 +141,7 @@ namespace Ntreev.Crema.Services.Data
             var dataType = this.types.First(item => item.Path == typePath);
             var dataSet = dataType.DataSet;
             dataSet.Types.Remove(dataType);
-            this.ValidateExists(dataType);
+            this.ValidateTypeExists(dataType.Path);
             this.DeleteTypesRepositoryPath();
         }
 
@@ -188,7 +149,7 @@ namespace Ntreev.Crema.Services.Data
         {
             foreach (var item in this.types)
             {
-                this.ValidateExists(item);
+                this.ValidateTypeExists(item.Path);
             }
             this.Serialize();
         }
@@ -202,7 +163,9 @@ namespace Ntreev.Crema.Services.Data
         public void RenameTable(string tablePath, string tableName)
         {
             var dataTable = this.tables.First(item => item.Path == tablePath);
+            this.ValidateTableExists(dataTable.Path);
             dataTable.TableName = tableName;
+            this.ValidateTableNotExists(dataTable.Path);
             this.Serialize();
             this.MoveTablesRepositoryPath();
         }
@@ -210,7 +173,9 @@ namespace Ntreev.Crema.Services.Data
         public void MoveTable(string tablePath, string categoryPath)
         {
             var dataTable = this.tables.First(item => item.Path == tablePath);
+            this.ValidateTableExists(dataTable.Path);
             dataTable.CategoryPath = categoryPath;
+            this.ValidateTableNotExists(dataTable.Path);
             this.Serialize();
             this.MoveTablesRepositoryPath();
         }
@@ -218,12 +183,17 @@ namespace Ntreev.Crema.Services.Data
         public void DeleteTable(string tablePath)
         {
             var dataTable = this.tables.First(item => item.Path == tablePath);
-            this.tables.Remove(dataTable);
+            var dataSet = dataTable.DataSet;
+            dataSet.Tables.Remove(dataTable);
             this.DeleteTablesRepositoryPath();
         }
 
         public void ModifyTable()
         {
+            foreach (var item in this.tables)
+            {
+                this.ValidateTableExists(item.Path);
+            }
             this.Serialize();
         }
 
@@ -231,6 +201,35 @@ namespace Ntreev.Crema.Services.Data
         {
             var dataBaseSet = new DataBaseSet(dataBase, dataSet);
             dataBaseSet.Serialize();
+        }
+
+        public IEnumerable<CremaDataType> Types => this.types;
+
+        public DataBaseItemState GetTypeState(CremaDataType dataType)
+        {
+            if (dataType.ExtendedProperties.ContainsKey(typeof(TypeInfo)) == true)
+            {
+                var typeInfo = (TypeInfo)dataType.ExtendedProperties[typeof(TypeInfo)];
+                var itemPath1 = this.TypeContext.GeneratePath(dataType.Path);
+                var itemPath2 = this.TypeContext.GeneratePath(typeInfo.Path);
+
+                if (dataType.Name != typeInfo.Name)
+                {
+                    return DataBaseItemState.Rename;
+                }
+                else if (itemPath1 != itemPath2)
+                {
+                    return DataBaseItemState.Move;
+                }
+                else
+                {
+                    return DataBaseItemState.None;
+                }
+            }
+            else
+            {
+                return DataBaseItemState.Create;
+            }
         }
 
         private void Serialize()
@@ -245,19 +244,19 @@ namespace Ntreev.Crema.Services.Data
 
                     if (itemPath1 != itemPath2)
                     {
-                        this.ValidateTypeNotExists(itemPath1);
-                        this.ValidateTypeExists(itemPath2);
+                        this.ValidateTypeNotExists(item.Path);
+                        this.ValidateTypeExists(typeInfo.Path);
                     }
                     else
                     {
-                        this.ValidateExists(item);
+                        this.ValidateTypeExists(item.Path);
                     }
 
                     this.Serializer.Serialize(itemPath2, item, ObjectSerializerSettings.Empty);
                 }
                 else
                 {
-                    this.ValidateNotExists(item);
+                    this.ValidateTypeNotExists(item.Path);
                     var itemPath = this.TypeContext.GenerateTypePath(item.CategoryPath, item.Name);
                     var sss = Path.GetFileName(itemPath);
 
@@ -487,6 +486,50 @@ namespace Ntreev.Crema.Services.Data
                     throw new FileNotFoundException();
             }
             this.Repository.DeleteRange(files);
+        }
+
+        private void ValidateTypeExists(string typePath)
+        {
+            var itemPath = this.TypeContext.GeneratePath(typePath);
+            var files = this.Serializer.GetPath(itemPath, typeof(CremaDataType), ObjectSerializerSettings.Empty);
+            foreach (var item in files)
+            {
+                if (File.Exists(item) == false)
+                    throw new FileNotFoundException();
+            }
+        }
+
+        private void ValidateTypeNotExists(string typePath)
+        {
+            var itemPath = this.TypeContext.GeneratePath(typePath);
+            var files = this.Serializer.GetPath(itemPath, typeof(CremaDataType), ObjectSerializerSettings.Empty);
+            foreach (var item in files)
+            {
+                if (File.Exists(item) == true)
+                    throw new FileNotFoundException();
+            }
+        }
+
+        private void ValidateTableExists(string tablePath)
+        {
+            var itemPath = this.TableContext.GeneratePath(tablePath);
+            var files = this.Serializer.GetPath(itemPath, typeof(CremaDataTable), ObjectSerializerSettings.Empty);
+            foreach (var item in files)
+            {
+                if (File.Exists(item) == false)
+                    throw new FileNotFoundException();
+            }
+        }
+
+        private void ValidateTableNotExists(string tablePath)
+        {
+            var itemPath = this.TableContext.GeneratePath(tablePath);
+            var files = this.Serializer.GetPath(itemPath, typeof(CremaDataTable), ObjectSerializerSettings.Empty);
+            foreach (var item in files)
+            {
+                if (File.Exists(item) == true)
+                    throw new FileNotFoundException();
+            }
         }
 
         private DataBaseRepositoryHost Repository => this.dataBase.Repository;

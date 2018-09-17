@@ -49,6 +49,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 return await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);

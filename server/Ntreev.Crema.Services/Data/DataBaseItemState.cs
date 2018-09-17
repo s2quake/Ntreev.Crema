@@ -15,32 +15,30 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.ServiceModel;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Ntreev.Crema.Data;
-using System.Collections.Specialized;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Properties;
+using Ntreev.Library.ObjectModel;
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.IO;
+using Ntreev.Library;
+using Ntreev.Library.IO;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.Services.Data
 {
-    public interface ITypeCollection : IReadOnlyCollection<IType>, IEnumerable<IType>, IServiceProvider, IDispatcherObject
+    enum DataBaseItemState
     {
-        bool Contains(string typeName);
+        None,
 
-        IType this[string typeName] { get; }
+        Create,
 
-        event ItemsEventHandler<IType> TypesStateChanged;
+        Rename,
 
-        event ItemsEventHandler<IType> TypesChanged;
+        Move,
 
-        event ItemsCreatedEventHandler<IType> TypesCreated;
-
-        event ItemsMovedEventHandler<IType> TypesMoved;
-
-        event ItemsRenamedEventHandler<IType> TypesRenamed;
-
-        event ItemsDeletedEventHandler<IType> TypesDeleted;
+        Delete,
     }
 }

@@ -25,6 +25,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using Ntreev.Crema.Data.Xml.Schema;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -34,21 +35,33 @@ namespace Ntreev.Crema.Services.Data
         private readonly CremaSettings settings;
         private Version version;
         private readonly HashSet<string> types = new HashSet<string>();
-        private readonly HashSet<string> typesToAdd = new HashSet<string>();
-        private readonly HashSet<string> typesToRemove = new HashSet<string>();
+        private readonly HashSet<string> tables = new HashSet<string>();
 
         public DataBaseRepositoryHost(DataBase dataBase, IRepository repository)
             : base(repository, null)
         {
             this.dataBase = dataBase;
             this.settings = this.dataBase.GetService(typeof(CremaSettings)) as CremaSettings;
+            this.RefreshItems();
         }
 
-        protected override void OnReverted()
+        public void RefreshItems()
         {
-            base.OnReverted();
-            this.typesToAdd.Clear();
-            this.typesToRemove.Clear();
+            var typeDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);
+            var typesItemPaths = this.dataBase.Serializer.GetItemPaths(typeDirectory, typeof(CremaDataType), ObjectSerializerSettings.Empty);
+            this.types.Clear();
+            foreach (var item in typesItemPaths)
+            {
+                this.types.Add(Path.GetFileName(item));
+            }
+
+            var tableDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TableDirectory);
+            var tablesItemPaths = this.dataBase.Serializer.GetItemPaths(tableDirectory, typeof(CremaDataTable), ObjectSerializerSettings.Empty);
+            this.tables.Clear();
+            foreach (var item in tablesItemPaths)
+            {
+                this.tables.Add(Path.GetFileName(item));
+            }
         }
 
         public void Initialize()
@@ -86,23 +99,11 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 base.Commit(authentication, comment, props.ToArray());
-                foreach (var item in this.typesToRemove)
-                {
-                    this.types.Remove(item);
-                }
-                foreach (var item in this.typesToAdd)
-                {
-                    this.types.Add(item);
-                }
+                this.RefreshItems();
             }
             catch
             {
                 throw;
-            }
-            finally
-            {
-                this.typesToAdd.Clear();
-                this.typesToRemove.Clear();
             }
         }
 
@@ -276,18 +277,20 @@ namespace Ntreev.Crema.Services.Data
 
         public void CreateType(DataBaseSet dataBaseSet, string typeName)
         {
-            if (this.types.Contains(typeName) || this.typesToAdd.Contains(typeName))
+            this.Dispatcher.VerifyAccess();
+
+            if (this.types.Contains(typeName))
                 throw new ItemAlreadyExistsException(typeName);
-            this.typesToAdd.Add(typeName);
+
             dataBaseSet.CreateType();
+            var typesDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);
+            var typesItemPaths = this.dataBase.Serializer.GetItemPaths(typesDirectory, typeof(CremaDataType), ObjectSerializerSettings.Empty);
         }
 
         public void RenameType(DataBaseSet dataBaseSet, string typePath, string typeName)
         {
-            if (this.types.Contains(typeName) || this.typesToAdd.Contains(typeName))
+            if (this.types.Contains(typeName))
                 throw new ItemAlreadyExistsException(typeName);
-            this.typesToAdd.Add(typeName);
-            this.typesToRemove.Add(Path.GetFileName(typePath));
             dataBaseSet.RenameType(typePath, typeName);
         }
 
@@ -298,7 +301,6 @@ namespace Ntreev.Crema.Services.Data
 
         public void DeleteType(DataBaseSet dataBaseSet, string typePath)
         {
-            this.typesToRemove.Add(Path.GetFileName(typePath));
             dataBaseSet.DeleteType(typePath);
         }
 
@@ -307,13 +309,20 @@ namespace Ntreev.Crema.Services.Data
             dataBaseSet.ModifyType();
         }
 
-        public void CreateTable(DataBaseSet dataBaseSet)
+        public void CreateTable(DataBaseSet dataBaseSet, string[] tableNames)
         {
+            foreach (var item in tableNames)
+            {
+                if (this.tables.Contains(item) == true)
+                    throw new ItemAlreadyExistsException(item);
+            }
             dataBaseSet.CreateTable();
         }
 
         public void RenameTable(DataBaseSet dataBaseSet, string tablePath, string tableName)
         {
+            if (this.tables.Contains(tableName))
+                throw new ItemAlreadyExistsException(tableName);
             dataBaseSet.RenameTable(tablePath, tableName);
         }
 

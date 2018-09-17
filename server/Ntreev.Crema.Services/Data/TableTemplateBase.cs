@@ -46,8 +46,10 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
                     return new TableColumn(this, this.TemplateSource.View.Table);
                 });
             }
@@ -62,6 +64,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.table.RowChanged -= Table_RowChanged;
@@ -85,19 +88,24 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task BeginEditAsync(Authentication authentication)
         {
+            var state = this.EditableState;
+            this.EditableState |= EditableState.Running;
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync));
                     this.ValidateBeginEdit(authentication);
                     this.CremaHost.Sign(authentication);
                     await this.OnBeginEditAsync(authentication);
+                    this.EditableState = EditableState.IsBeingEdited;
                     this.OnEditBegun(EventArgs.Empty);
                 });
             }
             catch (Exception e)
             {
+                this.EditableState = state;
                 this.CremaHost.Error(e);
                 throw;
             }
@@ -105,6 +113,8 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task EndEditAsync(Authentication authentication)
         {
+            var state = this.EditableState;
+            this.EditableState |= EditableState.Running;
             try
             {
                 await await this.Dispatcher.InvokeAsync(async () =>
@@ -112,12 +122,14 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync));
                     this.ValidateEndEdit(authentication);
                     this.CremaHost.Sign(authentication);
-                    await this.OnEndEditAsync(authentication, this.TemplateSource);
+                    await this.OnEndEditAsync(authentication);
+                    this.EditableState = EditableState.None;
                     this.OnEditEnded(EventArgs.Empty);
                 });
             }
             catch (Exception e)
             {
+                this.EditableState = state;
                 this.CremaHost.Error(e);
                 throw;
             }
@@ -125,19 +137,24 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task CancelEditAsync(Authentication authentication)
         {
+            var state = this.EditableState;
+            this.EditableState |= EditableState.Running;
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync));
                     this.ValidateCancelEdit(authentication);
                     this.CremaHost.Sign(authentication);
                     await this.OnCancelEditAsync(authentication);
+                    this.EditableState = EditableState.None;
                     this.OnEditCanceled(EventArgs.Empty);
                 });
             }
             catch (Exception e)
             {
+                this.EditableState = state;
                 this.CremaHost.Error(e);
                 throw;
             }
@@ -213,6 +230,8 @@ namespace Ntreev.Crema.Services.Data
         }
 
         public bool IsModified { get; private set; }
+
+        public EditableState EditableState { get; private set; }
 
         public event EventHandler EditBegun
         {
@@ -308,17 +327,19 @@ namespace Ntreev.Crema.Services.Data
             this.table.RowDeleted += Table_RowDeleted;
             this.table.RowChanged += Table_RowChanged;
 
-            this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
+            await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
             await this.domain.AddUserAsync(authentication, DomainAccessType.ReadWrite);
             await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
         }
 
-        protected virtual async Task OnEndEditAsync(Authentication authentication, CremaTemplate template)
+        protected virtual async Task OnEndEditAsync(Authentication authentication)
         {
-            await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
-            await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false);
-            this.domain = null;
-
+            if (this.domain != null)
+            {
+                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false);
+                this.domain = null;
+            }
             if (this.table != null)
             {
                 this.table.RowDeleted -= Table_RowDeleted;
@@ -331,10 +352,12 @@ namespace Ntreev.Crema.Services.Data
 
         protected virtual async Task OnCancelEditAsync(Authentication authentication)
         {
-            await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
-            await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true);
-            this.domain = null;
-
+            if (this.domain != null)
+            {
+                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true);
+                this.domain = null;
+            }
             if (this.table != null)
             {
                 this.table.RowDeleted -= Table_RowDeleted;
@@ -464,7 +487,7 @@ namespace Ntreev.Crema.Services.Data
             var isCanceled = e.IsCanceled;
             if (isCanceled == false)
             {
-                await this.OnEndEditAsync(e.Authentication, this.TemplateSource);
+                await this.OnEndEditAsync(e.Authentication);
                 await this.Dispatcher.InvokeAsync(() => this.OnEditEnded(e));
             }
             else

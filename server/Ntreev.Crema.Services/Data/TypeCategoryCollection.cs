@@ -49,6 +49,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 return await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.ValidateAddNew(authentication, name, parentPath);

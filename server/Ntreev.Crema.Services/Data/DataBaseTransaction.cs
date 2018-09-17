@@ -51,16 +51,12 @@ namespace Ntreev.Crema.Services.Data
             this.authentication.Expired += Authentication_Expired;
         }
 
-        private void BackupDomains()
-        {
-
-        }
-
-        public Task CommitAsync(Authentication authentication)
+        public async Task CommitAsync(Authentication authentication)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ValidateCommit(authentication);
                     this.dataBase.VerifyAccess(authentication);
@@ -78,11 +74,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task RollbackAsync(Authentication authentication)
+        public async Task RollbackAsync(Authentication authentication)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(async () =>
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.ValidateRollback(authentication);
                     this.dataBase.VerifyAccess(authentication);

@@ -121,18 +121,18 @@ namespace Ntreev.Crema.Services.Data
             await base.OnBeginEditAsync(authentication);
         }
 
-        protected override async Task OnEndEditAsync(Authentication authentication, CremaTemplate template)
+        protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            await base.OnEndEditAsync(authentication, template);
+            await base.OnEndEditAsync(authentication);
             if (this.parent is TableCategory category)
             {
                 var tables = category.GetService(typeof(TableCollection)) as TableCollection;
-                this.tables = await tables.AddNewAsync(authentication, template.TargetTable.DataSet.Copy());
+                this.tables = await tables.AddNewAsync(authentication, this.TemplateSource.TargetTable.DataSet.Copy());
             }
             else if (this.parent is Table table)
             {
                 var tables = table.GetService(typeof(TableCollection)) as TableCollection;
-                this.tables = await tables.AddNewAsync(authentication, template.TargetTable.DataSet.Copy());
+                this.tables = await tables.AddNewAsync(authentication, this.TemplateSource.TargetTable.DataSet.Copy());
             }
             this.parent = null;
         }

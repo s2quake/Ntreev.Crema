@@ -53,6 +53,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync), this.Table);
@@ -65,7 +66,7 @@ namespace Ntreev.Crema.Services.Data
                         var itemPath = string.Join("|", tables.Select(item => item.Path));
                         this.domain = new TableContentDomain(authentication, dataSet, this.Table.DataBase, itemPath, this.GetType().Name);
                         this.domain.Host = new TableContentDomainHost(this.Container, this.domain, itemPath);
-                        this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
+                        await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
                     }
                     await this.domainHost.BeginContentAsync(authentication);
                     this.domainHost.InvokeEditBegunEvent(EventArgs.Empty);
@@ -82,6 +83,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync), this.Table);
@@ -103,6 +105,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync), this.Table);
@@ -124,6 +127,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EnterEditAsync), this.Table);
@@ -145,6 +149,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(LeaveEditAsync), this.Table);
@@ -165,6 +170,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(ClearAsync), this.Table);
@@ -187,6 +193,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     if (this.domain == null)
@@ -206,6 +213,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     if (this.domain == null)

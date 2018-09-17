@@ -40,7 +40,7 @@ namespace Ntreev.Crema.Services.Data
 
         public AccessType GetAccessType(Authentication authentication)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
+            this.ValidateExpired();
             return base.GetAccessType(authentication);
         }
 
@@ -48,6 +48,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
@@ -69,6 +70,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
@@ -90,6 +92,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMemberAsync), this, memberID, accessType);
@@ -111,6 +114,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
@@ -132,6 +136,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
@@ -153,7 +158,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(LockAsync), this, comment);
@@ -174,7 +179,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnlockAsync), this);
@@ -195,7 +200,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
@@ -204,7 +209,7 @@ namespace Ntreev.Crema.Services.Data
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var dataSet = await this.ReadAllDataAsync(authentication);
-                    var signatueDate = await this.Container.InvokeTypeRenameAsync(authentication, this, name, dataSet);
+                    var signatueDate = await this.Container.InvokeTypeRenameAsync(authentication, base.TypeInfo, name, dataSet);
                     this.CremaHost.Sign(authentication, signatueDate);
                     base.Rename(authentication, name);
                     this.Container.InvokeTypesRenamedEvent(authentication, items, oldNames, oldPaths, dataSet);
@@ -221,7 +226,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(Move), this, categoryPath);
@@ -230,7 +235,7 @@ namespace Ntreev.Crema.Services.Data
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
                     var dataSet = await this.ReadAllDataAsync(authentication);
-                    var signatueDate = await this.Container.InvokeTypeMoveAsync(authentication, this, categoryPath, dataSet);
+                    var signatueDate = await this.Container.InvokeTypeMoveAsync(authentication, base.TypeInfo, categoryPath, dataSet);
                     this.CremaHost.Sign(authentication, signatueDate);
                     base.Move(authentication, categoryPath);
                     this.Container.InvokeTypesMovedEvent(authentication, items, oldPaths, oldCategoryPaths, dataSet);
@@ -247,7 +252,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(Delete), this);
@@ -256,7 +261,7 @@ namespace Ntreev.Crema.Services.Data
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var container = this.Container;
                     var dataSet = await this.ReadAllDataAsync(authentication);
-                    var signatureDate = await container.InvokeTypeDeleteAsync(authentication, this, dataSet);
+                    var signatureDate = await container.InvokeTypeDeleteAsync(authentication, base.TypeInfo, dataSet);
                     this.CremaHost.Sign(authentication, signatureDate);
                     base.Delete(authentication);
                     container.InvokeTypesDeletedEvent(authentication, items, oldPaths);
@@ -274,13 +279,14 @@ namespace Ntreev.Crema.Services.Data
             return this.Container.CopyAsync(authentication, base.Name, newTypeName, categoryPath);
         }
 
-        public Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision)
+        public async Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision)
         {
             try
             {
-                this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, revision);
-                return this.Dispatcher.InvokeAsync(() =>
+                this.ValidateExpired();
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, revision);
                     this.ValidateAccessType(authentication, AccessType.Guest);
                     this.CremaHost.Sign(authentication);
                     return this.Repository.GetTypeData(this.Serializer, this.ItemPath, revision);
@@ -293,13 +299,14 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision)
+        public async Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision)
         {
             try
             {
-                this.CremaHost.DebugMethod(authentication, this, nameof(GetLogAsync), this);
-                return this.Dispatcher.InvokeAsync(() =>
+                this.ValidateExpired();
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(GetLogAsync), this);
                     this.ValidateAccessType(authentication, AccessType.Guest);
                     this.CremaHost.Sign(authentication);
                     return this.Context.GetTypeLog(this.ItemPath, revision);
@@ -312,13 +319,14 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task<FindResultInfo[]> FindAsync(Authentication authentication, string text, FindOptions options)
+        public async Task<FindResultInfo[]> FindAsync(Authentication authentication, string text, FindOptions options)
         {
             try
             {
-                this.CremaHost.DebugMethod(authentication, this, nameof(FindAsync), this, text, options);
-                return this.Dispatcher.InvokeAsync(() =>
+                this.ValidateExpired();
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(FindAsync), this, text, options);
                     this.ValidateAccessType(authentication, AccessType.Guest);
                     this.CremaHost.Sign(authentication);
                     if (this.GetService(typeof(DataFindService)) is DataFindService service)

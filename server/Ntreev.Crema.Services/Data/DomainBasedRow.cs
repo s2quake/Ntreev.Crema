@@ -27,7 +27,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
-    abstract class DomainBasedRow
+    abstract class DomainBasedRow : IDispatcherObject
     {
         private readonly Domain domain;
         private readonly DataTable table;
@@ -58,6 +58,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     if (this.Row == null)
@@ -77,6 +78,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     if (this.Row != null)
@@ -118,6 +120,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     if (this.fields != null)

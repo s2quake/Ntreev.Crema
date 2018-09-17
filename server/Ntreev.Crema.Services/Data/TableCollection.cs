@@ -70,7 +70,7 @@ namespace Ntreev.Crema.Services.Data
                 this.ValidateAddNew(item.Name, item.CategoryPath, authentication);
             }
             var tableList = new List<Table>(tables.Length);
-            await this.InvokeTableCreateAsync(authentication, tables.Select(item => item.Name).ToArray(), dataSet, null);
+            await this.InvokeTableCreateAsync(authentication, tables.Select(item => item.Name).ToArray(), dataSet);
             foreach (var item in tables)
             {
                 var table = this.AddNew(authentication, item.Name, item.CategoryPath);
@@ -88,6 +88,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 return await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.ValidateInherit(authentication, table, newTableName, categoryPath, copyContent);
@@ -112,6 +113,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 return await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.ValidateCopy(authentication, table, newTableName, categoryPath, copyContent);
@@ -137,7 +139,7 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public Task<SignatureDate> InvokeTableCreateAsync(Authentication authentication, string[] tableNames, CremaDataSet dataSet, Table sourceTable)
+        public Task<SignatureDate> InvokeTableCreateAsync(Authentication authentication, string[] tableNames, CremaDataSet dataSet)
         {
             var message = EventMessageBuilder.CreateTable(authentication, tableNames);
             var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
@@ -146,7 +148,7 @@ namespace Ntreev.Crema.Services.Data
                 try
                 {
                     var signatureDate = authentication.Sign();
-                    this.Repository.CreateTable(dataBaseSet);
+                    this.Repository.CreateTable(dataBaseSet, tableNames);
                     this.Repository.Commit(authentication, message);
                     return signatureDate;
                 }
@@ -158,17 +160,16 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public Task<SignatureDate> InvokeTableRenameAsync(Authentication authentication, Table table, string newName, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTableRenameAsync(Authentication authentication, TableInfo tableInfo, string newName, CremaDataSet dataSet)
         {
-            var message = EventMessageBuilder.RenameTable(authentication, table.Name, newName);
+            var message = EventMessageBuilder.RenameTable(authentication, tableInfo.Name, newName);
             var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
-            var tablePath = table.Path;
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
                     var signatureDate = authentication.Sign();
-                    this.Repository.RenameTable(dataBaseSet, tablePath, newName);
+                    this.Repository.RenameTable(dataBaseSet, tableInfo.Path, newName);
                     this.Repository.Commit(authentication, message);
                     return signatureDate;
                 }
@@ -180,17 +181,16 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public Task<SignatureDate> InvokeTableMoveAsync(Authentication authentication, Table table, string newCategoryPath, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTableMoveAsync(Authentication authentication, TableInfo tableInfo, string newCategoryPath, CremaDataSet dataSet)
         {
-            var message = EventMessageBuilder.MoveTable(authentication, table.Name, newCategoryPath, table.Category.Path);
+            var message = EventMessageBuilder.MoveTable(authentication, tableInfo.Name, newCategoryPath, tableInfo.CategoryPath);
             var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
-            var tablePath = table.Path;
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
                     var signatureDate = authentication.Sign();
-                    this.Repository.MoveTable(dataBaseSet, tablePath, newCategoryPath);
+                    this.Repository.MoveTable(dataBaseSet, tableInfo.Path, newCategoryPath);
                     this.Repository.Commit(authentication, message);
                     return signatureDate;
                 }
@@ -202,17 +202,16 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public Task<SignatureDate> InvokeTableDeleteAsync(Authentication authentication, Table table, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTableDeleteAsync(Authentication authentication, TableInfo tableInfo, CremaDataSet dataSet)
         {
-            var message = EventMessageBuilder.DeleteTable(authentication, table.Name);
+            var message = EventMessageBuilder.DeleteTable(authentication, tableInfo.Name);
             var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
-            var tablePath = table.Path;
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
                     var signatureDate = authentication.Sign();
-                    this.Repository.DeleteTable(dataBaseSet, tablePath);
+                    this.Repository.DeleteTable(dataBaseSet, tableInfo.Path);
                     this.Repository.Commit(authentication, message);
                     return signatureDate;
                 }
