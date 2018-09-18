@@ -1096,7 +1096,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     item.Dispatcher.InvokeAsync(() =>
                     {
-                        if (item.Users.Contains(authentication.ID) == true)
+                        if (item.Users.ContainsKey(authentication.ID) == true)
                             item.Attach(authentication);
                     });
                 }
@@ -1131,7 +1131,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     item.Dispatcher.InvokeAsync(() =>
                     {
-                        if (item.Users.Contains(authentication.ID) == true)
+                        if (item.Users.ContainsKey(authentication.ID) == true)
                         {
                             var user = item.Users[authentication.ID];
                             if (user.IsOnline == true)

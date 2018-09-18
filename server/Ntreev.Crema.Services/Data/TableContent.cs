@@ -94,7 +94,7 @@ namespace Ntreev.Crema.Services.Data
                     this.ValidateEndEdit(authentication);
                     this.CremaHost.Sign(authentication);
                     await this.domainHost.EndContentAsync(authentication);
-                    this.EditableState = EditableState.None;
+                    this.domainHost.SetEditableState(EditableState.None);
                     this.domainHost.InvokeEditEndedEvent(EventArgs.Empty);
                     this.domainHost = null;
                 });
@@ -120,7 +120,7 @@ namespace Ntreev.Crema.Services.Data
                     this.ValidateCancelEdit(authentication);
                     this.CremaHost.Sign(authentication);
                     await this.domainHost.CancelContentAsync(authentication);
-                    this.EditableState = EditableState.None;
+                    this.domainHost.SetEditableState(EditableState.None);
                     this.domainHost.InvokeEditCanceledEvent(EventArgs.Empty);
                     this.domainHost = null;
                 });
@@ -243,10 +243,9 @@ namespace Ntreev.Crema.Services.Data
         public void ValidateBeginEdit(Authentication authentication)
         {
             var isAdmin = authentication.Types.HasFlag(AuthenticationType.Administrator);
-            var items = this.Table.GetRelations().Distinct().OrderBy(item => item.Name);
-            foreach (var item in items)
+            foreach (var item in this.Relations)
             {
-                item.Content.OnValidateBeginEdit(authentication, this);
+                item.OnValidateBeginEdit(authentication, this);
             }
         }
 
@@ -254,8 +253,10 @@ namespace Ntreev.Crema.Services.Data
         public void ValidateEndEdit(Authentication authentication)
         {
             var isAdmin = authentication.Types.HasFlag(AuthenticationType.Administrator);
-            if (this.domain == null)
-                throw new NotImplementedException();
+            foreach (var item in this.Relations)
+            {
+                item.OnValidateEndEdit(authentication, this);
+            }
             this.domain.Dispatcher?.Invoke(() =>
             {
                 var isOwner = this.domain.Users.OwnerUserID == authentication.ID;
@@ -286,18 +287,15 @@ namespace Ntreev.Crema.Services.Data
         public void ValidateCancelEdit(Authentication authentication)
         {
             var isAdmin = authentication.Types.HasFlag(AuthenticationType.Administrator);
-            if (this.domain == null)
-                throw new NotImplementedException();
+            foreach (var item in this.Relations)
+            {
+                item.OnValidateCancelEdit(authentication, this);
+            }
             this.domain.Dispatcher.Invoke(() =>
             {
                 if (isAdmin == false && this.domain.Users.Owner.ID != authentication.ID)
                     throw new NotImplementedException();
             });
-
-            foreach (var item in this.Relations)
-            {
-                item.OnValidateCancelEdit(authentication, this);
-            }
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -309,7 +307,7 @@ namespace Ntreev.Crema.Services.Data
                 throw new InvalidOperationException("database version is low.");
 
             if (this.domain != null)
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
             if (this.EditableState.HasFlag(EditableState.IsBeingEdited) == true)
                 throw new InvalidOperationException(Resources.Exception_ItIsAlreadyBeingEdited);
 
@@ -320,10 +318,21 @@ namespace Ntreev.Crema.Services.Data
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public void OnValidateEndEdit(Authentication authentication, object target)
+        {
+            if (this.domain == null)
+                throw new InvalidOperationException();
+            if (this.EditableState.HasFlag(EditableState.IsBeingEdited) == false)
+                throw new InvalidOperationException();
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public void OnValidateCancelEdit(Authentication authentication, object target)
         {
             if (this.domain == null)
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
+            if (this.EditableState.HasFlag(EditableState.IsBeingEdited) == false)
+                throw new InvalidOperationException();
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -332,7 +341,9 @@ namespace Ntreev.Crema.Services.Data
             this.Table.ValidateAccessType(authentication, AccessType.Guest);
 
             if (this.domain == null)
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
+            if (this.EditableState.HasFlag(EditableState.IsBeingEdited) == false)
+                throw new InvalidOperationException();
 
             this.Table.ValidateHasNotBeingEditedType();
 
@@ -346,7 +357,9 @@ namespace Ntreev.Crema.Services.Data
             this.Table.ValidateAccessType(authentication, AccessType.Guest);
 
             if (this.domain == null)
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
+            if (this.EditableState.HasFlag(EditableState.IsBeingEdited) == false)
+                throw new InvalidOperationException();
         }
 
         

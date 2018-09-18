@@ -388,7 +388,7 @@ namespace Ntreev.Crema.Services.Domains
                     ModifiedTables = this.modifiedTableList.ToArray(),
                 };
 
-                if (this.Users.Contains(authentication.ID) == true)
+                if (this.Users.ContainsKey(authentication.ID) == true)
                 {
                     if (this.data == null)
                         this.data = this.SerializeSource(this.Source);
@@ -782,7 +782,7 @@ namespace Ntreev.Crema.Services.Domains
 
         private void ValidateAdd(Authentication authentication)
         {
-            if (this.Users.Contains(authentication.ID) == true)
+            if (this.Users.ContainsKey(authentication.ID) == true)
                 throw new NotImplementedException();
         }
 
@@ -871,7 +871,7 @@ namespace Ntreev.Crema.Services.Domains
             if (this.Dispatcher == null)
                 throw new NotImplementedException();
 
-            if (this.Users.Contains(authentication.ID) == false)
+            if (this.Users.ContainsKey(authentication.ID) == false)
                 throw new UserNotFoundException(authentication.ID);
         }
 
@@ -998,7 +998,7 @@ namespace Ntreev.Crema.Services.Domains
             if (this.Dispatcher == null)
                 throw new NotImplementedException();
 
-            if (this.Users.Contains(authentication.ID) == false)
+            if (this.Users.ContainsKey(authentication.ID) == false)
                 throw new UserNotFoundException(authentication.ID);
 
             return this.Users[authentication.ID];

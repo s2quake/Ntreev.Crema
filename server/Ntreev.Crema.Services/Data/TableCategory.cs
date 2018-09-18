@@ -55,10 +55,10 @@ namespace Ntreev.Crema.Services.Data
                 this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(SetPublic), this);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
                     base.ValidateSetPublic(authentication);
                     this.CremaHost.Sign(authentication);
-                    await this.Context.InvokeTableItemSetPublicAsync(authentication, this);
+                    await this.Context.InvokeTableItemSetPublicAsync(authentication, this.Path);
                     base.SetPublic(authentication);
                     this.Context.InvokeItemsSetPublicEvent(authentication, new ITableItem[] { this });
                 });
@@ -79,7 +79,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
                     base.ValidateSetPrivate(authentication);
-                    var accessInfo = await this.Context.InvokeTableItemSetPrivateAsync(authentication, this);
+                    var accessInfo = await this.Context.InvokeTableItemSetPrivateAsync(authentication, this.Path);
                     this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
                     base.SetPrivate(authentication);
                     this.Context.InvokeItemsSetPrivateEvent(authentication, new ITableItem[] { this });

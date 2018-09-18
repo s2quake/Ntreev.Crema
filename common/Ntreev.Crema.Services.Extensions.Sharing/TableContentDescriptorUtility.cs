@@ -32,11 +32,7 @@ namespace Ntreev.Crema.Services.Extensions
                     await content.BeginEditAsync(authentication);
                 }
                 var domain = content.Domain;
-                var isEntered = await domain.Dispatcher.InvokeAsync(() =>
-                {
-                    return domain.Users.Contains(authentication.ID);
-                });
-                if (isEntered == false)
+                if (await domain.Users.ContainsAsync(authentication.ID) == false)
                 {
                     await content.EnterEditAsync(authentication);
                 }

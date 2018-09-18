@@ -85,7 +85,7 @@ namespace Ntreev.Crema.Bot.Tasks
                 else if (editableState == EditableState.IsBeingEdited)
                 {
                     var domain = template.Domain;
-                    if (await domain.Dispatcher.InvokeAsync(() => domain.Users.Contains(authentication.ID)) == false)
+                    if (await domain.Users.ContainsAsync(authentication.ID) == false)
                     {
                         context.Pop(template);
                         return;

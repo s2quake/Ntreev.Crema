@@ -37,12 +37,17 @@ namespace Ntreev.Crema.Bot.Tasks
     {
         public async Task InvokeAsync(TaskContext context)
         {
+            var authentication = context.Authentication;
             var column = context.Target as ITableColumn;
             if (context.IsCompleted(column) == true)
             {
                 var template = column.Template;
                 if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
                 {
+                    if (await template.Dispatcher.InvokeAsync(() => template.Any()) == false)
+                    {
+                        await column.SetIsKeyAsync(authentication, true);
+                    }
                     try
                     {
                         await template.EndNewAsync(context.Authentication, column);

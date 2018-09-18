@@ -245,7 +245,7 @@ namespace Ntreev.Crema.Commands.Consoles
                     var category = await this.GetCategoryAsync(this.ParentPath);
                     return await category.NewTableAsync(authentication);
                 }
-                else if (this.GetTableAsync(this.ParentPath) is ITable table)
+                else if (await this.GetTableAsync(this.ParentPath) is ITable table)
                 {
                     return await table.NewTableAsync(authentication);
                 }
@@ -286,7 +286,7 @@ namespace Ntreev.Crema.Commands.Consoles
             var table = await this.GetTableAsync(tableName);
             var template = table.Dispatcher.Invoke(() => table.Template);
             var domain = template.Dispatcher.Invoke(() => template.Domain);
-            var contains = domain == null ? false : domain.Dispatcher.Invoke(() => domain.Users.Contains(authentication.ID));
+            var contains = domain == null ? false : await domain.Users.ContainsAsync(authentication.ID);
 
             if (contains == false)
                 await template.BeginEditAsync(authentication);
@@ -319,7 +319,7 @@ namespace Ntreev.Crema.Commands.Consoles
             if (content.Domain == null)
                 await content.BeginEditAsync(authentication);
             var domain = content.Domain;
-            var contains = domain.Dispatcher.Invoke(() => domain.Users.Contains(authentication.ID));
+            var contains = await domain.Users.ContainsAsync(authentication.ID);
             if (contains == false)
                 await content.EnterEditAsync(authentication);
             domain.Dispatcher.Invoke(() => domain.UserRemoved += Domain_UserRemoved);

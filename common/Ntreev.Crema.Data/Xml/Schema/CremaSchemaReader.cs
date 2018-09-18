@@ -361,13 +361,13 @@ namespace Ntreev.Crema.Data.Xml.Schema
         {
             if (schemaAttribute.Name == CremaSchema.RelationID)
             {
-                dataTable.CreateRelationColumn();
+                //dataTable.CreateRelationColumn();
                 return;
             }
 
             if (schemaAttribute.Name == CremaSchema.ParentID)
             {
-                dataTable.CreateParentColumn();
+                //dataTable.CreateParentColumn();
                 return;
             }
 

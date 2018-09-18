@@ -229,8 +229,6 @@ namespace Ntreev.Crema.Bot.Tasks
             var categoryNanme = RandomUtility.NextIdentifier();
             if (context.AllowException == false)
             {
-                if (category.Parent == null)
-                    return;
                 if (category.GetAccessType(context.Authentication) < AccessType.Master)
                     return;
             }

@@ -1309,15 +1309,15 @@ namespace Ntreev.Crema.Data
             this.InternalObject.TemplatedParent = null;
         }
 
-        internal void CreateRelationColumn()
-        {
-            this.InternalObject.CreateRelationColumn();
-        }
+        //internal void CreateRelationColumn()
+        //{
+        //    this.InternalObject.CreateRelationColumn();
+        //}
 
-        internal void CreateParentColumn()
-        {
-            this.InternalObject.CreateParentColumn();
-        }
+        //internal void CreateParentColumn()
+        //{
+        //    this.InternalObject.CreateParentColumn();
+        //}
 
         internal string InternalName
         {

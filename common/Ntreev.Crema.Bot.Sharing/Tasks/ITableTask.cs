@@ -41,11 +41,11 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 context.Pop(table);
             }
-            //else if (RandomUtility.Within(75) == true)
-            //{
-            //    var content = await table.Dispatcher.InvokeAsync(() => table.Content);
-            //    context.Push(content, RandomUtility.Next(100));
-            //}
+            else if (RandomUtility.Within(75) == true)
+            {
+                var content = await table.Dispatcher.InvokeAsync(() => table.Content);
+                context.Push(content, RandomUtility.Next(100));
+            }
             else if (RandomUtility.Within(75) == true)
             {
                 var template = await table.Dispatcher.InvokeAsync(() => table.Template);
@@ -72,7 +72,7 @@ namespace Ntreev.Crema.Bot.Tasks
             });
         }
 
-        [TaskMethod(Weight = 10)]
+        //[TaskMethod(Weight = 10)]
         public async Task LockAsync(ITable table, TaskContext context)
         {
             var comment = RandomUtility.NextString();
@@ -112,7 +112,7 @@ namespace Ntreev.Crema.Bot.Tasks
             await table.SetPublicAsync(context.Authentication);
         }
 
-        [TaskMethod(Weight = 10)]
+        //[TaskMethod(Weight = 10)]
         public async Task SetPrivateAsync(ITable table, TaskContext context)
         {
             if (context.AllowException == false)

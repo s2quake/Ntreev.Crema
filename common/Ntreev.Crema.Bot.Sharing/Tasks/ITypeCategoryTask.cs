@@ -113,7 +113,7 @@ namespace Ntreev.Crema.Bot.Tasks
         //    });
         //}
 
-        [TaskMethod(Weight = 10)]
+        //[TaskMethod(Weight = 10)]
         public async Task LockAsync(ITypeCategory category, TaskContext context)
         {
             var comment = RandomUtility.NextString();
@@ -159,7 +159,7 @@ namespace Ntreev.Crema.Bot.Tasks
             await category.SetPublicAsync(context.Authentication);
         }
 
-        [TaskMethod(Weight = 10)]
+        //[TaskMethod(Weight = 10)]
         public async Task SetPrivateAsync(ITypeCategory category, TaskContext context)
         {
             if (context.AllowException == false)

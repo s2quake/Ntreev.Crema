@@ -32,7 +32,7 @@ namespace Ntreev.Crema.Services.Data
         private object parent;
         private Table[] tables;
         private IPermission permission;
-        private CremaDataTable[] dataTables;
+        private string[] tableNames;
 
         public NewTableTemplate(TableCategory category)
         {
@@ -135,10 +135,12 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
             var dataSet = this.TemplateSource.TargetTable.DataSet.Copy();
-            var query = from item in dataSet.Tables.Except(this.dataTables)
-                        orderby item.Name
-                        orderby item.TemplatedParentName != string.Empty
-                        select item;
+            var tableNames = dataSet.Tables.Select(item => item.Name).ToArray();
+            var query = from item in tableNames.Except(this.tableNames)
+                        let dataTable = dataSet.Tables[item]
+                        orderby dataTable.Name
+                        orderby dataTable.TemplatedParentName != string.Empty
+                        select dataTable;
 
             var dataTables = query.ToArray();
             this.tables = await this.Container.AddNewAsync(authentication, dataSet, dataTables);
@@ -162,14 +164,14 @@ namespace Ntreev.Crema.Services.Data
                 var dataSet = await typeContext.Root.ReadDataAsync(authentication, true);
                 var newName = NameUtility.GenerateNewName(nameof(Table), category.Context.Tables.Select((Table item) => item.Name));
                 var templateSource = CremaTemplate.Create(dataSet, newName, category.Path);
-                this.dataTables = new CremaDataTable[] { };
+                this.tableNames = new string[] { };
                 return templateSource;
             }
             else if (this.parent is Table table)
             {
                 var dataSet = await table.ReadAllAsync(authentication, true);
                 var dataTable = dataSet.Tables[table.Name, table.Category.Path];
-                this.dataTables = dataSet.Tables.ToArray();
+                this.tableNames = dataSet.Tables.Select(item => item.Name).ToArray();
                 return CremaTemplate.Create(dataTable);
             }
             throw new NotImplementedException();

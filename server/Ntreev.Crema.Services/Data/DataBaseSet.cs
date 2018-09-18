@@ -26,6 +26,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using Ntreev.Library;
 using Ntreev.Library.IO;
+using Ntreev.Crema.Data.Xml.Schema;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -158,6 +159,18 @@ namespace Ntreev.Crema.Services.Data
         {
             this.Serialize();
             this.AddTablesRepositoryPath();
+
+            
+            var status = this.Repository.Status();
+
+            var typesDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);
+            foreach (var item in status)
+            {
+                if (item.Path.StartsWith(typesDirectory) == true)
+                {
+                    throw new Exception("타입이 변경되었습니다.");
+                }
+            }
         }
 
         public void RenameTable(string tablePath, string tableName)
@@ -195,6 +208,17 @@ namespace Ntreev.Crema.Services.Data
                 this.ValidateTableExists(item.Path);
             }
             this.Serialize();
+
+            var status = this.Repository.Status();
+
+            var typesDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);
+            foreach (var item in status)
+            {
+                if (item.Path.StartsWith(typesDirectory) == true)
+                {
+                    throw new Exception("타입이 변경되었습니다.");
+                }
+            }
         }
 
         public static void Modify(CremaDataSet dataSet, DataBase dataBase)
@@ -277,22 +301,56 @@ namespace Ntreev.Crema.Services.Data
                 if (item.ExtendedProperties.ContainsKey(typeof(TableInfo)) == true)
                 {
                     var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
-                    var tablePath = tableInfo.CategoryPath + tableInfo.Name;
-                    var itemPath = this.TableContext.GeneratePath(tablePath);
-                    if (item.ExtendedProperties.ContainsKey(nameof(TableInfo.TemplatedParent)) == true && item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] != null)
+                    var itemPath1 = this.TableContext.GeneratePath(item.Path);
+                    var itemPath2 = this.TableContext.GeneratePath(tableInfo.Path);
+
+                    if (itemPath1 != itemPath2)
                     {
-                        var templateInfo = (TableInfo)item.ExtendedProperties[nameof(TableInfo.TemplatedParent)];
-                        var templatedItemPath = this.TableContext.GeneratePath(templateInfo.CategoryPath + templateInfo.Name);
+                        this.ValidateTableNotExists(item.Path);
+                        this.ValidateTableExists(tableInfo.Path);
                     }
                     else
                     {
-                        var props = new CremaDataTableSerializerSettings(itemPath, null);
-                        this.Serializer.Serialize(itemPath, item, props);
+                        this.ValidateTableExists(item.Path);
                     }
+
+                    var parentItemPath = string.Empty;
+                    if(item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] is TableInfo parentInfo)
+                    {
+                        parentItemPath = this.TableContext.GeneratePath(parentInfo.Path);
+                    }
+                    //var parentInfo = item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] is TableInfo info ? info : TableInfo.Empty;
+
+                    //var tablePath = tableInfo.CategoryPath + tableInfo.Name;
+                    //var itemPath = this.TableContext.GeneratePath(tablePath);
+                    //if (item.ExtendedProperties.ContainsKey(nameof(TableInfo.TemplatedParent)) == true && item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] != null)
+                    //{
+                    //    var templateInfo = (TableInfo)item.ExtendedProperties[nameof(TableInfo.TemplatedParent)];
+                    //    var templatedItemPath = this.TableContext.GeneratePath(templateInfo.CategoryPath + templateInfo.Name);
+                    //}
+                    //else
+                    //{
+
+                    //}
+                    
+
+
+                    var props = new CremaDataTableSerializerSettings(itemPath2, parentItemPath);
+                    this.Serializer.Serialize(itemPath2, item, props);
                 }
                 else
                 {
+                    this.ValidateTableNotExists(item.Path);
                     var itemPath = this.TableContext.GenerateTablePath(item.CategoryPath, item.Name);
+                    var sss = Path.GetFileName(itemPath);
+
+                    var files = DirectoryUtility.GetAllFiles(this.dataBase.BasePath, sss + ".*");
+                    if (files.Any())
+
+                    {
+                        int qwer = 0;
+                    }
+
                     var props = new CremaDataTableSerializerSettings(item.Namespace, item.TemplateNamespace);
                     this.Serializer.Serialize(itemPath, item, props);
                 }

@@ -21,6 +21,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains
 {
@@ -44,9 +45,9 @@ namespace Ntreev.Crema.Services.Domains
             this.RemoveBase(userID);
         }
 
-        public bool Contains(string userID)
+        public Task<bool> ContainsAsync(string userID)
         {
-            return base.ContainsKey(userID);
+            return this.Dispatcher.InvokeAsync(() => base.ContainsKey(userID));
         }
 
         public DomainUser Owner

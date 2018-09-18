@@ -338,7 +338,7 @@ namespace Ntreev.Crema.Services.Data
 
         public void ModifyTable(DataBaseSet dataBaseSet)
         {
-            dataBaseSet.ModifyType();
+            dataBaseSet.ModifyTable();
         }
 
         public void Modify(CremaDataSet dataSet)
