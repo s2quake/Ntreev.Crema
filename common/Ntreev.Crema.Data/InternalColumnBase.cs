@@ -568,7 +568,7 @@ namespace Ntreev.Crema.Data
         protected virtual void OnValidateSetAllowDBNull(bool value)
         {
             if (this.IsDiffMode == false && this.IsKey && value == true)
-                throw new Exception();
+                throw new ArgumentException("키로 설정된 열은 null 값을 허용할 수 없습니다.");
             if (this.Table != null && value == false)
                 this.CheckNotAllowNull();
         }

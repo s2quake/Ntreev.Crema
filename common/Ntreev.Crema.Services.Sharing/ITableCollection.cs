@@ -25,7 +25,7 @@ using Ntreev.Crema.Data;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ITableCollection : IReadOnlyCollection<ITable>, IEnumerable<ITable>, INotifyCollectionChanged, IServiceProvider, IDispatcherObject
+    public interface ITableCollection : IReadOnlyCollection<ITable>, IEnumerable<ITable>, IServiceProvider, IDispatcherObject
     {
         bool Contains(string tableName);
 

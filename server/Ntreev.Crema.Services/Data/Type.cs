@@ -53,8 +53,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
                     base.ValidateSetPublic(authentication);
-                    var signatureDate = await this.Context.InvokeTypeItemSetPublicAsync(authentication, this);
-                    this.CremaHost.Sign(authentication);
+                    var result = await this.Context.InvokeTypeItemSetPublicAsync(authentication, this);
+                    this.CremaHost.Sign(authentication, result);
                     base.SetPublic(authentication);
                     this.Context.InvokeItemsSetPublicEvent(authentication, new ITypeItem[] { this });
                 });
@@ -75,8 +75,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
                     base.ValidateSetPrivate(authentication);
-                    var accessInfo = await this.Context.InvokeTypeItemSetPrivateAsync(authentication, this, AccessInfo.Empty);
-                    this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
+                    var result = await this.Context.InvokeTypeItemSetPrivateAsync(authentication, this, AccessInfo.Empty);
+                    this.CremaHost.Sign(authentication, result.SignatureDate);
                     base.SetPrivate(authentication);
                     this.Context.InvokeItemsSetPrivateEvent(authentication, new ITypeItem[] { this });
                 });
@@ -97,8 +97,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMemberAsync), this, memberID, accessType);
                     base.ValidateAddAccessMember(authentication, memberID, accessType);
-                    var accessInfo = await this.Context.InvokeTypeItemAddAccessMemberAsync(authentication, this, this.AccessInfo, memberID, accessType);
-                    this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
+                    var signature = await this.Context.InvokeTypeItemAddAccessMemberAsync(authentication, this, this.AccessInfo, memberID, accessType);
+                    this.CremaHost.Sign(authentication, signature.SignatureDate);
                     base.AddAccessMember(authentication, memberID, accessType);
                     this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
                 });
@@ -119,8 +119,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
                     base.ValidateSetAccessMember(authentication, memberID, accessType);
-                    var accessInfo = await this.Context.InvokeTypeItemSetAccessMemberAsync(authentication, this, this.AccessInfo, memberID, accessType);
-                    this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
+                    var result = await this.Context.InvokeTypeItemSetAccessMemberAsync(authentication, this, this.AccessInfo, memberID, accessType);
+                    this.CremaHost.Sign(authentication, result.SignatureDate);
                     base.SetAccessMember(authentication, memberID, accessType);
                     this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
                 });
@@ -141,8 +141,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
                     base.ValidateRemoveAccessMember(authentication, memberID);
-                    var accessInfo = await this.Context.InvokeTypeItemRemoveAccessMemberAsync(authentication, this, this.AccessInfo, memberID);
-                    this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
+                    var result = await this.Context.InvokeTypeItemRemoveAccessMemberAsync(authentication, this, this.AccessInfo, memberID);
+                    this.CremaHost.Sign(authentication, result.SignatureDate);
                     base.RemoveAccessMember(authentication, memberID);
                     this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID });
                 });
@@ -209,8 +209,9 @@ namespace Ntreev.Crema.Services.Data
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var dataSet = await this.ReadAllDataAsync(authentication);
-                    var signatueDate = await this.Container.InvokeTypeRenameAsync(authentication, base.TypeInfo, name, dataSet);
-                    this.CremaHost.Sign(authentication, signatueDate);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var result = await this.Container.InvokeTypeRenameAsync(authentication, base.TypeInfo, name, dataBaseSet);
+                    this.CremaHost.Sign(authentication, result);
                     base.Rename(authentication, name);
                     this.Container.InvokeTypesRenamedEvent(authentication, items, oldNames, oldPaths, dataSet);
                 });
@@ -235,8 +236,9 @@ namespace Ntreev.Crema.Services.Data
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
                     var dataSet = await this.ReadAllDataAsync(authentication);
-                    var signatueDate = await this.Container.InvokeTypeMoveAsync(authentication, base.TypeInfo, categoryPath, dataSet);
-                    this.CremaHost.Sign(authentication, signatueDate);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var result = await this.Container.InvokeTypeMoveAsync(authentication, base.TypeInfo, categoryPath, dataBaseSet);
+                    this.CremaHost.Sign(authentication, result);
                     base.Move(authentication, categoryPath);
                     this.Container.InvokeTypesMovedEvent(authentication, items, oldPaths, oldCategoryPaths, dataSet);
                 });
@@ -261,8 +263,9 @@ namespace Ntreev.Crema.Services.Data
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var container = this.Container;
                     var dataSet = await this.ReadAllDataAsync(authentication);
-                    var signatureDate = await container.InvokeTypeDeleteAsync(authentication, base.TypeInfo, dataSet);
-                    this.CremaHost.Sign(authentication, signatureDate);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var result = await container.InvokeTypeDeleteAsync(authentication, base.TypeInfo, dataBaseSet);
+                    this.CremaHost.Sign(authentication, result);
                     base.Delete(authentication);
                     container.InvokeTypesDeletedEvent(authentication, items, oldPaths);
                 });

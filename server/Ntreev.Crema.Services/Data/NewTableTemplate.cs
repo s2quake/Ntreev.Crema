@@ -31,10 +31,13 @@ namespace Ntreev.Crema.Services.Data
     {
         private object parent;
         private Table[] tables;
+        private IPermission permission;
+        private CremaDataTable[] dataTables;
 
         public NewTableTemplate(TableCategory category)
         {
             this.parent = category ?? throw new ArgumentNullException(nameof(category));
+            this.permission = category;
             this.DispatcherObject = category;
             this.DomainContext = category.GetService(typeof(DomainContext)) as DomainContext;
             this.ItemPath = category.Path;
@@ -42,12 +45,14 @@ namespace Ntreev.Crema.Services.Data
             this.DataBase = category.DataBase;
             this.Permission = category;
             this.IsNew = true;
+            this.Container = category.GetService(typeof(TableCollection)) as TableCollection;
             category.Attach(this);
         }
 
         public NewTableTemplate(Table parent)
         {
             this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            this.permission = parent;
             this.DispatcherObject = parent;
             this.DomainContext = parent.GetService(typeof(DomainContext)) as DomainContext;
             this.ItemPath = parent.Path;
@@ -55,7 +60,13 @@ namespace Ntreev.Crema.Services.Data
             this.DataBase = parent.DataBase;
             this.Permission = parent;
             this.IsNew = true;
+            this.Container = parent.GetService(typeof(TableCollection)) as TableCollection;
             parent.Attach(this);
+        }
+
+        public override AccessType GetAccessType(Authentication authentication)
+        {
+            return this.permission.GetAccessType(authentication);
         }
 
         public override void OnValidateBeginEdit(Authentication authentication, object target)
@@ -123,24 +134,24 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
+            var dataSet = this.TemplateSource.TargetTable.DataSet.Copy();
+            var query = from item in dataSet.Tables.Except(this.dataTables)
+                        orderby item.Name
+                        orderby item.TemplatedParentName != string.Empty
+                        select item;
+
+            var dataTables = query.ToArray();
+            this.tables = await this.Container.AddNewAsync(authentication, dataSet, dataTables);
             await base.OnEndEditAsync(authentication);
-            if (this.parent is TableCategory category)
-            {
-                var tables = category.GetService(typeof(TableCollection)) as TableCollection;
-                this.tables = await tables.AddNewAsync(authentication, this.TemplateSource.TargetTable.DataSet.Copy());
-            }
-            else if (this.parent is Table table)
-            {
-                var tables = table.GetService(typeof(TableCollection)) as TableCollection;
-                this.tables = await tables.AddNewAsync(authentication, this.TemplateSource.TargetTable.DataSet.Copy());
-            }
             this.parent = null;
+            this.permission = null;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
             await base.OnCancelEditAsync(authentication);
             this.parent = null;
+            this.permission = null;
         }
 
         protected override async Task<CremaTemplate> CreateSourceAsync(Authentication authentication)
@@ -149,17 +160,21 @@ namespace Ntreev.Crema.Services.Data
             {
                 var typeContext = category.GetService(typeof(TypeContext)) as TypeContext;
                 var dataSet = await typeContext.Root.ReadDataAsync(authentication, true);
-                var newName = NameUtility.GenerateNewName(nameof(Target), category.Context.Tables.Select((Table item) => item.Name));
+                var newName = NameUtility.GenerateNewName(nameof(Table), category.Context.Tables.Select((Table item) => item.Name));
                 var templateSource = CremaTemplate.Create(dataSet, newName, category.Path);
+                this.dataTables = new CremaDataTable[] { };
                 return templateSource;
             }
             else if (this.parent is Table table)
             {
                 var dataSet = await table.ReadAllAsync(authentication, true);
                 var dataTable = dataSet.Tables[table.Name, table.Category.Path];
+                this.dataTables = dataSet.Tables.ToArray();
                 return CremaTemplate.Create(dataTable);
             }
             throw new NotImplementedException();
         }
+
+        private TableCollection Container { get; }
     }
 }

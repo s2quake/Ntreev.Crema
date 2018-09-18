@@ -41,11 +41,11 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 context.Pop(table);
             }
-            else if (RandomUtility.Within(75) == true)
-            {
-                var content = await table.Dispatcher.InvokeAsync(() => table.Content);
-                context.Push(content, RandomUtility.Next(100));
-            }
+            //else if (RandomUtility.Within(75) == true)
+            //{
+            //    var content = await table.Dispatcher.InvokeAsync(() => table.Content);
+            //    context.Push(content, RandomUtility.Next(100));
+            //}
             else if (RandomUtility.Within(75) == true)
             {
                 var template = await table.Dispatcher.InvokeAsync(() => table.Template);
@@ -72,42 +72,16 @@ namespace Ntreev.Crema.Bot.Tasks
             });
         }
 
-        //[TaskMethod]
-        //public void VerifyRead(ITable table, TaskContext context)
-        //{
-        //    table.Dispatcher.Invoke(() =>
-        //    {
-        //        table.VerifyRead(context.Authentication);
-        //    });
-        //}
-
-        //[TaskMethod]
-        //public void VerifyOwner(ITable table, TaskContext context)
-        //{
-        //    table.Dispatcher.Invoke(() =>
-        //    {
-        //        table.VerifyOwner(context.Authentication);
-        //    });
-        //}
-
-        //[TaskMethod]
-        //public void VerifyMember(ITable table, TaskContext context)
-        //{
-        //    table.Dispatcher.Invoke(() =>
-        //    {
-        //        table.VerifyMember(context.Authentication);
-        //    });
-        //}
-
         [TaskMethod(Weight = 10)]
         public async Task LockAsync(ITable table, TaskContext context)
         {
             var comment = RandomUtility.NextString();
             if (context.AllowException == false)
             {
-                if (comment == string.Empty)
+                if (string.IsNullOrEmpty(comment) == true)
                     return;
-                if (await table.Dispatcher.InvokeAsync(() => table.IsLocked) == true)
+                var lockInfo = await table.Dispatcher.InvokeAsync(() => table.LockInfo);
+                if (lockInfo.IsLocked == true || lockInfo.IsInherited == true)
                     return;
             }
 
@@ -119,7 +93,8 @@ namespace Ntreev.Crema.Bot.Tasks
         {
             if (context.AllowException == false)
             {
-                if (await table.Dispatcher.InvokeAsync(() => table.IsLocked) == false)
+                var lockInfo = await table.Dispatcher.InvokeAsync(() => table.LockInfo);
+                if (lockInfo.IsLocked == false || lockInfo.IsInherited == true)
                     return;
             }
             await table.UnlockAsync(context.Authentication);
@@ -151,6 +126,11 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 10)]
         public async Task AddAccessMemberAsync(ITable table, TaskContext context)
         {
+            if (context.AllowException == false)
+            {
+                if (await table.Dispatcher.InvokeAsync(() => table.IsPrivate) == false)
+                    return;
+            }
             var userContext = table.GetService(typeof(IUserContext)) as IUserContext;
             var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Select(item => item.Path).Random());
             var accessType = RandomUtility.NextEnum<AccessType>();
@@ -160,6 +140,11 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod]
         public async Task RemoveAccessMemberAsync(ITable table, TaskContext context)
         {
+            if (context.AllowException == false)
+            {
+                if (await table.Dispatcher.InvokeAsync(() => table.IsPrivate) == false)
+                    return;
+            }
             var userContext = table.GetService(typeof(IUserContext)) as IUserContext;
             var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Select(item => item.Path).Random());
             await table.RemoveAccessMemberAsync(context.Authentication, memberID);
@@ -168,6 +153,12 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod]
         public async Task RenameAsync(ITable table, TaskContext context)
         {
+            if (context.AllowException == false)
+            {
+                var tableState = await table.Dispatcher.InvokeAsync(() => table.TableState);
+                if (tableState != TableState.None)
+                    return;
+            }
             var tableName = RandomUtility.NextIdentifier();
             await table.RenameAsync(context.Authentication, tableName);
         }
@@ -177,6 +168,11 @@ namespace Ntreev.Crema.Bot.Tasks
         {
             var categories = table.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
+            if (context.AllowException == false)
+            {
+                if (await table.Dispatcher.InvokeAsync(() => table.Category.Path) == categoryPath)
+                    return;
+            }
             await table.MoveAsync(context.Authentication, categoryPath);
         }
 
@@ -191,6 +187,14 @@ namespace Ntreev.Crema.Bot.Tasks
         {
             var tags = (TagInfo)TagInfoUtility.Names.Random();
             var template = table.Template;
+
+            if (context.AllowException == false)
+            {
+                var editableState = await template.Dispatcher.InvokeAsync(() => template.EditableState);
+                if (editableState != EditableState.None)
+                    return;
+            }
+
             await template.BeginEditAsync(context.Authentication);
             try
             {

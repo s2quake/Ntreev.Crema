@@ -377,6 +377,18 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
+        public TableState TableState
+        {
+            get { return this.tableState; }
+            set
+            {
+                if (this.tableState == value)
+                    return;
+                this.tableState = value;
+                this.OnTableStateChanged(EventArgs.Empty);
+            }
+        }
+
         public TagInfo Tags
         {
             get
@@ -387,14 +399,28 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
-        public TableState TableState
+        public bool IsBeingEdited
         {
-            get { return this.tableState; }
+            get { return this.tableState.HasFlag(TableState.IsBeingEdited); }
             set
             {
-                if (this.tableState == value)
-                    return;
-                this.tableState = value;
+                if (value == true)
+                    this.tableState |= TableState.IsBeingEdited;
+                else
+                    this.tableState &= ~TableState.IsBeingEdited;
+                this.OnTableStateChanged(EventArgs.Empty);
+            }
+        }
+
+        public bool IsBeingSetup
+        {
+            get { return this.tableState.HasFlag(TableState.IsBeingSetup); }
+            set
+            {
+                if (value == true)
+                    this.tableState |= TableState.IsBeingSetup;
+                else
+                    this.tableState &= ~TableState.IsBeingSetup;
                 this.OnTableStateChanged(EventArgs.Empty);
             }
         }

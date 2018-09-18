@@ -42,14 +42,20 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 try
                 {
-                    if (Verify() == true)
+                    var editableState = await template.Dispatcher.InvokeAsync(() => template.EditableState);
+                    if (editableState == EditableState.IsBeingEdited)
                     {
-                        await template.EndEditAsync(context.Authentication);
+                        var keys = await template.Dispatcher.InvokeAsync(() => template.PrimaryKey.ToArray());
+                        if (keys.Length > 0)
+                            await template.EndEditAsync(context.Authentication);
+                        else
+                            await template.CancelEditAsync(context.Authentication);
                     }
                 }
                 catch
                 {
-                    await template.CancelEditAsync(context.Authentication);
+                    if (template.EditableState == EditableState.IsBeingEdited)
+                        await template.CancelEditAsync(context.Authentication);
                 }
 
                 context.Pop(template);
@@ -57,36 +63,51 @@ namespace Ntreev.Crema.Bot.Tasks
             }
             else
             {
-                if (template.Domain == null)
+                if (await template.Dispatcher.InvokeAsync(() => template.VerifyAccessType(authentication, AccessType.Developer)) == false)
                 {
-                    await template.BeginEditAsync(context.Authentication);
+                    context.Pop(template);
+                    return;
                 }
 
-                if (await template.Domain.Dispatcher.InvokeAsync(() => template.Domain.Users.Contains(context.Authentication.ID)) == true)
+                var editableState = await template.Dispatcher.InvokeAsync(() => template.EditableState);
+                if (editableState == EditableState.None)
                 {
-                    if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
+                    try
                     {
-                        var column = await template.AddNewAsync(context.Authentication);
-                        context.Push(column);
-                        context.State = System.Data.DataRowState.Detached;
+                        await template.BeginEditAsync(context.Authentication);
                     }
-                    else
+                    catch
                     {
-                        var member = template.Random();
-                        context.Push(member);
+                        context.Pop(template);
+                        throw;
                     }
                 }
-            }
+                else if (editableState == EditableState.IsBeingEdited)
+                {
+                    var domain = template.Domain;
+                    if (await domain.Dispatcher.InvokeAsync(() => domain.Users.Contains(authentication.ID)) == false)
+                    {
+                        context.Pop(template);
+                        return;
+                    }
+                }
+                else
+                {
+                    context.Pop(template);
+                    return;
+                }
 
-            bool Verify()
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (template.Domain == null)
-                    return false;
-                if (template.Any(item => item.IsKey) == false)
-                    return false;
-                return true;
+                if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
+                {
+                    var member = await template.AddNewAsync(context.Authentication);
+                    context.Push(member);
+                    context.State = System.Data.DataRowState.Detached;
+                }
+                else
+                {
+                    var member = template.Random();
+                    context.Push(member);
+                }
             }
         }
 

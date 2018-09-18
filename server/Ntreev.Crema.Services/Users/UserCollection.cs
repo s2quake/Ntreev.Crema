@@ -57,40 +57,52 @@ namespace Ntreev.Crema.Services.Users
 
         public async Task<User> AddNewAsync(Authentication authentication, string userID, string categoryPath, SecureString password, string userName, Authority authority)
         {
-            return await await this.Dispatcher.InvokeAsync(async () =>
+            try
             {
-                this.ValidateUserCreate(authentication, userID, categoryPath, password);
-                this.CremaHost.Sign(authentication);
-                var category = this.GetCategory(categoryPath);
-                var designedInfo = new SignatureDate(authentication.ID, DateTime.UtcNow);
-                var userInfo = new UserSerializationInfo()
+                this.ValidateExpired();
+                return await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    ID = userID,
-                    Password = UserContext.SecureStringToString(password).Encrypt(),
-                    Name = userName,
-                    Authority = authority,
-                    CategoryPath = categoryPath,
-                    CreationInfo = designedInfo,
-                    ModificationInfo = designedInfo,
-                };
-                await this.InvokeUserCreateAsync(authentication, userInfo);
-                var user = this.BaseAddNew(userID, categoryPath, null);
-                user.Initialize((UserInfo)userInfo, BanInfo.Empty);
-                user.Password = UserContext.StringToSecureString(userInfo.Password);
-                this.InvokeUsersCreatedEvent(authentication, new User[] { user });
-                return user;
-            });
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
+                    this.ValidateUserCreate(authentication, userID, categoryPath, password);
+                    this.CremaHost.Sign(authentication);
+                    var category = this.GetCategory(categoryPath);
+                    var userInfo = new UserSerializationInfo()
+                    {
+                        ID = userID,
+                        Password = UserContext.SecureStringToString(password).Encrypt(),
+                        Name = userName,
+                        Authority = authority,
+                        CategoryPath = categoryPath,
+                    };
+                    userInfo = await this.InvokeUserCreateAsync(authentication, userInfo);
+                    this.CremaHost.Sign(authentication, userInfo.CreationInfo);
+                    var user = this.BaseAddNew(userID, categoryPath, null);
+                    user.Initialize((UserInfo)userInfo, BanInfo.Empty);
+                    user.Password = UserContext.StringToSecureString(userInfo.Password);
+                    this.InvokeUsersCreatedEvent(authentication, new User[] { user });
+                    return user;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public Task InvokeUserCreateAsync(Authentication authentication, UserSerializationInfo userInfo)
+        public Task<UserSerializationInfo> InvokeUserCreateAsync(Authentication authentication, UserSerializationInfo userInfo)
         {
             var message = EventMessageBuilder.CreateUser(authentication, userInfo.ID, userInfo.Name);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
+                    var signatureDate = authentication.Sign();
+                    userInfo.CreationInfo = signatureDate;
+                    userInfo.ModificationInfo = signatureDate;
                     this.Repository.CreateUser(userInfo);
                     this.Repository.Commit(authentication, message);
+                    return userInfo;
                 }
                 catch
                 {
@@ -98,11 +110,6 @@ namespace Ntreev.Crema.Services.Users
                     throw;
                 }
             });
-        }
-
-        public void InvokeUserRename(Authentication authentication, User user, string newName)
-        {
-            throw new NotImplementedException();
         }
 
         public Task<SignatureDate> InvokeUserMoveAsync(Authentication authentication, User user, string categoryPath)
@@ -237,11 +244,6 @@ namespace Ntreev.Crema.Services.Users
             this.CremaHost.Info(message);
             this.OnUsersCreated(new ItemsCreatedEventArgs<IUser>(authentication, users, args));
             this.Context.InvokeItemsCreatedEvent(authentication, users, args);
-        }
-
-        public void InvokeUsersRenamedEvent(Authentication authentication, User[] users, string[] oldNames, string[] oldPaths)
-        {
-            throw new NotImplementedException();
         }
 
         public void InvokeUsersMovedEvent(Authentication authentication, User[] users, string[] oldPaths, string[] oldCategoryPaths)

@@ -108,7 +108,7 @@ namespace Ntreev.Crema.Services.Data
                 tableList.Add(table);
                 table.ValidateAccessType(authentication, AccessType.Editor);
                 table.ValidateHasNotBeingEditedType();
-                table.ValidateNotBeingEdited();
+                table.ValidateIsNotBeingEdited();
             }
 
             var query = from item in tableList

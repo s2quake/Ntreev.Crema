@@ -94,6 +94,7 @@ namespace Ntreev.Crema.Services.Users
         {
             try
             {
+                this.ValidateExpired();
                 var user = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ValidateLogin(userID, password);
@@ -112,11 +113,12 @@ namespace Ntreev.Crema.Services.Users
         {
             try
             {
+                this.ValidateExpired();
                 var user = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ValidateLogout(authentication);
                     return this.Users[authentication.ID];
-                    
+
                 });
                 await user.LogoutAsync(authentication);
             }
@@ -127,11 +129,12 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public Task NotifyMessageAsync(Authentication authentication, string[] userIDs, string message)
+        public async Task NotifyMessageAsync(Authentication authentication, string[] userIDs, string message)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(NotifyMessageAsync), this, userIDs, message);
                     this.ValidateSendMessage(authentication, userIDs, message);
@@ -147,11 +150,12 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public Task<Authentication> AuthenticateAsync(Guid authenticationToken)
+        public async Task<Authentication> AuthenticateAsync(Guid authenticationToken)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                this.ValidateExpired();
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
                     var query = from User item in this.Users
                                 let authentication = item.Authentication
@@ -174,9 +178,10 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public Task<bool> IsAuthenticatedAsync(string userID)
+        public async Task<bool> IsAuthenticatedAsync(string userID)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            this.ValidateExpired();
+            return await this.Dispatcher.InvokeAsync(() =>
             {
                 if (this.Users.Contains(userID) == false)
                     return false;
@@ -206,9 +211,10 @@ namespace Ntreev.Crema.Services.Users
             });
         }
 
-        public Task<UserContextMetaData> GetMetaDataAsync(Authentication authentication)
+        public async Task<UserContextMetaData> GetMetaDataAsync(Authentication authentication)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            this.ValidateExpired();
+            return await this.Dispatcher.InvokeAsync(() =>
             {
                 var metaData = new UserContextMetaData();
 

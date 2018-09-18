@@ -63,10 +63,10 @@ namespace Ntreev.Crema.Services.Data
             userContext.Dispatcher.Invoke(() => userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
         }
 
-        public Task<SignatureDate> InvokeTableItemSetPublicAsync(Authentication authentication, ITableItem tableItem)
+        public Task<SignatureDate> InvokeTableItemSetPublicAsync(Authentication authentication, string tableItemPath)
         {
-            var message = EventMessageBuilder.SetPublicTableItem(authentication, tableItem.Path);
-            var itemPath = this.GeneratePath(tableItem.Path);
+            var message = EventMessageBuilder.SetPublicTableItem(authentication, tableItemPath);
+            var itemPath = this.GeneratePath(tableItemPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
@@ -85,18 +85,17 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public Task<AccessInfo> InvokeTableItemSetPrivateAsync(Authentication authentication, ITableItem tableItem)
+        public Task<AccessInfo> InvokeTableItemSetPrivateAsync(Authentication authentication, string tableItemPath)
         {
-            var message = EventMessageBuilder.SetPrivateTableItem(authentication, tableItem.Path);
-            var typeName = tableItem.GetType().Name;
-            var itemPath = this.GeneratePath(tableItem.Path);
+            var message = EventMessageBuilder.SetPrivateTableItem(authentication, tableItemPath);
+            var itemPath = this.GeneratePath(tableItemPath);
             var accessInfo = AccessInfo.Empty;
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
                     var signatureDate = authentication.Sign();
-                    accessInfo.SetPrivate(typeName, signatureDate);
+                    accessInfo.SetPrivate(typeof(ITableItem).Name, signatureDate);
                     var itemPaths = this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
                     this.Repository.AddRange(itemPaths);
                     this.Repository.Commit(authentication, message);

@@ -52,19 +52,16 @@ namespace Ntreev.Crema.Services.Data
                 throw new InvalidOperationException(Resources.Exception_Expired);
             if (this.Domain != null)
                 throw new InvalidOperationException(Resources.Exception_ItIsAlreadyBeingEdited);
-            this.category.ValidateAccessType(authentication, AccessType.Master);
         }
 
         public override void OnValidateEndEdit(Authentication authentication, object target)
         {
             base.OnValidateEndEdit(authentication, target);
-            this.category.ValidateAccessType(authentication, AccessType.Master);
         }
 
         public override void OnValidateCancelEdit(Authentication authentication, object target)
         {
             base.OnValidateCancelEdit(authentication, target);
-            this.category.ValidateAccessType(authentication, AccessType.Master);
         }
 
         public override IType Type => this.type;

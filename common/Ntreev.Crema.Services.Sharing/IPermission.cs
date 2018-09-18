@@ -35,5 +35,11 @@ namespace Ntreev.Crema.Services
         {
             return permission.GetAccessType(authentication).HasFlag(accessType);
         }
+
+        public static void ValidateAccessType(this IPermission permission, Authentication authentication, AccessType accessType)
+        {
+            if (permission.VerifyAccessType(authentication, accessType) == false)
+                throw new PermissionDeniedException();
+        }
     }
 }

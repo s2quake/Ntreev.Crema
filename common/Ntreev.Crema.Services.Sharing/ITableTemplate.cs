@@ -27,7 +27,7 @@ using Ntreev.Library;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ITableTemplate : IEnumerable<ITableColumn>, IDispatcherObject
+    public interface ITableTemplate : IEnumerable<ITableColumn>, IDispatcherObject, IPermission
     {
         Task BeginEditAsync(Authentication authentication);
 
@@ -68,6 +68,8 @@ namespace Ntreev.Crema.Services
         bool IsNew { get; }
 
         bool IsModified { get; }
+
+        EditableState EditableState { get; }
 
         event EventHandler EditBegun;
 

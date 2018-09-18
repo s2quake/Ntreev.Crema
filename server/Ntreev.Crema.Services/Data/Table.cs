@@ -58,8 +58,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
                     base.ValidateSetPublic(authentication);
-                    var signatureDate = await this.Context.InvokeTableItemSetPublicAsync(authentication, this);
-                    this.CremaHost.Sign(authentication, signatureDate);
+                    var result = await this.Context.InvokeTableItemSetPublicAsync(authentication, this.Path);
+                    this.CremaHost.Sign(authentication, result);
                     base.SetPublic(authentication);
                     this.Context.InvokeItemsSetPublicEvent(authentication, new ITableItem[] { this });
                 });
@@ -80,8 +80,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
                     base.ValidateSetPrivate(authentication);
-                    var accessInfo = await this.Context.InvokeTableItemSetPrivateAsync(authentication, this);
-                    this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
+                    var result = await this.Context.InvokeTableItemSetPrivateAsync(authentication, this.Path);
+                    this.CremaHost.Sign(authentication, result.SignatureDate);
                     base.SetPrivate(authentication);
                     this.Context.InvokeItemsSetPrivateEvent(authentication, new ITableItem[] { this });
                 });
@@ -102,8 +102,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMemberAsync), this, memberID, accessType);
                     base.ValidateAddAccessMember(authentication, memberID, accessType);
-                    var accessInfo = await this.Context.InvokeTableItemAddAccessMemberAsync(authentication, this, this.AccessInfo, memberID, accessType);
-                    this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
+                    var result = await this.Context.InvokeTableItemAddAccessMemberAsync(authentication, this, this.AccessInfo, memberID, accessType);
+                    this.CremaHost.Sign(authentication, result.SignatureDate);
                     base.AddAccessMember(authentication, memberID, accessType);
                     this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
                 });
@@ -124,8 +124,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
                     base.ValidateSetAccessMember(authentication, memberID, accessType);
-                    var accessInfo = await this.Context.InvokeTableItemSetAccessMemberAsync(authentication, this, this.AccessInfo, memberID, accessType);
-                    this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
+                    var result = await this.Context.InvokeTableItemSetAccessMemberAsync(authentication, this, this.AccessInfo, memberID, accessType);
+                    this.CremaHost.Sign(authentication, result.SignatureDate);
                     base.SetAccessMember(authentication, memberID, accessType);
                     this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
                 });
@@ -146,8 +146,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
                     base.ValidateRemoveAccessMember(authentication, memberID);
-                    var accessInfo = await this.Context.InvokeTableItemRemoveAccessMemberAsync(authentication, this, this.AccessInfo, memberID);
-                    this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
+                    var result = await this.Context.InvokeTableItemRemoveAccessMemberAsync(authentication, this, this.AccessInfo, memberID);
+                    this.CremaHost.Sign(authentication, result.SignatureDate);
                     base.RemoveAccessMember(authentication, memberID);
                     this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID });
                 });
@@ -215,8 +215,9 @@ namespace Ntreev.Crema.Services.Data
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var dataSet = await this.ReadAllAsync(authentication);
-                    var signatureDate = await this.Container.InvokeTableRenameAsync(authentication, base.TableInfo, name, dataSet);
-                    this.CremaHost.Sign(authentication, signatureDate);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var result = await this.Container.InvokeTableRenameAsync(authentication, base.TableInfo, name, dataBaseSet);
+                    this.CremaHost.Sign(authentication, result);
                     base.Rename(authentication, name);
                     this.Container.InvokeTablesRenamedEvent(authentication, items, oldNames, oldPaths, dataSet);
                 });
@@ -241,8 +242,9 @@ namespace Ntreev.Crema.Services.Data
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
                     var dataSet = await this.ReadAllAsync(authentication);
-                    var signatureDate = await this.Container.InvokeTableMoveAsync(authentication, base.TableInfo, categoryPath, dataSet);
-                    this.CremaHost.Sign(authentication, signatureDate);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var result = await this.Container.InvokeTableMoveAsync(authentication, base.TableInfo, categoryPath, dataBaseSet);
+                    this.CremaHost.Sign(authentication, result);
                     base.Move(authentication, categoryPath);
                     this.Container.InvokeTablesMovedEvent(authentication, items, oldPaths, oldCategoryPaths, dataSet);
                 });
@@ -268,8 +270,9 @@ namespace Ntreev.Crema.Services.Data
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var container = this.Container;
                     var dataSet = await this.ReadAllAsync(authentication);
-                    var signatureDate = await container.InvokeTableDeleteAsync(authentication, base.TableInfo, dataSet);
-                    this.CremaHost.Sign(authentication, signatureDate);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var result = await container.InvokeTableDeleteAsync(authentication, base.TableInfo, dataBaseSet);
+                    this.CremaHost.Sign(authentication, result);
                     base.Delete(authentication);
                     container.InvokeTablesDeletedEvent(authentication, items, oldPaths);
                 });
@@ -416,9 +419,9 @@ namespace Ntreev.Crema.Services.Data
             return EnumerableUtility.FamilyTree(table, item => item.Childs);
         }
 
-        public void ValidateNotBeingEdited()
+        public void ValidateIsNotBeingEdited()
         {
-            if (this.Template.IsBeingEdited == true)
+            if (this.IsBeingEdited == true)
                 throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingSetup_Format, base.Name));
             if (this.Content.Domain != null)
                 throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingEdited_Format, base.Name));
@@ -695,28 +698,28 @@ namespace Ntreev.Crema.Services.Data
         public override void OnValidateSetPublic(IAuthentication authentication, object target)
         {
             base.OnValidateSetPublic(authentication, target);
-            this.ValidateNotBeingEdited();
+            this.ValidateIsNotBeingEdited();
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override void OnValidateSetPrivate(IAuthentication authentication, object target)
         {
             base.OnValidateSetPrivate(authentication, target);
-            this.ValidateNotBeingEdited();
+            this.ValidateIsNotBeingEdited();
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override void OnValidateAddAccessMember(IAuthentication authentication, object target, string memberID, AccessType accessType)
         {
             base.OnValidateAddAccessMember(authentication, target, memberID, accessType);
-            this.ValidateNotBeingEdited();
+            this.ValidateIsNotBeingEdited();
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override void OnValidateRemoveAccessMember(IAuthentication authentication, object target)
         {
             base.OnValidateRemoveAccessMember(authentication, target);
-            this.ValidateNotBeingEdited();
+            this.ValidateIsNotBeingEdited();
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -731,7 +734,7 @@ namespace Ntreev.Crema.Services.Data
             }
             if (this.templateList.Any() == true)
                 throw new InvalidOperationException(Resources.Exception_CannotRenameOnCreateChildTable);
-            this.ValidateNotBeingEdited();
+            this.ValidateIsNotBeingEdited();
             this.ValidateHasNotBeingEditedType();
 
             if (this.Parent == null)
@@ -747,7 +750,7 @@ namespace Ntreev.Crema.Services.Data
             base.OnValidateMove(authentication, target, oldPath, newPath);
             if (this.templateList.Any() == true)
                 throw new InvalidOperationException(Resources.Exception_CannotMoveOnCreateChildTable);
-            this.ValidateNotBeingEdited();
+            this.ValidateIsNotBeingEdited();
             this.ValidateHasNotBeingEditedType();
 
             if (this.Parent == null)
@@ -763,7 +766,7 @@ namespace Ntreev.Crema.Services.Data
             base.OnValidateDelete(authentication, target);
             if (this.templateList.Any() == true)
                 throw new InvalidOperationException(Resources.Exception_CannotDeleteOnCreateChildTable);
-            this.ValidateNotBeingEdited();
+            this.ValidateIsNotBeingEdited();
             this.ValidateHasNotBeingEditedType();
 
             if (this.IsBaseTemplate == true && this.Parent == null && target == this)
@@ -775,7 +778,7 @@ namespace Ntreev.Crema.Services.Data
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void OnValidateNewChild(IAuthentication authentication, object target)
         {
-            this.ValidateNotBeingEdited();
+            this.ValidateIsNotBeingEdited();
             this.ValidateHasNotBeingEditedType();
 
             foreach (var item in this.Childs)
@@ -792,7 +795,7 @@ namespace Ntreev.Crema.Services.Data
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void OnValidateRevert(IAuthentication authentication, object target)
         {
-            this.ValidateNotBeingEdited();
+            this.ValidateIsNotBeingEdited();
             this.ValidateHasNotBeingEditedType();
         }
 

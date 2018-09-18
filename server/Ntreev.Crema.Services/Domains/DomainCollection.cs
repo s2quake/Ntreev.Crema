@@ -53,14 +53,10 @@ namespace Ntreev.Crema.Services.Domains
             var args = new DomainEventArgs(authentication, domain);
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainCreatedEvent), domain);
             var comment = EventMessageBuilder.BeginDomain(authentication, domain);
-            //var domainInfo = domain.DomainInfo;
-            //this.Dispatcher.InvokeAsync(() =>
-            //{
-                this.CremaHost.Debug(eventLog);
-                this.CremaHost.Info(comment);
-                this.OnDomainCreated(args);
-                this.Context.InvokeItemsCreatedEvent(authentication, new IDomainItem[] { domain }, new object[] { domainInfo });
-            //});
+            this.CremaHost.Debug(eventLog);
+            this.CremaHost.Info(comment);
+            this.OnDomainCreated(args);
+            this.Context.InvokeItemsCreatedEvent(authentication, new IDomainItem[] { domain }, new object[] { domainInfo });
         }
 
         public void InvokeDomainDeletedEvent(Authentication authentication, Domain domain, bool isCanceled)
@@ -68,13 +64,10 @@ namespace Ntreev.Crema.Services.Domains
             var args = new DomainDeletedEventArgs(authentication, domain, isCanceled);
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainDeletedEvent), domain, isCanceled);
             var comment = isCanceled == false ? EventMessageBuilder.EndDomain(authentication, domain) : EventMessageBuilder.CancelDomain(authentication, domain);
-            //this.Dispatcher.InvokeAsync(() =>
-            //{
-                this.CremaHost.Debug(eventLog);
-                this.CremaHost.Info(comment);
-                this.OnDomainDeleted(args);
-                this.Context.InvokeItemsDeleteEvent(authentication, new IDomainItem[] { domain }, new string[] { domain.Path });
-            //});
+            this.CremaHost.Debug(eventLog);
+            this.CremaHost.Info(comment);
+            this.OnDomainDeleted(args);
+            this.Context.InvokeItemsDeleteEvent(authentication, new IDomainItem[] { domain }, new string[] { domain.Path });
         }
 
         public void InvokeDomainRowAddedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows)
@@ -179,9 +172,9 @@ namespace Ntreev.Crema.Services.Domains
             this.InvokeDomainCreatedEvent(authentication, domain, domain.DomainInfo);
         }
 
-        public Task AddAsync(Authentication authentication, Domain domain, DataBase dataBase)
+        public async Task AddAsync(Authentication authentication, Domain domain, DataBase dataBase)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            await await this.Dispatcher.InvokeAsync(async () =>
             {
                 var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
                 var category = this.Context.Categories.Prepare(categoryName);

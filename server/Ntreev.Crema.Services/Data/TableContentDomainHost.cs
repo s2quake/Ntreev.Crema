@@ -34,7 +34,6 @@ namespace Ntreev.Crema.Services.Data
         public class TableContentDomainHost : IDomainHost, IEnumerable<ITableContent>
         {
             private readonly TableCollection container;
-            private readonly TableContent[] contents;
             private Domain domain;
 
             public TableContentDomainHost(TableCollection container, Domain domain, string itemPath)
@@ -52,9 +51,9 @@ namespace Ntreev.Crema.Services.Data
 
                 this.container = container;
                 this.Tables = tableList.ToArray();
-                this.contents = tableList.Select(item => item.Content).ToArray();
+                this.Contents = tableList.Select(item => item.Content).ToArray();
                 this.domain = domain;
-                foreach (var item in this.contents)
+                foreach (var item in this.Contents)
                 {
                     item.domainHost = this;
                 }
@@ -80,7 +79,7 @@ namespace Ntreev.Crema.Services.Data
 
             public void InvokeEditBegunEvent(EventArgs e)
             {
-                foreach (var item in this.contents)
+                foreach (var item in this.Contents)
                 {
                     item.OnEditBegun(e);
                 }
@@ -88,7 +87,7 @@ namespace Ntreev.Crema.Services.Data
 
             public void InvokeEditEndedEvent(EventArgs e)
             {
-                foreach (var item in this.contents)
+                foreach (var item in this.Contents)
                 {
                     item.OnEditEnded(e);
                 }
@@ -96,7 +95,7 @@ namespace Ntreev.Crema.Services.Data
 
             public void InvokeEditCanceledEvent(EventArgs e)
             {
-                foreach (var item in this.contents)
+                foreach (var item in this.Contents)
                 {
                     item.OnEditCanceled(e);
                 }
@@ -105,7 +104,7 @@ namespace Ntreev.Crema.Services.Data
             public async Task BeginContentAsync(Authentication authentication)
             {
                 var dataSet = this.domain.Source as CremaDataSet;
-                foreach (var item in this.contents)
+                foreach (var item in this.Contents)
                 {
                     item.domain = domain;
                     item.dataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
@@ -119,17 +118,15 @@ namespace Ntreev.Crema.Services.Data
             public async Task EndContentAsync(Authentication authentication)
             {
                 var dataSet = this.domain.Source as CremaDataSet;
-                var tables = this.contents.Where(item => item.IsModified).Select(item => item.Table).ToArray();
+                var dataBaseSet = new DataBaseSet(this.container.DataBase, dataSet);
+                var tables = this.Contents.Where(item => item.IsModified).Select(item => item.Table).ToArray();
                 if (this.domain.IsModified == true)
                 {
-                    await this.container.InvokeTableEndContentEditAsync(authentication, this.Tables, dataSet);
+                    await this.container.InvokeTableEndContentEditAsync(authentication, this.Tables, dataBaseSet);
                 }
-                await this.domain.Dispatcher.InvokeAsync(() =>
-                {
-                    this.DetachDomainEvent();
-                    this.domain.Dispose(authentication, false);
-                });
-                foreach (var item in this.contents)
+                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false);
+                foreach (var item in this.Contents)
                 {
                     if (item.IsModified == true)
                         item.Table.UpdateContent(item.dataTable.TableInfo);
@@ -150,7 +147,7 @@ namespace Ntreev.Crema.Services.Data
                     this.DetachDomainEvent();
                     this.domain.Dispose(authentication, true);
                 });
-                foreach (var item in this.contents)
+                foreach (var item in this.Contents)
                 {
                     item.domain = null;
                     item.IsModified = false;
@@ -170,7 +167,17 @@ namespace Ntreev.Crema.Services.Data
 
             }
 
+            public void SetEditableState(EditableState state)
+            {
+                foreach (var item in this.Contents)
+                {
+                    item.EditableState = state;
+                }
+            }
+
             public Table[] Tables { get; }
+
+            public TableContent[] Contents { get; }
 
             private async void Domain_Deleted(object sender, DomainDeletedEventArgs e)
             {
@@ -191,7 +198,7 @@ namespace Ntreev.Crema.Services.Data
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var query = from row in e.Rows
-                                join content in this.contents on row.TableName equals content.dataTable.Name
+                                join content in this.Contents on row.TableName equals content.dataTable.Name
                                 select content;
                     foreach (var item in query)
                     {
@@ -206,7 +213,7 @@ namespace Ntreev.Crema.Services.Data
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var query = from row in e.Rows
-                                join content in this.contents on row.TableName equals content.dataTable.Name
+                                join content in this.Contents on row.TableName equals content.dataTable.Name
                                 select content;
                     foreach (var item in query)
                     {
@@ -221,7 +228,7 @@ namespace Ntreev.Crema.Services.Data
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var query = from row in e.Rows
-                                join content in this.contents on row.TableName equals content.dataTable.Name
+                                join content in this.Contents on row.TableName equals content.dataTable.Name
                                 select content;
                     foreach (var item in query)
                     {
@@ -238,13 +245,15 @@ namespace Ntreev.Crema.Services.Data
 
             private CremaDispatcher Dispatcher => this.container.Dispatcher;
 
+            private DomainContext DomainContext => this.container.GetService(typeof(DomainContext)) as DomainContext;
+
             #region IDomainHost
 
             void IDomainHost.Detach()
             {
                 this.domain.Dispatcher.Invoke(this.DetachDomainEvent);
                 this.domain = null;
-                foreach (var item in this.contents)
+                foreach (var item in this.Contents)
                 {
                     item.domain = null;
                     item.dataTable = null;
@@ -255,7 +264,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 var dataSet = domain.Source as CremaDataSet;
                 this.domain = domain;
-                foreach (var item in this.contents)
+                foreach (var item in this.Contents)
                 {
                     item.domainHost = this;
                     item.domain = domain;
@@ -279,7 +288,7 @@ namespace Ntreev.Crema.Services.Data
 
             IEnumerator<ITableContent> IEnumerable<ITableContent>.GetEnumerator()
             {
-                foreach (var item in this.contents)
+                foreach (var item in this.Contents)
                 {
                     yield return item;
                 }
@@ -287,7 +296,7 @@ namespace Ntreev.Crema.Services.Data
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                foreach (var item in this.contents)
+                foreach (var item in this.Contents)
                 {
                     yield return item;
                 }

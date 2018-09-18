@@ -106,12 +106,12 @@ namespace Ntreev.Crema.Services.Domains
             this.Users = new DomainUserCollection(this);
         }
 
-        public Task DeleteAsync(Authentication authentication, bool isCanceled)
+        public async Task DeleteAsync(Authentication authentication, bool isCanceled)
         {
             try
             {
                 this.ValidateExpired();
-                return this.Dispatcher.InvokeAsync(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, isCanceled);
                     this.ValidateDelete(authentication, isCanceled);
@@ -134,12 +134,12 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public Task BeginUserEditAsync(Authentication authentication, DomainLocationInfo location)
+        public async Task BeginUserEditAsync(Authentication authentication, DomainLocationInfo location)
         {
             try
             {
                 this.ValidateExpired();
-                return this.Dispatcher.InvokeAsync(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginUserEditAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateBeginUserEdit(authentication, location);
@@ -156,12 +156,12 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public Task EndUserEditAsync(Authentication authentication)
+        public async Task EndUserEditAsync(Authentication authentication)
         {
             try
             {
                 this.ValidateExpired();
-                return this.Dispatcher.InvokeAsync(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndUserEditAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateEndUserEdit(authentication);
@@ -178,12 +178,12 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public Task<DomainRowInfo[]> NewRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        public async Task<DomainRowInfo[]> NewRowAsync(Authentication authentication, DomainRowInfo[] rows)
         {
             try
             {
                 this.ValidateExpired();
-                return this.Dispatcher.InvokeAsync(() =>
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(NewRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateNewRow(authentication, rows);
@@ -208,12 +208,12 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public Task<DomainRowInfo[]> SetRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        public async Task<DomainRowInfo[]> SetRowAsync(Authentication authentication, DomainRowInfo[] rows)
         {
             try
             {
                 this.ValidateExpired();
-                return this.Dispatcher.InvokeAsync(() =>
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateSetRow(authentication, rows);
@@ -238,12 +238,12 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public Task RemoveRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        public async Task RemoveRowAsync(Authentication authentication, DomainRowInfo[] rows)
         {
             try
             {
                 this.ValidateExpired();
-                return this.Dispatcher.InvokeAsync(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateRemoveRow(authentication, rows);
@@ -267,12 +267,12 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public Task SetPropertyAsync(Authentication authentication, string propertyName, object value)
+        public async Task SetPropertyAsync(Authentication authentication, string propertyName, object value)
         {
             try
             {
                 this.ValidateExpired();
-                return this.Dispatcher.InvokeAsync(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPropertyAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, propertyName, value);
                     this.ValidateSetProperty(authentication, propertyName, value);
@@ -296,12 +296,12 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public Task SetUserLocationAsync(Authentication authentication, DomainLocationInfo location)
+        public async Task SetUserLocationAsync(Authentication authentication, DomainLocationInfo location)
         {
             try
             {
                 this.ValidateExpired();
-                return this.Dispatcher.InvokeAsync(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetUserLocationAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateSetLocation(authentication, location);
@@ -318,12 +318,12 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public Task<DomainUserInfo> KickAsync(Authentication authentication, string userID, string comment)
+        public async Task<DomainUserInfo> KickAsync(Authentication authentication, string userID, string comment)
         {
             try
             {
                 this.ValidateExpired();
-                return this.Dispatcher.InvokeAsync(() =>
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(KickAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, userID, comment);
                     this.ValidateKick(authentication, userID, comment);
@@ -344,12 +344,12 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public Task SetOwnerAsync(Authentication authentication, string userID)
+        public async Task SetOwnerAsync(Authentication authentication, string userID)
         {
             try
             {
                 this.ValidateExpired();
-                return this.Dispatcher.InvokeAsync(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetOwnerAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, userID);
                     this.ValidateSetOwner(authentication, userID);
@@ -409,12 +409,6 @@ namespace Ntreev.Crema.Services.Domains
             this.Dispose();
         }
 
-        //public void Initialize()
-        //{
-        //    this.Dispatcher = new CremaDispatcher(this);
-        //    this.Logger = new DomainLogger(this.Context.Serializer, this);
-        //}
-
         public void Dispose(Authentication authentication, bool isCanceled)
         {
             base.Dispose();
@@ -443,9 +437,9 @@ namespace Ntreev.Crema.Services.Domains
             this.Container.InvokeDomainStateChangedEvent(authentication, this);
         }
 
-        public Task AddUserAsync(Authentication authentication, DomainAccessType accessType)
+        public async Task AddUserAsync(Authentication authentication, DomainAccessType accessType)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 this.CremaHost.DebugMethod(authentication, this, nameof(AddUserAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, accessType);
                 this.ValidateAdd(authentication);
@@ -459,9 +453,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public Task RemoveUserAsync(Authentication authentication)
+        public async Task RemoveUserAsync(Authentication authentication)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 this.CremaHost.DebugMethod(authentication, this, nameof(RemoveUserAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                 this.ValidateRemove(authentication);

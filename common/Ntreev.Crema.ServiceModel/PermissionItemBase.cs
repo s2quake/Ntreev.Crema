@@ -270,12 +270,6 @@ namespace Ntreev.Crema.ServiceModel
             this.AccessChanged?.Invoke(this, e);
         }
 
-        public void ValidateAccessType(IAuthentication authentication, AccessType accessType)
-        {
-            if (this.VerifyAccessType(authentication, accessType) == false)
-                throw new PermissionDeniedException();
-        }
-
         protected void ValidateSetPublic(IAuthentication authentication)
         {
             if (this.AccessInfo.IsPrivate == false || this.AccessInfo.IsInherited == true)

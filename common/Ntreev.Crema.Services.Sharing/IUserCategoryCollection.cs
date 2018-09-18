@@ -23,7 +23,7 @@ using System.Collections.Generic;
 
 namespace Ntreev.Crema.Services
 {
-    public interface IUserCategoryCollection : IReadOnlyCollection<IUserCategory>, IEnumerable<IUserCategory>, INotifyCollectionChanged, IServiceProvider, IDispatcherObject
+    public interface IUserCategoryCollection : IReadOnlyCollection<IUserCategory>, IEnumerable<IUserCategory>, IServiceProvider, IDispatcherObject
     {
         bool Contains(string categoryPath);
 

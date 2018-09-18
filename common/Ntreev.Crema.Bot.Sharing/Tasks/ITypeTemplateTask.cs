@@ -62,6 +62,12 @@ namespace Ntreev.Crema.Bot.Tasks
             }
             else
             {
+                if (await template.Dispatcher.InvokeAsync(() => template.VerifyAccessType(authentication, AccessType.Developer)) == false)
+                {
+                    context.Pop(template);
+                    return;
+                }
+
                 var editableState = await template.Dispatcher.InvokeAsync(() => template.EditableState);
                 if (editableState == EditableState.None)
                 {

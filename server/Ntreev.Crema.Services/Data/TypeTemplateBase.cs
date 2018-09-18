@@ -176,6 +176,7 @@ namespace Ntreev.Crema.Services.Data
                 throw new InvalidOperationException(Resources.Exception_ItIsAlreadyBeingEdited);
             if (this.EditableState.HasFlag(EditableState.IsBeingEdited) == true)
                 throw new InvalidOperationException(Resources.Exception_ItIsAlreadyBeingEdited);
+            this.ValidateAccessType(authentication, AccessType.Developer);
             this.OnValidateBeginEdit(authentication, this);
         }
 
@@ -185,6 +186,7 @@ namespace Ntreev.Crema.Services.Data
                 throw new InvalidOperationException(Resources.Exception_TypeIsNotBeingEdited);
             if (this.EditableState.HasFlag(EditableState.IsBeingEdited) == false)
                 throw new InvalidOperationException(Resources.Exception_TypeIsNotBeingEdited);
+            this.ValidateAccessType(authentication, AccessType.Developer);
             this.OnValidateEndEdit(authentication, this);
         }
 
@@ -194,6 +196,7 @@ namespace Ntreev.Crema.Services.Data
                 throw new InvalidOperationException(Resources.Exception_TypeIsNotBeingEdited);
             if (this.EditableState.HasFlag(EditableState.IsBeingEdited) == false)
                 throw new InvalidOperationException(Resources.Exception_TypeIsNotBeingEdited);
+            this.ValidateAccessType(authentication, AccessType.Developer);
             this.OnValidateCancelEdit(authentication, this);
         }
 
@@ -537,13 +540,6 @@ namespace Ntreev.Crema.Services.Data
                 int qwer = 0;
             }
             refcount--;
-        }
-
-        private void ValidateDispatcher(Authentication authentication)
-        {
-            if (this.Dispatcher == null)
-                throw new InvalidOperationException(Resources.Exception_InvalidObject);
-            this.Dispatcher.VerifyAccess();
         }
 
         #region ITypeTemplate

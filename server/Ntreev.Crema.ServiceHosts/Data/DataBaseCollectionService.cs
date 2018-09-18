@@ -53,9 +53,9 @@ namespace Ntreev.Crema.ServiceHosts.Data
             this.logService.Debug($"{nameof(DataBaseCollectionService)} Constructor");
         }
 
-        public async Task<ResultBase> DefinitionTypeAsync(LogInfo[] param1)
+        public Task<ResultBase> DefinitionTypeAsync(LogInfo[] param1)
         {
-            return new ResultBase();
+            return Task.Run(() => new ResultBase());
         }
 
         public async Task<ResultBase<DataBaseCollectionMetaData>> SubscribeAsync(Guid authenticationToken)

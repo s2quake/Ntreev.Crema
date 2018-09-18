@@ -51,6 +51,8 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task BeginEditAsync(Authentication authentication)
         {
+            var state = this.EditableState;
+            this.EditableState |= EditableState.Running;
             try
             {
                 this.ValidateExpired();
@@ -59,21 +61,21 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync), this.Table);
                     this.ValidateBeginEdit(authentication);
                     this.CremaHost.Sign(authentication);
-                    if (this.domain == null)
-                    {
-                        var dataSet = await this.Table.ReadEditableDataAsync(authentication);
-                        var tables = this.Table.GetRelations();
-                        var itemPath = string.Join("|", tables.Select(item => item.Path));
-                        this.domain = new TableContentDomain(authentication, dataSet, this.Table.DataBase, itemPath, this.GetType().Name);
-                        this.domain.Host = new TableContentDomainHost(this.Container, this.domain, itemPath);
-                        await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
-                    }
+                    var dataSet = await this.Table.ReadEditableDataAsync(authentication);
+                    var tables = this.Table.GetRelations();
+                    var itemPath = string.Join("|", tables.Select(item => item.Path));
+
+                    this.domain = new TableContentDomain(authentication, dataSet, this.Table.DataBase, itemPath, this.GetType().Name);
+                    this.domain.Host = new TableContentDomainHost(this.Container, this.domain, itemPath);
+                    await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
                     await this.domainHost.BeginContentAsync(authentication);
+                    this.domainHost.SetEditableState(EditableState.IsBeingEdited);
                     this.domainHost.InvokeEditBegunEvent(EventArgs.Empty);
                 });
             }
             catch (Exception e)
             {
+                this.EditableState = state;
                 this.CremaHost.Error(e);
                 throw;
             }
@@ -81,6 +83,8 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task EndEditAsync(Authentication authentication)
         {
+            var state = this.EditableState;
+            this.EditableState |= EditableState.Running;
             try
             {
                 this.ValidateExpired();
@@ -90,12 +94,14 @@ namespace Ntreev.Crema.Services.Data
                     this.ValidateEndEdit(authentication);
                     this.CremaHost.Sign(authentication);
                     await this.domainHost.EndContentAsync(authentication);
+                    this.EditableState = EditableState.None;
                     this.domainHost.InvokeEditEndedEvent(EventArgs.Empty);
                     this.domainHost = null;
                 });
             }
             catch (Exception e)
             {
+                this.EditableState = state;
                 this.CremaHost.Error(e);
                 throw;
             }
@@ -103,6 +109,8 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task CancelEditAsync(Authentication authentication)
         {
+            var state = this.EditableState;
+            this.EditableState |= EditableState.Running;
             try
             {
                 this.ValidateExpired();
@@ -112,12 +120,14 @@ namespace Ntreev.Crema.Services.Data
                     this.ValidateCancelEdit(authentication);
                     this.CremaHost.Sign(authentication);
                     await this.domainHost.CancelContentAsync(authentication);
+                    this.EditableState = EditableState.None;
                     this.domainHost.InvokeEditCanceledEvent(EventArgs.Empty);
                     this.domainHost = null;
                 });
             }
             catch (Exception e)
             {
+                this.EditableState = state;
                 this.CremaHost.Error(e);
                 throw;
             }
@@ -300,11 +310,20 @@ namespace Ntreev.Crema.Services.Data
 
             if (this.domain != null)
                 throw new NotImplementedException();
+            if (this.EditableState.HasFlag(EditableState.IsBeingEdited) == true)
+                throw new InvalidOperationException(Resources.Exception_ItIsAlreadyBeingEdited);
 
             this.Table.ValidateHasNotBeingEditedType();
 
-            if (this.Table.Template.IsBeingEdited == true)
+            if (this.Table.IsBeingEdited == true)
                 throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingEdited_Format, this.Table.Name));
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void OnValidateCancelEdit(Authentication authentication, object target)
+        {
+            if (this.domain == null)
+                throw new NotImplementedException();
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -317,7 +336,7 @@ namespace Ntreev.Crema.Services.Data
 
             this.Table.ValidateHasNotBeingEditedType();
 
-            if (this.Table.Template.IsBeingEdited == true)
+            if (this.Table.IsBeingEdited == true)
                 throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingEdited_Format, this.Table.Name));
         }
 
@@ -330,12 +349,7 @@ namespace Ntreev.Crema.Services.Data
                 throw new NotImplementedException();
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void OnValidateCancelEdit(Authentication authentication, object target)
-        {
-            if (this.domain == null)
-                throw new NotImplementedException();
-        }
+        
 
         public override Domain Domain => this.domain;
 
@@ -370,6 +384,8 @@ namespace Ntreev.Crema.Services.Data
         }
 
         public bool IsModified { get; private set; }
+
+        public EditableState EditableState { get; private set; }
 
         public event EventHandler EditBegun
         {

@@ -65,33 +65,6 @@ namespace Ntreev.Crema.Bot.Tasks
             await type.Dispatcher.InvokeAsync(() => type.GetAccessType(context.Authentication));
         }
 
-        //[TaskMethod]
-        //public async Task VerifyReadAsync(IType type, TaskContext context)
-        //{
-        //    type.Dispatcher.Invoke(() =>
-        //    {
-        //        type.VerifyRead(context.Authentication);
-        //    });
-        //}
-
-        //[TaskMethod]
-        //public async Task VerifyOwnerAsync(IType type, TaskContext context)
-        //{
-        //    type.Dispatcher.Invoke(() =>
-        //    {
-        //        type.VerifyOwner(context.Authentication);
-        //    });
-        //}
-
-        //[TaskMethod]
-        //public async Task VerifyMemberAsync(IType type, TaskContext context)
-        //{
-        //    type.Dispatcher.Invoke(() =>
-        //    {
-        //        type.VerifyMember(context.Authentication);
-        //    });
-        //}
-
         [TaskMethod(Weight = 10)]
         public async Task LockAsync(IType type, TaskContext context)
         {
@@ -133,6 +106,11 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 10)]
         public async Task SetPrivateAsync(IType type, TaskContext context)
         {
+            if (context.AllowException == false)
+            {
+                if (await type.Dispatcher.InvokeAsync(() => type.IsPrivate) == true)
+                    return;
+            }
             await type.SetPrivateAsync(context.Authentication);
         }
 
@@ -166,6 +144,12 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 25)]
         public async Task RenameAsync(IType type, TaskContext context)
         {
+            if (context.AllowException == false)
+            {
+                var typeState = await type.Dispatcher.InvokeAsync(() => type.TypeState);
+                if (typeState != TypeState.None)
+                    return;
+            }
             var typeName = RandomUtility.NextIdentifier();
             await type.RenameAsync(context.Authentication, typeName);
         }
@@ -186,6 +170,12 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 5)]
         public async Task DeleteAsync(IType type, TaskContext context)
         {
+            if (context.AllowException == false)
+            {
+                var typeState = await type.Dispatcher.InvokeAsync(() => type.TypeState);
+                if (typeState.HasFlag(TypeState.IsBeingEdited) == true)
+                    return;
+            }
             await type.DeleteAsync(context.Authentication);
         }
 

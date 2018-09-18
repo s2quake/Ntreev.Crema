@@ -59,11 +59,13 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), dataType.Name, dataType.CategoryPath);
                     this.ValidateAddNew(dataType.Name, dataType.CategoryPath, authentication);
-                    var signatureDate = await this.InvokeTypeCreateAsync(authentication, dataType.Name, dataType.DataSet);
+                    var dataSet = dataType.DataSet;
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var signatureDate = await this.InvokeTypeCreateAsync(authentication, dataType.Name, dataBaseSet);
                     this.CremaHost.Sign(authentication, signatureDate);
                     var type = this.BaseAddNew(dataType.Name, dataType.CategoryPath, authentication);
                     type.Initialize(dataType.TypeInfo);
-                    this.InvokeTypesCreatedEvent(authentication, new Type[] { type }, dataType.DataSet);
+                    this.InvokeTypesCreatedEvent(authentication, new Type[] { type }, dataSet);
                     return type;
                 });
             }
@@ -88,7 +90,8 @@ namespace Ntreev.Crema.Services.Data
                     var dataType = dataSet.Types[type.Name, type.Category.Path];
                     var itemName = new ItemName(categoryPath, newTypeName);
                     var newDataType = dataType.Copy(itemName);
-                    var signatureDate = await this.InvokeTypeCreateAsync(authentication, newTypeName, dataSet);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var signatureDate = await this.InvokeTypeCreateAsync(authentication, newTypeName, dataBaseSet);
                     this.CremaHost.Sign(authentication, signatureDate);
                     var newType = this.BaseAddNew(newTypeName, categoryPath, authentication);
                     newType.Initialize(newDataType.TypeInfo);
@@ -108,10 +111,9 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public Task<SignatureDate> InvokeTypeCreateAsync(Authentication authentication, string typeName, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTypeCreateAsync(Authentication authentication, string typeName, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.CreateType(authentication, typeName);
-            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
@@ -129,10 +131,9 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public Task<SignatureDate> InvokeTypeRenameAsync(Authentication authentication, TypeInfo typeInfo, string newName, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTypeRenameAsync(Authentication authentication, TypeInfo typeInfo, string newName, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.RenameType(authentication, typeInfo.Name, newName);
-            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
@@ -150,10 +151,9 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public Task<SignatureDate> InvokeTypeMoveAsync(Authentication authentication, TypeInfo typeInfo, string newCategoryPath, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTypeMoveAsync(Authentication authentication, TypeInfo typeInfo, string newCategoryPath, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.MoveType(authentication, typeInfo.Name, newCategoryPath, typeInfo.CategoryPath);
-            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
@@ -171,10 +171,9 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public Task<SignatureDate> InvokeTypeDeleteAsync(Authentication authentication, TypeInfo typeInfo, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTypeDeleteAsync(Authentication authentication, TypeInfo typeInfo, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.DeleteType(authentication, typeInfo.Name);
-            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
 
@@ -193,10 +192,9 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public Task<SignatureDate> InvokeTypeEndTemplateEditAsync(Authentication authentication, string typeName, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTypeEndTemplateEditAsync(Authentication authentication, string typeName, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.ChangeTypeTemplate(authentication, typeName);
-            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try

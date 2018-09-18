@@ -70,14 +70,14 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemUnlock), tableItem);
         }
 
-        public void InvokeTableItemSetPrivate(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo)
+        public Task<ResultBase<AccessInfo>> InvokeTableItemSetPrivateAsync(Authentication authentication, string tableItemPath)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemSetPrivate), tableItem);
+            return this.Service.SetPrivateTableItemAsync(tableItemPath);
         }
 
-        public void InvokeTableItemSetPublic(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo)
+        public Task<ResultBase> InvokeTableItemSetPublicAsync(Authentication authentication, string tableItemPath)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemSetPrivate), tableItem);
+            return this.Service.SetPublicTableItemAsync(tableItemPath);
         }
 
         public void InvokeTableItemAddAccessMember(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID, AccessType accessType)

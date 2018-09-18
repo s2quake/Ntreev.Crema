@@ -42,6 +42,8 @@ namespace Ntreev.Crema.Services.Data
         private EventHandler editCanceled;
         private EventHandler changed;
 
+        public abstract AccessType GetAccessType(Authentication authentication);
+
         public async Task<TableColumn> AddNewAsync(Authentication authentication)
         {
             try
@@ -117,6 +119,7 @@ namespace Ntreev.Crema.Services.Data
             this.EditableState |= EditableState.Running;
             try
             {
+                this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync));
@@ -179,8 +182,6 @@ namespace Ntreev.Crema.Services.Data
         {
             return this.Dispatcher.InvokeAsync(() => this.columns.Any(item => item.Name == columnName));
         }
-
-        public bool IsBeingEdited => this.domain != null;
 
         public bool IsNew { get; set; }
 
@@ -405,6 +406,9 @@ namespace Ntreev.Crema.Services.Data
         {
             if (this.domain != null)
                 throw new InvalidOperationException(Resources.Exception_ItIsAlreadyBeingEdited);
+            if (this.EditableState.HasFlag(EditableState.IsBeingEdited) == true)
+                throw new InvalidOperationException(Resources.Exception_ItIsAlreadyBeingEdited);
+            this.ValidateAccessType(authentication, AccessType.Developer);
             this.OnValidateBeginEdit(authentication, this);
         }
 
@@ -413,14 +417,20 @@ namespace Ntreev.Crema.Services.Data
         {
             if (this.domain == null)
                 throw new InvalidOperationException(Resources.Exception_TableTemplateIsNotBeingEdited);
+            if (this.EditableState.HasFlag(EditableState.IsBeingEdited) == false)
+                throw new InvalidOperationException(Resources.Exception_TableTemplateIsNotBeingEdited);
+            this.ValidateAccessType(authentication, AccessType.Developer);
             this.OnValidateEndEdit(authentication, this);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void ValidateCancelEdit(Authentication authentication)
         {
-            if (this.domain == null)
+            if (this.domain == null || this.domain.Dispatcher == null)
                 throw new InvalidOperationException(Resources.Exception_TableTemplateIsNotBeingEdited);
+            if (this.EditableState.HasFlag(EditableState.IsBeingEdited) == false)
+                throw new InvalidOperationException(Resources.Exception_TableTemplateIsNotBeingEdited);
+            this.ValidateAccessType(authentication, AccessType.Developer);
             this.OnValidateCancelEdit(authentication, this);
         }
 
@@ -537,13 +547,6 @@ namespace Ntreev.Crema.Services.Data
             this.domain.RowChanged -= Domain_RowChanged;
             this.domain.RowRemoved -= Domain_RowRemoved;
             this.domain.PropertyChanged -= Domain_PropertyChanged;
-        }
-
-        private void ValidateDispatcher(Authentication authentication)
-        {
-            if (this.Dispatcher == null)
-                throw new InvalidOperationException(Resources.Exception_InvalidObject);
-            this.Dispatcher.VerifyAccess();
         }
 
         #region ITableTemplate

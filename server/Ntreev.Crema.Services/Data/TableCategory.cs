@@ -213,7 +213,8 @@ namespace Ntreev.Crema.Services.Data
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var dataSet = await this.ReadAllDataAsync(authentication);
-                    var signatureDate = await this.Container.InvokeCategoryRenameAsync(authentication, this, name, dataSet);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var signatureDate = await this.Container.InvokeCategoryRenameAsync(authentication, this.Path, name, dataBaseSet);
                     this.CremaHost.Sign(authentication, signatureDate);
                     base.Rename(authentication, name);
                     this.Container.InvokeCategoriesRenamedEvent(authentication, items, oldNames, oldPaths, dataSet);
@@ -239,7 +240,8 @@ namespace Ntreev.Crema.Services.Data
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
                     var dataSet = await this.ReadAllDataAsync(authentication);
-                    var signatureDate = await this.Container.InvokeCategoryMoveAsync(authentication, this, parentPath, dataSet);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var signatureDate = await this.Container.InvokeCategoryMoveAsync(authentication, this.Path, parentPath, dataBaseSet);
                     this.CremaHost.Sign(authentication, signatureDate);
                     base.Move(authentication, parentPath);
                     this.Container.InvokeCategoriesMovedEvent(authentication, items, oldPaths, oldParentPaths, dataSet);
@@ -259,13 +261,13 @@ namespace Ntreev.Crema.Services.Data
                 this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(Delete), this);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     base.ValidateDelete(authentication);
                     this.CremaHost.Sign(authentication);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var container = this.Container;
-                    var signatureDate = await container.InvokeCategoryDeleteAsync(authentication, this);
+                    var signatureDate = await container.InvokeCategoryDeleteAsync(authentication, this.Path);
                     base.Delete(authentication);
                     container.InvokeCategoriesDeletedEvent(authentication, items, oldPaths);
                 });
@@ -340,6 +342,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 return this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(FindAsync), this, text, options);

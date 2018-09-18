@@ -300,6 +300,16 @@ namespace Ntreev.Crema.Services
             this.Log.Fatal(message);
         }
 
+        public void Sign(Authentication authentication, ResultBase result)
+        {
+            result.Validate(authentication);
+        }
+
+        public void Sign<T>(Authentication authentication, ResultBase<T> result)
+        {
+            result.Validate(authentication);
+        }
+
         // mac의 mono 환경에서는 바인딩 값이 서버와 다를 경우 접속이 거부되는 현상이 있음(버그로 추정)
         // binding.SentTimeout 값이 달라도 접속이 안됨.
         public static Binding CreateBinding(ServiceInfo serviceInfo)

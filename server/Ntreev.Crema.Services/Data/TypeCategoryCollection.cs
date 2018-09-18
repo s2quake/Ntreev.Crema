@@ -95,12 +95,10 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public Task<SignatureDate> InvokeCategoryRenameAsync(Authentication authentication, TypeCategory category, string name, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeCategoryRenameAsync(Authentication authentication, string categoryPath, string name, DataBaseSet dataBaseSet)
         {
-            var newCategoryPath = new CategoryName(category.Path) { Name = name, };
-            var message = EventMessageBuilder.RenameTypeCategory(authentication, category.Path, newCategoryPath);
-            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
-            var categoryPath = category.Path;
+            var newCategoryPath = new CategoryName(categoryPath) { Name = name, };
+            var message = EventMessageBuilder.RenameTypeCategory(authentication, categoryPath, newCategoryPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
@@ -118,12 +116,11 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public Task<SignatureDate> InvokeCategoryMoveAsync(Authentication authentication, TypeCategory category, string parentPath, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeCategoryMoveAsync(Authentication authentication, string categoryPath, string parentPath, DataBaseSet dataBaseSet)
         {
-            var newCategoryPath = new CategoryName(parentPath, category.Name);
-            var message = EventMessageBuilder.MoveTypeCategory(authentication, category.Path, category.Parent.Path, parentPath);
-            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
-            var categoryPath = category.Path;
+            var categoryName = new CategoryName(categoryPath);
+            var newCategoryPath = new CategoryName(parentPath, categoryName.Name);
+            var message = EventMessageBuilder.MoveTypeCategory(authentication, categoryPath, categoryName.ParentPath, parentPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
@@ -141,19 +138,25 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public void InvokeCategoryDelete(Authentication authentication, TypeCategory category, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeCategoryDeleteAsync(Authentication authentication, string categoryPath, DataBaseSet dataBaseSet)
         {
-            var message = EventMessageBuilder.DeleteTableCategory(authentication, category.Path);
-            try
+            var message = EventMessageBuilder.DeleteTableCategory(authentication, categoryPath);
+            var itemPath = this.Context.GeneratePath(categoryPath);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Delete(category.ItemPath);
-                this.Repository.Commit(authentication, message);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.Delete(itemPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public void InvokeCategoriesCreatedEvent(Authentication authentication, TypeCategory[] categories)

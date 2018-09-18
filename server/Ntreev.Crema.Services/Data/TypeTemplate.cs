@@ -20,6 +20,7 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Crema.Services.Properties;
 using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
@@ -27,10 +28,13 @@ namespace Ntreev.Crema.Services.Data
     class TypeTemplate : TypeTemplateBase
     {
         private readonly Type type;
+        private readonly Type[] types;
+        private TypeInfo typeInfo;
 
         public TypeTemplate(Type type)
         {
             this.type = type;
+            this.types = new Type[] { type };
         }
 
         public override AccessType GetAccessType(Authentication authentication)
@@ -52,46 +56,24 @@ namespace Ntreev.Crema.Services.Data
 
         public override IPermission Permission => this.type;
 
-        public override void OnValidateBeginEdit(Authentication authentication, object target)
-        {
-            base.OnValidateBeginEdit(authentication, target);
-            this.type.ValidateIsNotBeingEdited();
-            this.type.ValidateAccessType(authentication, AccessType.Master);
-            this.type.ValidateUsingTables(authentication);
-        }
-
-        public override void OnValidateEndEdit(Authentication authentication, object target)
-        {
-            base.OnValidateEndEdit(authentication, target);
-            this.type.ValidateIsBeingEdited();
-            if (this.TypeSource == null)
-                throw new InvalidOperationException(Resources.Exception_CannotEndEdit);
-            this.type.ValidateUsingTables(authentication);
-        }
-
-        public override void OnValidateCancelEdit(Authentication authentication, object target)
-        {
-            base.OnValidateCancelEdit(authentication, target);
-            this.type.ValidateIsBeingEdited();
-            this.type.ValidateAccessType(authentication, AccessType.Master);
-        }
-
         protected override async Task OnBeginEditAsync(Authentication authentication)
         {
             await base.OnBeginEditAsync(authentication);
             this.type.IsBeingEdited = true;
-            this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
+            this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
         }
 
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            await this.Container.InvokeTypeEndTemplateEditAsync(authentication, this.type.Name, this.TypeSource.DataSet);
+            var template = this.TypeSource;
+            var dataSet = template.DataSet;
+            var dataBaseSet = new DataBaseSet(this.type.DataBase, dataSet);
+            await this.Container.InvokeTypeEndTemplateEditAsync(authentication, this.type.Name, dataBaseSet);
             await base.OnEndEditAsync(authentication);
-            var items = new Type[] { this.type };
-            this.type.UpdateTypeInfo(this.TypeSource.TypeInfo);
+            this.type.UpdateTypeInfo(this.typeInfo);
             this.type.IsBeingEdited = false;
-            this.Container.InvokeTypesStateChangedEvent(authentication, items);
-            this.Container.InvokeTypesChangedEvent(authentication, items, this.TypeSource.DataSet);
+            this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
+            this.Container.InvokeTypesChangedEvent(authentication, this.types, dataSet);
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
@@ -109,10 +91,42 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task<CremaDataType> CreateSourceAsync(Authentication authentication)
         {
+            var typePath = this.type.Path;
             var dataSet = await this.type.ReadAllDataAsync(authentication);
-            return dataSet.Types[this.type.Name, this.type.Category.Path];
+            var dataType = dataSet.Types[this.type.Name, this.type.Category.Path];
+            if (dataType == null)
+                throw new TypeNotFoundException(typePath);
+            this.typeInfo = this.type.TypeInfo;
+            return dataType;
         }
 
         private TypeCollection Container => this.type.Container;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override void OnValidateBeginEdit(Authentication authentication, object target)
+        {
+            base.OnValidateBeginEdit(authentication, target);
+            this.type.ValidateIsNotBeingEdited();
+            this.type.ValidateAccessType(authentication, AccessType.Master);
+            this.type.ValidateUsingTables(authentication);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override void OnValidateEndEdit(Authentication authentication, object target)
+        {
+            base.OnValidateEndEdit(authentication, target);
+            this.type.ValidateIsBeingEdited();
+            if (this.TypeSource == null)
+                throw new InvalidOperationException(Resources.Exception_CannotEndEdit);
+            this.type.ValidateUsingTables(authentication);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override void OnValidateCancelEdit(Authentication authentication, object target)
+        {
+            base.OnValidateCancelEdit(authentication, target);
+            this.type.ValidateIsBeingEdited();
+            this.type.ValidateAccessType(authentication, AccessType.Master);
+        }
     }
 }

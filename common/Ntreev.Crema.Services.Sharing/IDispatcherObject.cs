@@ -32,7 +32,7 @@ namespace Ntreev.Crema.Services
     {
         public static void ValidateExpired(this IDispatcherObject dispatcherObject)
         {
-            if (dispatcherObject == null)
+            if (dispatcherObject == null || dispatcherObject.Dispatcher == null)
                 throw new DispatcherExpiredException();
         }
     }
