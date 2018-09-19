@@ -51,8 +51,6 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task BeginEditAsync(Authentication authentication)
         {
-            var state = this.EditableState;
-            this.EditableState |= EditableState.Running;
             try
             {
                 this.ValidateExpired();
@@ -60,22 +58,35 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync), this.Table);
                     this.ValidateBeginEdit(authentication);
+                    var tables = this.Table.GetRelations().ToArray();
+                    foreach (var item in tables)
+                    {
+                        item.Content.EditableState |= EditableState.Running;
+                    }
                     this.CremaHost.Sign(authentication);
-                    var dataSet = await this.Table.ReadEditableDataAsync(authentication);
-                    var tables = this.Table.GetRelations();
-                    var itemPath = string.Join("|", tables.Select(item => item.Path));
-
-                    this.domain = new TableContentDomain(authentication, dataSet, this.Table.DataBase, itemPath, this.GetType().Name);
-                    this.domain.Host = new TableContentDomainHost(this.Container, this.domain, itemPath);
-                    await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
-                    await this.domainHost.BeginContentAsync(authentication);
+                    try
+                    {
+                        var dataSet = await this.Table.ReadDataForContentAsync(authentication);
+                        var itemPath = string.Join("|", tables.Select(item => item.Path));
+                        this.domain = new TableContentDomain(authentication, dataSet, this.Table.DataBase, itemPath, this.GetType().Name);
+                        this.domain.Host = new TableContentDomainHost(this.Container, this.domain, itemPath);
+                        await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
+                        await this.domainHost.BeginContentAsync(authentication);
+                    }
+                    catch
+                    {
+                        foreach (var item in tables)
+                        {
+                            item.Content.EditableState &= ~EditableState.Running;
+                        }
+                        throw;
+                    }
                     this.domainHost.SetEditableState(EditableState.IsBeingEdited);
                     this.domainHost.InvokeEditBegunEvent(EventArgs.Empty);
                 });
             }
             catch (Exception e)
             {
-                this.EditableState = state;
                 this.CremaHost.Error(e);
                 throw;
             }
@@ -83,8 +94,6 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task EndEditAsync(Authentication authentication)
         {
-            var state = this.EditableState;
-            this.EditableState |= EditableState.Running;
             try
             {
                 this.ValidateExpired();
@@ -92,8 +101,17 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync), this.Table);
                     this.ValidateEndEdit(authentication);
+                    this.domainHost.SetRunning(true);
                     this.CremaHost.Sign(authentication);
-                    await this.domainHost.EndContentAsync(authentication);
+                    try
+                    {
+                        await this.domainHost.EndContentAsync(authentication);
+                    }
+                    catch
+                    {
+                        this.domainHost.SetRunning(false);
+                        throw;
+                    }
                     this.domainHost.SetEditableState(EditableState.None);
                     this.domainHost.InvokeEditEndedEvent(EventArgs.Empty);
                     this.domainHost = null;
@@ -101,7 +119,6 @@ namespace Ntreev.Crema.Services.Data
             }
             catch (Exception e)
             {
-                this.EditableState = state;
                 this.CremaHost.Error(e);
                 throw;
             }
@@ -109,8 +126,6 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task CancelEditAsync(Authentication authentication)
         {
-            var state = this.EditableState;
-            this.EditableState |= EditableState.Running;
             try
             {
                 this.ValidateExpired();
@@ -118,8 +133,17 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync), this.Table);
                     this.ValidateCancelEdit(authentication);
-                    this.CremaHost.Sign(authentication);
-                    await this.domainHost.CancelContentAsync(authentication);
+                    this.domainHost.SetRunning(true);
+                    try
+                    {
+                        this.CremaHost.Sign(authentication);
+                        await this.domainHost.CancelContentAsync(authentication);
+                    }
+                    catch
+                    {
+                        this.domainHost.SetRunning(false);
+                        throw;
+                    }
                     this.domainHost.SetEditableState(EditableState.None);
                     this.domainHost.InvokeEditCanceledEvent(EventArgs.Empty);
                     this.domainHost = null;
@@ -127,7 +151,6 @@ namespace Ntreev.Crema.Services.Data
             }
             catch (Exception e)
             {
-                this.EditableState = state;
                 this.CremaHost.Error(e);
                 throw;
             }
@@ -347,8 +370,8 @@ namespace Ntreev.Crema.Services.Data
 
             this.Table.ValidateHasNotBeingEditedType();
 
-            if (this.Table.IsBeingEdited == true)
-                throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingEdited_Format, this.Table.Name));
+            //if (this.Table.IsBeingEdited == true)
+            //    throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingEdited_Format, this.Table.Name));
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]

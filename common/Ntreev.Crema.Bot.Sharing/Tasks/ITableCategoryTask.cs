@@ -76,34 +76,7 @@ namespace Ntreev.Crema.Bot.Tasks
             await category.Dispatcher.InvokeAsync(() => category.GetAccessType(context.Authentication));
         }
 
-        //[TaskMethod]
-        //public async Task VerifyReadAsync(ITableCategory category, TaskContext context)
-        //{
-        //    category.Dispatcher.Invoke(() =>
-        //    {
-        //        category.VerifyRead(context.Authentication);
-        //    });
-        //}
-
-        //[TaskMethod]
-        //public async Task VerifyOwnerAsync(ITableCategory category, TaskContext context)
-        //{
-        //    category.Dispatcher.Invoke(() =>
-        //    {
-        //        category.VerifyOwner(context.Authentication);
-        //    });
-        //}
-
-        //[TaskMethod]
-        //public async Task VerifyMemberAsync(ITableCategory category, TaskContext context)
-        //{
-        //    category.Dispatcher.Invoke(() =>
-        //    {
-        //        category.VerifyMember(context.Authentication);
-        //    });
-        //}
-
-        [TaskMethod(Weight = 10)]
+        //[TaskMethod(Weight = 10)]
         public async Task LockAsync(ITableCategory category, TaskContext context)
         {
             var comment = RandomUtility.NextString();
@@ -119,7 +92,7 @@ namespace Ntreev.Crema.Bot.Tasks
             await category.LockAsync(context.Authentication, comment);
         }
 
-        [TaskMethod]
+        //[TaskMethod]
         public async Task UnlockAsync(ITableCategory category, TaskContext context)
         {
             if (context.AllowException == false)
@@ -132,7 +105,7 @@ namespace Ntreev.Crema.Bot.Tasks
             await category.UnlockAsync(context.Authentication);
         }
 
-        [TaskMethod]
+        //[TaskMethod]
         public async Task SetPublicAsync(ITableCategory category, TaskContext context)
         {
             if (context.AllowException == false)
@@ -145,7 +118,7 @@ namespace Ntreev.Crema.Bot.Tasks
             await category.SetPublicAsync(context.Authentication);
         }
 
-        [TaskMethod(Weight = 10)]
+        //[TaskMethod(Weight = 10)]
         public async Task SetPrivateAsync(ITableCategory category, TaskContext context)
         {
             if (category.Parent == null)
@@ -153,7 +126,7 @@ namespace Ntreev.Crema.Bot.Tasks
             await category.SetPrivateAsync(context.Authentication);
         }
 
-        [TaskMethod(Weight = 10)]
+        //[TaskMethod(Weight = 10)]
         public async Task AddAccessMemberAsync(ITableCategory category, TaskContext context)
         {
             if (category.Parent == null)
@@ -171,7 +144,7 @@ namespace Ntreev.Crema.Bot.Tasks
             }
         }
 
-        [TaskMethod(Weight = 10)]
+        //[TaskMethod(Weight = 10)]
         public async Task RemoveAccessMemberAsync(ITableCategory category, TaskContext context)
         {
             if (category.Parent == null)
@@ -217,10 +190,11 @@ namespace Ntreev.Crema.Bot.Tasks
             await category.MoveAsync(context.Authentication, categoryPath);
         }
 
-        [TaskMethod(Weight = 1)]
+        //[TaskMethod(Weight = 1)]
         public async Task DeleteAsync(ITableCategory category, TaskContext context)
         {
             await category.DeleteAsync(context.Authentication);
+            context.Pop(category);
         }
 
         [TaskMethod(Weight = 10)]
@@ -242,19 +216,19 @@ namespace Ntreev.Crema.Bot.Tasks
             context.Push(template);
         }
 
-        [TaskMethod]
+        //[TaskMethod]
         public async Task GetDataSetAsync(ITableCategory category, TaskContext context)
         {
             await category.GetDataSetAsync(context.Authentication, null);
         }
 
-        [TaskMethod]
+        //[TaskMethod]
         public async Task GetLogAsync(ITableCategory category, TaskContext context)
         {
             await category.GetLogAsync(context.Authentication, null);
         }
 
-        [TaskMethod]
+        //[TaskMethod]
         public async Task FindAsync(ITableCategory category, TaskContext context)
         {
             var text = RandomUtility.NextWord();

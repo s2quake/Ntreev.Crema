@@ -41,10 +41,24 @@ namespace Ntreev.Crema.Bot.Tasks
             var content = context.Target as ITableContent;
             if (context.IsCompleted(content) == true)
             {
-                var editableState = await content.Dispatcher.InvokeAsync(() => content.EditableState);
-                if (editableState != EditableState.IsBeingEdited)
-                    return;
+                try
+                {
 
+                }
+                catch
+                {
+
+                }
+                var editableState = await content.Dispatcher.InvokeAsync(() => content.EditableState);
+                if(editableState == EditableState.None)
+                {
+                    context.Pop(content);
+                }
+                else if (editableState != EditableState.IsBeingEdited)
+                {
+                    return;
+                }
+                    
                 var domain = content.Domain;
                 if (domain != null && RandomUtility.Within(50) == true)
                 {
@@ -76,7 +90,7 @@ namespace Ntreev.Crema.Bot.Tasks
 
                 if (await domain.Users.ContainsAsync(authentication.ID) == false)
                 {
-                    await content.EndEditAsync(authentication);
+                    await content.EnterEditAsync(authentication);
                 }
                 else
                 {

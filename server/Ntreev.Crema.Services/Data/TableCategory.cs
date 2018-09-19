@@ -213,7 +213,7 @@ namespace Ntreev.Crema.Services.Data
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var dataSet = await this.ReadAllDataAsync(authentication);
-                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, false);
                     var signatureDate = await this.Container.InvokeCategoryRenameAsync(authentication, this.Path, name, dataBaseSet);
                     this.CremaHost.Sign(authentication, signatureDate);
                     base.Rename(authentication, name);
@@ -240,7 +240,7 @@ namespace Ntreev.Crema.Services.Data
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
                     var dataSet = await this.ReadAllDataAsync(authentication);
-                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, false);
                     var signatureDate = await this.Container.InvokeCategoryMoveAsync(authentication, this.Path, parentPath, dataBaseSet);
                     this.CremaHost.Sign(authentication, signatureDate);
                     base.Move(authentication, parentPath);

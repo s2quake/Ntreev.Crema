@@ -118,7 +118,7 @@ namespace Ntreev.Crema.Services.Data
             public async Task EndContentAsync(Authentication authentication)
             {
                 var dataSet = this.domain.Source as CremaDataSet;
-                var dataBaseSet = new DataBaseSet(this.container.DataBase, dataSet);
+                var dataBaseSet = new DataBaseSet(this.container.DataBase, dataSet, false);
                 var tables = this.Contents.Where(item => item.IsModified).Select(item => item.Table).ToArray();
                 if (this.domain.IsModified == true)
                 {
@@ -172,6 +172,17 @@ namespace Ntreev.Crema.Services.Data
                 foreach (var item in this.Contents)
                 {
                     item.EditableState = state;
+                }
+            }
+
+            public void SetRunning(bool value)
+            {
+                foreach (var item in this.Contents)
+                {
+                    if (value == true)
+                        item.EditableState |= EditableState.Running;
+                    else
+                        item.EditableState &= ~EditableState.Running;
                 }
             }
 

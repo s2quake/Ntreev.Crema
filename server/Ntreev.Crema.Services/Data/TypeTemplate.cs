@@ -67,7 +67,7 @@ namespace Ntreev.Crema.Services.Data
         {
             var template = this.TypeSource;
             var dataSet = template.DataSet;
-            var dataBaseSet = new DataBaseSet(this.type.DataBase, dataSet);
+            var dataBaseSet = new DataBaseSet(this.type.DataBase, dataSet, false);
             await this.Container.InvokeTypeEndTemplateEditAsync(authentication, this.type.Name, dataBaseSet);
             await base.OnEndEditAsync(authentication);
             this.type.UpdateTypeInfo(this.typeInfo);

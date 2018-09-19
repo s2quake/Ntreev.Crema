@@ -38,12 +38,19 @@ namespace Ntreev.Crema.Bot
         private readonly TaskContext taskContext = new TaskContext();
         private readonly CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
         private IEnumerable<ITaskProvider> taskProviders;
+        private CremaDispatcher dispatcher;
 
         public AutobotBase(string autobotID)
         {
             this.autobotID = autobotID;
+            this.dispatcher = new CremaDispatcher(this);
             this.MinSleepTime = 1;
             this.MaxSleepTime = 10;
+        }
+
+        public override string ToString()
+        {
+            return $"Autobot: {this.autobotID}";
         }
 
         public void Cancel()
@@ -97,11 +104,11 @@ namespace Ntreev.Crema.Bot
 
         public abstract object GetService(Type serviceType);
 
-        public async Task ExecuteAsync(IEnumerable<ITaskProvider> taskProviders)
+        public Task ExecuteAsync(IEnumerable<ITaskProvider> taskProviders)
         {
             this.taskProviders = taskProviders;
             this.taskContext.Push(this);
-            await Task.Run(async () => await this.Execute(taskProviders));
+            return this.dispatcher.InvokeAsync(async () => await this.ProcessAsync());
         }
 
         public event EventHandler Disposed;
@@ -115,7 +122,7 @@ namespace Ntreev.Crema.Bot
 
         protected abstract Task OnLogoutAsync(Authentication authentication);
 
-        private void InvokeTask(MethodInfo method, ITaskProvider taskProvider, object target)
+        private async Task InvokeTaskAsync(MethodInfo method, ITaskProvider taskProvider, object target)
         {
             try
             {
@@ -124,7 +131,7 @@ namespace Ntreev.Crema.Bot
                     var result = method.Invoke(taskProvider, new object[] { target, this.taskContext });
                     if (result is Task task)
                     {
-                        task.Wait();
+                        await task;
                     }
                 }
             }
@@ -138,7 +145,7 @@ namespace Ntreev.Crema.Bot
             }
         }
 
-        private async Task Execute(IEnumerable<ITaskProvider> taskProviders)
+        private async Task ProcessAsync()
         {
             try
             {
@@ -158,8 +165,7 @@ namespace Ntreev.Crema.Bot
                     {
                         if (this.cancelTokenSource.IsCancellationRequested == true)
                             break;
-                        var task = taskProvider.InvokeAsync(this.taskContext);
-                        task.Wait();
+                        await taskProvider.InvokeAsync(this.taskContext);
                     }
                     catch
                     {
@@ -172,13 +178,15 @@ namespace Ntreev.Crema.Bot
                         var method = RandomMethod(taskProvider);
                         if (this.cancelTokenSource.IsCancellationRequested == true)
                             break;
-                        this.InvokeTask(method, taskProvider, this.taskContext.Target);
+                        await this.InvokeTaskAsync(method, taskProvider, this.taskContext.Target);
                     }
                 }
                 if (this.taskContext.Authentication != null)
                 {
                     await this.OnLogoutAsync(this.taskContext.Authentication);
                 }
+                this.dispatcher.Dispose();
+                this.dispatcher = null;
                 this.OnDisposed(EventArgs.Empty);
             }
             catch (Exception e)

@@ -90,8 +90,6 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task BeginEditAsync(Authentication authentication)
         {
-            var state = this.EditableState;
-            this.EditableState |= EditableState.Running;
             try
             {
                 this.ValidateExpired();
@@ -100,14 +98,22 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync));
                     this.ValidateBeginEdit(authentication);
                     this.CremaHost.Sign(authentication);
-                    await this.OnBeginEditAsync(authentication);
+                    this.EditableState |= EditableState.Running;
+                    try
+                    {
+                        await this.OnBeginEditAsync(authentication);
+                    }
+                    catch
+                    {
+                        this.EditableState &= ~EditableState.Running;
+                        throw;
+                    }
                     this.EditableState = EditableState.IsBeingEdited;
                     this.OnEditBegun(EventArgs.Empty);
                 });
             }
             catch (Exception e)
             {
-                this.EditableState = state;
                 this.CremaHost.Error(e);
                 throw;
             }
@@ -115,8 +121,6 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task EndEditAsync(Authentication authentication)
         {
-            var state = this.EditableState;
-            this.EditableState |= EditableState.Running;
             try
             {
                 this.ValidateExpired();
@@ -125,14 +129,22 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync));
                     this.ValidateEndEdit(authentication);
                     this.CremaHost.Sign(authentication);
-                    await this.OnEndEditAsync(authentication);
+                    this.EditableState |= EditableState.Running;
+                    try
+                    {
+                        await this.OnEndEditAsync(authentication);
+                    }
+                    catch
+                    {
+                        this.EditableState &= ~EditableState.Running;
+                        throw;
+                    }
                     this.EditableState = EditableState.None;
                     this.OnEditEnded(EventArgs.Empty);
                 });
             }
             catch (Exception e)
             {
-                this.EditableState = state;
                 this.CremaHost.Error(e);
                 throw;
             }
@@ -140,8 +152,6 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task CancelEditAsync(Authentication authentication)
         {
-            var state = this.EditableState;
-            this.EditableState |= EditableState.Running;
             try
             {
                 this.ValidateExpired();
@@ -150,14 +160,22 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync));
                     this.ValidateCancelEdit(authentication);
                     this.CremaHost.Sign(authentication);
-                    await this.OnCancelEditAsync(authentication);
+                    this.EditableState |= EditableState.Running;
+                    try
+                    {
+                        await this.OnCancelEditAsync(authentication);
+                    }
+                    catch
+                    {
+                        this.EditableState &= ~EditableState.Running;
+                        throw;
+                    }
                     this.EditableState = EditableState.None;
                     this.OnEditCanceled(EventArgs.Empty);
                 });
             }
             catch (Exception e)
             {
-                this.EditableState = state;
                 this.CremaHost.Error(e);
                 throw;
             }

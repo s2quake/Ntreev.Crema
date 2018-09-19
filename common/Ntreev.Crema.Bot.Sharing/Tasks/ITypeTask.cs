@@ -54,11 +54,6 @@ namespace Ntreev.Crema.Bot.Tasks
             get { return typeof(IType); }
         }
 
-        public bool IsEnabled
-        {
-            get { return false; }
-        }
-
         [TaskMethod]
         public async Task GetAccessTypeAsync(IType type, TaskContext context)
         {

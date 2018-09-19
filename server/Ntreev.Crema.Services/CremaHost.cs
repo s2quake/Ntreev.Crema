@@ -195,7 +195,7 @@ namespace Ntreev.Crema.Services
                     await this.UserContext.ClearAsync();
                     this.UserContext.Dispose();
                     this.UserContext = null;
-                    this.DomainContext.Dispose();
+                    await this.DomainContext.DisposeAsync();
                     this.DomainContext = null;
                     this.DataBases.Dispose();
                     this.DataBases = null;

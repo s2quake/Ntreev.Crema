@@ -20,6 +20,7 @@ using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
@@ -42,10 +43,11 @@ namespace Ntreev.Crema.Bot.Consoles
         }
 
         [CommandMethod]
+        [CommandMethodProperty(nameof(Count))]
         public async Task StartAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            await this.AutobotService.StartAsync(authentication);
+            await this.AutobotService.StartAsync(authentication, this.Count);
         }
 
         [CommandMethod]
@@ -62,6 +64,13 @@ namespace Ntreev.Crema.Bot.Consoles
                     return false;
                 return this.CommandContext.Authority == ServiceModel.Authority.Admin;
             }
+        }
+
+        [CommandProperty]
+        [DefaultValue(0)]
+        public int Count
+        {
+            get;set;
         }
 
         protected override bool IsMethodEnabled(CommandMethodDescriptor descriptor)

@@ -45,8 +45,6 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 if (autobot.IsOnline == true)
                 {
-                    //var cremaHost = autobot.CremaHost;
-                    //context.Push(autobot.CremaHost.DataBases);
                     if (RandomUtility.Within(75) == true)
                     {
                         if (autobot.GetService(typeof(ICremaHost)) is ICremaHost cremaHost)
@@ -55,23 +53,12 @@ namespace Ntreev.Crema.Bot.Tasks
                             context.Push(dataBase);
                         }
                     }
-                    //else if (RandomUtility.Within(75) == true)
-                    if (RandomUtility.Within(75) == true)
+                    else if (RandomUtility.Within(75) == true)
                     {
                         //if (autobot.GetService(typeof(IUserContext)) is IUserContext userContext)
                         //{
-                        //    var user = await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Random());
-                        //    context.Push(user);
-                        //}
-                        //var userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-                        //if (RandomUtility.Within(75) == true)
-                        //{
-
-                        //}
-                        //else
-                        //{
-                        //    var category = await userContext.Dispatcher.InvokeAsync(() => userContext.Categories.Random());
-                        //    context.Push(category);
+                        //    var userItem = await userContext.Dispatcher.InvokeAsync(() => userContext.Random());
+                        //    context.Push(userItem);
                         //}
                     }
                     //else if (RandomUtility.Within(10) == true)
@@ -113,14 +100,7 @@ namespace Ntreev.Crema.Bot.Tasks
             }
         }
 
-        //[TaskMethod]
-        //public async Task WaitAsync(AutobotBase autobot, TaskContext context)
-        //{
-        //    var sleep = RandomUtility.Next(autobot.MinSleepTime, autobot.MaxSleepTime);
-        //    await Task.Delay(sleep);
-        //}
-
-        [TaskMethod(Weight = 10)]
+        [TaskMethod(Weight = 1)]
         public async Task CreateAutobotAsync(Autobot autobot, TaskContext context)
         {
             if (context.AllowException == false)

@@ -64,30 +64,23 @@ namespace Ntreev.Crema.Bot.Tasks
         }
 
         [TaskMethod]
-        public Task MoveAsync(IUser user, TaskContext context)
+        public async Task MoveAsync(IUser user, TaskContext context)
         {
-            return user.Dispatcher.InvokeAsync(async () =>
+            var authentication = context.Authentication;
+            var categories = user.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
+            if (context.AllowException == false)
             {
-                var categories = user.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-                var categoryPath = categories.Random().Path;
-                if (Verify(categoryPath) == false)
+                if (await user.Dispatcher.InvokeAsync(() => user.Category.Path) == categoryPath)
                     return;
-                await user.MoveAsync(context.Authentication, categoryPath);
-            });
-
-            bool Verify(string categoryPath)
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (user.Category.Path == categoryPath)
-                    return false;
-                return true;
             }
+            await user.MoveAsync(authentication, categoryPath);
         }
 
         [TaskMethod(Weight = 1)]
         public async Task DeleteAsync(IUser user, TaskContext context)
         {
+            var authentication = context.Authentication;
             await user.DeleteAsync(context.Authentication);
         }
 
@@ -100,58 +93,62 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod]
         public async Task SendMessageAsync(IUser user, TaskContext context)
         {
+            var authentication = context.Authentication;
             var message = RandomUtility.NextString();
             if (context.AllowException == false)
             {
-                if (string.IsNullOrEmpty(message) == true)
+                if (message == string.Empty)
                     return;
                 if (await user.Dispatcher.InvokeAsync(() => user.UserState) != UserState.Online)
                     return;
             }
-            await user.SendMessageAsync(context.Authentication, message);
+            await user.SendMessageAsync(authentication, message);
         }
 
-        [TaskMethod]
+        [TaskMethod(Authority = Authority.Admin)]
         public async Task KickAsync(IUser user, TaskContext context)
         {
+            var authentication = context.Authentication;
             var comment = RandomUtility.NextString();
             if (context.AllowException == false)
             {
-                if (string.IsNullOrEmpty(comment) == true)
+                if (comment == string.Empty)
                     return;
                 if (await user.Dispatcher.InvokeAsync(() => user.Authority) == Authority.Admin)
                     return;
                 if (await user.Dispatcher.InvokeAsync(() => user.UserState) != UserState.Online)
                     return;
             }
-            await user.KickAsync(context.Authentication, comment);
+            await user.KickAsync(authentication, comment);
         }
 
-        [TaskMethod]
+        [TaskMethod(Authority = Authority.Admin)]
         public async Task BanAsync(IUser user, TaskContext context)
         {
+            var authentication = context.Authentication;
             var comment = RandomUtility.NextString();
             if (context.AllowException == false)
             {
-                if (string.IsNullOrEmpty(comment) == true)
+                if (comment == string.Empty)
                     return;
                 if (await user.Dispatcher.InvokeAsync(() => user.BanInfo.Path) != string.Empty)
                     return;
                 if (await user.Dispatcher.InvokeAsync(() => user.Authority) == Authority.Admin)
                     return;
             }
-            await user.BanAsync(context.Authentication, comment);
+            await user.BanAsync(authentication, comment);
         }
 
-        [TaskMethod]
+        [TaskMethod(Authority = Authority.Admin)]
         public async Task UnbanAsync(IUser user, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (await user.Dispatcher.InvokeAsync(() => user.BanInfo.Path) != user.Path)
                     return;
             }
-            await user.UnbanAsync(context.Authentication);
+            await user.UnbanAsync(authentication);
         }
     }
 }

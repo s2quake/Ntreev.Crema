@@ -51,56 +51,50 @@ namespace Ntreev.Crema.Bot.Tasks
             await Task.Delay(0);
         }
 
-        public Type TargetType
-        {
-            get { return typeof(IUserCategory); }
-        }
-
-        public bool IsEnabled
-        {
-            get { return false; }
-        }
+        public Type TargetType => typeof(IUserCategory);
 
         [TaskMethod]
         public async Task RenameAsync(IUserCategory category, TaskContext context)
         {
-            if (category.Parent == null)
-                return;
+            var authentication = context.Authentication;
             var categoryName = RandomUtility.NextIdentifier();
-            await category.RenameAsync(context.Authentication, categoryName);
+            if (context.AllowException == false)
+            {
+                if (await category.Dispatcher.InvokeAsync(() => category.Parent) == null)
+                    return;
+            }
+            await category.RenameAsync(authentication, categoryName);
         }
 
         [TaskMethod]
         public async Task MoveAsync(IUserCategory category, TaskContext context)
         {
+            var authentication = context.Authentication;
             var categories = category.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
-
             if (context.AllowException == false)
             {
-                if (category.Parent == null)
+                if (await category.Dispatcher.InvokeAsync(() => category.Parent) == null)
                     return;
-                if (categoryPath.StartsWith(category.Path) == true)
+                if (await category.Dispatcher.InvokeAsync(() => categoryPath.StartsWith(category.Path)) == true)
                     return;
-                if (category.Path == categoryPath)
+                if (await category.Dispatcher.InvokeAsync(() => category.Path == categoryPath))
                     return;
-                if (category.Parent.Path == categoryPath)
+                if (await category.Dispatcher.InvokeAsync(() => category.Parent.Path == categoryPath))
                     return;
             }
-            
-            await category.MoveAsync(context.Authentication, categoryPath);
+            await category.MoveAsync(authentication, categoryPath);
         }
 
         [TaskMethod]
         public async Task DeleteAsync(IUserCategory category, TaskContext context)
         {
-            if (category.Parent == null)
-                return;
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
-                if (category.Parent == null)
+                if (await category.Dispatcher.InvokeAsync(() => category.Parent) == null)
                     return;
-                if (EnumerableUtility.Descendants<IUserItem, IUser>(category as IUserItem, item => item.Childs).Any() == true)
+                if (await category.Dispatcher.InvokeAsync(() => EnumerableUtility.Descendants<IUserItem, IUser>(category as IUserItem, item => item.Childs).Any()) == true)
                     return;
             }
             await category.DeleteAsync(context.Authentication);

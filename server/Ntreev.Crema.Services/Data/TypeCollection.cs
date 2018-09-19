@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), dataType.Name, dataType.CategoryPath);
                     this.ValidateAddNew(dataType.Name, dataType.CategoryPath, authentication);
                     var dataSet = dataType.DataSet;
-                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, true);
                     var signatureDate = await this.InvokeTypeCreateAsync(authentication, dataType.Name, dataBaseSet);
                     this.CremaHost.Sign(authentication, signatureDate);
                     var type = this.BaseAddNew(dataType.Name, dataType.CategoryPath, authentication);
@@ -90,7 +90,7 @@ namespace Ntreev.Crema.Services.Data
                     var dataType = dataSet.Types[type.Name, type.Category.Path];
                     var itemName = new ItemName(categoryPath, newTypeName);
                     var newDataType = dataType.Copy(itemName);
-                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, true);
                     var signatureDate = await this.InvokeTypeCreateAsync(authentication, newTypeName, dataBaseSet);
                     this.CremaHost.Sign(authentication, signatureDate);
                     var newType = this.BaseAddNew(newTypeName, categoryPath, authentication);

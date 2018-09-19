@@ -39,7 +39,7 @@ using Ntreev.Library.IO;
 namespace Ntreev.Crema.Services.Domains
 {
     class DomainContext : ItemContext<Domain, DomainCategory, DomainCollection, DomainCategoryCollection, DomainContext>,
-        IDomainContext, IServiceProvider, IDisposable
+        IDomainContext, IServiceProvider
     {
         private readonly UserContext userContext;
         private ItemsCreatedEventHandler<IDomainItem> itemsCreated;
@@ -214,11 +214,17 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public void Dispose()
+        public async Task DisposeAsync()
         {
             foreach (var item in this.Domains.ToArray<Domain>())
             {
-                item.Dispatcher.Invoke(() => item.Dispose(this));
+                this.Domains.Remove(item);
+                var dispatcher = item.Dispatcher;
+                item.Dispatcher = null;
+                item.Logger?.Dispose(true);
+                item.Logger = null;
+                await dispatcher.InvokeAsync(() => item.Dispose(this));
+                dispatcher.Dispose();
             }
         }
 

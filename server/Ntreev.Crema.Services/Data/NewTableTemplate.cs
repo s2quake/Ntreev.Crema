@@ -169,7 +169,7 @@ namespace Ntreev.Crema.Services.Data
             }
             else if (this.parent is Table table)
             {
-                var dataSet = await table.ReadAllAsync(authentication, true);
+                var dataSet = await table.ReadDataForTemplateAsync(authentication, true);
                 var dataTable = dataSet.Tables[table.Name, table.Category.Path];
                 this.tableNames = dataSet.Tables.Select(item => item.Name).ToArray();
                 return CremaTemplate.Create(dataTable);

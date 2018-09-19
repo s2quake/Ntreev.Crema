@@ -62,7 +62,12 @@ namespace Ntreev.Crema.Bot
             });
         }
 
-        public async Task StartAsync(Authentication authentication)
+        public Task StartAsync(Authentication authentication)
+        {
+            return this.StartAsync(authentication, 0);
+        }
+
+        public async Task StartAsync(Authentication authentication, int count)
         {
             if (this.IsPlaying == true || this.IsClosing == true)
                 throw new InvalidOperationException();
@@ -81,13 +86,12 @@ namespace Ntreev.Crema.Bot
 
 
             var autobotIDList = new List<string>();
-
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < count; i++)
             {
                 var autobotID = $"Autobot{RandomUtility.Next(1000)}";
                 var authority = RandomUtility.NextEnum<Authority>();
-                //var authentication = context.Authentication;
-                //var userContext = autobot.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
+                if (authority == Authority.Guest)
+                    authority = Authority.Member;
                 if (await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Contains(autobotID)) == false)
                 {
                     var category = userContext.Categories["/autobots/"];
@@ -113,18 +117,18 @@ namespace Ntreev.Crema.Bot
             this.IsClosing = true;
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.Dispatcher.Dispose();
-                this.Dispatcher = null;
+                foreach (var item in this.botByID.Values)
+                {
+                    item.Cancel();
+                }
             });
-            foreach (var item in this.botByID.Values)
-            {
-                item.Cancel();
-            }
+
             while (this.botByID.Any())
             {
                 Thread.Sleep(1);
             }
-            this.botByID.Clear();
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
             this.IsClosing = false;
         }
 
@@ -150,10 +154,10 @@ namespace Ntreev.Crema.Bot
         {
             if (sender is AutobotBase autobot)
             {
-                lock (this.botByID)
+                this.Dispatcher.InvokeAsync(() =>
                 {
                     this.botByID.Remove(autobot.AutobotID);
-                }
+                });
             }
         }
 

@@ -69,7 +69,7 @@ namespace Ntreev.Crema.Services.Data
         {
             var template = this.TemplateSource;
             var dataSet = template.TargetTable.DataSet;
-            var dataBaseSet = new DataBaseSet(this.table.DataBase, dataSet);
+            var dataBaseSet = new DataBaseSet(this.table.DataBase, dataSet, false);
             await this.Container.InvokeTableEndTemplateEditAsync(authentication, this.tableInfo, dataBaseSet);
             await base.OnEndEditAsync(authentication);
             this.table.UpdateTemplate(template.TableInfo);
@@ -96,7 +96,7 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task<CremaTemplate> CreateSourceAsync(Authentication authentication)
         {
             var tablePath = this.table.Path;
-            var dataSet = await this.table.ReadAllAsync(authentication, true);
+            var dataSet = await this.table.ReadDataForTemplateAsync(authentication, true);
             var dataTable = dataSet.Tables[this.table.Name, this.table.Category.Path];
             if (dataTable == null)
                 throw new TableNotFoundException(tablePath);

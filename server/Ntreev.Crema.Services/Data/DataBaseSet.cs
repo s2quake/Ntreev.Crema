@@ -37,7 +37,7 @@ namespace Ntreev.Crema.Services.Data
         private readonly List<CremaDataType> types = new List<CremaDataType>();
         private readonly List<CremaDataTable> tables = new List<CremaDataTable>();
 
-        public DataBaseSet(DataBase dataBase, CremaDataSet dataSet)
+        public DataBaseSet(DataBase dataBase, CremaDataSet dataSet, bool allowCreation)
         {
             this.dataBase = dataBase ?? throw new ArgumentNullException(nameof(dataBase));
             this.dataSet = dataSet ?? throw new ArgumentNullException(nameof(dataSet));
@@ -45,23 +45,32 @@ namespace Ntreev.Crema.Services.Data
 
             foreach (var item in dataSet.Types)
             {
-                this.types.Add(item);
                 var type = dataBase.TypeContext.Types[item.Name, item.CategoryPath];
+                if (type == null && allowCreation == false)
+                {
+                    throw new TypeNotFoundException(item.Name);
+                }
                 if (type != null)
                 {
                     item.ExtendedProperties[typeof(TypeInfo)] = type.TypeInfo;
                 }
+                this.types.Add(item);
             }
 
             foreach (var item in dataSet.Tables)
             {
-                this.tables.Add(item);
+
                 var table = dataBase.TableContext.Tables[item.Name, item.CategoryPath];
+                if (table == null && allowCreation == false)
+                {
+                    throw new TypeNotFoundException(item.Name);
+                }
                 if (table != null)
                 {
                     item.ExtendedProperties[typeof(TableInfo)] = table.TableInfo;
                     item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] = table.TemplatedParent?.TableInfo;
                 }
+                this.tables.Add(item);
             }
         }
 
@@ -160,7 +169,7 @@ namespace Ntreev.Crema.Services.Data
             this.Serialize();
             this.AddTablesRepositoryPath();
 
-            
+
             var status = this.Repository.Status();
 
             var typesDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);
@@ -223,7 +232,7 @@ namespace Ntreev.Crema.Services.Data
 
         public static void Modify(CremaDataSet dataSet, DataBase dataBase)
         {
-            var dataBaseSet = new DataBaseSet(dataBase, dataSet);
+            var dataBaseSet = new DataBaseSet(dataBase, dataSet, false);
             dataBaseSet.Serialize();
         }
 
@@ -315,7 +324,7 @@ namespace Ntreev.Crema.Services.Data
                     }
 
                     var parentItemPath = string.Empty;
-                    if(item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] is TableInfo parentInfo)
+                    if (item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] is TableInfo parentInfo)
                     {
                         parentItemPath = this.TableContext.GeneratePath(parentInfo.Path);
                     }
@@ -332,7 +341,7 @@ namespace Ntreev.Crema.Services.Data
                     //{
 
                     //}
-                    
+
 
 
                     var props = new CremaDataTableSerializerSettings(itemPath2, parentItemPath);

@@ -401,12 +401,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public void Dispose(DomainContext domainContext)
         {
-            this.Dispatcher.VerifyAccess();
-            this.Dispatcher.Dispose();
-            this.Dispatcher = null;
-            this.Logger?.Dispose(false);
-            this.Logger = null;
-            this.Dispose();
+            base.Dispose();
         }
 
         public void Dispose(Authentication authentication, bool isCanceled)
@@ -1024,19 +1019,17 @@ namespace Ntreev.Crema.Services.Domains
 
         private void Authentication_Expired(object sender, EventArgs e)
         {
-            var authentication = sender as Authentication;
-
-            if (this.Dispatcher == null)
-                return;
-
-            this.Dispatcher.Invoke(() =>
+            if (sender is Authentication authentication)
             {
-                var domainUser = this.GetDomainUser(authentication);
-                domainUser.Authentication = null;
-                domainUser.IsOnline = false;
-                authentication.Sign();
-                this.OnUserChanged(new DomainUserEventArgs(authentication, this, domainUser));
-            });
+                this.Dispatcher?.InvokeAsync(() =>
+                {
+                    var domainUser = this.GetDomainUser(authentication);
+                    domainUser.Authentication = null;
+                    domainUser.IsOnline = false;
+                    authentication.Sign();
+                    this.OnUserChanged(new DomainUserEventArgs(authentication, this, domainUser));
+                });
+            }
         }
 
         private void InitializeUsers(DomainUserInfo[] users)

@@ -211,11 +211,11 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
                     base.ValidateRename(authentication, name);
-                    var items = this.Parent == null ? EnumerableUtility.Friends(this, this.Childs).ToArray() : EnumerableUtility.Friends(this, this.DerivedTables).ToArray();
+                    var items = EnumerableUtility.FamilyTree(this, item => item.Childs).ToArray();
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
-                    var dataSet = await this.ReadAllAsync(authentication);
-                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var dataSet = await this.ReadDataForPathAsync(authentication);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, false);
                     var result = await this.Container.InvokeTableRenameAsync(authentication, base.TableInfo, name, dataBaseSet);
                     this.CremaHost.Sign(authentication, result);
                     base.Rename(authentication, name);
@@ -238,11 +238,11 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, categoryPath);
                     base.ValidateMove(authentication, categoryPath);
-                    var items = EnumerableUtility.Friends(this, this.Childs).ToArray();
+                    var items = EnumerableUtility.FamilyTree(this, item => item.Childs).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
-                    var dataSet = await this.ReadAllAsync(authentication);
-                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var dataSet = await this.ReadDataForPathAsync(authentication);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, false);
                     var result = await this.Container.InvokeTableMoveAsync(authentication, base.TableInfo, categoryPath, dataBaseSet);
                     this.CremaHost.Sign(authentication, result);
                     base.Move(authentication, categoryPath);
@@ -266,11 +266,11 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     base.ValidateDelete(authentication);
                     this.CremaHost.Sign(authentication);
-                    var items = this.Parent == null ? EnumerableUtility.Friends(this, this.Childs).ToArray() : EnumerableUtility.Friends(this, this.DerivedTables).ToArray();
+                    var items = EnumerableUtility.FamilyTree(this, item => item.Childs).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var container = this.Container;
-                    var dataSet = await this.ReadAllAsync(authentication);
-                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet);
+                    var dataSet = await this.ReadDataForPathAsync(authentication);
+                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, false);
                     var result = await container.InvokeTableDeleteAsync(authentication, base.TableInfo, dataBaseSet);
                     this.CremaHost.Sign(authentication, result);
                     base.Delete(authentication);
@@ -441,7 +441,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task<CremaDataSet> ReadEditableDataAsync(Authentication authentication)
+        public Task<CremaDataSet> ReadDataForContentAsync(Authentication authentication)
         {
             var tables = this.GetRelations().Distinct().OrderBy(item => item.Name).ToArray();
             var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
@@ -461,12 +461,20 @@ namespace Ntreev.Crema.Services.Data
             return this.Repository.Dispatcher.InvokeAsync(() => this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), props) as CremaDataSet);
         }
 
-        public Task<CremaDataSet> ReadAllAsync(Authentication authentication)
+        public async Task<CremaDataSet> ReadDataForPathAsync(Authentication authentication)
         {
-            return this.ReadAllAsync(authentication, false);
+            var typeCollection = this.GetService(typeof(TypeCollection)) as TypeCollection;
+            var tables = this.Collect().OrderBy(item => item.Name).ToArray();
+            var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
+            var typePaths = types.Select(item => item.ItemPath).ToArray();
+            var tablePaths = tables.Select(item => item.ItemPath).ToArray();
+            var props = new CremaDataSetSerializerSettings(authentication, typePaths, tablePaths);
+            var itemPath = this.ItemPath;
+            var dataSet = await this.Repository.Dispatcher.InvokeAsync(() => this.Serializer.Deserialize(itemPath, typeof(CremaDataSet), props) as CremaDataSet);
+            return dataSet;
         }
 
-        public Task<CremaDataSet> ReadAllAsync(Authentication authentication, bool allTypes)
+        public Task<CremaDataSet> ReadDataForTemplateAsync(Authentication authentication, bool allTypes)
         {
             var typeCollection = this.GetService(typeof(TypeCollection)) as TypeCollection;
             var tables = this.Collect().OrderBy(item => item.Name).ToArray();

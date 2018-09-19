@@ -43,8 +43,8 @@ namespace Ntreev.Crema.Bot.Tasks
             }
             else if (RandomUtility.Within(75) == true)
             {
-                var content = await table.Dispatcher.InvokeAsync(() => table.Content);
-                context.Push(content, RandomUtility.Next(100));
+                //var content = await table.Dispatcher.InvokeAsync(() => table.Content);
+                //context.Push(content, RandomUtility.Next(100));
             }
             else if (RandomUtility.Within(75) == true)
             {
@@ -63,7 +63,7 @@ namespace Ntreev.Crema.Bot.Tasks
             get { return false; }
         }
 
-        [TaskMethod]
+        //[TaskMethod]
         public void GetAccessType(ITable table, TaskContext context)
         {
             table.Dispatcher.Invoke(() =>
@@ -88,7 +88,7 @@ namespace Ntreev.Crema.Bot.Tasks
             await table.LockAsync(context.Authentication, comment);
         }
 
-        [TaskMethod]
+        //[TaskMethod]
         public async Task UnlockAsync(ITable table, TaskContext context)
         {
             if (context.AllowException == false)
@@ -100,7 +100,7 @@ namespace Ntreev.Crema.Bot.Tasks
             await table.UnlockAsync(context.Authentication);
         }
 
-        [TaskMethod]
+        //[TaskMethod]
         public async Task SetPublicAsync(ITable table, TaskContext context)
         {
             if (context.AllowException == false)
@@ -123,7 +123,7 @@ namespace Ntreev.Crema.Bot.Tasks
             await table.SetPrivateAsync(context.Authentication);
         }
 
-        [TaskMethod(Weight = 10)]
+        //[TaskMethod(Weight = 10)]
         public async Task AddAccessMemberAsync(ITable table, TaskContext context)
         {
             if (context.AllowException == false)
@@ -137,7 +137,7 @@ namespace Ntreev.Crema.Bot.Tasks
             await table.AddAccessMemberAsync(context.Authentication, memberID, accessType);
         }
 
-        [TaskMethod]
+        //[TaskMethod]
         public async Task RemoveAccessMemberAsync(ITable table, TaskContext context)
         {
             if (context.AllowException == false)
@@ -176,13 +176,13 @@ namespace Ntreev.Crema.Bot.Tasks
             await table.MoveAsync(context.Authentication, categoryPath);
         }
 
-        [TaskMethod(Weight = 1)]
+        //[TaskMethod(Weight = 1)]
         public async Task DeleteAsync(ITable table, TaskContext context)
         {
             await Task.Delay(0);
         }
 
-        [TaskMethod]
+        //[TaskMethod]
         public async Task SetTagsAsync(ITable table, TaskContext context)
         {
             var tags = (TagInfo)TagInfoUtility.Names.Random();
@@ -235,19 +235,19 @@ namespace Ntreev.Crema.Bot.Tasks
             context.Push(template);
         }
 
-        [TaskMethod]
+        //[TaskMethod]
         public async Task GetDataSetAsync(ITable table, TaskContext context)
         {
             await table.GetDataSetAsync(context.Authentication, null);
         }
 
-        [TaskMethod]
+        //[TaskMethod]
         public async Task GetLogAsync(ITable table, TaskContext context)
         {
             await table.GetLogAsync(context.Authentication, null);
         }
 
-        [TaskMethod]
+        //[TaskMethod]
         public async Task FindAsync(ITable table, TaskContext context)
         {
             var text = RandomUtility.NextWord();

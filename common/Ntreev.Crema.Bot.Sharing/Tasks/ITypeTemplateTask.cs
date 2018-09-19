@@ -114,11 +114,6 @@ namespace Ntreev.Crema.Bot.Tasks
             get { return typeof(ITypeTemplate); }
         }
 
-        public bool IsEnabled
-        {
-            get { return false; }
-        }
-
         [TaskMethod(Weight = 10)]
         public async Task SetTypeNameAsync(ITypeTemplate template, TaskContext context)
         {
