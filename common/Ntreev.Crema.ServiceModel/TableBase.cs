@@ -191,7 +191,7 @@ namespace Ntreev.Crema.ServiceModel
         public override void OnValidateMove(IAuthentication authentication, object target, string oldPath, string newPath)
         {
             if (target == this && this.Parent != null)
-                throw new NotImplementedException();
+                throw new InvalidOperationException("자식 테이블은 이동할 수 없습니다.");
             base.OnValidateMove(authentication, target, oldPath, newPath);
 
             foreach (var item in this.Childs)

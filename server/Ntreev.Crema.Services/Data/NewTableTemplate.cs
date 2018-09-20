@@ -33,6 +33,7 @@ namespace Ntreev.Crema.Services.Data
         private Table[] tables;
         private IPermission permission;
         private string[] tableNames;
+        private string[] itemPaths;
 
         public NewTableTemplate(TableCategory category)
         {
@@ -46,6 +47,7 @@ namespace Ntreev.Crema.Services.Data
             this.Permission = category;
             this.IsNew = true;
             this.Container = category.GetService(typeof(TableCollection)) as TableCollection;
+            this.Repository = category.Repository;
             category.Attach(this);
         }
 
@@ -61,6 +63,7 @@ namespace Ntreev.Crema.Services.Data
             this.Permission = parent;
             this.IsNew = true;
             this.Container = parent.GetService(typeof(TableCollection)) as TableCollection;
+            this.Repository = parent.Repository;
             parent.Attach(this);
         }
 
@@ -134,7 +137,7 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            var dataSet = this.TemplateSource.TargetTable.DataSet.Copy();
+            var dataSet = this.TemplateSource.TargetTable.DataSet;
             var tableNames = dataSet.Tables.Select(item => item.Name).ToArray();
             var query = from item in tableNames.Except(this.tableNames)
                         let dataTable = dataSet.Tables[item]
@@ -152,6 +155,10 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
             await base.OnCancelEditAsync(authentication);
+            await this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                this.Repository.Unlock(this.itemPaths);
+            });
             this.parent = null;
             this.permission = null;
         }
@@ -161,10 +168,11 @@ namespace Ntreev.Crema.Services.Data
             if (this.parent is TableCategory category)
             {
                 var typeContext = category.GetService(typeof(TypeContext)) as TypeContext;
-                var dataSet = await typeContext.Root.ReadDataAsync(authentication, true);
+                var dataSet = await category.ReadDataForNewTemplateAsync(authentication);
                 var newName = NameUtility.GenerateNewName(nameof(Table), category.Context.Tables.Select((Table item) => item.Name));
                 var templateSource = CremaTemplate.Create(dataSet, newName, category.Path);
                 this.tableNames = new string[] { };
+                this.itemPaths = dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] as string[] ?? new string[] { };
                 return templateSource;
             }
             else if (this.parent is Table table)
@@ -172,11 +180,14 @@ namespace Ntreev.Crema.Services.Data
                 var dataSet = await table.ReadDataForTemplateAsync(authentication, true);
                 var dataTable = dataSet.Tables[table.Name, table.Category.Path];
                 this.tableNames = dataSet.Tables.Select(item => item.Name).ToArray();
+                this.itemPaths = dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] as string[] ?? new string[] { };
                 return CremaTemplate.Create(dataTable);
             }
             throw new NotImplementedException();
         }
 
         private TableCollection Container { get; }
+
+        private DataBaseRepositoryHost Repository { get; }
     }
 }

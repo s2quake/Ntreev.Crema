@@ -36,6 +36,7 @@ namespace Ntreev.Crema.Services.Data
         private Version version;
         private readonly HashSet<string> types = new HashSet<string>();
         private readonly HashSet<string> tables = new HashSet<string>();
+        private readonly HashSet<string> itemPaths = new HashSet<string>();
 
         public DataBaseRepositoryHost(DataBase dataBase, IRepository repository)
             : base(repository, null)
@@ -43,6 +44,42 @@ namespace Ntreev.Crema.Services.Data
             this.dataBase = dataBase;
             this.settings = this.dataBase.GetService(typeof(CremaSettings)) as CremaSettings;
             this.RefreshItems();
+        }
+
+        public void Lock(params string[] itemPaths)
+        {
+            this.Dispatcher.VerifyAccess();
+            if(itemPaths.Distinct().Count()  != itemPaths.Length)
+            {
+                int wer = 0;
+            }
+            foreach (var item in itemPaths)
+            {
+                if (this.itemPaths.Contains(item) == true)
+                    throw new ItemAlreadyExistsException(item);
+            }
+            foreach (var item in itemPaths)
+            {
+                this.itemPaths.Add(item);
+            }
+        }
+
+        public void Unlock(params string[] itemPaths)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (itemPaths.Distinct().Count() != itemPaths.Length)
+            {
+                int wer = 0;
+            }
+            foreach (var item in itemPaths)
+            {
+                if (this.itemPaths.Contains(item) == false)
+                    throw new ItemNotFoundException(item);
+            }
+            foreach (var item in itemPaths)
+            {
+                this.itemPaths.Remove(item);
+            }
         }
 
         public void RefreshItems()
@@ -263,6 +300,17 @@ namespace Ntreev.Crema.Services.Data
         public void MoveTypeCategory(DataBaseSet dataBaseSet, string categoryPath, string newCategoryPath)
         {
             dataBaseSet.SetTypeCategoryPath(categoryPath, newCategoryPath);
+        }
+
+        public void CreateTableCategory(string itemPath)
+        {
+            var directoryName = PathUtility.GetDirectoryName(itemPath);
+            if (Directory.Exists(directoryName) == false)
+                throw new DirectoryNotFoundException();
+            if (Directory.Exists(itemPath) == true)
+                throw new IOException();
+            Directory.CreateDirectory(itemPath);
+            this.Add(itemPath);
         }
 
         public void RenameTableCategory(DataBaseSet dataBaseSet, string categoryPath, string newCategoryPath)

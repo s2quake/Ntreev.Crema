@@ -48,8 +48,8 @@ namespace Ntreev.Crema.Bot.Tasks
                 {
                     if (RandomUtility.Within(35) == true)
                     {
-                        //var typeItem = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TypeContext.Random());
-                        //context.Push(typeItem);
+                        var typeItem = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TypeContext.Random());
+                        context.Push(typeItem);
                     }
                     else
                     {

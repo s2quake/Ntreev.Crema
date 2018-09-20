@@ -253,7 +253,7 @@ namespace Ntreev.Crema.Services.Data
 
         public abstract DomainContext DomainContext { get; }
 
-        public abstract string ItemPath { get; }
+        public abstract string Path { get; }
 
         public abstract CremaHost CremaHost { get; }
 
@@ -356,7 +356,7 @@ namespace Ntreev.Crema.Services.Data
         protected virtual async Task OnBeginEditAsync(Authentication authentication)
         {
             this.TypeSource = await this.CreateSourceAsync(authentication);
-            this.domain = new TypeDomain(authentication, this.TypeSource, this.DataBase, this.ItemPath, this.GetType().Name)
+            this.domain = new TypeDomain(authentication, this.TypeSource, this.DataBase, this.Path, this.GetType().Name)
             {
                 IsNew = this.IsNew,
                 Host = this

@@ -512,22 +512,6 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        //public void ValidateBeginInDataBase(Authentication authentication)
-        //{
-        //    this.ValidateDispatcher();
-        //    authentication.Verify();
-        //    if (authentication != Authentication.System && this.authentications.Contains(authentication) == false)
-        //        throw new InvalidOperationException(Resources.Exception_NotInDataBase);
-        //}
-
-        //public void ValidateAsyncBeginInDataBase(Authentication authentication)
-        //{
-        //    if (this.Dispatcher == null)
-        //        throw new InvalidOperationException(Resources.Exception_InvalidObject);
-        //    if (authentication != Authentication.System && this.authentications.Contains(authentication) == false)
-        //        throw new InvalidOperationException(Resources.Exception_NotInDataBase);
-        //}
-
         public void ValidateGetDataSet(Authentication authentication)
         {
             if (this.IsLoaded == false)

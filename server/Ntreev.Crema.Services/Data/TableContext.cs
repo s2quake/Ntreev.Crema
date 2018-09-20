@@ -66,11 +66,11 @@ namespace Ntreev.Crema.Services.Data
         public Task<SignatureDate> InvokeTableItemSetPublicAsync(Authentication authentication, string tableItemPath)
         {
             var message = EventMessageBuilder.SetPublicTableItem(authentication, tableItemPath);
-            var itemPath = this.GeneratePath(tableItemPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
+                    var itemPath = this.GeneratePath(tableItemPath);
                     var signatureDate = authentication.Sign();
                     var itemPaths = this.Serializer.GetPath(itemPath, typeof(AccessSerializationInfo), AccessSerializationInfo.Settings);
                     this.Repository.DeleteRange(itemPaths);
@@ -88,12 +88,12 @@ namespace Ntreev.Crema.Services.Data
         public Task<AccessInfo> InvokeTableItemSetPrivateAsync(Authentication authentication, string tableItemPath)
         {
             var message = EventMessageBuilder.SetPrivateTableItem(authentication, tableItemPath);
-            var itemPath = this.GeneratePath(tableItemPath);
-            var accessInfo = AccessInfo.Empty;
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
+                    var accessInfo = AccessInfo.Empty;
+                    var itemPath = this.GeneratePath(tableItemPath);
                     var signatureDate = authentication.Sign();
                     accessInfo.SetPrivate(typeof(ITableItem).Name, signatureDate);
                     var itemPaths = this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
@@ -109,14 +109,14 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public Task<AccessInfo> InvokeTableItemAddAccessMemberAsync(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID, AccessType accessType)
+        public Task<AccessInfo> InvokeTableItemAddAccessMemberAsync(Authentication authentication, string tableItemPath, AccessInfo accessInfo, string memberID, AccessType accessType)
         {
-            var message = EventMessageBuilder.AddAccessMemberToTableItem(authentication, tableItem.Path, memberID, accessType);
-            var itemPath = this.GeneratePath(tableItem.Path);
+            var message = EventMessageBuilder.AddAccessMemberToTableItem(authentication, tableItemPath, memberID, accessType);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
+                    var itemPath = this.GeneratePath(tableItemPath);
                     var signatureDate = authentication.Sign();
                     accessInfo.Add(signatureDate, memberID, accessType);
                     this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
@@ -131,14 +131,14 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public Task<AccessInfo> InvokeTableItemSetAccessMemberAsync(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID, AccessType accessType)
+        public Task<AccessInfo> InvokeTableItemSetAccessMemberAsync(Authentication authentication, string tableItemPath, AccessInfo accessInfo, string memberID, AccessType accessType)
         {
-            var message = EventMessageBuilder.SetAccessMemberOfTableItem(authentication, tableItem.Path, memberID, accessType);
-            var itemPath = this.GeneratePath(tableItem.Path);
+            var message = EventMessageBuilder.SetAccessMemberOfTableItem(authentication, tableItemPath, memberID, accessType);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
+                    var itemPath = this.GeneratePath(tableItemPath);
                     var signatureDate = authentication.Sign();
                     accessInfo.Set(signatureDate, memberID, accessType);
                     this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
@@ -153,14 +153,14 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public Task<AccessInfo> InvokeTableItemRemoveAccessMemberAsync(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID)
+        public Task<AccessInfo> InvokeTableItemRemoveAccessMemberAsync(Authentication authentication, string tableItemPath, AccessInfo accessInfo, string memberID)
         {
-            var message = EventMessageBuilder.RemoveAccessMemberFromTableItem(authentication, tableItem.Path, memberID);
-            var itemPath = this.GeneratePath(tableItem.Path);
+            var message = EventMessageBuilder.RemoveAccessMemberFromTableItem(authentication, tableItemPath, memberID);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
+                    var itemPath = this.GeneratePath(tableItemPath);
                     var signatureDate = authentication.Sign();
                     accessInfo.Remove(signatureDate, memberID);
                     this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);

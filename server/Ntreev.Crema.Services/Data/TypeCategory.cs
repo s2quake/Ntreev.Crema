@@ -55,7 +55,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
                     base.ValidateSetPublic(authentication);
-                    var signatureDate = await this.Context.InvokeTypeItemSetPublicAsync(authentication, this);
+                    var signatureDate = await this.Context.InvokeTypeItemSetPublicAsync(authentication, this.Path);
                     this.CremaHost.Sign(authentication, signatureDate);
                     base.SetPublic(authentication);
                     this.Context.InvokeItemsSetPublicEvent(authentication, new ITypeItem[] { this });
@@ -76,7 +76,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
                     base.ValidateSetPrivate(authentication);
-                    var accessInfo = await this.Context.InvokeTypeItemSetPrivateAsync(authentication, this, AccessInfo.Empty);
+                    var accessInfo = await this.Context.InvokeTypeItemSetPrivateAsync(authentication, this.Path);
                     this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
                     base.SetPrivate(authentication);
                     this.Context.InvokeItemsSetPrivateEvent(authentication, new ITypeItem[] { this });
@@ -97,7 +97,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMemberAsync), this, memberID, accessType);
                     base.ValidateAddAccessMember(authentication, memberID, accessType);
-                    var accessInfo = await this.Context.InvokeTypeItemAddAccessMemberAsync(authentication, this, this.AccessInfo, memberID, accessType);
+                    var accessInfo = await this.Context.InvokeTypeItemAddAccessMemberAsync(authentication, this.Path, this.AccessInfo, memberID, accessType);
                     this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
                     base.AddAccessMember(authentication, memberID, accessType);
                     this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
@@ -118,7 +118,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
                     base.ValidateSetAccessMember(authentication, memberID, accessType);
-                    var accessInfo = await this.Context.InvokeTypeItemSetAccessMemberAsync(authentication, this, this.AccessInfo, memberID, accessType);
+                    var accessInfo = await this.Context.InvokeTypeItemSetAccessMemberAsync(authentication, this.Path, this.AccessInfo, memberID, accessType);
                     this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
                     base.SetAccessMember(authentication, memberID, accessType);
                     this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
@@ -139,7 +139,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
                     base.ValidateRemoveAccessMember(authentication, memberID);
-                    var accessInfo = await this.Context.InvokeTypeItemRemoveAccessMemberAsync(authentication, this, this.AccessInfo, memberID);
+                    var accessInfo = await this.Context.InvokeTypeItemRemoveAccessMemberAsync(authentication, this.Path, this.AccessInfo, memberID);
                     this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
                     base.RemoveAccessMember(authentication, memberID);
                     this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID });
@@ -207,7 +207,7 @@ namespace Ntreev.Crema.Services.Data
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
-                    var dataSet = await this.ReadAllDataAsync(authentication, true);
+                    var dataSet = await this.ReadDataForPathAsync(authentication);
                     var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, false);
                     var signatureDate = await this.Container.InvokeCategoryRenameAsync(authentication, this.Path, name, dataBaseSet);
                     this.CremaHost.Sign(authentication, signatureDate);
@@ -234,7 +234,7 @@ namespace Ntreev.Crema.Services.Data
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
-                    var dataSet = await this.ReadAllDataAsync(authentication, true);
+                    var dataSet = await this.ReadDataForPathAsync(authentication);
                     var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, false);
                     var signatureDate = await this.Container.InvokeCategoryMoveAsync(authentication, this.Path, parentPath, dataBaseSet);
                     this.CremaHost.Sign(authentication, signatureDate);
@@ -262,7 +262,7 @@ namespace Ntreev.Crema.Services.Data
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var container = this.Container;
-                    var dataSet = await this.ReadAllDataAsync(authentication, true);
+                    var dataSet = await this.ReadDataForPathAsync(authentication);
                     var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, false);
                     var signatureDate = await container.InvokeCategoryDeleteAsync(authentication, this.Path, dataBaseSet);
                     this.CremaHost.Sign(authentication, signatureDate);
@@ -368,62 +368,22 @@ namespace Ntreev.Crema.Services.Data
         /// <summary>
         /// 폴더내에 모든 타입과 타입이 사용하고 있는 테이블, 상속된 테이블을 읽어들입니다.
         /// </summary>
-        public Task<CremaDataSet> ReadAllDataAsync(Authentication authentication, bool recursive)
+        public Task<CremaDataSet> ReadDataForPathAsync(Authentication authentication)
         {
-            var types = CollectTypes();
-            var tables = CollectTables();
-            var typePaths = types.Select(item => item.ItemPath).ToArray();
-            var tablePaths = tables.Select(item => item.ItemPath)
-                                   .Distinct()
-                                   .ToArray();
-
-            var props = new CremaDataSetSerializerSettings(authentication, typePaths, tablePaths);
-            return this.Repository.Dispatcher.InvokeAsync(() => this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), props) as CremaDataSet);
-
-            Type[] CollectTypes()
+            var items = EnumerableUtility.FamilyTree(this as ITypeItem, item => item.Childs);
+            var types = items.Where(item => item is Type).Select(item => item as Type).ToArray();
+            var tables = types.SelectMany(item => item.GetTables()).Distinct().ToArray();
+            var typeItemPaths = types.Select(item => item.ItemPath).ToArray();
+            var tableItemPaths = tables.Select(item => item.ItemPath).ToArray();
+            var itemPaths = typeItemPaths.Concat(tableItemPaths).ToArray();
+            var props = new CremaDataSetSerializerSettings(authentication, typeItemPaths, tableItemPaths);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                if (recursive == true)
-                {
-                    return EnumerableUtility.Descendants<IItem, Type>(this as IItem, item => item.Childs).ToArray();
-                }
-                return this.Types.ToArray();
-            }
-
-            Table[] CollectTables()
-            {
-                var tableContext = this.GetService(typeof(TableContext)) as TableContext;
-                var query = from table in EnumerableUtility.Descendants<IItem, Table>(tableContext.Root as IItem, item => item.Childs)
-                            from type in types
-                            where table.IsTypeUsed(type.Path)
-                            select table;
-
-                return query.ToArray();
-            }
-        }
-
-        /// <summary>
-        /// 폴더내의 타입들을 읽어들입니다.
-        /// </summary>
-        public Task<CremaDataSet> ReadDataAsync(Authentication authentication)
-        {
-            return this.ReadDataAsync(authentication, false);
-        }
-
-        public Task<CremaDataSet> ReadDataAsync(Authentication authentication, bool recursive)
-        {
-            var types = CollectTypes();
-            var typePaths = types.Select(item => item.ItemPath).ToArray();
-            var info = new CremaDataSetSerializerSettings(authentication, typePaths, null);
-            return this.Repository.Dispatcher.InvokeAsync(() => this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), info) as CremaDataSet);
-
-            Type[] CollectTypes()
-            {
-                if (recursive == true)
-                {
-                    return EnumerableUtility.Descendants<IItem, Type>(this as IItem, item => item.Childs).ToArray();
-                }
-                return this.Types.ToArray();
-            }
+                this.Repository.Lock(itemPaths);
+                var dataSet = this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), props) as CremaDataSet;
+                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = itemPaths;
+                return dataSet;
+            });
         }
 
         public object GetService(System.Type serviceType)

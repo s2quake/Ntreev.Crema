@@ -36,12 +36,14 @@ namespace Ntreev.Crema.Services.Data
         private readonly CremaDataSet dataSet;
         private readonly List<CremaDataType> types = new List<CremaDataType>();
         private readonly List<CremaDataTable> tables = new List<CremaDataTable>();
+        private readonly List<string> itemPathList;
 
         public DataBaseSet(DataBase dataBase, CremaDataSet dataSet, bool allowCreation)
         {
             this.dataBase = dataBase ?? throw new ArgumentNullException(nameof(dataBase));
             this.dataSet = dataSet ?? throw new ArgumentNullException(nameof(dataSet));
             this.dataBase.Dispatcher.VerifyAccess();
+            this.itemPathList = new List<string>(dataSet.Types.Count + dataSet.Tables.Count);
 
             foreach (var item in dataSet.Types)
             {
@@ -55,11 +57,11 @@ namespace Ntreev.Crema.Services.Data
                     item.ExtendedProperties[typeof(TypeInfo)] = type.TypeInfo;
                 }
                 this.types.Add(item);
+                this.itemPathList.Add(this.dataBase.TypeContext.GeneratePath(item.Path));
             }
 
             foreach (var item in dataSet.Tables)
             {
-
                 var table = dataBase.TableContext.Tables[item.Name, item.CategoryPath];
                 if (table == null && allowCreation == false)
                 {
@@ -71,6 +73,7 @@ namespace Ntreev.Crema.Services.Data
                     item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] = table.TemplatedParent?.TableInfo;
                 }
                 this.tables.Add(item);
+                this.itemPathList.Add(this.dataBase.TableContext.GeneratePath(item.Path));
             }
         }
 
@@ -264,6 +267,10 @@ namespace Ntreev.Crema.Services.Data
                 return DataBaseItemState.Create;
             }
         }
+
+        public CremaDataSet DataSet => this.dataSet;
+
+        public string[] ItemPaths => this.dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] as string[] ?? new string[] { };
 
         private void Serialize()
         {

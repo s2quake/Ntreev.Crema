@@ -102,7 +102,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMemberAsync), this, memberID, accessType);
                     base.ValidateAddAccessMember(authentication, memberID, accessType);
-                    var result = await this.Context.InvokeTableItemAddAccessMemberAsync(authentication, this, this.AccessInfo, memberID, accessType);
+                    var result = await this.Context.InvokeTableItemAddAccessMemberAsync(authentication, this.Path, this.AccessInfo, memberID, accessType);
                     this.CremaHost.Sign(authentication, result.SignatureDate);
                     base.AddAccessMember(authentication, memberID, accessType);
                     this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
@@ -124,7 +124,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
                     base.ValidateSetAccessMember(authentication, memberID, accessType);
-                    var result = await this.Context.InvokeTableItemSetAccessMemberAsync(authentication, this, this.AccessInfo, memberID, accessType);
+                    var result = await this.Context.InvokeTableItemSetAccessMemberAsync(authentication, this.Path, this.AccessInfo, memberID, accessType);
                     this.CremaHost.Sign(authentication, result.SignatureDate);
                     base.SetAccessMember(authentication, memberID, accessType);
                     this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
@@ -146,7 +146,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
                     base.ValidateRemoveAccessMember(authentication, memberID);
-                    var result = await this.Context.InvokeTableItemRemoveAccessMemberAsync(authentication, this, this.AccessInfo, memberID);
+                    var result = await this.Context.InvokeTableItemRemoveAccessMemberAsync(authentication, this.Path, this.AccessInfo, memberID);
                     this.CremaHost.Sign(authentication, result.SignatureDate);
                     base.RemoveAccessMember(authentication, memberID);
                     this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID });
@@ -447,31 +447,51 @@ namespace Ntreev.Crema.Services.Data
             var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
             var typePaths = types.Select(item => item.ItemPath).ToArray();
             var tablePaths = tables.Select(item => item.ItemPath).ToArray();
+            var itemPaths = typePaths.Concat(tablePaths).ToArray();
             var props = new CremaDataSetSerializerSettings(authentication, typePaths, tablePaths);
-            return this.Repository.Dispatcher.InvokeAsync(() => this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), props) as CremaDataSet);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                this.Repository.Lock(itemPaths);
+                var dataSet = this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), props) as CremaDataSet;
+                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = itemPaths;
+                return dataSet;
+            });
         }
 
-        public Task<CremaDataSet> ReadDataAsync(Authentication authentication)
+        public Task<CremaDataSet> ReadDataForCopyAsync(Authentication authentication)
         {
             var tables = this.CollectChilds().OrderBy(item => item.Name).ToArray();
             var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
-            var typePaths = types.Select(item => item.ItemPath).ToArray();
-            var tablePaths = tables.Select(item => item.ItemPath).ToArray();
-            var props = new CremaDataSetSerializerSettings(authentication, typePaths, tablePaths);
-            return this.Repository.Dispatcher.InvokeAsync(() => this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), props) as CremaDataSet);
+            var typeItemPaths = types.Select(item => item.ItemPath).ToArray();
+            var tableItemPaths = tables.Select(item => item.ItemPath).ToArray();
+            var itemPaths = typeItemPaths.Concat(tableItemPaths).ToArray();
+            var props = new CremaDataSetSerializerSettings(authentication, typeItemPaths, tableItemPaths);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                this.Repository.Lock(itemPaths);
+                var dataSet = this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), props) as CremaDataSet;
+                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = itemPaths;
+                return dataSet;
+            });
         }
 
-        public async Task<CremaDataSet> ReadDataForPathAsync(Authentication authentication)
+        public Task<CremaDataSet> ReadDataForPathAsync(Authentication authentication)
         {
             var typeCollection = this.GetService(typeof(TypeCollection)) as TypeCollection;
             var tables = this.Collect().OrderBy(item => item.Name).ToArray();
             var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
-            var typePaths = types.Select(item => item.ItemPath).ToArray();
-            var tablePaths = tables.Select(item => item.ItemPath).ToArray();
-            var props = new CremaDataSetSerializerSettings(authentication, typePaths, tablePaths);
+            var typeItemPaths = types.Select(item => item.ItemPath).ToArray();
+            var tableItemPaths = tables.Select(item => item.ItemPath).ToArray();
+            var itemPaths = typeItemPaths.Concat(tableItemPaths).ToArray();
+            var props = new CremaDataSetSerializerSettings(authentication, typeItemPaths, tableItemPaths);
             var itemPath = this.ItemPath;
-            var dataSet = await this.Repository.Dispatcher.InvokeAsync(() => this.Serializer.Deserialize(itemPath, typeof(CremaDataSet), props) as CremaDataSet);
-            return dataSet;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                this.Repository.Lock(itemPaths);
+                var dataSet = this.Serializer.Deserialize(itemPath, typeof(CremaDataSet), props) as CremaDataSet;
+                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = itemPaths;
+                return dataSet;
+            });
         }
 
         public Task<CremaDataSet> ReadDataForTemplateAsync(Authentication authentication, bool allTypes)
@@ -479,10 +499,17 @@ namespace Ntreev.Crema.Services.Data
             var typeCollection = this.GetService(typeof(TypeCollection)) as TypeCollection;
             var tables = this.Collect().OrderBy(item => item.Name).ToArray();
             var types = allTypes == true ? typeCollection.ToArray<Type>() : tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
-            var typePaths = types.Select(item => item.ItemPath).ToArray();
-            var tablePaths = tables.Select(item => item.ItemPath).ToArray();
-            var props = new CremaDataSetSerializerSettings(authentication, typePaths, tablePaths);
-            return this.Repository.Dispatcher.InvokeAsync(() => this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), props) as CremaDataSet);
+            var typeItemPaths = types.Select(item => item.ItemPath).ToArray();
+            var tableItemPaths = tables.Select(item => item.ItemPath).ToArray();
+            var itemPaths = typeItemPaths.Concat(tableItemPaths).ToArray();
+            var props = new CremaDataSetSerializerSettings(authentication, typeItemPaths, tableItemPaths);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                this.Repository.Lock(itemPaths);
+                var dataSet = this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), props) as CremaDataSet;
+                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = itemPaths;
+                return dataSet;
+            });
         }
 
         private IEnumerable<Table> Collect()

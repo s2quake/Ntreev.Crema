@@ -35,8 +35,8 @@ namespace Ntreev.Crema.Services.Domains
     {
         public const string TypeName = nameof(TableTemplate);
 
-        private CremaTemplate template;
-        private DataView view;
+        private readonly CremaTemplate template;
+        private readonly DataView view;
 
         public TableTemplateDomain(DomainSerializationInfo serializationInfo, object source)
             : base(serializationInfo, source)

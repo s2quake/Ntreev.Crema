@@ -43,8 +43,8 @@ namespace Ntreev.Crema.Bot.Tasks
             }
             else if (RandomUtility.Within(75) == true)
             {
-                //var content = await table.Dispatcher.InvokeAsync(() => table.Content);
-                //context.Push(content, RandomUtility.Next(100));
+                var content = await table.Dispatcher.InvokeAsync(() => table.Content);
+                context.Push(content, RandomUtility.Next(100));
             }
             else if (RandomUtility.Within(75) == true)
             {
@@ -155,6 +155,8 @@ namespace Ntreev.Crema.Bot.Tasks
         {
             if (context.AllowException == false)
             {
+                if (await table.Dispatcher.InvokeAsync(() => table.Parent != null && table.TemplatedParent != null) == true)
+                    return;
                 var tableState = await table.Dispatcher.InvokeAsync(() => table.TableState);
                 if (tableState != TableState.None)
                     return;
@@ -170,6 +172,8 @@ namespace Ntreev.Crema.Bot.Tasks
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
             if (context.AllowException == false)
             {
+                if (await table.Dispatcher.InvokeAsync(() => table.Parent) != null)
+                    return;
                 if (await table.Dispatcher.InvokeAsync(() => table.Category.Path) == categoryPath)
                     return;
             }
@@ -215,6 +219,11 @@ namespace Ntreev.Crema.Bot.Tasks
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
             var tableName = RandomUtility.NextIdentifier();
             var copyData = RandomUtility.NextBoolean();
+            if (context.AllowException == false)
+            {
+                if (await table.Dispatcher.InvokeAsync(() => table.Parent) != null)
+                    return;
+            }
             await table.CopyAsync(context.Authentication, tableName, categoryPath, copyData);
         }
 
@@ -225,12 +234,22 @@ namespace Ntreev.Crema.Bot.Tasks
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
             var tableName = RandomUtility.NextIdentifier();
             var copyData = RandomUtility.NextBoolean();
+            if (context.AllowException == false)
+            {
+                if (await table.Dispatcher.InvokeAsync(() => table.Parent) != null)
+                    return;
+            }
             await table.InheritAsync(context.Authentication, tableName, categoryPath, copyData);
         }
 
         [TaskMethod]
         public async Task NewTableAsync(ITable table, TaskContext context)
         {
+            if (context.AllowException == false)
+            {
+                if (await table.Dispatcher.InvokeAsync(() => table.TemplatedParent) != null)
+                    return;
+            }
             var template = await table.NewTableAsync(context.Authentication);
             context.Push(template);
         }

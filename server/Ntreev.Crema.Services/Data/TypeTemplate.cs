@@ -30,6 +30,7 @@ namespace Ntreev.Crema.Services.Data
         private readonly Type type;
         private readonly Type[] types;
         private TypeInfo typeInfo;
+        private string[] itemPaths;
 
         public TypeTemplate(Type type)
         {
@@ -44,7 +45,7 @@ namespace Ntreev.Crema.Services.Data
 
         public override DomainContext DomainContext => this.type.GetService(typeof(DomainContext)) as DomainContext;
 
-        public override string ItemPath => this.type.Path;
+        public override string Path => this.type.Path;
 
         public override CremaHost CremaHost => this.type.CremaHost;
 
@@ -65,20 +66,22 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            var template = this.TypeSource;
-            var dataSet = template.DataSet;
-            var dataBaseSet = new DataBaseSet(this.type.DataBase, dataSet, false);
+            var dataBaseSet = new DataBaseSet(this.DataBase, this.TypeSource.DataSet, false);
             await this.Container.InvokeTypeEndTemplateEditAsync(authentication, this.type.Name, dataBaseSet);
             await base.OnEndEditAsync(authentication);
             this.type.UpdateTypeInfo(this.typeInfo);
             this.type.IsBeingEdited = false;
             this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
-            this.Container.InvokeTypesChangedEvent(authentication, this.types, dataSet);
+            this.Container.InvokeTypesChangedEvent(authentication, this.types, dataBaseSet.DataSet);
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
             await base.OnCancelEditAsync(authentication);
+            await this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                this.Repository.Unlock(this.itemPaths);
+            });
             this.type.IsBeingEdited = false;
             this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
         }
@@ -92,15 +95,18 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task<CremaDataType> CreateSourceAsync(Authentication authentication)
         {
             var typePath = this.type.Path;
-            var dataSet = await this.type.ReadAllDataAsync(authentication);
+            var dataSet = await this.type.ReadDataForTypeTemplateAsync(authentication);
             var dataType = dataSet.Types[this.type.Name, this.type.Category.Path];
             if (dataType == null)
                 throw new TypeNotFoundException(typePath);
             this.typeInfo = this.type.TypeInfo;
+            this.itemPaths = dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] as string[] ?? new string[] { };
             return dataType;
         }
 
         private TypeCollection Container => this.type.Container;
+
+        private DataBaseRepositoryHost Repository => this.type.Repository;
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override void OnValidateBeginEdit(Authentication authentication, object target)

@@ -65,7 +65,8 @@ namespace Ntreev.Crema.Services.Data
             }
             var tableList = new List<Table>(dataTables.Length);
             var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, true);
-            await this.InvokeTableCreateAsync(authentication, dataTables.Select(item => item.Name).ToArray(), dataBaseSet);
+            var tablePaths = dataTables.Select(item => item.Path).ToArray();
+            await this.InvokeTableCreateAsync(authentication, tablePaths, dataBaseSet);
             foreach (var item in dataTables)
             {
                 var table = this.AddNew(authentication, item.Name, item.CategoryPath);
@@ -87,7 +88,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.ValidateInherit(authentication, table, newTableName, categoryPath, copyContent);
                     this.CremaHost.Sign(authentication);
-                    var dataSet = await table.ReadDataAsync(authentication);
+                    var dataSet = await table.ReadDataForCopyAsync(authentication);
                     var dataTable = dataSet.Tables[table.Name, table.Category.Path];
                     var dataTables = dataSet.Tables.ToArray();
                     var itemName = new ItemName(categoryPath, newTableName);
@@ -117,7 +118,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.ValidateCopy(authentication, table, newTableName, categoryPath, copyContent);
                     this.CremaHost.Sign(authentication);
-                    var dataSet = await table.ReadDataAsync(authentication);
+                    var dataSet = await table.ReadDataForCopyAsync(authentication);
                     var dataTable = dataSet.Tables[table.Name, table.Category.Path];
                     var dataTables = dataSet.Tables.ToArray();
                     var itemName = new ItemName(categoryPath, newTableName);
@@ -143,15 +144,17 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public Task<SignatureDate> InvokeTableCreateAsync(Authentication authentication, string[] tableNames, DataBaseSet dataBaseSet)
+        public Task<SignatureDate> InvokeTableCreateAsync(Authentication authentication, string[] tablePaths, DataBaseSet dataBaseSet)
         {
-            var message = EventMessageBuilder.CreateTable(authentication, tableNames);
+            var message = EventMessageBuilder.CreateTable(authentication, tablePaths);
+            var itemPaths = tablePaths.Select(item => this.Context.GeneratePath(item)).ToArray();
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
                     var signatureDate = authentication.Sign();
-                    this.Repository.CreateTable(dataBaseSet, tableNames);
+                    this.Repository.Lock(itemPaths);
+                    this.Repository.CreateTable(dataBaseSet, tablePaths);
                     this.Repository.Commit(authentication, message);
                     return signatureDate;
                 }
@@ -160,17 +163,24 @@ namespace Ntreev.Crema.Services.Data
                     this.Repository.Revert();
                     throw;
                 }
+                finally
+                {
+                    this.Repository.Unlock(itemPaths);
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
             });
         }
 
         public Task<SignatureDate> InvokeTableRenameAsync(Authentication authentication, TableInfo tableInfo, string newName, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.RenameTable(authentication, tableInfo.Name, newName);
+            var newItemPath = this.Context.GeneratePath(tableInfo.CategoryPath + newName);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
                     var signatureDate = authentication.Sign();
+                    this.Repository.Lock(newItemPath);
                     this.Repository.RenameTable(dataBaseSet, tableInfo.Path, newName);
                     this.Repository.Commit(authentication, message);
                     return signatureDate;
@@ -180,17 +190,24 @@ namespace Ntreev.Crema.Services.Data
                     this.Repository.Revert();
                     throw;
                 }
+                finally
+                {
+                    this.Repository.Unlock(newItemPath);
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
             });
         }
 
         public Task<SignatureDate> InvokeTableMoveAsync(Authentication authentication, TableInfo tableInfo, string newCategoryPath, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.MoveTable(authentication, tableInfo.Name, newCategoryPath, tableInfo.CategoryPath);
+            var newItemPath = this.Context.GeneratePath(newCategoryPath + tableInfo.Name);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
                     var signatureDate = authentication.Sign();
+                    this.Repository.Lock(newItemPath);
                     this.Repository.MoveTable(dataBaseSet, tableInfo.Path, newCategoryPath);
                     this.Repository.Commit(authentication, message);
                     return signatureDate;
@@ -199,6 +216,11 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.Repository.Revert();
                     throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(newItemPath);
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
                 }
             });
         }
@@ -220,6 +242,10 @@ namespace Ntreev.Crema.Services.Data
                     this.Repository.Revert();
                     throw;
                 }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
             });
         }
 
@@ -240,6 +266,10 @@ namespace Ntreev.Crema.Services.Data
                     this.Repository.Revert();
                     throw;
                 }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
             });
         }
 
@@ -259,6 +289,10 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.Repository.Revert();
                     throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
                 }
             });
         }

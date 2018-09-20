@@ -68,7 +68,7 @@ namespace Ntreev.Crema.Services.Data
 
         public override DomainContext DomainContext => this.category.GetService(typeof(DomainContext)) as DomainContext;
 
-        public override string ItemPath => this.category.Path;
+        public override string Path => this.category.Path;
 
         public override CremaHost CremaHost => this.category.CremaHost;
 
@@ -80,9 +80,9 @@ namespace Ntreev.Crema.Services.Data
 
         public TypeCollection Types => this.category.Context.Types;
 
-        protected override Task OnBeginEditAsync(Authentication authentication)
+        protected override async Task OnBeginEditAsync(Authentication authentication)
         {
-            return base.OnBeginEditAsync(authentication);
+            await base.OnBeginEditAsync(authentication);
         }
 
         protected override async Task OnEndEditAsync(Authentication authentication)
@@ -107,5 +107,7 @@ namespace Ntreev.Crema.Services.Data
             dataType.CategoryPath = this.category.Path;
             return dataType;
         }
+
+        private DataBaseRepositoryHost Repository => this.category.Repository;
     }
 }

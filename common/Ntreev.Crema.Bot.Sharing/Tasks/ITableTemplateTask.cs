@@ -69,6 +69,12 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
                 }
 
+                if (await template.Dispatcher.InvokeAsync(() => template.Target is ITable table && table.TemplatedParent != null) == true)
+                {
+                    context.Pop(template);
+                    return;
+                }
+
                 var editableState = await template.Dispatcher.InvokeAsync(() => template.EditableState);
                 if (editableState == EditableState.None)
                 {

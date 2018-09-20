@@ -34,8 +34,8 @@ namespace Ntreev.Crema.Services.Domains
 {
     class TypeDomain : Domain
     {
-        private CremaDataType dataType;
-        private DataView view;
+        private readonly CremaDataType dataType;
+        private readonly DataView view;
 
         public TypeDomain(DomainSerializationInfo serializationInfo, object source)
             : base(serializationInfo, source)

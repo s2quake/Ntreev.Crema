@@ -195,6 +195,11 @@ namespace Ntreev.Crema.Bot.Tasks
         public async Task SetAllowNullAsync(ITableColumn column, TaskContext context)
         {
             var allowNull = RandomUtility.NextBoolean();
+            if (context.AllowException == false)
+            {
+                if (await column.Dispatcher.InvokeAsync(() => column.IsKey == true && allowNull == true) == true)
+                    return;
+            }
             await column.SetAllowNullAsync(context.Authentication, allowNull);
         }
     }

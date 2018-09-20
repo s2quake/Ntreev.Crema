@@ -32,6 +32,7 @@ namespace Ntreev.Crema.Services.Data
         private readonly Table table;
         private readonly Table[] tables;
         private TableInfo tableInfo;
+        private string[] itemPaths;
 
         public TableTemplate(Table table)
         {
@@ -83,6 +84,10 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
             await base.OnCancelEditAsync(authentication);
+            await this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                this.Repository.Unlock(this.itemPaths);
+            });
             this.table.IsBeingSetup = false;
             this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
         }
@@ -101,10 +106,13 @@ namespace Ntreev.Crema.Services.Data
             if (dataTable == null)
                 throw new TableNotFoundException(tablePath);
             this.tableInfo = this.table.TableInfo;
+            this.itemPaths = dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] as string[] ?? new string[] { };
             return new CremaTemplate(dataTable);
         }
 
         private TableCollection Container => this.table.Container;
+
+        private DataBaseRepositoryHost Repository => this.table.Repository;
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override void OnValidateBeginEdit(Authentication authentication, object target)
