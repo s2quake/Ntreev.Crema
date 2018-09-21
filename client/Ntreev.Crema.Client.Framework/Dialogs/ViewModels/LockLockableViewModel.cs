@@ -70,7 +70,7 @@ namespace Ntreev.Crema.Client.Framework.Dialogs.ViewModels
         protected override Task LockAsync(string comment)
         {
             var dispatcher = lockable is IDispatcherObject dispatcherObject ? dispatcherObject.Dispatcher : Application.Current.Dispatcher;
-            return dispatcher.InvokeAsync(() => this.lockable.Lock(this.authentication, comment)).Task;
+            return this.lockable.LockAsync(this.authentication, comment);
         }
 
         protected override void VerifyLock(string comment, Action<bool> isValid)

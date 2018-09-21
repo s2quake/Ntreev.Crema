@@ -88,7 +88,7 @@ namespace Ntreev.Crema.Client.Converters.Dialogs.ViewModels
                 var dataSet = new CremaDataSet() { SignatureDateProvider = new SignatureDateProvider(this.authentication.ID), };
                 await this.dataBase.Dispatcher.InvokeAsync(() => this.CreateTables(dataSet, tableNames));
                 await Task.Run(() => this.selectedImporter.Import(dataSet));
-                await this.dataBase.Dispatcher.InvokeAsync(() => dataBase.Import(this.authentication, dataSet, this.Comment));
+                await this.dataBase.ImportAsync(this.authentication, dataSet, this.Comment);
                 this.configs.Commit(this);
                 AppMessageBox.Show(Resources.Message_Imported);
             }

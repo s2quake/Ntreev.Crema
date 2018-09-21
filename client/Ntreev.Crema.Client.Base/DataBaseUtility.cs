@@ -117,7 +117,7 @@ namespace Ntreev.Crema.Client.Base
 
                 try
                 {
-                    await dataBase.Dispatcher.InvokeAsync(() => dataBase.Delete(authentication));
+                    await dataBase.DeleteAsync(authentication);
                     AppMessageBox.Show(Resources.Message_Deleted);
                     return true;
                 }
@@ -139,7 +139,7 @@ namespace Ntreev.Crema.Client.Base
             {
                 try
                 {
-                    await dataBase.Dispatcher.InvokeAsync(() => dataBase.Load(authentication));
+                    await dataBase.LoadAsync(authentication);
                     return true;
                 }
                 catch (Exception e)
@@ -162,7 +162,7 @@ namespace Ntreev.Crema.Client.Base
                 {
                     if (descriptor.AuthenticationInfos.Any() == true && AppMessageBox.ShowProceed(Resources.Message_VerifyToCloseDataBase) == false)
                         return false;
-                    await dataBase.Dispatcher.InvokeAsync(() => dataBase.Unload(authentication));
+                    await dataBase.UnloadAsync(authentication);
                     return true;
                 }
                 catch (Exception e)

@@ -97,7 +97,7 @@ namespace Ntreev.Crema.Client.Framework
                 var dispatcher = accessible is IDispatcherObject dispatcherObject ? dispatcherObject.Dispatcher : Application.Current.Dispatcher;
                 try
                 {
-                    await dispatcher.InvokeAsync(() => accessible.SetPrivate(authentication));
+                    await accessible.SetPrivateAsync(authentication);
                     return true;
                 }
                 catch (Exception e)
@@ -119,7 +119,7 @@ namespace Ntreev.Crema.Client.Framework
                 var dispatcher = accessible is IDispatcherObject dispatcherObject ? dispatcherObject.Dispatcher : Application.Current.Dispatcher;
                 try
                 {
-                    await dispatcher.InvokeAsync(() => accessible.SetPublic(authentication));
+                    await accessible.SetPublicAsync(authentication);
                     return true;
                 }
                 catch (Exception e)

@@ -61,12 +61,12 @@ namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
             }
         }
 
-        public async void Ban()
+        public async Task BanAsync()
         {
             try
             {
                 this.BeginProgress();
-                await this.user.Dispatcher.InvokeAsync(() => this.user.Ban(this.authentication, this.Comment));
+                await this.user.BanAsync(this.authentication, this.Comment);
                 this.EndProgress();
                 this.TryClose(true);
             }

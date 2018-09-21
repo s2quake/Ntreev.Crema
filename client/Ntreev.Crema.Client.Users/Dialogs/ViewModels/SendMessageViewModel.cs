@@ -80,15 +80,12 @@ namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
             get { return this.userID ?? string.Empty; }
         }
 
-        public async void Send()
+        public async Task SendAsync()
         {
             try
             {
                 this.BeginProgress(Resources.Message_SendMessage);
-                await this.user.Dispatcher.InvokeAsync(() =>
-                {
-                    user.SendMessage(this.authentication, this.Message);
-                });
+                await this.user.SendMessageAsync(this.authentication, this.Message);
                 this.EndProgress();
                 this.TryClose(true);
             }

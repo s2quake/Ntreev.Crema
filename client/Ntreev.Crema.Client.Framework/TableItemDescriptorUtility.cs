@@ -36,7 +36,7 @@ namespace Ntreev.Crema.Client.Framework
         {
             if (descriptor.Target is ITableItem tableItem)
             {
-                return await tableItem.Dispatcher.InvokeAsync(() => tableItem.GetLog(authentication, revision));
+                return await tableItem.GetLogAsync(authentication, revision);
             }
             else
             {
@@ -48,7 +48,7 @@ namespace Ntreev.Crema.Client.Framework
         {
             if (descriptor.Target is ITableItem tableItem)
             {
-                return await tableItem.Dispatcher.InvokeAsync(() => tableItem.Find(authentication, text, options));
+                return await tableItem.FindAsync(authentication, text, options);
             }
             else
             {
@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Client.Framework
         {
             if (descriptor.Target is ITableItem tableItem)
             {
-                return await tableItem.Dispatcher.InvokeAsync(() => tableItem.GetDataSet(authentication, revision));
+                return await tableItem.GetDataSetAsync(authentication, revision);
             }
             else
             {

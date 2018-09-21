@@ -78,7 +78,7 @@ namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
 
         protected override Task CreateAsync(string categoryName)
         {
-            return this.category.Dispatcher.InvokeAsync(() => this.category.AddNewCategory(this.authentication, categoryName));
+            return this.category.AddNewCategoryAsync(this.authentication, categoryName);
         }
 
         protected override void OnDeactivate(bool close)

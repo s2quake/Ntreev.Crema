@@ -84,7 +84,7 @@ namespace Ntreev.Crema.Client.Tables
 
         public static async Task<bool> RenameAsync(Authentication authentication, ITableCategoryDescriptor descriptor)
         {
-            var comment = await LockAsync(authentication, descriptor, nameof(ITableCategory.Rename));
+            var comment = await LockAsync(authentication, descriptor, nameof(ITableCategory.RenameAsync));
             if (comment == null)
                 return false;
 
@@ -97,7 +97,7 @@ namespace Ntreev.Crema.Client.Tables
 
         public static async Task<bool> MoveAsync(Authentication authentication, ITableCategoryDescriptor descriptor)
         {
-            var comment = await LockAsync(authentication, descriptor, nameof(ITableCategory.Move));
+            var comment = await LockAsync(authentication, descriptor, nameof(ITableCategory.MoveAsync));
             if (comment == null)
                 return false;
 
@@ -120,16 +120,14 @@ namespace Ntreev.Crema.Client.Tables
             {
                 try
                 {
-                    return await category.Dispatcher.InvokeAsync(() =>
+                    var lockInfo = await category.Dispatcher.InvokeAsync(() => category.LockInfo);
+                    if (lockInfo.IsLocked == false || lockInfo.IsInherited == true)
                     {
-                        if (category.IsLocked == false || category.LockInfo.IsInherited == true)
-                        {
-                            var lockComment = comment + ":" + Guid.NewGuid();
-                            category.Lock(authentication, lockComment);
-                            return lockComment;
-                        }
-                        return string.Empty;
-                    });
+                        var lockComment = comment + ":" + Guid.NewGuid();
+                        await category.LockAsync(authentication, lockComment);
+                        return lockComment;
+                    }
+                    return string.Empty;
                 }
                 catch (Exception e)
                 {

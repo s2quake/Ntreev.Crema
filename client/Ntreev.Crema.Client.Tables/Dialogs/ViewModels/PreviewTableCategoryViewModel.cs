@@ -98,7 +98,7 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
             {
                 this.DisplayName = await this.category.Dispatcher.InvokeAsync(() => $"{this.category.Path} - {revision}");
                 this.BeginProgress(Resources.Message_ReceivingInfo);
-                this.Source = await Task.Run(() => this.category.GetDataSet(this.authentication, this.revision));
+                this.Source = await this.category.GetDataSetAsync(this.authentication, this.revision);
             }
             catch (Exception e)
             {

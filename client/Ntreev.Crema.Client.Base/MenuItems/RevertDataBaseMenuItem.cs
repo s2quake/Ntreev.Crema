@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Client.Base.MenuItems
             {
                 if (parameter is LogInfoViewModel viewModel && viewModel.Target is IDataBase dataBase)
                 {
-                    await dataBase.Dispatcher.InvokeAsync(() => dataBase.Revert(this.authenticator, viewModel.Revision));
+                    await dataBase.RevertAsync(this.authenticator, viewModel.Revision);
                 }
             }
             catch (Exception e)

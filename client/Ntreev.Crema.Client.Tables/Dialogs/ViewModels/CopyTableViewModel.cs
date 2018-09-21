@@ -160,11 +160,10 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
             try
             {
                 this.BeginProgress(Resources.Message_Coping);
-                var dispatcher = this.table.Dispatcher;
                 if (this.UseTemplate == true)
-                    await dispatcher.InvokeAsync(() => this.table.Inherit(this.authentication, this.NewName, this.CategoryPath, this.CopyData));
+                    await this.table.InheritAsync(this.authentication, this.NewName, this.CategoryPath, this.CopyData);
                 else
-                    await dispatcher.InvokeAsync(() => this.table.Copy(this.authentication, this.NewName, this.CategoryPath, this.CopyData));
+                    await this.table.CopyAsync(this.authentication, this.NewName, this.CategoryPath, this.CopyData);
                 this.EndProgress();
                 this.TryClose(true);
             }

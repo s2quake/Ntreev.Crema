@@ -47,7 +47,7 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
             this.DisplayName = Resources.Title_NewTable;
         }
 
-        public static Task<NewTableViewModel> CreateInstanceAsync(Authentication authentication, ITableCategoryDescriptor descriptor)
+        public static async Task<NewTableViewModel> CreateInstanceAsync(Authentication authentication, ITableCategoryDescriptor descriptor)
         {
             if (authentication == null)
                 throw new ArgumentNullException(nameof(authentication));
@@ -56,9 +56,9 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 
             if (descriptor.Target is ITableCategory category)
             {
-                return category.Dispatcher.InvokeAsync(() =>
+                var template = await category.NewTableAsync(authentication);
+                return await category.Dispatcher.InvokeAsync(() =>
                 {
-                    var template = category.NewTable(authentication);
                     return new NewTableViewModel(authentication, category, template);
                 });
             }

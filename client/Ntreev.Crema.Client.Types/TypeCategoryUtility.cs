@@ -98,7 +98,7 @@ namespace Ntreev.Crema.Client.Types
 
         public static async Task<bool> RenameAsync(Authentication authentication, ITypeCategoryDescriptor descriptor)
         {
-            var comment = await LockAsync(authentication, descriptor, nameof(ITypeCategory.Rename));
+            var comment = await LockAsync(authentication, descriptor, nameof(ITypeCategory.RenameAsync));
             if (comment == null)
                 return false;
 
@@ -111,7 +111,7 @@ namespace Ntreev.Crema.Client.Types
 
         public static async Task<bool> MoveAsync(Authentication authentication, ITypeCategoryDescriptor descriptor)
         {
-            var comment = await LockAsync(authentication, descriptor, nameof(ITypeCategory.Move));
+            var comment = await LockAsync(authentication, descriptor, nameof(ITypeCategory.MoveAsync));
             if (comment == null)
                 return false;
 

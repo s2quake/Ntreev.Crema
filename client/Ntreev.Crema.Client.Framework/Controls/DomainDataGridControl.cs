@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Client.Framework.Controls
 
         }
 
-        public void PasteFromClipboard()
+        public async void PasteFromClipboard()
         {
             if (Clipboard.ContainsText() == false)
                 return;
@@ -73,7 +73,7 @@ namespace Ntreev.Crema.Client.Framework.Controls
             var rowInfos = parser.DomainRows;
             var domain = this.Domain;
             var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
-            domain.Dispatcher.Invoke(() => domain.SetRow(authenticator, rowInfos));
+            await domain.SetRowAsync(authenticator, rowInfos);
             parser.SelectRange();
         }
 
@@ -237,13 +237,13 @@ namespace Ntreev.Crema.Client.Framework.Controls
                     var fieldName = this.currentColumn.FieldName;
                     try
                     {
-                        await domain.Dispatcher.InvokeAsync(() => domain.SetLocation(authenticator, currentItem, fieldName));
+                        await domain.SetLocationAsync(authenticator, currentItem, fieldName);
                     }
                     catch { }
                 }
                 else if (this.currentItem == null)
                 {
-                    await domain.Dispatcher.InvokeAsync(() => domain.SetLocation(authenticator));
+                    await domain.SetLocationAsync(authenticator);
                 }
             }
         }
@@ -302,13 +302,13 @@ namespace Ntreev.Crema.Client.Framework.Controls
             }
         }
 
-        private void RequestRemoveRows(object[] items)
+        private async Task RequestRemoveRowsAsync(object[] items)
         {
             try
             {
                 var domain = this.Domain;
                 var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
-                domain.Dispatcher.Invoke(() => domain.RemoveRows(authenticator, items));
+                await domain.RemoveRowsAsync(authenticator, items);
             }
             catch (Exception e)
             {
@@ -322,7 +322,7 @@ namespace Ntreev.Crema.Client.Framework.Controls
             {
                 var domain = this.Domain;
                 var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
-                domain.Dispatcher.Invoke(() => domain.SetRow(authenticator, rows));
+                domain.Dispatcher.Invoke(() => domain.SetRowAsync(authenticator, rows));
             }
             catch (Exception e)
             {
@@ -346,7 +346,7 @@ namespace Ntreev.Crema.Client.Framework.Controls
             e.CanExecute = this.CanDeleteSelectedItems;
         }
 
-        private void DeleteRows_Execute(object sender, ExecutedRoutedEventArgs e)
+        private async void DeleteRows_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             var query = from gridContext in this.SelectedContexts
                         from range in gridContext.SelectedCellRanges
@@ -356,7 +356,7 @@ namespace Ntreev.Crema.Client.Framework.Controls
             if (AppMessageBox.ShowQuestion(Properties.Resources.Message_ConfirmToDeleteSelectedRows_Format, query.Count()) == false)
                 return;
 
-            this.RequestRemoveRows(query.ToArray());
+            await this.RequestRemoveRowsAsync(query.ToArray());
         }
 
         private void ResetFields_CanExecute(object sender, CanExecuteRoutedEventArgs e)

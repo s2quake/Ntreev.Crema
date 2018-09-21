@@ -224,14 +224,14 @@ namespace Ntreev.Crema.Client.Tables
             this.isFirst = true;
 
             var domainContext = dataBase.GetService(typeof(IDomainContext)) as IDomainContext;
-            var items = await dataBase.Dispatcher.InvokeAsync(() =>
+            var items = await await dataBase.Dispatcher.InvokeAsync(async () =>
             {
                 var restoreList = new List<System.Action>();
                 var domains = domainContext.Domains.Where(item => item.DataBaseID == dataBase.ID).ToArray();
 
                 foreach (var item in domains)
                 {
-                    if (item.Users.Contains(this.authenticator.ID) == false)
+                    if (await item.Users.ContainsAsync(this.authenticator.ID) == false)
                         continue;
 
                     var itemPath = item.DomainInfo.ItemPath;

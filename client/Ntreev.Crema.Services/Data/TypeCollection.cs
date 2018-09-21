@@ -313,20 +313,12 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITypeCollection
 
-        bool ITypeCollection.Contains(string typeName)
+        Task<bool> ITypeCollection.ContainsAsync(string typeName)
         {
-            this.Dispatcher?.VerifyAccess();
-            return this.Contains(typeName);
+            return this.Dispatcher.InvokeAsync(() => this.Contains(typeName));
         }
 
-        IType ITypeCollection.this[string typeName]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this[typeName];
-            }
-        }
+        IType ITypeCollection.this[string typeName] => this[typeName];
 
         #endregion
 

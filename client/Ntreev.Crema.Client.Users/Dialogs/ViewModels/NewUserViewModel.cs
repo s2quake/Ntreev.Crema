@@ -75,7 +75,7 @@ namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
             try
             {
                 this.BeginProgress(Resources.Message_NewUser);
-                await this.category.Dispatcher.InvokeAsync(() => this.category.AddNewUser(this.authentication, this.ID, this.Password, this.UserName, this.Authority));
+                await this.category.AddNewUserAsync(this.authentication, this.ID, this.Password, this.UserName, this.Authority);
                 this.EndProgress();
                 this.TryClose(true);
                 AppMessageBox.Show(Resources.Message_NewUserComplete);

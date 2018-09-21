@@ -91,7 +91,7 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 
         protected override Task RenameAsync(string newName)
         {
-            return this.table.Dispatcher.InvokeAsync(() => this.table.Rename(this.authentication, newName));
+            return this.table.RenameAsync(this.authentication, newName);
         }
     }
 }

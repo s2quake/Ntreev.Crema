@@ -71,9 +71,9 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
             try
             {
                 this.BeginProgress(this.IsNew ? Resources.Message_Creating : Resources.Message_Changing);
+                await this.template.EndEditAsync(this.authentication);
                 await this.template.Dispatcher.InvokeAsync(() =>
                 {
-                    this.template.EndEdit(this.authentication);
                     this.template.EditEnded -= Template_EditEnded;
                     this.template.EditCanceled -= Template_EditCanceled;
                     this.template.Changed -= Template_Changed;
@@ -126,13 +126,14 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
             get { return this.typeName ?? string.Empty; }
             set
             {
-                this.template.Dispatcher.Invoke(() =>
+                InvokeAsync();
+                async void InvokeAsync()
                 {
-                    this.template.SetTypeName(this.authentication, value);
+                    await this.template.SetTypeNameAsync(this.authentication, value);
                     this.typeName = value;
-                });
-                this.NotifyOfPropertyChange(nameof(this.TypeName));
-                this.Verify(this.VerifyAction);
+                    this.NotifyOfPropertyChange(nameof(this.TypeName));
+                    this.Verify(this.VerifyAction);
+                }
             }
         }
 
@@ -141,12 +142,13 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
             get { return this.comment ?? string.Empty; }
             set
             {
-                this.template.Dispatcher.Invoke(() =>
+                InvokeAsync();
+                async void InvokeAsync()
                 {
-                    this.template.SetComment(this.authentication, value);
+                    await this.template.SetCommentAsync(this.authentication, value);
                     this.comment = value;
-                });
-                this.NotifyOfPropertyChange(nameof(this.Comment));
+                    this.NotifyOfPropertyChange(nameof(this.Comment));
+                };
             }
         }
 
@@ -182,12 +184,13 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
             get { return this.isFlag; }
             set
             {
-                this.template.Dispatcher.Invoke(() =>
+                InvokeAsync();
+                async void InvokeAsync()
                 {
-                    this.template.SetIsFlag(this.authentication, value);
+                    await this.template.SetIsFlagAsync(this.authentication, value);
                     this.isFlag = value;
-                });
-                this.NotifyOfPropertyChange(nameof(this.IsFlag));
+                    this.NotifyOfPropertyChange(nameof(this.IsFlag));
+                }
             }
         }
 
@@ -209,9 +212,9 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
                 this.BeginProgress(this.IsNew ? Resources.Message_Creating : Resources.Message_Changing);
                 try
                 {
+                    await this.template.EndEditAsync(this.authentication);
                     await this.template.Dispatcher.InvokeAsync(() =>
                     {
-                        this.template.EndEdit(this.authentication);
                         this.template.EditEnded -= Template_EditEnded;
                         this.template.EditCanceled -= Template_EditCanceled;
                         this.template.Changed -= Template_Changed;
@@ -262,9 +265,9 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
 
             if (this.template != null)
             {
+                await this.template.CancelEditAsync(this.authentication);
                 await this.template.Dispatcher.InvokeAsync(() =>
                 {
-                    this.template.CancelEdit(this.authentication);
                     this.template.EditEnded -= Template_EditEnded;
                     this.template.EditCanceled -= Template_EditCanceled;
                     this.template.Changed -= Template_Changed;

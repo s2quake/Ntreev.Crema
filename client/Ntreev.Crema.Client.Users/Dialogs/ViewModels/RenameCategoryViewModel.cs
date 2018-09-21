@@ -79,7 +79,7 @@ namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
 
         protected override Task RenameAsync(string newName)
         {
-            return this.category.Dispatcher.InvokeAsync(() => this.category.Rename(this.authentication, newName));
+            return this.category.RenameAsync(this.authentication, newName);
         }
 
         protected override void OnDeactivate(bool close)

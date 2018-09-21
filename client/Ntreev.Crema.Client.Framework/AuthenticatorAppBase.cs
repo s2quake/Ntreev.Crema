@@ -50,23 +50,17 @@ namespace Ntreev.Crema.Client.Framework
             if (this.cremaAppHost.GetService(typeof(IDataBase)) is IDataBase dataBase)
             {
                 this.dataBase = dataBase;
-                await this.dataBase.Dispatcher.InvokeAsync(() =>
-                {
-                    this.dataBase.Enter(this);
-                });
+                await this.dataBase.EnterAsync(this);
             }
         }
 
         private async void CremaAppHost_Unloaded(object sender, EventArgs e)
         {
-            await this.dataBase?.Dispatcher.InvokeAsync(() =>
+            if ((Authentication)this is Authentication authentication)
             {
-                if ((Authentication)this is Authentication authentication)
-                {
-                    this.dataBase.Leave(authentication);
-                    this.dataBase = null;
-                }
-            });
+                await this.dataBase?.LeaveAsync(authentication);
+                this.dataBase = null;
+            }
         }
     }
 }

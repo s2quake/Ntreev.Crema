@@ -64,7 +64,7 @@ namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
 
         protected override Task ConfirmAsync(string comment)
         {
-            return this.domainUser.Dispatcher.InvokeAsync(() => this.domainUser.Kick(this.authentication, comment));
+            return this.domainUser.KickAsync(this.authentication, comment);
         }
 
         protected override void Verify(string comment, Action<bool> isValid)

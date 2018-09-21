@@ -67,12 +67,12 @@ namespace Ntreev.Crema.Client.Base.Dialogs.ViewModels
             }
         }
 
-        public async void Copy()
+        public async Task CopyAsync()
         {
             try
             {
                 this.BeginProgress(Resources.Message_CopingDataBase);
-                await this.dataBase.Dispatcher.InvokeAsync(() => this.dataBase.Copy(this.authentication, this.DataBaseName, this.Comment, false));
+                await this.dataBase.CopyAsync(this.authentication, this.DataBaseName, this.Comment, false);
                 this.EndProgress();
                 this.TryClose(true);
                 AppMessageBox.Show(Resources.Message_CopiedDataBase);

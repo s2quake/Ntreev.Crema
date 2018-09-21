@@ -68,10 +68,7 @@ namespace Ntreev.Crema.Client.Tables.MenuItems
                     if (AppMessageBox.ShowProceed(Resources.Message_ConfirmToCancelContentEditing) == false)
                         return;
 
-                    await table.Dispatcher.InvokeAsync(() =>
-                    {
-                        table.Content.CancelEdit(this.authenticator);
-                    });
+                    await table.Content.CancelEditAsync(this.authenticator);
                 }
             }
             catch (Exception e)

@@ -75,7 +75,7 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
 
         protected override Task RenameAsync(string newName)
         {
-            return this.type.Dispatcher.InvokeAsync(() => this.type.Rename(this.authentication, newName));
+            return this.type.RenameAsync(this.authentication, newName);
         }
     }
 }

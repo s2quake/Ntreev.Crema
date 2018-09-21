@@ -746,10 +746,7 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
 
         private async Task OpenAsync(string address, string userID, SecureString password)
         {
-            await this.cremaHost.Dispatcher.InvokeAsync(() =>
-            {
-                this.token = this.cremaHost.Open(address, userID, password);
-            });
+            this.token = await this.cremaHost.OpenAsync(address, userID, password);
             this.address = address;
             this.IsOpened = true;
             this.connectionItem.LastConnectedDateTime = DateTime.Now;
@@ -760,11 +757,8 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
         private async Task CloseAsync()
         {
             this.cremaHost.Closed -= CremaHost_Closed;
-            await this.cremaHost.Dispatcher.InvokeAsync(() =>
-            {
-                this.cremaHost.Close(this.token);
-                this.token = Guid.Empty;
-            });
+            await this.cremaHost.CloseAsync(this.token);
+            this.token = Guid.Empty;
             this.address = null;
             this.IsOpened = false;
             this.Refresh();
@@ -772,36 +766,36 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
             this.cremaHost.SaveConfigs();
         }
 
-        private Task EnterDataBaseAsync(string dataBaseName)
+        private async Task EnterDataBaseAsync(string dataBaseName)
         {
             var autoLoad = this.authenticator.Authority == Authority.Admin && Keyboard.Modifiers == ModifierKeys.Shift;
-            return this.cremaHost.Dispatcher.InvokeAsync(() =>
+            var dataBase = await this.cremaHost.Dispatcher.InvokeAsync(() => this.cremaHost.DataBases[dataBaseName]);
+            if (dataBase == null)
+                throw new ArgumentException(string.Format(Resources.Exception_NonExistentDataBase, dataBaseName), nameof(dataBaseName));
+            if (dataBase.IsLoaded == false && autoLoad == true)
             {
-                var dataBase = this.cremaHost.DataBases[dataBaseName];
-                if (dataBase == null)
-                    throw new ArgumentException(string.Format(Resources.Exception_NonExistentDataBase, dataBaseName), nameof(dataBaseName));
-                if (dataBase.IsLoaded == false && autoLoad == true)
-                {
-                    dataBase.Load(this.authenticator);
-                }
-                dataBase.Enter(this.authenticator);
+                await dataBase.LoadAsync(this.authenticator);
+            }
+            await dataBase.EnterAsync(this.authenticator);
+            await dataBase.Dispatcher.InvokeAsync(()=>
+            {
                 dataBase.Unloaded += DataBase_Unloaded;
                 dataBase.Resetting += DataBase_Resetting;
                 dataBase.Reset += DataBase_Reset;
-                this.dataBase = dataBase;
             });
+            this.dataBase = dataBase;
         }
 
-        private Task LeaveDataBaseAsync()
+        private async Task LeaveDataBaseAsync()
         {
-            return this.cremaHost.Dispatcher.InvokeAsync(() =>
+            await this.dataBase.Dispatcher.InvokeAsync(() =>
             {
                 this.dataBase.Unloaded -= DataBase_Unloaded;
                 this.dataBase.Resetting -= DataBase_Resetting;
                 this.dataBase.Reset -= DataBase_Reset;
-                this.dataBase.Leave(this.authenticator);
-                this.dataBase = null;
             });
+            await this.dataBase.LeaveAsync(this.authenticator);
+            this.dataBase = null;
         }
 
         private async Task CloseDocumentsAsync(bool save)

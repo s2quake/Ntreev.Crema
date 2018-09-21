@@ -74,7 +74,7 @@ namespace Ntreev.Crema.Client.Framework
 
                 try
                 {
-                    await domain.Dispatcher.InvokeAsync(() => domain.Delete(authentication, true));
+                    await domain.DeleteAsync(authentication, true);
                     return true;
                 }
                 catch (Exception e)
@@ -98,7 +98,7 @@ namespace Ntreev.Crema.Client.Framework
 
                 try
                 {
-                    await domain.Dispatcher.InvokeAsync(() => domain.Delete(authentication, false));
+                    await domain.DeleteAsync(authentication, false);
                     return true;
                 }
                 catch (Exception e)

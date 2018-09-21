@@ -49,13 +49,13 @@ namespace Ntreev.Crema.Client.Framework.Dialogs.ViewModels
             this.accessType = accessType;
         }
 
-        public async void Delete()
+        public async Task DeleteAsync()
         {
             if (AppMessageBox.ConfirmDelete() == false)
                 return;
             try
             {
-                await this.dispatcher.InvokeAsync(() => this.accessible.RemoveAccessMember(this.authentication, this.MemberID));
+                await this.accessible.RemoveAccessMemberAsync(this.authentication, this.MemberID);
                 this.viewMdoel.ItemsSource.Remove(this);
             }
             catch (Exception e)
@@ -112,11 +112,8 @@ namespace Ntreev.Crema.Client.Framework.Dialogs.ViewModels
                 this.accessType = accessType;
                 this.NotifyOfPropertyChange(nameof(this.AccessType));
                 this.CanChange = false;
-                var accessInfo = await this.dispatcher.InvokeAsync(() =>
-                {
-                    this.accessible.SetAccessMember(this.authentication, this.MemberID, accessType);
-                    return this.accessible.AccessInfo;
-                });
+                await this.accessible.SetAccessMemberAsync(this.authentication, this.MemberID, accessType);
+                var accessInfo = this.accessible.AccessInfo;
                 this.accessType = accessType;
                 await this.Dispatcher.InvokeAsync(() => this.viewMdoel.SetAccessInfo(accessInfo));
             }

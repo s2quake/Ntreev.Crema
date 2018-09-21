@@ -89,7 +89,7 @@ namespace Ntreev.Crema.Client.Users
                 try
                 {
 
-                    await domainUser.Dispatcher.InvokeAsync(() => domainUser.SetOwner(authentication));
+                    await domainUser.SetOwnerAsync(authentication);
                     return true;
                 }
                 catch (Exception e)
