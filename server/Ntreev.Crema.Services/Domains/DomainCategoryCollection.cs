@@ -22,6 +22,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains
 {
@@ -177,9 +178,9 @@ namespace Ntreev.Crema.Services.Domains
 
         #region IDomainCategoryCollection
 
-        bool IDomainCategoryCollection.Contains(string categoryPath)
+        Task<bool> IDomainCategoryCollection.ContainsAsync(string categoryPath)
         {
-            return this.Contains(categoryPath);
+            return this.Dispatcher.InvokeAsync(() => this.Contains(categoryPath));
         }
 
         IDomainCategory IDomainCategoryCollection.Root => this.Root;

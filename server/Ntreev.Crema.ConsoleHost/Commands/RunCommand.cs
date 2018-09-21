@@ -174,16 +174,19 @@ namespace Ntreev.Crema.ConsoleHost.Commands
 #endif
             this.application.Port = this.Port;
             await this.application.OpenAsync();
+            this.application.Closed += Application_Closed;
             Console.Title = $"{this.application.BasePath} --port {this.application.Port}";
             var cremaHost = this.application.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Closed += CremaHost_Closed;
             await this.WaitAsync(cremaHost);
-            Console.WriteLine(Resources.StoppingServer);
-            await this.application.CloseAsync();
+            if (this.application.ServiceState == ServiceState.Opened)
+            {
+                Console.WriteLine(Resources.StoppingServer);
+                await this.application.CloseAsync();
+            }
             Console.WriteLine(Resources.ServerHasBeenStopped);
         }
 
-        private void CremaHost_Closed(object sender, ClosedEventArgs e)
+        private void Application_Closed(object sender, ClosedEventArgs e)
         {
             if (e.Reason == CloseReason.Shutdown)
             {

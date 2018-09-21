@@ -128,9 +128,9 @@ namespace Ntreev.Crema.Commands.Consoles
                     throw new InvalidOperationException($"cannot move to : {destPath}");
                 var itemName = new ItemName(destPath);
                 var categories = sourceCategory.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-                if (categories.Contains(itemName.CategoryPath) == false)
+                if (await categories.ContainsAsync(itemName.CategoryPath) == false)
                     throw new InvalidOperationException($"cannot move to : {destPath}");
-                if (sourceCategory.Name != itemName.Name && users.Contains(itemName.Name) == true)
+                if (sourceCategory.Name != itemName.Name && await users.ContainsAsync(itemName.Name) == true)
                     throw new InvalidOperationException($"cannot move to : {destPath}");
                 if (sourceCategory.Parent.Path != itemName.CategoryPath)
                     await sourceCategory.MoveAsync(authentication, itemName.CategoryPath);
@@ -155,7 +155,7 @@ namespace Ntreev.Crema.Commands.Consoles
                     throw new InvalidOperationException($"cannot move to : {destPath}");
                 var itemName = new ItemName(destPath);
                 var categories = sourceUser.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-                if (categories.Contains(itemName.CategoryPath) == false)
+                if (await categories.ContainsAsync(itemName.CategoryPath) == false)
                     throw new InvalidOperationException($"cannot move to : {destPath}");
                 if (sourceUser.ID != itemName.Name)
                     throw new InvalidOperationException($"cannot move to : {destPath}");

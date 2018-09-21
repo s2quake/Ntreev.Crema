@@ -27,7 +27,7 @@ namespace Ntreev.Crema.Services
 {
     public interface ITableCollection : IReadOnlyCollection<ITable>, IEnumerable<ITable>, IServiceProvider, IDispatcherObject
     {
-        bool Contains(string tableName);
+        Task<bool> ContainsAsync(string tableName);
 
         ITable this[string tableName] { get; }
 

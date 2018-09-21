@@ -64,7 +64,7 @@ namespace Ntreev.Crema.Services
 
         Task CancelShutdownAsync(Authentication authentication);
 
-        bool IsOpened { get; }
+        ServiceState ServiceState { get; }
 
         IDataBaseCollection DataBases { get; }
 

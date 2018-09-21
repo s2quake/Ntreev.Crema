@@ -197,10 +197,11 @@ namespace Ntreev.Crema.Client.Converters.Dialogs.ViewModels
         {
             var tableCollection = this.dataBase.TableContext.Tables;
             var tableList = new List<ITable>(names.Length);
+            var tablesByName = tableCollection.Dispatcher.Invoke(() => tableCollection.ToDictionary(item => item.Name));
 
             foreach (var item in names)
             {
-                if (tableCollection.Contains(item) == false)
+                if (tablesByName.ContainsKey(item) == false)
                     throw new TableNotFoundException(item);
                 tableList.Add(tableCollection[item]);
             }

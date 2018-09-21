@@ -343,20 +343,12 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITableCollection
 
-        bool ITableCollection.Contains(string tableName)
+        Task<bool> ITableCollection.ContainsAsync(string tableName)
         {
-            this.Dispatcher?.VerifyAccess();
-            return this.Contains(tableName);
+            return this.Dispatcher.InvokeAsync(() => this.Contains(tableName));
         }
 
-        ITable ITableCollection.this[string tableName]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this[tableName];
-            }
-        }
+        ITable ITableCollection.this[string tableName] => this[tableName];
 
         #endregion
 
@@ -364,13 +356,11 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITable> IEnumerable<ITable>.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.GetEnumerator();
         }
 

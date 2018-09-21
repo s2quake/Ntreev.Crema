@@ -19,12 +19,13 @@ using System;
 using Ntreev.Library.ObjectModel;
 using System.Collections.Specialized;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
     public interface IDomainCategoryCollection : IReadOnlyCollection<IDomainCategory>, IEnumerable<IDomainCategory>, IServiceProvider, IDispatcherObject
     {
-        bool Contains(string categoryPath);
+        Task<bool> ContainsAsync(string categoryPath);
 
         string[] GetMetaData(Authentication authentication);
 

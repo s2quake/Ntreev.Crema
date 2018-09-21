@@ -20,12 +20,13 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
     public interface ITypeContext : IEnumerable<ITypeItem>, IServiceProvider, IDispatcherObject
     {
-        bool Contains(string itemPath);
+        Task<bool> ContainsAsync(string itemPath);
 
         ITypeCollection Types { get; }
 

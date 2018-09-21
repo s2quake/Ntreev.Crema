@@ -15,29 +15,27 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
+using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.ServiceModel;
-using System.Collections.Specialized;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ITableCategoryCollection : IReadOnlyCollection<ITableCategory>, IEnumerable<ITableCategory>, IServiceProvider, IDispatcherObject
+    public enum ServiceState
     {
-        Task<bool> ContainsAsync(string categoryPath);
+        None,
 
-        ITableCategory Root { get; }
+        Opening,
 
-        ITableCategory this[string categoryPath] { get; }
+        Opened,
 
-        event ItemsCreatedEventHandler<ITableCategory> CategoriesCreated;
+        Closing,
 
-        event ItemsRenamedEventHandler<ITableCategory> CategoriesRenamed;
-
-        event ItemsMovedEventHandler<ITableCategory> CategoriesMoved;
-
-        event ItemsDeletedEventHandler<ITableCategory> CategoriesDeleted;
+        Closed = None,
     }
 }

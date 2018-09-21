@@ -64,24 +64,21 @@ namespace Ntreev.Crema.Client.Differences.MenuItems
             dialog.ShowDialog();
         }
 
-        private Task<DiffDataTable> Initialize(LogInfoViewModel viewModel, ITable table)
+        private async Task<DiffDataTable> Initialize(LogInfoViewModel viewModel, ITable table)
         {
-            return table.Dispatcher.InvokeAsync(() =>
-            {
-                var logs = table.GetLog(this.authenticator, null);
-                var prevLog = this.GetPrevLog(logs, viewModel.Revision);
+            var logs = await table.GetLogAsync(this.authenticator, null);
+            var prevLog = this.GetPrevLog(logs, viewModel.Revision);
 
-                var header1 = prevLog != null ? $"[{prevLog.Value.DateTime}] {prevLog.Value.Revision}" : string.Empty;
-                var header2 = $"[{viewModel.DateTime}] {viewModel.Revision}";
-                var dataSet1 = prevLog != null ? table.GetDataSet(this.authenticator, prevLog.Value.Revision) : new CremaDataSet();
-                var dataSet2 = table.GetDataSet(this.authenticator, viewModel.Revision);
-                var dataSet = new DiffDataSet(dataSet1, dataSet2)
-                {
-                    Header1 = header1,
-                    Header2 = header2,
-                };
-                return dataSet.Tables.First();
-            });
+            var header1 = prevLog != null ? $"[{prevLog.Value.DateTime}] {prevLog.Value.Revision}" : string.Empty;
+            var header2 = $"[{viewModel.DateTime}] {viewModel.Revision}";
+            var dataSet1 = prevLog != null ? await table.GetDataSetAsync(this.authenticator, prevLog.Value.Revision) : new CremaDataSet();
+            var dataSet2 = await table.GetDataSetAsync(this.authenticator, viewModel.Revision);
+            var dataSet = new DiffDataSet(dataSet1, dataSet2)
+            {
+                Header1 = header1,
+                Header2 = header2,
+            };
+            return dataSet.Tables.First();
         }
 
         private LogInfo? GetPrevLog(LogInfo[] logs, string revision)

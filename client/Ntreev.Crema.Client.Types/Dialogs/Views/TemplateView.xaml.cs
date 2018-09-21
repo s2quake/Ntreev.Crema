@@ -116,7 +116,7 @@ namespace Ntreev.Crema.Client.Types.Dialogs.Views
                 try
                 {
                     var domain = this.Domain;
-                    await domain.Dispatcher.InvokeAsync(() => domain.SetRow(authenticator, item, CremaSchema.Index, index));
+                    await domain.SetRowAsync(authenticator, item, CremaSchema.Index, index);
                 }
                 catch (Exception ex)
                 {

@@ -463,9 +463,9 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITypeCollection
 
-        bool ITypeCollection.Contains(string typeName)
+        Task<bool> ITypeCollection.ContainsAsync(string typeName)
         {
-            return this.Contains(typeName);
+            return this.Dispatcher.InvokeAsync(() => this.Contains(typeName));
         }
 
         IType ITypeCollection.this[string typeName] => this[typeName];

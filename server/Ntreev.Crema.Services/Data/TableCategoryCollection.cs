@@ -342,9 +342,9 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITableCategoryCollection
 
-        bool ITableCategoryCollection.Contains(string categoryPath)
+        Task<bool> ITableCategoryCollection.ContainsAsync(string categoryPath)
         {
-            return this.Contains(categoryPath);
+            return this.Dispatcher.InvokeAsync(() => this.Contains(categoryPath));
         }
 
         ITableCategory ITableCategoryCollection.Root => this.Root;

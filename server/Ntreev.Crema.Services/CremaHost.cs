@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Services
     class CremaHost : ICremaHost, ILogService, IDisposable
     {
         private CremaConfiguration configs;
-        private IEnumerable<IPlugin> plugins;
+        private IPlugin[] plugins;
 
         [Import]
         private IServiceProvider container = null;
@@ -103,7 +103,7 @@ namespace Ntreev.Crema.Services
                 return this;
             if (serviceType == typeof(IObjectSerializer))
                 return this.Serializer;
-            if (this.IsOpened == true && serviceType == typeof(ICremaConfiguration))
+            if (this.ServiceState == ServiceState.Opened && serviceType == typeof(ICremaConfiguration))
                 return this.configs;
 
             if (this.container != null)
@@ -126,15 +126,18 @@ namespace Ntreev.Crema.Services
         {
             try
             {
+                if (this.ServiceState != ServiceState.Closed)
+                    throw new InvalidOperationException();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
+                    this.ServiceState = ServiceState.Opening;
                     this.OnOpening(EventArgs.Empty);
                     this.Info(Resources.Message_ProgramInfo, AppUtility.ProductName, AppUtility.ProductVersion);
                     this.Info("Repository module : {0}", this.settings.RepositoryModule);
                     this.Info(Resources.Message_ServiceStart);
                     this.configs = new CremaConfiguration(Path.Combine(this.BasePath, "configs"), this.propertiesProviders);
                     this.UserContext = new UserContext(this);
-                    this.UserContext.Dispatcher.Invoke(() => this.UserContext.Initialize());
+                    await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Initialize());
                     this.DataBases = new DataBaseCollection(this, this.RepositoryProvider);
                     this.DomainContext = new DomainContext(this, this.UserContext);
 
@@ -146,8 +149,7 @@ namespace Ntreev.Crema.Services
                         }
                     }
 
-                    this.plugins = this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>;
-                    this.plugins = this.plugins.TopologicalSort();
+                    this.plugins = (this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>).TopologicalSort().ToArray();
                     foreach (var item in this.plugins)
                     {
                         var authentication = new Authentication(new AuthenticationProvider(item), item.ID);
@@ -157,6 +159,7 @@ namespace Ntreev.Crema.Services
 
                     GC.Collect();
                     this.Info("Crema module has been started.");
+                    this.ServiceState = ServiceState.Opened;
                     this.OnOpened(EventArgs.Empty);
                     this.DataBases.RestoreStateAsync(this.settings);
                 });
@@ -185,22 +188,24 @@ namespace Ntreev.Crema.Services
         {
             try
             {
+                if (this.ServiceState != ServiceState.Opened)
+                    throw new InvalidOperationException();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
+                    this.ServiceState = ServiceState.Closing;
                     this.OnClosing(EventArgs.Empty);
                     foreach (var item in this.plugins.Reverse())
                     {
                         item.Release();
                     }
-                    await this.UserContext.ClearAsync();
-                    this.UserContext.Dispose();
+                    await this.UserContext.DisposeAsync();
                     this.UserContext = null;
                     await this.DomainContext.DisposeAsync();
                     this.DomainContext = null;
                     this.DataBases.Dispose();
                     this.DataBases = null;
-
                     this.Info("Crema module has been stopped.");
+                    this.ServiceState = ServiceState.Closed;
                     this.OnClosed(new ClosedEventArgs(reason, message));
                 });
             }
@@ -215,6 +220,8 @@ namespace Ntreev.Crema.Services
         {
             try
             {
+                if (this.ServiceState != ServiceState.Opened)
+                    throw new InvalidOperationException();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, shutdownType, message);
@@ -251,6 +258,8 @@ namespace Ntreev.Crema.Services
         {
             try
             {
+                if (this.ServiceState != ServiceState.Opened)
+                    throw new InvalidOperationException();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.DebugMethod(authentication, this, nameof(CancelShutdownAsync), this);
@@ -363,7 +372,7 @@ namespace Ntreev.Crema.Services
 
         public string BasePath { get; }
 
-        public bool IsOpened => this.DataBases != null;
+        public ServiceState ServiceState { get; set; }
 
         public bool NoCache => this.settings.NoCache;
 
@@ -529,7 +538,7 @@ namespace Ntreev.Crema.Services
 
         string ILogService.FileName => this.log.FileName;
 
-        bool ILogService.IsEnabled => this.IsOpened;
+        bool ILogService.IsEnabled => this.ServiceState == ServiceState.Opened;
 
         #endregion
 

@@ -65,11 +65,8 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
 
         protected async override void VerifyRename(string newName, Action<bool> isVerify)
         {
-            var result = await this.type.Dispatcher.InvokeAsync(() =>
-            {
-                var types = this.type.GetService(typeof(ITypeCollection)) as ITypeCollection;
-                return types.Contains(newName) == false;
-            });
+            var types = this.type.GetService(typeof(ITypeCollection)) as ITypeCollection;
+            var result = await types.ContainsAsync(newName) == false;
             isVerify(result);
         }
 

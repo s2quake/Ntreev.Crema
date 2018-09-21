@@ -647,10 +647,6 @@ namespace Ntreev.Crema.Services.Domains
             {
                 this.Dispatcher.VerifyAccess();
                 this.deleted -= value;
-                if (this.deleted != null)
-                {
-                    int qwer = 0;
-                }
             }
         }
 

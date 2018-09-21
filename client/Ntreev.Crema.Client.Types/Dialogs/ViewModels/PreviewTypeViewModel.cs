@@ -59,11 +59,8 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
             {
                 this.DisplayName = await this.type.Dispatcher.InvokeAsync(() => $"{this.type.Name} - {revision}");
                 this.BeginProgress(Resources.Message_ReceivingInfo);
-                this.Source = await Task.Run(() =>
-                {
-                    var dataSet = this.type.GetDataSet(this.authentication, this.revision);
-                    return dataSet.Types.FirstOrDefault();
-                });
+                var dataSet = await this.type.GetDataSetAsync(this.authentication, this.revision);
+                this.Source = dataSet.Types.FirstOrDefault();
             }
             catch (Exception e)
             {

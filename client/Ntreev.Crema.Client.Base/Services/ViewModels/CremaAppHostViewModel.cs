@@ -156,7 +156,7 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
             try
             {
                 this.ProgressMessage = Resources.Message_ConnectingToServer;
-                if (await this.cremaHost.Dispatcher.InvokeAsync(() => CremaBootstrapper.IsOnline(address, userID, password)) == true)
+                if (await CremaBootstrapper.IsOnlineAsync(address, userID, password) == true)
                 {
                     if (AppMessageBox.ShowQuestion(Resources.Message_SameIDConnected) == false)
                     {

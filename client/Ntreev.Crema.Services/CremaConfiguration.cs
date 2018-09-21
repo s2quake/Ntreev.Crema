@@ -30,7 +30,8 @@ namespace Ntreev.Crema.Services
         {
             this.xmlPath = path;
             this.schemaPath = Path.ChangeExtension(path, ".xsd");
-            this.Read(this.xmlPath);
+            if (File.Exists(this.xmlPath) == true)
+                this.Read(this.xmlPath);
         }
 
         public override string Name => "CremaConfigs";

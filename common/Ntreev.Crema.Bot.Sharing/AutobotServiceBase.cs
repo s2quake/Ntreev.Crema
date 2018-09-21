@@ -74,11 +74,11 @@ namespace Ntreev.Crema.Bot
 
             this.IsPlaying = true;
             var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            if (await userContext.Dispatcher.InvokeAsync(() => userContext.Categories.Contains("/autobots/")) == false)
+            if (await userContext.Categories.ContainsAsync("/autobots/") == false)
             {
                 await userContext.Root.AddNewCategoryAsync(authentication, "autobots");
             }
-            if (await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Contains(masterBotID)) == false)
+            if (await userContext.Users.ContainsAsync(masterBotID) == false)
             {
                 var category = userContext.Categories["/autobots/"];
                 await category.AddNewUserAsync(authentication, masterBotID, StringUtility.ToSecureString("1111"), masterBotID, Authority.Admin);
@@ -92,7 +92,7 @@ namespace Ntreev.Crema.Bot
                 var authority = RandomUtility.NextEnum<Authority>();
                 if (authority == Authority.Guest)
                     authority = Authority.Member;
-                if (await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Contains(autobotID)) == false)
+                if (await userContext.Users.ContainsAsync(autobotID) == false)
                 {
                     var category = userContext.Categories["/autobots/"];
                     await category.AddNewUserAsync(authentication, autobotID, StringUtility.ToSecureString("1111"), autobotID, authority);

@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 
         protected async override void VerifyRename(string newName, Action<bool> isVerify)
         {
-            var result = await this.table.Dispatcher.InvokeAsync(() =>
+            var result = await await this.table.Dispatcher.InvokeAsync(async () =>
             {
                 var tableContext = this.table.GetService(typeof(ITableContext)) as ITableContext;
                 var categoryNames = tableContext.Categories.Select(item => item.Path).ToArray();
@@ -83,7 +83,7 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
                     return true;
                 }
 
-                return tableContext.Tables.Contains(newName) == false;
+                return await tableContext.Tables.ContainsAsync(newName) == false;
             });
 
             isVerify(result);

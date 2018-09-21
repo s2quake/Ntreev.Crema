@@ -64,24 +64,20 @@ namespace Ntreev.Crema.Client.Differences.MenuItems
             dialog.ShowDialog();
         }
 
-        private Task<DiffDataType> Initialize(LogInfoViewModel viewModel, IType type)
+        private async Task<DiffDataType> Initialize(LogInfoViewModel viewModel, IType type)
         {
-            return type.Dispatcher.InvokeAsync(() =>
+            var logs = await type.GetLogAsync(this.authenticator, null);
+            var prevLog = this.GetPrevLog(logs, viewModel.Revision);
+            var header1 = prevLog != null ? $"[{prevLog.Value.DateTime}] {prevLog.Value.Revision}" : string.Empty;
+            var header2 = $"[{viewModel.DateTime}] {viewModel.Revision}";
+            var dataSet1 = prevLog != null ? await type.GetDataSetAsync(this.authenticator, prevLog.Value.Revision) : new CremaDataSet();
+            var dataSet2 = await type.GetDataSetAsync(this.authenticator, viewModel.Revision);
+            var dataSet = new DiffDataSet(dataSet1, dataSet2)
             {
-                var logs = type.GetLog(this.authenticator, null);
-                var prevLog = this.GetPrevLog(logs, viewModel.Revision);
-
-                var header1 = prevLog != null ? $"[{prevLog.Value.DateTime}] {prevLog.Value.Revision}" : string.Empty;
-                var header2 = $"[{viewModel.DateTime}] {viewModel.Revision}";
-                var dataSet1 = prevLog != null ? type.GetDataSet(this.authenticator, prevLog.Value.Revision) : new CremaDataSet();
-                var dataSet2 = type.GetDataSet(this.authenticator, viewModel.Revision);
-                var dataSet = new DiffDataSet(dataSet1, dataSet2)
-                {
-                    Header1 = header1,
-                    Header2 = header2,
-                };
-                return dataSet.Types.First();
-            });
+                Header1 = header1,
+                Header2 = header2,
+            };
+            return dataSet.Types.First();
         }
 
         private LogInfo? GetPrevLog(LogInfo[] logs, string revision)

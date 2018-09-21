@@ -182,14 +182,9 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 
         private async void VerfiyAction()
         {
-            this.isVerify = await this.table.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.tables.Contains(this.NewName) == true)
-                    return false;
-
-                return this.categories.Contains(this.CategoryPath) == true;
-            });
-
+            if (await this.tables.ContainsAsync(this.NewName) == true)
+                return;
+            this.isVerify = await this.categories.ContainsAsync(this.CategoryPath) == true;
             this.NotifyOfPropertyChange(nameof(this.CanCopy));
         }
     }

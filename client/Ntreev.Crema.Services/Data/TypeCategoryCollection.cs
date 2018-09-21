@@ -231,29 +231,14 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITypeCategoryCollection
 
-        bool ITypeCategoryCollection.Contains(string categoryPath)
+        Task<bool> ITypeCategoryCollection.ContainsAsync(string categoryPath)
         {
-            this.Dispatcher?.VerifyAccess();
-            return this.Contains(categoryPath);
+            return this.Dispatcher.InvokeAsync(() => this.Contains(categoryPath));
         }
 
-        ITypeCategory ITypeCategoryCollection.Root
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Root;
-            }
-        }
+        ITypeCategory ITypeCategoryCollection.Root => this.Root;
 
-        ITypeCategory ITypeCategoryCollection.this[string categoryPath]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this[categoryPath];
-            }
-        }
+        ITypeCategory ITypeCategoryCollection.this[string categoryPath] => this[categoryPath];
 
         #endregion
 
@@ -261,13 +246,11 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITypeCategory> IEnumerable<ITypeCategory>.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.GetEnumerator();
         }
 

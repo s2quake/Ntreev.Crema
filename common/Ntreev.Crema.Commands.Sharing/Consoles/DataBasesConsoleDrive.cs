@@ -223,7 +223,7 @@ namespace Ntreev.Crema.Commands.Consoles
                         throw new InvalidOperationException($"cannot move to : {destPath}");
                     var itemName = new ItemName(destPath.ItemPath);
                     var categories = sourceCategory.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
-                    if (categories.Contains(itemName.CategoryPath) == false)
+                    if (await categories.ContainsAsync(itemName.CategoryPath) == false)
                         throw new InvalidOperationException($"cannot move to : {destPath}");
                     if (sourceCategory.Name != itemName.Name && await types.ContainsAsync(itemName.Name) == true)
                         throw new InvalidOperationException($"cannot move to : {destPath}");
@@ -262,7 +262,7 @@ namespace Ntreev.Crema.Commands.Consoles
                         throw new InvalidOperationException($"cannot move to : {destPath}");
                     var itemName = new ItemName(destPath.ItemPath);
                     var categories = sourceType.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
-                    if (categories.Contains(itemName.CategoryPath) == false)
+                    if (await categories.ContainsAsync(itemName.CategoryPath) == false)
                         throw new InvalidOperationException($"cannot move to : {destPath}");
                     if (sourceType.Name != itemName.Name && await types.ContainsAsync(itemName.Name) == true)
                         throw new InvalidOperationException($"cannot move to : {destPath}");
@@ -301,9 +301,9 @@ namespace Ntreev.Crema.Commands.Consoles
                         throw new InvalidOperationException($"cannot move to : {destPath}");
                     var itemName = new ItemName(destPath.ItemPath);
                     var categories = sourceCategory.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
-                    if (categories.Contains(itemName.CategoryPath) == false)
+                    if (await categories.ContainsAsync(itemName.CategoryPath) == false)
                         throw new InvalidOperationException($"cannot move to : {destPath}");
-                    if (sourceCategory.Name != itemName.Name && tables.Contains(itemName.Name) == true)
+                    if (sourceCategory.Name != itemName.Name && await tables.ContainsAsync(itemName.Name) == true)
                         throw new InvalidOperationException($"cannot move to : {destPath}");
                     if (sourceCategory.Parent.Path != itemName.CategoryPath)
                         await sourceCategory.MoveAsync(authentication, itemName.CategoryPath);
@@ -340,9 +340,9 @@ namespace Ntreev.Crema.Commands.Consoles
                         throw new InvalidOperationException($"cannot move to : {destPath}");
                     var itemName = new ItemName(destPath.ItemPath);
                     var categories = sourceTable.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
-                    if (categories.Contains(itemName.CategoryPath) == false)
+                    if (await categories.ContainsAsync(itemName.CategoryPath) == false)
                         throw new InvalidOperationException($"cannot move to : {destPath}");
-                    if (sourceTable.Name != itemName.Name && tables.Contains(itemName.Name) == true)
+                    if (sourceTable.Name != itemName.Name && await tables.ContainsAsync(itemName.Name) == true)
                         throw new InvalidOperationException($"cannot move to : {destPath}");
                     if (sourceTable.Category.Path != itemName.CategoryPath)
                         await sourceTable.MoveAsync(authentication, itemName.CategoryPath);

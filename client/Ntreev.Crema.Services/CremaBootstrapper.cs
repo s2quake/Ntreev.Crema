@@ -28,6 +28,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
@@ -54,13 +55,13 @@ namespace Ntreev.Crema.Services
             this.Initialize();
         }
 
-        public static bool IsOnline(string address, string userID, SecureString password)
+        public static async Task<bool> IsOnlineAsync(string address, string userID, SecureString password)
         {
             var serviceClient = DescriptorServiceFactory.CreateServiceClient(address);
             serviceClient.Open();
             try
             {
-                return serviceClient.IsOnline(userID, UserContext.Encrypt(userID, password));
+                return await serviceClient.IsOnlineAsync(userID, UserContext.Encrypt(userID, password));
             }
             finally
             {

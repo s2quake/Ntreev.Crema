@@ -210,29 +210,14 @@ namespace Ntreev.Crema.Services.Users
 
         #region IUserCategoryCollection
 
-        bool IUserCategoryCollection.Contains(string categoryPath)
+        Task<bool> IUserCategoryCollection.ContainsAsync(string categoryPath)
         {
-            this.Dispatcher.VerifyAccess();
-            return this.Contains(categoryPath);
+            return this.Dispatcher.InvokeAsync(() => this.Contains(categoryPath));
         }
 
-        IUserCategory IUserCategoryCollection.Root
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Root;
-            }
-        }
+        IUserCategory IUserCategoryCollection.Root => this.Root;
 
-        IUserCategory IUserCategoryCollection.this[string categoryPath]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[categoryPath];
-            }
-        }
+        IUserCategory IUserCategoryCollection.this[string categoryPath] => this[categoryPath];
 
         #endregion
 
@@ -240,13 +225,11 @@ namespace Ntreev.Crema.Services.Users
 
         IEnumerator<IUserCategory> IEnumerable<IUserCategory>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 

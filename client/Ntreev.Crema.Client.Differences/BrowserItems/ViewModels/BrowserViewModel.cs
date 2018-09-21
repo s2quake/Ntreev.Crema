@@ -218,10 +218,7 @@ namespace Ntreev.Crema.Client.Differences.BrowserItems.ViewModels
 
                 var dialog = new ProgressViewModel();
                 dialog.DisplayName = viewModel.DisplayName;
-                dialog.ShowDialog(() =>
-                {
-                    this.cremaHost.Dispatcher.Invoke(() => dataBase.Import(this.authenticator, dataTable.DataSet, comment));
-                });
+                dialog.ShowDialog(() => dataBase.ImportAsync(this.authenticator, dataTable.DataSet, comment));
             }
             catch (Exception e)
             {

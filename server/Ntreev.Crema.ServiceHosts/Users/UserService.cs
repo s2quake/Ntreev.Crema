@@ -78,7 +78,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
                 });
 
                 this.OwnerID = this.authentication.ID;
-                this.AttachEventHandlers();
+                this.AttachEventHandlersAsync();
                 this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(SubscribeAsync)}");
 
                 result.Value = await this.userContext.GetMetaDataAsync(this.authentication);
@@ -106,7 +106,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var result = new ResultBase();
             try
             {
-                await this.userContext.Dispatcher.InvokeAsync(this.DetachEventHandlers);
+                await this.DetachEventHandlersAsync();
                 this.authentication.RemoveRef(this);
                 await this.userContext.LogoutAsync(this.authentication);
                 this.authentication = null;
@@ -340,21 +340,18 @@ namespace Ntreev.Crema.ServiceHosts.Users
             return true;
         }
 
-        protected override void OnDisposed(EventArgs e)
+        protected override async void OnDisposed(EventArgs e)
         {
             base.OnDisposed(e);
-            this.userContext.Dispatcher.Invoke(() =>
+            if (this.authentication != null)
             {
-                if (this.authentication != null)
+                await this.DetachEventHandlersAsync();
+                if (this.authentication.RemoveRef(this) == 0)
                 {
-                    this.DetachEventHandlers();
-                    if (this.authentication.RemoveRef(this) == 0)
-                    {
-                        this.userContext.LogoutAsync(this.authentication).Wait();
-                    }
-                    this.authentication = null;
+                    this.userContext.LogoutAsync(this.authentication).Wait();
                 }
-            });
+                this.authentication = null;
+            }
         }
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
@@ -362,42 +359,42 @@ namespace Ntreev.Crema.ServiceHosts.Users
             this.Callback.OnServiceClosed(signatureDate, closeInfo);
         }
 
-        private void AttachEventHandlers()
+        private async Task AttachEventHandlersAsync()
         {
-            this.userContext.Dispatcher.VerifyAccess();
-
-            this.userContext.Users.UsersStateChanged += Users_UsersStateChanged;
-            this.userContext.Users.UsersChanged += Users_UsersChanged;
-            this.userContext.ItemsCreated += UserContext_ItemsCreated;
-            this.userContext.ItemsRenamed += UserContext_ItemsRenamed;
-            this.userContext.ItemsMoved += UserContext_ItemsMoved;
-            this.userContext.ItemsDeleted += UserContext_ItemsDeleted;
-            this.userContext.Users.UsersLoggedIn += Users_UsersLoggedIn;
-            this.userContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
-            this.userContext.Users.UsersKicked += Users_UsersKicked;
-            this.userContext.Users.UsersBanChanged += Users_UsersBanChanged;
-            this.userContext.Users.MessageReceived += UserContext_MessageReceived;
-
-            this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(AttachEventHandlers)}");
+            await this.userContext.Dispatcher.InvokeAsync(() =>
+            {
+                this.userContext.Users.UsersStateChanged += Users_UsersStateChanged;
+                this.userContext.Users.UsersChanged += Users_UsersChanged;
+                this.userContext.ItemsCreated += UserContext_ItemsCreated;
+                this.userContext.ItemsRenamed += UserContext_ItemsRenamed;
+                this.userContext.ItemsMoved += UserContext_ItemsMoved;
+                this.userContext.ItemsDeleted += UserContext_ItemsDeleted;
+                this.userContext.Users.UsersLoggedIn += Users_UsersLoggedIn;
+                this.userContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
+                this.userContext.Users.UsersKicked += Users_UsersKicked;
+                this.userContext.Users.UsersBanChanged += Users_UsersBanChanged;
+                this.userContext.Users.MessageReceived += UserContext_MessageReceived;
+            });
+            this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(AttachEventHandlersAsync)}");
         }
 
-        private void DetachEventHandlers()
+        private async Task DetachEventHandlersAsync()
         {
-            this.userContext.Dispatcher.VerifyAccess();
-
-            this.userContext.Users.UsersStateChanged -= Users_UsersStateChanged;
-            this.userContext.Users.UsersChanged -= Users_UsersChanged;
-            this.userContext.ItemsCreated -= UserContext_ItemsCreated;
-            this.userContext.ItemsRenamed -= UserContext_ItemsRenamed;
-            this.userContext.ItemsMoved -= UserContext_ItemsMoved;
-            this.userContext.ItemsDeleted -= UserContext_ItemsDeleted;
-            this.userContext.Users.UsersLoggedIn -= Users_UsersLoggedIn;
-            this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-            this.userContext.Users.UsersKicked -= Users_UsersKicked;
-            this.userContext.Users.UsersBanChanged -= Users_UsersBanChanged;
-            this.userContext.Users.MessageReceived -= UserContext_MessageReceived;
-
-            this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(DetachEventHandlers)}");
+            await this.userContext.Dispatcher.InvokeAsync(() =>
+            {
+                this.userContext.Users.UsersStateChanged -= Users_UsersStateChanged;
+                this.userContext.Users.UsersChanged -= Users_UsersChanged;
+                this.userContext.ItemsCreated -= UserContext_ItemsCreated;
+                this.userContext.ItemsRenamed -= UserContext_ItemsRenamed;
+                this.userContext.ItemsMoved -= UserContext_ItemsMoved;
+                this.userContext.ItemsDeleted -= UserContext_ItemsDeleted;
+                this.userContext.Users.UsersLoggedIn -= Users_UsersLoggedIn;
+                this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+                this.userContext.Users.UsersKicked -= Users_UsersKicked;
+                this.userContext.Users.UsersBanChanged -= Users_UsersBanChanged;
+                this.userContext.Users.MessageReceived -= UserContext_MessageReceived;
+            });
+            this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(DetachEventHandlersAsync)}");
         }
 
         private void Users_UsersStateChanged(object sender, Services.ItemsEventArgs<IUser> e)
@@ -479,7 +476,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnUsersLoggedIn(signatureDate, userIDs));
         }
 
-        private void Users_UsersLoggedOut(object sender, Services.ItemsEventArgs<IUser> e)
+        private async void Users_UsersLoggedOut(object sender, Services.ItemsEventArgs<IUser> e)
         {
             var actionUserID = e.UserID;
             var contains = e.Items.Any(item => item.ID == this.authentication.ID);
@@ -487,7 +484,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             if (actionUserID != this.authentication.ID && contains == true)
             {
                 var signatureDate = e.SignatureDate;
-                this.DetachEventHandlers();
+                await this.DetachEventHandlersAsync();
                 this.InvokeEvent(null, null, () => this.Callback.OnServiceClosed(signatureDate, closeInfo));
             }
             else
@@ -614,13 +611,10 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         #region ICremaServiceItem
 
-        void ICremaServiceItem.Abort(bool disconnect)
+        async void ICremaServiceItem.Abort(bool disconnect)
         {
-            this.userContext.Dispatcher.Invoke(() =>
-            {
-                this.DetachEventHandlers();
-                this.authentication = null;
-            });
+            await this.DetachEventHandlersAsync();
+            this.authentication = null;
 
             CremaService.Dispatcher.Invoke(() =>
             {

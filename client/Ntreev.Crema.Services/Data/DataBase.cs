@@ -829,32 +829,11 @@ namespace Ntreev.Crema.Services.Data
 
         public IDataBaseService Service => this.service;
 
-        public new DataBaseInfo DataBaseInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.DataBaseInfo;
-            }
-        }
+        public new DataBaseInfo DataBaseInfo => base.DataBaseInfo;
 
-        public new DataBaseState DataBaseState
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.DataBaseState;
-            }
-        }
+        public new DataBaseState DataBaseState => base.DataBaseState;
 
-        public AuthenticationInfo[] AuthenticationInfos
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
-            }
-        }
+        public AuthenticationInfo[] AuthenticationInfos => this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
 
         public override TypeCategoryBase<Type, TypeCategory, TypeCollection, TypeCategoryCollection, TypeContext> TypeCategory => this.typeContext?.Root;
 
@@ -862,38 +841,17 @@ namespace Ntreev.Crema.Services.Data
 
         public new string Name
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Name;
-            }
-            set
-            {
-                base.Name = value;
-            }
+            get => base.Name;
+            set => base.Name = value;
         }
 
         public bool IsLoaded => this.DataBaseState.HasFlag(DataBaseState.IsLoaded);
 
         public bool IsResetting { get; private set; }
 
-        public new bool IsLocked
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.IsLocked;
-            }
-        }
+        public new bool IsLocked => base.IsLocked;
 
-        public new bool IsPrivate
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.IsPrivate;
-            }
-        }
+        public new bool IsPrivate => base.IsPrivate;
 
         public Guid ID => base.DataBaseInfo.ID;
 

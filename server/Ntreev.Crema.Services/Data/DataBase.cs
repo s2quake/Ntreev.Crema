@@ -47,7 +47,7 @@ namespace Ntreev.Crema.Services.Data
         private TableContext tableContext;
         private UserContext userContext;
         private CremaDataSet dataSet;
-        private DataBaseMetaData metaData;
+        private DataBaseMetaData metaData = DataBaseMetaData.Empty;
         private AuthenticationInfo[] authenticationInfos;
 
         private EventHandler<AuthenticationEventArgs> authenticationEntered;
@@ -1226,6 +1226,11 @@ namespace Ntreev.Crema.Services.Data
                     ModificationInfo = repositoryInfo.ModificationInfo,
                 };
             }
+
+            this.metaData.DataBaseInfo = base.DataBaseInfo;
+            this.metaData.DataBaseState = base.DataBaseState;
+            this.metaData.AccessInfo = base.AccessInfo;
+            this.metaData.LockInfo = base.LockInfo;
 
             this.ReadAccessInfo();
         }

@@ -220,29 +220,14 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITableCategoryCollection
 
-        bool ITableCategoryCollection.Contains(string categoryPath)
+        Task<bool> ITableCategoryCollection.ContainsAsync(string categoryPath)
         {
-            this.Dispatcher?.VerifyAccess();
-            return this.Contains(categoryPath);
+            return this.Dispatcher.InvokeAsync(() => this.Contains(categoryPath));
         }
 
-        ITableCategory ITableCategoryCollection.Root
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Root;
-            }
-        }
+        ITableCategory ITableCategoryCollection.Root => this.Root;
 
-        ITableCategory ITableCategoryCollection.this[string categoryPath]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this[categoryPath];
-            }
-        }
+        ITableCategory ITableCategoryCollection.this[string categoryPath] => this[categoryPath];
 
         #endregion
 

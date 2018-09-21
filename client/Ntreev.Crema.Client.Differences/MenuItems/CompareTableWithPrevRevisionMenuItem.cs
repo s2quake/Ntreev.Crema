@@ -57,22 +57,19 @@ namespace Ntreev.Crema.Client.Differences.MenuItems
             dialog.ShowDialog();
         }
 
-        private Task<DiffDataTable> Initialize(ITable table)
+        private async Task<DiffDataTable> Initialize(ITable table)
         {
-            return table.Dispatcher.InvokeAsync(() =>
+            var logs = await table.GetLogAsync(this.authenticator, null);
+            var hasRevision = logs.Length >= 2;
+            var dataSet1 = hasRevision ? await table.GetDataSetAsync(this.authenticator, logs[1].Revision) : new CremaDataSet();
+            var dataSet2 = await table.GetDataSetAsync(this.authenticator, null);
+            var header1 = hasRevision ? $"[{logs[1].DateTime}] {logs[1].Revision}" : string.Empty;
+            var dataSet = new DiffDataSet(dataSet1, dataSet2)
             {
-                var logs = table.GetLog(this.authenticator, null);
-                var hasRevision = logs.Length >= 2;
-                var dataSet1 = hasRevision ? table.GetDataSet(this.authenticator, logs[1].Revision) : new CremaDataSet();
-                var dataSet2 = table.GetDataSet(this.authenticator, null);
-                var header1 = hasRevision ? $"[{logs[1].DateTime}] {logs[1].Revision}" : string.Empty;
-                var dataSet = new DiffDataSet(dataSet1, dataSet2)
-                {
-                    Header1 = header1,
-                    Header2 = Resources.Text_Current,
-                };
-                return dataSet.Tables.First();
-            });
+                Header1 = header1,
+                Header2 = Resources.Text_Current,
+            };
+            return dataSet.Tables.First();
         }
     }
 }

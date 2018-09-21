@@ -70,14 +70,11 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 
         protected async override void Verify(Action<bool> isVerify)
         {
-            var result = await this.category.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.TableName == string.Empty)
-                    return false;
-                if (NameValidator.VerifyName(this.TableName) == false)
-                    return false;
-                return this.category.Dispatcher.Invoke(() => this.tableContext.Tables.Contains(this.TableName) == false);
-            });
+            if (this.TableName == string.Empty)
+                return;
+            if (NameValidator.VerifyName(this.TableName) == false)
+                return;
+            var result = await this.tableContext.Tables.ContainsAsync(this.TableName) == false;
             isVerify(result);
         }
     }

@@ -150,14 +150,11 @@ namespace Ntreev.Crema.Client.Tables
 
                 try
                 {
-                    await category.Dispatcher.InvokeAsync(() =>
+                    var lockInfo = await category.Dispatcher.InvokeAsync(() => category.LockInfo);
+                    if (lockInfo.IsLocked == true && lockInfo.IsInherited == false && lockInfo.Comment == comment)
                     {
-                        var lockInfo = category.LockInfo;
-                        if (lockInfo.IsLocked == true && lockInfo.IsInherited == false && lockInfo.Comment == comment)
-                        {
-                            category.Unlock(authentication);
-                        }
-                    });
+                        await category.UnlockAsync(authentication);
+                    }
                 }
                 catch (Exception e)
                 {

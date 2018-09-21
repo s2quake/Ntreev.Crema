@@ -53,7 +53,7 @@ namespace Ntreev.Crema.Client.Tables.Documents.Assets
                 try
                 {
                     var domain = gridControl.Domain;
-                    await domain.Dispatcher.InvokeAsync(() => domain.SetRow(authenticator, item, CremaSchema.Index, index));
+                    await domain.SetRowAsync(authenticator, item, CremaSchema.Index, index);
                 }
                 catch (Exception ex)
                 {

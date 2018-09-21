@@ -79,7 +79,7 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
             try
             {
                 this.BeginProgress(Resources.Message_CopingType);
-                await this.type.Dispatcher.InvokeAsync(() => this.type.Copy(this.authentication, this.NewName, this.CategoryPath));
+                await this.type.CopyAsync(this.authentication, this.NewName, this.CategoryPath);
                 this.EndProgress();
                 this.TryClose(true);
                 AppMessageBox.Show(Resources.Message_TypeCopied);
@@ -142,13 +142,9 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
 
         private async void VerifyCopy(Action<bool> isValid)
         {
-            var result = await this.type.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.types.Contains(this.NewName) == true)
-                    return false;
-
-                return this.categories.Contains(this.CategoryPath) == true;
-            });
+            if (await this.types.ContainsAsync(this.NewName) == true)
+                return;
+            var result = await this.categories.ContainsAsync(this.CategoryPath) == true;
             isValid(result);
         }
 

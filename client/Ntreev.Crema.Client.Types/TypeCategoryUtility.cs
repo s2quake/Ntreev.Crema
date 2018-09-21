@@ -166,16 +166,14 @@ namespace Ntreev.Crema.Client.Types
             {
                 try
                 {
-                    return await category.Dispatcher.InvokeAsync(() =>
+                    var lockInfo = await category.Dispatcher.InvokeAsync(() => category.LockInfo);
+                    if (lockInfo.IsLocked == false || lockInfo.IsInherited == true)
                     {
-                        if (category.IsLocked == false || category.LockInfo.IsInherited == true)
-                        {
-                            var lockComment = comment + ":" + Guid.NewGuid();
-                            category.Lock(authentication, lockComment);
-                            return lockComment;
-                        }
-                        return string.Empty;
-                    });
+                        var lockComment = comment + ":" + Guid.NewGuid();
+                        await category.LockAsync(authentication, lockComment);
+                        return lockComment;
+                    }
+                    return string.Empty;
                 }
                 catch (Exception e)
                 {
@@ -198,14 +196,11 @@ namespace Ntreev.Crema.Client.Types
 
                 try
                 {
-                    await category.Dispatcher.InvokeAsync(() =>
+                    var lockInfo = await category.Dispatcher.InvokeAsync(() => category.LockInfo);
+                    if (lockInfo.IsLocked == true && lockInfo.IsInherited == false && lockInfo.Comment == comment)
                     {
-                        var lockInfo = category.LockInfo;
-                        if (lockInfo.IsLocked == true && lockInfo.IsInherited == false && lockInfo.Comment == comment)
-                        {
-                            category.Unlock(authentication);
-                        }
-                    });
+                        await category.UnlockAsync(authentication);
+                    }
                 }
                 catch (Exception e)
                 {

@@ -383,47 +383,18 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITableContext
 
-        bool ITableContext.Contains(string itemPath)
+        Task<bool> ITableContext.ContainsAsync(string itemPath)
         {
-            this.Dispatcher?.VerifyAccess();
-            return this.Contains(itemPath);
+            return this.Dispatcher.InvokeAsync(() => this.Contains(itemPath));
         }
 
-        ITableCollection ITableContext.Tables
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Tables;
-            }
-        }
+        ITableCollection ITableContext.Tables => this.Tables;
 
-        ITableCategoryCollection ITableContext.Categories
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        ITableCategoryCollection ITableContext.Categories => this.Categories;
 
-        ITableCategory ITableContext.Root
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Root;
-            }
-        }
+        ITableCategory ITableContext.Root => this.Root;
 
-        ITableItem ITableContext.this[string itemPath]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this[itemPath] as ITableItem;
-            }
-        }
+        ITableItem ITableContext.this[string itemPath] => this[itemPath] as ITableItem;
 
         #endregion
 
@@ -431,7 +402,6 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITableItem> IEnumerable<ITableItem>.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as ITableItem;
@@ -440,7 +410,6 @@ namespace Ntreev.Crema.Services.Data
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as ITableItem;

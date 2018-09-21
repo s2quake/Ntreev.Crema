@@ -15,40 +15,28 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ServiceModel;
-using System.Reflection;
-using System.ServiceModel.Dispatcher;
-using System.Threading.Tasks;
-using System.Threading;
-using Ntreev.Library;
-using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
-using System.Windows.Threading;
-using System.Diagnostics;
+using Ntreev.Crema.Services;
+using Ntreev.Library;
+using System;
+using System.ServiceModel;
 
 namespace Ntreev.Crema.ServiceHosts
 {
     public abstract class CremaServiceItemBase<T> : IDisposable
     {
-        private string sessionID;
-        private IContextChannel channel;
-        private T callback;
-        private ServiceHostBase host;
         private readonly ILogService logService;
-        private string ownerID;
+        private readonly string sessionID;
+        private ServiceHostBase host;
 
         protected CremaServiceItemBase(ILogService logService)
         {
             this.logService = logService;
             OperationContext.Current.Host.Closing += Host_Closing;
             this.host = OperationContext.Current.Host;
-            this.channel = OperationContext.Current.Channel;
+            this.Channel = OperationContext.Current.Channel;
             this.sessionID = OperationContext.Current.Channel.SessionId;
-            this.callback = OperationContext.Current.GetCallbackChannel<T>();
+            this.Callback = OperationContext.Current.GetCallbackChannel<T>();
         }
 
         public event EventHandler Disposed;
@@ -59,7 +47,7 @@ namespace Ntreev.Crema.ServiceHosts
             {
                 if (this.sessionID == null || (userID != null && userID == exceptionUserID))
                     return;
-                if (this.channel != null)
+                if (this.Channel != null)
                 {
                     try
                     {
@@ -78,33 +66,23 @@ namespace Ntreev.Crema.ServiceHosts
             this.Disposed?.Invoke(this, e);
         }
 
-        protected T Callback
-        {
-            get { return this.callback; }
-        }
+        protected T Callback { get; private set; }
 
-        protected IContextChannel Channel
-        {
-            get { return this.channel; }
-        }
+        protected IContextChannel Channel { get; private set; }
 
         protected abstract void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo);
 
-        protected string OwnerID
-        {
-            get { return this.ownerID; }
-            set { this.ownerID = value; }
-        }
+        protected string OwnerID { get; set; }
 
         private void Host_Closing(object sender, EventArgs e)
         {
-            if (this.callback != null)
+            if (this.Callback != null)
             {
-                if (this.channel.State == CommunicationState.Opened)
+                if (this.Channel.State == CommunicationState.Opened)
                 {
                     this.OnServiceClosed(SignatureDate.Empty, CloseInfo.Empty);
                 }
-                this.callback = default(T);
+                this.Callback = default(T);
             }
         }
 
@@ -114,8 +92,8 @@ namespace Ntreev.Crema.ServiceHosts
         {
             this.host.Closing -= Host_Closing;
             this.host = null;
-            this.channel = null;
-            this.callback = default(T);
+            this.Channel = null;
+            this.Callback = default(T);
             this.OnDisposed(EventArgs.Empty);
             this.logService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(IDisposable.Dispose)}");
         }

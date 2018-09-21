@@ -21,12 +21,13 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
     public interface ITypeCategoryCollection : IReadOnlyCollection<ITypeCategory>, IEnumerable<ITypeCategory>, IServiceProvider, IDispatcherObject
     {
-        bool Contains(string categoryPath);
+        Task<bool> ContainsAsync(string categoryPath);
 
         ITypeCategory Root { get; }
 

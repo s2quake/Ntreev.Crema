@@ -115,7 +115,7 @@ namespace Ntreev.Crema.Bot.Tasks
             var authentication = context.Authentication;
             if (autobot.GetService(typeof(IUserContext)) is IUserContext userContext)
             {
-                if (await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Contains(autobotID)) == false)
+                if (await userContext.Users.ContainsAsync(autobotID) == false)
                 {
                     var category = userContext.Categories["/autobots/"];
                     await category.AddNewUserAsync(authentication, autobotID, StringUtility.ToSecureString("1111"), autobotID, authority);

@@ -432,20 +432,12 @@ namespace Ntreev.Crema.Services.Users
 
         #region IUserCollection
 
-        bool IUserCollection.Contains(string userID)
+        Task<bool> IUserCollection.ContainsAsync(string userID)
         {
-            this.Dispatcher.VerifyAccess();
-            return base.Contains(userID);
+            return this.Dispatcher.InvokeAsync(() => base.Contains(userID));
         }
 
-        IUser IUserCollection.this[string userID]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[userID];
-            }
-        }
+        IUser IUserCollection.this[string userID] => this[userID];
 
         #endregion
 
@@ -453,13 +445,11 @@ namespace Ntreev.Crema.Services.Users
 
         IEnumerator<IUser> IEnumerable<IUser>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 

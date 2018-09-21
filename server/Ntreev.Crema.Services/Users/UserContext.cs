@@ -34,7 +34,7 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.Services.Users
 {
     class UserContext : ItemContext<User, UserCategory, UserCollection, UserCategoryCollection, UserContext>,
-        IUserContext, IServiceProvider, IDisposable
+        IUserContext, IServiceProvider
     {
         private readonly string remotePath;
 
@@ -413,15 +413,9 @@ namespace Ntreev.Crema.Services.Users
             this.CremaHost.Debug("Loading complete!");
         }
 
-        public void Dispose()
+        public async Task DisposeAsync()
         {
-            this.Repository.Dispose();
-            this.Dispatcher.Dispose();
-        }
-
-        public Task ClearAsync()
-        {
-            return this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 foreach (var item in this.Users)
                 {
@@ -430,6 +424,8 @@ namespace Ntreev.Crema.Services.Users
                 }
                 base.Clear();
             });
+            this.Repository.Dispose();
+            this.Dispatcher.Dispose();
         }
 
         public UserRepositoryHost Repository { get; }

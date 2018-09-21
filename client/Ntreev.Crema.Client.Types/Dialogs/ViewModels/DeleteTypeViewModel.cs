@@ -65,7 +65,7 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
 
         protected override Task DeleteAsync()
         {
-            return this.type.Dispatcher.InvokeAsync(() => this.type.Delete(this.authentication));
+            return this.type.DeleteAsync(this.authentication);
         }
     }
 }
