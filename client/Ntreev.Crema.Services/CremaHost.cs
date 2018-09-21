@@ -30,6 +30,7 @@ using System.Linq;
 using System.Security;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Ntreev.Crema.Services
@@ -134,21 +135,20 @@ namespace Ntreev.Crema.Services
             this.Close(closeInfo);
         }
 
-        public Guid Open(string address, string userID, SecureString password)
+        public async Task<Guid> OpenAsync(string address, string userID, SecureString password)
         {
             try
             {
                 if (this.IsOpened == true)
                     throw new InvalidOperationException(Resources.Exception_AlreadyConnected);
 
-                this.IPAddress = AddressUtility.GetIPAddress(address);
-                this.ServiceInfos = GetServiceInfo(address).ToDictionary(item => item.Name);
-
-                this.OnOpening(EventArgs.Empty);
-                return this.Dispatcher.Invoke(() =>
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
                     try
                     {
+                        this.IPAddress = AddressUtility.GetIPAddress(address);
+                        this.ServiceInfos = GetServiceInfo(address).ToDictionary(item => item.Name);
+                        this.OnOpening(EventArgs.Empty);
                         this.Address = AddressUtility.GetDisplayAddress(address);
                         this.log = new LogService(this.Address.Replace(':', '_'), userID, AppUtility.UserAppDataPath)
                         {
@@ -208,7 +208,7 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        public void Close(Guid token)
+        public async Task CloseAsync(Guid token)
         {
             try
             {
@@ -217,7 +217,7 @@ namespace Ntreev.Crema.Services
                 if (this.IsOpened == false)
                     throw new InvalidOperationException(Resources.Exception_NotConnected);
 
-                this.Dispatcher.Invoke(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Close(CloseInfo.Empty);
                     this.token = Guid.Empty;
@@ -230,13 +230,16 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        public void Shutdown(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message)
+        public async Task ShutdownAsync(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message)
         {
             try
             {
-                this.DebugMethod(authentication, this, nameof(Shutdown), this, milliseconds, shutdownType, message);
-                var result = this.UserContext.Service.Shutdown(milliseconds, shutdownType, message);
-                result.Validate();
+                await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, shutdownType, message);
+                    var result = await this.UserContext.Service.ShutdownAsync(milliseconds, shutdownType, message);
+                    this.Sign(authentication, result);
+                });
             }
             catch (Exception e)
             {
@@ -245,13 +248,16 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        public void CancelShutdown(Authentication authentication)
+        public async Task CancelShutdownAsync(Authentication authentication)
         {
             try
             {
-                this.DebugMethod(authentication, this, nameof(CancelShutdown));
-                var result = this.UserContext.Service.CancelShutdown();
-                result.Validate();
+                await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.DebugMethod(authentication, this, nameof(CancelShutdownAsync));
+                    var result = await this.UserContext.Service.CancelShutdownAsync();
+                    this.Sign(authentication, result);
+                });
             }
             catch (Exception e)
             {
@@ -358,22 +364,6 @@ namespace Ntreev.Crema.Services
         }
 
         public bool IsOpened { get; private set; }
-
-        //public LogVerbose Verbose
-        //{
-        //    get
-        //    {
-        //        if (this.log != null)
-        //            return this.log.Verbose;
-        //        return this.verbose;
-        //    }
-        //    set
-        //    {
-        //        this.verbose = value;
-        //        if (this.log != null)
-        //            this.log.Verbose = value;
-        //    }
-        //}
 
         public DataBaseCollection DataBases { get; private set; }
 

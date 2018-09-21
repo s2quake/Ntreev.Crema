@@ -28,7 +28,7 @@ namespace Ntreev.Crema.Services
     public interface ICremaHost : IServiceProvider, IDisposable, IDispatcherObject
     {
 #if CLIENT
-        Guid Open(string address, string userID, SecureString password);
+        Task<Guid> OpenAsync(string address, string userID, SecureString password);
 
         string Address { get; }
 

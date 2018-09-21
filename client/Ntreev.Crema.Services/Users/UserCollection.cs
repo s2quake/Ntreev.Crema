@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Security;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users
 {
@@ -51,56 +52,27 @@ namespace Ntreev.Crema.Services.Users
             return base.BaseAddNew(name, categoryPath, null);
         }
 
-        public User AddNew(Authentication authentication, string userID, string categoryPath, SecureString password, string userName, Authority authority)
+        public async Task<User> AddNewAsync(Authentication authentication, string userID, string categoryPath, SecureString password, string userName, Authority authority)
         {
-            this.Dispatcher.VerifyAccess();
-            var result = this.Service.NewUser(userID, categoryPath, UserContext.Encrypt(userID, password), userName, authority);
-            this.Sign(authentication, result);
-            this.InvokeUserCreate(authentication, userID, authority, categoryPath);
-            var user = this.BaseAddNew(userID, categoryPath);
-            user.Initialize(result.Value, BanInfo.Empty);
-            this.InvokeUsersCreatedEvent(authentication, new User[] { user });
-            return user;
-        }
-
-        public void InvokeUserCreate(Authentication authentication, string userID, Authority authority, string categoryPath)
-        {
-
-        }
-
-        public void InvokeUserRename(Authentication authentication, User user, string newName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void InvokeUserMove(Authentication authentication, User user, string categoryPath)
-        {
-
-        }
-
-        public void InvokeUserDelete(Authentication authentication, User user)
-        {
-
-        }
-
-        public void InvokeUserChange(Authentication authentication, User user)
-        {
-
-        }
-
-        public void InvokeUserBan(Authentication authentication, User user, BanInfo banInfo)
-        {
-
-        }
-
-        public void InvokeUserUnban(Authentication authentication, User user)
-        {
-
-        }
-
-        public void InvokeUserKick(Authentication authentication, User user, string comment)
-        {
-
+            try
+            {
+                this.ValidateExpired();
+                return await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
+                    var result = await this.Service.NewUserAsync(userID, categoryPath, UserContext.Encrypt(userID, password), userName, authority);
+                    this.CremaHost.Sign(authentication, result);
+                    var user = this.BaseAddNew(userID, categoryPath);
+                    user.Initialize(result.Value, BanInfo.Empty);
+                    this.InvokeUsersCreatedEvent(authentication, new User[] { user });
+                    return user;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public void InvokeUsersCreatedEvent(Authentication authentication, User[] users)
@@ -456,16 +428,6 @@ namespace Ntreev.Crema.Services.Users
         protected virtual void OnMessageReceived(MessageEventArgs e)
         {
             this.messageReceived?.Invoke(this, e);
-        }
-
-        private void Sign(Authentication authentication, ResultBase result)
-        {
-            result.Validate(authentication);
-        }
-
-        private void Sign<T>(Authentication authentication, ResultBase<T> result)
-        {
-            result.Validate(authentication);
         }
 
         #region IUserCollection

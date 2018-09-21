@@ -134,19 +134,27 @@ namespace Ntreev.Crema.Services.Data
             result.Validate(authentication);
         }
 
-        public DataBase AddNewDataBase(Authentication authentication, string dataBaseName, string comment)
+        public async Task<DataBase> AddNewDataBaseAsync(Authentication authentication, string dataBaseName, string comment)
         {
-            this.Dispatcher.VerifyAccess();
-            this.CremaHost.DebugMethod(authentication, this, nameof(AddNewDataBase), dataBaseName, comment);
-
-            var result = this.service.Create(dataBaseName, comment);
-            result.Validate(authentication);
-            var dataBaseInfo = result.Value;
-            var dataBase = new DataBase(this.CremaHost, dataBaseInfo);
-            this.AddBase(dataBase.Name, dataBase);
-            authentication.SignatureDate = dataBaseInfo.CreationInfo;
-            this.InvokeItemsCreateEvent(authentication, new DataBase[] { dataBase }, comment);
-            return dataBase;
+            try
+            {
+                this.ValidateExpired();
+                return await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewDataBaseAsync), dataBaseName, comment);
+                    var result = await this.service.CreateAsync(dataBaseName, comment);
+                    this.CremaHost.Sign(authentication, result);
+                    var dataBase = new DataBase(this.CremaHost, result.Value);
+                    this.AddBase(dataBase.Name, dataBase);
+                    this.InvokeItemsCreateEvent(authentication, new DataBase[] { dataBase }, comment);
+                    return dataBase;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public void LoadDataBase(Authentication authentication, DataBase dataBase)
@@ -159,15 +167,15 @@ namespace Ntreev.Crema.Services.Data
             this.InvokeItemsLoadedEvent(authentication, new IDataBase[] { dataBase, });
         }
 
-        public void UnloadDataBase(Authentication authentication, DataBase dataBase)
-        {
-            this.Dispatcher.VerifyAccess();
-            this.CremaHost.DebugMethod(authentication, this, nameof(UnloadDataBase), dataBase);
-            var result = this.service.Unload(dataBase.Name);
-            result.Validate(authentication);
-            dataBase.SetUnloaded(authentication);
-            this.InvokeItemsUnloadedEvent(authentication, new IDataBase[] { dataBase, });
-        }
+        //public void UnloadDataBase(Authentication authentication, DataBase dataBase)
+        //{
+        //    this.Dispatcher.VerifyAccess();
+        //    this.CremaHost.DebugMethod(authentication, this, nameof(UnloadDataBase), dataBase);
+        //    var result = this.service.Unload(dataBase.Name);
+        //    result.Validate(authentication);
+        //    dataBase.SetUnloaded(authentication);
+        //    this.InvokeItemsUnloadedEvent(authentication, new IDataBase[] { dataBase, });
+        //}
 
         public void RenameDataBase(Authentication authentication, DataBase dataBase, string newDataBaseName)
         {
@@ -195,19 +203,28 @@ namespace Ntreev.Crema.Services.Data
             this.InvokeItemsDeletedEvent(authentication, new DataBase[] { dataBase }, new string[] { dataBaseName, });
         }
 
-        public DataBase CopyDataBase(Authentication authentication, DataBase dataBase, string newDataBaseName, string comment, bool force)
+        public async Task<DataBase> CopyDataBaseAsync(Authentication authentication, DataBase dataBase, string newDataBaseName, string comment, bool force)
         {
-            this.Dispatcher.VerifyAccess();
-            this.CremaHost.DebugMethod(authentication, this, nameof(CopyDataBase), dataBase, newDataBaseName, comment, force);
-
-            var result = this.service.Copy(dataBase.Name, newDataBaseName, comment, force);
-            result.Validate(authentication);
-            var dataBaseInfo = result.Value;
-            var newDataBase = new DataBase(this.CremaHost, dataBaseInfo);
-            this.AddBase(newDataBase.Name, newDataBase);
-            authentication.SignatureDate = dataBaseInfo.CreationInfo;
-            this.InvokeItemsCreateEvent(authentication, new DataBase[] { newDataBase }, comment);
-            return newDataBase;
+            try
+            {
+                this.ValidateExpired();
+                return await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(CopyDataBaseAsync), dataBase, newDataBaseName, comment, force);
+                    var result = await this.service.CopyAsync(dataBase.Name, newDataBaseName, comment, force);
+                    this.CremaHost.Sign(authentication, result);
+                    var dataBaseInfo = result.Value;
+                    var newDataBase = new DataBase(this.CremaHost, dataBaseInfo);
+                    this.AddBase(newDataBase.Name, newDataBase);
+                    this.InvokeItemsCreateEvent(authentication, new DataBase[] { newDataBase }, comment);
+                    return newDataBase;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public LogInfo[] GetLog(Authentication authentication, DataBase dataBase, string revision)
@@ -231,14 +248,20 @@ namespace Ntreev.Crema.Services.Data
             this.InvokeItemsRevertedEvent(authentication, new DataBase[] { dataBase }, new string[] { revision });
         }
 
-        public DataBaseCollectionMetaData GetMetaData(Authentication authentication)
+        public async Task<DataBaseCollectionMetaData> GetMetaDataAsync(Authentication authentication)
         {
             if (authentication == null)
                 throw new ArgumentNullException(nameof(authentication));
-            this.Dispatcher.VerifyAccess();
+
+            var dataBases = await this.Dispatcher.InvokeAsync(() => (from DataBase item in this select item).ToArray());
+            var metaList = new List<DataBaseMetaData>(this.Count);
+            foreach (var item in dataBases)
+            {
+                metaList.Add(await item.GetMetaDataAsync(authentication));
+            }
             return new DataBaseCollectionMetaData()
             {
-                DataBases = (from DataBase item in this select item.GetMetaData(authentication)).ToArray(),
+                DataBases = metaList.ToArray(),
             };
         }
 
@@ -1057,34 +1080,19 @@ namespace Ntreev.Crema.Services.Data
 
         #region IDataBaseCollection
 
-        IDataBase IDataBaseCollection.AddNewDataBase(Authentication authentication, string dataBaseName, string comment)
+        async Task<IDataBase> IDataBaseCollection.AddNewDataBaseAsync(Authentication authentication, string dataBaseName, string comment)
         {
-            return this.AddNewDataBase(authentication, dataBaseName, comment);
+            return await this.AddNewDataBaseAsync(authentication, dataBaseName, comment);
         }
 
-        bool IDataBaseCollection.Contains(string dataBaseName)
+        Task<bool> IDataBaseCollection.ContainsAsync(string dataBaseName)
         {
-            this.Dispatcher.VerifyAccess();
-            return this.ContainsKey(dataBaseName);
+            return this.Dispatcher.InvokeAsync(() => this.ContainsKey(dataBaseName));
         }
 
-        IDataBase IDataBaseCollection.this[string dataBaseName]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[dataBaseName];
-            }
-        }
+        IDataBase IDataBaseCollection.this[string dataBaseName] => this[dataBaseName];
 
-        IDataBase IDataBaseCollection.this[Guid dataBaseID]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[dataBaseID];
-            }
-        }
+        IDataBase IDataBaseCollection.this[Guid dataBaseID] => this[dataBaseID];
 
         #endregion
 
@@ -1092,13 +1100,11 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<IDataBase> IEnumerable<IDataBase>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 

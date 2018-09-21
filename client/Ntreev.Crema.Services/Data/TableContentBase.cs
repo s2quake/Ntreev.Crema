@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -38,38 +39,41 @@ namespace Ntreev.Crema.Services.Data
             this.rows.Clear();
         }
 
-        public TableRow Find(Authentication authentication, params object[] keys)
+        public Task<TableRow> FindAsync(Authentication authentication, params object[] keys)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            var table = this.DataTable.DefaultView.Table;
-            var row = table.Rows.Find(keys);
-            if (row == null)
-                return null;
-            if (this.rows.ContainsKey(row) == false)
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                this.rows.Add(row, new TableRow(this, row));
-            }
-            return this.rows[row];
+                var table = this.DataTable.DefaultView.Table;
+                var row = table.Rows.Find(keys);
+                if (row == null)
+                    return null;
+                if (this.rows.ContainsKey(row) == false)
+                {
+                    this.rows.Add(row, new TableRow(this, row));
+                }
+                return this.rows[row];
+            });
         }
 
-        public TableRow[] Select(Authentication authentication, string filterExpression)
+        public Task<TableRow[]> SelectAsync(Authentication authentication, string filterExpression)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            var table = this.DataTable.DefaultView.Table;
-            var rows = table.Select(filterExpression);
-            foreach (var item in rows)
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                if (this.rows.ContainsKey(item) == false)
+                var table = this.DataTable.DefaultView.Table;
+                var rows = table.Select(filterExpression);
+                foreach (var item in rows)
                 {
-                    this.rows.Add(item, new TableRow(this, item));
+                    if (this.rows.ContainsKey(item) == false)
+                    {
+                        this.rows.Add(item, new TableRow(this, item));
+                    }
                 }
-            }
-            return rows.Select(item => this.rows[item]).ToArray();
+                return rows.Select(item => this.rows[item]).ToArray();
+            });
         }
 
         public IEnumerator<TableRow> GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             if (this.DataTable != null)
             {
                 foreach (DataRow item in this.DataTable.DefaultView.Table.Rows)

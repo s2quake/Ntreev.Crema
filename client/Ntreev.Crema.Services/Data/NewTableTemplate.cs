@@ -20,6 +20,7 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.DataBaseService;
 using Ntreev.Crema.Services.Domains;
 using System;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -54,6 +55,11 @@ namespace Ntreev.Crema.Services.Data
             this.Service = parent.Service;
         }
 
+        public override AccessType GetAccessType(Authentication authentication)
+        {
+            return this.Permission.GetAccessType(authentication);
+        }
+
         public override object Target
         {
             get
@@ -77,14 +83,14 @@ namespace Ntreev.Crema.Services.Data
 
         public IDataBaseService Service { get; }
 
-        protected override void OnBeginEdit(Authentication authentication, DomainMetaData metaData)
+        protected override async Task OnBeginEditAsync(Authentication authentication, DomainMetaData metaData)
         {
-            base.OnBeginEdit(authentication, metaData);
+            await base.OnBeginEditAsync(authentication, metaData);
         }
 
-        protected override void OnEndEdit(Authentication authentication, TableInfo[] tableInfos)
+        protected override async Task OnEndEditAsync(Authentication authentication, TableInfo[] tableInfos)
         {
-            base.OnEndEdit(authentication, tableInfos);
+            await base.OnEndEditAsync(authentication, tableInfos);
             if (this.parent is TableCategory category)
             {
                 var tables = category.GetService(typeof(TableCollection)) as TableCollection;
@@ -98,25 +104,25 @@ namespace Ntreev.Crema.Services.Data
             this.parent = null;
         }
 
-        protected override void OnCancelEdit(Authentication authentication)
+        protected override async Task OnCancelEditAsync(Authentication authentication)
         {
-            base.OnCancelEdit(authentication);
+            await base.OnCancelEditAsync(authentication);
             this.parent = null;
         }
 
-        protected override ResultBase<DomainMetaData> BeginDomain(Authentication authentication)
+        protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
         {
-            return this.Service.BeginNewTable(this.ItemPath);
+            return this.Service.BeginNewTableAsync(this.ItemPath);
         }
 
-        protected override ResultBase<TableInfo[]> EndDomain(Authentication authentication, Guid domainID)
+        protected override Task<ResultBase<TableInfo[]>> EndDomainAsync(Authentication authentication, Guid domainID)
         {
-            return this.Service.EndTableTemplateEdit(domainID);
+            return this.Service.EndTableTemplateEditAsync(domainID);
         }
 
-        protected override ResultBase CancelDomain(Authentication authentication, Guid domainID)
+        protected override Task<ResultBase> CancelDomainAsync(Authentication authentication, Guid domainID)
         {
-            return this.Service.CancelTableTemplateEdit(domainID);
+            return this.Service.CancelTableTemplateEditAsync(domainID);
         }
     }
 }

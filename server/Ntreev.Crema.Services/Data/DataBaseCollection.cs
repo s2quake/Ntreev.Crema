@@ -21,6 +21,7 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Data.Serializations;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Crema.Services.Properties;
+using Ntreev.Library;
 using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Serialization;
@@ -42,6 +43,7 @@ namespace Ntreev.Crema.Services.Data
         private readonly string cachePath;
         private readonly string remotesPath;
         private readonly string basePath;
+        private CremaDispatcher repositoryDispatcher;
 
         private ItemsCreatedEventHandler<IDataBase> itemsCreated;
         private ItemsRenamedEventHandler<IDataBase> itemsRenamed;
@@ -64,6 +66,7 @@ namespace Ntreev.Crema.Services.Data
             this.repositoryProvider = cremaHost.RepositoryProvider;
             this.remotesPath = cremaHost.GetPath(CremaPath.RepositoryDataBases);
             this.basePath = cremaHost.GetPath(CremaPath.DataBases);
+            this.repositoryDispatcher = new CremaDispatcher(this);
             this.Initialize();
         }
         
@@ -99,30 +102,33 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task<DataBase> CreateDataBaseAsync(Authentication authentication, string dataBaseName, string comment)
+        public async Task<DataBase> AddNewDataBaseAsync(Authentication authentication, string dataBaseName, string comment)
         {
             try
             {
-                return this.Dispatcher.InvokeAsync(() =>
+                this.ValidateExpired();
+                return await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(CreateDataBaseAsync), dataBaseName, comment);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewDataBaseAsync), dataBaseName, comment);
                     this.ValidateCreateDataBase(authentication, dataBaseName);
                     this.CremaHost.Sign(authentication);
                     var dataSet = new CremaDataSet();
                     var tempPath = PathUtility.GetTempPath(true);
                     var dataBasePath = Path.Combine(tempPath, dataBaseName);
                     var message = EventMessageBuilder.CreateDataBase(authentication, dataBaseName) + ": " + comment;
-
-                    try
+                    await this.repositoryDispatcher.InvokeAsync(() =>
                     {
-                        FileUtility.WriteAllText($"{CremaSchema.MajorVersion}.{CremaSchema.MinorVersion}", dataBasePath, ".version");
-                        dataSet.WriteToDirectory(dataBasePath);
-                        this.repositoryProvider.CreateRepository(authentication, this.remotesPath, dataBasePath, comment);
-                    }
-                    finally
-                    {
-                        DirectoryUtility.Delete(tempPath);
-                    }
+                        try
+                        {
+                            FileUtility.WriteAllText($"{CremaSchema.MajorVersion}.{CremaSchema.MinorVersion}", dataBasePath, ".version");
+                            dataSet.WriteToDirectory(dataBasePath);
+                            this.repositoryProvider.CreateRepository(authentication, this.remotesPath, dataBasePath, comment);
+                        }
+                        finally
+                        {
+                            DirectoryUtility.Delete(tempPath);
+                        }
+                    });
                     var dataBase = new DataBase(this.CremaHost, dataBaseName);
                     this.AddBase(dataBase.Name, dataBase);
                     this.InvokeItemsCreateEvent(authentication, new DataBase[] { dataBase }, comment);
@@ -140,6 +146,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
+                this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyDataBaseAsync), dataBase, newDataBaseName, comment);
@@ -167,38 +174,44 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void InvokeDataBaseRename(Authentication authentication, DataBase dataBase, string newDataBaseName)
+        public async Task<SignatureDate> InvokeDataBaseRenameAsync(Authentication authentication, DataBaseInfo dataBaseInfo, string newDataBaseName)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseRename), dataBase, newDataBaseName);
-            this.ValidateRenameDataBase(authentication, dataBase, newDataBaseName);
-
-            var dataBaseName = dataBase.Name;
-            var message = EventMessageBuilder.RenameDataBase(authentication, dataBase.Name, newDataBaseName);
-            this.repositoryProvider.RenameRepository(authentication, this.remotesPath, dataBaseName, newDataBaseName, message);
-            this.ReplaceKeyBase(dataBaseName, newDataBaseName);
+            var message = EventMessageBuilder.RenameDataBase(authentication, dataBaseInfo.Name, newDataBaseName);
+            var remotesPath = this.remotesPath;
+            var result = await this.repositoryDispatcher.InvokeAsync(() =>
+            {
+                var signatureDate = authentication.Sign();
+                this.repositoryProvider.RenameRepository(authentication, remotesPath, dataBaseInfo.Name, newDataBaseName, message);
+                return signatureDate;
+            });
+            this.ReplaceKeyBase(dataBaseInfo.Name, newDataBaseName);
+            return result;
         }
 
-        public void InvokeDataBaseDelete(Authentication authentication, DataBase dataBase)
+        public async Task<SignatureDate> InvokeDataBaseDeleteAsync(Authentication authentication, DataBaseInfo dataBaseInfo)
         {
-            this.Dispatcher.VerifyAccess();
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseDelete), dataBase);
-            this.ValidateDeleteDataBase(authentication, dataBase);
+            var message = EventMessageBuilder.DeleteDataBase(authentication, dataBaseInfo.Name);
+            var result = await this.repositoryDispatcher.InvokeAsync(() =>
+            {
+                var signatureDate = authentication.Sign();
+                this.repositoryProvider.DeleteRepository(authentication, this.remotesPath, dataBaseInfo.Name, message);
+                return signatureDate;
+            });
+            this.DeleteCaches(dataBaseInfo);
+            this.RemoveBase(dataBaseInfo.Name);
+            return result;
 
-            var dataBaseName = dataBase.Name;
-            var message = EventMessageBuilder.DeleteDataBase(authentication, dataBase.Name);
-            this.repositoryProvider.DeleteRepository(authentication, this.remotesPath, dataBaseName, message);
-            this.DeleteCaches(dataBase);
-            this.RemoveBase(dataBase.Name);
         }
 
-        public void InvokeDataBaseRevert(Authentication authentication, DataBase dataBase, string revision)
+        public Task<RepositoryInfo> InvokeDataBaseRevertAsync(Authentication authentication, string dataBaseName, string revision)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseRevert), dataBase, revision);
-            this.ValidateRevertDataBase(authentication, dataBase, revision);
-
-            var dataBaseName = dataBase.Name;
             var comment = $"revert to {revision}";
-            this.repositoryProvider.RevertRepository(authentication.ID, this.remotesPath, dataBaseName, revision, comment);
+            return this.repositoryDispatcher.InvokeAsync(() =>
+            {
+                var signatureDate = authentication.Sign();
+                this.repositoryProvider.RevertRepository(authentication.ID, this.remotesPath, dataBaseName, revision, comment);
+                return this.repositoryProvider.GetRepositoryInfo(this.CremaHost.GetPath(CremaPath.RepositoryDataBases), dataBaseName);
+            });
         }
 
         public async Task<DataBaseCollectionMetaData> GetMetaDataAsync(Authentication authentication)
@@ -381,6 +394,7 @@ namespace Ntreev.Crema.Services.Data
 
         public void Dispose()
         {
+            this.repositoryDispatcher.Dispose();
             foreach (var item in this.ToArray<DataBase>())
             {
                 {
@@ -704,38 +718,38 @@ namespace Ntreev.Crema.Services.Data
                 throw new ArgumentException(string.Format(Resources.Exception_DataBaseIsAlreadyExisted_Format, dataBaseName), nameof(dataBaseName));
         }
 
-        private void ValidateRenameDataBase(Authentication authentication, DataBase dataBase, string newDataBaseName)
-        {
-            if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
-                throw new PermissionDeniedException();
+        //private void ValidateRenameDataBase(Authentication authentication, DataBase dataBase, string newDataBaseName)
+        //{
+        //    if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
+        //        throw new PermissionDeniedException();
 
-            if (dataBase.IsLoaded == true)
-                throw new InvalidOperationException(Resources.Exception_DataBaseHasBeenLoaded);
+        //    if (dataBase.IsLoaded == true)
+        //        throw new InvalidOperationException(Resources.Exception_DataBaseHasBeenLoaded);
 
-            var dataBasePath = Path.Combine(Path.GetDirectoryName(dataBase.BasePath), newDataBaseName);
-            if (DirectoryUtility.Exists(dataBasePath) == true)
-                throw new ArgumentException(string.Format(Resources.Exception_ExistsPath_Format, newDataBaseName), nameof(newDataBaseName));
+        //    var dataBasePath = Path.Combine(Path.GetDirectoryName(dataBase.BasePath), newDataBaseName);
+        //    if (DirectoryUtility.Exists(dataBasePath) == true)
+        //        throw new ArgumentException(string.Format(Resources.Exception_ExistsPath_Format, newDataBaseName), nameof(newDataBaseName));
 
-            if (this.ContainsKey(newDataBaseName) == true)
-                throw new ArgumentException(string.Format(Resources.Exception_DataBaseIsAlreadyExisted_Format, newDataBaseName), nameof(newDataBaseName));
-        }
+        //    if (this.ContainsKey(newDataBaseName) == true)
+        //        throw new ArgumentException(string.Format(Resources.Exception_DataBaseIsAlreadyExisted_Format, newDataBaseName), nameof(newDataBaseName));
+        //}
 
-        private void ValidateDeleteDataBase(Authentication authentication, DataBase dataBase)
-        {
-            if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
-                throw new PermissionDeniedException();
+        //private void ValidateDeleteDataBase(Authentication authentication, DataBase dataBase)
+        //{
+        //    if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
+        //        throw new PermissionDeniedException();
 
-            if (dataBase.IsLoaded == true)
-                throw new InvalidOperationException(Resources.Exception_DataBaseHasBeenLoaded);
-        }
+        //    if (dataBase.IsLoaded == true)
+        //        throw new InvalidOperationException(Resources.Exception_DataBaseHasBeenLoaded);
+        //}
 
-        private void ValidateRevertDataBase(Authentication authentication, DataBase dataBase, string revision)
-        {
-            if (authentication.IsSystem == false && authentication.IsAdmin == false)
-                throw new PermissionDeniedException();
-            if (dataBase.IsLoaded == true)
-                throw new InvalidOperationException(Resources.Exception_LoadedDataBaseCannotRevert);
-        }
+        //private void ValidateRevertDataBase(Authentication authentication, DataBase dataBase, string revision)
+        //{
+        //    if (authentication.IsSystem == false && authentication.IsAdmin == false)
+        //        throw new PermissionDeniedException();
+        //    if (dataBase.IsLoaded == true)
+        //        throw new InvalidOperationException(Resources.Exception_LoadedDataBaseCannotRevert);
+        //}
 
         private Dictionary<string, DataBaseSerializationInfo> ReadCaches()
         {
@@ -781,20 +795,25 @@ namespace Ntreev.Crema.Services.Data
             return caches;
         }
 
-        private void DeleteCaches(DataBase dataBase)
+        private void DeleteCaches(DataBaseInfo dataBaseInfo)
         {
-            {
-                var dataBaseInfo = (DataBaseSerializationInfo)dataBase.DataBaseInfo;
-                var filename = FileUtility.Prepare(this.cachePath, $"{dataBase.ID}");
-                var itemPaths = this.Serializer.Serialize(filename, dataBaseInfo, DataBaseSerializationInfo.Settings);
-                FileUtility.Delete(itemPaths);
-            }
-            {
-                var dataBaseState = (DataBaseStateSerializationInfo)dataBase.DataBaseState;
-                var filename = FileUtility.Prepare(this.cachePath, $"{dataBase.ID}");
-                var itemPaths = this.Serializer.Serialize(filename, dataBaseState, DataBaseStateSerializationInfo.Settings);
-                FileUtility.Delete(itemPaths);
-            }
+            var directoryName = Path.GetDirectoryName(this.cachePath);
+            var name = $"{dataBaseInfo.ID}";
+            var files = Directory.GetFiles(directoryName, $"{name}.*").Where(item => Path.GetFileNameWithoutExtension(item) == name).ToArray();
+            FileUtility.Delete(files);
+
+            //{
+            //    var dataBaseInfo = (DataBaseSerializationInfo)dataBaseInfo;
+            //    var filename = FileUtility.Prepare(this.cachePath, $"{dataBase.ID}");
+            //    var itemPaths = this.Serializer.Serialize(filename, (DataBaseSerializationInfo)dataBaseInfo, DataBaseSerializationInfo.Settings);
+            //    FileUtility.Delete(itemPaths);
+            //}
+            //{
+            //    var dataBaseState = (DataBaseStateSerializationInfo)dataBaseInfo;
+            //    var filename = FileUtility.Prepare(this.cachePath, $"{dataBase.ID}");
+            //    var itemPaths = this.Serializer.Serialize(filename, (DataBaseSerializationInfo)dataBaseInfo, DataBaseStateSerializationInfo.Settings);
+            //    FileUtility.Delete(itemPaths);
+            //}
         }
 
         private void Initialize()
@@ -815,7 +834,7 @@ namespace Ntreev.Crema.Services.Data
 
         async Task<IDataBase> IDataBaseCollection.AddNewDataBaseAsync(Authentication authentication, string dataBaseName, string comment)
         {
-            return await this.CreateDataBaseAsync(authentication, dataBaseName, comment);
+            return await this.AddNewDataBaseAsync(authentication, dataBaseName, comment);
         }
 
         Task<bool> IDataBaseCollection.ContainsAsync(string dataBaseName)

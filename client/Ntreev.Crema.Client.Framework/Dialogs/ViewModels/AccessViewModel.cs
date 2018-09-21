@@ -125,13 +125,13 @@ namespace Ntreev.Crema.Client.Framework.Dialogs.ViewModels
             throw new NotImplementedException();
         }
 
-        public async void Add()
+        public async Task AddAsync()
         {
             try
             {
                 var memberID = this.Path;
                 var accessType = this.AccessType;
-                await this.dispatcher.InvokeAsync(() => this.accessible.AddAccessMember(this.authentication, memberID, accessType));
+                await this.accessible.AddAccessMemberAsync(this.authentication, memberID, accessType);
                 this.itemsSource.Add(new AccessItemViewModel(this, memberID, this.AccessType));
                 this.Path = null;
                 this.AccessType = AccessType.Master;

@@ -41,13 +41,12 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
         }
 
 #if DEBUG
-        public void Start(string authentication)
+        public async Task StartAsync(string authentication)
         {
             if (authentication != null)
             {
                 var ss = StringUtility.Split(authentication, ':');
-                
-                this.commandContext.Login(this.commandContext.Address, ss[0], ss[1].ToSecureString());
+                await this.commandContext.LoginAsync(this.commandContext.Address, ss[0], ss[1].ToSecureString());
             }
             this.SetPrompt();
             base.Start();
@@ -60,10 +59,10 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
         }
 #endif
 
-        public new void Cancel()
+        public async Task CancelAsync()
         {
             if (this.commandContext.IsOnline == true)
-                this.commandContext.Logout();
+                await this.commandContext.LogoutAsync();
             base.Cancel();
         }
     }

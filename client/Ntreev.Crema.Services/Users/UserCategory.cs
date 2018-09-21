@@ -23,25 +23,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users
 {
     class UserCategory : UserCategoryBase<User, UserCategory, UserCollection, UserCategoryCollection, UserContext>,
         IUserCategory, IUserItem
     {
-        public void Rename(Authentication authentication, string name)
+        public async Task RenameAsync(Authentication authentication, string name)
         {
             try
             {
-                this.Dispatcher?.VerifyAccess();
-                this.CremaHost.DebugMethod(authentication, this, nameof(Rename), this, name);
-                var items = EnumerableUtility.One(this).ToArray();
-                var oldNames = items.Select(item => item.Name).ToArray();
-                var oldPaths = items.Select(item => item.Path).ToArray();
-                var result = this.Service.RenameUserItem(this.Path, name);
-                this.Sign(authentication, result);
-                base.Name = name;
-                this.Container.InvokeCategoriesRenamedEvent(authentication, items, oldNames, oldPaths);
+                this.ValidateExpired();
+                await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var oldNames = items.Select(item => item.Name).ToArray();
+                    var oldPaths = items.Select(item => item.Path).ToArray();
+                    var result = await this.Service.RenameUserItemAsync(this.Path, name);
+                    this.CremaHost.Sign(authentication, result);
+                    base.Name = name;
+                    this.Container.InvokeCategoriesRenamedEvent(authentication, items, oldNames, oldPaths);
+                });
             }
             catch (Exception e)
             {
@@ -50,19 +54,22 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public void Move(Authentication authentication, string parentPath)
+        public async Task MoveAsync(Authentication authentication, string parentPath)
         {
             try
             {
-                this.Dispatcher?.VerifyAccess();
-                this.CremaHost.DebugMethod(authentication, this, nameof(Move), this, parentPath);
-                var items = EnumerableUtility.One(this).ToArray();
-                var oldPaths = items.Select(item => item.Path).ToArray();
-                var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
-                var result = this.Service.MoveUserItem(this.Path, parentPath);
-                this.Sign(authentication, result);
-                this.Parent = this.Container[parentPath];
-                this.Container.InvokeCategoriesMovedEvent(authentication, items, oldPaths, oldParentPaths);
+                this.ValidateExpired();
+                await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, parentPath);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var oldPaths = items.Select(item => item.Path).ToArray();
+                    var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
+                    var result = await this.Service.MoveUserItemAsync(this.Path, parentPath);
+                    this.CremaHost.Sign(authentication, result);
+                    this.Parent = this.Container[parentPath];
+                    this.Container.InvokeCategoriesMovedEvent(authentication, items, oldPaths, oldParentPaths);
+                });
             }
             catch (Exception e)
             {
@@ -71,19 +78,22 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public void Delete(Authentication authentication)
+        public async Task DeleteAsync(Authentication authentication)
         {
             try
             {
-                this.Dispatcher?.VerifyAccess();
-                this.CremaHost.DebugMethod(authentication, this, nameof(Delete), this);
-                var items = EnumerableUtility.One(this).ToArray();
-                var oldPaths = items.Select(item => item.Path).ToArray();
-                var container = this.Container;
-                var result = this.Service.DeleteUserItem(this.Path);
-                this.Sign(authentication, result);
-                this.Dispose();
-                container.InvokeCategoriesDeletedEvent(authentication, items, oldPaths);
+                this.ValidateExpired();
+                await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var oldPaths = items.Select(item => item.Path).ToArray();
+                    var container = this.Container;
+                    var result = await this.Service.DeleteUserItemAsync(this.Path);
+                    this.CremaHost.Sign(authentication, result);
+                    this.Dispose();
+                    container.InvokeCategoriesDeletedEvent(authentication, items, oldPaths);
+                });
             }
             catch (Exception e)
             {
@@ -92,30 +102,14 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public UserCategory AddNewCategory(Authentication authentication, string name)
+        public Task<UserCategory> AddNewCategoryAsync(Authentication authentication, string name)
         {
-            try
-            {
-                return this.Container.AddNew(authentication, name, this.Path);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.Container.AddNewAsync(authentication, name, base.Path);
         }
 
-        public User AddNewUser(Authentication authentication, string userID, SecureString password, string userName, Authority authority)
+        public Task<User> AddNewUserAsync(Authentication authentication, string userID, SecureString password, string userName, Authority authority)
         {
-            try
-            {
-                return this.Context.Users.AddNew(authentication, userID, this.Path, password, userName, authority);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.Context.Users.AddNewAsync(authentication, userID, base.Path, password, userName, authority);
         }
 
         public void InternalSetName(string name)
@@ -129,23 +123,9 @@ namespace Ntreev.Crema.Services.Users
 
         public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
 
-        public new string Name
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Name;
-            }
-        }
+        public new string Name => base.Name;
 
-        public new string Path
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Path;
-            }
-        }
+        public new string Path => base.Path;
 
         public new event EventHandler Renamed
         {
@@ -189,78 +169,38 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        private void Sign(Authentication authentication, ResultBase result)
-        {
-            result.Validate(authentication);
-        }
-
-        private void Sign<T>(Authentication authentication, ResultBase<T> result)
-        {
-            result.Validate(authentication);
-        }
-
         #region IUserCategory
 
-        IUserCategory IUserCategory.AddNewCategory(Authentication authentication, string name)
+        async Task<IUserCategory> IUserCategory.AddNewCategoryAsync(Authentication authentication, string name)
         {
-            return this.AddNewCategory(authentication, name);
+            return await this.AddNewCategoryAsync(authentication, name);
         }
 
-        IUser IUserCategory.AddNewUser(Authentication authentication, string userID, SecureString password, string userName, Authority authority)
+        async Task<IUser> IUserCategory.AddNewUserAsync(Authentication authentication, string userID, SecureString password, string userName, Authority authority)
         {
-            return this.AddNewUser(authentication, userID, password, userName, authority);
+            return await this.AddNewUserAsync(authentication, userID, password, userName, authority);
         }
 
-        IUserCategory IUserCategory.Parent
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        IUserCategory IUserCategory.Parent => this.Parent;
 
-        IContainer<IUser> IUserCategory.Users
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Items;
-            }
-        }
+        IContainer<IUser> IUserCategory.Users => this.Items;
 
-        IContainer<IUserCategory> IUserCategory.Categories
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        IContainer<IUserCategory> IUserCategory.Categories => this.Categories;
 
         #endregion
 
         #region IUserItem
 
-        IUserItem IUserItem.Parent
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        IUserItem IUserItem.Parent => this.Parent;
 
         IEnumerable<IUserItem> IUserItem.Childs
         {
             get
             {
-                this.Dispatcher?.VerifyAccess();
                 foreach (var item in this.Categories)
                 {
                     yield return item;
                 }
-
                 foreach (var item in this.Items)
                 {
                     yield return item;

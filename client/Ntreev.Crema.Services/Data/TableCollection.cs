@@ -27,6 +27,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -54,7 +55,6 @@ namespace Ntreev.Crema.Services.Data
 
         public Table[] AddNew(Authentication authentication, TableInfo[] tableInfos)
         {
-            this.InvokeTableCreate(authentication, tableInfos, null);
             var tableList = new List<Table>(tableInfos.Length);
             foreach (var item in tableInfos)
             {
@@ -67,55 +67,51 @@ namespace Ntreev.Crema.Services.Data
             return tableList.ToArray();
         }
 
-        public Table Inherit(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
+        public async Task<Table> InheritAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
         {
-            var result = this.Service.InheritTable(table.Name, newTableName, categoryPath, copyContent);
-            this.Sign(authentication, result);
-            this.AddNew(authentication, result.Value);
-            return this[newTableName];
+            try
+            {
+                this.ValidateExpired();
+                return await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(InheritAsync), this, table, newTableName, categoryPath, copyContent);
+                    var result = await this.Service.InheritTableAsync(table.Name, newTableName, categoryPath, copyContent);
+                    this.CremaHost.Sign(authentication, result);
+                    this.AddNew(authentication, result.Value);
+                    return this[newTableName];
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public Table Copy(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
+        public async Task<Table> CopyAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
         {
-            var result = this.Service.CopyTable(table.Name, newTableName, categoryPath, copyContent);
-            this.Sign(authentication, result);
-            this.AddNew(authentication, result.Value);
-            return this[newTableName];
+            try
+            {
+                this.ValidateExpired();
+                return await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), this, table, newTableName, categoryPath, copyContent);
+                    var result = await this.Service.CopyTableAsync(table.Name, newTableName, categoryPath, copyContent);
+                    this.CremaHost.Sign(authentication, result);
+                    this.AddNew(authentication, result.Value);
+                    return this[newTableName];
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public object GetService(System.Type serviceType)
         {
             return this.DataBase.GetService(serviceType);
-        }
-
-        public void InvokeTableCreate(Authentication authentication, TableInfo[] tableInfos, Table sourceTable)
-        {
-
-        }
-
-        public void InvokeTableRename(Authentication authentication, Table table, string newName)
-        {
-
-        }
-
-        public void InvokeTableMove(Authentication authentication, Table table, string newCategoryPath)
-        {
-
-        }
-
-        public void InvokeTableDelete(Authentication authentication, Table table)
-        {
-
-        }
-
-        public void InvokeEndContentEdit(Authentication authentication, Table table)
-        {
-
-        }
-
-        public void InvokeTableEndTemplateEdit(Authentication authentication, Table table)
-        {
-
         }
 
         public void InvokeTablesCreatedEvent(Authentication authentication, Table[] tables)

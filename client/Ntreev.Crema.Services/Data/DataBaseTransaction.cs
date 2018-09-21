@@ -19,6 +19,7 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.DataBaseCollectionService;
 using Ntreev.Crema.Services.Domains;
 using System;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -35,25 +36,45 @@ namespace Ntreev.Crema.Services.Data
             this.service = service;
         }
 
-        public void Commit(Authentication authentication)
+        public async Task CommitAsync(Authentication authentication)
         {
-            this.dataBase.VerifyAccess(authentication);
-            if (this.authentication == null)
-                throw new InvalidOperationException();
-            var result = this.service.EndTransaction(this.dataBase.Name);
-            this.Sign(authentication, result);
-            this.OnDisposed(EventArgs.Empty);
+            try
+            {
+                this.ValidateExpired();
+                await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.dataBase.VerifyAccess(authentication);
+                    var result = await this.service.EndTransactionAsync(this.dataBase.Name);
+                    this.CremaHost.Sign(authentication, result);
+                    this.OnDisposed(EventArgs.Empty);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void Rollback(Authentication authentication)
+        public async Task RollbackAsync(Authentication authentication)
         {
-            this.dataBase.VerifyAccess(authentication);
-            if (this.authentication == null)
-                throw new InvalidOperationException();
-            var result = this.service.CancelTransaction(this.dataBase.Name);
-            this.Sign(authentication, result);
-            this.RollbackDomains(authentication);
-            this.OnDisposed(EventArgs.Empty);
+            try
+            {
+                this.ValidateExpired();
+                await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.dataBase.VerifyAccess(authentication);
+                    var result = await this.service.CancelTransactionAsync(this.dataBase.Name);
+                    this.CremaHost.Sign(authentication, result);
+                    this.RollbackDomains(authentication);
+                    this.OnDisposed(EventArgs.Empty);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         private void RollbackDomains(Authentication authentication)
@@ -77,21 +98,13 @@ namespace Ntreev.Crema.Services.Data
 
         public CremaDispatcher Dispatcher => this.dataBase.Dispatcher;
 
+        public CremaHost CremaHost => this.dataBase.CremaHost;
+
         public event EventHandler Disposed;
 
         protected virtual void OnDisposed(EventArgs e)
         {
             this.Disposed?.Invoke(this, e);
-        }
-
-        private void Sign(Authentication authentication, ResultBase result)
-        {
-            result.Validate(authentication);
-        }
-
-        private void Sign<T>(Authentication authentication, ResultBase<T> result)
-        {
-            result.Validate(authentication);
         }
     }
 }

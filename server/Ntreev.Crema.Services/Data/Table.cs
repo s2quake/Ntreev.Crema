@@ -265,7 +265,6 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     base.ValidateDelete(authentication);
-                    this.CremaHost.Sign(authentication);
                     var items = EnumerableUtility.FamilyTree(this, item => item.Childs).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var container = this.Container;
@@ -291,7 +290,7 @@ namespace Ntreev.Crema.Services.Data
 
         public Task<Table> InheritAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent)
         {
-            return this.Container.Inherit(authentication, this, newTableName, categoryPath, copyContent);
+            return this.Container.InheritAsync(authentication, this, newTableName, categoryPath, copyContent);
         }
 
         public async Task<NewTableTemplate> NewChildAsync(Authentication authentication)

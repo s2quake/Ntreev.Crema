@@ -474,11 +474,6 @@ namespace Ntreev.Crema.Services.Data
 
         protected abstract Task<CremaDataType> CreateSourceAsync(Authentication authentication);
 
-        protected void Sign(Authentication authentication)
-        {
-            authentication.Sign();
-        }
-
         private void Table_RowDeleted(object sender, DataRowChangeEventArgs e)
         {
             var column = this.members.FirstOrDefault(item => item.Row == e.Row);
@@ -580,10 +575,7 @@ namespace Ntreev.Crema.Services.Data
 
         IDomain ITypeTemplate.Domain => this.Domain;
 
-        ITypeMember ITypeTemplate.this[string columnName]
-        {
-            get { return this[columnName]; }
-        }
+        ITypeMember ITypeTemplate.this[string columnName] => this[columnName];
 
         #endregion
 

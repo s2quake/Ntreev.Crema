@@ -27,6 +27,7 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.ServiceModel;
 using System.Text;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace Ntreev.Crema.Services.Users
@@ -171,44 +172,58 @@ namespace Ntreev.Crema.Services.Users
             this.OnItemsChanged(new ItemsEventArgs<IUserItem>(authentication, items));
         }
 
-        public UserContextMetaData GetMetaData(Authentication authentication)
+        public async Task<UserContextMetaData> GetMetaDataAsync(Authentication authentication)
         {
-            this.Dispatcher.VerifyAccess();
-            var metaData = new UserContextMetaData();
-
+            this.ValidateExpired();
+            return await this.Dispatcher.InvokeAsync(() =>
             {
-                var query = from UserCategory item in this.Categories
-                            where item != this.Root
-                            orderby item.Path
-                            select item.Path;
+                var metaData = new UserContextMetaData();
 
-                metaData.Categories = query.ToArray();
-            }
+                {
+                    var query = from UserCategory item in this.Categories
+                                where item != this.Root
+                                orderby item.Path
+                                select item.Path;
 
-            {
-                var query = from User item in this.Users
-                            orderby item.Category.Path
-                            select new UserMetaData()
-                            {
-                                Path = item.Path,
-                                UserInfo = item.UserInfo,
-                                UserState = item.UserState,
-                                BanInfo = item.BanInfo,
-                            };
-                metaData.Users = query.ToArray();
-            }
+                    metaData.Categories = query.ToArray();
+                }
 
-            return metaData;
+                {
+                    var query = from User item in this.Users
+                                orderby item.Category.Path
+                                select new UserMetaData()
+                                {
+                                    Path = item.Path,
+                                    UserInfo = item.UserInfo,
+                                    UserState = item.UserState,
+                                    BanInfo = item.BanInfo,
+                                };
+                    metaData.Users = query.ToArray();
+                }
+
+                return metaData;
+            });
         }
 
-        public void NotifyMessage(Authentication authentication, string[] userIDs, string message)
+        public async Task NotifyMessageAsync(Authentication authentication, string[] userIDs, string message)
         {
-            this.Dispatcher.VerifyAccess();
-            this.CremaHost.DebugMethod(authentication, this, nameof(NotifyMessage), this, userIDs, message);
-            var result = this.service.NotifyMessage(userIDs, message);
-            result.Validate(authentication);
-            var users = userIDs == null ? new User[] { } : userIDs.Select(item => this.Users[item]).ToArray();
-            this.Users.InvokeNotifyMessageEvent(authentication, users, message);
+            try
+            {
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(NotifyMessageAsync), this, userIDs, message);
+                    var result = this.service.NotifyMessage(userIDs, message);
+                    result.Validate(authentication);
+                    var users = userIDs == null ? new User[] { } : userIDs.Select(item => this.Users[item]).ToArray();
+                    this.Users.InvokeNotifyMessageEvent(authentication, users, message);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public void Close(CloseInfo closeInfo)
@@ -823,47 +838,18 @@ namespace Ntreev.Crema.Services.Users
 
         #region IUserContext
 
-        bool IUserContext.Contains(string itemPath)
+        Task<bool> IUserContext.ContainsAsync(string itemPath)
         {
-            this.Dispatcher.VerifyAccess();
-            return this.Contains(itemPath);
+            return this.Dispatcher.InvokeAsync(() => this.Contains(itemPath));
         }
 
-        IUserCollection IUserContext.Users
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Users;
-            }
-        }
+        IUserCollection IUserContext.Users => this.Users;
 
-        IUserCategoryCollection IUserContext.Categories
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        IUserCategoryCollection IUserContext.Categories => this.Categories;
 
-        IUserItem IUserContext.this[string itemPath]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[itemPath] as IUserItem;
-            }
-        }
+        IUserItem IUserContext.this[string itemPath] => this[itemPath] as IUserItem;
 
-        IUserCategory IUserContext.Root
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Root;
-            }
-        }
+        IUserCategory IUserContext.Root => this.Root;
 
         #endregion
 
@@ -871,7 +857,6 @@ namespace Ntreev.Crema.Services.Users
 
         IEnumerator<IUserItem> IEnumerable<IUserItem>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IUserItem;
@@ -880,7 +865,6 @@ namespace Ntreev.Crema.Services.Users
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IUserItem;

@@ -45,100 +45,41 @@ namespace Ntreev.Crema.Services.Data
                         select item.Field<string>(CremaSchema.Name);
 
             var newName = NameUtility.GenerateNewName("Type", query);
-            this.SetField(null, CremaSchema.Name, newName);
-        }
+            Initialize();
 
-        public void SetIndex(Authentication authentication, int value)
-        {
-            try
+            async void Initialize()
             {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                this.SetField(authentication, CremaSchema.Index, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
+                await this.SetFieldAsync(null, CremaSchema.Name, newName);
             }
         }
 
-        public void SetName(Authentication authentication, string value)
+        public Task SetIndexAsync(Authentication authentication, int value)
         {
-            try
-            {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                this.SetField(authentication, CremaSchema.Name, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Index, value);
         }
 
-        public void SetValue(Authentication authentication, long value)
+        public Task SetNameAsync(Authentication authentication, string value)
         {
-            try
-            {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                this.SetField(authentication, CremaSchema.Value, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Name, value);
         }
 
-        public void SetComment(Authentication authentication, string value)
+        public Task SetValueAsync(Authentication authentication, long value)
         {
-            try
-            {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                this.SetField(authentication, CremaSchema.Comment, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Value, value);
         }
 
-        public int Index
+        public Task SetCommentAsync(Authentication authentication, string value)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<int>(CremaSchema.Index);
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Comment, value);
         }
 
-        public string Name
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<string>(CremaSchema.Name);
-            }
-        }
+        public int Index => this.GetField<int>(CremaSchema.Index);
 
-        public long Value
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<long>(CremaSchema.Value);
-            }
-        }
+        public string Name => this.GetField<string>(CremaSchema.Name);
 
-        public string Comment
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<string>(CremaSchema.Comment);
-            }
-        }
+        public long Value => this.GetField<long>(CremaSchema.Value);
+
+        public string Comment => this.GetField<string>(CremaSchema.Comment);
 
         public override DataBase DataBase => this.template.DataBase;
 
@@ -148,14 +89,7 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITypeTemplate
 
-        ITypeTemplate ITypeMember.Template
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.template;
-            }
-        }
+        ITypeTemplate ITypeMember.Template => this.template;
 
         #endregion
     }

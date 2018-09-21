@@ -97,7 +97,6 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync));
                     this.ValidateBeginEdit(authentication);
-                    this.CremaHost.Sign(authentication);
                     this.EditableState |= EditableState.Running;
                     try
                     {
@@ -108,6 +107,7 @@ namespace Ntreev.Crema.Services.Data
                         this.EditableState &= ~EditableState.Running;
                         throw;
                     }
+                    this.CremaHost.Sign(authentication);
                     this.EditableState = EditableState.IsBeingEdited;
                     this.OnEditBegun(EventArgs.Empty);
                 });
@@ -128,7 +128,6 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync));
                     this.ValidateEndEdit(authentication);
-                    this.CremaHost.Sign(authentication);
                     this.EditableState |= EditableState.Running;
                     try
                     {
@@ -139,6 +138,7 @@ namespace Ntreev.Crema.Services.Data
                         this.EditableState &= ~EditableState.Running;
                         throw;
                     }
+                    this.CremaHost.Sign(authentication);
                     this.EditableState = EditableState.None;
                     this.OnEditEnded(EventArgs.Empty);
                 });
@@ -159,7 +159,6 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync));
                     this.ValidateCancelEdit(authentication);
-                    this.CremaHost.Sign(authentication);
                     this.EditableState |= EditableState.Running;
                     try
                     {
@@ -170,6 +169,7 @@ namespace Ntreev.Crema.Services.Data
                         this.EditableState &= ~EditableState.Running;
                         throw;
                     }
+                    this.CremaHost.Sign(authentication);
                     this.EditableState = EditableState.None;
                     this.OnEditCanceled(EventArgs.Empty);
                 });
@@ -241,7 +241,6 @@ namespace Ntreev.Crema.Services.Data
                 {
                     if (item.IsNew == true)
                         continue;
-
                     if (item.IsKey == true)
                         yield return item;
                 }

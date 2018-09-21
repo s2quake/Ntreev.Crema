@@ -79,13 +79,14 @@ namespace Ntreev.Crema.Services.Data
             return tableList.ToArray();
         }
 
-        public async Task<Table> Inherit(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
+        public async Task<Table> InheritAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
         {
             try
             {
                 this.ValidateExpired();
                 return await await this.Dispatcher.InvokeAsync(async () =>
                 {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(InheritAsync), this, table, newTableName, categoryPath, copyContent);
                     this.ValidateInherit(authentication, table, newTableName, categoryPath, copyContent);
                     this.CremaHost.Sign(authentication);
                     var dataSet = await table.ReadDataForCopyAsync(authentication);
@@ -116,6 +117,7 @@ namespace Ntreev.Crema.Services.Data
                 this.ValidateExpired();
                 return await await this.Dispatcher.InvokeAsync(async () =>
                 {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), this, table, newTableName, categoryPath, copyContent);
                     this.ValidateCopy(authentication, table, newTableName, categoryPath, copyContent);
                     this.CremaHost.Sign(authentication);
                     var dataSet = await table.ReadDataForCopyAsync(authentication);

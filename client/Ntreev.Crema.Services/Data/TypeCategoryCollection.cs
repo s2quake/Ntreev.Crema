@@ -24,6 +24,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -40,41 +41,32 @@ namespace Ntreev.Crema.Services.Data
 
         }
 
-        public TypeCategory AddNew(Authentication authentication, string name, string parentPath)
+        public async Task<TypeCategory> AddNewAsync(Authentication authentication, string name, string parentPath)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            var categoryName = new CategoryName(parentPath, name);
-            var result = this.Service.NewTypeCategory(categoryName);
-            result.Validate(authentication);
-            var category = this.Prepare(categoryName.Path);
-            var items = EnumerableUtility.One(category).ToArray();
-            this.InvokeCategoriesCreatedEvent(authentication, items);
-            return category;
+            try
+            {
+                this.ValidateExpired();
+                return await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    var categoryName = new CategoryName(parentPath, name);
+                    var category = this.Prepare(categoryName.Path);
+                    var items = EnumerableUtility.One(category).ToArray();
+                    var result = await this.Service.NewTypeCategoryAsync(categoryName);
+                    this.CremaHost.Sign(authentication, result);
+                    this.InvokeCategoriesCreatedEvent(authentication, items);
+                    return category;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public object GetService(System.Type serviceType)
         {
             return this.DataBase.GetService(serviceType);
-        }
-
-        public void InvokeCategoryCreate(Authentication authentication, string name, string parentPath)
-        {
-
-        }
-
-        public void InvokeCategoryRename(Authentication authentication, TypeCategory category, string name)
-        {
-
-        }
-
-        public void InvokeCategoryMove(Authentication authentication, TypeCategory category, string parentPath)
-        {
-
-        }
-
-        public void InvokeCategoryDelete(Authentication authentication, TypeCategory category)
-        {
-
         }
 
         public void InvokeCategoriesCreatedEvent(Authentication authentication, TypeCategory[] categories)

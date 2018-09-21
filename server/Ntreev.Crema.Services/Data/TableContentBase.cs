@@ -101,12 +101,5 @@ namespace Ntreev.Crema.Services.Data
         public abstract IDispatcherObject DispatcherObject { get; }
 
         public CremaDispatcher Dispatcher => this.DispatcherObject.Dispatcher;
-
-        protected void ValidateDispatcher(Authentication authentication)
-        {
-            if (this.Dispatcher == null)
-                throw new InvalidOperationException(Resources.Exception_InvalidObject);
-            this.Dispatcher.VerifyAccess();
-        }
     }
 }

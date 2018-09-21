@@ -16,12 +16,14 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Data;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains
 {
@@ -40,33 +42,27 @@ namespace Ntreev.Crema.Services.Domains
         private EventHandler<DomainRowEventArgs> domainRowRemoved;
         private EventHandler<DomainPropertyEventArgs> domainPropertyChanged;
 
-        public async void InvokeDomainCreatedEvent(Authentication authentication, Domain domain)
+        public void InvokeDomainCreatedEvent(Authentication authentication, Domain domain)
         {
             var args = new DomainEventArgs(authentication, domain);
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainCreatedEvent), domain);
             var comment = EventMessageBuilder.BeginDomain(authentication, domain);
             var domainInfo = domain.DomainInfo;
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.CremaHost.Debug(eventLog);
-                this.CremaHost.Info(comment);
-                this.OnDomainCreated(args);
-                this.Context.InvokeItemsCreatedEvent(authentication, new IDomainItem[] { domain }, new object[] { domainInfo });
-            });
+            this.CremaHost.Debug(eventLog);
+            this.CremaHost.Info(comment);
+            this.OnDomainCreated(args);
+            this.Context.InvokeItemsCreatedEvent(authentication, new IDomainItem[] { domain }, new object[] { domainInfo });
         }
 
-        public async void InvokeDomainDeletedEvent(Authentication authentication, Domain domain, bool isCanceled)
+        public void InvokeDomainDeletedEvent(Authentication authentication, Domain domain, bool isCanceled)
         {
             var args = new DomainDeletedEventArgs(authentication, domain, isCanceled);
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainDeletedEvent), domain, isCanceled);
             var comment = isCanceled == false ? EventMessageBuilder.EndDomain(authentication, domain) : EventMessageBuilder.CancelDomain(authentication, domain);
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.CremaHost.Debug(eventLog);
-                this.CremaHost.Info(comment);
-                this.OnDomainDeleted(args);
-                this.Context.InvokeItemsDeleteEvent(authentication, new IDomainItem[] { domain }, new string[] { domain.Path });
-            });
+            this.CremaHost.Debug(eventLog);
+            this.CremaHost.Info(comment);
+            this.OnDomainDeleted(args);
+            this.Context.InvokeItemsDeleteEvent(authentication, new IDomainItem[] { domain }, new string[] { domain.Path });
         }
 
         public async void InvokeDomainRowAddedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows)
@@ -242,21 +238,46 @@ namespace Ntreev.Crema.Services.Domains
             return domain;
         }
 
-        public bool Contains(Guid domainID)
+        public async Task AddAsync(Authentication authentication, Domain domain, DataBase dataBase)
         {
-            this.Dispatcher.VerifyAccess();
-            return this.Contains(domainID.ToString());
+            await await this.Dispatcher.InvokeAsync(async () =>
+            {
+                var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
+                var category = this.Context.Categories.Prepare(categoryName);
+                domain.Category = category;
+                //domain.Logger = new DomainLogger(this.Context.Serializer, domain);
+                domain.Dispatcher = new CremaDispatcher(domain);
+                this.InvokeDomainCreatedEvent(authentication, domain);
+            });
         }
 
-        public DomainMetaData[] GetMetaData(Authentication authentication)
+        public async Task RemoveAsync(Authentication authentication, Domain domain, bool isCanceled)
         {
-            this.Dispatcher.VerifyAccess();
+            await await this.Dispatcher.InvokeAsync(async () =>
+            {
+                this.Remove(domain);
+                var dispatcher = domain.Dispatcher;
+                domain.Dispatcher = null;
+                //domain.Logger?.Dispose(true);
+                //domain.Logger = null;
+                await dispatcher.InvokeAsync(() => domain.Dispose(authentication, isCanceled));
+                dispatcher.Dispose();
+                this.InvokeDomainDeletedEvent(authentication, domain, isCanceled);
+            });
+        }
 
-            var domains = this.ToArray<Domain>();
+        public Task<bool> ContainsAsync(Guid domainID)
+        {
+            return this.Dispatcher.InvokeAsync(() => this.Contains(domainID.ToString()));
+        }
+
+        public async Task<DomainMetaData[]> GetMetaDataAsync(Authentication authentication)
+        {
+            var domains = await this.Dispatcher.InvokeAsync(() => this.ToArray<Domain>());
             var metaDataList = new List<DomainMetaData>(domains.Length);
             foreach (var item in domains)
             {
-                var metaData = item.Dispatcher.Invoke(() => item.GetMetaData(authentication));
+                var metaData = await item.GetMetaDataAsync(authentication);
                 metaDataList.Add(metaData);
             }
             return metaDataList.ToArray();

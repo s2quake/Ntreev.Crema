@@ -278,11 +278,6 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task<Type> CopyAsync(Authentication authentication, string newTypeName, string categoryPath)
-        {
-            return this.Container.CopyAsync(authentication, base.Name, newTypeName, categoryPath);
-        }
-
         public async Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision)
         {
             try
@@ -703,7 +698,7 @@ namespace Ntreev.Crema.Services.Data
 
         async Task<IType> IType.CopyAsync(Authentication authentication, string newTypeName, string categoryPath)
         {
-            return await this.CopyAsync(authentication, newTypeName, categoryPath);
+            return await this.Container.CopyAsync(authentication, base.Name, newTypeName, categoryPath);
         }
 
         ITypeCategory IType.Category => this.Category;

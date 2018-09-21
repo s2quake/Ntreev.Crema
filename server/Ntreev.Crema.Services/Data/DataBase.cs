@@ -213,7 +213,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.ValidateDispatcher();
+                this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(LockAsync), this, comment);
@@ -235,7 +235,7 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                this.ValidateDispatcher();
+                this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnlockAsync), this);
@@ -375,12 +375,13 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    var oldName = base.Name;
                     this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
-                    this.DataBases.InvokeDataBaseRename(authentication, this, name);
-                    this.CremaHost.Sign(authentication);
+                    base.ValidateRename(authentication, name);
+                    var oldName = base.Name;
+                    var result = await this.DataBases.InvokeDataBaseRenameAsync(authentication, this.DataBaseInfo, name);
+                    this.CremaHost.Sign(authentication, result);
                     base.Name = name;
                     this.metaData.DataBaseInfo = base.DataBaseInfo;
                     this.DataBases.InvokeItemsRenamedEvent(authentication, new DataBase[] { this }, new string[] { oldName });
@@ -398,16 +399,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(Delete), this);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     base.ValidateDelete(authentication);
-                    this.DataBases.InvokeDataBaseDelete(authentication, this);
+                    var result = await this.DataBases.InvokeDataBaseDeleteAsync(authentication, this.DataBaseInfo);
+                    this.CremaHost.Sign(authentication, result);
                     base.DataBaseState = DataBaseState.None;
                     this.DeleteCache();
-                    this.tableContext = null;
-                    this.typeContext = null;
-                    this.CremaHost.Sign(authentication);
                     this.DataBases.InvokeItemsDeletedEvent(authentication, new DataBase[] { this }, new string[] { base.Name });
                 });
             }
@@ -447,26 +446,19 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RevertAsync), this, revision);
-                    this.DataBases.InvokeDataBaseRevert(authentication, this, revision);
+                    var result = await this.DataBases.InvokeDataBaseRevertAsync(authentication, base.Name, revision);
                     this.CremaHost.Sign(authentication);
-                });
-                var repositoryInfo = await this.CremaHost.RepositoryDispatcher.InvokeAsync(() =>
-                {
-                    return this.repositoryProvider.GetRepositoryInfo(this.CremaHost.GetPath(CremaPath.RepositoryDataBases), base.Name);
-                });
-                await this.Dispatcher.InvokeAsync(() =>
-                {
                     base.DataBaseInfo = new DataBaseInfo()
                     {
-                        ID = repositoryInfo.ID,
-                        Name = repositoryInfo.Name,
-                        Revision = repositoryInfo.Revision,
-                        Comment = repositoryInfo.Comment,
-                        CreationInfo = repositoryInfo.CreationInfo,
-                        ModificationInfo = repositoryInfo.ModificationInfo,
+                        ID = result.ID,
+                        Name = result.Name,
+                        Revision = result.Revision,
+                        Comment = result.Comment,
+                        CreationInfo = result.CreationInfo,
+                        ModificationInfo = result.ModificationInfo,
                     };
                     this.DataBases.InvokeItemsRevertedEvent(authentication, new IDataBase[] { this }, new string[] { revision });
                 });
@@ -536,11 +528,11 @@ namespace Ntreev.Crema.Services.Data
 
         public Task<DataBaseMetaData> GetMetaDataAsync(Authentication authentication)
         {
+            this.ValidateExpired();
             return this.Dispatcher.InvokeAsync(() =>
              {
                  if (authentication == null)
                      throw new ArgumentNullException(nameof(authentication));
-                 this.ValidateDispatcher();
                  return this.metaData;
              });
         }
@@ -992,6 +984,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public override void OnValidateRemoveAccessMember(IAuthentication authentication, object target)
         {
             base.OnValidateRemoveAccessMember(authentication, target);
@@ -1004,12 +997,28 @@ namespace Ntreev.Crema.Services.Data
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override void OnValidateDelete(IAuthentication authentication, object target)
+        public override void OnValidateRename(IAuthentication authentication, object target, string oldName, string newName)
         {
+            base.OnValidateRename(authentication, target, oldName, newName);
+            if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
+                throw new PermissionDeniedException();
             if (this.IsLoaded == true)
                 throw new InvalidOperationException(Resources.Exception_DataBaseHasBeenLoaded);
+            var dataBasePath = Path.Combine(Path.GetDirectoryName(this.BasePath), newName);
+            if (DirectoryUtility.Exists(dataBasePath) == true)
+                throw new ArgumentException(string.Format(Resources.Exception_ExistsPath_Format, newName), nameof(newName));
+            if (this.DataBases.ContainsKey(newName) == true)
+                throw new ArgumentException(string.Format(Resources.Exception_DataBaseIsAlreadyExisted_Format, newName), nameof(newName));
+        }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override void OnValidateDelete(IAuthentication authentication, object target)
+        {
             base.OnValidateDelete(authentication, target);
+            if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
+                throw new PermissionDeniedException();
+            if (this.IsLoaded == true)
+                throw new InvalidOperationException(Resources.Exception_DataBaseHasBeenLoaded);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -1383,12 +1392,12 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        private void ValidateDispatcher()
-        {
-            if (this.Dispatcher == null)
-                throw new InvalidOperationException(Resources.Exception_InvalidObject);
-            //this.Dispatcher.VerifyAccess();
-        }
+        //private void ValidateDispatcher()
+        //{
+        //    if (this.Dispatcher == null)
+        //        throw new InvalidOperationException(Resources.Exception_InvalidObject);
+        //    //this.Dispatcher.VerifyAccess();
+        //}
 
         private void ValidateEnter(Authentication authentication)
         {
@@ -1434,6 +1443,14 @@ namespace Ntreev.Crema.Services.Data
                 throw new PermissionDeniedException();
             if (this.VerifyAccessType(authentication, AccessType.Owner) == false)
                 throw new PermissionDeniedException();
+        }
+
+             private void ValidateRevert(Authentication authentication, string revision)
+        {
+            if (authentication.IsSystem == false && authentication.IsAdmin == false)
+                throw new PermissionDeniedException();
+            if (this.IsLoaded == true)
+                throw new InvalidOperationException(Resources.Exception_LoadedDataBaseCannotRevert);
         }
 
         private async Task OnEnterAsync(Authentication authentication)

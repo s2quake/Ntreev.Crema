@@ -182,29 +182,17 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public DomainContextMetaData GetMetaData(Authentication authentication)
+        public async Task<DomainContextMetaData> GetMetaDataAsync(Authentication authentication)
         {
-            this.Dispatcher.VerifyAccess();
-
-            var domains = this.Domains.ToArray<Domain>();
-            var metaDataList = new List<DomainMetaData>(domains.Length);
-            foreach (var item in domains)
+            var domains = await this.Domains.GetMetaDataAsync(authentication);
+            return await this.Dispatcher.InvokeAsync(() =>
             {
-                var metaData = item.Dispatcher.Invoke(() => item.GetMetaData(authentication));
-                metaDataList.Add(metaData);
-            }
-
-            var categoryPathList = new List<string>(this.Categories.Count);
-            foreach (var item in this.Categories)
-            {
-                categoryPathList.Add(item.Path);
-            }
-
-            return new DomainContextMetaData()
-            {
-                DomainCategories = categoryPathList.ToArray(),
-                Domains = metaDataList.ToArray(),
-            };
+                return new DomainContextMetaData()
+                {
+                    DomainCategories = this.Categories.GetMetaData(authentication),
+                    Domains = domains,
+                };
+            });
         }
 
         public CremaHost CremaHost { get; }
@@ -579,41 +567,19 @@ namespace Ntreev.Crema.Services.Domains
 
         #region IDomainContext
 
-        IDomainCollection IDomainContext.Domains
+        Task<bool> IDomainContext.ContainsAsync(string itemPath)
         {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Domains;
-            }
+            return this.Dispatcher.InvokeAsync(() => this.Contains(itemPath));
         }
 
-        IDomainCategoryCollection IDomainContext.Categories
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        IDomainCollection IDomainContext.Domains => this.Domains;
 
-        IDomainItem IDomainContext.this[string itemPath]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[itemPath] as IDomainItem;
-            }
-        }
+        IDomainCategoryCollection IDomainContext.Categories => this.Categories;
 
-        IDomainCategory IDomainContext.Root
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Root;
-            }
-        }
+        IDomainItem IDomainContext.this[string itemPath] => this[itemPath] as IDomainItem;
+
+        IDomainCategory IDomainContext.Root => this.Root;
+
 
         #endregion
 
@@ -621,7 +587,6 @@ namespace Ntreev.Crema.Services.Domains
 
         IEnumerator<IDomainItem> IEnumerable<IDomainItem>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IDomainItem;
@@ -630,7 +595,6 @@ namespace Ntreev.Crema.Services.Domains
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IDomainItem;

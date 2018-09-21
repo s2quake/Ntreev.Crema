@@ -21,6 +21,7 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Library;
 using System;
 using System.Data;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -46,65 +47,28 @@ namespace Ntreev.Crema.Services.Data
             this.content = content;
         }
 
-        public void SetIsEnabled(Authentication authentication, bool value)
+        public Task SetIsEnabledAsync(Authentication authentication, bool value)
         {
-            this.SetField(authentication, CremaSchema.Enable, value);
+            return this.SetFieldAsync(authentication, CremaSchema.Enable, value);
         }
 
-        public void SetTags(Authentication authentication, TagInfo value)
+        public Task SetTagsAsync(Authentication authentication, TagInfo value)
         {
-            this.SetField(authentication, CremaSchema.Tags, value.ToString());
+            return this.SetFieldAsync(authentication, CremaSchema.Tags, value.ToString());
         }
 
-        public void SetField(Authentication authentication, string columnName, object value)
+        public Task SetFieldAsync(Authentication authentication, string columnName, object value)
         {
-            try
-            {
-                this.DataBase.ValidateBeginInDataBase(authentication);
-                base.SetField(authentication, columnName, value);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return base.SetFieldAsync(authentication, columnName, value);
         }
 
-        public object this[string columnName]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.GetField<object>(columnName);
-            }
-        }
+        public object this[string columnName] => base.GetField<object>(columnName);
 
-        public TagInfo Tags
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return (TagInfo)(this.GetField<string>(CremaSchema.Tags));
-            }
-        }
+        public TagInfo Tags => (TagInfo)(this.GetField<string>(CremaSchema.Tags));
 
-        public bool IsEnabled
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<bool>(CremaSchema.Enable);
-            }
-        }
+        public bool IsEnabled => this.GetField<bool>(CremaSchema.Enable);
 
-        public TableContentBase Content
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.content;
-            }
-        }
+        public TableContentBase Content { get; }
 
         public override DataBase DataBase => this.content.DataBase;
 
@@ -116,13 +80,10 @@ namespace Ntreev.Crema.Services.Data
         {
             get
             {
-                this.Dispatcher?.VerifyAccess();
                 var dataRow = this.Row;
                 var table = dataRow.Table;
-
                 if (table.Columns.Contains(CremaSchema.__RelationID__) == false)
                     return string.Empty;
-
                 return dataRow.Field<string>(CremaSchema.__RelationID__);
             }
         }
@@ -131,13 +92,10 @@ namespace Ntreev.Crema.Services.Data
         {
             get
             {
-                this.Dispatcher?.VerifyAccess();
                 var dataRow = this.Row;
                 var table = dataRow.Table;
-
                 if (table.Columns.Contains(CremaSchema.__ParentID__) == false)
                     return string.Empty;
-
                 return dataRow.Field<string>(CremaSchema.__ParentID__);
             }
         }

@@ -42,31 +42,36 @@ namespace Ntreev.Crema.Bot
             this.address = address;
         }
 
-        public override ICremaHost CremaHost => this.cremaHost;
+        //public override ICremaHost CremaHost => this.cremaHost;
+
+        public override object GetService(Type serviceType)
+        {
+            return this.cremaHost.GetService(serviceType);
+        }
 
         public override AutobotServiceBase Service => this.service;
 
-        protected override Authentication OnLogin()
+        protected override async Task<Authentication> OnLoginAsync()
         {
             this.cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
-            this.token = this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.Open(this.address, this.AutobotID, StringUtility.ToSecureString("1111")));
+            this.token = await this.cremaHost.OpenAsync(this.address, this.AutobotID, StringUtility.ToSecureString("1111"));
             var autheticator = app.GetService(typeof(Authenticator)) as Authenticator;
             return autheticator;
         }
 
-        protected override void OnLogout(Authentication authentication)
+        protected override Task OnLogoutAsync(Authentication authentication)
         {
-            this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.Close(this.token));
+            return this.cremaHost.CloseAsync(this.token);
         }
 
         protected override void OnDisposed(EventArgs e)
         {
             base.OnDisposed(e);
 
-            if (this.cremaHost != null && this.cremaHost.IsOpened == true)
-            {
-                this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.Close(this.token));
-            }
+            //if (this.cremaHost != null && this.cremaHost.IsOpened == true)
+            //{
+            //    this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.Close(this.token));
+            //}
             this.token = Guid.Empty;
             this.app?.Dispose();
             this.app = null;

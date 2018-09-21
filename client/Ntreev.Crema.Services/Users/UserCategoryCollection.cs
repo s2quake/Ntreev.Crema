@@ -23,6 +23,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users
 {
@@ -39,15 +40,26 @@ namespace Ntreev.Crema.Services.Users
 
         }
                 
-        public UserCategory AddNew(Authentication authentication, string name, string parentPath)
+        public async Task<UserCategory> AddNewAsync(Authentication authentication, string name, string parentPath)
         {
-            this.Dispatcher.VerifyAccess();
-            var categoryName = new CategoryName(parentPath, name);
-            var result = this.Context.Service.NewUserCategory(categoryName);
-            result.Validate(authentication);
-            var category = this.BaseAddNew(name, parentPath, authentication);
-            this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
-            return category;
+            try
+            {
+                this.ValidateExpired();
+                return await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    var categoryName = new CategoryName(parentPath, name);
+                    var result = await this.Context.Service.NewUserCategoryAsync(categoryName);
+                    result.Validate(authentication);
+                    var category = this.BaseAddNew(name, parentPath, authentication);
+                    this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
+                    return category;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public void InvokeCategoriesCreatedEvent(Authentication authentication, UserCategory[] categories)

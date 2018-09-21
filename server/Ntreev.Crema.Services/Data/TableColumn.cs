@@ -137,13 +137,6 @@ namespace Ntreev.Crema.Services.Data
 
         public override CremaHost CremaHost => this.template.CremaHost;
 
-        private void ValidateDispatcher(Authentication authentication)
-        {
-            if (this.Dispatcher == null)
-                throw new InvalidOperationException(Resources.Exception_InvalidObject);
-            this.Dispatcher.VerifyAccess();
-        }
-
         #region ITableTemplate
 
         ITableTemplate ITableColumn.Template => this.template;

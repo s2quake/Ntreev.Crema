@@ -245,7 +245,7 @@ namespace Ntreev.Crema.Services.Users
                 this.ValidateExpired();
                 await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(ChangeUserInfoAsync), this, password, newPassword, userName, authority);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(ChangeUserInfoAsync), this, userName, authority);
                     this.ValidateUserInfoChange(authentication, password, newPassword, userName, authority);
                     this.CremaHost.Sign(authentication);
                     var items = EnumerableUtility.One(this).ToArray();
@@ -271,6 +271,7 @@ namespace Ntreev.Crema.Services.Users
                 this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SendMessageAsync), this, message);
                     this.ValidateSendMessage(authentication, message);
                     this.CremaHost.Sign(authentication);
                     this.Container.InvokeSendMessageEvent(authentication, this, message);

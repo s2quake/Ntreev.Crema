@@ -99,13 +99,6 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        private void ValidateDispatcher(Authentication authentication)
-        {
-            if (this.Dispatcher == null)
-                throw new InvalidOperationException(Resources.Exception_InvalidObject);
-            this.Dispatcher.VerifyAccess();
-        }
-
         #region ITableRow
 
         ITableContent ITableRow.Content => this.Content as ITableContent;

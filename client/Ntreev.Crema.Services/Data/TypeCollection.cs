@@ -27,6 +27,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -56,7 +57,6 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.CremaHost.DebugMethod(authentication, this, nameof(AddNew), typeInfo.Name, typeInfo.CategoryPath);
-                this.InvokeTypeCreate(authentication, typeInfo.Name, typeInfo.CategoryPath);
                 var type = this.BaseAddNew(typeInfo.Name, typeInfo.CategoryPath, authentication);
                 type.Initialize(typeInfo);
                 var items = EnumerableUtility.One(type).ToArray();
@@ -70,50 +70,29 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Type Copy(Authentication authentication, Type type, string newTypeName, string categoryPath)
+        public async Task<Type> CopyAsync(Authentication authentication, string typeName, string newTypeName, string categoryPath)
         {
-            var result = this.Context.Service.CopyType(type.Name, newTypeName, categoryPath);
-            this.Sign(authentication, result);
-            return this.AddNew(authentication, result.Value);
+            try
+            {
+                this.ValidateExpired();
+                return await await this.Dispatcher.InvokeAsync(async () =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), typeName, newTypeName, categoryPath);
+                    var result = await this.Context.Service.CopyTypeAsync(typeName, newTypeName, categoryPath);
+                    this.CremaHost.Sign(authentication, result);
+                    return this.AddNew(authentication, result.Value);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public object GetService(System.Type serviceType)
         {
             return this.DataBase.GetService(serviceType);
-        }
-
-        public void InvokeTypeCreate(Authentication authentication, string typeName, string categoryPath)
-        {
-
-        }
-
-        public void InvokeTypeRename(Authentication authentication, Type type, string newName)
-        {
-
-        }
-
-        public void InvokeTypeMove(Authentication authentication, Type type, string newCategoryPath)
-        {
-
-        }
-
-        public void InvokeTypeDelete(Authentication authentication, Type type)
-        {
-
-        }
-
-        public void InvokeTypeBeginTemplateEdit(Authentication authentication, Type type)
-        {
-
-        }
-
-        public void InvokeTypeEndTemplateEdit(Authentication authentication, Type type, TypeInfo typeInfo)
-        {
-
-        }
-
-        public void InvokeTypeSetTags(Authentication authentication, Type type, TagInfo tags)
-        {
         }
 
         public void InvokeTypesCreatedEvent(Authentication authentication, Type[] types)
@@ -330,16 +309,6 @@ namespace Ntreev.Crema.Services.Data
         protected virtual void OnTypesChanged(ItemsEventArgs<IType> e)
         {
             this.typesChanged?.Invoke(this, e);
-        }
-
-        private void Sign(Authentication authentication, ResultBase result)
-        {
-            result.Validate(authentication);
-        }
-
-        private void Sign<T>(Authentication authentication, ResultBase<T> result)
-        {
-            result.Validate(authentication);
         }
 
         #region ITypeCollection

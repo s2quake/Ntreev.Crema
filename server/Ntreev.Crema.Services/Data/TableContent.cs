@@ -385,8 +385,6 @@ namespace Ntreev.Crema.Services.Data
                 throw new InvalidOperationException();
         }
 
-        
-
         public override Domain Domain => this.domain;
 
         public IPermission Permission => this.Table;

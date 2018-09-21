@@ -60,66 +60,6 @@ namespace Ntreev.Crema.Services.Data
             this.dataBase = null;
         }
 
-        public void InvokeTableItemLock(Authentication authentication, ITableItem tableItem, string comment)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemLock), tableItem, comment);
-        }
-
-        public void InvokeTableItemUnlock(Authentication authentication, ITableItem tableItem)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemUnlock), tableItem);
-        }
-
-        public Task<ResultBase<AccessInfo>> InvokeTableItemSetPrivateAsync(Authentication authentication, string tableItemPath)
-        {
-            return this.Service.SetPrivateTableItemAsync(tableItemPath);
-        }
-
-        public Task<ResultBase> InvokeTableItemSetPublicAsync(Authentication authentication, string tableItemPath)
-        {
-            return this.Service.SetPublicTableItemAsync(tableItemPath);
-        }
-
-        public void InvokeTableItemAddAccessMember(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID, AccessType accessType)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemAddAccessMember), tableItem, memberID, accessType);
-        }
-
-        public void InvokeTableItemSetAccessMember(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID, AccessType accessType)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemSetAccessMember), tableItem, memberID, accessType);
-        }
-
-        public void InvokeTableItemRemoveAccessMember(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemRemoveAccessMember), tableItem, memberID);
-        }
-
-        public void InvokeTableItemCreate(Authentication authentication, string path)
-        {
-
-        }
-
-        public void InvokeTableItemRename(Authentication authentication, ITableItem tableItem, string newName)
-        {
-
-        }
-
-        public void InvokeTableItemMove(Authentication authentication, ITableItem tableItem, string newCategoryPath)
-        {
-
-        }
-
-        public void InvokeTableItemDelete(Authentication authentication, ITableItem tableItem)
-        {
-
-        }
-
-        public void InvokeTableItemChange(Authentication authentication, ITableItem tableItem)
-        {
-
-        }
-
         public void InvokeItemsSetPublicEvent(Authentication authentication, ITableItem[] items)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetPublicEvent), items);

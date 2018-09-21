@@ -40,11 +40,11 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
                     this.ValidateRename(authentication, name);
-                    this.CremaHost.Sign(authentication);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
-                    await this.Container.InvokeCategoryRenameAsync(authentication, this, name);
+                    var result = await this.Container.InvokeCategoryRenameAsync(authentication, this.Path, name);
+                    this.CremaHost.Sign(authentication, result);;
                     base.Name = name;
                     this.Container.InvokeCategoriesRenamedEvent(authentication, items, oldNames, oldPaths);
                 });
@@ -65,11 +65,11 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, parentPath);
                     this.ValidateMove(authentication, parentPath);
-                    this.CremaHost.Sign(authentication);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
-                    await this.Container.InvokeCategoryMoveAsync(authentication, this, parentPath);
+                    var result = await this.Container.InvokeCategoryMoveAsync(authentication, this.Path, parentPath);
+                    this.CremaHost.Sign(authentication, result);
                     this.Parent = this.Container[parentPath];
                     this.Container.InvokeCategoriesMovedEvent(authentication, items, oldPaths, oldParentPaths);
                 });
@@ -90,11 +90,11 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     this.ValidateDelete(authentication);
-                    this.CremaHost.Sign(authentication);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var container = this.Container;
-                    await container.InvokeCategoryDeleteAsync(authentication, this);
+                    var result = await container.InvokeCategoryDeleteAsync(authentication, this.Path);
+                    this.CremaHost.Sign(authentication, result);
                     this.Dispose();
                     container.InvokeCategoriesDeletedEvent(authentication, items, oldPaths);
                 });
