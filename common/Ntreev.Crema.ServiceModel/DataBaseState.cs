@@ -25,17 +25,22 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ServiceModel
 {
-    [Flags]
     [DataContract(Namespace = SchemaUtility.Namespace)]
     public enum DataBaseState
     {
         [EnumMember]
-        None = 0,
+        None,
 
         [EnumMember]
-        IsLoaded = 1,
+        Loading,
 
         [EnumMember]
-        HasWorker = 2,
+        Loaded,
+
+        [EnumMember]
+        Unloading,
+
+        [EnumMember]
+        Unloaded = None,
     }
 }

@@ -61,7 +61,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             using (var restorer = new DomainRestorer(authentication, domainContext, workingPath))
             {
-                restorer.DeserializeDomain();
+                await restorer.DeserializeDomainAsync();
                 restorer.CollectCompletedActions();
                 restorer.CollectPostedActions();
                 restorer.CollectAuthentications();
@@ -93,7 +93,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        private void DeserializeDomain()
+        private async Task DeserializeDomainAsync()
         {
             var domainLogger = new DomainLogger(this.domainContext.Serializer, this.workingPath);
             var domainInfo = domainLogger.DomainInfo;
@@ -101,7 +101,7 @@ namespace Ntreev.Crema.Services.Domains
             var source = domainLogger.Source;
             this.domain = (Domain)Activator.CreateInstance(domainType, domainInfo, source);
             this.domain.Logger = domainLogger;
-            this.domainContext.Domains.Restore(this.authentication, this.domain);
+            await this.domainContext.Domains.RestoreAsync(this.authentication, this.domain);
         }
 
         private void CollectAuthentications()

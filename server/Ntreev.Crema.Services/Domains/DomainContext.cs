@@ -102,6 +102,22 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
+        public Task<Domain[]> GetDomainsAsync(Guid dataBaseID)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                var domainList = new List<Domain>(this.Domains.Count);
+                foreach (var item in this.Domains)
+                {
+                    if (item.DataBaseID == dataBaseID)
+                    {
+                        domainList.Add(item);
+                    }
+                }
+                return domainList.ToArray();
+            });
+        }
+
         public DomainCollection Domains => base.Items;
 
         public CremaHost CremaHost { get; }
@@ -165,6 +181,18 @@ namespace Ntreev.Crema.Services.Domains
             {
                 this.Dispatcher.VerifyAccess();
                 this.itemsDeleted -= value;
+            }
+        }
+
+        public async Task RestoreAsync(Authentication authentication, CremaSettings settings)
+        {
+            var dataBases = await this.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases.ToArray<DataBase>());
+            if (settings.NoCache == false)
+            {
+                foreach (var item in dataBases)
+                {
+                    await this.RestoreAsync(authentication, item);
+                }
             }
         }
 

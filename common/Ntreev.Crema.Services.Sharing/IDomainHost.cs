@@ -26,9 +26,9 @@ namespace Ntreev.Crema.Services
 {
     interface IDomainHost
     {
-        void Restore(Authentication authentication, Domain domain);
+        Task RestoreAsync(Authentication authentication, Domain domain);
 
-        void Detach();
+        Task DetachAsync();
 
 #if SERVER
         void ValidateDelete(Authentication authentication, bool isCanceled);

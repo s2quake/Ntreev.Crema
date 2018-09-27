@@ -128,7 +128,7 @@ namespace Ntreev.Crema.Services
             {
                 if (this.ServiceState != ServiceState.Closed)
                     throw new InvalidOperationException();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ServiceState = ServiceState.Opening;
                     this.OnOpening(EventArgs.Empty);
@@ -137,18 +137,16 @@ namespace Ntreev.Crema.Services
                     this.Info(Resources.Message_ServiceStart);
                     this.configs = new CremaConfiguration(Path.Combine(this.BasePath, "configs"), this.propertiesProviders);
                     this.UserContext = new UserContext(this);
-                    await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Initialize());
+                });
+                await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Initialize());
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.DataBases = new DataBaseCollection(this, this.RepositoryProvider);
                     this.DomainContext = new DomainContext(this, this.UserContext);
-
-                    if (this.settings.NoCache == false)
-                    {
-                        foreach (var item in this.DataBases)
-                        {
-                            await this.DomainContext.RestoreAsync(Authentication.System, item);
-                        }
-                    }
-
+                });
+                await this.DomainContext.RestoreAsync(Authentication.System, settings);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.plugins = (this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>).TopologicalSort().ToArray();
                     foreach (var item in this.plugins)
                     {
@@ -202,7 +200,7 @@ namespace Ntreev.Crema.Services
                     this.UserContext = null;
                     await this.DomainContext.DisposeAsync();
                     this.DomainContext = null;
-                    this.DataBases.Dispose();
+                    await this.DataBases.DisposeAsync();
                     this.DataBases = null;
                     this.Info("Crema module has been stopped.");
                     this.ServiceState = ServiceState.Closed;

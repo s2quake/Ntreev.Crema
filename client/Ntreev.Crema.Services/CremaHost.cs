@@ -377,6 +377,8 @@ namespace Ntreev.Crema.Services
 
         public string IPAddress { get; private set; }
 
+        public ServiceState ServiceState { get; }
+
         public event EventHandler Opening;
 
         public event EventHandler Opened;

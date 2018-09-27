@@ -152,7 +152,7 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             {
                 string productName = AppUtility.ProductName;
 
-                if (cremaHost.IsOpened == true)
+                if (cremaHost.ServiceState == ServiceState.Opened)
                     return $"{productName} - {this.cremaAppHost.DataBaseName} ({cremaHost.Address} - {cremaHost.UserID})";
                 else
                     return productName;

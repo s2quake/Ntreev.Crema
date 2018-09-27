@@ -28,7 +28,7 @@ namespace Ntreev.Crema.Services.Extensions
                 throw new ArgumentNullException(nameof(descriptor));
             if (authentication == null)
                 return false;
-            return descriptor.DataBaseState.HasFlag(DataBaseState.IsLoaded);
+            return descriptor.DataBaseState.HasFlag(DataBaseState.Loaded);
         }
 
         //public static bool IsEntered(Authentication authentication, IDataBaseDescriptor descriptor)

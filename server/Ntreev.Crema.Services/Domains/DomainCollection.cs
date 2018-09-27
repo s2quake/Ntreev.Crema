@@ -161,20 +161,23 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public void Restore(Authentication authentication, Domain domain)
+        public async Task RestoreAsync(Authentication authentication, Domain domain)
         {
-            authentication.Sign();
-            var dataBase = this.Context.CremaHost.DataBases[domain.DataBaseID];
-            var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
-            var category = this.Context.Categories.Prepare(categoryName);
-            domain.Category = category;
-            domain.Dispatcher = new CremaDispatcher(domain);
-            this.InvokeDomainCreatedEvent(authentication, domain, domain.DomainInfo);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                authentication.Sign();
+                var dataBase = this.Context.CremaHost.DataBases[domain.DataBaseID];
+                var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
+                var category = this.Context.Categories.Prepare(categoryName);
+                domain.Category = category;
+                domain.Dispatcher = new CremaDispatcher(domain);
+                this.InvokeDomainCreatedEvent(authentication, domain, domain.DomainInfo);
+            });
         }
 
         public async Task AddAsync(Authentication authentication, Domain domain, DataBase dataBase)
         {
-            await await this.Dispatcher.InvokeAsync(async () =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
                 var category = this.Context.Categories.Prepare(categoryName);

@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using System;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains
 {
@@ -27,12 +28,12 @@ namespace Ntreev.Crema.Services.Domains
 
         }
 
-        public void Restore(Authentication authentication, Domain domain)
+        public Task RestoreAsync(Authentication authentication, Domain domain)
         {
             throw new NotImplementedException();
         }
 
-        public void Detach()
+        public Task DetachAsync()
         {
             throw new NotImplementedException();
         }

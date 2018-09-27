@@ -291,42 +291,42 @@ namespace Ntreev.Crema.Services.Data
                 this.info.Revision = null;
             }
 
-            var domainContext = this.DataBase.GetService(typeof(IDomainContext)) as IDomainContext;
-            domainContext.Domains.DomainCreated += Domains_DomainCreated;
-            domainContext.Domains.DomainDeleted += Domains_DomainDeleted;
-            domainContext.Domains.DomainRowAdded += Domains_DomainRowAdded;
-            domainContext.Domains.DomainRowChanged += Domains_DomainRowChanged;
-            domainContext.Domains.DomainRowRemoved += Domains_DomainRowRemoved;
+            //var domainContext = this.DataBase.GetService(typeof(IDomainContext)) as IDomainContext;
+            //domainContext.Domains.DomainCreated += Domains_DomainCreated;
+            //domainContext.Domains.DomainDeleted += Domains_DomainDeleted;
+            //domainContext.Domains.DomainRowAdded += Domains_DomainRowAdded;
+            //domainContext.Domains.DomainRowChanged += Domains_DomainRowChanged;
+            //domainContext.Domains.DomainRowRemoved += Domains_DomainRowRemoved;
 
-            var domainItems = new Dictionary<string, IDomain>();
-            foreach (var item in domainContext.Domains)
-            {
-                if (item.DataBaseID != this.dataBaseID)
-                    continue;
-                Collect(item);
-            }
+            //var domainItems = new Dictionary<string, IDomain>();
+            //foreach (var item in domainContext.Domains)
+            //{
+            //    if (item.DataBaseID != this.dataBaseID)
+            //        continue;
+            //    Collect(item);
+            //}
 
             await this.Dispatcher.InvokeAsync(() =>
             {
-                foreach (var item in domainItems)
-                {
-                    this.domainItems.Add(item.Key, item.Value);
-                }
+                //foreach (var item in domainItems)
+                //{
+                //    this.domainItems.Add(item.Key, item.Value);
+                //}
                 this.Initialize();
             });
 
-            void Collect(IDomain domain)
-            {
-                if (domain.Host is TableContent content)
-                {
-                    var contents = EnumerableUtility.Friends(content, content.Childs);
-                    var tableNames = contents.Select(item => item.Table.Name).ToArray();
-                    foreach (var item in tableNames)
-                    {
-                        domainItems.Add(item, domain);
-                    }
-                }
-            }
+            //void Collect(IDomain domain)
+            //{
+            //    if (domain.Host is TableContent content)
+            //    {
+            //        var contents = EnumerableUtility.Friends(content, content.Childs);
+            //        var tableNames = contents.Select(item => item.Table.Name).ToArray();
+            //        foreach (var item in tableNames)
+            //        {
+            //            domainItems.Add(item, domain);
+            //        }
+            //    }
+            //}
         }
 
         private void Domains_DomainRowRemoved(object sender, DomainRowEventArgs e)

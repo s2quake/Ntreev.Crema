@@ -470,21 +470,25 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public void SetDomainHost(IDomainHost host)
+        public async Task SetDomainHostAsync(IDomainHost host)
         {
             Authentication.System.Sign();
-            this.Host = host;
-            if (this.Host != null)
+            
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                base.DomainState |= DomainState.IsActivated;
-            }
-            else
-            {
-                base.DomainState &= ~DomainState.IsActivated;
-            }
-            this.Dispatcher.Invoke(() =>
-            {
+                this.Host = host;
+                if (this.Host != null)
+                {
+                    base.DomainState |= DomainState.IsActivated;
+                }
+                else
+                {
+                    base.DomainState &= ~DomainState.IsActivated;
+                }
                 this.OnDomainStateChanged(new DomainEventArgs(Authentication.System, this));
+            });
+            await this.Container.Dispatcher.InvokeAsync(() =>
+            {
                 this.Container.InvokeDomainStateChangedEvent(Authentication.System, this);
             });
         }

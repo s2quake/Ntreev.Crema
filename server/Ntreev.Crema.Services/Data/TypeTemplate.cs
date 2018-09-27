@@ -86,10 +86,10 @@ namespace Ntreev.Crema.Services.Data
             this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
         }
 
-        protected override void OnRestore(Domain domain)
+        protected override async Task OnRestoreAsync(Domain domain)
         {
             this.type.IsBeingEdited = true;
-            base.OnRestore(domain);
+            await base.OnRestoreAsync(domain);
         }
 
         protected override async Task<CremaDataType> CreateSourceAsync(Authentication authentication)

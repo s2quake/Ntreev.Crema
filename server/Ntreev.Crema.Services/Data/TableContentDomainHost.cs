@@ -260,9 +260,9 @@ namespace Ntreev.Crema.Services.Data
 
             #region IDomainHost
 
-            void IDomainHost.Detach()
+            async Task IDomainHost.DetachAsync()
             {
-                this.domain.Dispatcher.Invoke(this.DetachDomainEvent);
+                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                 this.domain = null;
                 foreach (var item in this.Contents)
                 {
@@ -271,7 +271,7 @@ namespace Ntreev.Crema.Services.Data
                 }
             }
 
-            void IDomainHost.Restore(Authentication authentication, Domain domain)
+            async Task IDomainHost.RestoreAsync(Authentication authentication, Domain domain)
             {
                 var dataSet = domain.Source as CremaDataSet;
                 this.domain = domain;
@@ -283,9 +283,12 @@ namespace Ntreev.Crema.Services.Data
                     item.Table.SetTableState(TableState.IsBeingEdited);
                     item.IsModified = domain.ModifiedTables.Contains(item.dataTable.Name);
                 }
-                this.domain.Dispatcher.Invoke(this.AttachDomainEvent);
-                this.container.InvokeTablesStateChangedEvent(authentication, this.Tables);
-                this.InvokeEditBegunEvent(EventArgs.Empty);
+                await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.container.InvokeTablesStateChangedEvent(authentication, this.Tables);
+                    this.InvokeEditBegunEvent(EventArgs.Empty);
+                });
             }
 
             void IDomainHost.ValidateDelete(Authentication authentication, bool isCanceled)

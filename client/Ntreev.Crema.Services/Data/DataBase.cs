@@ -254,8 +254,8 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(LoadAsync), this);
                     var result = await this.DataBases.Service.LoadAsync(base.Name);
                     this.CremaHost.Sign(authentication, result);
-                    this.metaData.DataBaseState = DataBaseState.IsLoaded;
-                    base.DataBaseState = DataBaseState.IsLoaded;
+                    this.metaData.DataBaseState = DataBaseState.Loaded;
+                    base.DataBaseState = DataBaseState.Loaded;
                     base.Load(authentication);
                     this.DataBases.InvokeItemsLoadedEvent(authentication, new IDataBase[] { this });
                 });
@@ -575,7 +575,7 @@ namespace Ntreev.Crema.Services.Data
 
         public void SetLoaded(Authentication authentication)
         {
-            base.DataBaseState = DataBaseState.IsLoaded;
+            base.DataBaseState = DataBaseState.Loaded;
             base.Load(authentication);
         }
 
@@ -845,7 +845,7 @@ namespace Ntreev.Crema.Services.Data
             set => base.Name = value;
         }
 
-        public bool IsLoaded => this.DataBaseState.HasFlag(DataBaseState.IsLoaded);
+        public bool IsLoaded => this.DataBaseState.HasFlag(DataBaseState.Loaded);
 
         public bool IsResetting { get; private set; }
 
@@ -1186,7 +1186,7 @@ namespace Ntreev.Crema.Services.Data
             if (serviceType == typeof(IDataBase))
                 return this;
 
-            if (base.DataBaseState.HasFlag(DataBaseState.IsLoaded) == true && this.serviceDispatcher != null)
+            if (base.DataBaseState.HasFlag(DataBaseState.Loaded) == true && this.serviceDispatcher != null)
             {
                 if (serviceType == typeof(ITableContext))
                     return this.tableContext;

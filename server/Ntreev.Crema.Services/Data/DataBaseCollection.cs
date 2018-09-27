@@ -392,10 +392,11 @@ namespace Ntreev.Crema.Services.Data
             this.OnItemsLockChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData));
         }
 
-        public void Dispose()
+        public async Task DisposeAsync()
         {
+            var dataBases = await this.Dispatcher.InvokeAsync(() => this.ToArray<DataBase>());
             this.repositoryDispatcher.Dispose();
-            foreach (var item in this.ToArray<DataBase>())
+            foreach (var item in dataBases)
             {
                 {
                     var dataBaseInfo = (DataBaseSerializationInfo)item.DataBaseInfo;
@@ -407,7 +408,7 @@ namespace Ntreev.Crema.Services.Data
                     var filename = FileUtility.Prepare(this.cachePath, $"{item.ID}");
                     this.Serializer.Serialize(filename, dataBaseState, DataBaseStateSerializationInfo.Settings);
                 }
-                item.Dispose();
+                await item.DisposeAsync();
             }
         }
 

@@ -386,7 +386,7 @@ namespace Ntreev.Crema.Services.Data
             this.columns.Clear();
         }
 
-        protected virtual void OnRestore(Domain domain)
+        protected virtual async Task OnRestoreAsync(Domain domain)
         {
             this.TemplateSource = domain.Source as CremaTemplate;
             this.domain = domain as TableTemplateDomain;
@@ -402,19 +402,13 @@ namespace Ntreev.Crema.Services.Data
                 this.table.RowDeleted += Table_RowDeleted;
                 this.table.RowChanged += Table_RowChanged;
             }
-            this.domain.Dispatcher.Invoke(() =>
-            {
-                this.IsModified = this.domain.IsModified;
-                this.AttachDomainEvent();
-            });
+            this.IsModified = this.domain.IsModified;
+            await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
         }
 
-        protected virtual void OnDetach()
+        protected virtual async Task OnDetachAsync()
         {
-            this.domain.Dispatcher.Invoke(() =>
-            {
-                this.DetachDomainEvent();
-            });
+            await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
             this.domain = null;
         }
 
@@ -594,15 +588,15 @@ namespace Ntreev.Crema.Services.Data
 
         #region IDomainHost
 
-        void IDomainHost.Restore(Authentication authentication, Domain domain)
+        async Task IDomainHost.RestoreAsync(Authentication authentication, Domain domain)
         {
-            this.OnRestore(domain);
-            this.OnEditBegun(EventArgs.Empty);
+            await this.OnRestoreAsync(domain);
+            await this.Dispatcher.InvokeAsync(() => this.OnEditBegun(EventArgs.Empty));
         }
 
-        void IDomainHost.Detach()
+        async Task IDomainHost.DetachAsync()
         {
-            this.OnDetach();
+            await this.OnDetachAsync();
         }
 
         void IDomainHost.ValidateDelete(Authentication authentication, bool isCanceled)

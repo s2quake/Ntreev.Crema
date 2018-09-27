@@ -34,7 +34,7 @@ namespace Ntreev.Crema.Services.Data.Serializations
         {
             var dataBaseState = DataBaseState.None;
             if (obj.IsLoaded == true)
-                dataBaseState |= DataBaseState.IsLoaded;
+                dataBaseState = DataBaseState.Loaded;
             return dataBaseState;
         }
 
@@ -42,7 +42,7 @@ namespace Ntreev.Crema.Services.Data.Serializations
         {
             return new DataBaseStateSerializationInfo()
             {
-                IsLoaded = obj.HasFlag(DataBaseState.IsLoaded)
+                IsLoaded = obj.HasFlag(DataBaseState.Loaded)
             };
         }
 

@@ -92,10 +92,10 @@ namespace Ntreev.Crema.Services.Data
             this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
         }
 
-        protected override void OnRestore(Domain domain)
+        protected override async Task OnRestoreAsync(Domain domain)
         {
             this.table.IsBeingSetup = true;
-            base.OnRestore(domain);
+            await base.OnRestoreAsync(domain);
         }
 
         protected override async Task<CremaTemplate> CreateSourceAsync(Authentication authentication)

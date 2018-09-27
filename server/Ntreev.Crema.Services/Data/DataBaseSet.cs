@@ -27,6 +27,7 @@ using System.IO;
 using Ntreev.Library;
 using Ntreev.Library.IO;
 using Ntreev.Crema.Data.Xml.Schema;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -75,6 +76,11 @@ namespace Ntreev.Crema.Services.Data
                 this.tables.Add(item);
                 this.itemPathList.Add(this.dataBase.TableContext.GeneratePath(item.Path));
             }
+        }
+
+        public static Task<DataBaseSet> CreateAsync(DataBase dataBase, CremaDataSet dataSet, bool allowCreation)
+        {
+            return dataBase.Dispatcher.InvokeAsync(() => new DataBaseSet(dataBase, dataSet, allowCreation));
         }
 
         public void SetTypeCategoryPath(string categoryPath, string newCategoryPath)
@@ -362,7 +368,6 @@ namespace Ntreev.Crema.Services.Data
 
                     var files = DirectoryUtility.GetAllFiles(this.dataBase.BasePath, sss + ".*");
                     if (files.Any())
-
                     {
                         int qwer = 0;
                     }
