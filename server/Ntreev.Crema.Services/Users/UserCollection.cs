@@ -112,20 +112,19 @@ namespace Ntreev.Crema.Services.Users
             });
         }
 
-        public Task<SignatureDate> InvokeUserMoveAsync(Authentication authentication, User user, string categoryPath)
+        public Task<SignatureDate> InvokeUserMoveAsync(Authentication authentication, UserSerializationInfo userInfo, string categoryPath)
         {
-            var message = EventMessageBuilder.MoveUser(authentication, user.ID, user.UserName, user.Category.Path, categoryPath);
-            var serializationInfo = user.SerializationInfo;
-            var itemPath = user.ItemPath;
+            var message = EventMessageBuilder.MoveUser(authentication, userInfo.ID, userInfo.Name, userInfo.CategoryPath, categoryPath);
+            var itemPath = this.Context.GeneratePath(userInfo.Path);
             var categoryItemPath = this.Context.GenerateCategoryPath(categoryPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
                     var signatureDate = authentication.Sign();
-                    serializationInfo.CategoryPath = categoryPath;
-                    serializationInfo.ModificationInfo = signatureDate;
-                    this.Repository.MoveUser(signatureDate, itemPath, serializationInfo, categoryItemPath);
+                    userInfo.CategoryPath = categoryPath;
+                    userInfo.ModificationInfo = signatureDate;
+                    this.Repository.MoveUser(signatureDate, itemPath, userInfo, categoryItemPath);
                     this.Repository.Commit(authentication, message);
                     return signatureDate;
                 }
@@ -137,10 +136,10 @@ namespace Ntreev.Crema.Services.Users
             });
         }
 
-        public Task<SignatureDate> InvokeUserDeleteAsync(Authentication authentication, User user)
+        public Task<SignatureDate> InvokeUserDeleteAsync(Authentication authentication, UserSerializationInfo userInfo)
         {
-            var message = EventMessageBuilder.DeleteUser(authentication, user.ID);
-            var itemPath = user.ItemPath;
+            var message = EventMessageBuilder.DeleteUser(authentication, userInfo.ID);
+            var itemPath = this.Context.GeneratePath(userInfo.Path);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
@@ -158,26 +157,25 @@ namespace Ntreev.Crema.Services.Users
             });
         }
 
-        public Task<UserSerializationInfo> InvokeUserChangeAsync(Authentication authentication, User user, SecureString password, SecureString newPassword, string userName, Authority? authority)
+        public Task<UserSerializationInfo> InvokeUserChangeAsync(Authentication authentication, UserSerializationInfo userInfo, SecureString password, SecureString newPassword, string userName, Authority? authority)
         {
-            var message = EventMessageBuilder.ChangeUserInfo(authentication, user.ID, user.Name);
-            var itemPath = user.ItemPath;
-            var serializationInfo = user.SerializationInfo;
+            var message = EventMessageBuilder.ChangeUserInfo(authentication, userInfo.ID, userInfo.Name);
+            var itemPath = this.Context.GeneratePath(userInfo.Path);
             if (newPassword != null)
-                serializationInfo.Password = UserContext.SecureStringToString(newPassword).Encrypt();
+                userInfo.Password = UserContext.SecureStringToString(newPassword).Encrypt();
             if (userName != null)
-                serializationInfo.Name = userName;
+                userInfo.Name = userName;
             if (authority.HasValue)
-                serializationInfo.Authority = authority.Value;
+                userInfo.Authority = authority.Value;
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
                     var signatureDate = authentication.Sign();
-                    serializationInfo.ModificationInfo = signatureDate;
-                    this.Repository.ModifyUser(itemPath, serializationInfo);
+                    userInfo.ModificationInfo = signatureDate;
+                    this.Repository.ModifyUser(itemPath, userInfo);
                     this.Repository.Commit(authentication, message);
-                    return serializationInfo;
+                    return userInfo;
                 }
                 catch
                 {
@@ -187,20 +185,19 @@ namespace Ntreev.Crema.Services.Users
             });
         }
 
-        public Task<BanInfo> InvokeUserBanAsync(Authentication authentication, User user, string comment)
+        public Task<BanInfo> InvokeUserBanAsync(Authentication authentication, UserSerializationInfo userInfo, string comment)
         {
-            var message = EventMessageBuilder.BanUser(authentication, user.ID, user.UserName, comment);
-            var itemPath = user.ItemPath;
-            var banInfo = new BanInfo() { Path = user.Path, Comment = comment };
-            var serializationInfo = user.SerializationInfo;
+            var message = EventMessageBuilder.BanUser(authentication, userInfo.ID, userInfo.Name, comment);
+            var itemPath = this.Context.GeneratePath(userInfo.Path);
+            var banInfo = new BanInfo() { Path = userInfo.Path, Comment = comment };
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
                     var signatureDate = authentication.Sign();
                     banInfo.SignatureDate = signatureDate;
-                    serializationInfo.BanInfo = (BanSerializationInfo)banInfo;
-                    this.Repository.ModifyUser(itemPath, serializationInfo);
+                    userInfo.BanInfo = (BanSerializationInfo)banInfo;
+                    this.Repository.ModifyUser(itemPath, userInfo);
                     this.Repository.Commit(authentication, message);
                     return banInfo;
                 }
@@ -212,18 +209,17 @@ namespace Ntreev.Crema.Services.Users
             });
         }
 
-        public Task<SignatureDate> InvokeUserUnbanAsync(Authentication authentication, User user)
+        public Task<SignatureDate> InvokeUserUnbanAsync(Authentication authentication, UserSerializationInfo userInfo)
         {
-            var message = EventMessageBuilder.UnbanUser(authentication, user.ID, user.UserName);
-            var itemPath = user.ItemPath;
-            var serializationInfo = user.SerializationInfo;
+            var message = EventMessageBuilder.UnbanUser(authentication, userInfo.ID, userInfo.Name);
+            var itemPath = this.Context.GeneratePath(userInfo.Path);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
                     var signatureDate = authentication.Sign();
-                    serializationInfo.BanInfo = (BanSerializationInfo)BanInfo.Empty;
-                    this.Repository.ModifyUser(itemPath, serializationInfo);
+                    userInfo.BanInfo = (BanSerializationInfo)BanInfo.Empty;
+                    this.Repository.ModifyUser(itemPath, userInfo);
                     this.Repository.Commit(authentication, message);
                     return signatureDate;
                 }

@@ -518,7 +518,10 @@ namespace Ntreev.Crema.Data
 
         public void WriteXmlSchema(string filename, bool isRecursive)
         {
-            var schemaWriter = new CremaSchemaWriter(this)
+            var name = CremaDataSet.GetTableName(this.DataSet, this.TemplateNamespace != string.Empty ? this.TemplateNamespace : this.Namespace);
+            var categoryPath = CremaDataSet.GetTableCategoryPath(this.DataSet, this.TemplateNamespace != string.Empty ? this.TemplateNamespace : this.Namespace);
+            var itemName = new ItemName(categoryPath, name);
+            var schemaWriter = new CremaSchemaWriter(this, itemName)
             {
                 IsRecursive = isRecursive,
             };

@@ -35,6 +35,7 @@ namespace Ntreev.Crema.Services.Data
         {
             private readonly TableCollection container;
             private Domain domain;
+            private string[] itemPaths;
 
             public TableContentDomainHost(TableCollection container, Domain domain, string itemPath)
             {
@@ -104,6 +105,7 @@ namespace Ntreev.Crema.Services.Data
             public async Task BeginContentAsync(Authentication authentication)
             {
                 var dataSet = this.domain.Source as CremaDataSet;
+                this.itemPaths = dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] as string[] ?? new string[] { };
                 foreach (var item in this.Contents)
                 {
                     item.domain = domain;
@@ -123,6 +125,10 @@ namespace Ntreev.Crema.Services.Data
                 if (this.domain.IsModified == true)
                 {
                     await this.container.InvokeTableEndContentEditAsync(authentication, this.Tables, dataBaseSet);
+                }
+                else
+                {
+                    await this.Repository.UnlockAsync(this.itemPaths);
                 }
                 await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                 await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false);
@@ -147,6 +153,7 @@ namespace Ntreev.Crema.Services.Data
                     this.DetachDomainEvent();
                     this.domain.Dispose(authentication, true);
                 });
+                await this.Repository.UnlockAsync(this.itemPaths);
                 foreach (var item in this.Contents)
                 {
                     item.domain = null;
@@ -167,22 +174,11 @@ namespace Ntreev.Crema.Services.Data
 
             }
 
-            public void SetEditableState(EditableState state)
+            public void SetServiceState(ServiceState serviceState)
             {
                 foreach (var item in this.Contents)
                 {
-                    item.EditableState = state;
-                }
-            }
-
-            public void SetRunning(bool value)
-            {
-                foreach (var item in this.Contents)
-                {
-                    if (value == true)
-                        item.EditableState |= EditableState.Running;
-                    else
-                        item.EditableState &= ~EditableState.Running;
+                    item.ServiceState = serviceState;
                 }
             }
 
@@ -258,6 +254,8 @@ namespace Ntreev.Crema.Services.Data
 
             private DomainContext DomainContext => this.container.GetService(typeof(DomainContext)) as DomainContext;
 
+            private DataBaseRepositoryHost Repository => this.container.Repository;
+
             #region IDomainHost
 
             async Task IDomainHost.DetachAsync()
@@ -273,16 +271,20 @@ namespace Ntreev.Crema.Services.Data
 
             async Task IDomainHost.RestoreAsync(Authentication authentication, Domain domain)
             {
-                var dataSet = domain.Source as CremaDataSet;
-                this.domain = domain;
-                foreach (var item in this.Contents)
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    item.domainHost = this;
-                    item.domain = domain;
-                    item.dataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
-                    item.Table.SetTableState(TableState.IsBeingEdited);
-                    item.IsModified = domain.ModifiedTables.Contains(item.dataTable.Name);
-                }
+                    var dataSet = domain.Source as CremaDataSet;
+                    this.domain = domain;
+                    foreach (var item in this.Contents)
+                    {
+                        item.domainHost = this;
+                        item.domain = domain;
+                        item.dataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
+                        item.Table.IsBeingEdited = true;
+                        item.ServiceState = ServiceState.Opened;
+                        item.IsModified = domain.ModifiedTables.Contains(item.dataTable.Name);
+                    }
+                });
                 await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
                 await this.Dispatcher.InvokeAsync(() =>
                 {

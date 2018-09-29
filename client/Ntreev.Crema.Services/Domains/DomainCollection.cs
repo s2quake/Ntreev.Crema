@@ -227,7 +227,7 @@ namespace Ntreev.Crema.Services.Domains
                         var target = item.FindDomainHost(domain);
                         if (target != null)
                         {
-                            target.Restore(authentication, domain);
+                            target.RestoreAsync(authentication, domain);
                             domain.Host = target;
                         }
                     }

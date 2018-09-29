@@ -808,6 +808,7 @@ namespace Ntreev.Crema.Data
         /// <param name="path"></param>
         public void WriteToDirectory(string path)
         {
+            path = PathUtility.GetFullPath(path);
             DirectoryUtility.Prepare(path);
             DirectoryUtility.Prepare(path, CremaSchema.TypeDirectory);
             DirectoryUtility.Prepare(path, CremaSchema.TableDirectory);
@@ -822,9 +823,12 @@ namespace Ntreev.Crema.Data
 
             foreach (var item in this.Tables)
             {
-                if (item.TemplateNamespace != string.Empty)
+                if (item.TemplateNamespace != string.Empty && item.TemplatedParent == null)
                 {
-
+                    var relativePath = UriUtility.MakeRelativeOfDirectory(this.InternalObject.Namespace, item.TemplateNamespace);
+                    var filename = Path.Combine(path, relativePath + CremaSchema.SchemaExtension);
+                    FileUtility.Prepare(filename);
+                    item.WriteXmlSchema(filename);
                 }
                 else
                 {

@@ -32,11 +32,53 @@ namespace Ntreev.Crema.Services.Users
     class UserRepositoryHost : RepositoryHost
     {
         private readonly UserContext userContext;
+        private readonly HashSet<string> itemPaths = new HashSet<string>();
 
         public UserRepositoryHost(UserContext userContext, IRepository repository)
             : base(repository, null)
         {
             this.userContext = userContext;
+        }
+
+        public void Lock(params string[] itemPaths)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (itemPaths.Distinct().Count() != itemPaths.Length)
+            {
+                int wer = 0;
+            }
+            foreach (var item in itemPaths)
+            {
+                if (this.itemPaths.Contains(item) == true)
+                    throw new ItemAlreadyExistsException(item);
+            }
+            foreach (var item in itemPaths)
+            {
+                this.itemPaths.Add(item);
+            }
+        }
+
+        public void Unlock(params string[] itemPaths)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (itemPaths.Distinct().Count() != itemPaths.Length)
+            {
+                int wer = 0;
+            }
+            foreach (var item in itemPaths)
+            {
+                if (this.itemPaths.Contains(item) == false)
+                    throw new ItemNotFoundException(item);
+            }
+            foreach (var item in itemPaths)
+            {
+                this.itemPaths.Remove(item);
+            }
+        }
+
+        public Task UnlockAsync(params string[] itemPaths)
+        {
+            return this.Dispatcher.InvokeAsync(() => this.Unlock(itemPaths));
         }
 
         public void CreateCategory(Authentication authentication, string itemPath)
@@ -48,7 +90,7 @@ namespace Ntreev.Crema.Services.Users
             this.Add(itemPath);
         }
 
-        public void RenameCategory(Authentication authentication, UserSerializationInfo[] users, string categoryPath, string newCategoryPath)
+        public void RenameCategory(Authentication authentication, UserSerializationInfo[] userInfos, string categoryPath, string newCategoryPath)
         {
             var itemPath1 = this.userContext.GenerateCategoryPath(categoryPath);
             var itemPath2 = this.userContext.GenerateCategoryPath(newCategoryPath);
@@ -56,9 +98,9 @@ namespace Ntreev.Crema.Services.Users
             if (DirectoryUtility.Exists(itemPath1) == false)
                 throw new DirectoryNotFoundException();
 
-            for (var i = 0; i < users.Length; i++)
+            for (var i = 0; i < userInfos.Length; i++)
             {
-                var item = users[i];
+                var item = userInfos[i];
                 if (item.CategoryPath.StartsWith(categoryPath) == false)
                     continue;
                 var itemPath = this.userContext.GenerateUserPath(item.CategoryPath, item.ID);
@@ -68,7 +110,7 @@ namespace Ntreev.Crema.Services.Users
             this.Move(itemPath1, itemPath2);
         }
 
-        public void MoveCategory(Authentication authentication, UserSerializationInfo[] users, string categoryPath, string newCategoryPath)
+        public void MoveCategory(Authentication authentication, UserSerializationInfo[] userInfos, string categoryPath, string newCategoryPath)
         {
             var itemPath1 = this.userContext.GenerateCategoryPath(categoryPath);
             var itemPath2 = this.userContext.GenerateCategoryPath(newCategoryPath);
@@ -76,9 +118,9 @@ namespace Ntreev.Crema.Services.Users
             if (DirectoryUtility.Exists(itemPath1) == false)
                 throw new DirectoryNotFoundException();
 
-            for (var i = 0; i < users.Length; i++)
+            for (var i = 0; i < userInfos.Length; i++)
             {
-                var item = users[i];
+                var item = userInfos[i];
                 if (item.CategoryPath.StartsWith(categoryPath) == false)
                     continue;
                 var itemPath = this.userContext.GenerateUserPath(item.CategoryPath, item.ID);

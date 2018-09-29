@@ -310,12 +310,6 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        protected override void OnDataBaseStateChanged(EventArgs e)
-        {
-            this.metaData.DataBaseState = base.DataBaseState;
-            base.OnDataBaseStateChanged(e);
-        }
-
         public async Task UnloadAsync(Authentication authentication)
         {
             try
@@ -331,14 +325,12 @@ namespace Ntreev.Crema.Services.Data
                 await this.WriteCacheAsync();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.CremaHost.Sign(authentication);
                     this.tableContext.Dispose();
                     this.tableContext = null;
                     this.typeContext.Dispose();
                     this.typeContext = null;
-                });
-                await this.DetachUsersAsync();
-                await this.Dispatcher.InvokeAsync(() =>
-                {
+                    this.ClearAuthentications();
                     this.Repository.Changed -= Repository_Changed;
                     this.Repository.Dispose();
                     this.Repository = null;
@@ -362,11 +354,19 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ValidateEnter(authentication);
                     this.CremaHost.DebugMethod(authentication, this, nameof(EnterAsync), this);
-                    await this.OnEnterAsync(authentication);
+                    this.authentications.Add(authentication);
+                    this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
+                    authentication.Expired += Authentication_Expired;
+                });
+                await this.AttachUsersAsync(authentication);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication);
+                    this.authenticationEntered?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
                     this.DataBases.InvokeItemsAuthenticationEnteredEvent(authentication, new IDataBase[] { this });
                 });
             }
@@ -382,11 +382,20 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ValidateLeave(authentication);
                     this.CremaHost.DebugMethod(authentication, this, nameof(LeaveAsync), this);
-                    await this.OnLeaveAsync(authentication);
+
+                    this.authentications.Remove(authentication);
+                    this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
+                    authentication.Expired -= Authentication_Expired;
+                });
+                await this.DetachUsersAsync(authentication);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication);
+                    this.authenticationLeft?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
                     this.DataBases.InvokeItemsAuthenticationLeftEvent(authentication, new IDataBase[] { this });
                 });
             }
@@ -557,11 +566,11 @@ namespace Ntreev.Crema.Services.Data
         {
             this.ValidateExpired();
             return this.Dispatcher.InvokeAsync(() =>
-             {
-                 if (authentication == null)
-                     throw new ArgumentNullException(nameof(authentication));
-                 return this.metaData;
-             });
+            {
+                if (authentication == null)
+                    throw new ArgumentNullException(nameof(authentication));
+                return this.metaData;
+            });
         }
 
         public async Task DisposeAsync()
@@ -577,29 +586,23 @@ namespace Ntreev.Crema.Services.Data
             this.typeContext = null;
         }
 
-        public void ResettingDataBase(Authentication authentication)
+        public async Task ResettingDataBaseAsync(Authentication authentication)
         {
-            if (this.GetService(typeof(DomainContext)) is DomainContext domainContext)
+            await await this.Dispatcher.InvokeAsync(async () =>
             {
-                this.CremaHost.Sign(authentication);
                 if (this.IsLoaded == true)
-                    this.DetachDomainHostAsync();
+                    await this.DetachDomainHostAsync();
 
-                var domains = domainContext.Domains.Where<Domain>(item => item.DataBaseID == this.ID).ToArray();
+                var domains = await this.DomainContext.GetDomainsAsync(this.ID);
                 foreach (var item in domains)
                 {
-                    item.Dispatcher.Invoke(() => item.DeleteAsync(authentication, true));
+                    await item.DeleteAsync(authentication, true);
                 }
-
                 this.typeContext?.Dispose();
                 this.tableContext?.Dispose();
                 base.ResettingDataBase(authentication);
                 this.DataBases.InvokeItemsResettingEvent(authentication, new IDataBase[] { this });
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
+            });
         }
 
         public async Task ResetDataBaseAsync(Authentication authentication, TypeInfo[] typeInfos, TableInfo[] tableInfos)
@@ -620,6 +623,7 @@ namespace Ntreev.Crema.Services.Data
 
             var domains = await this.DomainContext.GetDomainsAsync(this.ID);
             var metaDataList = new List<DomainMetaData>(domains.Length);
+            var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
             foreach (var item in domains)
             {
                 try
@@ -627,7 +631,7 @@ namespace Ntreev.Crema.Services.Data
                     var target = await this.FindDomainHostAsync(item);
                     await target.RestoreAsync(Authentication.System, item);
                     await item.SetDomainHostAsync(target);
-
+                    await item.AttachAsync(authentications);
                     var metaData = await item.GetMetaDataAsync(authentication);
                     metaDataList.Add(metaData);
                 }
@@ -637,19 +641,6 @@ namespace Ntreev.Crema.Services.Data
                 }
             }
 
-            //await this.AttachDomainHostAsync();
-            foreach (var item in this.authentications)
-            {
-                await this.AttachUsersAsync(authentication);
-            }
-
-            
-            //var domains = await this.DomainContext.GetDomainsAsync(this.ID);
-            //foreach (var item in domains)
-            //{
-            //    var metaData = await item.GetMetaDataAsync(authentication);
-            //    metaDataList.Add(metaData);
-            //}
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.DataBases.InvokeItemsResetEvent(authentication, new IDataBase[] { this }, metaDataList.ToArray());
@@ -1080,6 +1071,12 @@ namespace Ntreev.Crema.Services.Data
             base.AccessInfo = accessInfo;
         }
 
+        protected override void OnDataBaseStateChanged(EventArgs e)
+        {
+            this.metaData.DataBaseState = base.DataBaseState;
+            base.OnDataBaseStateChanged(e);
+        }
+
         private async Task AttachDomainHostAsync()
         {
             var domains = await this.DomainContext.GetDomainsAsync(this.ID);
@@ -1100,13 +1097,12 @@ namespace Ntreev.Crema.Services.Data
 
         private async Task DetachDomainHostAsync()
         {
+            var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
             var domains = await this.DomainContext.GetDomainsAsync(this.ID);
             foreach (var item in domains)
             {
-                if (item.Host != null)
-                {
-                    await item.Host.DetachAsync();
-                }
+                await item.DetachAsync(authentications);
+                await item.Host.DetachAsync();
                 await item.SetDomainHostAsync(null);
             }
         }
@@ -1125,19 +1121,14 @@ namespace Ntreev.Crema.Services.Data
             var domains = await this.DomainContext.GetDomainsAsync(this.ID);
             foreach (var item in domains)
             {
-                await item.Dispatcher.InvokeAsync(() =>
-                {
-                    if (item.Users.ContainsKey(authentication.ID) == true)
-                        item.Attach(authentication);
-                });
+                await item.AttachAsync(authentication);
             }
         }
 
-        private async Task DetachUsersAsync()
+        private void ClearAuthentications()
         {
             foreach (var item in this.authentications.ToArray())
             {
-                await this.DetachUsersAsync(item);
                 if ((Authentication)item is Authentication authentication)
                 {
                     authentication.Expired -= Authentication_Expired;
@@ -1152,17 +1143,7 @@ namespace Ntreev.Crema.Services.Data
             var domains = await this.DomainContext.GetDomainsAsync(this.ID);
             foreach (var item in domains)
             {
-                await item.Dispatcher.InvokeAsync(() =>
-                {
-                    if (item.Users.ContainsKey(authentication.ID) == true)
-                    {
-                        var user = item.Users[authentication.ID];
-                        if (user.IsOnline == true)
-                        {
-                            item.Detach(authentication);
-                        }
-                    }
-                });
+                await item.DetachAsync(authentication);
             }
         }
 
@@ -1271,9 +1252,9 @@ namespace Ntreev.Crema.Services.Data
             this.ReadAccessInfo();
         }
 
-        private void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
+        private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
-            this.CremaHost.Dispatcher.InvokeAsync(() =>
+            await this.CremaHost.Dispatcher.InvokeAsync(() =>
             {
                 if (e.UserID == this.LockInfo.UserID)
                 {
@@ -1282,9 +1263,9 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        private void Repository_Changed(object sender, EventArgs e)
+        private async void Repository_Changed(object sender, EventArgs e)
         {
-            this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 this.CremaHost.Sign(Authentication.System);
                 var dataBaseInfo = new DataBaseInfo(base.DataBaseInfo)
@@ -1305,17 +1286,24 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        private void Authentication_Expired(object sender, EventArgs e)
+        private async void Authentication_Expired(object sender, EventArgs e)
         {
-            this.Dispatcher.InvokeAsync(async () =>
+            if (sender is Authentication authentication)
             {
-                var authentication = sender as Authentication;
-                if (this.IsLoaded == true && this.VerifyAccess(authentication) == true)
+                await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    await this.OnLeaveAsync(authentication);
-                    this.DataBases.InvokeItemsAuthenticationLeftEvent(authentication, new IDataBase[] { this });
-                }
-            });
+                    if (this.IsLoaded == true && this.VerifyAccess(authentication) == true)
+                    {
+                        this.CremaHost.Sign(authentication);
+                        this.authentications.Remove(authentication);
+                        this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
+                        authentication.Expired -= Authentication_Expired;
+                        await this.DetachUsersAsync(authentication);
+                        this.authenticationLeft?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
+                        this.DataBases.InvokeItemsAuthenticationLeftEvent(authentication, new IDataBase[] { this });
+                    }
+                });
+            }
         }
 
         private Task<SignatureDate> InvokeDataBaseSetPublicAsync(Authentication authentication)
@@ -1494,30 +1482,25 @@ namespace Ntreev.Crema.Services.Data
                 throw new InvalidOperationException(Resources.Exception_LoadedDataBaseCannotRevert);
         }
 
-        private async Task OnEnterAsync(Authentication authentication)
-        {
-            this.CremaHost.Sign(authentication);
-            this.authentications.Add(authentication);
-            this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
-            authentication.Expired += Authentication_Expired;
-            //this.SetDataBaseState(authentication, this.DataBaseState | DataBaseState.HasWorker);
-            await this.AttachUsersAsync(authentication);
-            this.authenticationEntered?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
-        }
+        //private async Task OnEnterAsync(Authentication authentication)
+        //{
+        //    this.CremaHost.Sign(authentication);
+        //    this.authentications.Add(authentication);
+        //    this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
+        //    authentication.Expired += Authentication_Expired;
+        //    await this.AttachUsersAsync(authentication);
+        //    this.authenticationEntered?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
+        //}
 
-        private async Task OnLeaveAsync(Authentication authentication)
-        {
-            this.CremaHost.Sign(authentication);
-            this.authentications.Remove(authentication);
-            this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
-            authentication.Expired -= Authentication_Expired;
-            await this.DetachUsersAsync(authentication);
-            //if (this.authentications.Any() == false)
-            //{
-            //    this.SetDataBaseState(authentication, this.DataBaseState & ~DataBaseState.HasWorker);
-            //}
-            this.authenticationLeft?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
-        }
+        //private async Task OnLeaveAsync(Authentication authentication)
+        //{
+        //    this.CremaHost.Sign(authentication);
+        //    this.authentications.Remove(authentication);
+        //    this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
+        //    authentication.Expired -= Authentication_Expired;
+        //    await this.DetachUsersAsync(authentication);
+        //    this.authenticationLeft?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
+        //}
 
         private void ReadAccessInfo()
         {

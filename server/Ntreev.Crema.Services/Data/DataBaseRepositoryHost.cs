@@ -26,6 +26,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using Ntreev.Crema.Data.Xml.Schema;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -80,6 +81,11 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.itemPaths.Remove(item);
             }
+        }
+
+        public Task UnlockAsync(params string[] itemPaths)
+        {
+            return this.Dispatcher.InvokeAsync(() => this.Unlock(itemPaths));
         }
 
         public void RefreshItems()

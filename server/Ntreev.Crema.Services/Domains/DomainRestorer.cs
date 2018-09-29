@@ -50,22 +50,32 @@ namespace Ntreev.Crema.Services.Domains
         private Domain domain;
         private DateTime dateTime;
 
-        private DomainRestorer(Authentication authentication, DomainContext domainContext, string workingPath)
+        public DomainRestorer(Authentication authentication, DomainContext domainContext, string workingPath)
         {
             this.authentication = authentication;
             this.domainContext = domainContext;
             this.workingPath = workingPath;
         }
 
-        public static async Task RestoreAsync(Authentication authentication, DomainContext domainContext, string workingPath)
+        public async Task RestoreAsync()
         {
-            using (var restorer = new DomainRestorer(authentication, domainContext, workingPath))
+            //using (var restorer = new DomainRestorer(authentication, domainContext, workingPath))
             {
-                await restorer.DeserializeDomainAsync();
-                restorer.CollectCompletedActions();
-                restorer.CollectPostedActions();
-                restorer.CollectAuthentications();
-                await restorer.RestoreDomainAsync();
+                try
+                {
+                    await Task.Run(async () =>
+                    {
+                        await this.DeserializeDomainAsync();
+                        this.CollectCompletedActions();
+                        this.CollectPostedActions();
+                        this.CollectAuthentications();
+                        await this.RestoreDomainAsync();
+                    });
+                }
+                finally
+                {
+                    this.Dispose();
+                }
             }
         }
 
@@ -125,70 +135,66 @@ namespace Ntreev.Crema.Services.Domains
         {
             var dummyHost = new DummyDomainHost(this.domain);
             this.domain.Host = dummyHost;
-            //this.domain.Dispatcher.Invoke(() =>
-            //{
-                this.domain.Logger.IsEnabled = false;
+            this.domain.Logger.IsEnabled = false;
 
-                foreach (var item in this.actionList)
+            foreach (var item in this.actionList)
+            {
+                var authentication = this.authentications[item.UserID];
+                try
                 {
-                    var authentication = this.authentications[item.UserID];
-                    try
+                    if (!(item is DomainActionBase action))
+                        throw new Exception();
+
+                    this.domain.DateTimeProvider = this.GetTime;
+                    this.dateTime = action.AcceptTime;
+
+                    if (item is NewRowAction newRowAction)
                     {
-                        var action = item as DomainActionBase;
-                        if (action == null)
-                            throw new Exception();
-
-                        this.domain.DateTimeProvider = this.GetTime;
-                        this.dateTime = action.AcceptTime;
-
-                        if (item is NewRowAction newRowAction)
-                        {
-                            await this.domain.NewRowAsync(authentication, newRowAction.Rows);
-                        }
-                        else if (item is RemoveRowAction removeRowAction)
-                        {
-                            await this.domain.RemoveRowAsync(authentication, removeRowAction.Rows);
-                        }
-                        else if (item is SetRowAction setRowAction)
-                        {
-                            await this.domain.SetRowAsync(authentication, setRowAction.Rows);
-                        }
-                        else if (item is SetPropertyAction setPropertyAction)
-                        {
-                            await this.domain.SetPropertyAsync(authentication, setPropertyAction.PropertyName, setPropertyAction.Value);
-                        }
-                        else if (item is JoinAction joinAction)
-                        {
-                            await this.domain.AddUserAsync(authentication, joinAction.AccessType);
-                        }
-                        else if (item is DisjoinAction disjoinAction)
-                        {
-                            await this.domain.RemoveUserAsync(authentication);
-                        }
-                        else if (item is KickAction kickAction)
-                        {
-                            await this.domain.KickAsync(authentication, kickAction.TargetID, kickAction.Comment);
-                        }
-                        else if (item is SetOwnerAction setOwnerAction)
-                        {
-                            await this.domain.SetOwnerAsync(authentication, setOwnerAction.TargetID);
-                        }
-                        else
-                        {
-                            throw new NotImplementedException(item.GetType().Name);
-                        }
+                        await this.domain.NewRowAsync(authentication, newRowAction.Rows);
                     }
-                    finally
+                    else if (item is RemoveRowAction removeRowAction)
                     {
-                        this.domain.DateTimeProvider = null;
-                        // 데이터 베이스 Reset에 의해서 복구가 되었을때 클라이언트에 이벤트 전달 순서가 꼬이는 경우가 생김
-                        Thread.Sleep(1);
+                        await this.domain.RemoveRowAsync(authentication, removeRowAction.Rows);
+                    }
+                    else if (item is SetRowAction setRowAction)
+                    {
+                        await this.domain.SetRowAsync(authentication, setRowAction.Rows);
+                    }
+                    else if (item is SetPropertyAction setPropertyAction)
+                    {
+                        await this.domain.SetPropertyAsync(authentication, setPropertyAction.PropertyName, setPropertyAction.Value);
+                    }
+                    else if (item is JoinAction joinAction)
+                    {
+                        await this.domain.AddUserAsync(authentication, joinAction.AccessType);
+                    }
+                    else if (item is DisjoinAction disjoinAction)
+                    {
+                        await this.domain.RemoveUserAsync(authentication);
+                    }
+                    else if (item is KickAction kickAction)
+                    {
+                        await this.domain.KickAsync(authentication, kickAction.TargetID, kickAction.Comment);
+                    }
+                    else if (item is SetOwnerAction setOwnerAction)
+                    {
+                        await this.domain.SetOwnerAsync(authentication, setOwnerAction.TargetID);
+                    }
+                    else
+                    {
+                        throw new NotImplementedException(item.GetType().Name);
                     }
                 }
+                finally
+                {
+                    this.domain.DateTimeProvider = null;
+                    // 데이터 베이스 Reset에 의해서 복구가 되었을때 클라이언트에 이벤트 전달 순서가 꼬이는 경우가 생김
+                    Thread.Sleep(1);
+                }
+            }
 
-                this.domain.Logger.ID = this.postedList.Count;
-                this.domain.Logger.IsEnabled = true;
-            //});
+            this.domain.Logger.ID = this.postedList.Count;
+            this.domain.Logger.IsEnabled = true;
             this.domain.Host = null;
         }
 
@@ -198,6 +204,16 @@ namespace Ntreev.Crema.Services.Domains
         }
 
         private IObjectSerializer Serializer => this.domainContext.Serializer;
+
+        private void Dispose()
+        {
+            if (this.authentications == null)
+                return;
+            foreach (var item in this.authentications)
+            {
+                item.Value.InvokeExpiredEvent(Authentication.SystemID);
+            }
+        }
 
         void IDisposable.Dispose()
         {

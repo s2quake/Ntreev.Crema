@@ -42,8 +42,8 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 try
                 {
-                    var editableState = await template.Dispatcher.InvokeAsync(() => template.EditableState);
-                    if (editableState == EditableState.IsBeingEdited)
+                    var editableState = await template.Dispatcher.InvokeAsync(() => template.ServiceState);
+                    if (editableState == ServiceState.Opened)
                     {
                         if (template.Count > 0)
                             await template.EndEditAsync(context.Authentication);
@@ -53,7 +53,7 @@ namespace Ntreev.Crema.Bot.Tasks
                 }
                 catch
                 {
-                    if (template.EditableState == EditableState.IsBeingEdited)
+                    if (template.ServiceState == ServiceState.Opened)
                         await template.CancelEditAsync(context.Authentication);
                 }
 
@@ -68,8 +68,8 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
                 }
 
-                var editableState = await template.Dispatcher.InvokeAsync(() => template.EditableState);
-                if (editableState == EditableState.None)
+                var editableState = await template.Dispatcher.InvokeAsync(() => template.ServiceState);
+                if (editableState == ServiceState.None)
                 {
                     try
                     {
@@ -81,7 +81,7 @@ namespace Ntreev.Crema.Bot.Tasks
                         throw;
                     }
                 }
-                else if (editableState == EditableState.IsBeingEdited)
+                else if (editableState == ServiceState.Opened)
                 {
                     var domain = template.Domain;
                     if (await domain.Users.ContainsAsync(authentication.ID) == false)
@@ -120,7 +120,7 @@ namespace Ntreev.Crema.Bot.Tasks
             var authentication = context.Authentication;
             if (context.AllowException == false)
             {
-                if (template.EditableState != EditableState.IsBeingEdited)
+                if (template.ServiceState != ServiceState.Opened)
                     return;
             }
             var tableName = RandomUtility.NextIdentifier();
@@ -133,7 +133,7 @@ namespace Ntreev.Crema.Bot.Tasks
             var authentication = context.Authentication;
             if (context.AllowException == false)
             {
-                if (template.EditableState != EditableState.IsBeingEdited)
+                if (template.ServiceState != ServiceState.Opened)
                     return;
             }
             var isFlag = RandomUtility.NextBoolean();
@@ -146,7 +146,7 @@ namespace Ntreev.Crema.Bot.Tasks
             var authentication = context.Authentication;
             if (context.AllowException == false)
             {
-                if (template.EditableState != EditableState.IsBeingEdited)
+                if (template.ServiceState != ServiceState.Opened)
                     return;
             }
             var comment = RandomUtility.NextString();

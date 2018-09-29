@@ -1007,7 +1007,7 @@ namespace Ntreev.Crema.Services.Data
                 try
                 {
                     var target = this.FindDomainHost(item);
-                    target.Restore(Authentication.System, item);
+                    target.RestoreAsync(Authentication.System, item);
                     item.Host = target;
                     item.AttachUser();
                 }
@@ -1025,7 +1025,7 @@ namespace Ntreev.Crema.Services.Data
 
             foreach (var item in domains)
             {
-                item.Host?.Detach();
+                item.Host?.DetachAsync();
                 item.Host = null;
                 item.DetachUser();
             }

@@ -57,7 +57,6 @@ namespace Ntreev.Crema.Services.Users.Serializations
         [DataMember(EmitDefaultValue = false)]
         public BanSerializationInfo BanInfo { get; set; }
 
-        [XmlIgnore]
         [IgnoreDataMember]
         public string CategoryPath
         {
@@ -76,6 +75,8 @@ namespace Ntreev.Crema.Services.Users.Serializations
                     this.CategoryName = value.Trim(PathUtility.SeparatorChar);
             }
         }
+
+        public string Path => this.CategoryPath + this.Name;
 
         public static explicit operator UserInfo(UserSerializationInfo value)
         {

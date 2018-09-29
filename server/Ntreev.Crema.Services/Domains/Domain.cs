@@ -35,7 +35,6 @@ namespace Ntreev.Crema.Services.Domains
     {
         private const string dataKey = "Data";
         private const string usersKey = "Users";
-        private object source;
         private byte[] data;
         private Func<DateTime> dateTimeProvider;
         private readonly HashSet<string> modifiedTableList = new HashSet<string>();
@@ -56,7 +55,7 @@ namespace Ntreev.Crema.Services.Domains
             this.Initialize(domainInfo);
             this.Name = base.DomainInfo.DomainID.ToString();
             this.data = (byte[])info.GetValue(dataKey, typeof(byte[]));
-            this.source = this.DerializeSource(this.data);
+            this.Source = this.DerializeSource(this.data);
             this.Users = new DomainUserCollection(this);
             this.InitializeUsers(userInfos);
 
@@ -77,7 +76,7 @@ namespace Ntreev.Crema.Services.Domains
 
         protected Domain(DomainSerializationInfo serializationInfo, object source)
         {
-            this.source = source;
+            this.Source = source;
             this.Initialize(serializationInfo.DomainInfo);
             this.Name = serializationInfo.DomainInfo.DomainID.ToString();
             this.data = this.SerializeSource(source);
@@ -97,9 +96,8 @@ namespace Ntreev.Crema.Services.Domains
                 ItemPath = itemPath,
                 ItemType = itemType,
                 DomainType = this.GetType().Name,
-
             };
-            this.source = source;
+            this.Source = source;
             this.Initialize(domainInfo);
             base.DomainState = DomainState.IsActivated;
             this.Name = base.DomainInfo.DomainID.ToString();
@@ -410,26 +408,42 @@ namespace Ntreev.Crema.Services.Domains
             this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
         }
 
-        public void Attach(Authentication authentication)
+        public Task AttachAsync(params Authentication[] authentications)
         {
-            this.Dispatcher.VerifyAccess();
-            this.Sign(authentication, true);
-            this.InvokeAttach(authentication, out var domainUser);
-            this.OnUserChanged(new DomainUserEventArgs(authentication, this, domainUser));
-            this.OnDomainStateChanged(new DomainEventArgs(authentication, this));
-            this.Container.InvokeDomainUserChangedEvent(authentication, this, domainUser);
-            this.Container.InvokeDomainStateChangedEvent(authentication, this);
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                foreach (var item in authentications)
+                {
+                    if (this.Users.ContainsKey(item.ID) == true)
+                    {
+                        this.Sign(item, true);
+                        this.InvokeAttach(item, out var domainUser);
+                        this.OnUserChanged(new DomainUserEventArgs(item, this, domainUser));
+                        this.OnDomainStateChanged(new DomainEventArgs(item, this));
+                        this.Container.InvokeDomainUserChangedEvent(item, this, domainUser);
+                        this.Container.InvokeDomainStateChangedEvent(item, this);
+                    }
+                }
+            });
         }
 
-        public void Detach(Authentication authentication)
+        public Task DetachAsync(params Authentication[] authentications)
         {
-            this.Dispatcher.VerifyAccess();
-            this.Sign(authentication, true);
-            this.InvokeDetach(authentication, out var domainUser);
-            this.OnUserChanged(new DomainUserEventArgs(authentication, this, domainUser));
-            this.OnDomainStateChanged(new DomainEventArgs(authentication, this));
-            this.Container.InvokeDomainUserChangedEvent(authentication, this, domainUser);
-            this.Container.InvokeDomainStateChangedEvent(authentication, this);
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                foreach (var item in authentications)
+                {
+                    if (this.Users[item.ID] is DomainUser user && user.IsOnline == true)
+                    {
+                        this.Sign(item, true);
+                        this.InvokeDetach(item, out var domainUser);
+                        this.OnUserChanged(new DomainUserEventArgs(item, this, domainUser));
+                        this.OnDomainStateChanged(new DomainEventArgs(item, this));
+                        this.Container.InvokeDomainUserChangedEvent(item, this, domainUser);
+                        this.Container.InvokeDomainStateChangedEvent(item, this);
+                    }
+                }
+            });
         }
 
         public async Task AddUserAsync(Authentication authentication, DomainAccessType accessType)
@@ -524,7 +538,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public Guid DataBaseID => base.DomainInfo.DataBaseID;
 
-        public object Source => this.source;
+        public object Source { get; }
 
         public CremaDispatcher Dispatcher { get; internal set; }
 

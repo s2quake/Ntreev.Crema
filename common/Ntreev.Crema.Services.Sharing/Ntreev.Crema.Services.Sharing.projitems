@@ -18,7 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)IInfoProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IDispatcherObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IExtendedProperties.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)EditableState.cs" />
+    <None Include="$(MSBuildThisFileDirectory)EditableState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UsingDataBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DomainDeletedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DomainEventArgs.cs" />

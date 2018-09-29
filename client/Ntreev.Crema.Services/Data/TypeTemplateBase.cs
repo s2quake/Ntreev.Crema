@@ -474,7 +474,7 @@ namespace Ntreev.Crema.Services.Data
 
         async Task IDomainHost.DetachAsync()
         {
-            this.OnDetached();
+            await this.OnDetachedAsync();
         }
 
         #endregion

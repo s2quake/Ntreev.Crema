@@ -73,6 +73,8 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
+        public string Path => this.CategoryPath + this.Name;
+
         public IDictionary<string, object> ToDictionary()
         {
             var props = new Dictionary<string, object>

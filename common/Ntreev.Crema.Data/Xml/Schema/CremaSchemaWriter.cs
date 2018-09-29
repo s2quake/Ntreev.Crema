@@ -139,7 +139,7 @@ namespace Ntreev.Crema.Data.Xml.Schema
                         {
                             Schema = typeSchema,
                             Namespace = item.Namespace,
-                            SchemaLocation = UriUtility.MakeRelative(this.dataTable.Namespace, item.Namespace) + CremaSchema.SchemaExtension
+                            SchemaLocation = UriUtility.MakeRelative(tableNamespace, item.Namespace) + CremaSchema.SchemaExtension
                         };
                         schema.Includes.Add(import);
                         schema.Namespaces.Add("d" + index, item.Namespace);

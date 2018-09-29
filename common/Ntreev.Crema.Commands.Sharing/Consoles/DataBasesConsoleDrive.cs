@@ -34,14 +34,14 @@ namespace Ntreev.Crema.Commands.Consoles
     [Export(typeof(IConsoleDrive))]
     public sealed class DataBasesConsoleDrive : ConsoleDriveBase, IPartImportsSatisfiedNotification
     {
-        [Import]
-        private Lazy<ICremaHost> cremaHost = null;
+        private readonly ICremaHost cremaHost;
         private DataBasePath dataBasePath;
 
-        internal DataBasesConsoleDrive()
+        [ImportingConstructor]
+        internal DataBasesConsoleDrive(ICremaHost cremaHost)
             : base("databases")
         {
-
+            this.cremaHost = cremaHost;
         }
 
         public override string[] GetPaths()
@@ -413,7 +413,7 @@ namespace Ntreev.Crema.Commands.Consoles
                 this.CommandContext.Path = PathUtility.Separator;
         }
 
-        private ICremaHost CremaHost => this.cremaHost.Value;
+        private ICremaHost CremaHost => this.cremaHost;
 
         #region IPartImportsSatisfiedNotification
 

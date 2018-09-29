@@ -155,10 +155,7 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
             await base.OnCancelEditAsync(authentication);
-            await this.Repository.Dispatcher.InvokeAsync(() =>
-            {
-                this.Repository.Unlock(this.itemPaths);
-            });
+            await this.Repository.UnlockAsync(this.itemPaths);
             this.parent = null;
             this.permission = null;
         }

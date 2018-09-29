@@ -194,8 +194,8 @@ namespace Ntreev.Crema.Bot.Tasks
 
             if (context.AllowException == false)
             {
-                var editableState = await template.Dispatcher.InvokeAsync(() => template.EditableState);
-                if (editableState != EditableState.None)
+                var editableState = await template.Dispatcher.InvokeAsync(() => template.ServiceState);
+                if (editableState != ServiceState.None)
                     return;
             }
 

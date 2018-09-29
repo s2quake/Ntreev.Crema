@@ -36,17 +36,26 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
                     this.ValidateRename(authentication, name);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
-                    var result = await this.Container.InvokeCategoryRenameAsync(authentication, this.Path, name);
-                    this.CremaHost.Sign(authentication, result);;
+                    var path = base.Path;
+                    var query = from User item in this.Context.Users
+                                where item.Category.Path.StartsWith(this.Path)
+                                select item.SerializationInfo;
+                    var userInfos = query.ToArray();
+                    return (items, oldNames, oldPaths, path, userInfos);
+                });
+                var result = await this.Container.InvokeCategoryRenameAsync(authentication, tuple.path, name, tuple.userInfos);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result); ;
                     base.Name = name;
-                    this.Container.InvokeCategoriesRenamedEvent(authentication, items, oldNames, oldPaths);
+                    this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths);
                 });
             }
             catch (Exception e)
@@ -61,17 +70,26 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, parentPath);
                     this.ValidateMove(authentication, parentPath);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
-                    var result = await this.Container.InvokeCategoryMoveAsync(authentication, this.Path, parentPath);
+                    var path = base.Path;
+                    var query = from User item in this.Context.Users
+                                where item.Category.Path.StartsWith(this.Path)
+                                select item.SerializationInfo;
+                    var userInfos = query.ToArray();
+                    return (items, oldPaths, oldParentPaths, path, userInfos);
+                });
+                var result = await this.Container.InvokeCategoryMoveAsync(authentication, tuple.path, parentPath, tuple.userInfos);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     this.Parent = this.Container[parentPath];
-                    this.Container.InvokeCategoriesMovedEvent(authentication, items, oldPaths, oldParentPaths);
+                    this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths);
                 });
             }
             catch (Exception e)
@@ -86,17 +104,22 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     this.ValidateDelete(authentication);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
+                    var path = base.Path;
+                    return (items, oldPaths, path);
+                });
+                var result = await this.Container.InvokeCategoryDeleteAsync(authentication, tuple.path);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     var container = this.Container;
-                    var result = await container.InvokeCategoryDeleteAsync(authentication, this.Path);
                     this.CremaHost.Sign(authentication, result);
                     this.Dispose();
-                    container.InvokeCategoriesDeletedEvent(authentication, items, oldPaths);
+                    container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
                 });
             }
             catch (Exception e)

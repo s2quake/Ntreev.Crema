@@ -186,9 +186,9 @@ namespace Ntreev.Crema.Services.Domains
 
         public async Task RestoreAsync(Authentication authentication, CremaSettings settings)
         {
-            var dataBases = await this.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases.ToArray<DataBase>());
             if (settings.NoCache == false)
             {
+                var dataBases = await this.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases.ToArray<DataBase>());
                 foreach (var item in dataBases)
                 {
                     await this.RestoreAsync(authentication, item);
@@ -198,48 +198,69 @@ namespace Ntreev.Crema.Services.Domains
 
         public async Task RestoreAsync(Authentication authentication, DataBase dataBase)
         {
-            var succeededCount = 0;
-            var failedCount = 0;
-            var path = Path.Combine(this.BasePath, dataBase.ID.ToString());
-            if (Directory.Exists(path) == false)
+            var restorers = this.GetDomainRestorers(authentication, dataBase);
+            if (restorers.Any() == false)
                 return;
 
-            var domainList = new List<string>();
-            foreach (var item in Directory.GetDirectories(path))
+            var tasks = restorers.Select(item => item.RestoreAsync()).ToArray();
+            var result = Task.WhenAll(tasks);
+
+            try
             {
-                var dirInfo = new DirectoryInfo(item);
-                if (Guid.TryParse(dirInfo.Name, out Guid domainID) == true)
+                await result;
+                this.CremaHost.Info(string.Format(Resources.Message_RestoreResult_Format, restorers.Length, 0));
+            }
+            catch
+            {
+                var exceptions = result.Exception.InnerExceptions;
+                foreach (var item in exceptions)
                 {
-                    domainList.Add(item);
+                    this.CremaHost.Error(item);
                 }
+                this.CremaHost.Info(string.Format(Resources.Message_RestoreResult_Format, restorers.Length - exceptions.Count, exceptions.Count));
             }
 
-            if (domainList.Any() == true)
-            {
-                this.CremaHost.Info(Resources.Message_DomainRestorationMessage);
-                foreach (var item in domainList)
-                {
-                    var domainID = Guid.Parse(Path.GetFileName(item));
-                    try
-                    {
-                        await DomainRestorer.RestoreAsync(authentication, this, item);
-                        this.CremaHost.Debug(Resources.Message_DomainIsRestored_Format, domainID);
-                        succeededCount++;
-                    }
-                    catch (Exception e)
-                    {
-                        this.CremaHost.Error(e.Message);
-                        this.CremaHost.Error(Resources.Message_DomainRestorationIsFailed_Format, domainID);
-                        failedCount++;
-                    }
-                }
+            //var path = Path.Combine(this.BasePath, dataBase.ID.ToString());
+            //if (Directory.Exists(path) == false)
+            //    return;
 
-                this.CremaHost.Info(string.Format(Resources.Message_RestoreResult_Format, succeededCount, failedCount));
-            }
-            else
-            {
-                this.CremaHost.Info(Resources.Message_NotFoundDomainsToRestore);
-            }
+            //var directories = Directory.GetDirectories(path);
+            //var domainList = new List<string>(directories.Length);
+            //foreach (var item in directories)
+            //{
+            //    var directoryInfo = new DirectoryInfo(item);
+            //    if (Guid.TryParse(directoryInfo.Name, out Guid domainID) == true)
+            //    {
+            //        domainList.Add(item);
+            //    }
+            //}
+
+            //if (domainList.Any() == true)
+            //{
+            //    this.CremaHost.Info(Resources.Message_DomainRestorationMessage);
+            //    foreach (var item in domainList)
+            //    {
+            //        var domainID = Guid.Parse(Path.GetFileName(item));
+            //        try
+            //        {
+            //            await DomainRestorer.RestoreAsync(authentication, this, item);
+            //            this.CremaHost.Debug(Resources.Message_DomainIsRestored_Format, domainID);
+            //            succeededCount++;
+            //        }
+            //        catch (Exception e)
+            //        {
+            //            this.CremaHost.Error(e.Message);
+            //            this.CremaHost.Error(Resources.Message_DomainRestorationIsFailed_Format, domainID);
+            //            failedCount++;
+            //        }
+            //    }
+
+            //    this.CremaHost.Info(string.Format(Resources.Message_RestoreResult_Format, succeededCount, failedCount));
+            //}
+            //else
+            //{
+            //    this.CremaHost.Info(Resources.Message_NotFoundDomainsToRestore);
+            //}
         }
 
         public async Task DisposeAsync()
@@ -351,6 +372,26 @@ namespace Ntreev.Crema.Services.Domains
             }
 
             DirectoryUtility.Delete(this.BasePath, dataBase.ID.ToString());
+        }
+
+        private DomainRestorer[] GetDomainRestorers(Authentication authentication, DataBase dataBase)
+        {
+            var path = Path.Combine(this.BasePath, dataBase.ID.ToString());
+            if (Directory.Exists(path) == false)
+                return new DomainRestorer[] { };
+
+            var directories = Directory.GetDirectories(path);
+            var domainRestorerList = new List<DomainRestorer>(directories.Length);
+            foreach (var item in directories)
+            {
+                var directoryInfo = new DirectoryInfo(item);
+                if (Guid.TryParse(directoryInfo.Name, out Guid domainID) == true)
+                {
+                    domainRestorerList.Add(new DomainRestorer(authentication, this, item));
+                }
+            }
+
+            return domainRestorerList.ToArray();
         }
 
         #region IDomainContext

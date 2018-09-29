@@ -84,7 +84,7 @@ namespace Ntreev.Crema.Services.Data
                     this.ValidateRollback(authentication);
                     this.dataBase.VerifyAccess(authentication);
                     this.CremaHost.Sign(authentication);
-                    this.dataBase.ResettingDataBase(authentication);
+                    await this.dataBase.ResettingDataBaseAsync(authentication);
                     await this.RollbackDomainsAsync(authentication);
                     await this.dataBase.ResetDataBaseAsync(authentication, this.typeInfos, this.tableInfos);
                     this.authentication.Expired -= Authentication_Expired;

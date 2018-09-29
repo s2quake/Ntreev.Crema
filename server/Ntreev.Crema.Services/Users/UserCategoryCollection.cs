@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Users.Serializations;
 using Ntreev.Library;
 using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
@@ -88,7 +89,7 @@ namespace Ntreev.Crema.Services.Users
             });
         }
 
-        public Task<SignatureDate> InvokeCategoryRenameAsync(Authentication authentication, string categoryPath, string name)
+        public Task<SignatureDate> InvokeCategoryRenameAsync(Authentication authentication, string categoryPath, string name, UserSerializationInfo[] userInfos)
         {
             var newCategoryName = new CategoryName(categoryPath) { Name = name, };
             var message = EventMessageBuilder.RenameUserCategory(authentication, categoryPath, name);
@@ -113,7 +114,7 @@ namespace Ntreev.Crema.Services.Users
             });
         }
 
-        public Task<SignatureDate> InvokeCategoryMoveAsync(Authentication authentication, string categoryPath, string parentPath)
+        public Task<SignatureDate> InvokeCategoryMoveAsync(Authentication authentication, string categoryPath, string parentPath, UserSerializationInfo[] userInfos)
         {
             var categoryName = new CategoryName(categoryPath);
             var newCategoryName = new CategoryName(parentPath, categoryName.Name);

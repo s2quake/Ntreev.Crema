@@ -49,12 +49,12 @@ namespace Ntreev.Crema.Bot.Tasks
                 {
 
                 }
-                var editableState = await content.Dispatcher.InvokeAsync(() => content.EditableState);
-                if(editableState == EditableState.None)
+                var editableState = await content.Dispatcher.InvokeAsync(() => content.ServiceState);
+                if(editableState == ServiceState.None)
                 {
                     context.Pop(content);
                 }
-                else if (editableState != EditableState.IsBeingEdited)
+                else if (editableState != ServiceState.Opened)
                 {
                     return;
                 }
@@ -80,8 +80,8 @@ namespace Ntreev.Crema.Bot.Tasks
             }
             else
             {
-                var editableState = await content.Dispatcher.InvokeAsync(() => content.EditableState);
-                if (editableState == EditableState.None)
+                var editableState = await content.Dispatcher.InvokeAsync(() => content.ServiceState);
+                if (editableState == ServiceState.None)
                 {
                     await content.BeginEditAsync(authentication);
                 }

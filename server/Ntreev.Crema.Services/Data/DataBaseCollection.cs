@@ -70,19 +70,17 @@ namespace Ntreev.Crema.Services.Data
             this.Initialize();
         }
         
-        public async void RestoreStateAsync(CremaSettings settings)
+        public void RestoreStateAsync(CremaSettings settings)
         {
+            var dataBaseList = new List<DataBase>(this.Count);
             if (settings.NoCache == false)
             {
                 var stateCaches = this.ReadStateCaches();
                 foreach (var item in this)
                 {
-                    if (stateCaches.ContainsKey($"{item.ID}") == true)
+                    if (stateCaches.ContainsKey($"{item.ID}") == true && stateCaches[$"{item.ID}"].IsLoaded == true)
                     {
-                        if (stateCaches[$"{item.ID}"].IsLoaded == true)
-                        {
-                            await item.LoadAsync(Authentication.System);
-                        }
+                        dataBaseList.Add(item);
                     }
                 }
             }
@@ -91,14 +89,18 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (this.ContainsKey(item) == true)
                 {
-                    var dataBase = this[item];
-                    if (dataBase.IsLoaded == false)
-                        await dataBase.LoadAsync(Authentication.System);
+                    dataBaseList.Add(this[item]);
                 }
                 else
                 {
                     CremaLog.Error(new DataBaseNotFoundException(item));
                 }
+            }
+
+            var dataBases = dataBaseList.Distinct().ToArray();
+            foreach (var item in dataBases)
+            {
+                Task.Run(() => item.LoadAsync(Authentication.System));
             }
         }
 
