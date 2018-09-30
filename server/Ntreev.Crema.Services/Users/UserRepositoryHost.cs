@@ -32,53 +32,11 @@ namespace Ntreev.Crema.Services.Users
     class UserRepositoryHost : RepositoryHost
     {
         private readonly UserContext userContext;
-        private readonly HashSet<string> itemPaths = new HashSet<string>();
 
         public UserRepositoryHost(UserContext userContext, IRepository repository)
             : base(repository, null)
         {
             this.userContext = userContext;
-        }
-
-        public void Lock(params string[] itemPaths)
-        {
-            this.Dispatcher.VerifyAccess();
-            if (itemPaths.Distinct().Count() != itemPaths.Length)
-            {
-                int wer = 0;
-            }
-            foreach (var item in itemPaths)
-            {
-                if (this.itemPaths.Contains(item) == true)
-                    throw new ItemAlreadyExistsException(item);
-            }
-            foreach (var item in itemPaths)
-            {
-                this.itemPaths.Add(item);
-            }
-        }
-
-        public void Unlock(params string[] itemPaths)
-        {
-            this.Dispatcher.VerifyAccess();
-            if (itemPaths.Distinct().Count() != itemPaths.Length)
-            {
-                int wer = 0;
-            }
-            foreach (var item in itemPaths)
-            {
-                if (this.itemPaths.Contains(item) == false)
-                    throw new ItemNotFoundException(item);
-            }
-            foreach (var item in itemPaths)
-            {
-                this.itemPaths.Remove(item);
-            }
-        }
-
-        public Task UnlockAsync(params string[] itemPaths)
-        {
-            return this.Dispatcher.InvokeAsync(() => this.Unlock(itemPaths));
         }
 
         public void CreateCategory(Authentication authentication, string itemPath)

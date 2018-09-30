@@ -35,16 +35,22 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.Closing += CremaHost_Closing;
         }
 
-        public void Initialize(Authentication authentication)
+        public async void Initialize(Authentication authentication)
         {
             this.Authentication = authentication;
-            foreach (var item in this.CremaHost.DataBases)
+            if (this.CremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
             {
-                var serviceItem = this.CreateItem(item, this.Dispatcher, authentication);
-                this.items.Add(item, serviceItem);
+                await dataBases.Dispatcher.InvokeAsync(() =>
+                {
+                    foreach (var item in dataBases)
+                    {
+                        var serviceItem = this.CreateItem(item, this.Dispatcher, authentication);
+                        this.items.Add(item, serviceItem);
+                    }
+                    dataBases.ItemsCreated += DataBases_ItemCreated;
+                    dataBases.ItemsDeleted += DataBases_ItemsDeleted;
+                });
             }
-            this.CremaHost.DataBases.ItemsCreated += DataBases_ItemCreated;
-            this.CremaHost.DataBases.ItemsDeleted += DataBases_ItemsDeleted;
         }
 
         public void Release()

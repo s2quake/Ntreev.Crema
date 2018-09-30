@@ -202,19 +202,24 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
                     base.ValidateRename(authentication, name);
                     var items = new Type[] { this };
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
-                    var dataSet = await this.ReadDataForPathAsync(authentication);
-                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, false);
-                    var result = await this.Container.InvokeTypeRenameAsync(authentication, base.TypeInfo, name, dataBaseSet);
+                    var typeInfo = base.TypeInfo;
+                    return (items, oldNames, oldPaths, typeInfo);
+                });
+                var dataSet = await this.ReadDataForPathAsync(authentication);
+                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
+                var result = await this.Container.InvokeTypeRenameAsync(authentication, tuple.typeInfo, name, dataBaseSet);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.Rename(authentication, name);
-                    this.Container.InvokeTypesRenamedEvent(authentication, items, oldNames, oldPaths, dataSet);
+                    this.Container.InvokeTypesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, dataSet);
                 });
             }
             catch (Exception e)
@@ -229,19 +234,24 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(Move), this, categoryPath);
                     base.ValidateMove(authentication, categoryPath);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
-                    var dataSet = await this.ReadDataForPathAsync(authentication);
-                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, false);
-                    var result = await this.Container.InvokeTypeMoveAsync(authentication, base.TypeInfo, categoryPath, dataBaseSet);
+                    var typeInfo = base.TypeInfo;
+                    return (items, oldPaths, oldCategoryPaths, typeInfo);
+                });
+                var dataSet = await this.ReadDataForPathAsync(authentication);
+                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
+                var result = await this.Container.InvokeTypeMoveAsync(authentication, tuple.typeInfo, categoryPath, dataBaseSet);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.Move(authentication, categoryPath);
-                    this.Container.InvokeTypesMovedEvent(authentication, items, oldPaths, oldCategoryPaths, dataSet);
+                    this.Container.InvokeTypesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths, dataSet);
                 });
             }
             catch (Exception e)
@@ -256,19 +266,24 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(Delete), this);
                     base.ValidateDelete(authentication);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
+                    var typeInfo = base.TypeInfo;
+                    return (items, oldPaths, typeInfo);
+                });
+                var dataSet = await this.ReadDataForPathAsync(authentication);
+                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
+                var result = await this.Container.InvokeTypeDeleteAsync(authentication, tuple.typeInfo, dataBaseSet);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     var container = this.Container;
-                    var dataSet = await this.ReadDataForPathAsync(authentication);
-                    var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, false);
-                    var result = await container.InvokeTypeDeleteAsync(authentication, base.TypeInfo, dataBaseSet);
                     this.CremaHost.Sign(authentication, result);
                     base.Delete(authentication);
-                    container.InvokeTypesDeletedEvent(authentication, items, oldPaths);
+                    container.InvokeTypesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
                 });
             }
             catch (Exception e)
@@ -342,11 +357,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task<CremaDataSet> ReadDataForCopyAsync(Authentication authentication)
+        public async Task<CremaDataSet> ReadDataForCopyAsync(Authentication authentication)
         {
-            var itemPaths = new string[] { this.ItemPath };
+            var itemPaths = await this.Dispatcher.InvokeAsync(() => new string[] { this.ItemPath });
             var props = new CremaDataSetSerializerSettings(authentication, itemPaths, null);
-            return this.Repository.Dispatcher.InvokeAsync(() =>
+            return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 this.Repository.Lock(itemPaths);
                 var dataSet = this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), props) as CremaDataSet;
@@ -355,36 +370,46 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public Task<CremaDataSet> ReadDataForTypeTemplateAsync(Authentication authentication)
+        public async Task<CremaDataSet> ReadDataForTypeTemplateAsync(Authentication authentication)
         {
-            var tables = this.GetTables();
-            var types = tables.SelectMany(item => item.GetTypes()).Concat(new Type[] { this }).Distinct().ToArray();
-            var typeItemPaths = types.Select(item => item.ItemPath).ToArray();
-            var tableItemPaths = tables.Select(item => item.ItemPath).ToArray();
-            var itemPaths = typeItemPaths.Concat(tableItemPaths).ToArray();
-            var props = new CremaDataSetSerializerSettings(authentication, typeItemPaths, tableItemPaths);
-            return this.Repository.Dispatcher.InvokeAsync(() =>
+            var tuple = await this.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Lock(itemPaths);
-                var dataSet = this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), props) as CremaDataSet;
-                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = itemPaths;
+                var tables = this.GetTables();
+                var types = tables.SelectMany(item => item.GetTypes()).Concat(new Type[] { this }).Distinct().ToArray();
+                var typeItemPaths = types.Select(item => item.ItemPath).ToArray();
+                var tableItemPaths = tables.Select(item => item.ItemPath).ToArray();
+                var itemPaths = typeItemPaths.Concat(tableItemPaths).ToArray();
+                var props = new CremaDataSetSerializerSettings(authentication, typeItemPaths, tableItemPaths);
+                var itemPath = this.ItemPath;
+                return (itemPaths, props, itemPath);
+            });
+            return await this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                this.Repository.Lock(tuple.itemPaths);
+                var dataSet = this.Serializer.Deserialize(tuple.itemPath, typeof(CremaDataSet), tuple.props) as CremaDataSet;
+                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = tuple.itemPaths;
                 return dataSet;
             });
         }
 
-        public Task<CremaDataSet> ReadDataForPathAsync(Authentication authentication)
+        public async Task<CremaDataSet> ReadDataForPathAsync(Authentication authentication)
         {
-            var tables = this.GetTables();
-            var types = tables.SelectMany(item => item.GetTypes()).ToArray();
-            var typeItemPaths = types.Select(item => item.ItemPath).ToArray();
-            var tableItemPaths = tables.Select(item => item.ItemPath).ToArray();
-            var itemPaths = typeItemPaths.Concat(tableItemPaths).ToArray();
-            var props = new CremaDataSetSerializerSettings(authentication, typeItemPaths, tableItemPaths);
-            return this.Repository.Dispatcher.InvokeAsync(() =>
+            var tuple = await this.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Lock(itemPaths);
-                var dataSet = this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), props) as CremaDataSet;
-                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = itemPaths;
+                var tables = this.GetTables();
+                var types = tables.SelectMany(item => item.GetTypes()).Concat(new Type[] { this }).Distinct().ToArray();
+                var typeItemPaths = types.Select(item => item.ItemPath).ToArray();
+                var tableItemPaths = tables.Select(item => item.ItemPath).ToArray();
+                var itemPaths = typeItemPaths.Concat(tableItemPaths).ToArray();
+                var props = new CremaDataSetSerializerSettings(authentication, typeItemPaths, tableItemPaths);
+                var itemPath = this.ItemPath;
+                return (itemPaths, props, itemPath);
+            });
+            return await this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                this.Repository.Lock(tuple.itemPaths);
+                var dataSet = this.Serializer.Deserialize(tuple.itemPath, typeof(CremaDataSet), tuple.props) as CremaDataSet;
+                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = tuple.itemPaths;
                 return dataSet;
             });
         }

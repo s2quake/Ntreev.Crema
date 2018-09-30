@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Commands.Consoles
                 {
                     PathUtility.Separator
                 };
-                foreach (var item in this.CremaHost.DataBases)
+                foreach (var item in this.DataBases)
                 {
                     var items = item.DataBaseInfo.Paths.Select(i => $"{PathUtility.SeparatorChar}{item.Name}{i}");
                     pathList.AddRange(items);
@@ -76,7 +76,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
             if (dataBaseName != string.Empty && dataBasePath.DataBaseName != dataBaseName)
             {
-                var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[dataBaseName]);
+                var dataBase = this.DataBases.Dispatcher.Invoke(() => this.DataBases[dataBaseName]);
                 await dataBase.Dispatcher.InvokeAsync(() =>
                 {
                     dataBase.Unloaded -= DataBase_Unloaded;
@@ -89,7 +89,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
             if (dataBasePath.DataBaseName != string.Empty && dataBasePath.DataBaseName != dataBaseName)
             {
-                var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[dataBasePath.DataBaseName]);
+                var dataBase = this.DataBases.Dispatcher.Invoke(() => this.DataBases[dataBasePath.DataBaseName]);
                 if (dataBase.IsLoaded == false)
                     await dataBase.LoadAsync(authentication);
                 await dataBase.EnterAsync(authentication);
@@ -109,7 +109,7 @@ namespace Ntreev.Crema.Commands.Consoles
             if (target is ITableCategory tableCategory)
             {
                 var dataBase = tableCategory.GetService(typeof(IDataBase)) as IDataBase;
-                using (await DataBaseUsing.SetAsync(dataBase, authentication))
+                using (await UsingDataBase.SetAsync(dataBase, authentication))
                 {
                     await tableCategory.AddNewCategoryAsync(authentication, name);
                 }
@@ -117,7 +117,7 @@ namespace Ntreev.Crema.Commands.Consoles
             else if (target is ITypeCategory typeCategory)
             {
                 var dataBase = typeCategory.GetService(typeof(IDataBase)) as IDataBase;
-                using (await DataBaseUsing.SetAsync(dataBase, authentication))
+                using (await UsingDataBase.SetAsync(dataBase, authentication))
                 {
                     await typeCategory.AddNewCategoryAsync(authentication, name);
                 }
@@ -125,7 +125,7 @@ namespace Ntreev.Crema.Commands.Consoles
             else if (path == PathUtility.Separator)
             {
                 var comment = this.CommandContext.ReadString("comment:");
-                await this.CremaHost.DataBases.AddNewDataBaseAsync(authentication, name, comment);
+                await this.DataBases.AddNewDataBaseAsync(authentication, name, comment);
             }
             else
             {
@@ -177,7 +177,7 @@ namespace Ntreev.Crema.Commands.Consoles
             else if (target is ITableItem tableItem)
             {
                 var dataBase = tableItem.GetService(typeof(IDataBase)) as IDataBase;
-                using (await DataBaseUsing.SetAsync(dataBase, authentication))
+                using (await UsingDataBase.SetAsync(dataBase, authentication))
                 {
                     await tableItem.DeleteAsync(authentication);
                 }
@@ -185,7 +185,7 @@ namespace Ntreev.Crema.Commands.Consoles
             else if (target is ITypeItem typeItem)
             {
                 var dataBase = typeItem.GetService(typeof(IDataBase)) as IDataBase;
-                using (await DataBaseUsing.SetAsync(dataBase, authentication))
+                using (await UsingDataBase.SetAsync(dataBase, authentication))
                 {
                     await typeItem.DeleteAsync(authentication);
                 }
@@ -210,7 +210,7 @@ namespace Ntreev.Crema.Commands.Consoles
             if (destObject is IType)
                 throw new InvalidOperationException($"cannot move to : {destPath}");
 
-            using (await DataBaseUsing.SetAsync(dataBase, authentication))
+            using (await UsingDataBase.SetAsync(dataBase, authentication))
             {
                 if (destObject is ITypeCategory destCategory)
                 {
@@ -249,7 +249,7 @@ namespace Ntreev.Crema.Commands.Consoles
             if (destObject is IType)
                 throw new InvalidOperationException($"cannot move to : {destPath}");
 
-            using (await DataBaseUsing.SetAsync(dataBase, authentication))
+            using (await UsingDataBase.SetAsync(dataBase, authentication))
             {
                 if (destObject is ITypeCategory destCategory)
                 {
@@ -288,7 +288,7 @@ namespace Ntreev.Crema.Commands.Consoles
             if (destObject is ITable)
                 throw new InvalidOperationException($"cannot move to : {destPath}");
 
-            using (await DataBaseUsing.SetAsync(dataBase, authentication))
+            using (await UsingDataBase.SetAsync(dataBase, authentication))
             {
                 if (destObject is ITableCategory destCategory)
                 {
@@ -327,7 +327,7 @@ namespace Ntreev.Crema.Commands.Consoles
             if (destObject is ITable)
                 throw new InvalidOperationException($"cannot move to : {destPath}");
 
-            using (await DataBaseUsing.SetAsync(dataBase, authentication))
+            using (await UsingDataBase.SetAsync(dataBase, authentication))
             {
                 if (destObject is ITableCategory destCategory)
                 {
@@ -370,7 +370,7 @@ namespace Ntreev.Crema.Commands.Consoles
             if (dataBasePath.DataBaseName == string.Empty)
                 return null;
 
-            var dataBase = this.CremaHost.DataBases[dataBasePath.DataBaseName];
+            var dataBase = this.DataBases[dataBasePath.DataBaseName];
             if (dataBase == null)
                 throw new DataBaseNotFoundException(dataBasePath.DataBaseName);
 
@@ -414,6 +414,8 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         private ICremaHost CremaHost => this.cremaHost;
+
+        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
 
         #region IPartImportsSatisfiedNotification
 

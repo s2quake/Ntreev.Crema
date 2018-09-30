@@ -44,15 +44,21 @@ namespace Ntreev.Crema.Services.Data
             this.cremaHost.Opened += CremaHost_Opened;
         }
 
-        public void Initialize(Authentication authentication)
+        public async void Initialize(Authentication authentication)
         {
             this.Dispatcher = new CremaDispatcher(this);
             this.authentication = authentication;
 
-            foreach (var item in this.cremaHost.DataBases)
+            if (this.cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
             {
-                var serviceItem = new DataFindServiceItem(item, this.Dispatcher, authentication);
-                this.items.Add(item.ID, serviceItem);
+                await dataBases.Dispatcher.InvokeAsync(() =>
+                {
+                    foreach (var item in dataBases)
+                    {
+                        var serviceItem = new DataFindServiceItem(item, this.Dispatcher, authentication);
+                        this.items.Add(item.ID, serviceItem);
+                    }
+                });
             }
         }
 
@@ -81,10 +87,16 @@ namespace Ntreev.Crema.Services.Data
 
         public Guid ID => Guid.Parse(ServiceID);
 
-        private void CremaHost_Opened(object sender, EventArgs e)
+        private async void CremaHost_Opened(object sender, EventArgs e)
         {
-            this.cremaHost.DataBases.ItemsCreated += DataBases_ItemCreated;
-            this.cremaHost.DataBases.ItemsDeleted += DataBases_ItemDeleted;
+            if (this.cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
+            {
+                await dataBases.Dispatcher.InvokeAsync(() =>
+                {
+                    dataBases.ItemsCreated += DataBases_ItemCreated;
+                    dataBases.ItemsDeleted += DataBases_ItemDeleted;
+                });
+            }
         }
 
         private void CremaHost_Closing(object sender, EventArgs e)

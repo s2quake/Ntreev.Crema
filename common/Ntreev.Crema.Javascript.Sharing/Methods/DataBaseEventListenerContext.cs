@@ -45,8 +45,8 @@ namespace Ntreev.Crema.Javascript.Methods
             {
                 item.Dispatcher = this.dispatcher;
             }
-            this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases.ItemsLoaded += DataBases_ItemsLoaded);
-            this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases.ItemsUnloaded += DataBases_ItemsUnloaded);
+            this.DataBases.Dispatcher.Invoke(() => this.DataBases.ItemsLoaded += DataBases_ItemsLoaded);
+            this.DataBases.Dispatcher.Invoke(() => this.DataBases.ItemsUnloaded += DataBases_ItemsUnloaded);
         }
 
         public void Dispose()
@@ -74,7 +74,7 @@ namespace Ntreev.Crema.Javascript.Methods
 
                     this.listeners[eventName].Add(listener);
 
-                    var dataBases = this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases.Where(item => item.IsLoaded).ToArray());
+                    var dataBases = this.DataBases.Dispatcher.Invoke(() => this.DataBases.Where(item => item.IsLoaded).ToArray());
                     var listenerHost = this.listenerHosts[eventName];
                     foreach (var item in dataBases)
                     {
@@ -94,7 +94,7 @@ namespace Ntreev.Crema.Javascript.Methods
             {
                 if (this.listenerHosts.ContainsKey(eventName) == true)
                 {
-                    var dataBases = this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases.Where(item => item.IsLoaded).ToArray());
+                    var dataBases = this.DataBases.Dispatcher.Invoke(() => this.DataBases.Where(item => item.IsLoaded).ToArray());
                     var listenerHost = this.listenerHosts[eventName];
                     foreach (var item in dataBases)
                     {
@@ -140,6 +140,8 @@ namespace Ntreev.Crema.Javascript.Methods
                 });
             }
         }
+
+        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
 
         #region classes
 

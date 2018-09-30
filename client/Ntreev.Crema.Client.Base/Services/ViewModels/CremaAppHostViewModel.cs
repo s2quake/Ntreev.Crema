@@ -768,8 +768,9 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
 
         private async Task EnterDataBaseAsync(string dataBaseName)
         {
+            var dataBases = this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
             var autoLoad = this.authenticator.Authority == Authority.Admin && Keyboard.Modifiers == ModifierKeys.Shift;
-            var dataBase = await this.cremaHost.Dispatcher.InvokeAsync(() => this.cremaHost.DataBases[dataBaseName]);
+            var dataBase = await dataBases.Dispatcher.InvokeAsync(() => dataBases[dataBaseName]);
             if (dataBase == null)
                 throw new ArgumentException(string.Format(Resources.Exception_NonExistentDataBase, dataBaseName), nameof(dataBaseName));
             if (dataBase.IsLoaded == false && autoLoad == true)

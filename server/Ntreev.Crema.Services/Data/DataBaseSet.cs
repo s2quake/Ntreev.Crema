@@ -93,15 +93,43 @@ namespace Ntreev.Crema.Services.Data
             if (Directory.Exists(itemPath2) == true)
                 throw new IOException();
 
+            var typeNames = dataSet.ExtendedProperties["TypeNames"] as string[];
+            var typeNameList = typeNames.ToList();
+            var files = DirectoryUtility.GetAllFiles(itemPath1, "*.xsd");
+            var sss = files.Select(item => Path.GetFileNameWithoutExtension(item)).ToList();
+
             foreach (var item in this.types)
             {
                 var typeInfo = (TypeInfo)item.ExtendedProperties[typeof(TypeInfo)];
-                if (typeInfo.Path.StartsWith(categoryPath) == false)
+                if(typeInfo.Path != item.Path)
+                {
+                    int wer = 0;
+                    System.Diagnostics.Debugger.Launch();
+                }
+                if (typeInfo.CategoryPath.StartsWith(categoryPath) == false)
                     continue;
 
                 this.ValidateTypeExists(item.Path);
+                var cc = item.CategoryPath;
                 item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
+                if(item.CategoryPath == cc)
+                {
+                    int qwer = 0;
+                    System.Diagnostics.Debugger.Launch();
+                }
                 this.ValidateTypeNotExists(item.Path);
+                typeNameList.Remove(item.Name);
+                sss.Remove(item.Name);
+            }
+
+            if(typeNameList.Any() == true)
+            {
+                System.Diagnostics.Debugger.Launch();
+            }
+
+            if (sss.Any() == true)
+            {
+                System.Diagnostics.Debugger.Launch();
             }
 
             this.Serialize();
@@ -110,22 +138,55 @@ namespace Ntreev.Crema.Services.Data
 
         public void SetTableCategoryPath(string categoryPath, string newCategoryPath)
         {
+            var itemPath1 = this.TableContext.GenerateCategoryPath(categoryPath);
+            var itemPath2 = this.TableContext.GenerateCategoryPath(newCategoryPath);
+
+            if (Directory.Exists(itemPath1) == false)
+                throw new DirectoryNotFoundException();
+            if (Directory.Exists(itemPath2) == true)
+                throw new IOException();
+
+            var tableNames = dataSet.ExtendedProperties["TableNames"] as string[];
+            var tableNameList = tableNames.ToList();
+            var files = DirectoryUtility.GetAllFiles(itemPath1, "*.xml");
+            var sss = files.Select(item => Path.GetFileNameWithoutExtension(item)).ToList();
+
             foreach (var item in this.tables)
             {
                 var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
-                var tablePath = tableInfo.CategoryPath + tableInfo.Name;
-                if (tablePath.StartsWith(categoryPath) == false)
+                if (tableInfo.CategoryPath.StartsWith(categoryPath) == false)
                     continue;
-                if (tableInfo.ParentName != string.Empty)
-                    continue;
+                if (tableInfo.ParentName == string.Empty)
+                {
 
-                item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
+                    if (tableInfo.Path != item.Path)
+                    {
+                        int wer = 0;
+                        System.Diagnostics.Debugger.Launch();
+                    }
+
+                    var cc = item.CategoryPath;
+                    item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
+                    if (item.CategoryPath == cc)
+                    {
+                        int qwer = 0;
+                        System.Diagnostics.Debugger.Launch();
+                    }
+                }
+
+                tableNameList.Remove(item.Name);
+                sss.Remove(item.Name);
             }
 
+            if (tableNameList.Any() == true)
+            {
+                System.Diagnostics.Debugger.Launch();
+            }
+            if (sss.Any() == true)
+            {
+                System.Diagnostics.Debugger.Launch();
+            }
             this.Serialize();
-
-            var itemPath1 = this.TableContext.GenerateCategoryPath(categoryPath);
-            var itemPath2 = this.TableContext.GenerateCategoryPath(newCategoryPath);
             this.Repository.Move(itemPath1, itemPath2);
         }
 

@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Commands.Spreadsheet
         {
             this.ValidateExport(filename);
             var authentication = this.CommandContext.GetAuthentication(this);
-            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.DataBase]);
+            var dataBase = this.DataBases.Dispatcher.Invoke(() => this.DataBases[this.DataBase]);
             var revision = dataBase.Dispatcher.Invoke(() => this.Revision ?? dataBase.DataBaseInfo.Revision);
             var dataSet = await dataBase.GetDataSetAsync(authentication, DataSetTypeProperties.DataSetType, FilterProperties.FilterExpression, revision);
             var settings = new SpreadsheetWriterSettings()
@@ -95,7 +95,7 @@ namespace Ntreev.Crema.Commands.Spreadsheet
             var path = Path.GetFullPath(Path.Combine(this.CommandContext.BaseDirectory, filename));
             var sheetNames = SpreadsheetReader.ReadTableNames(path);
             var authentication = this.CommandContext.GetAuthentication(this);
-            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.DataBase]);
+            var dataBase = this.DataBases.Dispatcher.Invoke(() => this.DataBases[this.DataBase]);
             var tableNames = dataBase.Dispatcher.Invoke(() => dataBase.TableContext.Tables.Select(item => item.Name).ToArray());
             var query = from sheet in sheetNames
                         join table in tableNames on sheet equals SpreadsheetUtility.Ellipsis(table)
@@ -293,5 +293,7 @@ namespace Ntreev.Crema.Commands.Spreadsheet
         }
 
         private ICremaHost CremaHost => this.cremaHost.Value;
+
+        private IDataBaseCollection DataBases => this.CremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
     }
 }

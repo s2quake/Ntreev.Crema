@@ -60,13 +60,13 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                var userInfo = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
                     this.ValidateUserCreate(authentication, userID, categoryPath, password);
                     this.CremaHost.Sign(authentication);
                     var category = this.GetCategory(categoryPath);
-                    var userInfo = new UserSerializationInfo()
+                    return new UserSerializationInfo()
                     {
                         ID = userID,
                         Password = UserContext.SecureStringToString(password).Encrypt(),
@@ -74,11 +74,14 @@ namespace Ntreev.Crema.Services.Users
                         Authority = authority,
                         CategoryPath = categoryPath,
                     };
-                    userInfo = await this.InvokeUserCreateAsync(authentication, userInfo);
-                    this.CremaHost.Sign(authentication, userInfo.CreationInfo);
+                });
+                var result = await this.InvokeUserCreateAsync(authentication, userInfo);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result.CreationInfo);
                     var user = this.BaseAddNew(userID, categoryPath, null);
-                    user.Initialize((UserInfo)userInfo, BanInfo.Empty);
-                    user.Password = UserContext.StringToSecureString(userInfo.Password);
+                    user.Initialize((UserInfo)result, BanInfo.Empty);
+                    user.Password = UserContext.StringToSecureString(result.Password);
                     this.InvokeUsersCreatedEvent(authentication, new User[] { user });
                     return user;
                 });

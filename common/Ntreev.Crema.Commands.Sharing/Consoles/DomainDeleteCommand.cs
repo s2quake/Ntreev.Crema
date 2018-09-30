@@ -86,30 +86,30 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        private Task DeleteAsync(string domainID)
+        private async Task DeleteAsync(string domainID)
         {
-            var domain = this.GetDomain(Guid.Parse(domainID));
-            var dataBase = this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases.FirstOrDefault(item => item.ID == domain.DataBaseID));
+            var domain = await this.GetDomainAsync(Guid.Parse(domainID));
+            var dataBase = await this.DataBases.Dispatcher.InvokeAsync(() => this.DataBases.FirstOrDefault(item => item.ID == domain.DataBaseID));
             var isLoaded = dataBase.Dispatcher.Invoke(() => dataBase.IsLoaded);
 
             if (isLoaded == false && this.IsForce == false)
                 throw new ArgumentException($"'{dataBase}' database is not loaded.");
 
             var authentication = this.CommandContext.GetAuthentication(this);
-            return domain.DeleteAsync(authentication, this.IsCancelled);
+            await domain.DeleteAsync(authentication, this.IsCancelled);
         }
 
         private async Task DeleteDomainsAsync(string dataBaseName)
         {
-            var dataBase = this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases[dataBaseName]);
+            var dataBase = await this.DataBases.Dispatcher.InvokeAsync(() => this.DataBases[dataBaseName]);
             if (dataBase == null)
                 throw new DataBaseNotFoundException(dataBaseName);
 
-            var isLoaded = dataBase.Dispatcher.Invoke(() => dataBase.IsLoaded);
+            var isLoaded = await dataBase.Dispatcher.InvokeAsync(() => dataBase.IsLoaded);
             if (isLoaded == false && this.IsForce == false)
                 throw new ArgumentException($"'{dataBase}' database is not loaded.");
 
-            var domains = this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.Domains.Where(item => item.DataBaseID == dataBase.ID).ToArray());
+            var domains = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains.Where(item => item.DataBaseID == dataBase.ID).ToArray());
             var authentication = this.CommandContext.GetAuthentication(this);
 
             foreach (var item in domains)
@@ -125,22 +125,24 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private string[] GetDataBaseNames()
         {
-            return this.CremaHost.Dispatcher.Invoke(() =>
+            return this.DataBases.Dispatcher.Invoke(() =>
             {
-                var query = from item in this.CremaHost.DataBases
+                var query = from item in this.DataBases
                             select item.Name;
                 return query.ToArray();
             });
         }
 
-        private IDomain GetDomain(Guid domainID)
+        private async Task<IDomain> GetDomainAsync(Guid domainID)
         {
-            var domain = this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.Domains[domainID]);
+            var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
             if (domain == null)
                 throw new DomainNotFoundException(domainID);
             return domain;
         }
 
         private ICremaHost CremaHost => this.cremaHost;
+
+        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
     }
 }

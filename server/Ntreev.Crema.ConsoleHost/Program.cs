@@ -48,7 +48,7 @@ namespace Ntreev.Crema.ConsoleHost
     {
         static Program()
         {
-            
+
         }
 
         static void Main(string[] args)

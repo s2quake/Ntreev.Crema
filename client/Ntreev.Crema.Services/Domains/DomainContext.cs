@@ -44,16 +44,18 @@ namespace Ntreev.Crema.Services.Domains
         private ItemsMovedEventHandler<IDomainItem> itemsMoved;
         private ItemsDeletedEventHandler<IDomainItem> itemsDeleted;
 
-        public DomainContext(CremaHost cremaHost, string address, ServiceInfo serviceInfo)
+        public DomainContext(CremaHost cremaHost)
         {
             this.CremaHost = cremaHost;
             this.userContext = cremaHost.UserContext;
-
             this.serviceDispatcher = new CremaDispatcher(this);
-            var metaData = this.serviceDispatcher.Invoke(() =>
+        }
+
+        public async Task InitializeAsync(string address, Guid authenticationToken, ServiceInfo serviceInfo)
+        {
+            await this.serviceDispatcher.InvokeAsync(() =>
             {
                 var binding = CremaHost.CreateBinding(serviceInfo);
-
                 var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/DomainService");
                 var instanceContext = new InstanceContext(this);
                 if (Environment.OSVersion.Platform != PlatformID.Unix)
@@ -65,21 +67,26 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     service.Faulted += Service_Faulted;
                 }
-                var result = this.service.Subscribe(this.CremaHost.AuthenticationToken);
+            });
+                var result = await this.service.SubscribeAsync(authenticationToken);
                 result.Validate();
 #if !DEBUG
                 this.timer = new Timer(30000);
                 this.timer.Elapsed += Timer_Elapsed;
                 this.timer.Start();
 #endif
-                return result.Value;
-            });
+            var metaData =result.Value;
 
-            this.Initialize(metaData);
-            this.CremaHost.DataBases.ItemsCreated += DataBases_ItemsCreated;
-            this.CremaHost.DataBases.ItemsRenamed += DataBases_ItemsRenamed;
-            this.CremaHost.DataBases.ItemsDeleted += DataBases_ItemDeleted;
-            this.CremaHost.AddService(this);
+            //});
+
+            await this.InitializeAsync(metaData);
+            await this.CremaHost.Dispatcher.InvokeAsync(() =>
+            {
+                this.CremaHost.DataBases.ItemsCreated += DataBases_ItemsCreated;
+                this.CremaHost.DataBases.ItemsRenamed += DataBases_ItemsRenamed;
+                this.CremaHost.DataBases.ItemsDeleted += DataBases_ItemDeleted;
+                this.CremaHost.AddService(this);
+            });
         }
 
         public DomainMetaData[] Restore(DataBase dataBase)
@@ -279,29 +286,34 @@ namespace Ntreev.Crema.Services.Domains
             this.itemsDeleted?.Invoke(this, e);
         }
 
-        private void Initialize(DomainContextMetaData metaData)
+        private Task InitializeAsync(DomainContextMetaData metaData)
         {
-            var dataBases = this.CremaHost.DataBases;
-            foreach (var item in metaData.DomainCategories)
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                if (item != this.Root.Path)
+
+
+                var dataBases = this.CremaHost.DataBases;
+                foreach (var item in metaData.DomainCategories)
                 {
-                    var category = this.Categories.AddNew(item);
-                    if (category.Parent == this.Root)
+                    if (item != this.Root.Path)
                     {
-                        category.DataBase = this.CremaHost.DataBases[category.Name];
+                        var category = this.Categories.AddNew(item);
+                        if (category.Parent == this.Root)
+                        {
+                            category.DataBase = this.CremaHost.DataBases[category.Name];
+                        }
                     }
                 }
-            }
 
-            foreach (var item in metaData.Domains)
-            {
-                var domain = this.Domains.AddDomain(null, item.DomainInfo);
-                if (domain == null)
-                    continue;
+                foreach (var item in metaData.Domains)
+                {
+                    var domain = this.Domains.AddDomain(null, item.DomainInfo);
+                    if (domain == null)
+                        continue;
 
-                domain.Initialize(Authentication.System, item);
-            }
+                    domain.Initialize(Authentication.System, item);
+                }
+            });
         }
 
         private void DataBases_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)

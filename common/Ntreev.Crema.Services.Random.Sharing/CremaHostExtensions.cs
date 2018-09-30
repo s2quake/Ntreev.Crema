@@ -30,7 +30,11 @@ namespace Ntreev.Crema.Services.Random
         {
             var dataBaseName = RandomUtility.NextIdentifier();
             var comment = RandomUtility.NextString();
-            return cremaHost.DataBases.AddNewDataBaseAsync(authentication, dataBaseName, comment);
+            if (cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
+            {
+                return dataBases.AddNewDataBaseAsync(authentication, dataBaseName, comment);
+            }
+            throw new NotImplementedException();
         }
     }
 }

@@ -75,9 +75,9 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 {
                     this.userContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
                 });
-                await this.cremaHost.Dispatcher.InvokeAsync(() =>
+                await this.DataBases.Dispatcher.InvokeAsync(() =>
                 {
-                    this.dataBase = this.cremaHost.DataBases[dataBaseName];
+                    this.dataBase = this.DataBases[dataBaseName];
                     this.dataBaseName = dataBaseName;
                 });
                 await this.dataBase.EnterAsync(this.authentication);
@@ -1375,6 +1375,8 @@ namespace Ntreev.Crema.ServiceHosts.Data
         private ITableContext TableContext => this.dataBase.TableContext;
 
         private ITypeContext TypeContext => this.dataBase.TypeContext;
+
+        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
 
         #region ICremaServiceItem
 

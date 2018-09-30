@@ -431,6 +431,17 @@ namespace Ntreev.Crema.Services
             return string.Format(EventResources.CreateType, authentication.ID, authentication.Name, typeName);
         }
 
+        public static string CreateType(Authentication authentication, string[] typeNames)
+        {
+            var messageList = new List<string>(typeNames.Length);
+            for (var i = 0; i < typeNames.Length; i++)
+            {
+                var message = CreateType(authentication, typeNames[i]);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
         public static string CreateType(Authentication authentication, IType[] items)
         {
             var messageList = new List<string>(items.Length);

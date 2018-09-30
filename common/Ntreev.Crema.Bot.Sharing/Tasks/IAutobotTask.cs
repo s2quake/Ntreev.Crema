@@ -47,9 +47,9 @@ namespace Ntreev.Crema.Bot.Tasks
                 {
                     if (RandomUtility.Within(75) == true)
                     {
-                        if (autobot.GetService(typeof(ICremaHost)) is ICremaHost cremaHost)
+                        if (autobot.GetService(typeof(ICremaHost)) is ICremaHost cremaHost && cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
                         {
-                            var dataBase = await cremaHost.Dispatcher.InvokeAsync(() => cremaHost.DataBases.Random());
+                            var dataBase = await dataBases.Dispatcher.InvokeAsync(() => dataBases.Random());
                             context.Push(dataBase);
                         }
                     }

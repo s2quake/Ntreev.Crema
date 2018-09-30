@@ -210,7 +210,7 @@ namespace Ntreev.Crema.Client.Differences.BrowserItems.ViewModels
             {
                 var dataTable = viewModel.Source.ExportTable2();
                 var dataBaseName = this.cremaAppHost.DataBaseName;
-                var dataBase = await this.cremaHost.Dispatcher.InvokeAsync(() => this.cremaHost.DataBases[dataBaseName]);
+                var dataBase = await this.DataBases.Dispatcher.InvokeAsync(() => this.DataBases[dataBaseName]);
 
                 var comment = this.GetComment(viewModel.DisplayName);
                 if (comment == null)
@@ -238,5 +238,7 @@ namespace Ntreev.Crema.Client.Differences.BrowserItems.ViewModels
         }
 
         private IServiceProvider ServiceProvider => this.serviceProvider.Value;
+
+        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
     }
 }

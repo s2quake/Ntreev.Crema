@@ -232,7 +232,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private async Task<IType> GetTypeAsync(string typeName)
         {
-            var dataBase = await this.CremaHost.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var dataBase = await this.DataBases.Dispatcher.InvokeAsync(() => this.DataBases[this.Drive.DataBaseName]);
             var type = await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 if (NameValidator.VerifyItemPath(typeName) == true)
@@ -246,7 +246,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private async Task<ITypeCategory> GetCategoryAsync(string categoryPath)
         {
-            var dataBase = await this.CremaHost.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var dataBase = await this.DataBases.Dispatcher.InvokeAsync(() => this.DataBases[this.Drive.DataBaseName]);
             var category = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TypeContext.Categories[categoryPath]);
             if (category == null)
                 throw new CategoryNotFoundException(categoryPath);
@@ -255,7 +255,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private async Task<ITypeItem> GetTypeItemAsync([CommandCompletion(nameof(GetPaths))]string typeItemName)
         {
-            var dataBase = await this.CremaHost.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var dataBase = await this.DataBases.Dispatcher.InvokeAsync(() => this.DataBases[this.Drive.DataBaseName]);
             var typeItem = await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 if (NameValidator.VerifyItemPath(typeItemName) == true || NameValidator.VerifyCategoryPath(typeItemName) == true)
@@ -274,7 +274,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private string[] GetTypeNames(TagInfo tags, string filterExpress)
         {
-            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var dataBase = this.DataBases.Dispatcher.Invoke(() => this.DataBases[this.Drive.DataBaseName]);
             return dataBase.Dispatcher.Invoke(() =>
             {
                 var query = from item in dataBase.TypeContext.Types
@@ -289,7 +289,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private string[] GetCategoryPaths()
         {
-            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var dataBase = this.DataBases.Dispatcher.Invoke(() => this.DataBases[this.Drive.DataBaseName]);
             return dataBase.Dispatcher.Invoke(() =>
             {
                 var query = from item in dataBase.TypeContext.Categories
@@ -301,7 +301,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private string[] GetPaths()
         {
-            var dataBase = this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.DataBases[this.Drive.DataBaseName]);
+            var dataBase = this.DataBases.Dispatcher.Invoke(() => this.DataBases[this.Drive.DataBaseName]);
             return dataBase.Dispatcher.Invoke(() =>
             {
                 var query = from item in dataBase.TypeContext.Categories
@@ -332,5 +332,7 @@ namespace Ntreev.Crema.Commands.Consoles
         private DataBasesConsoleDrive Drive => this.CommandContext.Drive as DataBasesConsoleDrive;
 
         private ICremaHost CremaHost => this.cremaHost;
+
+        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
     }
 }

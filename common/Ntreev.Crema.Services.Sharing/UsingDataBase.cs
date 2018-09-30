@@ -44,11 +44,15 @@ namespace Ntreev.Crema.Services
 
         public static async Task<UsingDataBase> SetAsync(ICremaHost cremaHost, string dataBaseName, Authentication authentication)
         {
-            var dataBase = await cremaHost.Dispatcher.InvokeAsync(() => cremaHost.DataBases[dataBaseName]);
-            if (dataBase == null)
-                throw new DataBaseNotFoundException(dataBaseName);
+            if (cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
+            {
+                var dataBase = await dataBases.Dispatcher.InvokeAsync(() => dataBases[dataBaseName]);
+                if (dataBase == null)
+                    throw new DataBaseNotFoundException(dataBaseName);
 
-            return await SetAsync(dataBase, authentication);
+                return await SetAsync(dataBase, authentication);
+            }
+            throw new NotImplementedException();
         }
 
         public static async Task<UsingDataBase> SetAsync(IDataBase dataBase, Authentication authentication)

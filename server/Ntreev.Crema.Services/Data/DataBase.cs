@@ -55,28 +55,28 @@ namespace Ntreev.Crema.Services.Data
 
         private HashSet<AuthenticationToken> authentications = new HashSet<AuthenticationToken>();
 
-        public DataBase(CremaHost cremaHost, string name)
+        public DataBase(DataBaseCollection dataBases, string name)
         {
-            this.CremaHost = cremaHost;
-            this.Dispatcher = cremaHost.Dispatcher;
-            this.repositoryProvider = cremaHost.RepositoryProvider;
-            this.serializer = cremaHost.Serializer;
+            this.DataBases = dataBases;
+            this.Dispatcher = dataBases.Dispatcher;
+            this.repositoryProvider = this.CremaHost.RepositoryProvider;
+            this.serializer = this.CremaHost.Serializer;
             base.Name = name;
-            this.cachePath = cremaHost.GetPath(CremaPath.Caches, DataBaseCollection.DataBasesString);
+            this.cachePath = this.CremaHost.GetPath(CremaPath.Caches, DataBaseCollection.DataBasesString);
             this.userContext = this.CremaHost.UserContext;
             this.userContext.Dispatcher.Invoke(() => this.userContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
             this.Initialize();
         }
 
-        public DataBase(CremaHost cremaHost, string name, DataBaseSerializationInfo dataBaseInfo)
-            : this(cremaHost, name)
+        public DataBase(DataBaseCollection dataBases, string name, DataBaseSerializationInfo dataBaseInfo)
+            : this(dataBases, name)
         {
-            this.CremaHost = cremaHost;
-            this.Dispatcher = cremaHost.Dispatcher;
-            this.repositoryProvider = cremaHost.RepositoryProvider;
-            this.serializer = cremaHost.Serializer;
+            this.DataBases = dataBases;
+            this.Dispatcher = dataBases.Dispatcher;
+            this.repositoryProvider = this.CremaHost.RepositoryProvider;
+            this.serializer = this.CremaHost.Serializer;
             base.Name = name;
-            this.cachePath = cremaHost.GetPath(CremaPath.Caches, DataBaseCollection.DataBasesString);
+            this.cachePath = this.CremaHost.GetPath(CremaPath.Caches, DataBaseCollection.DataBasesString);
             this.userContext = this.CremaHost.UserContext;
             this.userContext.Dispatcher.Invoke(() => this.userContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
             base.DataBaseInfo = (DataBaseInfo)dataBaseInfo;
@@ -768,9 +768,9 @@ namespace Ntreev.Crema.Services.Data
 
         public string BasePath => this.CremaHost.GetPath(CremaPath.DataBases, $"{base.DataBaseInfo.ID}");
 
-        public CremaHost CremaHost { get; }
+        public CremaHost CremaHost => this.DataBases.CremaHost;
 
-        public DataBaseCollection DataBases => this.CremaHost.DataBases;
+        public DataBaseCollection DataBases { get; }
 
         public TableContext TableContext => this.tableContext;
 

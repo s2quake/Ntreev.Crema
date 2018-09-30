@@ -70,7 +70,7 @@ namespace Ntreev.Crema.Client.Base.Dialogs.ViewModels
             try
             {
                 this.BeginProgress(Resources.Message_CreatingNewDataBase);
-                await this.cremaHost.DataBases.AddNewDataBaseAsync(this.authentication, this.DataBaseName, this.Comment);
+                await this.DataBases.AddNewDataBaseAsync(this.authentication, this.DataBaseName, this.Comment);
                 this.EndProgress();
                 this.TryClose(true);
                 AppMessageBox.Show(Resources.Message_CreatedNewDataBase);
@@ -121,5 +121,7 @@ namespace Ntreev.Crema.Client.Base.Dialogs.ViewModels
                 return NameValidator.VerifyName(this.DataBaseName);
             }
         }
+
+        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
     }
 }

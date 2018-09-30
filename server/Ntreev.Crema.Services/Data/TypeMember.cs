@@ -45,7 +45,7 @@ namespace Ntreev.Crema.Services.Data
             var query = from DataRow item in table.Rows
                         select item.Field<string>(CremaSchema.Name);
 
-            var newName = NameUtility.GenerateNewName("Type", query);
+            var newName = NameUtility.GenerateNewName(nameof(Type), query);
             Initialize();
 
             async void Initialize()

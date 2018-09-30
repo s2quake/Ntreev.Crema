@@ -78,11 +78,10 @@ namespace Ntreev.Crema.ServiceHosts.Users
                 });
 
                 this.OwnerID = this.authentication.ID;
-                this.AttachEventHandlersAsync();
-                this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(SubscribeAsync)}");
-
+                await this.AttachEventHandlersAsync();
                 result.Value = await this.userContext.GetMetaDataAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
+                this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(SubscribeAsync)}");
             }
             catch (Exception e)
             {

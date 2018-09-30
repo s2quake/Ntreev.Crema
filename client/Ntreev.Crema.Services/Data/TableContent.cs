@@ -285,7 +285,7 @@ namespace Ntreev.Crema.Services.Data
 
         public bool IsModified { get; private set; }
 
-        public EditableState EditableState { get; private set; }
+        public ServiceState ServiceState { get; private set; }
 
         public event EventHandler EditBegun
         {

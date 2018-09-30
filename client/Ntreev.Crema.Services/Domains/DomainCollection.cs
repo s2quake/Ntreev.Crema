@@ -240,7 +240,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public async Task AddAsync(Authentication authentication, Domain domain, DataBase dataBase)
         {
-            await await this.Dispatcher.InvokeAsync(async () =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
                 var category = this.Context.Categories.Prepare(categoryName);

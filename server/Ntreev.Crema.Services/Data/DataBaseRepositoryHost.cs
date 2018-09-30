@@ -334,20 +334,23 @@ namespace Ntreev.Crema.Services.Data
             dataBaseSet.SetTableCategoryPath(categoryPath, newCategoryPath);
         }
 
-        public void CreateType(DataBaseSet dataBaseSet, string typeName)
+        public void CreateType(DataBaseSet dataBaseSet, string[] typePaths)
         {
             this.Dispatcher.VerifyAccess();
-
-            if (this.types.Contains(typeName))
-                throw new ItemAlreadyExistsException(typeName);
-
+            foreach (var item in typePaths)
+            {
+                var name = Path.GetFileName(item);
+                if (this.types.Contains(name) == true)
+                    throw new ItemAlreadyExistsException(item);
+            }
             dataBaseSet.CreateType();
-            var typesDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);
-            var typesItemPaths = this.dataBase.Serializer.GetItemPaths(typesDirectory, typeof(CremaDataType), ObjectSerializerSettings.Empty);
+            //var typesDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);
+            //var typesItemPaths = this.dataBase.Serializer.GetItemPaths(typesDirectory, typeof(CremaDataType), ObjectSerializerSettings.Empty);
         }
 
         public void RenameType(DataBaseSet dataBaseSet, string typePath, string typeName)
         {
+            this.Dispatcher.VerifyAccess();
             if (this.types.Contains(typeName))
                 throw new ItemAlreadyExistsException(typeName);
             dataBaseSet.RenameType(typePath, typeName);
@@ -355,24 +358,29 @@ namespace Ntreev.Crema.Services.Data
 
         public void MoveType(DataBaseSet dataBaseSet, string typePath, string categoryPath)
         {
+            this.Dispatcher.VerifyAccess();
             dataBaseSet.MoveType(typePath, categoryPath);
         }
 
         public void DeleteType(DataBaseSet dataBaseSet, string typePath)
         {
+            this.Dispatcher.VerifyAccess();
             dataBaseSet.DeleteType(typePath);
         }
 
         public void ModifyType(DataBaseSet dataBaseSet)
         {
+            this.Dispatcher.VerifyAccess();
             dataBaseSet.ModifyType();
         }
 
-        public void CreateTable(DataBaseSet dataBaseSet, string[] tableNames)
+        public void CreateTable(DataBaseSet dataBaseSet, string[] tablePaths)
         {
-            foreach (var item in tableNames)
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in tablePaths)
             {
-                if (this.tables.Contains(item) == true)
+                var name = Path.GetFileName(item);
+                if (this.tables.Contains(name) == true)
                     throw new ItemAlreadyExistsException(item);
             }
             dataBaseSet.CreateTable();
@@ -380,6 +388,7 @@ namespace Ntreev.Crema.Services.Data
 
         public void RenameTable(DataBaseSet dataBaseSet, string tablePath, string tableName)
         {
+            this.Dispatcher.VerifyAccess();
             if (this.tables.Contains(tableName))
                 throw new ItemAlreadyExistsException(tableName);
             dataBaseSet.RenameTable(tablePath, tableName);
@@ -387,21 +396,25 @@ namespace Ntreev.Crema.Services.Data
 
         public void MoveTable(DataBaseSet dataBaseSet, string tablePath, string categoryPath)
         {
+            this.Dispatcher.VerifyAccess();
             dataBaseSet.MoveTable(tablePath, categoryPath);
         }
 
         public void DeleteTable(DataBaseSet dataBaseSet, string tablePath)
         {
+            this.Dispatcher.VerifyAccess();
             dataBaseSet.DeleteTable(tablePath);
         }
 
         public void ModifyTable(DataBaseSet dataBaseSet)
         {
+            this.Dispatcher.VerifyAccess();
             dataBaseSet.ModifyTable();
         }
 
         public void Modify(CremaDataSet dataSet)
         {
+            this.Dispatcher.VerifyAccess();
             DataBaseSet.Modify(dataSet, this.dataBase);
         }
 

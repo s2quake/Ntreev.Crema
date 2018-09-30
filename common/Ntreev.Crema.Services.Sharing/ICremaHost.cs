@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Services
 
         ServiceState ServiceState { get; }
 
-        IDataBaseCollection DataBases { get; }
+        //IDataBaseCollection DataBases { get; }
 
         ICremaConfiguration Configs { get; }
     }

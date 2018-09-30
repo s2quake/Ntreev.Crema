@@ -383,34 +383,37 @@ namespace Ntreev.Crema.Services.Users
             return files;
         }
 
-        public void Initialize()
+        public async Task InitializeAsync()
         {
-            this.CremaHost.Debug("Load user data...");
-
-            var directories = DirectoryUtility.GetAllDirectories(this.BasePath, "*", true);
-            foreach (var item in directories)
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                var relativeUri = UriUtility.MakeRelativeOfDirectory(this.BasePath, item);
-                var segments = StringUtility.Split(relativeUri, PathUtility.SeparatorChar, true);
-                var categoryName = CategoryName.Create(relativeUri);
-                this.Categories.Prepare(categoryName);
-            }
+                this.CremaHost.Debug("Load user data...");
 
-            var settings = ObjectSerializerSettings.Empty;
-            var itemPaths = this.Serializer.GetItemPaths(this.BasePath, typeof(UserSerializationInfo), settings);
-            foreach (var item in itemPaths)
-            {
-                var userInfo = (UserSerializationInfo)this.Serializer.Deserialize(item, typeof(UserSerializationInfo), settings);
-                var directory = Path.GetDirectoryName(item);
-                var relativeUri = UriUtility.MakeRelativeOfDirectory(this.BasePath, item);
-                var segments = StringUtility.Split(relativeUri, PathUtility.SeparatorChar, true);
-                var itemName = ItemName.Create(segments);
-                var user = this.Users.AddNew(userInfo.ID, itemName.CategoryPath);
-                user.Initialize((UserInfo)userInfo, (BanInfo)userInfo.BanInfo);
-                user.Password = UserContext.StringToSecureString(userInfo.Password);
-            }
+                var directories = DirectoryUtility.GetAllDirectories(this.BasePath, "*", true);
+                foreach (var item in directories)
+                {
+                    var relativeUri = UriUtility.MakeRelativeOfDirectory(this.BasePath, item);
+                    var segments = StringUtility.Split(relativeUri, PathUtility.SeparatorChar, true);
+                    var categoryName = CategoryName.Create(relativeUri);
+                    this.Categories.Prepare(categoryName);
+                }
 
-            this.CremaHost.Debug("Loading complete!");
+                var settings = ObjectSerializerSettings.Empty;
+                var itemPaths = this.Serializer.GetItemPaths(this.BasePath, typeof(UserSerializationInfo), settings);
+                foreach (var item in itemPaths)
+                {
+                    var userInfo = (UserSerializationInfo)this.Serializer.Deserialize(item, typeof(UserSerializationInfo), settings);
+                    var directory = Path.GetDirectoryName(item);
+                    var relativeUri = UriUtility.MakeRelativeOfDirectory(this.BasePath, item);
+                    var segments = StringUtility.Split(relativeUri, PathUtility.SeparatorChar, true);
+                    var itemName = ItemName.Create(segments);
+                    var user = this.Users.AddNew(userInfo.ID, itemName.CategoryPath);
+                    user.Initialize((UserInfo)userInfo, (BanInfo)userInfo.BanInfo);
+                    user.Password = UserContext.StringToSecureString(userInfo.Password);
+                }
+
+                this.CremaHost.Debug("Loading complete!");
+            });
         }
 
         public async Task DisposeAsync()

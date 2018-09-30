@@ -235,68 +235,19 @@ namespace Ntreev.Crema.Services.Users
                 base.BanInfo = BanInfo.Empty;
         }
 
-        public string ID
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Name;
-            }
-        }
+        public string ID => this.Name;
 
-        public string UserName
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.UserInfo.Name;
-            }
-        }
+        public string UserName => this.UserInfo.Name;
 
-        public new string Path
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Path;
-            }
-        }
+        public new string Path => base.Path;
 
-        public new Authority Authority
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Authority;
-            }
-        }
+        public new Authority Authority => base.Authority;
 
-        public new UserInfo UserInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.UserInfo;
-            }
-        }
+        public new UserInfo UserInfo => base.UserInfo;
 
-        public new UserState UserState
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.UserState;
-            }
-        }
+        public new UserState UserState => base.UserState;
 
-        public new BanInfo BanInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.BanInfo;
-            }
-        }
+        public new BanInfo BanInfo => base.BanInfo;
 
         public bool IsBanned => this.BanInfo.Path != string.Empty;
 
@@ -306,7 +257,7 @@ namespace Ntreev.Crema.Services.Users
 
         public CremaHost CremaHost => this.Context.CremaHost;
 
-        public CremaDispatcher Dispatcher => this.CremaHost.Dispatcher;
+        public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
 
         public new event EventHandler Renamed
         {
@@ -402,14 +353,7 @@ namespace Ntreev.Crema.Services.Users
 
         string IUser.ID => this.ID;
 
-        IUserCategory IUser.Category
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Category;
-            }
-        }
+        IUserCategory IUser.Category => this.Category;
 
         #endregion
 
@@ -417,23 +361,9 @@ namespace Ntreev.Crema.Services.Users
 
         string IUserItem.Name => this.ID;
 
-        IUserItem IUserItem.Parent
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Category;
-            }
-        }
+        IUserItem IUserItem.Parent => this.Category;
 
-        IEnumerable<IUserItem> IUserItem.Childs
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return Enumerable.Empty<IUserItem>();
-            }
-        }
+        IEnumerable<IUserItem> IUserItem.Childs => Enumerable.Empty<IUserItem>();
 
         #endregion
 

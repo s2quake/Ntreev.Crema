@@ -37,7 +37,6 @@ namespace Ntreev.Crema.Services.Users
         IUserServiceCallback, IUserContext, ICremaService
     {
         private UserServiceClient service;
-        private CremaDispatcher serviceDispatcher;
         private Timer timer;
 
         private ItemsCreatedEventHandler<IUserItem> itemsCreated;
@@ -48,12 +47,16 @@ namespace Ntreev.Crema.Services.Users
 
         private readonly Dictionary<string, Authentication> customAuthentications = new Dictionary<string, Authentication>();
 
-        public UserContext(CremaHost cremaHost, string address, ServiceInfo serviceInfo, string userID, SecureString password)
+        public UserContext(CremaHost cremaHost)
         {
             this.CremaHost = cremaHost;
+            this.Dispatcher = new CremaDispatcher(this);
+        }
 
-            this.serviceDispatcher = new CremaDispatcher(this);
-            var metaData = this.serviceDispatcher.Invoke(() =>
+        public async Task<Guid> InitializeAsync(string address, ServiceInfo serviceInfo, string userID, SecureString password)
+        {
+            var version = typeof(CremaHost).Assembly.GetName().Version;
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 this.service = UserServiceFactory.CreateServiceClient(address, serviceInfo, this);
                 this.service.Open();
@@ -61,33 +64,59 @@ namespace Ntreev.Crema.Services.Users
                 {
                     service.Faulted += Service_Faulted;
                 }
-                var version = typeof(CremaHost).Assembly.GetName().Version;
-                try
-                {
-                    var result = this.service.Subscribe(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}");
-                    result.Validate();
-#if !DEBUG
-                    this.timer = new Timer(30000);
-                    this.timer.Elapsed += Timer_Elapsed;
-                    this.timer.Start();
-#endif
-                    return result.Value;
-                }
-                catch
-                {
-                    if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                        this.service.Close();
-                    else
-                        this.service.Abort();
-                    this.serviceDispatcher.Dispose();
-                    this.serviceDispatcher = null;
-                    throw;
-                }
             });
+            try
+            {
+                var result = await this.service.SubscribeAsync(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}");
+                result.Validate();
+#if !DEBUG
+                this.timer = new Timer(30000);
+                this.timer.Elapsed += Timer_Elapsed;
+                this.timer.Start();
+#endif
+                var metaData = result.Value;
+                //this.CremaHost.AuthenticationToken = metaData.AuthenticationToken;
 
-            this.AuthenticationToken = metaData.AuthenticationToken;
-            this.Initialize(metaData);
-            this.CremaHost.AddService(this);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    foreach (var item in metaData.Categories)
+                    {
+                        if (item == this.Root.Path)
+                            continue;
+                        this.Categories.Prepare(item);
+                    }
+
+                    foreach (var item in metaData.Users)
+                    {
+                        var itemName = new ItemName(item.Path);
+                        var user = this.Users.BaseAddNew(itemName.Name, itemName.CategoryPath);
+                        user.Initialize(item.UserInfo, item.BanInfo);
+                        user.SetUserState(item.UserState);
+                    }
+
+                    this.CurrentUser = this.Users[userID];
+                    this.CurrentUser.SetUserState(UserState.Online);
+                });
+                //await this.InitializeAsync(metaData);
+                this.CremaHost.AddService(this);
+                return metaData.AuthenticationToken;
+            }
+            catch
+            {
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                    this.service.Close();
+                else
+                    this.service.Abort();
+                this.Dispatcher.Dispose();
+                throw;
+            }
+            //});
+
+
+
+            //var user = this.Users[userID];
+            //user.SetUserState(UserState.Online);
+            //return user;
         }
 
         public static byte[] Encrypt(string userID, SecureString value)
@@ -228,7 +257,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void Close(CloseInfo closeInfo)
         {
-            this.serviceDispatcher?.Invoke(() =>
+            this.Dispatcher?.Invoke(() =>
             {
                 this.timer?.Dispose();
                 this.timer = null;
@@ -255,12 +284,13 @@ namespace Ntreev.Crema.Services.Users
                     }
                     this.service = null;
                 }
-                this.serviceDispatcher?.Dispose();
-                this.serviceDispatcher = null;
+                this.Dispatcher?.Dispose();
             });
         }
 
-        public Guid AuthenticationToken { get; }
+        //public Guid AuthenticationToken { get; private set; }
+
+            public User CurrentUser { get; private set; }
 
         public IUserService Service => this.service;
 
@@ -268,7 +298,7 @@ namespace Ntreev.Crema.Services.Users
 
         public CremaHost CremaHost { get; }
 
-        public CremaDispatcher Dispatcher => this.CremaHost.Dispatcher;
+        public CremaDispatcher Dispatcher { get; }
 
         public event ItemsCreatedEventHandler<IUserItem> ItemsCreated
         {
@@ -365,27 +395,34 @@ namespace Ntreev.Crema.Services.Users
             this.itemsChanged?.Invoke(this, e);
         }
 
-        private void Initialize(UserContextMetaData metaData)
-        {
-            foreach (var item in metaData.Categories)
-            {
-                if (item == this.Root.Path)
-                    continue;
-                this.Categories.Prepare(item);
-            }
+        //private Task InitializeAsync(UserContextMetaData metaData)
+        //{
+        //    return this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        foreach (var item in metaData.Categories)
+        //        {
+        //            if (item == this.Root.Path)
+        //                continue;
+        //            this.Categories.Prepare(item);
+        //        }
 
-            foreach (var item in metaData.Users)
-            {
-                var itemName = new ItemName(item.Path);
-                var user = this.Users.BaseAddNew(itemName.Name, itemName.CategoryPath);
-                user.Initialize(item.UserInfo, item.BanInfo);
-                user.SetUserState(item.UserState);
-            }
-        }
+        //        foreach (var item in metaData.Users)
+        //        {
+        //            var itemName = new ItemName(item.Path);
+        //            var user = this.Users.BaseAddNew(itemName.Name, itemName.CategoryPath);
+        //            user.Initialize(item.UserInfo, item.BanInfo);
+        //            user.SetUserState(item.UserState);
+        //        }
+
+        //        var currentUser = this.Users[userID];
+        //        user.SetUserState(UserState.Online);
+        //        return user;
+        //    });
+        //}
 
         private void Service_Faulted(object sender, EventArgs e)
         {
-            this.serviceDispatcher.Invoke(() =>
+            this.Dispatcher.Invoke(() =>
             {
                 try
                 {
@@ -398,8 +435,7 @@ namespace Ntreev.Crema.Services.Users
                 }
                 this.timer?.Dispose();
                 this.timer = null;
-                this.serviceDispatcher.Dispose();
-                this.serviceDispatcher = null;
+                this.Dispatcher.Dispose();
             });
             this.InvokeAsync(() =>
             {
@@ -425,7 +461,7 @@ namespace Ntreev.Crema.Services.Users
             this.timer?.Stop();
             try
             {
-                await this.serviceDispatcher.InvokeAsync(() => this.service.IsAlive());
+                await this.Dispatcher.InvokeAsync(() => this.service.IsAlive());
                 this.timer?.Start();
             }
             catch
@@ -445,8 +481,7 @@ namespace Ntreev.Crema.Services.Users
             this.service = null;
             this.timer?.Dispose();
             this.timer = null;
-            this.serviceDispatcher?.Dispose();
-            this.serviceDispatcher = null;
+            this.Dispatcher?.Dispose();
             this.InvokeAsync(() =>
             {
                 this.CremaHost.RemoveService(this, closeInfo);

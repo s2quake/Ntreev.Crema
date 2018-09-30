@@ -125,7 +125,7 @@ namespace Ntreev.Crema.Data.Xml.Schema
                 {
                     var columns = tables.SelectMany(item => item.Columns).Distinct();
                     var query = from item in this.dataTable.DataSet.Types
-                                join column in columns on item.TypeName equals column.DataType.GetSchemaTypeName()
+                                join column in columns on item.Path equals column.DataTypeName
                                 select item;
 
                     var index = 0;
@@ -142,7 +142,7 @@ namespace Ntreev.Crema.Data.Xml.Schema
                             SchemaLocation = UriUtility.MakeRelative(tableNamespace, item.Namespace) + CremaSchema.SchemaExtension
                         };
                         schema.Includes.Add(import);
-                        schema.Namespaces.Add("d" + index, item.Namespace);
+                        //schema.Namespaces.Add("d" + index, item.Namespace);
                         index++;
                     }
                 }

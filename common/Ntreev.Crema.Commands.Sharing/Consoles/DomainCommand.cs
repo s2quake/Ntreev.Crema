@@ -49,7 +49,7 @@ namespace Ntreev.Crema.Commands.Consoles
         //public void Delete([CommandCompletion(nameof(GetDomainIDs))]string domainID = null)
         //{
         //    var domain = this.GetDomain(Guid.Parse(domainID));
-        //    var dataBase = this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases.FirstOrDefault(item => item.ID == domain.DataBaseID));
+        //    var dataBase = this.cremaHost.Dispatcher.Invoke(() => this.DataBases.FirstOrDefault(item => item.ID == domain.DataBaseID));
         //    var isLoaded = dataBase.Dispatcher.Invoke(() => dataBase.IsLoaded);
 
         //    if (isLoaded == false && this.IsForce == false)
@@ -63,7 +63,7 @@ namespace Ntreev.Crema.Commands.Consoles
         //[CommandMethodProperty(nameof(IsCancelled), nameof(IsForce))]
         //public void DeleteAll([CommandCompletion(nameof(GetDataBaseNames))]string dataBaseName)
         //{
-        //    var dataBase = this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases[dataBaseName]);
+        //    var dataBase = this.cremaHost.Dispatcher.Invoke(() => this.DataBases[dataBaseName]);
         //    if (dataBase == null)
         //        throw new DataBaseNotFoundException(dataBaseName);
 
@@ -97,7 +97,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
             var dataBaseInfos = this.cremaHost.Dispatcher.Invoke(() =>
             {
-                return this.cremaHost.DataBases.Select(item => item.DataBaseInfo).ToArray();
+                return this.DataBases.Select(item => item.DataBaseInfo).ToArray();
             });
 
             var query = from domainInfo in domainInfos
@@ -160,9 +160,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private string[] GetDataBaseNames()
         {
-            return this.CremaHost.Dispatcher.Invoke(() =>
+            return this.DataBases.Dispatcher.Invoke(() =>
             {
-                var query = from item in this.CremaHost.DataBases
+                var query = from item in this.DataBases
                             select item.Name;
                 return query.ToArray();
             });
@@ -188,5 +188,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         private ICremaHost CremaHost => this.cremaHost;
+
+        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
     }
 }

@@ -100,8 +100,8 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task<CremaDataType> CreateSourceAsync(Authentication authentication)
         {
+            var dataSet = await this.category.ReadDataForNewTemplateAsync(authentication);
             var typeName = NameUtility.GenerateNewName(nameof(Type), this.Types.Select((Type item) => item.Name).ToArray());
-            var dataSet = await Task.Run(() => CremaDataSet.Create(new SignatureDateProvider(authentication.ID)));
             var dataType = dataSet.Types.Add();
             dataType.TypeName = typeName;
             dataType.CategoryPath = this.category.Path;

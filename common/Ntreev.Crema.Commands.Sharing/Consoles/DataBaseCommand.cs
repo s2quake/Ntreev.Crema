@@ -40,16 +40,12 @@ namespace Ntreev.Crema.Commands.Consoles
         private const string dataBaseNameParameter = "dataBaseName";
 
         private readonly ICremaHost cremaHost;
-        private IDataBaseCollection dataBases;
 
         [ImportingConstructor]
         public DataBaseCommand(ICremaHost cremaHost)
             : base("database")
         {
             this.cremaHost = cremaHost;
-            this.dataBases = cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
-            this.cremaHost.Opened += (s, e) => this.dataBases = this.cremaHost.DataBases;
-            this.cremaHost.Closed += (s, e) => this.dataBases = null;
         }
 
         public override string[] GetCompletions(CommandMethodDescriptor methodDescriptor, CommandMemberDescriptor memberDescriptor, string find)
@@ -62,7 +58,7 @@ namespace Ntreev.Crema.Commands.Consoles
         public Task CreateAsync(string dataBaseName)
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            return this.dataBases.AddNewDataBaseAsync(authentication, dataBaseName, MessageProperties.Message);
+            return this.DataBases.AddNewDataBaseAsync(authentication, dataBaseName, MessageProperties.Message);
         }
 
         [CommandMethod]
@@ -131,9 +127,9 @@ namespace Ntreev.Crema.Commands.Consoles
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         public void List()
         {
-            var items = this.dataBases.Dispatcher.Invoke(() =>
+            var items = this.DataBases.Dispatcher.Invoke(() =>
             {
-                var query = from item in this.dataBases
+                var query = from item in this.DataBases
                             where StringUtility.GlobMany(item.Name, FilterProperties.FilterExpression)
                             select new ItemObject(item.Name, item.IsLoaded);
                 return query.ToArray();
@@ -199,9 +195,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private string[] GetDataBaseNames()
         {
-            return this.dataBases.Dispatcher.Invoke(() =>
+            return this.DataBases.Dispatcher.Invoke(() =>
             {
-                var query = from item in this.dataBases
+                var query = from item in this.DataBases
                             select item.Name;
                 return query.ToArray();
             });
@@ -209,16 +205,18 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private IDataBase GetDataBase(string dataBaseName)
         {
-            var dataBase = this.dataBases.Dispatcher.Invoke(GetDataBase);
+            var dataBase = this.DataBases.Dispatcher.Invoke(GetDataBase);
             if (dataBase == null)
                 throw new DataBaseNotFoundException(dataBaseName);
             return dataBase;
 
             IDataBase GetDataBase()
             {
-                return this.dataBases[dataBaseName];
+                return this.DataBases[dataBaseName];
             }
         }
+
+        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
 
         #region classes
 

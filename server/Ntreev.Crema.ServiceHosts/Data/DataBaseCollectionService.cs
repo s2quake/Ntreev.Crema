@@ -70,12 +70,9 @@ namespace Ntreev.Crema.ServiceHosts.Data
                     this.OwnerID = this.authentication.ID;
                     this.userContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
                 });
-                await this.cremaHost.Dispatcher.InvokeAsync(() =>
-                {
-                    this.AttachEventHandlers();
-                });
+                await this.AttachEventHandlersAsync();
                 this.logService.Debug($"[{this.OwnerID}] {nameof(DataBaseCollectionService)} {nameof(SubscribeAsync)}");
-                result.Value = await this.cremaHost.DataBases.GetMetaDataAsync(this.authentication);
+                result.Value = await this.DataBases.GetMetaDataAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -90,10 +87,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var result = new ResultBase();
             try
             {
-                await this.cremaHost.Dispatcher.InvokeAsync(() =>
-                {
-                    this.DetachEventHandlers();
-                });
+                await this.DetachEventHandlersAsync();
                 await this.userContext.Dispatcher.InvokeAsync(() =>
                 {
                     this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
@@ -266,7 +260,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var result = new ResultBase<DataBaseInfo>();
             try
             {
-                var dataBase = await this.cremaHost.DataBases.AddNewDataBaseAsync(this.authentication, dataBaseName, comment);
+                var dataBase = await this.DataBases.AddNewDataBaseAsync(this.authentication, dataBaseName, comment);
                 result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -419,28 +413,25 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return true;
         }
 
-        protected override void OnDisposed(EventArgs e)
+        protected override async void OnDisposed(EventArgs e)
         {
             base.OnDisposed(e);
-            this.cremaHost.Dispatcher.Invoke(() =>
+            if (this.authentication != null)
             {
-                if (this.authentication != null)
-                {
-                    this.DetachEventHandlers();
-                }
-            });
-            this.userContext.Dispatcher.Invoke(() =>
+                await this.DetachEventHandlersAsync();
+            }
+            await this.userContext.Dispatcher.InvokeAsync(() =>
             {
                 this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                if (this.authentication != null)
-                {
-                    if (this.authentication.RemoveRef(this) == 0)
-                    {
-                        this.userContext.LogoutAsync(this.authentication).Wait();
-                    }
-                    this.authentication = null;
-                }
             });
+            if (this.authentication != null)
+            {
+                if (this.authentication.RemoveRef(this) == 0)
+                {
+                    this.userContext.LogoutAsync(this.authentication).Wait();
+                }
+                this.authentication = null;
+            }
         }
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
@@ -615,44 +606,46 @@ namespace Ntreev.Crema.ServiceHosts.Data
             this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnDataBasesLockChanged(signatureDate, changeType, values, comments));
         }
 
-        private void AttachEventHandlers()
+        private async Task AttachEventHandlersAsync()
         {
-            this.cremaHost.Dispatcher.VerifyAccess();
-
-            this.cremaHost.DataBases.ItemsCreated += DataBases_ItemsCreated;
-            this.cremaHost.DataBases.ItemsRenamed += DataBases_ItemsRenamed;
-            this.cremaHost.DataBases.ItemsDeleted += DataBases_ItemsDeleted;
-            this.cremaHost.DataBases.ItemsLoaded += DataBases_ItemsLoaded;
-            this.cremaHost.DataBases.ItemsUnloaded += DataBases_ItemsUnloaded;
-            this.cremaHost.DataBases.ItemsResetting += DataBases_ItemsResetting;
-            this.cremaHost.DataBases.ItemsReset += DataBases_ItemsReset;
-            this.cremaHost.DataBases.ItemsAuthenticationEntered += DataBases_ItemsAuthenticationEntered;
-            this.cremaHost.DataBases.ItemsAuthenticationLeft += DataBases_ItemsAuthenticationLeft;
-            this.cremaHost.DataBases.ItemsInfoChanged += DataBases_ItemsInfoChanged;
-            this.cremaHost.DataBases.ItemsStateChanged += DataBases_ItemsStateChanged;
-            this.cremaHost.DataBases.ItemsAccessChanged += DataBases_ItemsAccessChanged;
-            this.cremaHost.DataBases.ItemsLockChanged += DataBases_ItemsLockChanged;
-            this.logService.Debug($"[{this.OwnerID}] {nameof(DataBaseCollectionService)} {nameof(AttachEventHandlers)}");
+            await this.DataBases.Dispatcher.InvokeAsync(() =>
+            {
+                this.DataBases.ItemsCreated += DataBases_ItemsCreated;
+                this.DataBases.ItemsRenamed += DataBases_ItemsRenamed;
+                this.DataBases.ItemsDeleted += DataBases_ItemsDeleted;
+                this.DataBases.ItemsLoaded += DataBases_ItemsLoaded;
+                this.DataBases.ItemsUnloaded += DataBases_ItemsUnloaded;
+                this.DataBases.ItemsResetting += DataBases_ItemsResetting;
+                this.DataBases.ItemsReset += DataBases_ItemsReset;
+                this.DataBases.ItemsAuthenticationEntered += DataBases_ItemsAuthenticationEntered;
+                this.DataBases.ItemsAuthenticationLeft += DataBases_ItemsAuthenticationLeft;
+                this.DataBases.ItemsInfoChanged += DataBases_ItemsInfoChanged;
+                this.DataBases.ItemsStateChanged += DataBases_ItemsStateChanged;
+                this.DataBases.ItemsAccessChanged += DataBases_ItemsAccessChanged;
+                this.DataBases.ItemsLockChanged += DataBases_ItemsLockChanged;
+            });
+            this.logService.Debug($"[{this.OwnerID}] {nameof(DataBaseCollectionService)} {nameof(AttachEventHandlersAsync)}");
         }
-        
-        private void DetachEventHandlers()
-        {
-            this.cremaHost.Dispatcher.VerifyAccess();
 
-            this.cremaHost.DataBases.ItemsCreated -= DataBases_ItemsCreated;
-            this.cremaHost.DataBases.ItemsRenamed -= DataBases_ItemsRenamed;
-            this.cremaHost.DataBases.ItemsDeleted -= DataBases_ItemsDeleted;
-            this.cremaHost.DataBases.ItemsLoaded -= DataBases_ItemsLoaded;
-            this.cremaHost.DataBases.ItemsUnloaded -= DataBases_ItemsUnloaded;
-            this.cremaHost.DataBases.ItemsResetting -= DataBases_ItemsResetting;
-            this.cremaHost.DataBases.ItemsReset -= DataBases_ItemsReset;
-            this.cremaHost.DataBases.ItemsAuthenticationEntered -= DataBases_ItemsAuthenticationEntered;
-            this.cremaHost.DataBases.ItemsAuthenticationLeft -= DataBases_ItemsAuthenticationLeft;
-            this.cremaHost.DataBases.ItemsInfoChanged -= DataBases_ItemsInfoChanged;
-            this.cremaHost.DataBases.ItemsStateChanged -= DataBases_ItemsStateChanged;
-            this.cremaHost.DataBases.ItemsAccessChanged -= DataBases_ItemsAccessChanged;
-            this.cremaHost.DataBases.ItemsLockChanged -= DataBases_ItemsLockChanged;
-            this.logService.Debug($"[{this.OwnerID}] {nameof(DataBaseCollectionService)} {nameof(DetachEventHandlers)}");
+        private async Task DetachEventHandlersAsync()
+        {
+            await this.DataBases.Dispatcher.InvokeAsync(() =>
+            {
+                this.DataBases.ItemsCreated -= DataBases_ItemsCreated;
+                this.DataBases.ItemsRenamed -= DataBases_ItemsRenamed;
+                this.DataBases.ItemsDeleted -= DataBases_ItemsDeleted;
+                this.DataBases.ItemsLoaded -= DataBases_ItemsLoaded;
+                this.DataBases.ItemsUnloaded -= DataBases_ItemsUnloaded;
+                this.DataBases.ItemsResetting -= DataBases_ItemsResetting;
+                this.DataBases.ItemsReset -= DataBases_ItemsReset;
+                this.DataBases.ItemsAuthenticationEntered -= DataBases_ItemsAuthenticationEntered;
+                this.DataBases.ItemsAuthenticationLeft -= DataBases_ItemsAuthenticationLeft;
+                this.DataBases.ItemsInfoChanged -= DataBases_ItemsInfoChanged;
+                this.DataBases.ItemsStateChanged -= DataBases_ItemsStateChanged;
+                this.DataBases.ItemsAccessChanged -= DataBases_ItemsAccessChanged;
+                this.DataBases.ItemsLockChanged -= DataBases_ItemsLockChanged;
+            });
+            this.logService.Debug($"[{this.OwnerID}] {nameof(DataBaseCollectionService)} {nameof(DetachEventHandlersAsync)}");
         }
 
         //private async Task<ResultBase> InvokeAsync(Action action)
@@ -687,26 +680,25 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private async Task<IDataBase> GetDataBaseAsync(string dataBaseName)
         {
-            var dataBase = await this.cremaHost.Dispatcher.InvokeAsync(() => this.cremaHost.DataBases[dataBaseName]);
+            var dataBase = await this.cremaHost.Dispatcher.InvokeAsync(() => this.DataBases[dataBaseName]);
             if (dataBase == null)
                 throw new DataBaseNotFoundException(dataBaseName);
             return dataBase;
         }
 
+        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
+
         #region ICremaServiceItem
 
-        void ICremaServiceItem.Abort(bool disconnect)
+        async void ICremaServiceItem.Abort(bool disconnect)
         {
-            this.cremaHost.Dispatcher.Invoke(() =>
-            {
-                this.DetachEventHandlers();
-            });
-            this.userContext.Dispatcher.Invoke(() =>
+            await this.DetachEventHandlersAsync();
+            await this.userContext.Dispatcher.InvokeAsync(() =>
             {
                 this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                this.authentication = null;
             });
-            CremaService.Dispatcher.Invoke(() =>
+            this.authentication = null;
+            await CremaService.Dispatcher.InvokeAsync(() =>
             {
                 if (disconnect == false)
                 {

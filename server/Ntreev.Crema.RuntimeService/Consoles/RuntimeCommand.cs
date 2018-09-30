@@ -45,9 +45,9 @@ namespace Ntreev.Crema.RuntimeService.Consoles
         [CommandMethod]
         public async Task ResetAsync(string dataBaseName)
         {
-            var dataBaseID = this.CremaHost.Dispatcher.Invoke(() =>
+            var dataBaseID = this.DataBases.Dispatcher.Invoke(() =>
             {
-                var dataBase = this.CremaHost.DataBases[dataBaseName];
+                var dataBase = this.DataBases[dataBaseName];
                 if (dataBase == null)
                     throw new Exception();
                 return dataBase.ID;
@@ -61,9 +61,9 @@ namespace Ntreev.Crema.RuntimeService.Consoles
         [CommandMethodStaticProperty(typeof(FormatProperties))]
         public void Info(string dataBaseName)
         {
-            var dataBaseID = this.CremaHost.Dispatcher.Invoke(() =>
+            var dataBaseID = this.DataBases.Dispatcher.Invoke(() =>
             {
-                var dataBase = this.CremaHost.DataBases[dataBaseName];
+                var dataBase = this.DataBases[dataBaseName];
                 if (dataBase == null)
                     throw new Exception();
                 return dataBase.ID;
@@ -77,5 +77,7 @@ namespace Ntreev.Crema.RuntimeService.Consoles
         private RuntimeService RuntimeService => this.runtimeService.Value;
 
         private ICremaHost CremaHost => this.cremaHost.Value;
+
+        private IDataBaseCollection DataBases => this.CremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
     }
 }

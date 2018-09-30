@@ -53,32 +53,44 @@ namespace Ntreev.Crema.Services.Data
         private ItemsEventHandler<IDataBase> itemsAccessChanged;
         private ItemsEventHandler<IDataBase> itemsLockChanged;
 
-        public DataBaseCollection(CremaHost cremaHost, string address, ServiceInfo serviceInfo)
+        public DataBaseCollection(CremaHost cremaHost)
         {
             this.CremaHost = cremaHost;
             this.userContext = cremaHost.UserContext;
-
+            this.Dispatcher = new CremaDispatcher(this);
             this.serviceDispatcher = new CremaDispatcher(this);
-            var metaData = this.serviceDispatcher.Invoke(() =>
-            {
-                this.service = DataBaseCollectionServiceFactory.CreateServiceClient(address, serviceInfo, this);
-                this.service.Open();
-                if (this.service is ICommunicationObject service)
-                {
-                    service.Faulted += Service_Faulted;
-                }
-                var result = this.service.Subscribe(cremaHost.AuthenticationToken);
-                result.Validate();
+        }
+
+        public async Task InitializeAsync(string address, Guid authenticationToken, ServiceInfo serviceInfo)
+        {
+            await this.serviceDispatcher.InvokeAsync(() =>
+             {
+                 this.service = DataBaseCollectionServiceFactory.CreateServiceClient(address, serviceInfo, this);
+                 this.service.Open();
+                 if (this.service is ICommunicationObject service)
+                 {
+                     service.Faulted += Service_Faulted;
+
+                 }
+             });
+                 var result = await this.service.SubscribeAsync(authenticationToken);
+                 result.Validate();
+            var metaData = result.Value;
 #if !DEBUG
                 this.timer = new Timer(30000);
                 this.timer.Elapsed += Timer_Elapsed;
                 this.timer.Start();
 #endif
-                return result.Value;
-            });
+            //return result.Value;
+            // });
 
-            this.Initialize(metaData);
+            await this.InitializeAsync(metaData);
             this.CremaHost.AddService(this);
+        }
+
+        public async Task DisposeAsync()
+        {
+            this.Dispatcher.Dispose();
         }
 
         public LockInfo InvokeDataBaseLock(Authentication authentication, DataBase dataBase, string comment)
@@ -468,38 +480,17 @@ namespace Ntreev.Crema.Services.Data
             return this.service.Unload(dataBase.Name);
         }
 
-        public new DataBase this[string dataBaseName]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base[dataBaseName];
-            }
-        }
+        public new DataBase this[string dataBaseName] => base[dataBaseName];
 
-        public DataBase this[Guid dataBaseID]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.FirstOrDefault<DataBase>(item => item.ID == dataBaseID);
-            }
-        }
+        public DataBase this[Guid dataBaseID] => this.FirstOrDefault<DataBase>(item => item.ID == dataBaseID);
 
-        public CremaDispatcher Dispatcher => this.CremaHost.Dispatcher;
+        public CremaDispatcher Dispatcher { get; }
 
         public CremaHost CremaHost { get; }
 
         public IDataBaseCollectionService Service => this.service;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public new int Count => base.Count;
 
         public event ItemsCreatedEventHandler<IDataBase> ItemsCreated
         {
@@ -748,14 +739,17 @@ namespace Ntreev.Crema.Services.Data
             this.itemsLockChanged?.Invoke(this, e);
         }
 
-        private void Initialize(DataBaseCollectionMetaData metaData)
+        private Task InitializeAsync(DataBaseCollectionMetaData metaData)
         {
-            for (var i = 0; i < metaData.DataBases.Length; i++)
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                var dataBaseInfo = metaData.DataBases[i];
-                var dataBase = new DataBase(CremaHost, dataBaseInfo);
-                this.AddBase(dataBase.Name, dataBase);
-            }
+                for (var i = 0; i < metaData.DataBases.Length; i++)
+                {
+                    var dataBaseInfo = metaData.DataBases[i];
+                    var dataBase = new DataBase(CremaHost, dataBaseInfo);
+                    this.AddBase(dataBase.Name, dataBase);
+                }
+            });
         }
 
         private async void InvokeAsync(Action action, string callbackName)

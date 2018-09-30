@@ -41,22 +41,28 @@ namespace Ntreev.Crema.Services.Domains
     class DomainContext : ItemContext<Domain, DomainCategory, DomainCollection, DomainCategoryCollection, DomainContext>,
         IDomainContext, IServiceProvider
     {
-        private readonly UserContext userContext;
         private ItemsCreatedEventHandler<IDomainItem> itemsCreated;
         private ItemsRenamedEventHandler<IDomainItem> itemsRenamed;
         private ItemsMovedEventHandler<IDomainItem> itemsMoved;
         private ItemsDeletedEventHandler<IDomainItem> itemsDeleted;
 
-        public DomainContext(CremaHost cremaHost, UserContext userContext)
+        public DomainContext(CremaHost cremaHost)
         {
             this.CremaHost = cremaHost;
             this.CremaHost.Debug(Resources.Message_DomainContextInitialize);
-            this.userContext = userContext;
+            this.Dispatcher = new CremaDispatcher(this);
             this.BasePath = cremaHost.GetPath(CremaPath.Domains);
             this.CremaHost.Opened += CremaHost_Opened;
             this.CremaHost.Debug(Resources.Message_DomainContextIsCreated);
 
-            foreach (var item in this.CremaHost.DataBases)
+
+        }
+
+        public async Task InitializeAsync()
+        {
+            var dataBases = await this.CremaHost.DataBases.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases.ToArray<DataBase>());
+
+            foreach (var item in dataBases)
             {
                 var categoryName = CategoryName.Create(item.Name);
                 var category = this.Categories.AddNew(categoryName);
@@ -124,7 +130,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public string BasePath { get; }
 
-        public CremaDispatcher Dispatcher => this.CremaHost.Dispatcher;
+        public CremaDispatcher Dispatcher { get; }
 
         public IObjectSerializer Serializer => this.CremaHost.Serializer;
 
@@ -275,6 +281,7 @@ namespace Ntreev.Crema.Services.Domains
                 await dispatcher.InvokeAsync(() => item.Dispose(this));
                 dispatcher.Dispose();
             }
+            this.Dispatcher.Dispose();
         }
 
         protected virtual void OnItemsCreated(ItemsCreatedEventArgs<IDomainItem> e)
@@ -297,11 +304,14 @@ namespace Ntreev.Crema.Services.Domains
             this.itemsDeleted?.Invoke(this, e);
         }
 
-        private void CremaHost_Opened(object sender, EventArgs e)
+        private async void CremaHost_Opened(object sender, EventArgs e)
         {
-            this.CremaHost.DataBases.ItemsCreated += DataBases_ItemsCreated;
-            this.CremaHost.DataBases.ItemsRenamed += DataBases_ItemsRenamed;
-            this.CremaHost.DataBases.ItemsDeleted += DataBases_ItemDeleted;
+            await this.CremaHost.DataBases.Dispatcher.InvokeAsync(() =>
+            {
+                this.CremaHost.DataBases.ItemsCreated += DataBases_ItemsCreated;
+                this.CremaHost.DataBases.ItemsRenamed += DataBases_ItemsRenamed;
+                this.CremaHost.DataBases.ItemsDeleted += DataBases_ItemDeleted;
+            });
         }
 
         private void DataBases_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)

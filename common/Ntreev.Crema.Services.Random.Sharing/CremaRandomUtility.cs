@@ -618,13 +618,13 @@ namespace Ntreev.Crema.Services.Random
             });
         }
 
-        public static IDataBase RandomDataBase(this ICremaHost cremaHost)
-        {
-            var dataBase = cremaHost.DataBases.Random();
-            //if (dataBase.IsLoaded == false)
-            //    dataBase.Load();
-            return dataBase;
-        }
+        //public static IDataBase RandomDataBase(this ICremaHost cremaHost)
+        //{
+        //    var dataBase = cremaHost.DataBases.Random();
+        //    //if (dataBase.IsLoaded == false)
+        //    //    dataBase.Load();
+        //    return dataBase;
+        //}
 
         public static TagInfo RandomTags()
         {
