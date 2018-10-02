@@ -28,19 +28,19 @@ namespace Ntreev.Crema.Services.Data
 {
     class TableRow : DomainBasedRow, ITableRow
     {
-        public TableRow(TableContentBase content, DataRow row)
+        public TableRow(TableContent content, DataRow row)
             : base(content.Domain, row)
         {
             this.Content = content;
         }
 
-        public TableRow(TableContentBase content, DataTable table)
+        public TableRow(TableContent content, DataTable table)
             : base(content.Domain, table)
         {
             this.Content = content;
         }
 
-        public TableRow(TableContentBase content, DataTable table, string parentID)
+        public TableRow(TableContent content, DataTable table, string parentID)
             : base(content.Domain, table, parentID)
         {
             this.Content = content;
@@ -67,7 +67,7 @@ namespace Ntreev.Crema.Services.Data
 
         public bool IsEnabled => this.GetField<bool>(CremaSchema.Enable);
 
-        public TableContentBase Content { get; }
+        public TableContent Content { get; }
 
         public override DataBase DataBase => this.Content.DataBase;
 

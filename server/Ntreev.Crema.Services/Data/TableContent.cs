@@ -29,10 +29,14 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
-    partial class TableContent : TableContentBase, ITableContent
+    partial class TableContent : ITableContent
     {
         private Domain domain;
         private CremaDataTable dataTable;
+        private DataTable internalTable;
+
+        //private readonly Dictionary<DataRow, TableRow> rows = new Dictionary<DataRow, TableRow>();
+        private readonly HashSet<DataRow> rowsToAdd = new HashSet<DataRow>();
 
         private EventHandler editBegun;
         private EventHandler editEnded;
@@ -49,38 +53,70 @@ namespace Ntreev.Crema.Services.Data
             return this.Table.ToString();
         }
 
+        protected Task AddAsync(TableRow row)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                this.dataTable.ExtendedProperties[row.Row] = row;
+                this.rowsToAdd.Remove(row.Row);
+            });
+        }
+
+        protected void Clear()
+        {
+            //this.rows.Clear();
+        }
+
+        public Task<TableRow> FindAsync(Authentication authentication, params object[] keys)
+        {
+            return this.Domain.Dispatcher.InvokeAsync(() =>
+            {
+                var row = this.internalTable.Rows.Find(keys);
+                if (row == null)
+                    return null;
+                return this.dataTable.ExtendedProperties[row] as TableRow;
+            });
+        }
+
+        public Task<TableRow[]> SelectAsync(Authentication authentication, string filterExpression)
+        {
+            return this.Domain.Dispatcher.InvokeAsync(() =>
+            {
+                var rows = this.internalTable.Select(filterExpression);
+                var rowList = new List<TableRow>(rows.Length);
+                foreach (var item in rows)
+                {
+                    rowList.Add(this.dataTable.ExtendedProperties[item] as TableRow);
+                }
+                return rowList.ToArray();
+            });
+        }
+
         public async Task BeginEditAsync(Authentication authentication)
         {
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync), this.Table);
                     this.ValidateBeginEdit(authentication);
-                    var tables = this.Table.GetRelations().ToArray();
-                    foreach (var item in tables)
-                    {
-                        item.Content.ServiceState = ServiceState.Opening;
-                    }
+                    this.domainHost = new TableContentDomainHost(this.Container, this.Table.GetRelations().ToArray());
+                    this.domainHost.SetServiceState(ServiceState.Opening);
+                });
+                try
+                {
+                    await this.domainHost.BeginContentAsync(authentication);
+                }
+                catch
+                {
+                    await this.Dispatcher.InvokeAsync(() => this.domainHost.SetServiceState(ServiceState.None));
+                    this.domainHost = null;
+                    throw;
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication);
-                    try
-                    {
-                        var dataSet = await this.Table.ReadDataForContentAsync(authentication);
-                        var itemPath = string.Join("|", tables.Select(item => item.Path));
-                        this.domain = new TableContentDomain(authentication, dataSet, this.Table.DataBase, itemPath, this.GetType().Name);
-                        this.domain.Host = new TableContentDomainHost(this.Container, this.domain, itemPath);
-                        await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
-                        await this.domainHost.BeginContentAsync(authentication);
-                    }
-                    catch
-                    {
-                        foreach (var item in tables)
-                        {
-                            item.Content.ServiceState = ServiceState.None;
-                        }
-                        throw;
-                    }
                     this.domainHost.SetServiceState(ServiceState.Opened);
                     this.domainHost.InvokeEditBegunEvent(EventArgs.Empty);
                 });
@@ -227,13 +263,13 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await this.Dispatcher.InvokeAsync(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    if (this.domain == null)
-                        throw new InvalidOperationException(Resources.Exception_TableIsNotBeingEdited);
-                    var view = this.dataTable.DefaultView;
-                    return new TableRow(this, view.Table, relationID);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
                 });
+                var row = await this.domain.Dispatcher.InvokeAsync(() => new TableRow(this, this.dataTable.DefaultView.Table, relationID));
+                await this.Dispatcher.InvokeAsync(() => this.rowsToAdd.Add(row.Row));
+                return row;
             }
             catch (Exception e)
             {
@@ -247,13 +283,12 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    if (this.domain == null)
-                        throw new InvalidOperationException(Resources.Exception_TableIsNotBeingEdited);
-                    await row.EndNewAsync(authentication);
-                    this.Add(row);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(EndNewAsync));
                 });
+                await row.EndNewAsync(authentication);
+                await this.AddAsync(row);
             }
             catch (Exception e)
             {
@@ -385,21 +420,35 @@ namespace Ntreev.Crema.Services.Data
                 throw new InvalidOperationException();
         }
 
-        public override Domain Domain => this.domain;
+        public Domain Domain => this.domain;
 
         public IPermission Permission => this.Table;
 
         public Table Table { get; }
 
-        public override CremaHost CremaHost => this.Table.CremaHost;
+        public CremaHost CremaHost => this.Table.CremaHost;
 
-        public override DataBase DataBase => this.Table.DataBase;
+        public DataBase DataBase => this.Table.DataBase;
 
-        public override IDispatcherObject DispatcherObject => this.Table;
+        public IDispatcherObject DispatcherObject => this.Table;
+
+        public CremaDispatcher Dispatcher => this.DispatcherObject.Dispatcher;
 
         public int Count => this.dataTable.Rows.Count;
 
-        public override CremaDataTable DataTable => this.dataTable;
+        public CremaDataTable DataTable
+        {
+            get => this.dataTable;
+            set
+            {
+                this.dataTable = value;
+                this.internalTable = this.dataTable.DefaultView.Table;
+                foreach (DataRow item in this.internalTable.Rows)
+                {
+                    this.dataTable.ExtendedProperties[item] = new TableRow(this, item);
+                }
+            }
+        }
 
         public DomainContext DomainContext => this.Table.CremaHost.DomainContext;
 
@@ -553,12 +602,18 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITableRow> IEnumerable<ITableRow>.GetEnumerator()
         {
-            return this.GetEnumerator();
+            foreach (DataRow item in this.internalTable.Rows)
+            {
+                yield return this.dataTable.ExtendedProperties[item] as TableRow;
+            }
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            foreach (DataRow item in this.internalTable.Rows)
+            {
+                yield return this.dataTable.ExtendedProperties[item] as TableRow;
+            }
         }
 
         #endregion

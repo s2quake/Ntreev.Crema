@@ -141,6 +141,26 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
+        public async Task<CremaDataSet> ReadDataForContentAsync(Authentication authentication, Table[] tables)
+        {
+            var tuple = await this.Dispatcher.InvokeAsync(() =>
+            {
+                var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
+                var typePaths = types.Select(item => item.ItemPath).ToArray();
+                var tablePaths = tables.Select(item => item.ItemPath).ToArray();
+                var itemPaths = typePaths.Concat(tablePaths).ToArray();
+                var props = new CremaDataSetSerializerSettings(authentication, typePaths, tablePaths);
+                return (itemPaths, props);
+            });
+            return await this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                this.Repository.Lock(tuple.itemPaths);
+                var dataSet = this.Serializer.Deserialize(this.DataBase.BasePath, typeof(CremaDataSet), tuple.props) as CremaDataSet;
+                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = tuple.itemPaths;
+                return dataSet;
+            });
+        }
+
         public object GetService(System.Type serviceType)
         {
             return this.DataBase.GetService(serviceType);

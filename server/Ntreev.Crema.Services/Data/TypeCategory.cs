@@ -389,7 +389,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 var items = EnumerableUtility.FamilyTree(this as ITypeItem, item => item.Childs);
                 var types = items.Where(item => item is Type).Select(item => item as Type).ToArray();
-                var typeNames = types.SelectMany(item => item.Name).ToArray();
+                var typeNames = types.Select(item => item.Name).ToArray();
                 var tables = types.SelectMany(item => item.GetTables()).Distinct().ToArray();
                 var typesByTables = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
                 var allTypes = types.Concat(typesByTables).Distinct().ToArray();

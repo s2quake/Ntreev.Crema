@@ -49,14 +49,18 @@ namespace Ntreev.Crema.Data
         {
             if (column.Editor != null)
                 throw new ArgumentException();
-
+            var readOnly = column.ReadOnly;
             try
             {
                 column.Editor = editor;
+                if (readOnly == true)
+                    column.ReadOnly = false;
                 row.SetField(column, value);
             }
             finally
             {
+                if (readOnly == true)
+                    column.ReadOnly = true;
                 column.Editor = null;
             }
         }

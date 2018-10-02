@@ -29,7 +29,7 @@ namespace Ntreev.Crema.Services.Data
 {
     class NewTypeTemplate : TypeTemplateBase
     {
-        private TypeCategory category;
+        private readonly TypeCategory category;
         private Type type;
 
         public NewTypeTemplate(TypeCategory category)
@@ -89,13 +89,11 @@ namespace Ntreev.Crema.Services.Data
         {
             this.type = await this.Types.AddNewAsync(authentication, this.TypeSource);
             await base.OnEndEditAsync(authentication);
-            this.category = null;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
             await base.OnCancelEditAsync(authentication);
-            this.category = null;
         }
 
         protected override async Task<CremaDataType> CreateSourceAsync(Authentication authentication)

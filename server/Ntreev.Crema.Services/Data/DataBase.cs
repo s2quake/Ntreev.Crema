@@ -657,7 +657,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (itemType == nameof(TableContent))
                 {
-                    return new TableContent.TableContentDomainHost(this.tableContext.Tables, null, itemPath);
+                    return new TableContent.TableContentDomainHost(this.tableContext.Tables, itemPath);
                 }
                 else if (itemType == nameof(NewTableTemplate))
                 {

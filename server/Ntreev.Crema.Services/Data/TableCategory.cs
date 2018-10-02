@@ -395,7 +395,7 @@ namespace Ntreev.Crema.Services.Data
                 var itemPaths = items.Select(item => this.Context.GeneratePath(item.Path)).ToArray();
                 var baseTables = items.Where(item => item is Table).Select(item => item as Table).ToArray();
 
-                if(baseTables.Distinct().Count() != baseTables.Length)
+                if (baseTables.Distinct().Count() != baseTables.Length)
                 {
                     System.Diagnostics.Debugger.Launch();
                 }

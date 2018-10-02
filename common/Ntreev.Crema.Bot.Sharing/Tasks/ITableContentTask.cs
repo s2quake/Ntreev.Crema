@@ -50,15 +50,17 @@ namespace Ntreev.Crema.Bot.Tasks
 
                 }
                 var editableState = await content.Dispatcher.InvokeAsync(() => content.ServiceState);
-                if(editableState == ServiceState.None)
+                if (editableState == ServiceState.None)
                 {
                     context.Pop(content);
+                    context.Complete(context.Target);
+                    return;
                 }
                 else if (editableState != ServiceState.Opened)
                 {
                     return;
                 }
-                    
+
                 var domain = content.Domain;
                 if (domain != null && RandomUtility.Within(50) == true)
                 {

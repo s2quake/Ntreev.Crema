@@ -402,13 +402,10 @@ namespace Ntreev.Crema.Services.Domains
             base.Dispose();
         }
 
-        public Task DisposeAsync(Authentication authentication, bool isCanceled)
+        public void Dispose(Authentication authentication, bool isCanceled)
         {
-            return this.Dispatcher.InvokeAsync(() =>
-            {
-                base.Dispose();
-                this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
-            });
+            base.Dispose();
+            this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
         }
 
         public Task AttachAsync(params Authentication[] authentications)

@@ -43,8 +43,7 @@ namespace Ntreev.Crema.Bot.Tasks
             }
             else if (RandomUtility.Within(75) == true)
             {
-                var template = type.Dispatcher.Invoke(() => type.Template);
-                context.Push(template);
+                context.Push(type.Template);
             }
             await Task.Delay(0);
         }

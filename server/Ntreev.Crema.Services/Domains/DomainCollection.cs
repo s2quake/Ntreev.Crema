@@ -197,7 +197,7 @@ namespace Ntreev.Crema.Services.Domains
                 domain.Dispatcher = null;
                 domain.Logger?.Dispose(true);
                 domain.Logger = null;
-                await domain.DisposeAsync(authentication, isCanceled);
+                await dispatcher.InvokeAsync(() => domain.Dispose(authentication, isCanceled));
                 dispatcher.Dispose();
                 this.InvokeDomainDeletedEvent(authentication, domain, isCanceled);
             });

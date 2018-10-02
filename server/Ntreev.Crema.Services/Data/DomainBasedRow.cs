@@ -36,8 +36,6 @@ namespace Ntreev.Crema.Services.Data
         protected DomainBasedRow(Domain domain, DataRow row)
         {
             this.domain = domain ?? throw new ArgumentNullException(nameof(domain));
-            if (this.domain.Dispatcher != null)
-                throw new InvalidOperationException();
             this.Row = row;
             this.table = row.Table;
         }
