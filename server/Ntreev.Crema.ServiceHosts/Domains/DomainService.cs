@@ -33,7 +33,7 @@ using Ntreev.Library;
 namespace Ntreev.Crema.ServiceHosts.Domains
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    class DomainService : CremaServiceItemBase<IDomainEventCallback>, IDomainService, ICremaServiceItem
+    class DomainService : CremaServiceItemBase<IDomainEventCallback>, IDomainService
     {
         private readonly ICremaHost cremaHost;
         private readonly ILogService logService;
@@ -63,7 +63,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             try
             {
                 this.authentication = await this.userContext.AuthenticateAsync(authenticationToken);
-                this.authentication.AddRef(this);
+                await this.authentication.AddRefAsync(this);
                 this.OwnerID = this.authentication.ID;
                 await this.userContext.Dispatcher.InvokeAsync(() =>
                 {
@@ -101,7 +101,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
                 {
                     this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
                 });
-                this.authentication.RemoveRef(this);
+                await this.authentication.RemoveRefAsync(this);
                 this.authentication = null;
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
                 this.logService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(UnsubscribeAsync)}");
@@ -293,31 +293,31 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             if (this.authentication == null)
                 return false;
             this.logService.Debug($"[{this.authentication}] {nameof(DomainService)}.{nameof(IsAlive)} : {DateTime.Now}");
-            this.authentication.Ping();
+            this.authentication.PingAsync();
             return true;
         }
 
-        protected override async void OnDisposed(EventArgs e)
-        {
-            base.OnDisposed(e);
-            if (this.authentication != null)
-            {
-                await this.DetachEventHandlersAsync();
-            }
-            await this.userContext.Dispatcher.InvokeAsync(() =>
-            {
-                this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+        //protected override async void OnDisposed(EventArgs e)
+        //{
+        //    base.OnDisposed(e);
+        //    if (this.authentication != null)
+        //    {
+        //        await this.DetachEventHandlersAsync();
+        //    }
+        //    await this.userContext.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
                 
-            });
-            if (this.authentication != null)
-            {
-                if (this.authentication.RemoveRef(this) == 0)
-                {
-                    this.userContext.LogoutAsync(this.authentication).Wait();
-                }
-                this.authentication = null;
-            }
-        }
+        //    });
+        //    if (this.authentication != null)
+        //    {
+        //        if (await this.authentication.RemoveRefAsync(this) == 0)
+        //        {
+        //            this.userContext.LogoutAsync(this.authentication).Wait();
+        //        }
+        //        this.authentication = null;
+        //    }
+        //}
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
@@ -347,6 +347,10 @@ namespace Ntreev.Crema.ServiceHosts.Domains
                 this.domainContext.Domains.DomainRowChanged += DomainContext_DomainRowChanged;
                 this.domainContext.Domains.DomainRowRemoved += DomainContext_DomainRowRemoved;
                 this.domainContext.Domains.DomainPropertyChanged += DomainContext_DomainPropertyChanged;
+                
+            });
+            await this.dataBases.Dispatcher.InvokeAsync(() =>
+            {
                 this.dataBases.ItemsResetting += DataBases_ItemsResetting;
                 this.dataBases.ItemsReset += DataBases_ItemsReset;
             });
@@ -368,6 +372,9 @@ namespace Ntreev.Crema.ServiceHosts.Domains
                 this.domainContext.Domains.DomainRowChanged -= DomainContext_DomainRowChanged;
                 this.domainContext.Domains.DomainRowRemoved -= DomainContext_DomainRowRemoved;
                 this.domainContext.Domains.DomainPropertyChanged -= DomainContext_DomainPropertyChanged;
+            });
+            await this.dataBases.Dispatcher.InvokeAsync(() =>
+            {
                 this.dataBases.ItemsResetting -= DataBases_ItemsResetting;
                 this.dataBases.ItemsReset -= DataBases_ItemsReset;
             });
@@ -589,7 +596,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
 
         #region ICremaServiceItem
 
-        async void ICremaServiceItem.Abort(bool disconnect)
+        protected override async Task OnAbortAsync(bool disconnect)
         {
             await this.DetachEventHandlersAsync();
             await this.userContext.Dispatcher.InvokeAsync(() =>

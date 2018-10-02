@@ -61,12 +61,16 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.dataBase.VerifyAccess(authentication);
-                    var result = await this.service.CancelTransactionAsync(this.dataBase.Name);
-                    this.CremaHost.Sign(authentication, result);
-                    this.RollbackDomains(authentication);
+                    return this.dataBase.Name;
+                });
+                var result = await this.service.CancelTransactionAsync(this.dataBase.Name);
+                this.CremaHost.Sign(authentication, result);
+                await this.RollbackDomainsAsync(authentication);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.OnDisposed(EventArgs.Empty);
                 });
             }
@@ -77,18 +81,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        private void RollbackDomains(Authentication authentication)
+        private async Task RollbackDomainsAsync(Authentication authentication)
         {
-            if (this.dataBase.GetService(typeof(DomainContext)) is DomainContext domainContext)
-            {
-                this.dataBase.SetResetting(authentication);
-                var metaDatas = domainContext.Restore(this.dataBase);
-                this.dataBase.SetReset(authentication, metaDatas);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
+            await this.dataBase.SetResettingAsync(authentication);
+            var metaDatas = await this.DomainContext.RestoreAsync(authentication, this.dataBase);
+            this.dataBase.SetReset(authentication, metaDatas);
         }
 
         public void Dispose()
@@ -106,5 +103,7 @@ namespace Ntreev.Crema.Services.Data
         {
             this.Disposed?.Invoke(this, e);
         }
+
+        private DomainContext DomainContext => this.CremaHost.DomainContext;
     }
 }

@@ -35,7 +35,7 @@ using System.Text;
 namespace Ntreev.Crema.ServiceHosts.Data
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    class DataBaseService : CremaServiceItemBase<IDataBaseEventCallback>, IDataBaseService, ICremaServiceItem
+    class DataBaseService : CremaServiceItemBase<IDataBaseEventCallback>, IDataBaseService
     {
         private readonly ICremaHost cremaHost;
         private readonly ILogService logService;
@@ -69,7 +69,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 this.authentication = await this.userContext.AuthenticateAsync(authenticationToken);
-                this.authentication.AddRef(this);
+                await this.authentication.AddRefAsync(this);
                 this.OwnerID = this.authentication.ID;
                 await this.userContext.Dispatcher.InvokeAsync(() =>
                 {
@@ -107,7 +107,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 {
                     this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
                 });
-                this.authentication.RemoveRef(this);
+                await this.authentication.RemoveRefAsync(this);
                 this.authentication = null;
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
                 this.logService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(UnsubscribeAsync)} : {this.dataBaseName}");
@@ -940,31 +940,31 @@ namespace Ntreev.Crema.ServiceHosts.Data
             if (this.authentication == null)
                 return false;
             this.logService.Debug($"[{this.authentication}] {nameof(DataBaseService)}.{nameof(IsAlive)} : {DateTime.Now}");
-            this.authentication.Ping();
+            this.authentication.PingAsync();
             return true;
         }
 
-        protected override async void OnDisposed(EventArgs e)
-        {
-            base.OnDisposed(e);
-            if (this.authentication != null)
-            {
-                await this.DetachEventHandlersAsync();
-            }
-            this.dataBase = null;
-            this.userContext.Dispatcher.Invoke(() =>
-            {
-                this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-            });
-            if (this.authentication != null)
-            {
-                if (this.authentication.RemoveRef(this) == 0)
-                {
-                    this.userContext.LogoutAsync(this.authentication).Wait();
-                }
-                this.authentication = null;
-            }
-        }
+        //protected override async void OnDisposed(EventArgs e)
+        //{
+        //    base.OnDisposed(e);
+        //    if (this.authentication != null)
+        //    {
+        //        await this.DetachEventHandlersAsync();
+        //    }
+        //    this.dataBase = null;
+        //    this.userContext.Dispatcher.Invoke(() =>
+        //    {
+        //        this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+        //    });
+        //    if (this.authentication != null)
+        //    {
+        //        if (await this.authentication.RemoveRefAsync(this) == 0)
+        //        {
+        //            this.userContext.LogoutAsync(this.authentication).Wait();
+        //        }
+        //        this.authentication = null;
+        //    }
+        //}
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
@@ -1380,7 +1380,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         #region ICremaServiceItem
 
-        async void ICremaServiceItem.Abort(bool disconnect)
+        protected override async Task OnAbortAsync(bool disconnect)
         {
             await this.DetachEventHandlersAsync();
             this.dataBase = null;

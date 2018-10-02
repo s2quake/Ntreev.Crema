@@ -56,17 +56,21 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync), this.Table);
-                    var result = await this.Service.BeginTableContentEditAsync(this.table.Name);
+                    return this.table.Name;
+                });
+                var result = await this.Service.BeginTableContentEditAsync(name);
+                if (this.domain == null)
+                {
+                    this.domain = await this.DomainContext.CreateAsync(authentication, result.Value);
+                    this.domain.Host = new TableContentDomainHost(this.Container, this.domain, this.domain.DomainInfo.ItemPath);
+                    await this.domainHost.AttachDomainEventAsync();
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
-                    if (this.domain == null)
-                    {
-                        this.domain = this.DomainContext.Create(authentication, result.Value);
-                        this.domain.Host = new TableContentDomainHost(this.Container, this.domain, this.domain.DomainInfo.ItemPath);
-                        this.domain.Dispatcher.Invoke(this.domainHost.AttachDomainEvent);
-                    }
                     this.domainHost.BeginContent(authentication, this.domain);
                     this.domainHost.InvokeEditBegunEvent(EventArgs.Empty);
                 });
@@ -83,23 +87,24 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync), this.Table);
-                    var result = await this.Service.EndTableContentEditAsync(this.table.Name);
+                    return this.table.Name;
+                });
+                var result = await this.Service.EndTableContentEditAsync(name);
+                if (this.domain != null)
+                {
+                    await this.domainHost.DetachDomainEventAsync();
+                    await this.domain.DisposeAsync(authentication, false);
+                }
+                else
+                {
+                    await this.DomainContext.DeleteAsync(authentication, this.domain, false);
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
-                    if (this.domain != null)
-                    {
-                        this.domain.Dispatcher.Invoke(() =>
-                        {
-                            this.domainHost.DetachDomainEvent();
-                            this.domain.Dispose(authentication, false);
-                        });
-                    }
-                    else
-                    {
-                        this.DomainContext.Delete(authentication, this.table.DataBase.ID, this.table.Path, nameof(TableContent), false);
-                    }
                     this.domainHost.EndContent(authentication, result.Value);
                     this.domainHost.InvokeEditEndedEvent(EventArgs.Empty);
                     this.domainHost = null;
@@ -117,23 +122,24 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync), this.Table);
-                    var result = await this.Service.CancelTableContentEditAsync(this.table.Name);
+                    return this.table.Name;
+                });
+                var result = await this.Service.CancelTableContentEditAsync(name);
+                if (this.domain != null)
+                {
+                    await this.domainHost.DetachDomainEventAsync();
+                    await this.domain.DisposeAsync(authentication, true);
+                }
+                else
+                {
+                    await this.DomainContext.DeleteAsync(authentication, this.domain, true);
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
-                    if (this.domain != null)
-                    {
-                        this.domain.Dispatcher.Invoke(() =>
-                        {
-                            this.domainHost.DetachDomainEvent();
-                            this.domain.Dispose(authentication, true);
-                        });
-                    }
-                    else
-                    {
-                        this.DomainContext.Delete(authentication, this.table.DataBase.ID, this.table.Path, nameof(TableContent), true);
-                    }
                     this.domainHost.CancelContent(authentication);
                     this.domainHost.InvokeEditCanceledEvent(EventArgs.Empty);
                     this.domainHost = null;

@@ -25,6 +25,6 @@ namespace Ntreev.Crema.ServiceHosts
 {
     interface ICremaServiceItem
     {
-        void Abort(bool disconnect);
+        Task AbortAsync(bool disconnect);
     }
 }

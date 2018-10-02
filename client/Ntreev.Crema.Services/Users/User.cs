@@ -47,16 +47,21 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                 {
+                     this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, categoryPath);
+                     var items = EnumerableUtility.One(this).ToArray();
+                     var oldPaths = items.Select(item => item.Path).ToArray();
+                     var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
+                     var path = base.Path;
+                     return (items, oldPaths, oldCategoryPaths, path);
+                 });
+                var result = await this.Service.MoveUserItemAsync(this.Path, categoryPath);
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, categoryPath);
-                    var items = EnumerableUtility.One(this).ToArray();
-                    var oldPaths = items.Select(item => item.Path).ToArray();
-                    var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
-                    var result = await this.Service.MoveUserItemAsync(this.Path, categoryPath);
                     this.CremaHost.Sign(authentication, result);
                     base.Move(authentication, categoryPath);
-                    this.Container.InvokeUsersMovedEvent(authentication, items, oldPaths, oldCategoryPaths);
+                    this.Container.InvokeUsersMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths);
                 });
             }
             catch (Exception e)

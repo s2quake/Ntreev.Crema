@@ -44,7 +44,7 @@ namespace Ntreev.Crema.Services.Domains
         protected Domain(DomainInfo domainInfo, CremaDispatcher dispatcher)
         {
             this.Dispatcher = dispatcher;
-            this.Initialize(domainInfo); ;
+            this.Initialize(domainInfo);
             this.Name = domainInfo.DomainID.ToString();
             this.Users = new DomainUserCollection(this);
         }
@@ -369,13 +369,16 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public void Dispose(Authentication authentication, bool isCanceled)
+        public Task DisposeAsync(Authentication authentication, bool isCanceled)
         {
-            var container = this.Container;
-            this.Dispose();
-            this.Dispatcher = null;
-            this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
-            container.InvokeDomainDeletedEvent(authentication, this, isCanceled);
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                var container = this.Container;
+                this.Dispose();
+                this.Dispatcher = null;
+                this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
+                container.InvokeDomainDeletedEvent(authentication, this, isCanceled);
+            });
         }
 
         public void AttachUser()
@@ -389,15 +392,16 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public void DetachUser()
+        public Task DetachUserAsync()
         {
-            this.Dispatcher.VerifyAccess();
-
-            if (this.Users.ContainsKey(this.CremaHost.UserID) == true)
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                var domainUser = this.Users[this.CremaHost.UserID];
-                domainUser.IsOnline = false;
-            }
+                if (this.Users.ContainsKey(this.CremaHost.UserID) == true)
+                {
+                    var domainUser = this.Users[this.CremaHost.UserID];
+                    domainUser.IsOnline = false;
+                }
+            });
         }
 
         public object GetService(System.Type serviceType)

@@ -36,6 +36,8 @@ namespace Ntreev.Crema.Services.Data
         protected DomainBasedRow(Domain domain, DataRow row)
         {
             this.domain = domain ?? throw new ArgumentNullException(nameof(domain));
+            if (this.domain.Dispatcher != null)
+                throw new InvalidOperationException();
             this.Row = row;
             this.table = row.Table;
         }
@@ -43,6 +45,7 @@ namespace Ntreev.Crema.Services.Data
         protected DomainBasedRow(Domain domain, DataTable table)
         {
             this.domain = domain ?? throw new ArgumentNullException(nameof(domain));
+            this.domain.Dispatcher.VerifyAccess();
             this.table = table;
             this.Backup(this.table.NewRow());
         }
@@ -59,13 +62,15 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.domain.Dispatcher.InvokeAsync(() =>
                 {
                     if (this.Row == null)
                         throw new InvalidOperationException();
                     var keys = this.Row.GetKeys();
-                    await this.domain.RemoveRowAsync(authentication, this.table.TableName, keys);
+                    var name = this.table.TableName;
+                    return (keys, name);
                 });
+                await this.domain.RemoveRowAsync(authentication, tuple.name, tuple.keys);
             }
             catch (Exception e)
             {
@@ -79,13 +84,17 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.domain.Dispatcher.InvokeAsync(() =>
                 {
                     if (this.Row != null)
                         throw new InvalidOperationException();
-
                     var fields = this.fields.Values.ToArray();
-                    var keys = await this.domain.NewRowAsync(authentication, this.table.TableName, fields);
+                    var name = this.table.TableName;
+                    return (fields, name);
+                });
+                var keys = await this.domain.NewRowAsync(authentication, tuple.name, tuple.fields);
+                await this.domain.Dispatcher.InvokeAsync(() =>
+                {
                     this.Row = this.table.Rows.Find(keys);
                     this.fields = null;
                 });
@@ -121,13 +130,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.domain.Dispatcher.InvokeAsync(() =>
                 {
                     if (this.fields != null)
                     {
                         if (this.fields.ContainsKey(columnName) == false)
                             throw new KeyNotFoundException(columnName);
                         this.fields[columnName] = value;
+                        return (null, null);
                     }
                     else
                     {
@@ -135,9 +145,13 @@ namespace Ntreev.Crema.Services.Data
                         var fields = new object[this.table.Columns.Count];
                         var column = this.table.Columns[columnName];
                         fields[column.Ordinal] = value;
-                        await this.domain.SetRowAsync(authentication, this.table.TableName, keys, fields);
+                        return (keys, fields);
                     }
                 });
+                if (tuple.keys != null)
+                {
+                    await this.domain.SetRowAsync(authentication, this.table.TableName, tuple.keys, tuple.fields);
+                }
             }
             catch (Exception e)
             {

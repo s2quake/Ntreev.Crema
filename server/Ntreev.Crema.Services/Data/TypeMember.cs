@@ -38,20 +38,26 @@ namespace Ntreev.Crema.Services.Data
             this.template = template;
         }
 
-        public TypeMember(TypeTemplateBase template, DataTable table)
+        private TypeMember(TypeTemplateBase template, DataTable table)
             : base(template.Domain, table)
         {
             this.template = template;
-            var query = from DataRow item in table.Rows
-                        select item.Field<string>(CremaSchema.Name);
+        }
 
-            var newName = NameUtility.GenerateNewName(nameof(Type), query);
-            Initialize();
-
-            async void Initialize()
+        public static async Task<TypeMember> CreateAsync(Authentication authentication, TypeTemplateBase template, DataTable table)
+        {
+            var domain = template.Domain;
+            var tuple = await domain.Dispatcher.InvokeAsync(() =>
             {
-                await this.SetFieldAsync(null, CremaSchema.Name, newName);
-            }
+                var member = new TypeMember(template, table);
+                var query = from DataRow item in table.Rows
+                            select item.Field<string>(CremaSchema.Name);
+
+                var newName = NameUtility.GenerateNewName("Member", query);
+                return (member, newName);
+            });
+            await tuple.member.SetFieldAsync(authentication, CremaSchema.Name, tuple.newName);
+            return tuple.member;
         }
 
         public Task SetIndexAsync(Authentication authentication, int value)

@@ -60,13 +60,6 @@ namespace Ntreev.Crema.Services.Test.DispatcherTest
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void Contains()
-        {
-            users.Contains(string.Empty);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void Indexer()
         {
             Console.Write(users[string.Empty]);
@@ -174,13 +167,6 @@ namespace Ntreev.Crema.Services.Test.DispatcherTest
             {
                 Console.Write(item);
             }
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void CollectionChanged()
-        {
-            users.CollectionChanged += (s, e) => Assert.Inconclusive();
         }
 
         [TestMethod]

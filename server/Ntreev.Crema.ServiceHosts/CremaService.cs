@@ -176,6 +176,7 @@ namespace Ntreev.Crema.ServiceHosts
         {
             base.OnDisposed(e);
             dispatcher.Dispose();
+            AuthenticationUtility.Dispose();
         }
 
         private async void CremaHost_Opened(object sender, EventArgs e)

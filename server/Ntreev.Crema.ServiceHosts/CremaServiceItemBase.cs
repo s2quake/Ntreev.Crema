@@ -20,10 +20,11 @@ using Ntreev.Crema.Services;
 using Ntreev.Library;
 using System;
 using System.ServiceModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ServiceHosts
 {
-    public abstract class CremaServiceItemBase<T> : IDisposable
+    public abstract class CremaServiceItemBase<T> : ICremaServiceItem
     {
         private readonly ILogService logService;
         private readonly string sessionID;
@@ -39,7 +40,7 @@ namespace Ntreev.Crema.ServiceHosts
             this.Callback = OperationContext.Current.GetCallbackChannel<T>();
         }
 
-        public event EventHandler Disposed;
+        //public event EventHandler Disposed;
 
         protected void InvokeEvent(string userID, string exceptionUserID, Action action)
         {
@@ -61,10 +62,10 @@ namespace Ntreev.Crema.ServiceHosts
             });
         }
 
-        protected virtual void OnDisposed(EventArgs e)
-        {
-            this.Disposed?.Invoke(this, e);
-        }
+        //protected virtual void OnDisposed(EventArgs e)
+        //{
+        //    this.Disposed?.Invoke(this, e);
+        //}
 
         protected T Callback { get; private set; }
 
@@ -86,17 +87,33 @@ namespace Ntreev.Crema.ServiceHosts
             }
         }
 
+        protected abstract Task OnAbortAsync(bool disconnect);
+
+        async Task ICremaServiceItem.AbortAsync(bool disconnect)
+        {
+            if (this.host != null)
+            {
+                await this.OnAbortAsync(disconnect);
+                //this.host.Closing -= Host_Closing;
+                this.host = null;
+                this.Channel = null;
+                this.Callback = default(T);
+                //this.OnDisposed(EventArgs.Empty);
+                this.logService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(IDisposable.Dispose)}");
+            }
+        }
+
         #region IDisposable
 
-        void IDisposable.Dispose()
-        {
-            this.host.Closing -= Host_Closing;
-            this.host = null;
-            this.Channel = null;
-            this.Callback = default(T);
-            this.OnDisposed(EventArgs.Empty);
-            this.logService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(IDisposable.Dispose)}");
-        }
+        //void IDisposable.Dispose()
+        //{
+        //    this.host.Closing -= Host_Closing;
+        //    this.host = null;
+        //    this.Channel = null;
+        //    this.Callback = default(T);
+        //    this.OnDisposed(EventArgs.Empty);
+        //    this.logService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(IDisposable.Dispose)}");
+        //}
 
         #endregion
     }

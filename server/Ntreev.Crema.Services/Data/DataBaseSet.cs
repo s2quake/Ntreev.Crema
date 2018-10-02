@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Services.Data
         private readonly List<CremaDataTable> tables = new List<CremaDataTable>();
         private readonly List<string> itemPathList;
 
-        public DataBaseSet(DataBase dataBase, CremaDataSet dataSet, bool allowCreation)
+        private DataBaseSet(DataBase dataBase, CremaDataSet dataSet, bool allowCreation)
         {
             this.dataBase = dataBase ?? throw new ArgumentNullException(nameof(dataBase));
             this.dataSet = dataSet ?? throw new ArgumentNullException(nameof(dataSet));
@@ -101,7 +101,7 @@ namespace Ntreev.Crema.Services.Data
             foreach (var item in this.types)
             {
                 var typeInfo = (TypeInfo)item.ExtendedProperties[typeof(TypeInfo)];
-                if(typeInfo.Path != item.Path)
+                if (typeInfo.Path != item.Path)
                 {
                     int wer = 0;
                     System.Diagnostics.Debugger.Launch();
@@ -112,7 +112,7 @@ namespace Ntreev.Crema.Services.Data
                 this.ValidateTypeExists(item.Path);
                 var cc = item.CategoryPath;
                 item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
-                if(item.CategoryPath == cc)
+                if (item.CategoryPath == cc)
                 {
                     int qwer = 0;
                     System.Diagnostics.Debugger.Launch();
@@ -122,7 +122,7 @@ namespace Ntreev.Crema.Services.Data
                 sss.Remove(item.Name);
             }
 
-            if(typeNameList.Any() == true)
+            if (typeNameList.Any() == true)
             {
                 System.Diagnostics.Debugger.Launch();
             }

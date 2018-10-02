@@ -36,7 +36,7 @@ using Ntreev.Crema.ServiceHosts.Properties;
 namespace Ntreev.Crema.ServiceHosts.Users
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    class UserService : CremaServiceItemBase<IUserEventCallback>, IUserService, ICremaServiceItem
+    class UserService : CremaServiceItemBase<IUserEventCallback>, IUserService
     {
         private readonly ICremaHost cremaHost;
         private readonly CremaService cremaService;
@@ -72,10 +72,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
                     throw new ArgumentException(Resources.Exception_LowerVersion, nameof(version));
 
                 this.authentication = await this.userContext.LoginAsync(userID, ToSecureString(userID, password));
-                this.authentication.AddRef(this, (a) =>
-                {
-                    this.userContext.LogoutAsync(a).Wait();
-                });
+                await this.authentication.AddRefAsync(this, (a) => this.userContext.LogoutAsync(a));
 
                 this.OwnerID = this.authentication.ID;
                 await this.AttachEventHandlersAsync();
@@ -106,7 +103,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             try
             {
                 await this.DetachEventHandlersAsync();
-                this.authentication.RemoveRef(this);
+                await this.authentication.RemoveRefAsync(this);
                 await this.userContext.LogoutAsync(this.authentication);
                 this.authentication = null;
                 this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(UnsubscribeAsync)}");
@@ -335,23 +332,23 @@ namespace Ntreev.Crema.ServiceHosts.Users
             if (this.authentication == null)
                 return false;
             this.logService.Debug($"[{this.authentication}] {nameof(UserService)}.{nameof(IsAlive)} : {DateTime.Now}");
-            this.authentication.Ping();
+            this.authentication.PingAsync();
             return true;
         }
 
-        protected override async void OnDisposed(EventArgs e)
-        {
-            base.OnDisposed(e);
-            if (this.authentication != null)
-            {
-                await this.DetachEventHandlersAsync();
-                if (this.authentication.RemoveRef(this) == 0)
-                {
-                    this.userContext.LogoutAsync(this.authentication).Wait();
-                }
-                this.authentication = null;
-            }
-        }
+        //protected override async void OnDisposed(EventArgs e)
+        //{
+        //    base.OnDisposed(e);
+        //    if (this.authentication != null)
+        //    {
+        //        await this.DetachEventHandlersAsync();
+        //        if (await this.authentication.RemoveRefAsync(this) == 0)
+        //        {
+        //            this.userContext.LogoutAsync(this.authentication).Wait();
+        //        }
+        //        this.authentication = null;
+        //    }
+        //}
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
@@ -610,12 +607,15 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         #region ICremaServiceItem
 
-        async void ICremaServiceItem.Abort(bool disconnect)
+        protected override async Task OnAbortAsync(bool disconnect)
         {
             await this.DetachEventHandlersAsync();
+            if (this.authentication != null)
+            {
+                await this.userContext.LogoutAsync(this.authentication);
+            }
             this.authentication = null;
-
-            CremaService.Dispatcher.Invoke(() =>
+            await CremaService.Dispatcher.InvokeAsync(() =>
             {
                 if (disconnect == false)
                 {

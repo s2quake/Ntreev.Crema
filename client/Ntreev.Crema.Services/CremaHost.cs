@@ -103,36 +103,40 @@ namespace Ntreev.Crema.Services
             return null;
         }
 
-        public void AddService(ICremaService service)
+        public Task AddServiceAsync(ICremaService service)
         {
-            this.services.Add(service);
-            CremaLog.Debug($"{service.GetType().Name} Initialized.");
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                this.services.Add(service);
+                CremaLog.Debug($"{service.GetType().Name} Initialized.");
+            });
         }
 
-        public async void RemoveService(ICremaService service)
+        public async Task RemoveServiceAsync(ICremaService service)
         {
-            if (this.services.Contains(service) == false)
-                return;
-            this.services.Remove(service);
-            CremaLog.Debug($"{service.GetType().Name} Released.");
-            if (this.services.Any() == false)
+            var isAny = await this.Dispatcher.InvokeAsync(() =>
             {
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.InvokeClose(this.closeInfo);
-                });
+                if (this.services.Contains(service) == false)
+                    return false;
+                this.services.Remove(service);
+                CremaLog.Debug($"{service.GetType().Name} Released.");
+                return this.services.Any();
+            });
+            if (isAny == false)
+            {
+                await this.CloseAsync(closeInfo);
             }
         }
 
-        public void RemoveService(ICremaService service, CloseInfo closeInfo)
+        public Task RemoveServiceAsync(ICremaService service, CloseInfo closeInfo)
         {
             this.closeInfo = closeInfo;
-            this.RemoveService(service);
+            return this.RemoveServiceAsync(service);
         }
 
-        public void InvokeClose(CloseInfo closeInfo)
+        public Task InvokeCloseAsync(CloseInfo closeInfo)
         {
-            this.CloseAsync(closeInfo);
+            return this.CloseAsync(closeInfo);
         }
 
         public async Task<Guid> OpenAsync(string address, string userID, SecureString password)
@@ -166,7 +170,7 @@ namespace Ntreev.Crema.Services
                 {
                     this.Authority = this.UserContext.CurrentUser.Authority;
                     this.configs = new CremaConfiguration(this.ConfigPath, this.propertiesProviders);
-                    this.plugins = this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>;
+                    this.plugins = (this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>).ToArray();
                     foreach (var item in this.plugins)
                     {
                         var authentication = new Authentication(new AuthenticationProvider(this.UserContext.CurrentUser), item.ID);
@@ -182,7 +186,7 @@ namespace Ntreev.Crema.Services
             }
             catch (Exception e)
             {
-                this.UserContext?.Close(CloseInfo.Empty);
+                await this.UserContext?.CloseAsync(CloseInfo.Empty);
                 this.UserContext = null;
                 this.log?.Dispose();
                 this.log = null;
@@ -213,12 +217,8 @@ namespace Ntreev.Crema.Services
                     throw new ArgumentException(Resources.Exception_InvalidToken, nameof(token));
                 if (this.ServiceState != ServiceState.Opened)
                     throw new InvalidOperationException(Resources.Exception_NotConnected);
-
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CloseAsync(CloseInfo.Empty);
-                    this.token = Guid.Empty;
-                });
+                await this.CloseAsync(CloseInfo.Empty);
+                
             }
             catch (Exception e)
             {
@@ -269,7 +269,8 @@ namespace Ntreev.Crema.Services
 
             if (Environment.ExitCode != 0 && this.ServiceState == ServiceState.Opened)
             {
-                this.CloseAsync(CloseInfo.Empty);
+                var task = this.CloseAsync(CloseInfo.Empty);
+                task.Wait();
             }
 
             this.Dispatcher.Dispose(false);
@@ -419,37 +420,38 @@ namespace Ntreev.Crema.Services
 
         private async Task CloseAsync(CloseInfo closeInfo)
         {
-            this.ServiceState = ServiceState.Closing;
-            this.OnClosing(EventArgs.Empty);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.ServiceState = ServiceState.Closing;
+                this.OnClosing(EventArgs.Empty);
+            });
             foreach (var item in this.services.Reverse<ICremaService>())
             {
-                item.Close(closeInfo);
+                await item.CloseAsync(closeInfo);
             }
-            this.services.Clear();
-            await this.DataBases.DisposeAsync();
-            //await this.DomainContext.DisposeAsync();
-            //await this.UserContext.DisposeAsync();
-            this.DomainContext = null;
-            this.DataBases = null;
-            this.UserContext = null;
-            foreach (var item in this.plugins)
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                item.Release();
-            }
-            foreach (var item in this.authentications)
-            {
-                item.InvokeExpiredEvent(Authentication.SystemID);
-            }
-            this.Dispatcher.InvokeAsync(() =>
-            {
+                this.services.Clear();
+                this.DomainContext = null;
+                this.DataBases = null;
+                this.UserContext = null;
+                foreach (var item in this.plugins.Reverse())
+                {
+                    item.Release();
+                }
+                foreach (var item in this.authentications)
+                {
+                    item.InvokeExpiredEvent(Authentication.SystemID);
+                }
                 this.log?.Dispose();
                 this.log = null;
+                this.Address = null;
+                this.UserID = null;
+                this.ServiceState = ServiceState.Closed;
+                this.token = Guid.Empty;
+                this.OnClosed(new ClosedEventArgs(closeInfo.Reason, closeInfo.Message));
+                CremaLog.Debug("Crema closed.");
             });
-            this.Address = null;
-            this.UserID = null;
-            this.ServiceState = ServiceState.Closed;
-            this.OnClosed(new ClosedEventArgs(closeInfo.Reason, closeInfo.Message));
-            CremaLog.Debug("Crema closed.");
         }
 
         private static async Task<IReadOnlyDictionary<string, ServiceInfo>> GetServiceInfoAsync(string address)

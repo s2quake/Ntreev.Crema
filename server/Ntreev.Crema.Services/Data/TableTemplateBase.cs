@@ -35,7 +35,8 @@ namespace Ntreev.Crema.Services.Data
         private TableTemplateDomain domain;
         private DataTable table;
 
-        private readonly List<TableColumn> columns = new List<TableColumn>();
+        private readonly HashSet<DataRow> rowsToAdd = new HashSet<DataRow>();
+        private List<TableColumn> items;
 
         private EventHandler editBegun;
         private EventHandler editEnded;
@@ -49,11 +50,13 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await this.Dispatcher.InvokeAsync(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
-                    return new TableColumn(this, this.TemplateSource.View.Table);
                 });
+                var column = await TableColumn.CreateAsync(authentication, this, this.TemplateSource.View.Table);
+                await this.Dispatcher.InvokeAsync(() => this.rowsToAdd.Add(column.Row));
+                return column;
             }
             catch (Exception e)
             {
@@ -67,18 +70,15 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.table.RowChanged -= Table_RowChanged;
-                    try
-                    {
-                        await column.EndNewAsync(authentication);
-                        this.columns.Add(column);
-                    }
-                    finally
-                    {
-                        this.table.RowChanged += Table_RowChanged;
-                    }
+                    this.CremaHost.DebugMethod(authentication, this, nameof(EndNewAsync));
+                });
+                await column.EndNewAsync(authentication);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.items.Add(column);
+                    this.rowsToAdd.Remove(column.Row);
                 });
             }
             catch (Exception e)
@@ -93,20 +93,23 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync));
                     this.ValidateBeginEdit(authentication);
                     this.ServiceState = ServiceState.Opening;
-                    try
-                    {
-                        await this.OnBeginEditAsync(authentication);
-                    }
-                    catch
-                    {
-                        this.ServiceState = ServiceState.None;
-                        throw;
-                    }
+                });
+                try
+                {
+                    await this.OnBeginEditAsync(authentication);
+                }
+                catch
+                {
+                    await this.Dispatcher.InvokeAsync(() => this.ServiceState = ServiceState.None);
+                    throw;
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication);
                     this.ServiceState = ServiceState.Opened;
                     this.OnEditBegun(EventArgs.Empty);
@@ -124,20 +127,23 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync));
                     this.ValidateEndEdit(authentication);
                     this.ServiceState = ServiceState.Closing;
-                    try
-                    {
-                        await this.OnEndEditAsync(authentication);
-                    }
-                    catch
-                    {
-                        this.ServiceState = ServiceState.Opened;
-                        throw;
-                    }
+                });
+                try
+                {
+                    await this.OnEndEditAsync(authentication);
+                }
+                catch
+                {
+                    await this.Dispatcher.InvokeAsync(() => this.ServiceState = ServiceState.Opened);
+                    throw;
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication);
                     this.ServiceState = ServiceState.None;
                     this.OnEditEnded(EventArgs.Empty);
@@ -155,20 +161,23 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync));
                     this.ValidateCancelEdit(authentication);
                     this.ServiceState = ServiceState.Closing;
-                    try
-                    {
-                        await this.OnCancelEditAsync(authentication);
-                    }
-                    catch
-                    {
-                        this.ServiceState = ServiceState.Opened;
-                        throw;
-                    }
+                });
+                try
+                {
+                    await this.OnCancelEditAsync(authentication);
+                }
+                catch
+                {
+                    await this.Dispatcher.InvokeAsync(() => this.ServiceState = ServiceState.Opened);
+                    throw;
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication);
                     this.ServiceState = ServiceState.None;
                     this.OnEditCanceled(EventArgs.Empty);
@@ -198,7 +207,7 @@ namespace Ntreev.Crema.Services.Data
 
         public Task<bool> ContainsAsync(string columnName)
         {
-            return this.Dispatcher.InvokeAsync(() => this.columns.Any(item => item.Name == columnName));
+            return this.Dispatcher.InvokeAsync(() => this.items.Any(item => item.Name == columnName));
         }
 
         public bool IsNew { get; set; }
@@ -207,7 +216,7 @@ namespace Ntreev.Crema.Services.Data
 
         public abstract IPermission Permission { get; }
 
-        public int Count => this.columns.Count;
+        public int Count => this.items.Count;
 
         public abstract DomainContext DomainContext { get; }
 
@@ -229,7 +238,7 @@ namespace Ntreev.Crema.Services.Data
 
         public string Comment => this.TemplateSource.Comment;
 
-        public TableColumn this[string columnName] => this.columns.FirstOrDefault(item => item.Name == columnName);
+        public TableColumn this[string columnName] => this.items.FirstOrDefault(item => item.Name == columnName);
 
         public string[] SelectableTypes => this.TemplateSource.Types;
 
@@ -237,7 +246,7 @@ namespace Ntreev.Crema.Services.Data
         {
             get
             {
-                foreach (var item in this.columns)
+                foreach (var item in this.items)
                 {
                     if (item.IsNew == true)
                         continue;
@@ -337,24 +346,25 @@ namespace Ntreev.Crema.Services.Data
             };
 
             this.table = this.TemplateSource.View.Table;
+            this.items = new List<TableColumn>(this.table.Rows.Count);
             for (var i = 0; i < this.table.Rows.Count; i++)
             {
                 var item = this.table.Rows[i];
-                this.columns.Add(new TableColumn(this, item));
+                this.items.Add(new TableColumn(this, item));
             }
             this.table.RowDeleted += Table_RowDeleted;
             this.table.RowChanged += Table_RowChanged;
 
             await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
             await this.domain.AddUserAsync(authentication, DomainAccessType.ReadWrite);
-            await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
+            await this.AttachDomainEventAsync();
         }
 
         protected virtual async Task OnEndEditAsync(Authentication authentication)
         {
             if (this.domain != null)
             {
-                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                await this.DetachDomainEventAsync();
                 await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false);
                 this.domain = null;
             }
@@ -365,14 +375,15 @@ namespace Ntreev.Crema.Services.Data
             }
             this.IsModified = false;
             this.table = null;
-            this.columns.Clear();
+            this.items = null;
+            this.rowsToAdd.Clear();
         }
 
         protected virtual async Task OnCancelEditAsync(Authentication authentication)
         {
             if (this.domain != null)
             {
-                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                await this.DetachDomainEventAsync();
                 await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true);
                 this.domain = null;
             }
@@ -383,7 +394,8 @@ namespace Ntreev.Crema.Services.Data
             }
             this.IsModified = false;
             this.table = null;
-            this.columns.Clear();
+            this.items = null;
+            this.rowsToAdd.Clear();
         }
 
         protected virtual async Task OnRestoreAsync(Domain domain)
@@ -394,21 +406,22 @@ namespace Ntreev.Crema.Services.Data
             if (this.TemplateSource != null)
             {
                 this.table = this.TemplateSource.View.Table;
+                this.items = new List<TableColumn>(this.table.Rows.Count);
                 for (var i = 0; i < this.table.Rows.Count; i++)
                 {
                     var item = this.table.Rows[i];
-                    this.columns.Add(new TableColumn(this, item));
+                    this.items.Add(new TableColumn(this, item));
                 }
                 this.table.RowDeleted += Table_RowDeleted;
                 this.table.RowChanged += Table_RowChanged;
             }
             this.IsModified = this.domain.IsModified;
-            await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
+            await this.AttachDomainEventAsync();
         }
 
         protected virtual async Task OnDetachAsync()
         {
-            await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+            await this.DetachDomainEventAsync();
             this.domain = null;
         }
 
@@ -473,33 +486,42 @@ namespace Ntreev.Crema.Services.Data
 
         protected abstract Task<CremaTemplate> CreateSourceAsync(Authentication authentication);
 
-        protected virtual void OnDomainDeleted(Authentication authentication)
-        {
-            this.domain = null;
-            this.table.RowDeleted -= Table_RowDeleted;
-            this.table.RowChanged -= Table_RowChanged;
-            this.IsModified = false;
-            this.table = null;
-            this.columns.Clear();
-            this.OnEditCanceled(EventArgs.Empty);
-        }
+        //protected virtual void OnDomainDeleted(Authentication authentication)
+        //{
+        //    this.domain = null;
+        //    this.table.RowDeleted -= Table_RowDeleted;
+        //    this.table.RowChanged -= Table_RowChanged;
+        //    this.IsModified = false;
+        //    this.table = null;
+        //    this.columns.Clear();
+        //    this.OnEditCanceled(EventArgs.Empty);
+        //}
 
         protected void Sign(Authentication authentication)
         {
             authentication.Sign();
         }
 
-        private void Table_RowDeleted(object sender, DataRowChangeEventArgs e)
+        private async void Table_RowDeleted(object sender, DataRowChangeEventArgs e)
         {
-            var column = this.columns.FirstOrDefault(item => item.Row == e.Row);
-            this.columns.Remove(column);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                var column = this.items.FirstOrDefault(item => item.Row == e.Row);
+                this.items.Remove(column);
+            });
         }
 
-        private void Table_RowChanged(object sender, DataRowChangeEventArgs e)
+        private async void Table_RowChanged(object sender, DataRowChangeEventArgs e)
         {
             if (e.Action == DataRowAction.Add)
             {
-                this.Dispatcher.InvokeAsync(() => this.columns.Add(new TableColumn(this, e.Row)));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    if (this.rowsToAdd.Contains(e.Row) == false)
+                    {
+                        this.items.Add(new TableColumn(this, e.Row));
+                    }
+                });
             }
         }
 
@@ -542,22 +564,28 @@ namespace Ntreev.Crema.Services.Data
             await this.Dispatcher.InvokeAsync(() => this.OnChanged(e));
         }
 
-        private void AttachDomainEvent()
+        private Task AttachDomainEventAsync()
         {
-            this.domain.Deleted += Domain_Deleted;
-            this.domain.RowAdded += Domain_RowAdded;
-            this.domain.RowChanged += Domain_RowChanged;
-            this.domain.RowRemoved += Domain_RowRemoved;
-            this.domain.PropertyChanged += Domain_PropertyChanged;
+            return this.domain.Dispatcher.InvokeAsync(() =>
+            {
+                this.domain.Deleted += Domain_Deleted;
+                this.domain.RowAdded += Domain_RowAdded;
+                this.domain.RowChanged += Domain_RowChanged;
+                this.domain.RowRemoved += Domain_RowRemoved;
+                this.domain.PropertyChanged += Domain_PropertyChanged;
+            });
         }
 
-        private void DetachDomainEvent()
+        private Task DetachDomainEventAsync()
         {
-            this.domain.Deleted -= Domain_Deleted;
-            this.domain.RowAdded -= Domain_RowAdded;
-            this.domain.RowChanged -= Domain_RowChanged;
-            this.domain.RowRemoved -= Domain_RowRemoved;
-            this.domain.PropertyChanged -= Domain_PropertyChanged;
+            return this.domain.Dispatcher.InvokeAsync(() =>
+            {
+                this.domain.Deleted -= Domain_Deleted;
+                this.domain.RowAdded -= Domain_RowAdded;
+                this.domain.RowChanged -= Domain_RowChanged;
+                this.domain.RowRemoved -= Domain_RowRemoved;
+                this.domain.PropertyChanged -= Domain_PropertyChanged;
+            });
         }
 
         #region ITableTemplate
@@ -613,12 +641,12 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITableColumn> IEnumerable<ITableColumn>.GetEnumerator()
         {
-            return this.columns.GetEnumerator();
+            return this.items.GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return this.columns.GetEnumerator();
+            return this.items.GetEnumerator();
         }
 
         #endregion

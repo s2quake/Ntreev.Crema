@@ -35,7 +35,8 @@ namespace Ntreev.Crema.Services.Data
         private TypeDomain domain;
         private DataTable table;
 
-        private readonly List<TypeMember> members = new List<TypeMember>();
+        private readonly HashSet<DataRow> rowsToAdd = new HashSet<DataRow>();
+        private List<TypeMember> items;
 
         private EventHandler editBegun;
         private EventHandler editEnded;
@@ -49,11 +50,13 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await this.Dispatcher.InvokeAsync(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
-                    return new TypeMember(this, this.TypeSource.View.Table);
                 });
+                var member = await TypeMember.CreateAsync(authentication, this, this.TypeSource.View.Table);
+                await this.Dispatcher.InvokeAsync(() => this.rowsToAdd.Add(member.Row));
+                return member;
             }
             catch (Exception e)
             {
@@ -67,18 +70,15 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.table.RowChanged -= Table_RowChanged;
-                    try
-                    {
-                        await member.EndNewAsync(authentication);
-                        this.members.Add(member);
-                    }
-                    finally
-                    {
-                        this.table.RowChanged += Table_RowChanged;
-                    }
+                    this.CremaHost.DebugMethod(authentication, this, nameof(EndNewAsync));
+                });
+                await member.EndNewAsync(authentication);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.items.Add(member);
+                    this.rowsToAdd.Remove(member.Row);
                 });
             }
             catch (Exception e)
@@ -93,21 +93,24 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync));
                     this.ValidateBeginEdit(authentication);
                     this.ServiceState = ServiceState.Opening;
+                });
+                try
+                {
+                    await this.OnBeginEditAsync(authentication);
+                }
+                catch
+                {
+                    await this.Dispatcher.InvokeAsync(() => this.ServiceState = ServiceState.None);
+                    throw;
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication);
-                    try
-                    {
-                        await this.OnBeginEditAsync(authentication);
-                    }
-                    catch
-                    {
-                        this.ServiceState = ServiceState.None;
-                        throw;
-                    }
                     this.ServiceState = ServiceState.Opened;
                     this.OnEditBegun(EventArgs.Empty);
                 });
@@ -124,21 +127,24 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync));
                     this.ValidateEndEdit(authentication);
-                    this.CremaHost.Sign(authentication);
                     this.ServiceState = ServiceState.Closing;
-                    try
-                    {
-                        await this.OnEndEditAsync(authentication);
-                    }
-                    catch
-                    {
-                        this.ServiceState = ServiceState.Opened;
-                        throw;
-                    }
+                });
+                try
+                {
+                    await this.OnEndEditAsync(authentication);
+                }
+                catch
+                {
+                    await this.Dispatcher.InvokeAsync(() => this.ServiceState = ServiceState.Opened);
+                    throw;
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication);
                     this.ServiceState = ServiceState.Closed;
                     this.OnEditEnded(EventArgs.Empty);
                 });
@@ -155,21 +161,24 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync));
                     this.ValidateCancelEdit(authentication);
-                    this.CremaHost.Sign(authentication);
                     this.ServiceState = ServiceState.Closing;
-                    try
-                    {
-                        await this.OnCancelEditAsync(authentication);
-                    }
-                    catch
-                    {
-                        this.ServiceState = ServiceState.Opened;
-                        throw;
-                    }
+                });
+                try
+                {
+                    await this.OnCancelEditAsync(authentication);
+                }
+                catch
+                {
+                    await this.Dispatcher.InvokeAsync(() => this.ServiceState = ServiceState.Opened);
+                    throw;
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication);
                     this.ServiceState = ServiceState.Closed;
                     this.OnEditCanceled(EventArgs.Empty);
                 });
@@ -240,7 +249,7 @@ namespace Ntreev.Crema.Services.Data
 
         public Task<bool> ContainsAsync(string memberName)
         {
-            return this.Dispatcher.InvokeAsync(() => this.members.Any(item => item.Name == memberName));
+            return this.Dispatcher.InvokeAsync(() => this.items.Any(item => item.Name == memberName));
         }
 
         public bool IsNew { get; set; }
@@ -249,7 +258,7 @@ namespace Ntreev.Crema.Services.Data
 
         public abstract IPermission Permission { get; }
 
-        public int Count => this.members.Count;
+        public int Count => this.items.Count;
 
         public abstract DomainContext DomainContext { get; }
 
@@ -271,7 +280,7 @@ namespace Ntreev.Crema.Services.Data
 
         public string Comment => this.TypeSource.Comment;
 
-        public TypeMember this[string memberName] => this.members.FirstOrDefault(item => item.Name == memberName);
+        public TypeMember this[string memberName] => this.items.FirstOrDefault(item => item.Name == memberName);
 
         public bool IsModified { get; private set; }
 
@@ -363,24 +372,25 @@ namespace Ntreev.Crema.Services.Data
             };
 
             this.table = this.TypeSource.View.Table;
+            this.items = new List<TypeMember>(this.table.Rows.Count);
             for (var i = 0; i < this.table.Rows.Count; i++)
             {
                 var item = this.table.Rows[i];
-                this.members.Add(new TypeMember(this, item));
+                this.items.Add(new TypeMember(this, item));
             }
             this.table.RowDeleted += Table_RowDeleted;
             this.table.RowChanged += Table_RowChanged;
 
             await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
             await this.domain.AddUserAsync(authentication, DomainAccessType.ReadWrite);
-            await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
+            await this.AttachDomainEventAsync();
         }
 
         protected virtual async Task OnEndEditAsync(Authentication authentication)
         {
             if (this.domain != null)
             {
-                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                await this.DetachDomainEventAsync();
                 await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false);
                 this.domain = null;
             }
@@ -391,14 +401,15 @@ namespace Ntreev.Crema.Services.Data
             }
             this.IsModified = false;
             this.table = null;
-            this.members.Clear();
+            this.items = null;
+            this.rowsToAdd.Clear();
         }
 
         protected virtual async Task OnCancelEditAsync(Authentication authentication)
         {
             if (this.domain != null)
             {
-                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                await this.DetachDomainEventAsync();
                 await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true);
                 this.domain = null;
             }
@@ -409,7 +420,8 @@ namespace Ntreev.Crema.Services.Data
             }
             this.IsModified = false;
             this.table = null;
-            this.members.Clear();
+            this.items = null;
+            this.rowsToAdd.Clear();
         }
 
         protected virtual async Task OnRestoreAsync(Domain domain)
@@ -420,22 +432,23 @@ namespace Ntreev.Crema.Services.Data
             if (this.TypeSource != null)
             {
                 this.table = this.TypeSource.View.Table;
+                this.items = new List<TypeMember>(this.table.Rows.Count);
                 for (var i = 0; i < this.table.Rows.Count; i++)
                 {
                     var item = this.table.Rows[i];
-                    this.members.Add(new TypeMember(this, item));
+                    this.items.Add(new TypeMember(this, item));
                 }
                 this.table.RowDeleted += Table_RowDeleted;
                 this.table.RowChanged += Table_RowChanged;
             }
 
             this.IsModified = this.domain.IsModified;
-            await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
+            await this.AttachDomainEventAsync();
         }
 
         protected virtual async Task OnDetachedAsync()
         {
-            await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+            await this.DetachDomainEventAsync();
             this.domain = null;
         }
 
@@ -468,17 +481,26 @@ namespace Ntreev.Crema.Services.Data
 
         protected abstract Task<CremaDataType> CreateSourceAsync(Authentication authentication);
 
-        private void Table_RowDeleted(object sender, DataRowChangeEventArgs e)
+        private async void Table_RowDeleted(object sender, DataRowChangeEventArgs e)
         {
-            var column = this.members.FirstOrDefault(item => item.Row == e.Row);
-            this.members.Remove(column);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                var member = this.items.FirstOrDefault(item => item.Row == e.Row);
+                this.items.Remove(member);
+            });
         }
 
-        private void Table_RowChanged(object sender, DataRowChangeEventArgs e)
+        private async void Table_RowChanged(object sender, DataRowChangeEventArgs e)
         {
             if (e.Action == DataRowAction.Add)
             {
-                this.Dispatcher.InvokeAsync(() => this.members.Add(new TypeMember(this, e.Row)));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    if (this.rowsToAdd.Contains(e.Row) == false)
+                    {
+                        this.items.Add(new TypeMember(this, e.Row));
+                    }
+                });
             }
         }
 
@@ -521,32 +543,38 @@ namespace Ntreev.Crema.Services.Data
         }
 
         int refcount;
-        private void AttachDomainEvent()
+        private Task AttachDomainEventAsync()
         {
-            if (refcount != 0)
+            return this.domain.Dispatcher.InvokeAsync(() =>
             {
-                int qwer = 0;
-            }
-            this.domain.Deleted += Domain_Deleted;
-            this.domain.RowAdded += Domain_RowAdded;
-            this.domain.RowChanged += Domain_RowChanged;
-            this.domain.RowRemoved += Domain_RowRemoved;
-            this.domain.PropertyChanged += Domain_PropertyChanged;
-            refcount++;
+                if (refcount != 0)
+                {
+                    int qwer = 0;
+                }
+                this.domain.Deleted += Domain_Deleted;
+                this.domain.RowAdded += Domain_RowAdded;
+                this.domain.RowChanged += Domain_RowChanged;
+                this.domain.RowRemoved += Domain_RowRemoved;
+                this.domain.PropertyChanged += Domain_PropertyChanged;
+                refcount++;
+            });
         }
 
-        private void DetachDomainEvent()
+        private Task DetachDomainEventAsync()
         {
-            this.domain.Deleted -= Domain_Deleted;
-            this.domain.RowAdded -= Domain_RowAdded;
-            this.domain.RowChanged -= Domain_RowChanged;
-            this.domain.RowRemoved -= Domain_RowRemoved;
-            this.domain.PropertyChanged -= Domain_PropertyChanged;
-            if (refcount != 1)
+            return this.domain.Dispatcher.InvokeAsync(() =>
             {
-                int qwer = 0;
-            }
-            refcount--;
+                this.domain.Deleted -= Domain_Deleted;
+                this.domain.RowAdded -= Domain_RowAdded;
+                this.domain.RowChanged -= Domain_RowChanged;
+                this.domain.RowRemoved -= Domain_RowRemoved;
+                this.domain.PropertyChanged -= Domain_PropertyChanged;
+                if (refcount != 1)
+                {
+                    int qwer = 0;
+                }
+                refcount--;
+            });
         }
 
         #region ITypeTemplate
@@ -600,12 +628,12 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITypeMember> IEnumerable<ITypeMember>.GetEnumerator()
         {
-            return this.members.GetEnumerator();
+            return this.items.GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return this.members.GetEnumerator();
+            return this.items.GetEnumerator();
         }
 
         #endregion

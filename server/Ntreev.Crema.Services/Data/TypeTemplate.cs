@@ -60,30 +60,36 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task OnBeginEditAsync(Authentication authentication)
         {
             await base.OnBeginEditAsync(authentication);
-            this.type.IsBeingEdited = true;
-            this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.type.IsBeingEdited = true;
+                this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
+            });
         }
 
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            var dataBaseSet = new DataBaseSet(this.DataBase, this.TypeSource.DataSet, false);
+            var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, this.TypeSource.DataSet, false);
             await this.Container.InvokeTypeEndTemplateEditAsync(authentication, this.type.Name, dataBaseSet);
             await base.OnEndEditAsync(authentication);
-            this.type.UpdateTypeInfo(this.typeInfo);
-            this.type.IsBeingEdited = false;
-            this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
-            this.Container.InvokeTypesChangedEvent(authentication, this.types, dataBaseSet.DataSet);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.type.UpdateTypeInfo(this.typeInfo);
+                this.type.IsBeingEdited = false;
+                this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
+                this.Container.InvokeTypesChangedEvent(authentication, this.types, dataBaseSet.DataSet);
+            });
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
             await base.OnCancelEditAsync(authentication);
-            await this.Repository.Dispatcher.InvokeAsync(() =>
+            await this.Repository.UnlockAsync(this.itemPaths);
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Unlock(this.itemPaths);
+                this.type.IsBeingEdited = false;
+                this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
             });
-            this.type.IsBeingEdited = false;
-            this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
         }
 
         protected override async Task OnRestoreAsync(Domain domain)

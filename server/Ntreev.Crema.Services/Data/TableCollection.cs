@@ -64,7 +64,7 @@ namespace Ntreev.Crema.Services.Data
                 this.ValidateAddNew(item.Name, item.CategoryPath, authentication);
             }
             var tableList = new List<Table>(dataTables.Length);
-            var dataBaseSet = new DataBaseSet(this.DataBase, dataSet, true);
+            var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, true);
             var tablePaths = dataTables.Select(item => item.Path).ToArray();
             await this.InvokeTableCreateAsync(authentication, tablePaths, dataBaseSet);
             foreach (var item in dataTables)

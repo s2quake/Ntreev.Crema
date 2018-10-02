@@ -98,7 +98,7 @@ namespace Ntreev.Crema.Services.Users
                     this.CurrentUser.SetUserState(UserState.Online);
                 });
                 //await this.InitializeAsync(metaData);
-                this.CremaHost.AddService(this);
+                await this.CremaHost.AddServiceAsync(this);
                 return metaData.AuthenticationToken;
             }
             catch
@@ -143,29 +143,32 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public Authentication Authenticate(SignatureDate signatureDate)
+        public Task<Authentication> AuthenticateAsync(SignatureDate signatureDate)
         {
-            if (signatureDate.ID == Authentication.SystemID)
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                Authentication.System.SignatureDate = signatureDate;
-                return Authentication.System;
-            }
+                if (signatureDate.ID == Authentication.SystemID)
+                {
+                    Authentication.System.SignatureDate = signatureDate;
+                    return Authentication.System;
+                }
 
-            var user = this.Users[signatureDate.ID];
-            if (user != null)
-            {
-                user.Authentication.SignatureDate = signatureDate;
-                return user.Authentication;
-            }
+                var user = this.Users[signatureDate.ID];
+                if (user != null)
+                {
+                    user.Authentication.SignatureDate = signatureDate;
+                    return user.Authentication;
+                }
 
-            if (this.customAuthentications.ContainsKey(signatureDate.ID) == false)
-            {
-                this.customAuthentications.Add(signatureDate.ID, new Authentication(new AuthenticationProvider(signatureDate.ID)));
-            }
+                if (this.customAuthentications.ContainsKey(signatureDate.ID) == false)
+                {
+                    this.customAuthentications.Add(signatureDate.ID, new Authentication(new AuthenticationProvider(signatureDate.ID)));
+                }
 
-            var authentication = this.customAuthentications[signatureDate.ID];
-            authentication.SignatureDate = signatureDate;
-            return authentication;
+                var authentication = this.customAuthentications[signatureDate.ID];
+                authentication.SignatureDate = signatureDate;
+                return authentication;
+            });
         }
 
         public Authentication Authenticate(AuthenticationInfo authenticationInfo)
@@ -255,42 +258,46 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public void Close(CloseInfo closeInfo)
+        public async Task CloseAsync(CloseInfo closeInfo)
         {
-            this.Dispatcher?.Invoke(() =>
+            if (this.Dispatcher == null)
+                return;
+
+            this.Dispatcher.Invoke(() =>
             {
                 this.timer?.Dispose();
                 this.timer = null;
-                if (this.service != null)
+                this.Dispatcher?.Dispose();
+                this.Dispatcher = null;
+            });
+            if (this.service != null)
+            {
+                try
                 {
-                    try
+                    if (closeInfo.Reason != CloseReason.NoResponding)
                     {
-                        if (closeInfo.Reason != CloseReason.NoResponding)
-                        {
-                            this.service.Unsubscribe();
-                            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                                this.service.Close();
-                            else
-                                this.service.Abort();
-                        }
+                        await this.service.UnsubscribeAsync();
+                        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                            this.service.Close();
                         else
-                        {
                             this.service.Abort();
-                        }
                     }
-                    catch
+                    else
                     {
                         this.service.Abort();
                     }
-                    this.service = null;
                 }
-                this.Dispatcher?.Dispose();
-            });
+                catch
+                {
+                    this.service.Abort();
+                }
+                this.service = null;
+            }
         }
 
         //public Guid AuthenticationToken { get; private set; }
 
-            public User CurrentUser { get; private set; }
+        public User CurrentUser { get; private set; }
 
         public IUserService Service => this.service;
 
@@ -298,7 +305,7 @@ namespace Ntreev.Crema.Services.Users
 
         public CremaHost CremaHost { get; }
 
-        public CremaDispatcher Dispatcher { get; }
+        public CremaDispatcher Dispatcher { get; set; }
 
         public event ItemsCreatedEventHandler<IUserItem> ItemsCreated
         {
@@ -420,9 +427,9 @@ namespace Ntreev.Crema.Services.Users
         //    });
         //}
 
-        private void Service_Faulted(object sender, EventArgs e)
+        private async void Service_Faulted(object sender, EventArgs e)
         {
-            this.Dispatcher.Invoke(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
@@ -436,14 +443,25 @@ namespace Ntreev.Crema.Services.Users
                 this.timer?.Dispose();
                 this.timer = null;
                 this.Dispatcher.Dispose();
+                this.Dispatcher = null;
             });
-            this.InvokeAsync(() =>
-            {
-                this.CremaHost.RemoveService(this, new CloseInfo(CloseReason.Faulted, "서버와의 연결이 끊어졌습니다."));
-            }, nameof(Service_Faulted));
+            await this.CremaHost.RemoveServiceAsync(this, new CloseInfo(CloseReason.Faulted, "서버와의 연결이 끊어졌습니다."));
         }
 
-        private async void InvokeAsync(Action action, string callbackName)
+        private async Task InvokeAsync(Action action, string callbackName)
+        {
+            try
+            {
+                await this.Dispatcher.InvokeAsync(action);
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(callbackName);
+                this.CremaHost.Error(e);
+            }
+        }
+
+        private async void InvokeAsync<T>(Func<T> action, string callbackName)
         {
             try
             {
@@ -466,402 +484,469 @@ namespace Ntreev.Crema.Services.Users
             }
             catch
             {
-                this.CremaHost.Dispatcher.Invoke(() =>
-                {
-                    this.CremaHost.InvokeClose(new CloseInfo(CloseReason.NoResponding, "서버가 응답하질 않습니다."));
-                });
+                await this.CremaHost.InvokeCloseAsync(new CloseInfo(CloseReason.NoResponding, "서버가 응답하질 않습니다."));
             }
         }
 
         #region IUserServiceCallback
 
-        void IUserServiceCallback.OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
+        async void IUserServiceCallback.OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
             this.service.Abort();
             this.service = null;
             this.timer?.Dispose();
             this.timer = null;
             this.Dispatcher?.Dispose();
-            this.InvokeAsync(() =>
-            {
-                this.CremaHost.RemoveService(this, closeInfo);
-            }, nameof(IUserServiceCallback.OnServiceClosed));
+            this.Dispatcher = null;
+            await this.CremaHost.RemoveServiceAsync(this, closeInfo);
         }
 
-        void IUserServiceCallback.OnUsersChanged(SignatureDate signatureDate, UserInfo[] userInfos)
+        async void IUserServiceCallback.OnUsersChanged(SignatureDate signatureDate, UserInfo[] userInfos)
         {
-            this.InvokeAsync(() =>
+            try
             {
-                var authentication = this.Authenticate(signatureDate);
-                var users = new User[userInfos.Length];
-                for (var i = 0; i < userInfos.Length; i++)
+                var authentication = await this.AuthenticateAsync(signatureDate);
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var userInfo = userInfos[i];
-                    var user = this.Users[userInfo.ID];
-                    user.SetUserInfo(userInfo);
-                    users[i] = user;
-                }
-                this.Users.InvokeUsersChangedEvent(authentication, users);
-            }, nameof(IUserServiceCallback.OnUsersChanged));
+                    var users = new User[userInfos.Length];
+                    for (var i = 0; i < userInfos.Length; i++)
+                    {
+                        var userInfo = userInfos[i];
+                        var user = this.Users[userInfo.ID];
+                        user.SetUserInfo(userInfo);
+                        users[i] = user;
+                    }
+                    this.Users.InvokeUsersChangedEvent(authentication, users);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
         }
 
-        void IUserServiceCallback.OnUsersStateChanged(SignatureDate signatureDate, string[] userIDs, UserState[] states)
+        async void IUserServiceCallback.OnUsersStateChanged(SignatureDate signatureDate, string[] userIDs, UserState[] states)
         {
-            this.InvokeAsync(() =>
+            try
             {
-                var authentication = this.Authenticate(signatureDate);
-                var users = new User[userIDs.Length];
-                for (var i = 0; i < userIDs.Length; i++)
-                {
-                    var user = this.Users[userIDs[i]];
-                    user.SetUserState(states[i]);
-                    users[i] = user;
-                }
-                this.Users.InvokeUsersStateChangedEvent(authentication, users);
-            }, nameof(IUserServiceCallback.OnUsersStateChanged));
-        }
-
-        void IUserServiceCallback.OnUserItemsCreated(SignatureDate signatureDate, string[] itemPaths, UserInfo?[] args)
-        {
-            this.InvokeAsync(() =>
-            {
-                var authentication = this.Authenticate(signatureDate);
-                var userItems = new IUserItem[itemPaths.Length];
-                var categories = new List<UserCategory>(itemPaths.Length);
-                var users = new List<User>(itemPaths.Length);
-
-                for (var i = 0; i < itemPaths.Length; i++)
-                {
-                    var itemPath = itemPaths[i];
-                    if (NameValidator.VerifyCategoryPath(itemPath) == true)
-                    {
-                        var categoryName = new CategoryName(itemPath);
-                        var category = this.Categories.Prepare(itemPath);
-                        categories.Add(category);
-                        userItems[i] = category;
-                    }
-                    else
-                    {
-                        var userInfo = (UserInfo)args[i];
-                        var user = this.Users.BaseAddNew(userInfo.ID, userInfo.CategoryPath);
-                        user.Initialize(userInfo, BanInfo.Empty);
-                        users.Add(user);
-                        userItems[i] = user;
-                    }
-                }
-
-                if (categories.Any() == true)
-                {
-                    this.Categories.InvokeCategoriesCreatedEvent(authentication, categories.ToArray());
-                }
-
-                if (users.Any() == true)
-                {
-                    this.Users.InvokeUsersCreatedEvent(authentication, users.ToArray());
-                }
-            }, nameof(IUserServiceCallback.OnUserItemsCreated));
-        }
-
-        void IUserServiceCallback.OnUserItemsRenamed(SignatureDate signatureDate, string[] itemPaths, string[] newNames)
-        {
-            this.InvokeAsync(() =>
-            {
-                var authentication = this.Authenticate(signatureDate);
-
-                {
-                    var items = new List<UserCategory>(itemPaths.Length);
-                    var oldNames = new List<string>(itemPaths.Length);
-                    var oldPaths = new List<string>(itemPaths.Length);
-
-                    for (var i = 0; i < itemPaths.Length; i++)
-                    {
-                        var userItem = this[itemPaths[i]];
-                        if (userItem is UserCategory == false)
-                            continue;
-
-                        var category = userItem as UserCategory;
-                        items.Add(category);
-                        oldNames.Add(category.Name);
-                        oldPaths.Add(category.Path);
-                    }
-
-                    for (var i = 0; i < itemPaths.Length; i++)
-                    {
-                        var userItem = this[itemPaths[i]];
-                        if (userItem is UserCategory == false)
-                            continue;
-
-                        var category = userItem as UserCategory;
-                        category.InternalSetName(newNames[i]);
-                    }
-
-                    this.Categories.InvokeCategoriesRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
-                }
-
-                {
-                    var items = new List<User>(itemPaths.Length);
-                    var oldNames = new List<string>(itemPaths.Length);
-                    var oldPaths = new List<string>(itemPaths.Length);
-
-                    for (var i = 0; i < itemPaths.Length; i++)
-                    {
-                        var userItem = this[itemPaths[i]];
-                        if (userItem is User == false)
-                            continue;
-
-                        var user = userItem as User;
-                        items.Add(user);
-                        oldNames.Add(user.Name);
-                        oldPaths.Add(user.Path);
-                    }
-
-                    for (var i = 0; i < itemPaths.Length; i++)
-                    {
-                        var userItem = this[itemPaths[i]];
-                        if (userItem is User == false)
-                            continue;
-
-                        var user = userItem as User;
-                        user.Name = newNames[i];
-                    }
-
-                    this.Users.InvokeUsersRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
-                }
-
-            }, nameof(IUserServiceCallback.OnUserItemsRenamed));
-        }
-
-        void IUserServiceCallback.OnUserItemsMoved(SignatureDate signatureDate, string[] itemPaths, string[] parentPaths)
-        {
-            this.InvokeAsync(() =>
-            {
-                var authentication = this.Authenticate(signatureDate);
-
-                {
-                    var items = new List<UserCategory>(itemPaths.Length);
-                    var oldPaths = new List<string>(itemPaths.Length);
-                    var oldParentPaths = new List<string>(itemPaths.Length);
-
-                    for (var i = 0; i < itemPaths.Length; i++)
-                    {
-                        var userItem = this[itemPaths[i]];
-                        if (userItem is UserCategory == false)
-                            continue;
-
-                        var category = userItem as UserCategory;
-                        items.Add(category);
-                        oldPaths.Add(category.Path);
-                        oldParentPaths.Add(category.Parent.Path);
-                    }
-
-                    for (var i = 0; i < itemPaths.Length; i++)
-                    {
-                        var userItem = this[itemPaths[i]];
-                        if (userItem is UserCategory == false)
-                            continue;
-
-                        var category = userItem as UserCategory;
-                        category.Parent = this.Categories[parentPaths[i]];
-                    }
-
-                    this.Categories.InvokeCategoriesMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
-                }
-
-                {
-                    var items = new List<User>(itemPaths.Length);
-                    var oldPaths = new List<string>(itemPaths.Length);
-                    var oldParentPaths = new List<string>(itemPaths.Length);
-
-                    for (var i = 0; i < itemPaths.Length; i++)
-                    {
-                        var userItem = this[itemPaths[i]];
-                        if (userItem is User == false)
-                            continue;
-
-                        var user = userItem as User;
-                        items.Add(user);
-                        oldPaths.Add(user.Path);
-                        oldParentPaths.Add(user.Category.Path);
-                    }
-
-                    for (var i = 0; i < itemPaths.Length; i++)
-                    {
-                        var userItem = this[itemPaths[i]];
-                        if (userItem is User == false)
-                            continue;
-
-                        var user = userItem as User;
-                        user.Category = this.Categories[parentPaths[i]];
-                    }
-
-                    this.Users.InvokeUsersMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
-                }
-            }, nameof(IUserServiceCallback.OnUserItemsMoved));
-        }
-
-        void IUserServiceCallback.OnUserItemsDeleted(SignatureDate signatureDate, string[] itemPaths)
-        {
-            this.InvokeAsync(() =>
-            {
-                var authentication = this.Authenticate(signatureDate);
-
-                {
-                    var items = new List<UserCategory>(itemPaths.Length);
-                    var oldPaths = new List<string>(itemPaths.Length);
-
-                    for (var i = 0; i < itemPaths.Length; i++)
-                    {
-                        var userItem = this[itemPaths[i]];
-                        if (userItem is UserCategory == false)
-                            continue;
-
-                        var category = userItem as UserCategory;
-                        items.Add(category);
-                        oldPaths.Add(category.Path);
-                    }
-
-                    for (var i = 0; i < itemPaths.Length; i++)
-                    {
-                        var userItem = this[itemPaths[i]];
-                        if (userItem is UserCategory == false)
-                            continue;
-
-                        var category = userItem as UserCategory;
-                        category.Dispose();
-                    }
-
-                    this.Categories.InvokeCategoriesDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
-                }
-
-                {
-                    var items = new List<User>(itemPaths.Length);
-                    var oldPaths = new List<string>(itemPaths.Length);
-
-                    for (var i = 0; i < itemPaths.Length; i++)
-                    {
-                        var userItem = this[itemPaths[i]];
-                        if (userItem is User == false)
-                            continue;
-
-                        var user = userItem as User;
-                        items.Add(user);
-                        oldPaths.Add(user.Path);
-                    }
-
-                    for (var i = 0; i < itemPaths.Length; i++)
-                    {
-                        var userItem = this[itemPaths[i]];
-                        if (userItem is User == false)
-                            continue;
-
-                        var user = userItem as User;
-                        user.Dispose();
-                    }
-
-                    this.Users.InvokeUsersDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
-                }
-            }, nameof(IUserServiceCallback.OnUserItemsDeleted));
-        }
-
-        void IUserServiceCallback.OnUsersLoggedIn(SignatureDate signatureDate, string[] userIDs)
-        {
-            this.InvokeAsync(() =>
-            {
-                var authentication = this.Authenticate(signatureDate);
-                var users = new User[userIDs.Length];
-                for (var i = 0; i < userIDs.Length; i++)
-                {
-                    var user = this.Users[userIDs[i]];
-                    user.IsOnline = true;
-                    users[i] = user;
-                }
-                this.Users.InvokeUsersLoggedInEvent(authentication, users);
-            }, nameof(IUserServiceCallback.OnUsersLoggedIn));
-        }
-
-        void IUserServiceCallback.OnUsersLoggedOut(SignatureDate signatureDate, string[] userIDs)
-        {
-            this.InvokeAsync(() =>
-            {
-                var authentication = this.Authenticate(signatureDate);
-                var users = new User[userIDs.Length];
-                for (var i = 0; i < userIDs.Length; i++)
-                {
-                    var user = this.Users[userIDs[i]];
-                    user.IsOnline = false;
-                    users[i] = user;
-                }
-                this.Users.InvokeUsersLoggedOutEvent(authentication, users, CloseInfo.Empty);
-            }, nameof(IUserServiceCallback.OnUsersLoggedOut));
-        }
-
-        void IUserServiceCallback.OnUsersKicked(SignatureDate signatureDate, string[] userIDs, string[] comments)
-        {
-            this.InvokeAsync(() =>
-            {
-                var authentication = this.Authenticate(signatureDate);
-                var users = new User[userIDs.Length];
-                for (var i = 0; i < userIDs.Length; i++)
-                {
-                    var user = this.Users[userIDs[i]];
-                    user.IsOnline = false;
-                    users[i] = user;
-                }
-                this.Users.InvokeUsersKickedEvent(authentication, users, comments);
-            }, nameof(IUserServiceCallback.OnUsersKicked));
-        }
-
-        void IUserServiceCallback.OnUsersBanChanged(SignatureDate signatureDate, BanInfo[] banInfos, BanChangeType changeType, string[] comments)
-        {
-            this.InvokeAsync(() =>
-            {
-                var authentication = this.Authenticate(signatureDate);
-                var users = new User[banInfos.Length];
-                for (var i = 0; i < banInfos.Length; i++)
-                {
-                    var banInfo = banInfos[i];
-                    var user = this[banInfo.Path] as User;
-                    user.SetBanInfo(changeType, banInfo);
-                    users[i] = user;
-                }
-
-                switch (changeType)
-                {
-                    case BanChangeType.Ban:
-                        this.Users.InvokeUsersBannedEvent(authentication, users, comments);
-                        break;
-                    case BanChangeType.Unban:
-                        this.Users.InvokeUsersUnbannedEvent(authentication, users);
-                        break;
-                }
-
-            }, nameof(IUserServiceCallback.OnUsersBanChanged));
-        }
-
-        void IUserServiceCallback.OnMessageReceived(SignatureDate signatureDate, string[] userIDs, string message, MessageType messageType)
-        {
-            this.InvokeAsync(() =>
-            {
-                var authentication = this.Authenticate(signatureDate);
-                if (messageType == MessageType.None)
-                {
-                    foreach (var item in userIDs)
-                    {
-                        var user = this.Users[item];
-                        this.Users.InvokeSendMessageEvent(authentication, user, message);
-                    }
-                }
-                else if (messageType == MessageType.Notification)
+                var authentication = await this.AuthenticateAsync(signatureDate);
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     var users = new User[userIDs.Length];
                     for (var i = 0; i < userIDs.Length; i++)
                     {
                         var user = this.Users[userIDs[i]];
+                        user.SetUserState(states[i]);
                         users[i] = user;
                     }
-                    this.Users.InvokeNotifyMessageEvent(authentication, users, message);
-                }
-            }, nameof(IUserServiceCallback.OnMessageReceived));
+                    this.Users.InvokeUsersStateChangedEvent(authentication, users);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IUserServiceCallback.OnUserItemsCreated(SignatureDate signatureDate, string[] itemPaths, UserInfo?[] args)
+        {
+            try
+            {
+                var authentication = await this.AuthenticateAsync(signatureDate);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var userItems = new IUserItem[itemPaths.Length];
+                    var categories = new List<UserCategory>(itemPaths.Length);
+                    var users = new List<User>(itemPaths.Length);
+
+                    for (var i = 0; i < itemPaths.Length; i++)
+                    {
+                        var itemPath = itemPaths[i];
+                        if (NameValidator.VerifyCategoryPath(itemPath) == true)
+                        {
+                            var categoryName = new CategoryName(itemPath);
+                            var category = this.Categories.Prepare(itemPath);
+                            categories.Add(category);
+                            userItems[i] = category;
+                        }
+                        else
+                        {
+                            var userInfo = (UserInfo)args[i];
+                            var user = this.Users.BaseAddNew(userInfo.ID, userInfo.CategoryPath);
+                            user.Initialize(userInfo, BanInfo.Empty);
+                            users.Add(user);
+                            userItems[i] = user;
+                        }
+                    }
+
+                    if (categories.Any() == true)
+                    {
+                        this.Categories.InvokeCategoriesCreatedEvent(authentication, categories.ToArray());
+                    }
+
+                    if (users.Any() == true)
+                    {
+                        this.Users.InvokeUsersCreatedEvent(authentication, users.ToArray());
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IUserServiceCallback.OnUserItemsRenamed(SignatureDate signatureDate, string[] itemPaths, string[] newNames)
+        {
+            try
+            {
+                var authentication = await this.AuthenticateAsync(signatureDate);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    {
+                        var items = new List<UserCategory>(itemPaths.Length);
+                        var oldNames = new List<string>(itemPaths.Length);
+                        var oldPaths = new List<string>(itemPaths.Length);
+
+                        for (var i = 0; i < itemPaths.Length; i++)
+                        {
+                            var userItem = this[itemPaths[i]];
+                            if (userItem is UserCategory == false)
+                                continue;
+
+                            var category = userItem as UserCategory;
+                            items.Add(category);
+                            oldNames.Add(category.Name);
+                            oldPaths.Add(category.Path);
+                        }
+
+                        for (var i = 0; i < itemPaths.Length; i++)
+                        {
+                            var userItem = this[itemPaths[i]];
+                            if (userItem is UserCategory == false)
+                                continue;
+
+                            var category = userItem as UserCategory;
+                            category.InternalSetName(newNames[i]);
+                        }
+
+                        this.Categories.InvokeCategoriesRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
+                    }
+
+                    {
+                        var items = new List<User>(itemPaths.Length);
+                        var oldNames = new List<string>(itemPaths.Length);
+                        var oldPaths = new List<string>(itemPaths.Length);
+
+                        for (var i = 0; i < itemPaths.Length; i++)
+                        {
+                            var userItem = this[itemPaths[i]];
+                            if (userItem is User == false)
+                                continue;
+
+                            var user = userItem as User;
+                            items.Add(user);
+                            oldNames.Add(user.Name);
+                            oldPaths.Add(user.Path);
+                        }
+
+                        for (var i = 0; i < itemPaths.Length; i++)
+                        {
+                            var userItem = this[itemPaths[i]];
+                            if (userItem is User == false)
+                                continue;
+
+                            var user = userItem as User;
+                            user.Name = newNames[i];
+                        }
+
+                        this.Users.InvokeUsersRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IUserServiceCallback.OnUserItemsMoved(SignatureDate signatureDate, string[] itemPaths, string[] parentPaths)
+        {
+            try
+            {
+                var authentication = await this.AuthenticateAsync(signatureDate);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    {
+                        var items = new List<UserCategory>(itemPaths.Length);
+                        var oldPaths = new List<string>(itemPaths.Length);
+                        var oldParentPaths = new List<string>(itemPaths.Length);
+
+                        for (var i = 0; i < itemPaths.Length; i++)
+                        {
+                            var userItem = this[itemPaths[i]];
+                            if (userItem is UserCategory == false)
+                                continue;
+
+                            var category = userItem as UserCategory;
+                            items.Add(category);
+                            oldPaths.Add(category.Path);
+                            oldParentPaths.Add(category.Parent.Path);
+                        }
+
+                        for (var i = 0; i < itemPaths.Length; i++)
+                        {
+                            var userItem = this[itemPaths[i]];
+                            if (userItem is UserCategory == false)
+                                continue;
+
+                            var category = userItem as UserCategory;
+                            category.Parent = this.Categories[parentPaths[i]];
+                        }
+
+                        this.Categories.InvokeCategoriesMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
+                    }
+
+                    {
+                        var items = new List<User>(itemPaths.Length);
+                        var oldPaths = new List<string>(itemPaths.Length);
+                        var oldParentPaths = new List<string>(itemPaths.Length);
+
+                        for (var i = 0; i < itemPaths.Length; i++)
+                        {
+                            var userItem = this[itemPaths[i]];
+                            if (userItem is User == false)
+                                continue;
+
+                            var user = userItem as User;
+                            items.Add(user);
+                            oldPaths.Add(user.Path);
+                            oldParentPaths.Add(user.Category.Path);
+                        }
+
+                        for (var i = 0; i < itemPaths.Length; i++)
+                        {
+                            var userItem = this[itemPaths[i]];
+                            if (userItem is User == false)
+                                continue;
+
+                            var user = userItem as User;
+                            user.Category = this.Categories[parentPaths[i]];
+                        }
+
+                        this.Users.InvokeUsersMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
+                    }
+
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IUserServiceCallback.OnUserItemsDeleted(SignatureDate signatureDate, string[] itemPaths)
+        {
+            try
+            {
+                var authentication = await this.AuthenticateAsync(signatureDate);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    {
+                        var items = new List<UserCategory>(itemPaths.Length);
+                        var oldPaths = new List<string>(itemPaths.Length);
+
+                        for (var i = 0; i < itemPaths.Length; i++)
+                        {
+                            var userItem = this[itemPaths[i]];
+                            if (userItem is UserCategory == false)
+                                continue;
+
+                            var category = userItem as UserCategory;
+                            items.Add(category);
+                            oldPaths.Add(category.Path);
+                        }
+
+                        for (var i = 0; i < itemPaths.Length; i++)
+                        {
+                            var userItem = this[itemPaths[i]];
+                            if (userItem is UserCategory == false)
+                                continue;
+
+                            var category = userItem as UserCategory;
+                            category.Dispose();
+                        }
+
+                        this.Categories.InvokeCategoriesDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
+                    }
+
+                    {
+                        var items = new List<User>(itemPaths.Length);
+                        var oldPaths = new List<string>(itemPaths.Length);
+
+                        for (var i = 0; i < itemPaths.Length; i++)
+                        {
+                            var userItem = this[itemPaths[i]];
+                            if (userItem is User == false)
+                                continue;
+
+                            var user = userItem as User;
+                            items.Add(user);
+                            oldPaths.Add(user.Path);
+                        }
+
+                        for (var i = 0; i < itemPaths.Length; i++)
+                        {
+                            var userItem = this[itemPaths[i]];
+                            if (userItem is User == false)
+                                continue;
+
+                            var user = userItem as User;
+                            user.Dispose();
+                        }
+                        this.Users.InvokeUsersDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IUserServiceCallback.OnUsersLoggedIn(SignatureDate signatureDate, string[] userIDs)
+        {
+            try
+            {
+                var authentication = await this.AuthenticateAsync(signatureDate);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var users = new User[userIDs.Length];
+                    for (var i = 0; i < userIDs.Length; i++)
+                    {
+                        var user = this.Users[userIDs[i]];
+                        user.IsOnline = true;
+                        users[i] = user;
+                    }
+                    this.Users.InvokeUsersLoggedInEvent(authentication, users);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IUserServiceCallback.OnUsersLoggedOut(SignatureDate signatureDate, string[] userIDs)
+        {
+            try
+            {
+                var authentication = await this.AuthenticateAsync(signatureDate);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var users = new User[userIDs.Length];
+                    for (var i = 0; i < userIDs.Length; i++)
+                    {
+                        var user = this.Users[userIDs[i]];
+                        user.IsOnline = false;
+                        users[i] = user;
+                    }
+                    this.Users.InvokeUsersLoggedOutEvent(authentication, users, CloseInfo.Empty);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IUserServiceCallback.OnUsersKicked(SignatureDate signatureDate, string[] userIDs, string[] comments)
+        {
+            try
+            {
+                var authentication = await this.AuthenticateAsync(signatureDate);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var users = new User[userIDs.Length];
+                    for (var i = 0; i < userIDs.Length; i++)
+                    {
+                        var user = this.Users[userIDs[i]];
+                        user.IsOnline = false;
+                        users[i] = user;
+                    }
+                    this.Users.InvokeUsersKickedEvent(authentication, users, comments);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IUserServiceCallback.OnUsersBanChanged(SignatureDate signatureDate, BanInfo[] banInfos, BanChangeType changeType, string[] comments)
+        {
+            try
+            {
+                var authentication = await this.AuthenticateAsync(signatureDate);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var users = new User[banInfos.Length];
+                    for (var i = 0; i < banInfos.Length; i++)
+                    {
+                        var banInfo = banInfos[i];
+                        var user = this[banInfo.Path] as User;
+                        user.SetBanInfo(changeType, banInfo);
+                        users[i] = user;
+                    }
+
+                    switch (changeType)
+                    {
+                        case BanChangeType.Ban:
+                            this.Users.InvokeUsersBannedEvent(authentication, users, comments);
+                            break;
+                        case BanChangeType.Unban:
+                            this.Users.InvokeUsersUnbannedEvent(authentication, users);
+                            break;
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IUserServiceCallback.OnMessageReceived(SignatureDate signatureDate, string[] userIDs, string message, MessageType messageType)
+        {
+            try
+            {
+                var authentication = await this.AuthenticateAsync(signatureDate);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    if (messageType == MessageType.None)
+                    {
+                        foreach (var item in userIDs)
+                        {
+                            var user = this.Users[item];
+                            this.Users.InvokeSendMessageEvent(authentication, user, message);
+                        }
+                    }
+                    else if (messageType == MessageType.Notification)
+                    {
+                        var users = new User[userIDs.Length];
+                        for (var i = 0; i < userIDs.Length; i++)
+                        {
+                            var user = this.Users[userIDs[i]];
+                            users[i] = user;
+                        }
+                        this.Users.InvokeNotifyMessageEvent(authentication, users, message);
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
         }
 
         bool IUserServiceCallback.OnPing()
