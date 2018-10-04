@@ -37,12 +37,6 @@ namespace Ntreev.Crema.ServiceHosts.Data
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
     class DataBaseService : CremaServiceItemBase<IDataBaseEventCallback>, IDataBaseService
     {
-        private readonly ICremaHost cremaHost;
-        private readonly ILogService logService;
-
-        private readonly IDomainContext domainContext;
-        private readonly IUserContext userContext;
-
         private IDataBase dataBase;
         private Authentication authentication;
         private string dataBaseName;
@@ -50,12 +44,13 @@ namespace Ntreev.Crema.ServiceHosts.Data
         public DataBaseService(ICremaHost cremaHost)
             : base(cremaHost.GetService(typeof(ILogService)) as ILogService)
         {
-            this.cremaHost = cremaHost;
-            this.logService = cremaHost.GetService(typeof(ILogService)) as ILogService;
-            this.userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            this.domainContext = cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
+            this.CremaHost = cremaHost;
+            this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;
+            this.UserContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            this.DomainContext = cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
+            this.DataBases = cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
 
-            this.logService.Debug($"{nameof(DataBaseService)} Constructor");
+            this.LogService.Debug($"{nameof(DataBaseService)} Constructor");
         }
 
         public Task<ResultBase> DefinitionTypeAsync(LogInfo[] param1, FindResultInfo[] param2)
@@ -68,12 +63,12 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var result = new ResultBase<DataBaseMetaData>();
             try
             {
-                this.authentication = await this.userContext.AuthenticateAsync(authenticationToken);
+                this.authentication = await this.UserContext.AuthenticateAsync(authenticationToken);
                 await this.authentication.AddRefAsync(this);
                 this.OwnerID = this.authentication.ID;
-                await this.userContext.Dispatcher.InvokeAsync(() =>
+                await this.UserContext.Dispatcher.InvokeAsync(() =>
                 {
-                    this.userContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
+                    this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
                 });
                 await this.DataBases.Dispatcher.InvokeAsync(() =>
                 {
@@ -82,7 +77,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 });
                 await this.dataBase.EnterAsync(this.authentication);
                 await this.AttachEventHandlersAsync();
-                this.logService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(SubscribeAsync)} : {dataBaseName}");
+                this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(SubscribeAsync)} : {dataBaseName}");
                 result.Value = await this.dataBase.GetMetaDataAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -103,14 +98,14 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 await this.DetachEventHandlersAsync();
                 await this.dataBase?.LeaveAsync(this.authentication);
                 this.dataBase = null;
-                await this.userContext.Dispatcher.InvokeAsync(() =>
+                await this.UserContext.Dispatcher.InvokeAsync(() =>
                 {
-                    this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+                    this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
                 });
                 await this.authentication.RemoveRefAsync(this);
                 this.authentication = null;
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-                this.logService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(UnsubscribeAsync)} : {this.dataBaseName}");
+                this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(UnsubscribeAsync)} : {this.dataBaseName}");
             }
             catch (Exception e)
             {
@@ -576,7 +571,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var result = new ResultBase<TableInfo[]>();
             try
             {
-                var domain = await this.domainContext.Dispatcher.InvokeAsync(() => this.domainContext.Domains[domainID]);
+                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
                 var template = domain.Host as ITableTemplate;
                 await template.EndEditAsync(this.authentication);
                 if (template.Target is ITable table)
@@ -603,7 +598,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var result = new ResultBase();
             try
             {
-                var domain = await this.domainContext.Dispatcher.InvokeAsync(() => this.domainContext.Domains[domainID]);
+                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
                 var template = domain.Host as ITableTemplate;
                 await template.CancelEditAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
@@ -685,7 +680,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var result = new ResultBase();
             try
             {
-                var typeItem =await this.GetTypeItemAsync(itemPath);
+                var typeItem = await this.GetTypeItemAsync(itemPath);
                 await typeItem.DeleteAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -755,7 +750,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var result = new ResultBase<TypeInfo>();
             try
             {
-                var domain = await this.domainContext.Dispatcher.InvokeAsync(() => this.domainContext.Domains[domainID]);
+                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
                 var template = domain.Host as ITypeTemplate;
                 await template.EndEditAsync(this.authentication);
                 result.Value = await template.Dispatcher.InvokeAsync(() => template.Type.TypeInfo);
@@ -773,7 +768,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var result = new ResultBase();
             try
             {
-                var domain = await this.domainContext.Dispatcher.InvokeAsync(() => this.domainContext.Domains[domainID]);
+                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
                 var template = domain.Host as ITypeTemplate;
                 await template.CancelEditAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
@@ -935,36 +930,24 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return result;
         }
 
-        public bool IsAlive()
+        public async Task<bool> IsAliveAsync()
         {
             if (this.authentication == null)
                 return false;
-            this.logService.Debug($"[{this.authentication}] {nameof(DataBaseService)}.{nameof(IsAlive)} : {DateTime.Now}");
-            this.authentication.PingAsync();
+            this.LogService.Debug($"[{this.authentication}] {nameof(DataBaseService)}.{nameof(IsAliveAsync)} : {DateTime.Now}");
+            await this.authentication.PingAsync();
             return true;
         }
 
-        //protected override async void OnDisposed(EventArgs e)
-        //{
-        //    base.OnDisposed(e);
-        //    if (this.authentication != null)
-        //    {
-        //        await this.DetachEventHandlersAsync();
-        //    }
-        //    this.dataBase = null;
-        //    this.userContext.Dispatcher.Invoke(() =>
-        //    {
-        //        this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-        //    });
-        //    if (this.authentication != null)
-        //    {
-        //        if (await this.authentication.RemoveRefAsync(this) == 0)
-        //        {
-        //            this.userContext.LogoutAsync(this.authentication).Wait();
-        //        }
-        //        this.authentication = null;
-        //    }
-        //}
+        public ICremaHost CremaHost { get; }
+
+        public ILogService LogService { get; }
+
+        public IDomainContext DomainContext { get; }
+
+        public IUserContext UserContext { get; }
+
+        public IDataBaseCollection DataBases { get; }
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
@@ -1228,7 +1211,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 this.dataBase.Unloaded += DataBase_Unloaded;
             });
 
-            this.logService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(AttachEventHandlersAsync)}");
+            this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(AttachEventHandlersAsync)}");
         }
 
         private async Task DetachEventHandlersAsync()
@@ -1258,53 +1241,8 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
                 this.dataBase.Unloaded -= DataBase_Unloaded;
             });
-            this.logService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(DetachEventHandlersAsync)}");
+            this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(DetachEventHandlersAsync)}");
         }
-
-        private async Task<ResultBase> Invoke(Task task)
-        {
-            var result = new ResultBase();
-            try
-            {
-                await task;
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
-            return result;
-        }
-
-        private async Task<ResultBase<T>> Invoke<T>(Task<T> func)
-        {
-            var result = new ResultBase<T>();
-            try
-            {
-                result.Value = await func;
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
-            return result;
-        }
-
-        //private async Task<ResultBase<T>> InvokeImmediately<T>Async(Func<T> func)
-        //{
-        //    var result = new ResultBase<T>();
-        //    try
-        //    {
-        //        result.Value = func();
-        //        result.SignatureDate = this.authentication.SignatureDate;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-        //    }
-        //    return result;
-        //}
 
         private Task<ITypeItem> GetTypeItemAsync(string itemPath)
         {
@@ -1376,20 +1314,21 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private ITypeContext TypeContext => this.dataBase.TypeContext;
 
-        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
-
         #region ICremaServiceItem
 
         protected override async Task OnAbortAsync(bool disconnect)
         {
-            await this.DetachEventHandlersAsync();
-            this.dataBase = null;
-            this.userContext.Dispatcher.Invoke(() =>
+            if (this.dataBase != null)
             {
-                this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                this.authentication = null;
-            });
-            CremaService.Dispatcher.Invoke(() =>
+                await this.DetachEventHandlersAsync();
+                this.dataBase = null;
+                this.UserContext.Dispatcher.Invoke(() =>
+                {
+                    this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+                    this.authentication = null;
+                });
+            }
+            await CremaService.Dispatcher.InvokeAsync(() =>
             {
                 if (disconnect == false)
                 {

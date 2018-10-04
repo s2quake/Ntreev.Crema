@@ -35,12 +35,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
     class DomainService : CremaServiceItemBase<IDomainEventCallback>, IDomainService
     {
-        private readonly ICremaHost cremaHost;
-        private readonly ILogService logService;
-        private readonly IDomainContext domainContext;
-        private readonly IDataBaseCollection dataBases;
-        private readonly IUserContext userContext;
-
         private Authentication authentication;
         private readonly HashSet<Guid> domains = new HashSet<Guid>();
         private readonly HashSet<Guid> resettings = new HashSet<Guid>();
@@ -48,13 +42,13 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         public DomainService(ICremaHost cremaHost)
             : base(cremaHost.GetService(typeof(ILogService)) as ILogService)
         {
-            this.cremaHost = cremaHost;
-            this.logService = cremaHost.GetService(typeof(ILogService)) as ILogService;
-            this.userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            this.domainContext = cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
-            this.dataBases = cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
+            this.CremaHost = cremaHost;
+            this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;
+            this.UserContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            this.DomainContext = cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
+            this.DataBases = cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
 
-            this.logService.Debug($"{nameof(DomainService)} Constructor");
+            this.LogService.Debug($"{nameof(DomainService)} Constructor");
         }
 
         public async Task<ResultBase<DomainContextMetaData>> SubscribeAsync(Guid authenticationToken)
@@ -62,17 +56,14 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var result = new ResultBase<DomainContextMetaData>();
             try
             {
-                this.authentication = await this.userContext.AuthenticateAsync(authenticationToken);
+                this.authentication = await this.UserContext.AuthenticateAsync(authenticationToken);
                 await this.authentication.AddRefAsync(this);
                 this.OwnerID = this.authentication.ID;
-                await this.userContext.Dispatcher.InvokeAsync(() =>
-                {
-                    this.userContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
-                });
-                await this.AttachEventHandlersAsync();
-                this.logService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(SubscribeAsync)}");
 
-                var metaData = await this.domainContext.GetMetaDataAsync(this.authentication);
+                await this.AttachEventHandlersAsync();
+                this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(SubscribeAsync)}");
+
+                var metaData = await this.DomainContext.GetMetaDataAsync(this.authentication);
                 foreach (var item in metaData.Domains)
                 {
                     if (item.Users.Any(i => i.DomainUserInfo.UserID == this.OwnerID) == true)
@@ -97,14 +88,14 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             try
             {
                 await this.DetachEventHandlersAsync();
-                await this.userContext.Dispatcher.InvokeAsync(() =>
+                await this.UserContext.Dispatcher.InvokeAsync(() =>
                 {
-                    this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+                    this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
                 });
                 await this.authentication.RemoveRefAsync(this);
                 this.authentication = null;
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
-                this.logService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(UnsubscribeAsync)}");
+                this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(UnsubscribeAsync)}");
             }
             catch (Exception e)
             {
@@ -118,7 +109,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var result = new ResultBase<DomainContextMetaData>();
             try
             {
-                result.Value = await this.domainContext.GetMetaDataAsync(this.authentication);
+                result.Value = await this.DomainContext.GetMetaDataAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -246,7 +237,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             try
             {
                 var domain = await this.GetDomainAsync(domainID);
-                await domain.NewRowAsync(this.authentication, rows);
+                result.Value = await domain.NewRowAsync(this.authentication, rows);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -288,36 +279,24 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return result;
         }
 
-        public bool IsAlive()
+        public async Task<bool> IsAliveAsync()
         {
             if (this.authentication == null)
                 return false;
-            this.logService.Debug($"[{this.authentication}] {nameof(DomainService)}.{nameof(IsAlive)} : {DateTime.Now}");
-            this.authentication.PingAsync();
+            this.LogService.Debug($"[{this.authentication}] {nameof(DomainService)}.{nameof(IsAliveAsync)} : {DateTime.Now}");
+            await this.authentication.PingAsync();
             return true;
         }
 
-        //protected override async void OnDisposed(EventArgs e)
-        //{
-        //    base.OnDisposed(e);
-        //    if (this.authentication != null)
-        //    {
-        //        await this.DetachEventHandlersAsync();
-        //    }
-        //    await this.userContext.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                
-        //    });
-        //    if (this.authentication != null)
-        //    {
-        //        if (await this.authentication.RemoveRefAsync(this) == 0)
-        //        {
-        //            this.userContext.LogoutAsync(this.authentication).Wait();
-        //        }
-        //        this.authentication = null;
-        //    }
-        //}
+        public ICremaHost CremaHost { get; }
+
+        public ILogService LogService { get; }
+
+        public IDomainContext DomainContext { get; }
+
+        public IDataBaseCollection DataBases { get; }
+
+        public IUserContext UserContext { get; }
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
@@ -326,7 +305,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
 
         private async Task<IDomain> GetDomainAsync(Guid domainID)
         {
-            var domain = await this.domainContext.Dispatcher.InvokeAsync(() => this.domainContext.Domains[domainID]);
+            var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
             if (domain == null)
                 throw new DomainNotFoundException(domainID);
             return domain;
@@ -334,51 +313,60 @@ namespace Ntreev.Crema.ServiceHosts.Domains
 
         private async Task AttachEventHandlersAsync()
         {
-            await this.domainContext.Dispatcher.InvokeAsync(() =>
+            await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
-                this.domainContext.Domains.DomainCreated += DomainContext_DomainCreated;
-                this.domainContext.Domains.DomainDeleted += DomainContext_DomainDeleted;
-                this.domainContext.Domains.DomainInfoChanged += DomainContext_DomainInfoChanged;
-                this.domainContext.Domains.DomainStateChanged += DomainContext_DomainStateChanged;
-                this.domainContext.Domains.DomainUserAdded += DomainContext_DomainUserAdded;
-                this.domainContext.Domains.DomainUserRemoved += DomainContext_DomainUserRemoved;
-                this.domainContext.Domains.DomainUserChanged += DomainContext_DomainUserChanged;
-                this.domainContext.Domains.DomainRowAdded += DomainContext_DomainRowAdded;
-                this.domainContext.Domains.DomainRowChanged += DomainContext_DomainRowChanged;
-                this.domainContext.Domains.DomainRowRemoved += DomainContext_DomainRowRemoved;
-                this.domainContext.Domains.DomainPropertyChanged += DomainContext_DomainPropertyChanged;
-                
+                this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
             });
-            await this.dataBases.Dispatcher.InvokeAsync(() =>
+            await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
-                this.dataBases.ItemsResetting += DataBases_ItemsResetting;
-                this.dataBases.ItemsReset += DataBases_ItemsReset;
+                this.DomainContext.Domains.DomainCreated += DomainContext_DomainCreated;
+                this.DomainContext.Domains.DomainDeleted += DomainContext_DomainDeleted;
+                this.DomainContext.Domains.DomainInfoChanged += DomainContext_DomainInfoChanged;
+                this.DomainContext.Domains.DomainStateChanged += DomainContext_DomainStateChanged;
+                this.DomainContext.Domains.DomainUserAdded += DomainContext_DomainUserAdded;
+                this.DomainContext.Domains.DomainUserRemoved += DomainContext_DomainUserRemoved;
+                this.DomainContext.Domains.DomainUserChanged += DomainContext_DomainUserChanged;
+                this.DomainContext.Domains.DomainRowAdded += DomainContext_DomainRowAdded;
+                this.DomainContext.Domains.DomainRowChanged += DomainContext_DomainRowChanged;
+                this.DomainContext.Domains.DomainRowRemoved += DomainContext_DomainRowRemoved;
+                this.DomainContext.Domains.DomainPropertyChanged += DomainContext_DomainPropertyChanged;
+
             });
-            this.logService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(AttachEventHandlersAsync)}");
+            await this.DataBases.Dispatcher.InvokeAsync(() =>
+            {
+                this.DataBases.ItemsResetting += DataBases_ItemsResetting;
+                this.DataBases.ItemsReset += DataBases_ItemsReset;
+            });
+            this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(AttachEventHandlersAsync)}");
         }
 
         private async Task DetachEventHandlersAsync()
         {
-            await this.domainContext.Dispatcher.InvokeAsync(() =>
+            await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
-                this.domainContext.Domains.DomainCreated -= DomainContext_DomainCreated;
-                this.domainContext.Domains.DomainDeleted -= DomainContext_DomainDeleted;
-                this.domainContext.Domains.DomainInfoChanged -= DomainContext_DomainInfoChanged;
-                this.domainContext.Domains.DomainStateChanged -= DomainContext_DomainStateChanged;
-                this.domainContext.Domains.DomainUserRemoved -= DomainContext_DomainUserRemoved;
-                this.domainContext.Domains.DomainUserAdded -= DomainContext_DomainUserAdded;
-                this.domainContext.Domains.DomainUserChanged -= DomainContext_DomainUserChanged;
-                this.domainContext.Domains.DomainRowAdded -= DomainContext_DomainRowAdded;
-                this.domainContext.Domains.DomainRowChanged -= DomainContext_DomainRowChanged;
-                this.domainContext.Domains.DomainRowRemoved -= DomainContext_DomainRowRemoved;
-                this.domainContext.Domains.DomainPropertyChanged -= DomainContext_DomainPropertyChanged;
+                this.DomainContext.Domains.DomainCreated -= DomainContext_DomainCreated;
+                this.DomainContext.Domains.DomainDeleted -= DomainContext_DomainDeleted;
+                this.DomainContext.Domains.DomainInfoChanged -= DomainContext_DomainInfoChanged;
+                this.DomainContext.Domains.DomainStateChanged -= DomainContext_DomainStateChanged;
+                this.DomainContext.Domains.DomainUserRemoved -= DomainContext_DomainUserRemoved;
+                this.DomainContext.Domains.DomainUserAdded -= DomainContext_DomainUserAdded;
+                this.DomainContext.Domains.DomainUserChanged -= DomainContext_DomainUserChanged;
+                this.DomainContext.Domains.DomainRowAdded -= DomainContext_DomainRowAdded;
+                this.DomainContext.Domains.DomainRowChanged -= DomainContext_DomainRowChanged;
+                this.DomainContext.Domains.DomainRowRemoved -= DomainContext_DomainRowRemoved;
+                this.DomainContext.Domains.DomainPropertyChanged -= DomainContext_DomainPropertyChanged;
             });
-            await this.dataBases.Dispatcher.InvokeAsync(() =>
+            await this.DataBases.Dispatcher.InvokeAsync(() =>
             {
-                this.dataBases.ItemsResetting -= DataBases_ItemsResetting;
-                this.dataBases.ItemsReset -= DataBases_ItemsReset;
+                this.DataBases.ItemsResetting -= DataBases_ItemsResetting;
+                this.DataBases.ItemsReset -= DataBases_ItemsReset;
             });
-            this.logService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(DetachEventHandlersAsync)}");
+            await this.UserContext.Dispatcher.InvokeAsync(() =>
+            {
+                this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+                this.authentication = null;
+            });
+            this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(DetachEventHandlersAsync)}");
         }
 
         private void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
@@ -438,7 +426,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var domainState = e.DomainState;
             if (this.resettings.Contains(e.DomainInfo.DataBaseID))
                 return;
-            System.Diagnostics.Trace.WriteLine("DomainContext_DomainStateChanged");
             this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnDomainStateChanged(signatureDate, domainID, domainState));
         }
 
@@ -558,52 +545,11 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             }
         }
 
-        //private async Task<ResultBase<T>> Invoke<T>Async(Guid domainID, Func<IDomain, T> func)
-        //{
-        //    var result = new ResultBase<T>();
-        //    try
-        //    {
-        //        var domain = this.GetDomain(domainID);
-        //        if (domain == null)
-        //            throw new DomainNotFoundException(domainID);
-        //        result.Value = domain.Dispatcher.Invoke(() => func(domain));
-        //        result.SignatureDate = this.authentication.SignatureDate;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-        //    }
-        //    return result;
-        //}
-
-        //private async Task<ResultBase> InvokeAsync(Guid domainID, Action<IDomain> action)
-        //{
-        //    var result = new ResultBase();
-        //    try
-        //    {
-        //        var domain = this.GetDomain(domainID);
-        //        if (domain == null)
-        //            throw new DomainNotFoundException(domainID);
-        //        domain.Dispatcher.Invoke(() => action(domain));
-        //        result.SignatureDate = this.authentication.SignatureDate;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-        //    }
-        //    return result;
-        //}
-
         #region ICremaServiceItem
 
         protected override async Task OnAbortAsync(bool disconnect)
         {
             await this.DetachEventHandlersAsync();
-            await this.userContext.Dispatcher.InvokeAsync(() =>
-            {
-                this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                this.authentication = null;
-            });
             await CremaService.Dispatcher.InvokeAsync(() =>
             {
                 if (disconnect == false)

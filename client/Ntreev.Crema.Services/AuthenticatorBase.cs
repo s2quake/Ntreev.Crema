@@ -31,7 +31,7 @@ namespace Ntreev.Crema.Services
 
         protected AuthenticatorBase()
         {
-            if (this.GetType().Attributes.HasFlag(TypeAttributes.Public) == true)
+            if (this.GetType().IsPublic == true || this.GetType().IsNestedPublic == true)
                 throw new InvalidOperationException(Resources.Exception_NotAllowedAsPublic);
             this.name = this.GetType().Assembly.FullName;
             this.pluginID = GuidUtility.FromName(name);

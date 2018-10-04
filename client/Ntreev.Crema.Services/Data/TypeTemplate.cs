@@ -40,13 +40,15 @@ namespace Ntreev.Crema.Services.Data
 
         public override DomainContext DomainContext => this.type.GetService(typeof(DomainContext)) as DomainContext;
 
-        public override CremaDispatcher Dispatcher => this.type.Dispatcher;
+        public override string Path => this.type.Path;
 
         public override CremaHost CremaHost => this.type.CremaHost;
 
         public override IType Type => this.type;
 
         public override DataBase DataBase => this.type.DataBase;
+
+        public override IDispatcherObject DispatcherObject => this.type;
 
         public override IPermission Permission => this.type;
 

@@ -48,7 +48,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public TableContentDomain(Authentication authentication, CremaDataSet dataSet, DataBase dataBase, string itemPath, string itemType)
+        public TableContentDomain(Authentication authentication, CremaDataSet dataSet, DataBase dataBase, string itemPath, string itemType, IDomainHost domainHost)
             : base(authentication.ID, dataSet, dataBase.ID, itemPath, itemType)
         {
             if (dataSet.HasChanges() == true)
@@ -59,6 +59,7 @@ namespace Ntreev.Crema.Services.Domains
                 var view = item.AsDataView();
                 this.views.Add(item.Name, view);
             }
+            this.Host = domainHost;
         }
 
         protected override byte[] SerializeSource(object source)

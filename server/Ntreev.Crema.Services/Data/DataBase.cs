@@ -358,13 +358,13 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.ValidateEnter(authentication);
                     this.CremaHost.DebugMethod(authentication, this, nameof(EnterAsync), this);
-                    this.authentications.Add(authentication);
-                    this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
-                    authentication.Expired += Authentication_Expired;
                 });
                 await this.AttachUsersAsync(authentication);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.authentications.Add(authentication);
+                    this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
+                    authentication.Expired += Authentication_Expired;
                     this.CremaHost.Sign(authentication);
                     this.authenticationEntered?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
                     this.DataBases.InvokeItemsAuthenticationEnteredEvent(authentication, new IDataBase[] { this });
@@ -386,14 +386,13 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.ValidateLeave(authentication);
                     this.CremaHost.DebugMethod(authentication, this, nameof(LeaveAsync), this);
-
-                    this.authentications.Remove(authentication);
-                    this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
-                    authentication.Expired -= Authentication_Expired;
                 });
                 await this.DetachUsersAsync(authentication);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.authentications.Remove(authentication);
+                    this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
+                    authentication.Expired -= Authentication_Expired;
                     this.CremaHost.Sign(authentication);
                     this.authenticationLeft?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
                     this.DataBases.InvokeItemsAuthenticationLeftEvent(authentication, new IDataBase[] { this });
@@ -616,6 +615,10 @@ namespace Ntreev.Crema.Services.Data
                 this.tableContext = new TableContext(this, tableInfos);
                 this.tableContext.ItemsLockChanged += TableContext_ItemsLockChanged;
                 this.tableContext.ItemsAccessChanged += TableContext_ItemsAccessChanged;
+                this.metaData.TypeCategories = this.typeContext.GetCategoryMetaDatas();
+                this.metaData.Types = this.typeContext.GetTypeMetaDatas();
+                this.metaData.TableCategories = this.tableContext.GetCategoryMetaDatas();
+                this.metaData.Tables = this.tableContext.GetTableMetaDatas();
                 base.ResetDataBase(authentication);
                 base.UpdateLockParent();
                 base.UpdateAccessParent();

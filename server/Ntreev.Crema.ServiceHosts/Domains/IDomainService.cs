@@ -72,6 +72,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         Task<ResultBase> DeleteDomainAsync(Guid domainID, bool force);
 
         [OperationContract]
-        bool IsAlive();
+        Task<bool> IsAliveAsync();
     }
 }

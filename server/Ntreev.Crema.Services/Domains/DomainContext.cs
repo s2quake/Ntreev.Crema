@@ -54,8 +54,6 @@ namespace Ntreev.Crema.Services.Domains
             this.BasePath = cremaHost.GetPath(CremaPath.Domains);
             this.CremaHost.Opened += CremaHost_Opened;
             this.CremaHost.Debug(Resources.Message_DomainContextIsCreated);
-
-
         }
 
         public async Task InitializeAsync()
@@ -190,21 +188,21 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public async Task RestoreAsync(Authentication authentication, CremaSettings settings)
+        public async Task RestoreAsync(CremaSettings settings)
         {
             if (settings.NoCache == false)
             {
                 var dataBases = await this.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases.ToArray<DataBase>());
                 foreach (var item in dataBases)
                 {
-                    await this.RestoreAsync(authentication, item);
+                    await this.RestoreAsync(item);
                 }
             }
         }
 
-        public async Task RestoreAsync(Authentication authentication, DataBase dataBase)
+        public async Task RestoreAsync(DataBase dataBase)
         {
-            var restorers = this.GetDomainRestorers(authentication, dataBase);
+            var restorers = this.GetDomainRestorers(dataBase);
             if (restorers.Any() == false)
                 return;
 
@@ -384,7 +382,7 @@ namespace Ntreev.Crema.Services.Domains
             DirectoryUtility.Delete(this.BasePath, dataBase.ID.ToString());
         }
 
-        private DomainRestorer[] GetDomainRestorers(Authentication authentication, DataBase dataBase)
+        private DomainRestorer[] GetDomainRestorers(DataBase dataBase)
         {
             var path = Path.Combine(this.BasePath, dataBase.ID.ToString());
             if (Directory.Exists(path) == false)
@@ -397,7 +395,7 @@ namespace Ntreev.Crema.Services.Domains
                 var directoryInfo = new DirectoryInfo(item);
                 if (Guid.TryParse(directoryInfo.Name, out Guid domainID) == true)
                 {
-                    domainRestorerList.Add(new DomainRestorer(authentication, this, item));
+                    domainRestorerList.Add(new DomainRestorer(this, item));
                 }
             }
 

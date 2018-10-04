@@ -44,9 +44,9 @@ namespace Ntreev.Crema.ServiceHosts
             return this.service.ServiceInfos;
         }
 
-        public DataBaseInfo[] GetDataBaseInfos()
+        public Task<DataBaseInfo[]> GetDataBaseInfosAsync()
         {
-            return this.DataBases.Dispatcher.Invoke(() => this.DataBases.Select(item => item.DataBaseInfo).ToArray());
+            return this.DataBases.Dispatcher.InvokeAsync(() => this.DataBases.Select(item => item.DataBaseInfo).ToArray());
         }
 
         public string GetVersion()

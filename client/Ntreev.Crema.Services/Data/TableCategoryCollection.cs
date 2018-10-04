@@ -119,14 +119,7 @@ namespace Ntreev.Crema.Services.Data
 
         public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public new int Count => base.Count;
 
         public event ItemsCreatedEventHandler<ITableCategory> CategoriesCreated
         {
@@ -235,13 +228,11 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITableCategory> IEnumerable<ITableCategory>.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.GetEnumerator();
         }
 

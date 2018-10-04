@@ -109,19 +109,24 @@ namespace Ntreev.Crema.Services.Domains
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                var container = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, isCanceled);
                     this.ValidateDelete(authentication, isCanceled);
                     this.Sign(authentication, true);
-                    var container = this.Container;
-                    this.Dispatcher.Dispose();
-                    this.Dispatcher = null;
+                    return this.Container;
+                });
+                await this.Container.Dispatcher.InvokeAsync(() => this.Dispose());
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.Logger?.Dispose(true);
                     this.Logger = null;
-                    this.Users.Clear();
-                    this.Dispose();
+                    this.Dispatcher.Dispose();
+                    this.Dispatcher = null;
                     this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
+                });
+                await container.Dispatcher.InvokeAsync(() =>
+                {
                     container.InvokeDomainDeletedEvent(authentication, this, isCanceled);
                 });
             }
@@ -181,7 +186,7 @@ namespace Ntreev.Crema.Services.Domains
             try
             {
                 this.ValidateExpired();
-                return await this.Dispatcher.InvokeAsync(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(NewRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateNewRow(authentication, rows);
@@ -193,11 +198,14 @@ namespace Ntreev.Crema.Services.Domains
                     base.UpdateModificationInfo(authentication.SignatureDate);
                     this.Logger.Complete();
                     this.OnRowAdded(new DomainRowEventArgs(authentication, this, rows));
+                });
+                await this.Container.Dispatcher.InvokeAsync(() =>
+                {
                     this.Container.InvokeDomainRowAddedEvent(authentication, this, rows);
                     this.Container.InvokeDomainStateChangedEvent(authentication, this);
                     this.Container.InvokeDomainInfoChangedEvent(authentication, this);
-                    return rows;
                 });
+                return rows;
             }
             catch (Exception e)
             {

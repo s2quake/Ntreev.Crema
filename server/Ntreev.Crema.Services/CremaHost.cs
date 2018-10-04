@@ -143,7 +143,7 @@ namespace Ntreev.Crema.Services
                 await this.UserContext.InitializeAsync();
                 await this.DataBases.InitializeAsync();
                 await this.DomainContext.InitializeAsync();
-                await this.DomainContext.RestoreAsync(Authentication.System, settings);
+                await this.DomainContext.RestoreAsync(settings);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.plugins = (this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>).TopologicalSort().ToArray();

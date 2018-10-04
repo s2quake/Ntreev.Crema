@@ -36,13 +36,14 @@ namespace Ntreev.Crema.Services.Data
             private readonly string itemPath;
             private Domain domain;
             private DataBaseSet dataBaseSet;
+            private CremaDataSet dataSet;
 
             public TableContentDomainHost(TableCollection container, Table[] tables)
             {
                 this.Container = container;
                 this.Tables = tables;
                 this.Contents = tables.Select(item => item.Content).ToArray();
-                this.itemPath = string.Join("|", tables.Select(item => item.ItemPath));
+                this.itemPath = string.Join("|", tables.Select(item => item.Path));
             }
 
             public TableContentDomainHost(TableCollection container, string itemPath)
@@ -114,30 +115,31 @@ namespace Ntreev.Crema.Services.Data
 
             public async Task BeginContentAsync(Authentication authentication)
             {
-                var dataSet = await this.Container.ReadDataForContentAsync(authentication, this.Tables);
-                this.domain = new TableContentDomain(authentication, dataSet, this.DataBase, this.itemPath, typeof(TableContent).Name)
-                {
-                    Host = this
-                };
+                this.dataSet = await this.Container.ReadDataForContentAsync(authentication, this.Tables);
+                this.domain = new TableContentDomain(authentication, dataSet, this.DataBase, this.itemPath, typeof(TableContent).Name, this);
                 this.dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
-                foreach (var item in this.Contents)
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    item.domain = this.domain;
-                    item.domainHost = this;
-                    item.DataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
-                    item.Table.SetTableState(TableState.IsBeingEdited);
-                    item.IsModified = this.domain.ModifiedTables.Contains(item.dataTable.Name);
-                }
+                    foreach (var item in this.Contents)
+                    {
+                        item.domain = this.domain;
+                        item.domainHost = this;
+                        item.DataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
+                        item.Table.SetTableState(TableState.IsBeingEdited);
+                        item.IsModified = this.domain.ModifiedTables.Contains(item.dataTable.Name);
+                    }
+                });
                 await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
                 await this.AttachDomainEventAsync();
-                await this.Dispatcher.InvokeAsync(() => this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
+                });
             }
 
-            public async Task EndContentAsync(Authentication authentication)
+            public async Task EndContentAsync(Authentication authentication, string name)
             {
-                var dataSet = this.domain.Source as CremaDataSet;
-                var tables = this.Contents.Where(item => item.IsModified).Select(item => item.Table).ToArray();
-                if (this.domain.IsModified == true)
+                if (this.domain.IsModified == true && name != null)
                 {
                     await this.Container.InvokeTableEndContentEditAsync(authentication, this.Tables, this.dataBaseSet);
                 }
@@ -147,33 +149,43 @@ namespace Ntreev.Crema.Services.Data
                 }
                 await this.DetachDomainEventAsync();
                 await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false);
-                foreach (var item in this.Contents)
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    if (item.IsModified == true)
-                        item.Table.UpdateContent(item.dataTable.TableInfo);
-                    item.domain = null;
-                    item.IsModified = false;
-                    item.dataTable = null;
-                    item.Table.SetTableState(TableState.None);
-                }
-                if (tables.Any() == true)
-                    this.Container.InvokeTablesContentChangedEvent(authentication, tables, dataSet);
-                this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
+                    var tables = this.Contents.Where(item => item.IsModified).Select(item => item.Table).ToArray();
+                    foreach (var item in this.Contents)
+                    {
+                        if (item.IsModified == true)
+                            item.Table.UpdateContent(item.dataTable.TableInfo);
+                        item.domain = null;
+                        item.IsModified = false;
+                        item.dataTable = null;
+                        item.Table.SetTableState(TableState.None);
+                    }
+                    if (tables.Any() == true)
+                        this.Container.InvokeTablesContentChangedEvent(authentication, tables, dataSet);
+                    this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
+                });
             }
 
-            public async Task CancelContentAsync(Authentication authentication)
+            public async Task CancelContentAsync(Authentication authentication, string name)
             {
-                await this.DetachDomainEventAsync();
-                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true);
-                await this.Repository.UnlockAsync(this.dataBaseSet.ItemPaths);
-                foreach (var item in this.Contents)
+                if (name != null)
                 {
-                    item.domain = null;
-                    item.IsModified = false;
-                    item.dataTable = null;
-                    item.Table.SetTableState(TableState.None);
+                    await this.DetachDomainEventAsync();
+                    await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true);
                 }
-                this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
+                await this.Repository.UnlockAsync(this.dataBaseSet.ItemPaths);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    foreach (var item in this.Contents)
+                    {
+                        item.domain = null;
+                        item.IsModified = false;
+                        item.dataTable = null;
+                        item.Table.SetTableState(TableState.None);
+                    }
+                    this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
+                });
             }
 
             public void EnterContent(Authentication authentication)
@@ -198,8 +210,6 @@ namespace Ntreev.Crema.Services.Data
 
             public TableContent[] Contents { get; }
 
-            //public string ItemPath => this.itemPath;
-
             public DataBase DataBase => this.Container.DataBase;
 
             public TableCollection Container { get; }
@@ -208,12 +218,12 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (e.IsCanceled == false)
                 {
-                    await this.EndContentAsync(e.Authentication);
+                    await this.EndContentAsync(e.Authentication, null);
                     await this.Dispatcher.InvokeAsync(() => this.InvokeEditEndedEvent(e));
                 }
                 else
                 {
-                    await this.CancelContentAsync(e.Authentication);
+                    await this.CancelContentAsync(e.Authentication, null);
                     await this.Dispatcher.InvokeAsync(() => this.InvokeEditCanceledEvent(e));
                 }
             }
@@ -279,25 +289,29 @@ namespace Ntreev.Crema.Services.Data
             async Task IDomainHost.DetachAsync()
             {
                 await this.DetachDomainEventAsync();
-                this.domain = null;
-                foreach (var item in this.Contents)
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    item.domain = null;
-                    item.dataTable = null;
-                }
+                    this.domain = null;
+                    foreach (var item in this.Contents)
+                    {
+                        item.domain = null;
+                        item.dataTable = null;
+                    }
+                });
             }
 
             async Task IDomainHost.RestoreAsync(Authentication authentication, Domain domain)
             {
+                this.dataSet = domain.Source as CremaDataSet;
+                this.domain = domain;
+                this.dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var dataSet = domain.Source as CremaDataSet;
-                    this.domain = domain;
                     foreach (var item in this.Contents)
                     {
                         item.domainHost = this;
                         item.domain = domain;
-                        item.dataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
+                        item.DataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
                         item.Table.IsBeingEdited = true;
                         item.ServiceState = ServiceState.Opened;
                         item.IsModified = domain.ModifiedTables.Contains(item.dataTable.Name);

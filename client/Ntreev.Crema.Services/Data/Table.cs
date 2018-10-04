@@ -52,10 +52,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var path = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
-                    var result = await this.Service.SetPublicTableItemAsync(this.Path);
+                    return base.Path;
+                });
+                var result = await this.Service.SetPublicTableItemAsync(path);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.SetPublic(authentication);
                     this.Context.InvokeItemsSetPublicEvent(authentication, new ITableItem[] { this });
@@ -73,10 +77,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var path = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
-                    var result = await this.Service.SetPrivateTableItemAsync(this.Path);
+                    return base.Path;
+                });
+                var result = await this.Service.SetPrivateTableItemAsync(path);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.SetPrivate(authentication);
                     this.Context.InvokeItemsSetPrivateEvent(authentication, new ITableItem[] { this });
@@ -94,10 +102,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var path = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMemberAsync), this, memberID, accessType);
-                    var result = await this.Service.AddAccessMemberTableItemAsync(this.Path, memberID, accessType);
+                    return base.Path;
+                });
+                var result = await this.Service.AddAccessMemberTableItemAsync(path, memberID, accessType);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.AddAccessMember(authentication, memberID, accessType);
                     this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
@@ -115,10 +127,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var path = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
-                    var result = await this.Service.SetAccessMemberTableItemAsync(base.Path, memberID, accessType);
+                    return base.Path;
+                });
+                var result = await this.Service.SetAccessMemberTableItemAsync(path, memberID, accessType);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.SetAccessMember(authentication, memberID, accessType);
                     this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
@@ -136,10 +152,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var path = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
-                    var result = await this.Service.RemoveAccessMemberTableItemAsync(base.Path, memberID);
+                    return base.Path;
+                });
+                var result = await this.Service.RemoveAccessMemberTableItemAsync(path, memberID);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.RemoveAccessMember(authentication, memberID);
                     this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID });
@@ -157,10 +177,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var path = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(Lock), this, comment);
-                    var result = await this.Service.LockTableItemAsync(base.Path, comment);
+                    return base.Path;
+                });
+                var result = await this.Service.LockTableItemAsync(path, comment);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.Lock(authentication, comment);
                     this.Context.InvokeItemsLockedEvent(authentication, new ITableItem[] { this }, new string[] { comment });
@@ -178,10 +202,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var path = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnlockAsync), this);
-                    var result = await this.Service.UnlockTableItemAsync(base.Path);
+                    return base.Path;
+                });
+                var result = await this.Service.UnlockTableItemAsync(path);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.Unlock(authentication);
                     this.Context.InvokeItemsUnlockedEvent(authentication, new ITableItem[] { this });
@@ -199,16 +227,21 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
                     var items = EnumerableUtility.FamilyTree(this, item => item.Childs).ToArray();
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
-                    var result = await this.Service.RenameTableItemAsync(base.Path, name);
+                    var path = base.Path;
+                    return (items, oldNames, oldPaths, path);
+                });
+                var result = await this.Service.RenameTableItemAsync(tuple.path, name);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.Rename(authentication, name);
-                    this.Container.InvokeTablesRenamedEvent(authentication, items, oldNames, oldPaths);
+                    this.Container.InvokeTablesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths);
                 });
             }
             catch (Exception e)
@@ -373,95 +406,25 @@ namespace Ntreev.Crema.Services.Data
 
         public DataBase DataBase => this.Context.DataBase;
 
-        public new string Name
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Name;
-            }
-        }
+        public new string Name => base.Name;
 
-        public new string TableName
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.TableName;
-            }
-        }
+        public new string TableName => base.TableName;
 
-        public new string Path
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Path;
-            }
-        }
+        public new string Path => base.Path;
 
-        public new bool IsLocked
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.IsLocked;
-            }
-        }
+        public new bool IsLocked => base.IsLocked;
 
-        public new bool IsPrivate
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.IsPrivate;
-            }
-        }
+        public new bool IsPrivate => base.IsPrivate;
 
-        public new AccessInfo AccessInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.AccessInfo;
-            }
-        }
+        public new AccessInfo AccessInfo => base.AccessInfo;
 
-        public new LockInfo LockInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.LockInfo;
-            }
-        }
+        public new LockInfo LockInfo => base.LockInfo;
 
-        public new TableInfo TableInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.TableInfo;
-            }
-        }
+        public new TableInfo TableInfo => base.TableInfo;
 
-        public new TableState TableState
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.TableState;
-            }
-        }
+        public new TableState TableState => base.TableState;
 
-        public new TagInfo Tags
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Tags;
-            }
-        }
+        public new TagInfo Tags => base.Tags;
 
         public new event EventHandler Renamed
         {

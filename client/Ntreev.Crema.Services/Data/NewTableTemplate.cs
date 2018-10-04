@@ -35,7 +35,6 @@ namespace Ntreev.Crema.Services.Data
             this.DomainContext = category.GetService(typeof(DomainContext)) as DomainContext;
             this.ItemPath = category.Path;
             this.CremaHost = category.CremaHost;
-            this.Dispatcher = category?.Dispatcher;
             this.DataBase = category.DataBase;
             this.Permission = category;
             this.IsNew = true;
@@ -48,7 +47,6 @@ namespace Ntreev.Crema.Services.Data
             this.DomainContext = parent.GetService(typeof(DomainContext)) as DomainContext;
             this.ItemPath = parent.Path;
             this.CremaHost = parent.CremaHost;
-            this.Dispatcher = parent?.Dispatcher;
             this.DataBase = parent.DataBase;
             this.Permission = parent;
             this.IsNew = true;
@@ -60,14 +58,7 @@ namespace Ntreev.Crema.Services.Data
             return this.Permission.GetAccessType(authentication);
         }
 
-        public override object Target
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.tables;
-            }
-        }
+        public override object Target => this.tables;
 
         public override DomainContext DomainContext { get; }
 
@@ -75,13 +66,13 @@ namespace Ntreev.Crema.Services.Data
 
         public override CremaHost CremaHost { get; }
 
-        public override CremaDispatcher Dispatcher { get; }
-
         public override DataBase DataBase { get; }
 
         public override IPermission Permission { get; }
 
-        public IDataBaseService Service { get; }
+        public override IDispatcherObject DispatcherObject { get; }
+		
+		public IDataBaseService Service { get; }
 
         protected override async Task OnBeginEditAsync(Authentication authentication, DomainMetaData metaData)
         {

@@ -40,14 +40,7 @@ namespace Ntreev.Crema.Services.Data
             return this.table.GetAccessType(authentication);
         }
 
-        public override object Target
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.table;
-            }
-        }
+        public override object Target => this.table;
 
         public override DomainContext DomainContext => this.table.GetService(typeof(DomainContext)) as DomainContext;
 
@@ -55,9 +48,9 @@ namespace Ntreev.Crema.Services.Data
 
         public override CremaHost CremaHost => this.table.CremaHost;
 
-        public override CremaDispatcher Dispatcher => this.table.Dispatcher;
-
         public override DataBase DataBase => this.table.DataBase;
+
+        public override IDispatcherObject DispatcherObject => this.table;
 
         public override IPermission Permission => this.table;
 

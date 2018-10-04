@@ -31,7 +31,8 @@ namespace Ntreev.Crema.Services.Data
 
         public NewTypeTemplate(TypeCategory category)
         {
-            this.category = category;
+            this.category = category ?? throw new ArgumentNullException(nameof(category));
+            this.DispatcherObject = category;
             this.IsNew = true;
         }
 
@@ -44,13 +45,15 @@ namespace Ntreev.Crema.Services.Data
 
         public override DomainContext DomainContext => this.category.GetService(typeof(DomainContext)) as DomainContext;
 
-        public override CremaDispatcher Dispatcher => this.category?.Dispatcher;
+        public override string Path => this.category.Path;
 
         public override CremaHost CremaHost => this.category.CremaHost;
 
         public override DataBase DataBase => this.category.DataBase;
 
         public override IPermission Permission => this.category;
+
+        public override IDispatcherObject DispatcherObject { get; }
 
         public TypeCollection Types => this.category.Context.Types;
 

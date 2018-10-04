@@ -38,21 +38,15 @@ namespace Ntreev.Crema.ServiceHosts.Users
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
     class UserService : CremaServiceItemBase<IUserEventCallback>, IUserService
     {
-        private readonly ICremaHost cremaHost;
-        private readonly CremaService cremaService;
-        private readonly ILogService logService;
-        private readonly IUserContext userContext;
-
         private Authentication authentication;
 
-        public UserService(ICremaHost cremaHost, CremaService cremaService)
+        public UserService(ICremaHost cremaHost)
             : base(cremaHost.GetService(typeof(ILogService)) as ILogService)
         {
-            this.cremaHost = cremaHost;
-            this.cremaService = cremaService;
-            this.logService = cremaHost.GetService(typeof(ILogService)) as ILogService;
-            this.userContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            this.logService.Debug($"{nameof(UserService)} Constructor");
+            this.CremaHost = cremaHost;
+            this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;
+            this.UserContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            this.LogService.Debug($"{nameof(UserService)} Constructor");
         }
 
         public ResultBase DefinitionType(SignatureDate p1)
@@ -71,14 +65,14 @@ namespace Ntreev.Crema.ServiceHosts.Users
                 if (clientVersion < serverVersion)
                     throw new ArgumentException(Resources.Exception_LowerVersion, nameof(version));
 
-                this.authentication = await this.userContext.LoginAsync(userID, ToSecureString(userID, password));
-                await this.authentication.AddRefAsync(this, (a) => this.userContext.LogoutAsync(a));
+                this.authentication = await this.UserContext.LoginAsync(userID, ToSecureString(userID, password));
+                await this.authentication.AddRefAsync(this, (a) => this.UserContext.LogoutAsync(a));
 
                 this.OwnerID = this.authentication.ID;
                 await this.AttachEventHandlersAsync();
-                result.Value = await this.userContext.GetMetaDataAsync(this.authentication);
+                result.Value = await this.UserContext.GetMetaDataAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
-                this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(SubscribeAsync)}");
+                this.LogService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(SubscribeAsync)}");
             }
             catch (Exception e)
             {
@@ -93,7 +87,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var authentication = sender as Authentication;
             if (this.authentication != null && this.authentication == authentication)
             {
-                await this.userContext.LogoutAsync(this.authentication);
+                await this.UserContext.LogoutAsync(this.authentication);
             }
         }
 
@@ -104,9 +98,9 @@ namespace Ntreev.Crema.ServiceHosts.Users
             {
                 await this.DetachEventHandlersAsync();
                 await this.authentication.RemoveRefAsync(this);
-                await this.userContext.LogoutAsync(this.authentication);
+                await this.UserContext.LogoutAsync(this.authentication);
                 this.authentication = null;
-                this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(UnsubscribeAsync)}");
+                this.LogService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(UnsubscribeAsync)}");
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
             }
             catch (Exception e)
@@ -121,7 +115,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var result = new ResultBase();
             try
             {
-                await this.cremaHost.ShutdownAsync(this.authentication, milliseconds, shutdownType, message);
+                await this.CremaHost.ShutdownAsync(this.authentication, milliseconds, shutdownType, message);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -136,7 +130,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var result = new ResultBase();
             try
             {
-                await this.cremaHost.CancelShutdownAsync(this.authentication);
+                await this.CremaHost.CancelShutdownAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -317,7 +311,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var result = new ResultBase();
             try
             {
-                await this.userContext.NotifyMessageAsync(this.authentication, userIDs, message);
+                await this.UserContext.NotifyMessageAsync(this.authentication, userIDs, message);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -327,28 +321,20 @@ namespace Ntreev.Crema.ServiceHosts.Users
             return result;
         }
 
-        public bool IsAlive()
+        public async Task<bool> IsAliveAsync()
         {
             if (this.authentication == null)
                 return false;
-            this.logService.Debug($"[{this.authentication}] {nameof(UserService)}.{nameof(IsAlive)} : {DateTime.Now}");
-            this.authentication.PingAsync();
+            this.LogService.Debug($"[{this.authentication}] {nameof(UserService)}.{nameof(IsAliveAsync)} : {DateTime.Now}");
+            await this.authentication.PingAsync();
             return true;
         }
 
-        //protected override async void OnDisposed(EventArgs e)
-        //{
-        //    base.OnDisposed(e);
-        //    if (this.authentication != null)
-        //    {
-        //        await this.DetachEventHandlersAsync();
-        //        if (await this.authentication.RemoveRefAsync(this) == 0)
-        //        {
-        //            this.userContext.LogoutAsync(this.authentication).Wait();
-        //        }
-        //        this.authentication = null;
-        //    }
-        //}
+        public ICremaHost CremaHost { get; }
+
+        public ILogService LogService { get; }
+
+        public IUserContext UserContext { get; }
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
@@ -357,40 +343,40 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         private async Task AttachEventHandlersAsync()
         {
-            await this.userContext.Dispatcher.InvokeAsync(() =>
+            await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
-                this.userContext.Users.UsersStateChanged += Users_UsersStateChanged;
-                this.userContext.Users.UsersChanged += Users_UsersChanged;
-                this.userContext.ItemsCreated += UserContext_ItemsCreated;
-                this.userContext.ItemsRenamed += UserContext_ItemsRenamed;
-                this.userContext.ItemsMoved += UserContext_ItemsMoved;
-                this.userContext.ItemsDeleted += UserContext_ItemsDeleted;
-                this.userContext.Users.UsersLoggedIn += Users_UsersLoggedIn;
-                this.userContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
-                this.userContext.Users.UsersKicked += Users_UsersKicked;
-                this.userContext.Users.UsersBanChanged += Users_UsersBanChanged;
-                this.userContext.Users.MessageReceived += UserContext_MessageReceived;
+                this.UserContext.Users.UsersStateChanged += Users_UsersStateChanged;
+                this.UserContext.Users.UsersChanged += Users_UsersChanged;
+                this.UserContext.ItemsCreated += UserContext_ItemsCreated;
+                this.UserContext.ItemsRenamed += UserContext_ItemsRenamed;
+                this.UserContext.ItemsMoved += UserContext_ItemsMoved;
+                this.UserContext.ItemsDeleted += UserContext_ItemsDeleted;
+                this.UserContext.Users.UsersLoggedIn += Users_UsersLoggedIn;
+                this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
+                this.UserContext.Users.UsersKicked += Users_UsersKicked;
+                this.UserContext.Users.UsersBanChanged += Users_UsersBanChanged;
+                this.UserContext.Users.MessageReceived += UserContext_MessageReceived;
             });
-            this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(AttachEventHandlersAsync)}");
+            this.LogService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(AttachEventHandlersAsync)}");
         }
 
         private async Task DetachEventHandlersAsync()
         {
-            await this.userContext.Dispatcher.InvokeAsync(() =>
+            await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
-                this.userContext.Users.UsersStateChanged -= Users_UsersStateChanged;
-                this.userContext.Users.UsersChanged -= Users_UsersChanged;
-                this.userContext.ItemsCreated -= UserContext_ItemsCreated;
-                this.userContext.ItemsRenamed -= UserContext_ItemsRenamed;
-                this.userContext.ItemsMoved -= UserContext_ItemsMoved;
-                this.userContext.ItemsDeleted -= UserContext_ItemsDeleted;
-                this.userContext.Users.UsersLoggedIn -= Users_UsersLoggedIn;
-                this.userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                this.userContext.Users.UsersKicked -= Users_UsersKicked;
-                this.userContext.Users.UsersBanChanged -= Users_UsersBanChanged;
-                this.userContext.Users.MessageReceived -= UserContext_MessageReceived;
+                this.UserContext.Users.UsersStateChanged -= Users_UsersStateChanged;
+                this.UserContext.Users.UsersChanged -= Users_UsersChanged;
+                this.UserContext.ItemsCreated -= UserContext_ItemsCreated;
+                this.UserContext.ItemsRenamed -= UserContext_ItemsRenamed;
+                this.UserContext.ItemsMoved -= UserContext_ItemsMoved;
+                this.UserContext.ItemsDeleted -= UserContext_ItemsDeleted;
+                this.UserContext.Users.UsersLoggedIn -= Users_UsersLoggedIn;
+                this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+                this.UserContext.Users.UsersKicked -= Users_UsersKicked;
+                this.UserContext.Users.UsersBanChanged -= Users_UsersBanChanged;
+                this.UserContext.Users.MessageReceived -= UserContext_MessageReceived;
             });
-            this.logService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(DetachEventHandlersAsync)}");
+            this.LogService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(DetachEventHandlersAsync)}");
         }
 
         private void Users_UsersStateChanged(object sender, Services.ItemsEventArgs<IUser> e)
@@ -547,7 +533,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var result = new ResultBase<T>();
             try
             {
-                result.Value = this.userContext.Dispatcher.Invoke(func);
+                result.Value = this.UserContext.Dispatcher.Invoke(func);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -562,7 +548,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var result = new ResultBase();
             try
             {
-                this.userContext.Dispatcher.Invoke(action);
+                this.UserContext.Dispatcher.Invoke(action);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -574,9 +560,9 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         private Task<IUserItem> GetUserItemAsync(string itemPath)
         {
-            return this.userContext.Dispatcher.InvokeAsync(() =>
+            return this.UserContext.Dispatcher.InvokeAsync(() =>
             {
-                var item = this.userContext[itemPath];
+                var item = this.UserContext[itemPath];
                 if (item == null)
                     throw new ItemNotFoundException(itemPath);
                 return item;
@@ -585,9 +571,9 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         private Task<IUser> GetUserAsync(string userID)
         {
-            return this.userContext.Dispatcher.InvokeAsync(() =>
+            return this.UserContext.Dispatcher.InvokeAsync(() =>
             {
-                var user = this.userContext.Users[userID];
+                var user = this.UserContext.Users[userID];
                 if (user == null)
                     throw new UserNotFoundException(userID);
                 return user;
@@ -596,9 +582,9 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         private Task<IUserCategory> GetCategoryAsync(string categoryPath)
         {
-            return this.userContext.Dispatcher.InvokeAsync(() =>
+            return this.UserContext.Dispatcher.InvokeAsync(() =>
             {
-                var category = this.userContext.Categories[categoryPath];
+                var category = this.UserContext.Categories[categoryPath];
                 if (category == null)
                     throw new CategoryNotFoundException(categoryPath);
                 return category;
@@ -612,7 +598,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             await this.DetachEventHandlersAsync();
             if (this.authentication != null)
             {
-                await this.userContext.LogoutAsync(this.authentication);
+                await this.UserContext.LogoutAsync(this.authentication);
             }
             this.authentication = null;
             await CremaService.Dispatcher.InvokeAsync(() =>

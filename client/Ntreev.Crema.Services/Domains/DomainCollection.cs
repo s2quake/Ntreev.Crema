@@ -181,11 +181,11 @@ namespace Ntreev.Crema.Services.Domains
                     domain.Category = this.Context.Categories.Prepare(metaData.DomainInfo.CategoryPath);
                     domain.Dispatcher = new CremaDispatcher(domain);
                     this.InvokeDomainCreatedEvent(authentication, domain);
-                    await domain.Dispatcher.InvokeAsync(() => domain.Initialize(authentication, metaData));
+                    await domain.InitializeAsync(authentication, metaData);
                 }
                 else
                 {
-                    domain.Initialize(authentication, metaData);
+                    await domain.InitializeAsync(authentication, metaData);
                 }
 
                 return domain;
@@ -199,7 +199,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.Remove(domain);
                 var dispatcher = domain.Dispatcher;
                 domain.Dispatcher = null;
-                await domain.DisposeAsync(authentication, isCanceled);
+                await dispatcher.InvokeAsync(() => domain.Dispose(authentication, isCanceled));
                 if (dispatcher.Owner is DomainContext == false)
                 {
                     dispatcher.Dispose();
@@ -220,41 +220,46 @@ namespace Ntreev.Crema.Services.Domains
             //});
         }
 
-        public Domain AddDomain(Authentication authentication, DomainInfo domainInfo)
+        private Domain CreateDomain(DomainInfo domainInfo)
         {
             var domainType = domainInfo.DomainType;
-            var domain = null as Domain;
             if (domainType == typeof(TableContentDomain).Name)
             {
-                domain = new TableContentDomain(domainInfo, this.Dispatcher);
+                return new TableContentDomain(domainInfo, this.Dispatcher);
             }
             else if (domainType == typeof(TypeDomain).Name)
             {
-                domain = new TypeDomain(domainInfo, this.Dispatcher);
+                return new TypeDomain(domainInfo, this.Dispatcher);
             }
             else if (domainType == typeof(TableTemplateDomain).Name)
             {
-                domain = new TableTemplateDomain(domainInfo, this.Dispatcher);
+                return new TableTemplateDomain(domainInfo, this.Dispatcher);
             }
-            if (domain != null)
+            return null;
+        }
+
+        public async Task<Domain> AddDomainAsync(DomainInfo domainInfo)
+        {
+            var userConext = this.CremaHost.UserContext;
+            var authentication = await userConext.AuthenticateAsync(domainInfo.CreationInfo);
+            var domain = this.CreateDomain(domainInfo);
+            var dataBase = await this.Dispatcher.InvokeAsync(() =>
             {
-                domain.Category = this.Context.Categories.Prepare(domainInfo.CategoryPath);
-                foreach (var item in this.CremaHost.DataBases)
+                var category = this.Context.Categories.Prepare(domainInfo.CategoryPath);
+                domain.Category = category;
+                return category.DataBase as DataBase;
+            });
+            var isLoaded = dataBase.Service != null;
+            if (domain.DataBaseID == dataBase.ID && isLoaded == true && dataBase.IsResetting == false)
+            {
+                var target = await dataBase.FindDomainHostAsync(domain);
+                if (target != null)
                 {
-                    var isLoaded = item.Service != null;
-                    if (domain.DataBaseID == item.ID && isLoaded == true && item.IsResetting == false)
-                    {
-                        var target = item.FindDomainHost(domain);
-                        if (target != null)
-                        {
-                            target.RestoreAsync(authentication, domain);
-                            domain.Host = target;
-                        }
-                    }
+                    await target.RestoreAsync(authentication, domain);
+                    domain.Host = target;
                 }
-                if (authentication != null)
-                    this.InvokeDomainCreatedEvent(authentication, domain);
             }
+            await this.Dispatcher.InvokeAsync(() => this.InvokeDomainCreatedEvent(authentication, domain));
             return domain;
         }
 
@@ -280,7 +285,7 @@ namespace Ntreev.Crema.Services.Domains
                 domain.Dispatcher = null;
                 //domain.Logger?.Dispose(true);
                 //domain.Logger = null;
-                await domain.DisposeAsync(authentication, isCanceled);
+                await dispatcher.InvokeAsync(() => domain.Dispose(authentication, isCanceled));
                 dispatcher.Dispose();
                 this.InvokeDomainDeletedEvent(authentication, domain, isCanceled);
             });

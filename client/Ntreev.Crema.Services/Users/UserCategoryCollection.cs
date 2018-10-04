@@ -107,7 +107,7 @@ namespace Ntreev.Crema.Services.Users
 
         public CremaHost CremaHost => this.Context.CremaHost;
 
-        public CremaDispatcher Dispatcher => this.CremaHost.Dispatcher;
+        public CremaDispatcher Dispatcher => this.Context.Dispatcher;
 
         public new int Count
         {

@@ -77,6 +77,6 @@ namespace Ntreev.Crema.ServiceHosts.Users
         Task<ResultBase> NotifyMessageAsync(string[] userIDs, string message);
 
         [OperationContract]
-        bool IsAlive();
+        Task<bool> IsAliveAsync();
     }
 }

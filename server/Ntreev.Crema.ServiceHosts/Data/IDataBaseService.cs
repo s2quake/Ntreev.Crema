@@ -185,6 +185,6 @@ namespace Ntreev.Crema.ServiceHosts.Data
         Task<ResultBase<FindResultInfo[]>> FindTypeItemAsync(string itemPath, string text, FindOptions options);
 
         [OperationContract]
-        bool IsAlive();
+        Task<bool> IsAliveAsync();
     }
 }

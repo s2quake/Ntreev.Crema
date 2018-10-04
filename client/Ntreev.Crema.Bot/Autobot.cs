@@ -46,16 +46,20 @@ namespace Ntreev.Crema.Bot
 
         public override object GetService(Type serviceType)
         {
-            return this.cremaHost.GetService(serviceType);
+            if (this.app.GetService(typeof(ICremaHost)) is ICremaHost cremaHost)
+            {
+                return cremaHost.GetService(serviceType);
+            }
+            return this.app.GetService(serviceType);
         }
 
         public override AutobotServiceBase Service => this.service;
 
         protected override async Task<Authentication> OnLoginAsync()
         {
-            this.cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
+            this.cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
             this.token = await this.cremaHost.OpenAsync(this.address, this.AutobotID, StringUtility.ToSecureString("1111"));
-            var autheticator = app.GetService(typeof(Authenticator)) as Authenticator;
+            var autheticator = this.app.GetService(typeof(Authenticator)) as Authenticator;
             return autheticator;
         }
 

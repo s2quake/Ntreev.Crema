@@ -131,7 +131,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (DirectoryUtility.Exists(this.transactionPath) == true)
                     DirectoryUtility.Copy(this.transactionPath, this.domainPath);
-                await domainContext.RestoreAsync(authentication, this.dataBase);
+                await domainContext.RestoreAsync(this.dataBase);
                 DirectoryUtility.Delete(this.transactionPath);
             }
             else

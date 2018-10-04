@@ -133,21 +133,25 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync), this.Table);
                     this.ValidateEndEdit(authentication);
                     this.domainHost.SetServiceState(ServiceState.Closing);
+                    return this.Table.Name;
+                });
+                try
+                {
+                    await this.domainHost.EndContentAsync(authentication, name);
+                }
+                catch
+                {
+                    this.domainHost.SetServiceState(ServiceState.Opened);
+                    throw;
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication);
-                    try
-                    {
-                        await this.domainHost.EndContentAsync(authentication);
-                    }
-                    catch
-                    {
-                        this.domainHost.SetServiceState(ServiceState.Opened);
-                        throw;
-                    }
                     this.domainHost.SetServiceState(ServiceState.Closed);
                     this.domainHost.InvokeEditEndedEvent(EventArgs.Empty);
                     this.domainHost = null;
@@ -165,21 +169,25 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync), this.Table);
                     this.ValidateCancelEdit(authentication);
                     this.domainHost.SetServiceState(ServiceState.Closing);
-                    try
-                    {
-                        this.CremaHost.Sign(authentication);
-                        await this.domainHost.CancelContentAsync(authentication);
-                    }
-                    catch
-                    {
-                        this.domainHost.SetServiceState(ServiceState.Opened);
-                        throw;
-                    }
+                    return this.Table.Name;
+                });
+                try
+                {
+                    await this.domainHost.CancelContentAsync(authentication, name);
+                }
+                catch
+                {
+                    this.domainHost.SetServiceState(ServiceState.Opened);
+                    throw;
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication);
                     this.domainHost.SetServiceState(ServiceState.Closed);
                     this.domainHost.InvokeEditCanceledEvent(EventArgs.Empty);
                     this.domainHost = null;
@@ -197,13 +205,16 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var accessType = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EnterEditAsync), this.Table);
                     this.ValidateEnter(authentication);
+                    return this.GetAccessType(authentication);
+                });
+                await this.domain.AddUserAsync(authentication, accessType);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication);
-                    var accessType = this.GetAccessType(authentication);
-                    await this.domain.AddUserAsync(authentication, accessType);
                     this.domainHost.EnterContent(authentication);
                 });
             }
@@ -219,12 +230,15 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(LeaveEditAsync), this.Table);
                     this.ValidateLeave(authentication);
+                });
+                await this.domain.RemoveUserAsync(authentication);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication);
-                    await this.domain.RemoveUserAsync(authentication);
                     this.domainHost.LeaveContent(authentication);
                 });
             }
@@ -240,16 +254,17 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(ClearAsync), this.Table);
-                    var rowInfo = new DomainRowInfo()
-                    {
-                        TableName = this.Table.Name,
-                        Keys = DomainRowInfo.ClearKey,
-                    };
-                    await this.domain.RemoveRowAsync(authentication, new DomainRowInfo[] { rowInfo });
+                    return this.Table.Name;
                 });
+                var rowInfo = new DomainRowInfo()
+                {
+                    TableName = name,
+                    Keys = DomainRowInfo.ClearKey,
+                };
+                await this.domain.RemoveRowAsync(authentication, new DomainRowInfo[] { rowInfo });
             }
             catch (Exception e)
             {
@@ -548,6 +563,7 @@ namespace Ntreev.Crema.Services.Data
 
         private DomainAccessType GetAccessType(Authentication authentication)
         {
+            this.Dispatcher.VerifyAccess();
             if (this.Table.VerifyAccessType(authentication, AccessType.Editor))
                 return DomainAccessType.ReadWrite;
             else if (this.Table.VerifyAccessType(authentication, AccessType.Guest))

@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Services.Domains
             IgnoreWhitespace = true,
         };
 
-        private readonly Authentication authentication;
+        //private readonly Authentication authentication;
         private readonly DomainContext domainContext;
         private readonly string workingPath;
 
@@ -50,9 +50,8 @@ namespace Ntreev.Crema.Services.Domains
         private Domain domain;
         private DateTime dateTime;
 
-        public DomainRestorer(Authentication authentication, DomainContext domainContext, string workingPath)
+        public DomainRestorer(DomainContext domainContext, string workingPath)
         {
-            this.authentication = authentication;
             this.domainContext = domainContext;
             this.workingPath = workingPath;
         }
@@ -65,10 +64,10 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     await Task.Run(async () =>
                     {
+                        //await this.CollectAuthenticationsAsync();
                         await this.DeserializeDomainAsync();
                         this.CollectCompletedActions();
                         this.CollectPostedActions();
-                        this.CollectAuthentications();
                         await this.RestoreDomainAsync();
                     });
                 }
@@ -105,31 +104,40 @@ namespace Ntreev.Crema.Services.Domains
 
         private async Task DeserializeDomainAsync()
         {
-            var domainLogger = new DomainLogger(this.domainContext.Serializer, this.workingPath);
-            var domainInfo = domainLogger.DomainInfo;
-            var domainType = Type.GetType(domainInfo.DomainType);
-            var source = domainLogger.Source;
-            this.domain = (Domain)Activator.CreateInstance(domainType, domainInfo, source);
-            this.domain.Logger = domainLogger;
-            await this.domainContext.Domains.RestoreAsync(this.authentication, this.domain);
-        }
-
-        private void CollectAuthentications()
-        {
-            var creatorID = this.domain.DomainInfo.CreationInfo.ID;
             var userContext = this.domainContext.CremaHost.UserContext;
-            var userIDs = this.actionList.Select(item => item.UserID).Concat(Enumerable.Repeat(creatorID, 1)).Distinct();
-
-            var users = userContext.Dispatcher.Invoke(() =>
+            var domainLogger = new DomainLogger(this.domainContext.Serializer, this.workingPath);
+            var domainSerializationInfo = domainLogger.DomainInfo;
+            var domainType = Type.GetType(domainSerializationInfo.DomainType);
+            var domainInfo = domainSerializationInfo.DomainInfo;
+            var source = domainLogger.Source;
+            var users = await userContext.Dispatcher.InvokeAsync(() =>
             {
-                var query = from userID in userIDs
-                            join User user in userContext.Users on userID equals user.ID
+                var query = from User user in userContext.Users
                             select new Authentication(new UserAuthenticationProvider(user, true));
                 return query.ToArray();
             });
-
             this.authentications = users.ToDictionary(item => item.ID);
+            this.domain = (Domain)Activator.CreateInstance(domainType, domainSerializationInfo, source);
+            this.domain.Logger = domainLogger;
+            await this.domainContext.Domains.RestoreAsync(this.authentications[domainInfo.CreationInfo.ID], this.domain);
         }
+
+        //private async Task CollectAuthenticationsAsync()
+        //{
+        //    var creatorID = this.domain.DomainInfo.CreationInfo.ID;
+        //    var userContext = this.domainContext.CremaHost.UserContext;
+        //    var userIDs = this.actionList.Select(item => item.UserID).Concat(Enumerable.Repeat(creatorID, 1)).Distinct();
+
+        //    var users = await userContext.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        var query = from userID in userIDs
+        //                    join User user in userContext.Users on userID equals user.ID
+        //                    select new Authentication(new UserAuthenticationProvider(user, true));
+        //        return query.ToArray();
+        //    });
+
+        //    this.authentications = users.ToDictionary(item => item.ID);
+        //}
 
         private async Task RestoreDomainAsync()
         {

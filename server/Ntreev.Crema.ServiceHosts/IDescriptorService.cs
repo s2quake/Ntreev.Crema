@@ -35,7 +35,7 @@ namespace Ntreev.Crema.ServiceHosts
         Task<bool> IsOnlineAsync(string userID, byte[] password);
 
         [OperationContract]
-        DataBaseInfo[] GetDataBaseInfos();
+        Task<DataBaseInfo[]> GetDataBaseInfosAsync();
 
         [OperationContract]
         ServiceInfo[] GetServiceInfos();

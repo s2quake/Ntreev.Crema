@@ -18,6 +18,7 @@
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
 using System;
 using System.Data;
@@ -36,21 +37,27 @@ namespace Ntreev.Crema.Services.Data
             this.template = template;
         }
 
-        public TableColumn(TableTemplateBase template, DataTable table)
+        private TableColumn(TableTemplateBase template, DataTable table)
             : base(template.Domain, table)
         {
             this.template = template;
-            var query = from DataRow item in table.Rows
-                        where (item.RowState == DataRowState.Deleted || item.RowState == DataRowState.Detached) == false
-                        select item.Field<string>(CremaSchema.ColumnName);
+        }
 
-            var newName = NameUtility.GenerateNewName("Column", query);
-            Initialize();
-
-            async void Initialize()
+        public static async Task<TableColumn> CreateAsync(Authentication authentication, TableTemplateBase template, DataTable table)
+        {
+            var domain = template.Domain;
+            var tuple = await domain.Dispatcher.InvokeAsync(() =>
             {
-                await this.SetFieldAsync(null, CremaSchema.ColumnName, newName);
-            }
+                var column = new TableColumn(template, table);
+                var query = from DataRow item in table.Rows
+                            where (item.RowState == DataRowState.Deleted || item.RowState == DataRowState.Detached) == false
+                            select item.Field<string>(CremaSchema.ColumnName);
+
+                var newName = NameUtility.GenerateNewName("Column", query);
+                return (column, newName);
+            });
+            await tuple.column.SetFieldAsync(authentication, CremaSchema.ColumnName, tuple.newName);
+            return tuple.column;
         }
 
         public Task SetIndexAsync(Authentication authentication, int value)

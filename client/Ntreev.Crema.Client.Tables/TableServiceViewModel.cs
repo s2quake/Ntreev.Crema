@@ -224,51 +224,48 @@ namespace Ntreev.Crema.Client.Tables
             this.isFirst = true;
 
             var domainContext = dataBase.GetService(typeof(IDomainContext)) as IDomainContext;
-            var items = await await dataBase.Dispatcher.InvokeAsync(async () =>
+            var domains = await domainContext.Dispatcher.InvokeAsync(() => domainContext.Domains.Where(item => item.DataBaseID == dataBase.ID).ToArray());
+            var restoreList = new List<System.Action>();
+
+            foreach (var item in domains)
             {
-                var restoreList = new List<System.Action>();
-                var domains = domainContext.Domains.Where(item => item.DataBaseID == dataBase.ID).ToArray();
+                if (await item.Users.ContainsAsync(this.authenticator.ID) == false)
+                    continue;
 
-                foreach (var item in domains)
+                var itemPath = item.DomainInfo.ItemPath;
+                var itemType = item.DomainInfo.ItemType;
+
+                if (item.Host is ITableContent content)
                 {
-                    if (await item.Users.ContainsAsync(this.authenticator.ID) == false)
-                        continue;
-
-                    var itemPath = item.DomainInfo.ItemPath;
-                    var itemType = item.DomainInfo.ItemType;
-
-                    if (item.Host is ITableContent content)
+                    var table = content.Table;
+                    var tableDescriptor = this.browser.GetDescriptor(table.Path) as ITableDescriptor;
+                    restoreList.Add(new System.Action(() => this.DocumentService.OpenTable(this.authenticator, tableDescriptor)));
+                }
+                else if (item.Host is ITableTemplate template)
+                {
+                    if (itemType == "NewTableTemplate")
                     {
-                        var table = content.Table;
-                        var tableDescriptor = this.browser.GetDescriptor(table.Path) as ITableDescriptor;
-                        restoreList.Add(new System.Action(() => this.DocumentService.OpenTable(this.authenticator, tableDescriptor)));
+                        var category = dataBase.TableContext[itemPath] as ITableCategory;
+                        var dialog = new NewTableViewModel(this.authenticator, category, template);
+                        restoreList.Add(new System.Action(() => dialog.ShowDialog()));
                     }
-                    else if (item.Host is ITableTemplate template)
+                    else if (itemType == "NewChildTableTemplate")
                     {
-                        if (itemType == "NewTableTemplate")
-                        {
-                            var category = dataBase.TableContext[itemPath] as ITableCategory;
-                            var dialog = new NewTableViewModel(this.authenticator, category, template);
-                            restoreList.Add(new System.Action(() => dialog.ShowDialog()));
-                        }
-                        else if (itemType == "NewChildTableTemplate")
-                        {
-                            var table = dataBase.TableContext[itemPath] as ITable;
-                            var dialog = new NewChildTableViewModel(this.authenticator, table, template);
-                            restoreList.Add(new System.Action(() => dialog.ShowDialog()));
-                        }
-                        else if (itemType == "TableTemplate")
-                        {
-                            var table = dataBase.TableContext[itemPath] as ITable;
-                            var dialog = new EditTemplateViewModel(this.authenticator, table, template);
-                            restoreList.Add(new System.Action(() => dialog.ShowDialog()));
-                        }
+                        var table = dataBase.TableContext[itemPath] as ITable;
+                        var dialog = new NewChildTableViewModel(this.authenticator, table, template);
+                        restoreList.Add(new System.Action(() => dialog.ShowDialog()));
+                    }
+                    else if (itemType == "TableTemplate")
+                    {
+                        var table = dataBase.TableContext[itemPath] as ITable;
+                        var dialog = new EditTemplateViewModel(this.authenticator, table, template);
+                        restoreList.Add(new System.Action(() => dialog.ShowDialog()));
                     }
                 }
-                return restoreList.ToArray();
-            });
+            }
+            //return restoreList.ToArray();
 
-            foreach (var item in items)
+            foreach (var item in restoreList)
             {
                 if (this.cremaAppHost.IsLoaded == false)
                     return;

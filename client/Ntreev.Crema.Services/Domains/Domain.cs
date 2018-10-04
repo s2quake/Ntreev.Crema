@@ -54,15 +54,25 @@ namespace Ntreev.Crema.Services.Domains
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var container = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, isCanceled);
-                    var container = this.Container;
-                    var result = await this.Service.DeleteDomainAsync(this.ID, isCanceled);
+                    return this.Container;
+                });
+                var result = await this.Service.DeleteDomainAsync(this.ID, isCanceled);
+                await this.Container.Dispatcher.InvokeAsync(() => this.Dispose());
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
-                    this.Dispose();
+                    if (this.Dispatcher.Owner is DomainContext == false)
+                    {
+                        this.Dispatcher.Dispose();
+                    }
                     this.Dispatcher = null;
                     this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
+                });
+                await container.Dispatcher.InvokeAsync(() =>
+                {
                     container.InvokeDomainDeletedEvent(authentication, this, isCanceled);
                 });
             }
@@ -317,79 +327,85 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public void Initialize(Authentication authentication, DomainMetaData metaData)
+        public async Task InitializeAsync(Authentication authentication, DomainMetaData metaData)
         {
-            base.DomainState = metaData.DomainState;
-            this.modifiedTableList.Clear();
-            foreach (var item in metaData.ModifiedTables)
+            await await this.Dispatcher.InvokeAsync(async () =>
             {
-                this.modifiedTableList.Add(item);
-            }
-
-            if (metaData.Data == null)
-            {
-                foreach (var item in metaData.Users)
+                base.DomainState = metaData.DomainState;
+                this.modifiedTableList.Clear();
+                foreach (var item in metaData.ModifiedTables)
                 {
-                    this.InvokeUserAdded(authentication, item.DomainUserInfo, item.DomainUserState);
+                    this.modifiedTableList.Add(item);
                 }
-            }
-            else
-            {
-                this.OnInitialize(metaData);
-                this.initialized = true;
-                foreach (var item in metaData.Users)
+
+                if (metaData.Data == null)
                 {
-                    if (this.Users.ContainsKey(item.DomainUserInfo.UserID) == false)
+                    foreach (var item in metaData.Users)
+                    {
                         this.InvokeUserAdded(authentication, item.DomainUserInfo, item.DomainUserState);
+                    }
                 }
-            }
-        }
-
-        public void Release(Authentication authentication, DomainMetaData metaData)
-        {
-            this.OnRelease();
-            this.initialized = false;
-
-            foreach (var item in this.Users.ToArray<DomainUser>())
-            {
-                if (metaData.Users.Any(i => i.DomainUserInfo.UserID == item.DomainUserInfo.UserID) == false)
+                else
                 {
-                    this.InvokeUserRemoved(authentication, item.DomainUserInfo, RemoveInfo.Empty);
+                    this.OnInitialize(metaData);
+                    this.initialized = true;
+                    var userContext = this.CremaHost.UserContext;
+                    foreach (var item in metaData.Users)
+                    {
+                        if (this.Users.ContainsKey(item.DomainUserInfo.UserID) == false)
+                        {
+                            var signatureDate = new SignatureDate(item.DomainUserInfo.UserID, authentication.SignatureDate.DateTime);
+                            var userAuthentication = await userContext.AuthenticateAsync(signatureDate);
+                            this.InvokeUserAdded(userAuthentication, item.DomainUserInfo, item.DomainUserState);
+                        }
+                    }
                 }
-            }
-
-            foreach (var item in metaData.Users)
-            {
-                if (item.DomainUserState.HasFlag(DomainUserState.IsOwner) == true)
-                {
-                    var master = this.Users[item.DomainUserInfo.UserID];
-                    this.Users.Owner = master;
-                    this.InvokeUserChanged(authentication, item.DomainUserInfo, item.DomainUserState);
-                }
-            }
-        }
-
-        public Task DisposeAsync(Authentication authentication, bool isCanceled)
-        {
-            return this.Dispatcher.InvokeAsync(() =>
-            {
-                var container = this.Container;
-                this.Dispose();
-                this.Dispatcher = null;
-                this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
-                container.InvokeDomainDeletedEvent(authentication, this, isCanceled);
             });
         }
 
-        public void AttachUser()
+        public Task ReleaseAsync(Authentication authentication, DomainMetaData metaData)
         {
-            this.Dispatcher.VerifyAccess();
-
-            if (this.Users.ContainsKey(this.CremaHost.UserID) == true)
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                var domainUser = this.Users[this.CremaHost.UserID];
-                domainUser.IsOnline = true;
-            }
+                this.OnRelease();
+                this.initialized = false;
+
+                foreach (var item in this.Users.ToArray<DomainUser>())
+                {
+                    if (metaData.Users.Any(i => i.DomainUserInfo.UserID == item.DomainUserInfo.UserID) == false)
+                    {
+                        this.InvokeUserRemoved(authentication, item.DomainUserInfo, RemoveInfo.Empty);
+                    }
+                }
+
+                foreach (var item in metaData.Users)
+                {
+                    if (item.DomainUserState.HasFlag(DomainUserState.IsOwner) == true)
+                    {
+                        var master = this.Users[item.DomainUserInfo.UserID];
+                        this.Users.Owner = master;
+                        this.InvokeUserChanged(authentication, item.DomainUserInfo, item.DomainUserState);
+                    }
+                }
+            });
+        }
+
+        public void Dispose(Authentication authentication, bool isCanceled)
+        {
+            this.Dispose();
+            this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
+        }
+
+        public Task AttachUserAsync()
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.Users.ContainsKey(this.CremaHost.UserID) == true)
+                {
+                    var domainUser = this.Users[this.CremaHost.UserID];
+                    domainUser.IsOnline = true;
+                }
+            });
         }
 
         public Task DetachUserAsync()
@@ -872,57 +888,23 @@ namespace Ntreev.Crema.Services.Domains
             result.Validate(authentication);
         }
 
-        private IDomainService Service
-        {
-            get { return this.Context.Service; }
-        }
+        private IDomainService Service => this.Context.Service;
 
         #region IDomain
 
-        IDomainUserCollection IDomain.Users
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Users;
-            }
-        }
+        IDomainUserCollection IDomain.Users => this.Users;
 
-        DomainInfo IDomain.DomainInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.DomainInfo;
-            }
-        }
+        DomainInfo IDomain.DomainInfo => base.DomainInfo;
 
-        object IDomain.Host
-        {
-            get { return this.Host; }
-        }
+        object IDomain.Host => this.Host;
 
         #endregion
 
         #region IDomainItem
 
-        IDomainItem IDomainItem.Parent
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Category;
-            }
-        }
+        IDomainItem IDomainItem.Parent => this.Category;
 
-        IEnumerable<IDomainItem> IDomainItem.Childs
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return Enumerable.Empty<IDomainItem>();
-            }
-        }
+        IEnumerable<IDomainItem> IDomainItem.Childs => Enumerable.Empty<IDomainItem>();
 
         #endregion
 

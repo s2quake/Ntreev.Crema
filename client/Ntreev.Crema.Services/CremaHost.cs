@@ -155,6 +155,7 @@ namespace Ntreev.Crema.Services
                 {
                     this.IPAddress = AddressUtility.GetIPAddress(address);
                     this.Address = AddressUtility.GetDisplayAddress(address);
+                    this.UserID = userID;
                     this.log = new LogService(this.Address.Replace(':', '_'), userID, AppUtility.UserAppDataPath)
                     {
                         Verbose = this.settings.Verbose
@@ -312,6 +313,11 @@ namespace Ntreev.Crema.Services
         public void Sign<T>(Authentication authentication, ResultBase<T> result)
         {
             result.Validate(authentication);
+        }
+
+        public void Sign(Authentication authentication, SignatureDate signatureDate)
+        {
+            authentication.Sign(signatureDate.DateTime);
         }
 
         // mac의 mono 환경에서는 바인딩 값이 서버와 다를 경우 접속이 거부되는 현상이 있음(버그로 추정)

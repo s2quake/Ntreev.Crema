@@ -98,6 +98,6 @@ namespace Ntreev.Crema.ServiceHosts.Data
         Task<ResultBase> CancelTransactionAsync(string dataBaseName);
 
         [OperationContract]
-        bool IsAlive();
+        Task<bool> IsAliveAsync();
     }
 }

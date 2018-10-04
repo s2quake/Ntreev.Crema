@@ -125,14 +125,21 @@ namespace Ntreev.Crema.ApplicationHost.Views
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(e.Property.Name));
         }
 
-        private void CremaHost_Opened(object sender, EventArgs e)
+        private async void CremaHost_Opened(object sender, EventArgs e)
         {
-            var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            userContext.Users.UsersKicked += Users_UsersKicked;
-            userContext.Users.UsersBanChanged += Users_UsersBanChanged;
+            if (this.cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
+            {
+                await userContext.Dispatcher.InvokeAsync(() =>
+                {
+                    userContext.Users.UsersKicked += Users_UsersKicked;
+                    userContext.Users.UsersBanChanged += Users_UsersBanChanged;
+                });
+            }
 
-            var logService = this.cremaHost.GetService(typeof(ILogService)) as ILogService;
-            logService.RedirectionWriter = new LogWriter() { TextBox = this.logView, };
+            if (this.cremaHost.GetService(typeof(ILogService)) is ILogService logService)
+            {
+                logService.RedirectionWriter = new LogWriter() { TextBox = this.logView, };
+            }
         }
 
         private void CremaHost_Closing(object sender, EventArgs e)
@@ -246,7 +253,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
 
         private void ModernWindow_Initialized(object sender, EventArgs e)
         {
-            
+
         }
 
         private void ModernWindow_Loaded(object sender, RoutedEventArgs e)

@@ -85,7 +85,7 @@ namespace Ntreev.Crema.Services.Data
         {
             await this.dataBase.SetResettingAsync(authentication);
             var metaDatas = await this.DomainContext.RestoreAsync(authentication, this.dataBase);
-            this.dataBase.SetReset(authentication, metaDatas);
+            await this.dataBase.SetResetAsync(authentication, metaDatas);
         }
 
         public void Dispose()
