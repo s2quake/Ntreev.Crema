@@ -93,6 +93,49 @@ namespace Ntreev.Crema.Services.Domains
             return this.CremaHost.GetService(serviceType);
         }
 
+        public async Task RestoreAsync(Authentication authentication, Domain domain)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                authentication.Sign();
+                var dataBase = this.CremaHost.DataBases[domain.DataBaseID];
+                var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
+                var category = this.Categories.Prepare(categoryName);
+                domain.Category = category;
+                //domain.Dispatcher = new CremaDispatcher(domain);
+                this.Domains.InvokeDomainCreatedEvent(authentication, domain, domain.DomainInfo);
+            });
+        }
+
+        public async Task AddAsync(Authentication authentication, Domain domain, DataBase dataBase)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
+                var category = this.Categories.Prepare(categoryName);
+                domain.Category = category;
+                domain.Logger = new DomainLogger(this.Serializer, domain);
+                //domain.Dispatcher = new CremaDispatcher(domain);
+                this.Domains.InvokeDomainCreatedEvent(authentication, domain, domain.DomainInfo);
+            });
+        }
+
+        public async Task RemoveAsync(Authentication authentication, Domain domain, bool isCanceled)
+        {
+            await domain.Logger?.DisposeAsync(true);
+            domain.Logger = null;
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Domains.Remove(domain);
+                //var dispatcher = domain.Dispatcher;
+                //domain.Dispatcher = null;
+
+                domain.Dispose(authentication, isCanceled);
+                //dispatcher.Dispose();
+                this.Domains.InvokeDomainDeletedEvent(authentication, domain, isCanceled);
+            });
+        }
+
         public async Task<DomainContextMetaData> GetMetaDataAsync(Authentication authentication)
         {
             var domains = await this.Domains.GetMetaDataAsync(authentication);
@@ -269,17 +312,24 @@ namespace Ntreev.Crema.Services.Domains
 
         public async Task DisposeAsync()
         {
-            foreach (var item in this.Domains.ToArray<Domain>())
+            var tasks = await this.Dispatcher.InvokeAsync(() =>
             {
-                this.Domains.Remove(item);
-                var dispatcher = item.Dispatcher;
-                item.Dispatcher = null;
-                item.Logger?.Dispose(true);
-                item.Logger = null;
-                await dispatcher.InvokeAsync(() => item.Dispose(this));
-                dispatcher.Dispose();
-            }
-            this.Dispatcher.Dispose();
+                var taskList = new List<Task>(this.Domains.Count);
+                foreach (var item in this.Domains.ToArray<Domain>())
+                {
+                    if (item.Logger != null)
+                    {
+                        taskList.Add(item.Logger.DisposeAsync(true));
+                    }
+                }
+                return taskList.ToArray();
+            });
+            await Task.WhenAll();
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Clear();
+                this.Dispatcher.Dispose();
+            });
         }
 
         protected virtual void OnItemsCreated(ItemsCreatedEventArgs<IDomainItem> e)

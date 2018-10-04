@@ -89,10 +89,10 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(InheritAsync), this, table, newTableName, categoryPath, copyContent);
                     this.ValidateInherit(authentication, table, newTableName, categoryPath, copyContent);
                     this.CremaHost.Sign(authentication);
-                    var dataSet = await table.ReadDataForCopyAsync(authentication);
+                    var itemName = new ItemName(categoryPath, newTableName);
+                    var dataSet = await table.ReadDataForCopyAsync(authentication, itemName);
                     var dataTable = dataSet.Tables[table.Name, table.Category.Path];
                     var dataTables = dataSet.Tables.ToArray();
-                    var itemName = new ItemName(categoryPath, newTableName);
                     var newDataTable = dataTable.Inherit(itemName, copyContent);
                     newDataTable.CategoryPath = categoryPath;
                     var query = from item in dataSet.Tables.Except(dataTables)
@@ -120,10 +120,10 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), this, table, newTableName, categoryPath, copyContent);
                     this.ValidateCopy(authentication, table, newTableName, categoryPath, copyContent);
                     this.CremaHost.Sign(authentication);
-                    var dataSet = await table.ReadDataForCopyAsync(authentication);
+                    var itemName = new ItemName(categoryPath, newTableName);
+                    var dataSet = await table.ReadDataForCopyAsync(authentication, itemName);
                     var dataTable = dataSet.Tables[table.Name, table.Category.Path];
                     var dataTables = dataSet.Tables.ToArray();
-                    var itemName = new ItemName(categoryPath, newTableName);
                     var newDataTable = dataTable.Copy(itemName, copyContent);
                     newDataTable.CategoryPath = categoryPath;
                     var query = from item in dataSet.Tables.Except(dataTables)

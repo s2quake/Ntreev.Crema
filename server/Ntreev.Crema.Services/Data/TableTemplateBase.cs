@@ -355,7 +355,7 @@ namespace Ntreev.Crema.Services.Data
             this.table.RowDeleted += Table_RowDeleted;
             this.table.RowChanged += Table_RowChanged;
 
-            await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
+            await this.DomainContext.AddAsync(authentication, this.domain, this.DataBase);
             await this.domain.AddUserAsync(authentication, DomainAccessType.ReadWrite);
             await this.AttachDomainEventAsync();
         }
@@ -365,7 +365,7 @@ namespace Ntreev.Crema.Services.Data
             if (this.domain != null)
             {
                 await this.DetachDomainEventAsync();
-                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false);
+                await this.DomainContext.RemoveAsync(authentication, this.domain, false);
                 this.domain = null;
             }
             if (this.table != null)
@@ -384,7 +384,7 @@ namespace Ntreev.Crema.Services.Data
             if (this.domain != null)
             {
                 await this.DetachDomainEventAsync();
-                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true);
+                await this.DomainContext.RemoveAsync(authentication, this.domain, true);
                 this.domain = null;
             }
             if (this.table != null)
@@ -402,7 +402,6 @@ namespace Ntreev.Crema.Services.Data
         {
             this.TemplateSource = domain.Source as CremaTemplate;
             this.domain = domain as TableTemplateDomain;
-
             if (this.TemplateSource != null)
             {
                 this.table = this.TemplateSource.View.Table;
@@ -417,6 +416,7 @@ namespace Ntreev.Crema.Services.Data
             }
             this.IsModified = this.domain.IsModified;
             await this.AttachDomainEventAsync();
+            this.ServiceState = ServiceState.Opened;
         }
 
         protected virtual async Task OnDetachAsync()

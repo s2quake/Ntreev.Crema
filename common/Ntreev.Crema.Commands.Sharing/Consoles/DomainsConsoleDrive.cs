@@ -62,7 +62,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         protected override Task OnSetPathAsync(Authentication authentication, string path)
         {
-            throw new NotImplementedException();
+            return Task.Delay(1);
         }
 
         public override string[] GetPaths()

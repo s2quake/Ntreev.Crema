@@ -357,15 +357,25 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task<CremaDataSet> ReadDataForCopyAsync(Authentication authentication)
+        public async Task<CremaDataSet> ReadDataForCopyAsync(Authentication authentication, ItemName targetName)
         {
-            var itemPaths = await this.Dispatcher.InvokeAsync(() => new string[] { this.ItemPath });
-            var props = new CremaDataSetSerializerSettings(authentication, itemPaths, null);
+            var tuple = await this.Dispatcher.InvokeAsync(() =>
+            {
+                var itemPaths = new string[] 
+                {
+                    this.Context.GenerateCategoryPath(targetName.CategoryPath),
+                    this.Context.GeneratePath(targetName),
+                    this.ItemPath
+                };
+                var props = new CremaDataSetSerializerSettings(authentication, itemPaths, null);
+                var itemPath = this.ItemPath;
+                return (itemPaths, props, itemPath);
+            });
             return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Lock(itemPaths);
-                var dataSet = this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), props) as CremaDataSet;
-                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = itemPaths;
+                this.Repository.Lock(tuple.itemPaths);
+                var dataSet = this.Serializer.Deserialize(this.ItemPath, typeof(CremaDataSet), tuple.props) as CremaDataSet;
+                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = tuple.itemPaths;
                 return dataSet;
             });
         }

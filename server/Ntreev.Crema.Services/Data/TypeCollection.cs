@@ -87,9 +87,9 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), typeName, newTypeName, categoryPath);
                     this.ValidateCopy(authentication, typeName, newTypeName);
                     var type = this[typeName];
-                    var dataSet = await type.ReadDataForCopyAsync(authentication);
-                    var dataType = dataSet.Types[type.Name, type.Category.Path];
                     var itemName = new ItemName(categoryPath, newTypeName);
+                    var dataSet = await type.ReadDataForCopyAsync(authentication, itemName);
+                    var dataType = dataSet.Types[type.Name, type.Category.Path];
                     var newDataType = dataType.Copy(itemName);
                     var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, true);
                     var typePaths = new string[] { categoryPath + newTypeName };

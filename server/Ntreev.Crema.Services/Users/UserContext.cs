@@ -420,11 +420,11 @@ namespace Ntreev.Crema.Services.Users
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                foreach (var item in this.Users)
-                {
-                    if (item.Authentication != null)
-                        item.Authentication.InvokeExpiredEvent(Authentication.System.ID);
-                }
+                //foreach (var item in this.Users)
+                //{
+                //    if (item.Authentication != null)
+                //        item.Authentication.InvokeExpiredEvent(Authentication.System.ID);
+                //}
                 base.Clear();
             });
             this.Repository.Dispose();

@@ -129,7 +129,7 @@ namespace Ntreev.Crema.Services.Data
                         item.IsModified = this.domain.ModifiedTables.Contains(item.dataTable.Name);
                     }
                 });
-                await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
+                await this.DomainContext.AddAsync(authentication, this.domain, this.DataBase);
                 await this.AttachDomainEventAsync();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -147,8 +147,11 @@ namespace Ntreev.Crema.Services.Data
                 {
                     await this.Repository.UnlockAsync(this.dataBaseSet.ItemPaths);
                 }
-                await this.DetachDomainEventAsync();
-                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false);
+                if (name != null)
+                {
+                    await this.DetachDomainEventAsync();
+                    await this.DomainContext.RemoveAsync(authentication, this.domain, false);
+                }
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var tables = this.Contents.Where(item => item.IsModified).Select(item => item.Table).ToArray();
@@ -172,7 +175,7 @@ namespace Ntreev.Crema.Services.Data
                 if (name != null)
                 {
                     await this.DetachDomainEventAsync();
-                    await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true);
+                    await this.DomainContext.RemoveAsync(authentication, this.domain, true);
                 }
                 await this.Repository.UnlockAsync(this.dataBaseSet.ItemPaths);
                 await this.Dispatcher.InvokeAsync(() =>

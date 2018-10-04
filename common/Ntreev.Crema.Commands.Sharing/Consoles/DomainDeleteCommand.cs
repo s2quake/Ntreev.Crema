@@ -45,7 +45,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        [CommandMethodProperty(nameof(DomainID), nameof(DataBaseName))]
+        [CommandMethodProperty(nameof(DomainID))]
         public Task DeleteAsync()
         {
             if (this.DataBaseName == null)
@@ -60,7 +60,8 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [CommandProperty(IsRequired = true)]
         [DefaultValue("")]
-        [CommandPropertyTrigger(nameof(DataBaseName), null)]
+        //[CommandPropertyTrigger(nameof(DataBaseName), null)]
+        [CommandCompletion(nameof(GetDomainIDs))]
         public string DomainID
         {
             get; set;
@@ -78,7 +79,7 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty("database")]
+        [CommandProperty("database", IsRequired = true, IsExplicit = true)]
         [CommandPropertyTrigger(nameof(DomainID), "")]
         [CommandCompletion(nameof(GetDataBaseNames))]
         public string DataBaseName
@@ -130,6 +131,14 @@ namespace Ntreev.Crema.Commands.Consoles
                 var query = from item in this.DataBases
                             select item.Name;
                 return query.ToArray();
+            });
+        }
+
+        private string[] GetDomainIDs()
+        {
+            return this.DomainContext.Dispatcher.Invoke(() =>
+            {
+                return this.DomainContext.Domains.Select(item => $"{item.ID}").ToArray();
             });
         }
 

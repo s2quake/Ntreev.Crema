@@ -119,7 +119,7 @@ namespace Ntreev.Crema.Services.Domains
             this.authentications = users.ToDictionary(item => item.ID);
             this.domain = (Domain)Activator.CreateInstance(domainType, domainSerializationInfo, source);
             this.domain.Logger = domainLogger;
-            await this.domainContext.Domains.RestoreAsync(this.authentications[domainInfo.CreationInfo.ID], this.domain);
+            await this.domainContext.RestoreAsync(this.authentications[domainInfo.CreationInfo.ID], this.domain);
         }
 
         //private async Task CollectAuthenticationsAsync()
@@ -155,6 +155,7 @@ namespace Ntreev.Crema.Services.Domains
 
                     this.domain.DateTimeProvider = this.GetTime;
                     this.dateTime = action.AcceptTime;
+                    this.domain.Logger.ID = item.ID;
 
                     if (item is NewRowAction newRowAction)
                     {

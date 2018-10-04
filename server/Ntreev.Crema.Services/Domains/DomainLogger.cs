@@ -23,11 +23,12 @@ using Ntreev.Library.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Ntreev.Crema.Services.Domains
 {
-    class DomainLogger
+    class DomainLogger : IDispatcherObject
     {
         public const string HeaderItemPath = "header";
         public const string SourceItemPath = "source";
@@ -61,12 +62,13 @@ namespace Ntreev.Crema.Services.Domains
             this.sourcePath = Path.Combine(this.basePath, SourceItemPath);
             this.postedPath = Path.Combine(this.basePath, PostedItemPath);
             this.completedPath = Path.Combine(this.basePath, CompletedItemPath);
-            
+
             this.serializer.Serialize(this.headerPath, this.domainInfo, ObjectSerializerSettings.Empty);
             this.serializer.Serialize(this.sourcePath, this.source, ObjectSerializerSettings.Empty);
             this.postedList = new List<DomainPostItemSerializationInfo>();
             this.completedList = new List<DomainCompleteItemSerializationInfo>();
-    }
+            this.Dispatcher = new CremaDispatcher(this);
+        }
 
         public DomainLogger(IObjectSerializer serializer, string basePath)
         {
@@ -91,28 +93,36 @@ namespace Ntreev.Crema.Services.Domains
 
             {
                 var items = File.ReadAllLines(this.postedPath);
-                this.postedList = new List<DomainPostItemSerializationInfo>(items.Length); 
+                this.postedList = new List<DomainPostItemSerializationInfo>(items.Length);
                 foreach (var item in items)
                 {
                     this.postedList.Add(DomainPostItemSerializationInfo.Parse(item));
                 }
             }
+            this.Dispatcher = new CremaDispatcher(this);
         }
 
-        public void Dispose(bool delete)
+        public override string ToString()
         {
-            if (delete == true)
+            return $"{this.domainInfo.DomainInfo.CategoryPath}{this.domainInfo.DomainInfo.DomainID}";
+        }
+
+        public Task DisposeAsync(bool delete)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                DirectoryUtility.Delete(this.basePath);
-            }
+                if (delete == true)
+                {
+                    DirectoryUtility.Delete(this.basePath);
+                }
+                this.Dispatcher.Dispose();
+                this.Dispatcher = null;
+            });
         }
 
-        public void NewRow(Authentication authentication, DomainRowInfo[] rows)
+        public Task<long> NewRowAsync(Authentication authentication, DomainRowInfo[] rows)
         {
-            if (this.IsEnabled == false)
-                return;
-
-            this.Post(new NewRowAction()
+            return this.PostAsync(new NewRowAction()
             {
                 UserID = authentication.ID,
                 Rows = rows,
@@ -120,12 +130,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public void SetRow(Authentication authentication, DomainRowInfo[] rows)
+        public Task<long> SetRowAsync(Authentication authentication, DomainRowInfo[] rows)
         {
-            if (this.IsEnabled == false)
-                return;
-
-            this.Post(new SetRowAction()
+            return this.PostAsync(new SetRowAction()
             {
                 UserID = authentication.ID,
                 Rows = rows,
@@ -133,12 +140,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public void RemoveRow(Authentication authentication, DomainRowInfo[] rows)
+        public Task<long> RemoveRowAsync(Authentication authentication, DomainRowInfo[] rows)
         {
-            if (this.IsEnabled == false)
-                return;
-
-            this.Post(new RemoveRowAction()
+            return this.PostAsync(new RemoveRowAction()
             {
                 UserID = authentication.ID,
                 Rows = rows,
@@ -146,12 +150,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public void SetProperty(Authentication authentication, string propertyName, object value)
+        public Task<long> SetPropertyAsync(Authentication authentication, string propertyName, object value)
         {
-            if (this.IsEnabled == false)
-                return;
-
-            this.Post(new SetPropertyAction()
+            return this.PostAsync(new SetPropertyAction()
             {
                 UserID = authentication.ID,
                 PropertyName = propertyName,
@@ -160,9 +161,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public void Join(Authentication authentication, DomainAccessType accessType)
+        public Task<long> JoinAsync(Authentication authentication, DomainAccessType accessType)
         {
-            this.Post(new JoinAction()
+            return this.PostAsync(new JoinAction()
             {
                 UserID = authentication.ID,
                 AccessType = accessType,
@@ -170,9 +171,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public void Disjoin(Authentication authentication, RemoveInfo removeInfo)
+        public Task<long> DisjoinAsync(Authentication authentication, RemoveInfo removeInfo)
         {
-            this.Post(new DisjoinAction()
+            return this.PostAsync(new DisjoinAction()
             {
                 UserID = authentication.ID,
                 RemoveInfo = removeInfo,
@@ -180,9 +181,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public void Kick(Authentication authentication, string userID, string comment)
+        public Task<long> KickAsync(Authentication authentication, string userID, string comment)
         {
-            this.Post(new KickAction()
+            return this.PostAsync(new KickAction()
             {
                 UserID = authentication.ID,
                 TargetID = userID,
@@ -191,9 +192,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public void SetOwner(Authentication authentication, string userID)
+        public Task<long> SetOwnerAsync(Authentication authentication, string userID)
         {
-            this.Post(new SetOwnerAction()
+            return this.PostAsync(new SetOwnerAction()
             {
                 UserID = authentication.ID,
                 TargetID = userID,
@@ -201,31 +202,40 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public void Post(DomainActionBase action)
+        public Task<long> PostAsync(DomainActionBase action)
         {
-            if (this.IsEnabled == false)
-                return;
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.IsEnabled == false)
+                    return this.ID;
 
-            var id = this.ID++;
-            var itemPath = Path.Combine(this.basePath, $"{id}");
-            this.currentPost = new DomainPostItemSerializationInfo(id, action.GetType());
-            this.postedList.Add(this.currentPost);
-            this.serializer.Serialize(itemPath, action, ObjectSerializerSettings.Empty);
-            File.AppendAllText(this.postedPath, $"{this.currentPost}{Environment.NewLine}");
+                var id = this.ID++;
+                var itemPath = Path.Combine(this.basePath, $"{id}");
+                this.currentPost = new DomainPostItemSerializationInfo(id, action.GetType());
+                this.postedList.Add(this.currentPost);
+                this.serializer.Serialize(itemPath, action, ObjectSerializerSettings.Empty);
+                File.AppendAllText(this.postedPath, $"{this.currentPost}{Environment.NewLine}");
+                return id;
+            });
         }
 
-        public void Complete()
+        public Task CompleteAsync(long id)
         {
-            if (this.IsEnabled == false)
-                return;
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.IsEnabled == false)
+                    return;
 
-            this.completedList.Add(new DomainCompleteItemSerializationInfo(this.currentPost.ID));
-            File.AppendAllText(this.completedPath, $"{new DomainCompleteItemSerializationInfo(this.currentPost.ID)}{Environment.NewLine}");
+                this.completedList.Add(new DomainCompleteItemSerializationInfo(id));
+                File.AppendAllText(this.completedPath, $"{new DomainCompleteItemSerializationInfo(id)}{Environment.NewLine}");
+            });
         }
 
         public long ID { get; set; }
 
         public bool IsEnabled { get; set; } = true;
+
+        public CremaDispatcher Dispatcher { get; private set; }
 
         public IReadOnlyList<DomainPostItemSerializationInfo> PostedList => this.postedList;
 
