@@ -79,19 +79,19 @@ namespace Ntreev.Crema.Services.Domains
         public void InvokeDomainRowChangedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows)
         {
             var args = new DomainRowEventArgs(authentication, domain, rows);
-                this.OnDomainRowChanged(args);
+            this.OnDomainRowChanged(args);
         }
 
         public void InvokeDomainRowRemovedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows)
         {
             var args = new DomainRowEventArgs(authentication, domain, rows);
-                this.OnDomainRowChanged(args);
+            this.OnDomainRowChanged(args);
         }
 
         public void InvokeDomainPropertyChangedEvent(Authentication authentication, Domain domain, string propertyName, object value)
         {
             var args = new DomainPropertyEventArgs(authentication, domain, propertyName, value);
-                this.OnDomainPropertyChanged(args);
+            this.OnDomainPropertyChanged(args);
         }
 
         public void InvokeDomainUserAddedEvent(Authentication authentication, Domain domain, DomainUser domainUser)
@@ -99,9 +99,9 @@ namespace Ntreev.Crema.Services.Domains
             var args = new DomainUserEventArgs(authentication, domain, domainUser);
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainUserAddedEvent), domain, domainUser);
             var comment = EventMessageBuilder.EnterDomainUser(authentication, domain);
-                this.CremaHost.Debug(eventLog);
-                this.CremaHost.Info(comment);
-                this.OnDomainUserAdded(args);
+            this.CremaHost.Debug(eventLog);
+            this.CremaHost.Info(comment);
+            this.OnDomainUserAdded(args);
         }
 
         public void InvokeDomainUserRemovedEvent(Authentication authentication, Domain domain, DomainUser domainUser, RemoveInfo removeInfo)
@@ -111,30 +111,28 @@ namespace Ntreev.Crema.Services.Domains
             var comment = removeInfo.Reason == RemoveReason.Kick
                 ? EventMessageBuilder.KickDomainUser(authentication, domain, domainUser)
                 : EventMessageBuilder.LeaveDomainUser(authentication, domain);
-                this.CremaHost.Debug(eventLog);
-                this.CremaHost.Info(comment);
-                this.OnDomainUserRemoved(args);
+            this.CremaHost.Debug(eventLog);
+            this.CremaHost.Info(comment);
+            this.OnDomainUserRemoved(args);
         }
 
         public void InvokeDomainUserChangedEvent(Authentication authentication, Domain domain, DomainUser domainUser)
         {
             var args = new DomainUserEventArgs(authentication, domain, domainUser);
-                this.OnDomainUserChanged(args);
+            this.OnDomainUserChanged(args);
         }
 
         public void InvokeDomainInfoChangedEvent(Authentication authentication, Domain domain)
         {
             var args = new DomainEventArgs(authentication, domain);
-                this.OnDomainInfoChanged(args);
+            this.OnDomainInfoChanged(args);
         }
 
         public void InvokeDomainStateChangedEvent(Authentication authentication, Domain domain)
         {
             var args = new DomainEventArgs(authentication, domain);
-                this.OnDomainStateChanged(args);
+            this.OnDomainStateChanged(args);
         }
-
-        
 
         public Task<bool> ContainsAsync(Guid domainID)
         {

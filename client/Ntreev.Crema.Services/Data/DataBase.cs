@@ -38,7 +38,6 @@ namespace Ntreev.Crema.Services.Data
         IDataBaseServiceCallback, IDataBase, ICremaService, IInfoProvider, IStateProvider
     {
         private DataBaseServiceClient service;
-        private CremaDispatcher serviceDispatcher;
         private DataBaseMetaData metaData;
         private Timer timer;
 
@@ -329,39 +328,48 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var value = await this.Dispatcher.InvokeAsync(() =>
                 {
                     if (this.IsLoaded == false)
                         throw new InvalidOperationException(Resources.Exception_CannotEnter);
                     this.authentications.Add(authentication);
-                    if (this.authentications.Any(item => ((Authentication)item).ID == authentication.ID) && this.serviceDispatcher == null)
+                    return this.authentications.Any(item => ((Authentication)item).ID == authentication.ID) && this.Dispatcher.Owner is DataBase == false;
+                });
+
+                if (value == true)
+                {
+                    await this.Dispatcher.InvokeAsync(() =>
                     {
-                        this.serviceDispatcher = new CremaDispatcher(this);
                         this.service = DataServiceFactory.CreateServiceClient(this.CremaHost.IPAddress, this.CremaHost.ServiceInfos[nameof(DataBaseService)], this);
                         this.service.Open();
                         if (this.service is ICommunicationObject service)
                         {
                             service.Faulted += Service_Faulted;
                         }
-                        var result = await this.service.SubscribeAsync(this.CremaHost.AuthenticationToken, base.Name);
+                    });
+                    var result = await this.service.SubscribeAsync(this.CremaHost.AuthenticationToken, base.Name);
 #if !DEBUG
                         this.timer = new Timer(30000);
                         this.timer.Elapsed += Timer_Elapsed;
                         this.timer.Start();
 #endif
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
                         this.CremaHost.Sign(authentication, result);
-
                         this.TypeContext = new TypeContext(this, result.Value);
                         this.TableContext = new TableContext(this, result.Value);
-                        await this.AttachDomainHostAsync();
-                        await this.CremaHost.AddServiceAsync(this);
-                        this.Dispatcher = this.serviceDispatcher;
+                    });
+                    await this.AttachDomainHostAsync();
+                    await this.CremaHost.AddServiceAsync(this);
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.Dispatcher = new CremaDispatcher(this);
                         base.UpdateAccessParent();
                         base.UpdateLockParent();
                         this.authenticationEntered?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
                         this.DataBases.InvokeItemsAuthenticationEnteredEvent(authentication, new IDataBase[] { this });
-                    }
-                });
+                    });
+                }
             }
             catch (Exception e)
             {
@@ -378,7 +386,7 @@ namespace Ntreev.Crema.Services.Data
                 var value = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.authentications.Remove(authentication);
-                    return this.authentications.Any(item => ((Authentication)item).ID == authentication.ID) == false && this.serviceDispatcher != null;
+                    return this.authentications.Any(item => ((Authentication)item).ID == authentication.ID) == false && this.Dispatcher.Owner is DataBase;
                 });
                 if (value == true)
                 {
@@ -391,8 +399,7 @@ namespace Ntreev.Crema.Services.Data
                         this.TypeContext = null;
                         this.TableContext.Dispose();
                         this.TableContext = null;
-                        this.serviceDispatcher.Dispose();
-                        this.serviceDispatcher = null;
+                        this.Dispatcher.Dispose();
                         this.Dispatcher = this.DataBases.Dispatcher;
                         this.authenticationLeft?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
                         this.DataBases.InvokeItemsAuthenticationLeftEvent(authentication, new IDataBase[] { this });
@@ -514,10 +521,13 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(ImportAsync), this, comment);
-                    var result = await this.Service.ImportDataSetAsync(dataSet, comment);
+                });
+                var result = await this.Service.ImportDataSetAsync(dataSet, comment);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                 });
             }
@@ -618,7 +628,7 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task SetUnloadedAsync(Authentication authentication)
         {
-            if (this.serviceDispatcher != null)
+            if (this.Dispatcher.Owner is DataBase)
             {
                 await this.DetachDomainHostAsync();
                 await this.ReleaseServiceAsync();
@@ -640,7 +650,7 @@ namespace Ntreev.Crema.Services.Data
             base.ResettingDataBase(authentication);
             this.DataBases.InvokeItemsResettingEvent(authentication, new IDataBase[] { this, });
 
-            if (this.serviceDispatcher != null)
+            if (this.Dispatcher.Owner is DataBase)
             {
                 await this.DetachDomainHostAsync();
             }
@@ -654,7 +664,7 @@ namespace Ntreev.Crema.Services.Data
         {
             var domains = metaDatas.Where(item => item.DomainInfo.DataBaseID == this.ID).ToArray();
             await this.CremaHost.DomainContext.AddDomainsAsync(domains);
-            if (this.serviceDispatcher != null)
+            if (this.Dispatcher.Owner is DataBase)
             {
                 var result = await this.service.GetMetaDataAsync();
                 this.TypeContext = new TypeContext(this, result.Value);
@@ -738,14 +748,14 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task CloseAsync(CloseInfo closeInfo)
         {
-            if (this.serviceDispatcher == null)
+            if (this.Dispatcher.Owner is DataBase == false)
                 return;
-            await this.serviceDispatcher?.InvokeAsync(() =>
+            await this.Dispatcher?.InvokeAsync(() =>
             {
                 this.timer?.Dispose();
                 this.timer = null;
-                this.serviceDispatcher.Dispose();
-                this.serviceDispatcher = null;
+                this.Dispatcher.Dispose();
+                this.Dispatcher = null;
             });
             if (this.service != null)
             {
@@ -1061,13 +1071,6 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        //private void ValidateDispatcher()
-        //{
-        //    if (this.Dispatcher == null)
-        //        throw new InvalidOperationException(Resources.Exception_InvalidObject);
-        //    this.Dispatcher?.VerifyAccess();
-        //}
-
         private async Task<SignatureDate> ReleaseServiceAsync()
         {
             var result = await this.service.UnsubscribeAsync();
@@ -1086,7 +1089,7 @@ namespace Ntreev.Crema.Services.Data
 
         private async void Service_Faulted(object sender, EventArgs e)
         {
-            await this.serviceDispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
@@ -1099,8 +1102,8 @@ namespace Ntreev.Crema.Services.Data
                 }
                 this.timer?.Dispose();
                 this.timer = null;
-                this.serviceDispatcher.Dispose();
-                this.serviceDispatcher = null;
+                this.Dispatcher.Dispose();
+                this.Dispatcher = null;
             });
             await this.CremaHost.RemoveServiceAsync(this);
             this.OnUnloaded(EventArgs.Empty);
@@ -1124,7 +1127,7 @@ namespace Ntreev.Crema.Services.Data
             this.timer?.Stop();
             try
             {
-                await this.serviceDispatcher.InvokeAsync(() => this.service.IsAlive());
+                await this.Dispatcher.InvokeAsync(() => this.service.IsAlive());
                 this.timer?.Start();
             }
             catch
@@ -1132,60 +1135,6 @@ namespace Ntreev.Crema.Services.Data
 
             }
         }
-
-        //        private void OnEnter(Authentication authentication)
-        //        {
-        //            if (this.IsLoaded == false)
-        //                throw new InvalidOperationException(Resources.Exception_CannotEnter);
-        //            this.authentications.Add(authentication);
-        //            if (this.authentications.Any(item => ((Authentication)item).ID == authentication.ID) && this.serviceDispatcher == null)
-        //            {
-        //                this.serviceDispatcher = new CremaDispatcher(this);
-        //                var metaData = this.serviceDispatcher.Invoke(() =>
-        //                {
-        //                    this.service = DataServiceFactory.CreateServiceClient(this.CremaHost.IPAddress, this.CremaHost.ServiceInfos[nameof(DataBaseService)], this);
-        //                    this.service.Open();
-        //                    if (this.service is ICommunicationObject service)
-        //                    {
-        //                        service.Faulted += Service_Faulted;
-        //                    }
-        //                    var result = this.service.Subscribe(this.CremaHost.AuthenticationToken, base.Name);
-        //                    result.Validate(authentication);
-        //#if !DEBUG
-        //                    this.timer = new Timer(30000);
-        //                    this.timer.Elapsed += Timer_Elapsed;
-        //                    this.timer.Start();
-        //#endif
-        //                    return result.Value;
-        //                });
-        //                this.typeContext = new TypeContext(this, metaData);
-        //                this.tableContext = new TableContext(this, metaData);
-        //                this.AttachDomainHost();
-        //                this.CremaHost.AddService(this);
-        //                base.UpdateAccessParent();
-        //                base.UpdateLockParent();
-        //                this.authenticationEntered?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
-        //                this.DataBases.InvokeItemsAuthenticationEnteredEvent(authentication, new IDataBase[] { this });
-        //            }
-        //        }
-
-        //        private void OnLeave(Authentication authentication)
-        //        {
-        //            this.authentications.Remove(authentication);
-
-        //            if (this.authentications.Any(item => ((Authentication)item).ID == authentication.ID) == false && this.serviceDispatcher != null)
-        //            {
-        //                var signatureDate = this.ReleaseService();
-        //                authentication.SignatureDate = signatureDate;
-        //                this.DetachDomainHost();
-        //                this.typeContext.Dispose();
-        //                this.typeContext = null;
-        //                this.tableContext.Dispose();
-        //                this.tableContext = null;
-        //                this.authenticationLeft?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
-        //                this.DataBases.InvokeItemsAuthenticationLeftEvent(authentication, new IDataBase[] { this });
-        //            }
-        //        }
 
         private DomainContext DomainContext => this.CremaHost.DomainContext;
 
@@ -1214,7 +1163,7 @@ namespace Ntreev.Crema.Services.Data
             if (serviceType == typeof(IDataBase))
                 return this;
 
-            if (base.DataBaseState.HasFlag(DataBaseState.Loaded) == true && this.serviceDispatcher != null)
+            if (base.DataBaseState.HasFlag(DataBaseState.Loaded) == true && this.Dispatcher.Owner is DataBase)
             {
                 if (serviceType == typeof(ITableContext))
                     return this.TableContext;
@@ -1243,8 +1192,8 @@ namespace Ntreev.Crema.Services.Data
             this.service = null;
             this.timer?.Dispose();
             this.timer = null;
-            this.serviceDispatcher.Dispose();
-            this.serviceDispatcher = null;
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
             base.DataBaseState = DataBaseState.None;
             await this.CremaHost.RemoveServiceAsync(this);
         }

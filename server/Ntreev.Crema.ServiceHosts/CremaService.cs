@@ -46,7 +46,6 @@ namespace Ntreev.Crema.ServiceHosts
         private readonly List<ServiceHost> hosts = new List<ServiceHost>();
         private ICremaHost cremaHost;
         private ILogService logService;
-        private int port = AddressUtility.DefaultPort;
         private DescriptorService descriptorService;
         private DescriptorServiceHost descriptorServiceHost;
         private List<ServiceInfo> serviceInfos = new List<ServiceInfo>();
@@ -64,19 +63,25 @@ namespace Ntreev.Crema.ServiceHosts
 
         public async Task OpenAsync()
         {
-            await await CremaService.Dispatcher.InvokeAsync(async () =>
+            await CremaService.Dispatcher.InvokeAsync(() =>
             {
                 this.ServiceState = ServiceState.Opening;
                 this.OnOpening(EventArgs.Empty);
                 this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
                 this.logService = this.cremaHost.GetService(typeof(ILogService)) as ILogService;
-                this.token = await this.cremaHost.OpenAsync();
-                this.cremaHost.Closed += CremaHost_Closed;
+            });
+            this.token = await this.cremaHost.OpenAsync();
+            this.cremaHost.Closed += CremaHost_Closed;
+            await CremaService.Dispatcher.InvokeAsync(() =>
+            {
                 this.descriptorService = new DescriptorService(this, this.cremaHost);
-                this.descriptorServiceHost = new DescriptorServiceHost(this.cremaHost, this.descriptorService, this.port);
+                this.descriptorServiceHost = new DescriptorServiceHost(this.cremaHost, this.descriptorService, this.Port);
                 this.descriptorServiceHost.Open();
                 this.logService.Info(Resources.ServiceStart, nameof(DescriptorServiceHost));
-                this.StartServices();
+            });
+            await this.StartServicesAsync();
+            await CremaService.Dispatcher.InvokeAsync(() =>
+            {
                 this.ServiceState = ServiceState.Opened;
                 this.OnOpened(EventArgs.Empty);
             });
@@ -84,16 +89,22 @@ namespace Ntreev.Crema.ServiceHosts
 
         public async Task CloseAsync()
         {
-            await await CremaService.Dispatcher.InvokeAsync(async () =>
+            await CremaService.Dispatcher.InvokeAsync(() =>
             {
                 this.OnClosing(EventArgs.Empty);
-                this.StopServices();
+            });
+            await this.StopServicesAsync();
+            await CremaService.Dispatcher.InvokeAsync(() =>
+            {
                 this.descriptorServiceHost.Close();
                 this.descriptorServiceHost = null;
                 this.descriptorService = null;
                 this.logService.Info(Resources.ServiceStop, nameof(DescriptorServiceHost));
-                await this.cremaHost.CloseAsync(this.token);
-                this.cremaHost.SaveConfigs();
+            });
+            await this.cremaHost.CloseAsync(this.token);
+            this.cremaHost.SaveConfigs();
+            await CremaService.Dispatcher.InvokeAsync(() =>
+            {
                 this.token = Guid.Empty;
                 this.OnClosed(new ClosedEventArgs(CloseReason.Shutdown, string.Empty));
             });
@@ -101,26 +112,14 @@ namespace Ntreev.Crema.ServiceHosts
 
         public async Task RestartAsync()
         {
-            await await CremaService.Dispatcher.InvokeAsync(async () =>
-            {
-                this.StopServices();
-                await this.cremaHost.CloseAsync(this.token);
-                this.cremaHost.SaveConfigs();
-                this.token = await this.cremaHost.OpenAsync();
-                this.StartServices();
-            });
+            await this.StopServicesAsync();
+            await this.cremaHost.CloseAsync(this.token);
+            this.cremaHost.SaveConfigs();
+            this.token = await this.cremaHost.OpenAsync();
+            this.StartServicesAsync();
         }
 
-        public int Port
-        {
-            get { return this.port; }
-            set { this.port = value; }
-        }
-
-        //public ICremaHost CremaHost
-        //{
-        //    get { return this.cremaHost; }
-        //}
+        public int Port { get; set; } = AddressUtility.DefaultPort;
 
         public ServiceInfo[] ServiceInfos
         {
@@ -187,7 +186,10 @@ namespace Ntreev.Crema.ServiceHosts
                 await CremaService.Dispatcher.InvokeAsync(() =>
                 {
                     this.ServiceState = ServiceState.Opening;
-                    this.StartServices();
+                });
+                await this.StartServicesAsync();
+                await CremaService.Dispatcher.InvokeAsync(() =>
+                {
                     this.ServiceState = ServiceState.Opened;
                 });
             }
@@ -202,7 +204,10 @@ namespace Ntreev.Crema.ServiceHosts
                 await CremaService.Dispatcher.InvokeAsync(() =>
                 {
                     this.ServiceState = ServiceState.Closing;
-                    this.StopServices();
+                });
+                await this.StopServicesAsync();
+                await CremaService.Dispatcher.InvokeAsync(() =>
+                {
                     if (e.Reason == CloseReason.Shutdown)
                     {
                         this.descriptorServiceHost.Close();
@@ -222,55 +227,59 @@ namespace Ntreev.Crema.ServiceHosts
             }
         }
 
-        private void StartServices()
+        private Task StartServicesAsync()
         {
-            CremaService.Dispatcher.VerifyAccess();
-            var providers = this.GetService(typeof(IEnumerable<IServiceHostProvider>)) as IEnumerable<IServiceHostProvider>;
-            var items = providers.TopologicalSort().ToArray();
-            var port = this.port;
-            var version = new Version(FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).ProductVersion);
-
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
-                port += 2;
-            foreach (var item in items)
+            return CremaService.Dispatcher.InvokeAsync(() =>
             {
-                var host = item.CreateInstance(port);
-                host.Open();
-                this.hosts.Add(host);
-                this.logService.Info(Resources.ServiceStart_Port, host.GetType().Name, port);
-                this.serviceInfos.Add(new ServiceInfo()
+                var providers = this.GetService(typeof(IEnumerable<IServiceHostProvider>)) as IEnumerable<IServiceHostProvider>;
+                var items = providers.TopologicalSort().ToArray();
+                var port = this.Port;
+                var version = new Version(FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).ProductVersion);
+
+                if (Environment.OSVersion.Platform == PlatformID.Unix)
+                    port += 2;
+                foreach (var item in items)
                 {
-                    Name = item.Name,
-                    Port = port,
+                    var host = item.CreateInstance(port);
+                    host.Open();
+                    this.hosts.Add(host);
+                    this.logService.Info(Resources.ServiceStart_Port, host.GetType().Name, port);
+                    this.serviceInfos.Add(new ServiceInfo()
+                    {
+                        Name = item.Name,
+                        Port = port,
 #if DEBUG
-                    PlatformID = $"DEBUG_{Environment.OSVersion.Platform}",
+                        PlatformID = $"DEBUG_{Environment.OSVersion.Platform}",
 #else
                         PlatformID = $"{Environment.OSVersion.Platform}",
 #endif
-                    Version = $"{version}",
-                    Culture = $"{CultureInfo.CurrentCulture}"
-                });
-                if (Environment.OSVersion.Platform == PlatformID.Unix)
-                    port++;
-            }
-            this.logService.Info(Resources.ServiceStart, cremaString);
+                        Version = $"{version}",
+                        Culture = $"{CultureInfo.CurrentCulture}"
+                    });
+                    if (Environment.OSVersion.Platform == PlatformID.Unix)
+                        port++;
+                }
+                this.logService.Info(Resources.ServiceStart, cremaString);
+            });
         }
 
-        private void StopServices()
+        private Task StopServicesAsync()
         {
-            CremaService.Dispatcher.VerifyAccess();
-            if (this.hosts.Any() == false)
-                return;
-
-            foreach (var item in this.hosts.Reverse<ServiceHost>())
+            return CremaService.Dispatcher.InvokeAsync(() =>
             {
-                item.Close();
-                this.logService.Info(Resources.ServiceStop, item.GetType().Name);
-            }
+                if (this.hosts.Any() == false)
+                    return;
 
-            this.hosts.Clear();
-            this.serviceInfos.Clear();
-            this.logService.Info(Resources.ServiceStop, cremaString);
+                foreach (var item in this.hosts.Reverse<ServiceHost>())
+                {
+                    item.Close();
+                    this.logService.Info(Resources.ServiceStop, item.GetType().Name);
+                }
+
+                this.hosts.Clear();
+                this.serviceInfos.Clear();
+                this.logService.Info(Resources.ServiceStop, cremaString);
+            });
         }
     }
 }

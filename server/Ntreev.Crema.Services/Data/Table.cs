@@ -177,7 +177,6 @@ namespace Ntreev.Crema.Services.Data
                     base.RemoveAccessMember(authentication, memberID);
                     this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID });
                 });
-
             }
             catch (Exception e)
             {

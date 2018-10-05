@@ -109,7 +109,7 @@ namespace Ntreev.Crema.Bot
                 }
                 catch
                 {
-                    
+
                 }
             }
         }
