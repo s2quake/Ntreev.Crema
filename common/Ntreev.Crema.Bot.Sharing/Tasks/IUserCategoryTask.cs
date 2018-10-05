@@ -97,25 +97,27 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (await category.Dispatcher.InvokeAsync(() => EnumerableUtility.Descendants<IUserItem, IUser>(category as IUserItem, item => item.Childs).Any()) == true)
                     return;
             }
-            await category.DeleteAsync(context.Authentication);
+            await category.DeleteAsync(authentication);
             context.Complete(category);
         }
 
         [TaskMethod(Weight = 10)]
         public async Task AddNewCategoryAsync(IUserCategory category, TaskContext context)
         {
+            var authentication = context.Authentication;
             var categoryName = RandomUtility.NextIdentifier();
-            await category.AddNewCategoryAsync(context.Authentication, categoryName);
+            await category.AddNewCategoryAsync(authentication, categoryName);
         }
 
         [TaskMethod]
         public async Task AddNewUserAsync(IUserCategory category, TaskContext context)
         {
+            var authentication = context.Authentication;
             var index = RandomUtility.Next(int.MaxValue);
             var authority = RandomUtility.NextEnum<Authority>();
             var userID = $"{authority.ToString().ToLower()}_bot_{index}";
             var userName = "봇" + index;
-            await category.AddNewUserAsync(context.Authentication, userID, ToSecureString("1111"), userName, authority);
+            await category.AddNewUserAsync(authentication, userID, ToSecureString("1111"), userName, authority);
         }
 
         private static SecureString ToSecureString(string value)

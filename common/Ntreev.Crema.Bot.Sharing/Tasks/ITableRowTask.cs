@@ -37,6 +37,7 @@ namespace Ntreev.Crema.Bot.Tasks
     {
         public async Task InvokeAsync(TaskContext context)
         {
+            var authentication = context.Authentication;
             var row = context.Target as ITableRow;
             var content = row.Content;
             if (context.IsCompleted(row) == true)
@@ -46,7 +47,7 @@ namespace Ntreev.Crema.Bot.Tasks
                     try
                     {
                         if (Verify() == true)
-                            await content.EndNewAsync(context.Authentication, row);
+                            await content.EndNewAsync(authentication, row);
                     }
                     catch
                     {
@@ -90,9 +91,10 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 1)]
         public async Task DeleteAsync(ITableRow row, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (object.Equals(context.State, System.Data.DataRowState.Detached) == false)
             {
-                await row.DeleteAsync(context.Authentication);
+                await row.DeleteAsync(authentication);
                 context.State = System.Data.DataRowState.Deleted;
                 context.Complete(row);
             }
@@ -101,19 +103,21 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 5)]
         public async Task SetIsEnabledAsync(ITableRow row, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
                 return;
             var isEnabled = RandomUtility.NextBoolean();
-            await row.SetIsEnabledAsync(context.Authentication, isEnabled);
+            await row.SetIsEnabledAsync(authentication, isEnabled);
         }
 
         [TaskMethod(Weight = 5)]
         public async Task SetTagsAsync(ITableRow row, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
                 return;
             var tags = TagInfoUtility.Names.Random();
-            await row.SetTagsAsync(context.Authentication, (TagInfo)tags);
+            await row.SetTagsAsync(authentication, (TagInfo)tags);
         }
 
         [TaskMethod]

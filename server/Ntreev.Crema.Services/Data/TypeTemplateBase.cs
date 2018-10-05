@@ -550,7 +550,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (refcount != 0)
                 {
-                    int qwer = 0;
+                    System.Diagnostics.Debugger.Launch();
                 }
                 this.domain.Deleted += Domain_Deleted;
                 this.domain.RowAdded += Domain_RowAdded;
@@ -572,7 +572,7 @@ namespace Ntreev.Crema.Services.Data
                 this.domain.PropertyChanged -= Domain_PropertyChanged;
                 if (refcount != 1)
                 {
-                    int qwer = 0;
+                    System.Diagnostics.Debugger.Launch();
                 }
                 refcount--;
             });

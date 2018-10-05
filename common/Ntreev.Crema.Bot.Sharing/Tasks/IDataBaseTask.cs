@@ -37,6 +37,7 @@ namespace Ntreev.Crema.Bot.Tasks
     {
         public async Task InvokeAsync(TaskContext context)
         {
+            var authentication = context.Authentication;
             var dataBase = context.Target as IDataBase;
             if (context.IsCompleted(dataBase) == true)
             {
@@ -44,7 +45,7 @@ namespace Ntreev.Crema.Bot.Tasks
             }
             else 
             {
-                if (await dataBase.ContainsAsync(context.Authentication) == true)
+                if (await dataBase.ContainsAsync(authentication) == true)
                 {
                     if (RandomUtility.Within(35) == true)
                     {
@@ -68,28 +69,30 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod]
         public async Task EnterAsync(IDataBase dataBase, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (await dataBase.Dispatcher.InvokeAsync(() => dataBase.IsLoaded) == false)
                     return;
-                if (await dataBase.ContainsAsync(context.Authentication) == true)
+                if (await dataBase.ContainsAsync(authentication) == true)
                     return;
             }
-            await dataBase.EnterAsync(context.Authentication);
+            await dataBase.EnterAsync(authentication);
         }
 
         [TaskMethod]
         public async Task LeaveAsync(IDataBase dataBase, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (await dataBase.Dispatcher.InvokeAsync(() => dataBase.IsLoaded) == false)
                     return;
-                if (await dataBase.ContainsAsync(context.Authentication) == false)
+                if (await dataBase.ContainsAsync(authentication) == false)
                     return;
             }
 
-            await dataBase.LeaveAsync(context.Authentication);
+            await dataBase.LeaveAsync(authentication);
             //if (context.IsCompleted(dataBase) == true)
             //{
                 

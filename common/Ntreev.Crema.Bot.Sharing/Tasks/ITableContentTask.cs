@@ -41,49 +41,36 @@ namespace Ntreev.Crema.Bot.Tasks
             var content = context.Target as ITableContent;
             if (context.IsCompleted(content) == true)
             {
+                var domain = content.Domain;
                 try
                 {
-
+                    if (domain != null && RandomUtility.Within(50) == true)
+                    {
+                        if (await domain.Users.ContainsAsync(authentication.ID) == false)
+                            return;
+                        var userState = await domain.Dispatcher.InvokeAsync(() => domain.Users[authentication.ID].DomainUserState);
+                        var isMember = userState.HasFlag(DomainUserState.Online);
+                        if (isMember == true)
+                        {
+                            await content.LeaveEditAsync(authentication);
+                        }
+                        if (await domain.Dispatcher.InvokeAsync(() => domain.Users.Any()) == false)
+                        {
+                            await content.EndEditAsync(authentication);
+                        }
+                    }
                 }
-                catch
-                {
-
-                }
-                var editableState = await content.Dispatcher.InvokeAsync(() => content.ServiceState);
-                if (editableState == ServiceState.None)
+                finally
                 {
                     context.Pop(content);
                     context.Complete(context.Target);
-                    return;
                 }
-                else if (editableState != ServiceState.Opened)
-                {
-                    return;
-                }
-
-                var domain = content.Domain;
-                if (domain != null && RandomUtility.Within(50) == true)
-                {
-                    if (await domain.Users.ContainsAsync(context.Authentication.ID) == false)
-                        return;
-                    var userState = await domain.Dispatcher.InvokeAsync(() => domain.Users[authentication.ID].DomainUserState);
-                    var isMember = userState.HasFlag(DomainUserState.Online);
-                    if (isMember == true)
-                    {
-                        await content.LeaveEditAsync(authentication);
-                    }
-                    if (await domain.Dispatcher.InvokeAsync(() => domain.Users.Any()) == false)
-                    {
-                        await content.EndEditAsync(authentication);
-                    }
-                }
-                context.Pop(content);
-                context.Complete(context.Target);
             }
             else
             {
-                var editableState = await content.Dispatcher.InvokeAsync(() => content.ServiceState);
-                if (editableState == ServiceState.None)
+                var table = content.Table;
+                var canEdit = await table.Dispatcher.InvokeAsync(() => table.TableState == TableState.None);
+                if (canEdit == true)
                 {
                     await content.BeginEditAsync(authentication);
                 }
@@ -105,10 +92,10 @@ namespace Ntreev.Crema.Bot.Tasks
 
                 if (RandomUtility.Within(25) == true || await content.Dispatcher.InvokeAsync(() => content.Any()) == false)
                 {
-                    var row = await this.AddNewRowAsync(context.Authentication, content);
+                    var row = await this.AddNewRowAsync(authentication, content);
                     if (row != null)
                     {
-                        await row.InitializeRandomAsync(context.Authentication);
+                        await row.InitializeRandomAsync(authentication);
                         context.Push(row);
                         context.State = System.Data.DataRowState.Detached;
                     }

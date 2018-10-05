@@ -103,16 +103,16 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 1)]
         public async Task CreateAutobotAsync(Autobot autobot, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (autobot.IsOnline == false)
                     return;
-                if (context.Authentication.Authority != Authority.Admin)
+                if (authentication.Authority != Authority.Admin)
                     return;
             }
             var autobotID = $"Autobot{RandomUtility.Next(1000)}";
             var authority = RandomUtility.NextEnum<Authority>();
-            var authentication = context.Authentication;
             if (autobot.GetService(typeof(IUserContext)) is IUserContext userContext)
             {
                 if (await userContext.Users.ContainsAsync(autobotID) == false)
@@ -120,7 +120,7 @@ namespace Ntreev.Crema.Bot.Tasks
                     var category = userContext.Categories["/autobots/"];
                     await category.AddNewUserAsync(authentication, autobotID, StringUtility.ToSecureString("1111"), autobotID, authority);
                 }
-                await autobot.Service.CreateAutobotAsync(context.Authentication, autobotID);
+                await autobot.Service.CreateAutobotAsync(authentication, autobotID);
             }
         }
     }

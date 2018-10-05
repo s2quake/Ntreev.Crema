@@ -42,23 +42,24 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 try
                 {
-                    var editableState = await template.Dispatcher.InvokeAsync(() => template.ServiceState);
-                    if (editableState == ServiceState.Opened)
+                    var domain = template.Domain;
+                    if (domain != null && await domain.Users.ContainsAsync(authentication.ID) == true)
                     {
-                        if (template.Count > 0)
-                            await template.EndEditAsync(context.Authentication);
+                        if (await template.Dispatcher.InvokeAsync(() => template.Any()))
+                            await template.EndEditAsync(authentication);
                         else
-                            await template.CancelEditAsync(context.Authentication);
+                            await template.CancelEditAsync(authentication);
                     }
                 }
                 catch
                 {
-                    if (template.ServiceState == ServiceState.Opened)
-                        await template.CancelEditAsync(context.Authentication);
+                    await template.CancelEditAsync(authentication);
                 }
-
-                context.Pop(template);
-                context.Complete(context.Target);
+                finally
+                {
+                    context.Pop(template);
+                    context.Complete(context.Target);
+                }
             }
             else
             {
@@ -68,36 +69,17 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
                 }
 
-                var editableState = await template.Dispatcher.InvokeAsync(() => template.ServiceState);
-                if (editableState == ServiceState.None)
+                var domain = template.Domain;
+                if (domain == null)
                 {
-                    try
-                    {
-                        await template.BeginEditAsync(context.Authentication);
-                    }
-                    catch
-                    {
-                        context.Pop(template);
-                        throw;
-                    }
-                }
-                else if (editableState == ServiceState.Opened)
-                {
-                    var domain = template.Domain;
-                    if (await domain.Users.ContainsAsync(authentication.ID) == false)
-                    {
-                        context.Pop(template);
-                        return;
-                    }
-                }
-                else
-                {
-                    return;
+                    await template.BeginEditAsync(authentication);
                 }
 
-                if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
+                if (template.IsNew == true ||
+                    await template.Dispatcher.InvokeAsync(() => template.Any()) == false ||
+                    RandomUtility.Within(25) == true)
                 {
-                    var member = await template.AddNewAsync(context.Authentication);
+                    var member = await template.AddNewAsync(authentication);
                     context.Push(member);
                     context.State = System.Data.DataRowState.Detached;
                 }
@@ -118,39 +100,24 @@ namespace Ntreev.Crema.Bot.Tasks
         public async Task SetTypeNameAsync(ITypeTemplate template, TaskContext context)
         {
             var authentication = context.Authentication;
-            if (context.AllowException == false)
-            {
-                if (template.ServiceState != ServiceState.Opened)
-                    return;
-            }
             var tableName = RandomUtility.NextIdentifier();
-            await template.SetTypeNameAsync(context.Authentication, tableName);
+            await template.SetTypeNameAsync(authentication, tableName);
         }
 
         [TaskMethod(Weight = 10)]
         public async Task SetIsFlagAsync(ITypeTemplate template, TaskContext context)
         {
             var authentication = context.Authentication;
-            if (context.AllowException == false)
-            {
-                if (template.ServiceState != ServiceState.Opened)
-                    return;
-            }
             var isFlag = RandomUtility.NextBoolean();
-            await template.SetIsFlagAsync(context.Authentication, isFlag);
+            await template.SetIsFlagAsync(authentication, isFlag);
         }
 
         [TaskMethod(Weight = 10)]
         public async Task SetCommentAsync(ITypeTemplate template, TaskContext context)
         {
             var authentication = context.Authentication;
-            if (context.AllowException == false)
-            {
-                if (template.ServiceState != ServiceState.Opened)
-                    return;
-            }
             var comment = RandomUtility.NextString();
-            await template.SetCommentAsync(context.Authentication, comment);
+            await template.SetCommentAsync(authentication, comment);
         }
 
         private bool CanEdit(ITypeTemplate template)
@@ -166,8 +133,6 @@ namespace Ntreev.Crema.Bot.Tasks
 
             if (query.Any() == true)
                 return false;
-
-
             return true;
         }
     }

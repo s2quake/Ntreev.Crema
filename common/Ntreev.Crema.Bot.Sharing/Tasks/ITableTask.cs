@@ -66,15 +66,17 @@ namespace Ntreev.Crema.Bot.Tasks
         //[TaskMethod]
         public void GetAccessType(ITable table, TaskContext context)
         {
+            var authentication = context.Authentication;
             table.Dispatcher.Invoke(() =>
             {
-                table.GetAccessType(context.Authentication);
+                table.GetAccessType(authentication);
             });
         }
 
         //[TaskMethod(Weight = 10)]
         public async Task LockAsync(ITable table, TaskContext context)
         {
+            var authentication = context.Authentication;
             var comment = RandomUtility.NextString();
             if (context.AllowException == false)
             {
@@ -85,47 +87,51 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
             }
 
-            await table.LockAsync(context.Authentication, comment);
+            await table.LockAsync(authentication, comment);
         }
 
         //[TaskMethod]
         public async Task UnlockAsync(ITable table, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 var lockInfo = await table.Dispatcher.InvokeAsync(() => table.LockInfo);
                 if (lockInfo.IsLocked == false || lockInfo.IsInherited == true)
                     return;
             }
-            await table.UnlockAsync(context.Authentication);
+            await table.UnlockAsync(authentication);
         }
 
         //[TaskMethod]
         public async Task SetPublicAsync(ITable table, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (await table.Dispatcher.InvokeAsync(() => table.IsPrivate) == false)
                     return;
             }
 
-            await table.SetPublicAsync(context.Authentication);
+            await table.SetPublicAsync(authentication);
         }
 
         //[TaskMethod(Weight = 10)]
         public async Task SetPrivateAsync(ITable table, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (await table.Dispatcher.InvokeAsync(() => table.IsPrivate) == true)
                     return;
             }
-            await table.SetPrivateAsync(context.Authentication);
+            await table.SetPrivateAsync(authentication);
         }
 
         //[TaskMethod(Weight = 10)]
         public async Task AddAccessMemberAsync(ITable table, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (await table.Dispatcher.InvokeAsync(() => table.IsPrivate) == false)
@@ -134,12 +140,13 @@ namespace Ntreev.Crema.Bot.Tasks
             var userContext = table.GetService(typeof(IUserContext)) as IUserContext;
             var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Select(item => item.Path).Random());
             var accessType = RandomUtility.NextEnum<AccessType>();
-            await table.AddAccessMemberAsync(context.Authentication, memberID, accessType);
+            await table.AddAccessMemberAsync(authentication, memberID, accessType);
         }
 
         //[TaskMethod]
         public async Task RemoveAccessMemberAsync(ITable table, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (await table.Dispatcher.InvokeAsync(() => table.IsPrivate) == false)
@@ -147,12 +154,13 @@ namespace Ntreev.Crema.Bot.Tasks
             }
             var userContext = table.GetService(typeof(IUserContext)) as IUserContext;
             var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Select(item => item.Path).Random());
-            await table.RemoveAccessMemberAsync(context.Authentication, memberID);
+            await table.RemoveAccessMemberAsync(authentication, memberID);
         }
 
         [TaskMethod]
         public async Task RenameAsync(ITable table, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (await table.Dispatcher.InvokeAsync(() => table.Parent != null && table.TemplatedParent != null) == true)
@@ -162,12 +170,13 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
             }
             var tableName = RandomUtility.NextIdentifier();
-            await table.RenameAsync(context.Authentication, tableName);
+            await table.RenameAsync(authentication, tableName);
         }
 
         [TaskMethod]
         public async Task MoveAsync(ITable table, TaskContext context)
         {
+            var authentication = context.Authentication;
             var categories = table.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
             if (context.AllowException == false)
@@ -177,7 +186,7 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (await table.Dispatcher.InvokeAsync(() => table.Category.Path) == categoryPath)
                     return;
             }
-            await table.MoveAsync(context.Authentication, categoryPath);
+            await table.MoveAsync(authentication, categoryPath);
         }
 
         //[TaskMethod(Weight = 1)]
@@ -186,35 +195,10 @@ namespace Ntreev.Crema.Bot.Tasks
             await Task.Delay(0);
         }
 
-        //[TaskMethod]
-        public async Task SetTagsAsync(ITable table, TaskContext context)
-        {
-            var tags = (TagInfo)TagInfoUtility.Names.Random();
-            var template = table.Template;
-
-            if (context.AllowException == false)
-            {
-                var editableState = await template.Dispatcher.InvokeAsync(() => template.ServiceState);
-                if (editableState != ServiceState.None)
-                    return;
-            }
-
-            await template.BeginEditAsync(context.Authentication);
-            try
-            {
-                await template.SetTagsAsync(context.Authentication, tags);
-                await template.EndEditAsync(context.Authentication);
-            }
-            catch
-            {
-                await template.CancelEditAsync(context.Authentication);
-                throw;
-            }
-        }
-
         [TaskMethod]
         public async Task CopyAsync(ITable table, TaskContext context)
         {
+            var authentication = context.Authentication;
             var categories = table.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
             var tableName = RandomUtility.NextIdentifier();
@@ -224,12 +208,13 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (await table.Dispatcher.InvokeAsync(() => table.Parent) != null)
                     return;
             }
-            await table.CopyAsync(context.Authentication, tableName, categoryPath, copyData);
+            await table.CopyAsync(authentication, tableName, categoryPath, copyData);
         }
 
         [TaskMethod]
         public async Task InheritAaync(ITable table, TaskContext context)
         {
+            var authentication = context.Authentication;
             var categories = table.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
             var tableName = RandomUtility.NextIdentifier();
@@ -239,39 +224,43 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (await table.Dispatcher.InvokeAsync(() => table.Parent) != null)
                     return;
             }
-            await table.InheritAsync(context.Authentication, tableName, categoryPath, copyData);
+            await table.InheritAsync(authentication, tableName, categoryPath, copyData);
         }
 
         [TaskMethod]
         public async Task NewTableAsync(ITable table, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (await table.Dispatcher.InvokeAsync(() => table.TemplatedParent) != null)
                     return;
             }
-            var template = await table.NewTableAsync(context.Authentication);
+            var template = await table.NewTableAsync(authentication);
             context.Push(template);
         }
 
         //[TaskMethod]
         public async Task GetDataSetAsync(ITable table, TaskContext context)
         {
-            await table.GetDataSetAsync(context.Authentication, null);
+            var authentication = context.Authentication;
+            await table.GetDataSetAsync(authentication, null);
         }
 
         //[TaskMethod]
         public async Task GetLogAsync(ITable table, TaskContext context)
         {
-            await table.GetLogAsync(context.Authentication, null);
+            var authentication = context.Authentication;
+            await table.GetLogAsync(authentication, null);
         }
 
         //[TaskMethod]
         public async Task FindAsync(ITable table, TaskContext context)
         {
+            var authentication = context.Authentication;
             var text = RandomUtility.NextWord();
             var option = RandomUtility.NextEnum<FindOptions>();
-            await table.FindAsync(context.Authentication, text, option);
+            await table.FindAsync(authentication, text, option);
         }
     }
 }

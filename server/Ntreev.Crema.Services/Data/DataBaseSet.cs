@@ -208,10 +208,8 @@ namespace Ntreev.Crema.Services.Data
                     continue;
                 if (tableInfo.ParentName == string.Empty)
                 {
-
                     if (tableInfo.Path != item.Path)
                     {
-                        int wer = 0;
                         System.Diagnostics.Debugger.Launch();
                     }
 
@@ -219,7 +217,6 @@ namespace Ntreev.Crema.Services.Data
                     item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
                     if (item.CategoryPath == cc)
                     {
-                        int qwer = 0;
                         System.Diagnostics.Debugger.Launch();
                     }
                 }

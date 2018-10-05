@@ -37,6 +37,7 @@ namespace Ntreev.Crema.Bot.Tasks
     {
         public async Task InvokeAsync(TaskContext context)
         {
+            var authentication = context.Authentication;
             var member = context.Target as ITypeMember;
             var template = member.Template;
             if (context.IsCompleted(member) == true)
@@ -45,7 +46,7 @@ namespace Ntreev.Crema.Bot.Tasks
                 {
                     try
                     {
-                        await template.EndNewAsync(context.Authentication, member);
+                        await template.EndNewAsync(authentication, member);
                     }
                     catch
                     {
@@ -71,9 +72,10 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 1)]
         public async Task DeleteAsync(ITypeMember member, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (object.Equals(context.State, System.Data.DataRowState.Detached) == false)
             {
-                await member.DeleteAsync(context.Authentication);
+                await member.DeleteAsync(authentication);
                 context.State = System.Data.DataRowState.Deleted;
                 context.Complete(member);
             }
@@ -82,38 +84,42 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod]
         public async Task SetIndexAsync(ITypeMember member, TaskContext context)
         {
+            var authentication = context.Authentication;
             var index = RandomUtility.Next(member.Template.Count);
-            await member.SetIndexAsync(context.Authentication, index);
+            await member.SetIndexAsync(authentication, index);
         }
 
         [TaskMethod(Weight = 20)]
         public async Task SetNameAsync(ITypeMember member, TaskContext context)
         {
+            var authentication = context.Authentication;
             var memberName = RandomUtility.NextIdentifier();
-            await member.SetNameAsync(context.Authentication, memberName);
+            await member.SetNameAsync(authentication, memberName);
         }
 
         [TaskMethod]
         public async Task SetValueAsync(ITypeMember member, TaskContext context)
         {
+            var authentication = context.Authentication;
             var template = member.Template;
             if (template.IsFlag == true)
             {
                 var value = RandomUtility.NextBit();
-                await member.SetValueAsync(context.Authentication, value);
+                await member.SetValueAsync(authentication, value);
             }
             else
             {
                 var value = RandomUtility.NextLong(long.MaxValue);
-                await member.SetValueAsync(context.Authentication, value);
+                await member.SetValueAsync(authentication, value);
             }
         }
 
         [TaskMethod]
         public async Task SetCommentAsync(ITypeMember member, TaskContext context)
         {
+            var authentication = context.Authentication;
             var comment = RandomUtility.NextString();
-            await member.SetCommentAsync(context.Authentication, comment);
+            await member.SetCommentAsync(authentication, comment);
         }
     }
 }

@@ -52,7 +52,7 @@ namespace Ntreev.Crema.Services.Data
             this.Dispatcher.VerifyAccess();
             if (itemPaths.Distinct().Count() != itemPaths.Length)
             {
-                int wer = 0;
+                System.Diagnostics.Debugger.Launch();
             }
             foreach (var item in itemPaths)
             {
@@ -70,7 +70,7 @@ namespace Ntreev.Crema.Services.Data
             this.Dispatcher.VerifyAccess();
             if (itemPaths.Distinct().Count() != itemPaths.Length)
             {
-                int wer = 0;
+                System.Diagnostics.Debugger.Launch();
             }
             foreach (var item in itemPaths)
             {
@@ -139,6 +139,7 @@ namespace Ntreev.Crema.Services.Data
                 }
                 catch (Exception e)
                 {
+                    System.Diagnostics.Debugger.Launch();
                     this.dataBase.CremaHost.Error("DataSet Error");
                     this.dataBase.CremaHost.Error(e);
                 }

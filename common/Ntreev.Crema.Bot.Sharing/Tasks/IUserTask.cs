@@ -81,7 +81,7 @@ namespace Ntreev.Crema.Bot.Tasks
         public async Task DeleteAsync(IUser user, TaskContext context)
         {
             var authentication = context.Authentication;
-            await user.DeleteAsync(context.Authentication);
+            await user.DeleteAsync(authentication);
         }
 
         [TaskMethod]

@@ -56,12 +56,14 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod]
         public async Task GetAccessTypeAsync(IType type, TaskContext context)
         {
-            await type.Dispatcher.InvokeAsync(() => type.GetAccessType(context.Authentication));
+            var authentication = context.Authentication;
+            await type.Dispatcher.InvokeAsync(() => type.GetAccessType(authentication));
         }
 
         [TaskMethod(Weight = 10)]
         public async Task LockAsync(IType type, TaskContext context)
         {
+            var authentication = context.Authentication;
             var comment = RandomUtility.NextString();
             if (context.AllowException == false)
             {
@@ -71,46 +73,50 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (lockInfo.IsLocked == true || lockInfo.IsInherited == true)
                     return;
             }
-            await type.LockAsync(context.Authentication, comment);
+            await type.LockAsync(authentication, comment);
         }
 
         [TaskMethod]
         public async Task UnlockAsync(IType type, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 var lockInfo = await type.Dispatcher.InvokeAsync(() => type.LockInfo);
                 if (lockInfo.IsLocked == false || lockInfo.IsInherited == true)
                     return;
             }
-            await type.UnlockAsync(context.Authentication);
+            await type.UnlockAsync(authentication);
         }
 
         [TaskMethod]
         public async Task SetPublicAsync(IType type, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (await type.Dispatcher.InvokeAsync(() => type.IsPrivate) == false)
                     return;
             }
-            await type.SetPublicAsync(context.Authentication);
+            await type.SetPublicAsync(authentication);
         }
 
         [TaskMethod(Weight = 10)]
         public async Task SetPrivateAsync(IType type, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (await type.Dispatcher.InvokeAsync(() => type.IsPrivate) == true)
                     return;
             }
-            await type.SetPrivateAsync(context.Authentication);
+            await type.SetPrivateAsync(authentication);
         }
 
         [TaskMethod(Weight = 10)]
         public async Task AddAccessMemberAsync(IType type, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (await type.Dispatcher.InvokeAsync(() => type.IsPrivate) == false)
@@ -119,12 +125,13 @@ namespace Ntreev.Crema.Bot.Tasks
             var userContext = type.GetService(typeof(IUserContext)) as IUserContext;
             var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Random().ID);
             var accessType = RandomUtility.NextEnum<AccessType>();
-            await type.AddAccessMemberAsync(context.Authentication, memberID, accessType);
+            await type.AddAccessMemberAsync(authentication, memberID, accessType);
         }
 
         [TaskMethod]
         public async Task RemoveAccessMemberAsync(IType type, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (await type.Dispatcher.InvokeAsync(() => type.IsPrivate) == false)
@@ -132,12 +139,13 @@ namespace Ntreev.Crema.Bot.Tasks
             }
             var userContext = type.GetService(typeof(IUserContext)) as IUserContext;
             var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Random().ID);
-            await type.RemoveAccessMemberAsync(context.Authentication, memberID);
+            await type.RemoveAccessMemberAsync(authentication, memberID);
         }
 
         [TaskMethod(Weight = 25)]
         public async Task RenameAsync(IType type, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 var typeState = await type.Dispatcher.InvokeAsync(() => type.TypeState);
@@ -145,12 +153,13 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
             }
             var typeName = RandomUtility.NextIdentifier();
-            await type.RenameAsync(context.Authentication, typeName);
+            await type.RenameAsync(authentication, typeName);
         }
 
         [TaskMethod(Weight = 25)]
         public async Task MoveAsync(IType type, TaskContext context)
         {
+            var authentication = context.Authentication;
             var categories = type.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
             if (context.AllowException == false)
@@ -158,35 +167,37 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (await type.Dispatcher.InvokeAsync(() => type.Category.Path) == categoryPath)
                     return;
             }
-            await type.MoveAsync(context.Authentication, categoryPath);
+            await type.MoveAsync(authentication, categoryPath);
         }
 
         [TaskMethod(Weight = 5)]
         public async Task DeleteAsync(IType type, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 var typeState = await type.Dispatcher.InvokeAsync(() => type.TypeState);
                 if (typeState.HasFlag(TypeState.IsBeingEdited) == true)
                     return;
             }
-            await type.DeleteAsync(context.Authentication);
+            await type.DeleteAsync(authentication);
         }
 
         //[TaskMethod]
         public async Task SetTagsAsync(IType type, TaskContext context)
         {
+            var authentication = context.Authentication;
             var tags = (TagInfo)TagInfoUtility.Names.Random();
             var template = type.Template;
-            await template.BeginEditAsync(context.Authentication);
+            await template.BeginEditAsync(authentication);
             try
             {
-                await template.SetTagsAsync(context.Authentication, tags);
-                await template.EndEditAsync(context.Authentication);
+                await template.SetTagsAsync(authentication, tags);
+                await template.EndEditAsync(authentication);
             }
             catch
             {
-                await template.CancelEditAsync(context.Authentication);
+                await template.CancelEditAsync(authentication);
                 throw;
             }
         }
@@ -194,30 +205,34 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod]
         public async Task CopyAsync(IType type, TaskContext context)
         {
+            var authentication = context.Authentication;
             var categories = type.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
             var typeName = RandomUtility.NextIdentifier();
-            await type.CopyAsync(context.Authentication, typeName, categoryPath);
+            await type.CopyAsync(authentication, typeName, categoryPath);
         }
 
         [TaskMethod]
         public async Task GetDataSetAsync(IType type, TaskContext context)
         {
-            await type.GetDataSetAsync(context.Authentication, null);
+            var authentication = context.Authentication;
+            await type.GetDataSetAsync(authentication, null);
         }
 
         [TaskMethod]
         public async Task GetLogAsync(IType type, TaskContext context)
         {
-            await type.GetLogAsync(context.Authentication, null);
+            var authentication = context.Authentication;
+            await type.GetLogAsync(authentication, null);
         }
 
         [TaskMethod]
         public async Task FindAsync(IType type, TaskContext context)
         {
+            var authentication = context.Authentication;
             var text = RandomUtility.NextWord();
             var option = RandomUtility.NextEnum<FindOptions>();
-            await type.FindAsync(context.Authentication, text, option);
+            await type.FindAsync(authentication, text, option);
         }
     }
 }

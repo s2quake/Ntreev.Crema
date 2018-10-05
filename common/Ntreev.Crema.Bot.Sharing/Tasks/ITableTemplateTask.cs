@@ -42,24 +42,25 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 try
                 {
-                    var editableState = await template.Dispatcher.InvokeAsync(() => template.ServiceState);
-                    if (editableState == ServiceState.Opened)
+                    var domain = template.Domain;
+                    if (domain != null && await domain.Users.ContainsAsync(authentication.ID) == true)
                     {
                         var keys = await template.Dispatcher.InvokeAsync(() => template.PrimaryKey.ToArray());
                         if (keys.Length > 0)
-                            await template.EndEditAsync(context.Authentication);
+                            await template.EndEditAsync(authentication);
                         else
-                            await template.CancelEditAsync(context.Authentication);
+                            await template.CancelEditAsync(authentication);
                     }
                 }
                 catch
                 {
-                    if (template.ServiceState == ServiceState.Opened)
-                        await template.CancelEditAsync(context.Authentication);
+                    await template.CancelEditAsync(authentication);
                 }
-
-                context.Pop(template);
-                context.Complete(context.Target);
+                finally
+                {
+                    context.Pop(template);
+                    context.Complete(context.Target);
+                }
             }
             else
             {
@@ -75,37 +76,17 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
                 }
 
-                var editableState = await template.Dispatcher.InvokeAsync(() => template.ServiceState);
-                if (editableState == ServiceState.None)
+                var domain = template.Domain;
+                if (domain == null)
                 {
-                    try
-                    {
-                        await template.BeginEditAsync(context.Authentication);
-                    }
-                    catch
-                    {
-                        context.Pop(template);
-                        throw;
-                    }
-                }
-                else if (editableState == ServiceState.Opened)
-                {
-                    var domain = template.Domain;
-                    if (await domain.Users.ContainsAsync(authentication.ID) == false)
-                    {
-                        context.Pop(template);
-                        return;
-                    }
-                }
-                else
-                {
-                    context.Pop(template);
-                    return;
+                    await template.BeginEditAsync(authentication);
                 }
 
-                if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
+                if (template.IsNew == true ||
+                    await template.Dispatcher.InvokeAsync(() => template.Any()) == false ||
+                    RandomUtility.Within(25) == true)
                 {
-                    var member = await template.AddNewAsync(context.Authentication);
+                    var member = await template.AddNewAsync(authentication);
                     context.Push(member);
                     context.State = System.Data.DataRowState.Detached;
                 }
@@ -130,22 +111,25 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 10)]
         public async Task SetTableNameAsync(ITableTemplate template, TaskContext context)
         {
+            var authentication = context.Authentication;
             var tableName = RandomUtility.NextIdentifier();
-            await template.SetTableNameAsync(context.Authentication, tableName);
+            await template.SetTableNameAsync(authentication, tableName);
         }
 
         [TaskMethod(Weight = 10)]
         public async Task SetTagsAsync(ITableTemplate template, TaskContext context)
         {
+            var authentication = context.Authentication;
             var tags = (TagInfo)TagInfoUtility.Names.Random();
-            await template.SetTagsAsync(context.Authentication, tags);
+            await template.SetTagsAsync(authentication, tags);
         }
 
         [TaskMethod(Weight = 10)]
         public async Task SetCommentAsync(ITableTemplate template, TaskContext context)
         {
+            var authentication = context.Authentication;
             var comment = RandomUtility.NextString();
-            await template.SetCommentAsync(context.Authentication, comment);
+            await template.SetCommentAsync(authentication, comment);
         }
     }
 }

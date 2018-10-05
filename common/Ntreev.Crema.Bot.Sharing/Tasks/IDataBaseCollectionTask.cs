@@ -60,9 +60,10 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod(Weight = 10)]
         public async Task AddNewDataBaseAsync(IDataBaseCollection dataBases, TaskContext context)
         {
+            var authentication = context.Authentication;
             var dataBaseName = RandomUtility.NextIdentifier();
             var comment = RandomUtility.NextString();
-            await dataBases.AddNewDataBaseAsync(context.Authentication, dataBaseName, comment);
+            await dataBases.AddNewDataBaseAsync(authentication, dataBaseName, comment);
         }
 
         [ConfigurationProperty(ScopeType = typeof(ICremaConfiguration))]

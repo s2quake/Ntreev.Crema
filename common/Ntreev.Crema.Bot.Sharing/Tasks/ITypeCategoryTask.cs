@@ -34,6 +34,7 @@ namespace Ntreev.Crema.Bot.Tasks
     {
         public async Task InvokeAsync(TaskContext context)
         {
+            var authentication = context.Authentication;
             var category = context.Target as ITypeCategory;
             var types = category.GetService(typeof(ITypeCollection)) as ITypeCollection;
             var categories = category.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
@@ -45,7 +46,7 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 if (context.AllowException == false)
                 {
-                    if (await category.Dispatcher.InvokeAsync(() => category.GetAccessType(context.Authentication)) < AccessType.Master)
+                    if (await category.Dispatcher.InvokeAsync(() => category.GetAccessType(authentication)) < AccessType.Master)
                         return;
                 }
                 await this.AddNewCategoryAsync(category, context);
@@ -55,10 +56,10 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 if (context.AllowException == false)
                 {
-                    if (await category.Dispatcher.InvokeAsync(() => category.GetAccessType(context.Authentication)) < AccessType.Master)
+                    if (await category.Dispatcher.InvokeAsync(() => category.GetAccessType(authentication)) < AccessType.Master)
                         return;
                 }
-                var template = await category.NewTypeAsync(context.Authentication);
+                var template = await category.NewTypeAsync(authentication);
                 context.Push(template);
             }
             else
@@ -77,13 +78,14 @@ namespace Ntreev.Crema.Bot.Tasks
             get { return false; }
         }
 
-        [TaskMethod]
-        public async Task GetAccessTypeAsync(ITypeCategory category, TaskContext context)
+        //[TaskMethod]
+        public Task GetAccessTypeAsync(ITypeCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
-            {
-                category.GetAccessType(context.Authentication);
-            });
+            throw new NotImplementedException();
+            //category.Dispatcher.Invoke(() =>
+            //{
+            //    category.GetAccessType(authentication);
+            //});
         }
 
         //[TaskMethod]
@@ -91,7 +93,7 @@ namespace Ntreev.Crema.Bot.Tasks
         //{
         //    category.Dispatcher.Invoke(() =>
         //    {
-        //        category.VerifyRead(context.Authentication);
+        //        category.VerifyRead(authentication);
         //    });
         //}
 
@@ -100,7 +102,7 @@ namespace Ntreev.Crema.Bot.Tasks
         //{
         //    category.Dispatcher.Invoke(() =>
         //    {
-        //        category.VerifyOwner(context.Authentication);
+        //        category.VerifyOwner(authentication);
         //    });
         //}
 
@@ -109,13 +111,14 @@ namespace Ntreev.Crema.Bot.Tasks
         //{
         //    category.Dispatcher.Invoke(() =>
         //    {
-        //        category.VerifyMember(context.Authentication);
+        //        category.VerifyMember(authentication);
         //    });
         //}
 
         //[TaskMethod(Weight = 10)]
         public async Task LockAsync(ITypeCategory category, TaskContext context)
         {
+            var authentication = context.Authentication;
             var comment = RandomUtility.NextString();
             if (context.AllowException == false)
             {
@@ -128,12 +131,13 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
             }
             
-            await category.LockAsync(context.Authentication, comment);
+            await category.LockAsync(authentication, comment);
         }
 
         [TaskMethod]
         public async Task UnlockAsync(ITypeCategory category, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (category.Parent == null)
@@ -143,12 +147,13 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
                 
             }
-            await category.UnlockAsync(context.Authentication);
+            await category.UnlockAsync(authentication);
         }
 
         [TaskMethod]
         public async Task SetPublicAsync(ITypeCategory category, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (category.Parent == null)
@@ -156,12 +161,13 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (category.IsPrivate == false)
                     return;
             }
-            await category.SetPublicAsync(context.Authentication);
+            await category.SetPublicAsync(authentication);
         }
 
         //[TaskMethod(Weight = 10)]
         public async Task SetPrivateAsync(ITypeCategory category, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (category.Parent == null)
@@ -169,12 +175,13 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (category.IsPrivate == false)
                     return;
             }
-            await category.SetPrivateAsync(context.Authentication);
+            await category.SetPrivateAsync(authentication);
         }
 
         [TaskMethod(Weight = 10)]
         public async Task AddAccessMemberAsync(ITypeCategory category, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (category.Parent == null)
@@ -187,17 +194,18 @@ namespace Ntreev.Crema.Bot.Tasks
             var accessType = RandomUtility.NextEnum<AccessType>();
             if (NameValidator.VerifyItemPath(memberID) == true)
             {
-                await category.AddAccessMemberAsync(context.Authentication, new ItemName(memberID).Name, accessType);
+                await category.AddAccessMemberAsync(authentication, new ItemName(memberID).Name, accessType);
             }
             else
             {
-                await category.AddAccessMemberAsync(context.Authentication, memberID, accessType);
+                await category.AddAccessMemberAsync(authentication, memberID, accessType);
             }
         }
 
         [TaskMethod]
         public async Task RemoveAccessMemberAsync(ITypeCategory category, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
                 if (category.Parent == null)
@@ -210,11 +218,11 @@ namespace Ntreev.Crema.Bot.Tasks
 
             if (NameValidator.VerifyItemPath(memberID) == true)
             {
-                await category.RemoveAccessMemberAsync(context.Authentication, new ItemName(memberID).Name);
+                await category.RemoveAccessMemberAsync(authentication, new ItemName(memberID).Name);
             }
             else
             {
-                await category.RemoveAccessMemberAsync(context.Authentication, memberID);
+                await category.RemoveAccessMemberAsync(authentication, memberID);
             }
         }
 
@@ -230,7 +238,7 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (await category.Dispatcher.InvokeAsync(() => category.VerifyAccessType(authentication, AccessType.Master)) == false)
                     return;
             }
-            await category.RenameAsync(context.Authentication, categoryName);
+            await category.RenameAsync(authentication, categoryName);
         }
 
         [TaskMethod(Weight = 25)]
@@ -250,7 +258,7 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (await category.Dispatcher.InvokeAsync(() => category.VerifyAccessType(authentication, AccessType.Master)) == false)
                     return;
             }
-            await category.MoveAsync(context.Authentication, categoryPath);
+            await category.MoveAsync(authentication, categoryPath);
         }
 
         [TaskMethod(Weight = 1)]
@@ -262,45 +270,50 @@ namespace Ntreev.Crema.Bot.Tasks
         [TaskMethod]
         public async Task AddNewCategoryAsync(ITypeCategory category, TaskContext context)
         {
+            var authentication = context.Authentication;
             var categoryNanme = RandomUtility.NextIdentifier();
             if (context.AllowException == false)
             {
-                if (category.GetAccessType(context.Authentication) < AccessType.Master)
+                if (category.GetAccessType(authentication) < AccessType.Master)
                     return;
             }
-            await category.AddNewCategoryAsync(context.Authentication, categoryNanme);
+            await category.AddNewCategoryAsync(authentication, categoryNanme);
         }
 
         [TaskMethod(Weight = 10)]
         public async Task NewTypeAsync(ITypeCategory category, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (context.AllowException == false)
             {
-                if (await category.Dispatcher.InvokeAsync(() => category.GetAccessType(context.Authentication)) < AccessType.Master)
+                if (await category.Dispatcher.InvokeAsync(() => category.GetAccessType(authentication)) < AccessType.Master)
                     return;
             }
-            var template = await category.NewTypeAsync(context.Authentication);
+            var template = await category.NewTypeAsync(authentication);
             context.Push(template);
         }
 
         [TaskMethod]
         public async Task GetDataSetAsync(ITypeCategory category, TaskContext context)
         {
-            await category.GetDataSetAsync(context.Authentication, null);
+            var authentication = context.Authentication;
+            await category.GetDataSetAsync(authentication, null);
         }
 
         [TaskMethod]
         public async Task GetLogAsync(ITypeCategory category, TaskContext context)
         {
-            await category.GetLogAsync(context.Authentication, null);
+            var authentication = context.Authentication;
+            await category.GetLogAsync(authentication, null);
         }
 
         [TaskMethod]
         public async Task FindAsync(ITypeCategory category, TaskContext context)
         {
+            var authentication = context.Authentication;
             var text = RandomUtility.NextWord();
             var option = RandomUtility.NextEnum<FindOptions>();
-            await category.FindAsync(context.Authentication, text, option);
+            await category.FindAsync(authentication, text, option);
         }
     }
 }
