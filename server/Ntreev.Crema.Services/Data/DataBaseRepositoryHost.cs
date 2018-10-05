@@ -313,6 +313,11 @@ namespace Ntreev.Crema.Services.Data
             dataBaseSet.SetTypeCategoryPath(categoryPath, newCategoryPath);
         }
 
+        public void DeleteTypeCategory(DataBaseSet dataBaseSet, string categoryPath)
+        {
+            dataBaseSet.DeleteTypeCategory(categoryPath);
+        }
+
         public void CreateTableCategory(string itemPath)
         {
             var directoryName = PathUtility.GetDirectoryName(itemPath);
@@ -332,6 +337,11 @@ namespace Ntreev.Crema.Services.Data
         public void MoveTableCategory(DataBaseSet dataBaseSet, string categoryPath, string newCategoryPath)
         {
             dataBaseSet.SetTableCategoryPath(categoryPath, newCategoryPath);
+        }
+
+        public void DeleteTableCategory(DataBaseSet dataBaseSet, string categoryPath)
+        {
+            dataBaseSet.DeleteTableCategory(categoryPath);
         }
 
         public void CreateType(DataBaseSet dataBaseSet, string[] typePaths)

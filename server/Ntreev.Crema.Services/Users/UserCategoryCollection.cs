@@ -50,11 +50,14 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);
                     this.ValidateAddNew(authentication, name, parentPath);
-                    await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
+                });
+                await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication);
                     var category = this.BaseAddNew(name, parentPath, authentication);
                     this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });

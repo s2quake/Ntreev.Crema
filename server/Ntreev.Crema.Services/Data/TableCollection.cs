@@ -84,24 +84,25 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                var path = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(InheritAsync), this, table, newTableName, categoryPath, copyContent);
                     this.ValidateInherit(authentication, table, newTableName, categoryPath, copyContent);
-                    this.CremaHost.Sign(authentication);
-                    var itemName = new ItemName(categoryPath, newTableName);
-                    var dataSet = await table.ReadDataForCopyAsync(authentication, itemName);
-                    var dataTable = dataSet.Tables[table.Name, table.Category.Path];
-                    var dataTables = dataSet.Tables.ToArray();
-                    var newDataTable = dataTable.Inherit(itemName, copyContent);
-                    newDataTable.CategoryPath = categoryPath;
-                    var query = from item in dataSet.Tables.Except(dataTables)
-                                orderby item.Name
-                                orderby item.TemplatedParentName != string.Empty
-                                select item;
-                    await this.AddNewAsync(authentication, dataSet, query.ToArray());
-                    return this[newTableName];
+                    return table.Path;
                 });
+                var itemName = new ItemName(path);
+                var targetName = new ItemName(categoryPath, newTableName);
+                var dataSet = await table.ReadDataForCopyAsync(authentication, targetName);
+                var dataTable = dataSet.Tables[itemName.Name, itemName.CategoryPath];
+                var dataTables = dataSet.Tables.ToArray();
+                var newDataTable = dataTable.Inherit(targetName, copyContent);
+                newDataTable.CategoryPath = categoryPath;
+                var query = from item in dataSet.Tables.Except(dataTables)
+                            orderby item.Name
+                            orderby item.TemplatedParentName != string.Empty
+                            select item;
+                var tables = await this.AddNewAsync(authentication, dataSet, query.ToArray());
+                return await this.Dispatcher.InvokeAsync(() => this[newTableName]);
             }
             catch (Exception e)
             {
@@ -115,24 +116,25 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                var path = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), this, table, newTableName, categoryPath, copyContent);
                     this.ValidateCopy(authentication, table, newTableName, categoryPath, copyContent);
-                    this.CremaHost.Sign(authentication);
-                    var itemName = new ItemName(categoryPath, newTableName);
-                    var dataSet = await table.ReadDataForCopyAsync(authentication, itemName);
-                    var dataTable = dataSet.Tables[table.Name, table.Category.Path];
-                    var dataTables = dataSet.Tables.ToArray();
-                    var newDataTable = dataTable.Copy(itemName, copyContent);
-                    newDataTable.CategoryPath = categoryPath;
-                    var query = from item in dataSet.Tables.Except(dataTables)
-                                orderby item.Name
-                                orderby item.TemplatedParentName != string.Empty
-                                select item;
-                    await this.AddNewAsync(authentication, dataSet, query.ToArray());
-                    return this[newTableName];
+                    return table.Path;
                 });
+                var itemName = new ItemName(path);
+                var targetName = new ItemName(categoryPath, newTableName);
+                var dataSet = await table.ReadDataForCopyAsync(authentication, targetName);
+                var dataTable = dataSet.Tables[itemName.Name, itemName.CategoryPath];
+                var dataTables = dataSet.Tables.ToArray();
+                var newDataTable = dataTable.Copy(targetName, copyContent);
+                newDataTable.CategoryPath = categoryPath;
+                var query = from item in dataSet.Tables.Except(dataTables)
+                            orderby item.Name
+                            orderby item.TemplatedParentName != string.Empty
+                            select item;
+                await this.AddNewAsync(authentication, dataSet, query.ToArray());
+                return await this.Dispatcher.InvokeAsync(() => this[newTableName]);
             }
             catch (Exception e)
             {
@@ -196,13 +198,11 @@ namespace Ntreev.Crema.Services.Data
         public Task<SignatureDate> InvokeTableRenameAsync(Authentication authentication, TableInfo tableInfo, string newName, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.RenameTable(authentication, tableInfo.Name, newName);
-            var newItemPath = this.Context.GeneratePath(tableInfo.CategoryPath + newName);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
                     var signatureDate = authentication.Sign();
-                    this.Repository.Lock(newItemPath);
                     this.Repository.RenameTable(dataBaseSet, tableInfo.Path, newName);
                     this.Repository.Commit(authentication, message);
                     return signatureDate;
@@ -214,7 +214,6 @@ namespace Ntreev.Crema.Services.Data
                 }
                 finally
                 {
-                    this.Repository.Unlock(newItemPath);
                     this.Repository.Unlock(dataBaseSet.ItemPaths);
                 }
             });
@@ -223,13 +222,11 @@ namespace Ntreev.Crema.Services.Data
         public Task<SignatureDate> InvokeTableMoveAsync(Authentication authentication, TableInfo tableInfo, string newCategoryPath, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.MoveTable(authentication, tableInfo.Name, newCategoryPath, tableInfo.CategoryPath);
-            var newItemPath = this.Context.GeneratePath(newCategoryPath + tableInfo.Name);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
                     var signatureDate = authentication.Sign();
-                    this.Repository.Lock(newItemPath);
                     this.Repository.MoveTable(dataBaseSet, tableInfo.Path, newCategoryPath);
                     this.Repository.Commit(authentication, message);
                     return signatureDate;
@@ -241,7 +238,6 @@ namespace Ntreev.Crema.Services.Data
                 }
                 finally
                 {
-                    this.Repository.Unlock(newItemPath);
                     this.Repository.Unlock(dataBaseSet.ItemPaths);
                 }
             });

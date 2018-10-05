@@ -51,12 +51,17 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                await await this.Dispatcher.InvokeAsync(async () =>
+                this.ValidateExpired();
+                var path = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
                     base.ValidateSetPublic(authentication);
-                    var signatureDate = await this.Context.InvokeTypeItemSetPublicAsync(authentication, this.Path);
-                    this.CremaHost.Sign(authentication, signatureDate);
+                    return base.Path;
+                });
+                await this.Context.InvokeTypeItemSetPublicAsync(authentication, path);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication);
                     base.SetPublic(authentication);
                     this.Context.InvokeItemsSetPublicEvent(authentication, new ITypeItem[] { this });
                 });
@@ -72,12 +77,17 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                await await this.Dispatcher.InvokeAsync(async () =>
+                this.ValidateExpired();
+                var path = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
                     base.ValidateSetPrivate(authentication);
-                    var accessInfo = await this.Context.InvokeTypeItemSetPrivateAsync(authentication, this.Path);
-                    this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
+                    return base.Path;
+                });
+                var result = await this.Context.InvokeTypeItemSetPrivateAsync(authentication, path);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result.SignatureDate);
                     base.SetPrivate(authentication);
                     this.Context.InvokeItemsSetPrivateEvent(authentication, new ITypeItem[] { this });
                 });
@@ -93,12 +103,19 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                await await this.Dispatcher.InvokeAsync(async () =>
+                this.ValidateExpired();
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMemberAsync), this, memberID, accessType);
                     base.ValidateAddAccessMember(authentication, memberID, accessType);
-                    var accessInfo = await this.Context.InvokeTypeItemAddAccessMemberAsync(authentication, this.Path, this.AccessInfo, memberID, accessType);
-                    this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
+                    var path = base.Path;
+                    var accessInfo = base.AccessInfo;
+                    return (path, accessInfo);
+                });
+                var result = await this.Context.InvokeTypeItemAddAccessMemberAsync(authentication, tuple.path, tuple.accessInfo, memberID, accessType);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result.SignatureDate);
                     base.AddAccessMember(authentication, memberID, accessType);
                     this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
                 });
@@ -114,12 +131,19 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                await await this.Dispatcher.InvokeAsync(async () =>
+                this.ValidateExpired();
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
                     base.ValidateSetAccessMember(authentication, memberID, accessType);
-                    var accessInfo = await this.Context.InvokeTypeItemSetAccessMemberAsync(authentication, this.Path, this.AccessInfo, memberID, accessType);
-                    this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
+                    var path = base.Path;
+                    var accessInfo = base.AccessInfo;
+                    return (path, accessInfo);
+                });
+                var result = await this.Context.InvokeTypeItemSetAccessMemberAsync(authentication, tuple.path, tuple.accessInfo, memberID, accessType);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result.SignatureDate);
                     base.SetAccessMember(authentication, memberID, accessType);
                     this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
                 });
@@ -135,12 +159,19 @@ namespace Ntreev.Crema.Services.Data
         {
             try
             {
-                await await this.Dispatcher.InvokeAsync(async () =>
+                this.ValidateExpired();
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
                     base.ValidateRemoveAccessMember(authentication, memberID);
-                    var accessInfo = await this.Context.InvokeTypeItemRemoveAccessMemberAsync(authentication, this.Path, this.AccessInfo, memberID);
-                    this.CremaHost.Sign(authentication, accessInfo.SignatureDate);
+                    var path = base.Path;
+                    var accessInfo = base.AccessInfo;
+                    return (path, accessInfo);
+                });
+                var result = await this.Context.InvokeTypeItemRemoveAccessMemberAsync(authentication, tuple.path, tuple.accessInfo, memberID);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result.SignatureDate);
                     base.RemoveAccessMember(authentication, memberID);
                     this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID });
                 });
@@ -302,13 +333,13 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                var template = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(NewTypeAsync), this);
-                    var template = new NewTypeTemplate(this);
-                    await template.BeginEditAsync(authentication);
-                    return template;
+                    return new NewTypeTemplate(this);
                 });
+                await template.BeginEditAsync(authentication);
+                return template;
             }
             catch (Exception e)
             {

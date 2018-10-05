@@ -70,7 +70,7 @@ namespace Ntreev.Crema.Services.Data
             this.repositoryDispatcher = new CremaDispatcher(this);
         }
 
-        public void RestoreStateAsync(CremaSettings settings)
+        public async void RestoreStateAsync(CremaSettings settings)
         {
             var dataBaseList = new List<DataBase>(this.Count);
             if (settings.NoCache == false)
@@ -84,7 +84,6 @@ namespace Ntreev.Crema.Services.Data
                     }
                 }
             }
-
             foreach (var item in settings.DataBaseList)
             {
                 if (this.ContainsKey(item) == true)
@@ -96,12 +95,9 @@ namespace Ntreev.Crema.Services.Data
                     CremaLog.Error(new DataBaseNotFoundException(item));
                 }
             }
-
             var dataBases = dataBaseList.Distinct().ToArray();
-            foreach (var item in dataBases)
-            {
-                Task.Run(() => item.LoadAsync(Authentication.System));
-            }
+            var tasks = dataBases.Select(item => item.LoadAsync(Authentication.System)).ToArray();
+            await Task.WhenAll(tasks);
         }
 
         public async Task<DataBase> AddNewDataBaseAsync(Authentication authentication, string dataBaseName, string comment)
@@ -109,29 +105,32 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewDataBaseAsync), dataBaseName, comment);
                     this.ValidateCreateDataBase(authentication, dataBaseName);
-                    this.CremaHost.Sign(authentication);
-                    var dataSet = new CremaDataSet();
-                    var tempPath = PathUtility.GetTempPath(true);
-                    var dataBasePath = Path.Combine(tempPath, dataBaseName);
-                    var message = EventMessageBuilder.CreateDataBase(authentication, dataBaseName) + ": " + comment;
-                    await this.repositoryDispatcher.InvokeAsync(() =>
+                });
+                var dataSet = new CremaDataSet();
+                var tempPath = PathUtility.GetTempPath(true);
+                var dataBasePath = Path.Combine(tempPath, dataBaseName);
+                var message = EventMessageBuilder.CreateDataBase(authentication, dataBaseName) + ": " + comment;
+                await this.repositoryDispatcher.InvokeAsync(() =>
+                {
+                    try
                     {
-                        try
-                        {
-                            FileUtility.WriteAllText($"{CremaSchema.MajorVersion}.{CremaSchema.MinorVersion}", dataBasePath, ".version");
-                            dataSet.WriteToDirectory(dataBasePath);
-                            this.repositoryProvider.CreateRepository(authentication, this.remotesPath, dataBasePath, comment);
-                        }
-                        finally
-                        {
-                            DirectoryUtility.Delete(tempPath);
-                        }
-                    });
+                        FileUtility.WriteAllText($"{CremaSchema.MajorVersion}.{CremaSchema.MinorVersion}", dataBasePath, ".version");
+                        dataSet.WriteToDirectory(dataBasePath);
+                        this.repositoryProvider.CreateRepository(authentication, this.remotesPath, dataBasePath, comment);
+                    }
+                    finally
+                    {
+                        DirectoryUtility.Delete(tempPath);
+                    }
+                });
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
                     var dataBase = new DataBase(this, dataBaseName);
+                    this.CremaHost.Sign(authentication);
                     this.AddBase(dataBase.Name, dataBase);
                     this.InvokeItemsCreateEvent(authentication, new DataBase[] { dataBase }, comment);
                     return dataBase;
@@ -721,39 +720,6 @@ namespace Ntreev.Crema.Services.Data
             if (this.ContainsKey(dataBaseName) == true)
                 throw new ArgumentException(string.Format(Resources.Exception_DataBaseIsAlreadyExisted_Format, dataBaseName), nameof(dataBaseName));
         }
-
-        //private void ValidateRenameDataBase(Authentication authentication, DataBase dataBase, string newDataBaseName)
-        //{
-        //    if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
-        //        throw new PermissionDeniedException();
-
-        //    if (dataBase.IsLoaded == true)
-        //        throw new InvalidOperationException(Resources.Exception_DataBaseHasBeenLoaded);
-
-        //    var dataBasePath = Path.Combine(Path.GetDirectoryName(dataBase.BasePath), newDataBaseName);
-        //    if (DirectoryUtility.Exists(dataBasePath) == true)
-        //        throw new ArgumentException(string.Format(Resources.Exception_ExistsPath_Format, newDataBaseName), nameof(newDataBaseName));
-
-        //    if (this.ContainsKey(newDataBaseName) == true)
-        //        throw new ArgumentException(string.Format(Resources.Exception_DataBaseIsAlreadyExisted_Format, newDataBaseName), nameof(newDataBaseName));
-        //}
-
-        //private void ValidateDeleteDataBase(Authentication authentication, DataBase dataBase)
-        //{
-        //    if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)
-        //        throw new PermissionDeniedException();
-
-        //    if (dataBase.IsLoaded == true)
-        //        throw new InvalidOperationException(Resources.Exception_DataBaseHasBeenLoaded);
-        //}
-
-        //private void ValidateRevertDataBase(Authentication authentication, DataBase dataBase, string revision)
-        //{
-        //    if (authentication.IsSystem == false && authentication.IsAdmin == false)
-        //        throw new PermissionDeniedException();
-        //    if (dataBase.IsLoaded == true)
-        //        throw new InvalidOperationException(Resources.Exception_LoadedDataBaseCannotRevert);
-        //}
 
         private Dictionary<string, DataBaseSerializationInfo> ReadCaches()
         {

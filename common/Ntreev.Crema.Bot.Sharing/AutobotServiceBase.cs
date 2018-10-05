@@ -104,7 +104,14 @@ namespace Ntreev.Crema.Bot
             await this.CreateAutobotAsync(authentication, masterBotID);
             foreach (var item in autobotIDList)
             {
-                await this.CreateAutobotAsync(authentication, item);
+                try
+                {
+                    await this.CreateAutobotAsync(authentication, item);
+                }
+                catch
+                {
+                    
+                }
             }
         }
 

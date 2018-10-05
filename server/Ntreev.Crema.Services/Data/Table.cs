@@ -241,9 +241,10 @@ namespace Ntreev.Crema.Services.Data
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var tableInfo = base.TableInfo;
-                    return (items, oldNames, oldPaths, tableInfo);
+                    var targetName = new ItemName(base.Path) { Name = name };
+                    return (items, oldNames, oldPaths, tableInfo, targetName);
                 });
-                var dataSet = await this.ReadDataForPathAsync(authentication);
+                var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
                 var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
                 var result = await this.Container.InvokeTableRenameAsync(authentication, tuple.tableInfo, name, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
@@ -273,9 +274,10 @@ namespace Ntreev.Crema.Services.Data
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
                     var tableInfo = base.TableInfo;
-                    return (items, oldPaths, oldCategoryPaths, tableInfo);
+                    var targetName = new ItemName(categoryPath, base.Path);
+                    return (items, oldPaths, oldCategoryPaths, tableInfo, targetName);
                 });
-                var dataSet = await this.ReadDataForPathAsync(authentication);
+                var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
                 var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
                 var result = await this.Container.InvokeTableMoveAsync(authentication, tuple.tableInfo, categoryPath, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
@@ -307,7 +309,7 @@ namespace Ntreev.Crema.Services.Data
                     var tableInfo = base.TableInfo;
                     return (items, oldPaths, tableInfo);
                 });
-                var dataSet = await this.ReadDataForPathAsync(authentication);
+                var dataSet = await this.ReadDataForPathAsync(authentication, new ItemName(tuple.tableInfo.Path));
                 var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
                 var result = await container.InvokeTableDeleteAsync(authentication, tuple.tableInfo, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
@@ -529,16 +531,21 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public async Task<CremaDataSet> ReadDataForPathAsync(Authentication authentication)
+        public async Task<CremaDataSet> ReadDataForPathAsync(Authentication authentication, ItemName targetName)
         {
             var tuple = await this.Dispatcher.InvokeAsync(() =>
             {
+                var targetItemPaths = new string[]
+                {
+                    this.Context.GenerateCategoryPath(targetName.CategoryPath),
+                    this.Context.GeneratePath(targetName),
+                };
                 var typeCollection = this.GetService(typeof(TypeCollection)) as TypeCollection;
                 var tables = this.Collect().OrderBy(item => item.Name).ToArray();
                 var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
                 var typeItemPaths = types.Select(item => item.ItemPath).ToArray();
                 var tableItemPaths = tables.Select(item => item.ItemPath).ToArray();
-                var itemPaths = typeItemPaths.Concat(tableItemPaths).ToArray();
+                var itemPaths = typeItemPaths.Concat(tableItemPaths).Concat(targetItemPaths).Distinct().ToArray();
                 var props = new CremaDataSetSerializerSettings(authentication, typeItemPaths, tableItemPaths);
                 var itemPath = this.ItemPath;
                 return (itemPaths, props, itemPath);

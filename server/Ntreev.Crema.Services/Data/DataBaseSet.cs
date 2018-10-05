@@ -136,6 +136,56 @@ namespace Ntreev.Crema.Services.Data
             this.Repository.Move(itemPath1, itemPath2);
         }
 
+        public void DeleteTypeCategory(string categoryPath)
+        {
+            var itemPath = this.TypeContext.GenerateCategoryPath(categoryPath);
+            this.Repository.Delete(itemPath);
+        }
+
+        public void CreateType()
+        {
+            this.Serialize();
+            this.AddTypesRepositoryPath();
+        }
+
+        public void RenameType(string typePath, string typeName)
+        {
+            var dataType = this.types.First(item => item.Path == typePath);
+            this.ValidateTypeExists(dataType.Path);
+            dataType.TypeName = typeName;
+            this.ValidateTypeNotExists(dataType.Path);
+            this.Serialize();
+            this.MoveTypesRepositoryPath();
+        }
+
+        public void MoveType(string typePath, string categoryPath)
+        {
+            var dataType = this.types.First(item => item.Path == typePath);
+            this.ValidateTypeExists(dataType.Path);
+            dataType.CategoryPath = categoryPath;
+            this.ValidateTypeNotExists(dataType.Path);
+            this.Serialize();
+            this.MoveTypesRepositoryPath();
+        }
+
+        public void DeleteType(string typePath)
+        {
+            var dataType = this.types.First(item => item.Path == typePath);
+            var dataSet = dataType.DataSet;
+            dataSet.Types.Remove(dataType);
+            this.ValidateTypeExists(dataType.Path);
+            this.DeleteTypesRepositoryPath();
+        }
+
+        public void ModifyType()
+        {
+            foreach (var item in this.types)
+            {
+                this.ValidateTypeExists(item.Path);
+            }
+            this.Serialize();
+        }
+
         public void SetTableCategoryPath(string categoryPath, string newCategoryPath)
         {
             var itemPath1 = this.TableContext.GenerateCategoryPath(categoryPath);
@@ -190,48 +240,10 @@ namespace Ntreev.Crema.Services.Data
             this.Repository.Move(itemPath1, itemPath2);
         }
 
-        public void CreateType()
+        public void DeleteTableCategory(string categoryPath)
         {
-            this.Serialize();
-            this.AddTypesRepositoryPath();
-        }
-
-        public void RenameType(string typePath, string typeName)
-        {
-            var dataType = this.types.First(item => item.Path == typePath);
-            this.ValidateTypeExists(dataType.Path);
-            dataType.TypeName = typeName;
-            this.ValidateTypeNotExists(dataType.Path);
-            this.Serialize();
-            this.MoveTypesRepositoryPath();
-        }
-
-        public void MoveType(string typePath, string categoryPath)
-        {
-            var dataType = this.types.First(item => item.Path == typePath);
-            this.ValidateTypeExists(dataType.Path);
-            dataType.CategoryPath = categoryPath;
-            this.ValidateTypeNotExists(dataType.Path);
-            this.Serialize();
-            this.MoveTypesRepositoryPath();
-        }
-
-        public void DeleteType(string typePath)
-        {
-            var dataType = this.types.First(item => item.Path == typePath);
-            var dataSet = dataType.DataSet;
-            dataSet.Types.Remove(dataType);
-            this.ValidateTypeExists(dataType.Path);
-            this.DeleteTypesRepositoryPath();
-        }
-
-        public void ModifyType()
-        {
-            foreach (var item in this.types)
-            {
-                this.ValidateTypeExists(item.Path);
-            }
-            this.Serialize();
+            var itemPath = this.TableContext.GenerateCategoryPath(categoryPath);
+            this.Repository.Delete(itemPath);
         }
 
         public void CreateTable()
