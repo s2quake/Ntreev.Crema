@@ -84,7 +84,6 @@ namespace Ntreev.Crema.Bot
                 await category.AddNewUserAsync(authentication, masterBotID, StringUtility.ToSecureString("1111"), masterBotID, Authority.Admin);
             }
 
-
             var autobotIDList = new List<string>();
             for (var i = 0; i < count; i++)
             {
@@ -122,18 +121,8 @@ namespace Ntreev.Crema.Bot
 
             this.IsPlaying = false;
             this.IsClosing = true;
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                foreach (var item in this.botByID.Values)
-                {
-                    item.Cancel();
-                }
-            });
-
-            while (this.botByID.Any())
-            {
-                Thread.Sleep(1);
-            }
+            var tasks = await this.Dispatcher.InvokeAsync(() => this.botByID.Values.Select(item => item.CancelAsync()).ToArray());
+            await Task.WhenAll(tasks);
             this.Dispatcher.Dispose();
             this.Dispatcher = null;
             this.IsClosing = false;

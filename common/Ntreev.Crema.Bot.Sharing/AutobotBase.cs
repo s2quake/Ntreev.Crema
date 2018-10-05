@@ -58,6 +58,15 @@ namespace Ntreev.Crema.Bot
             this.cancelTokenSource.Cancel();
         }
 
+        public async Task CancelAsync()
+        {
+            this.cancelTokenSource.Cancel();
+            while (this.dispatcher != null)
+            {
+                await Task.Delay(1);
+            }
+        }
+
         public async Task LoginAsync()
         {
             var authentication = await this.OnLoginAsync();
