@@ -49,8 +49,8 @@ namespace Ntreev.Crema.Bot.Tasks
                     {
                         if (autobot.GetService(typeof(ICremaHost)) is ICremaHost cremaHost && cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
                         {
-                            //var dataBase = await dataBases.Dispatcher.InvokeAsync(() => dataBases.Random());
-                            //context.Push(dataBase);
+                            var dataBase = await dataBases.Dispatcher.InvokeAsync(() => dataBases.Random());
+                            context.Push(dataBase);
                         }
                     }
                     else if (RandomUtility.Within(75) == true)
@@ -100,7 +100,7 @@ namespace Ntreev.Crema.Bot.Tasks
             }
         }
 
-        //[TaskMethod(Weight = 1)]
+        [TaskMethod(Weight = 1)]
         public async Task CreateAutobotAsync(Autobot autobot, TaskContext context)
         {
             if (context.AllowException == false)

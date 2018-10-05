@@ -54,16 +54,16 @@ namespace Ntreev.Crema.Services.Data
 
         public override IPermission Permission => this.table;
 
-        protected override async Task OnBeginEditAsync(Authentication authentication, DomainMetaData metaData)
+        protected override async Task OnBeginEditAsync(Authentication authentication)
         {
-            await base.OnBeginEditAsync(authentication, metaData);
+            await base.OnBeginEditAsync(authentication);
             this.table.SetTableState(TableState.IsBeingSetup | TableState.IsMember);
             this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table, });
         }
 
-        protected override async Task OnEndEditAsync(Authentication authentication, TableInfo[] tableInfos)
+        protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication)
         {
-            await base.OnEndEditAsync(authentication, tableInfos);
+            var tableInfos = await base.OnEndEditAsync(authentication);
             var tableInfo = tableInfos.First();
             this.table.UpdateTemplate(tableInfo);
             this.table.UpdateTags(tableInfo.Tags);
@@ -73,6 +73,7 @@ namespace Ntreev.Crema.Services.Data
             var items = EnumerableUtility.One(this.table).ToArray();
             this.Container.InvokeTablesStateChangedEvent(authentication, items);
             this.Container.InvokeTablesTemplateChangedEvent(authentication, items);
+            return tableInfos;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)

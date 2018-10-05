@@ -35,16 +35,21 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
-                    var result = await this.Service.RenameUserItemAsync(this.Path, name);
+                    var path = base.Path;
+                    return (items, oldNames, oldPaths, path);
+                });
+                var result = await this.Service.RenameUserItemAsync(tuple.path, name);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.Name = name;
-                    this.Container.InvokeCategoriesRenamedEvent(authentication, items, oldNames, oldPaths);
+                    this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths);
                 });
             }
             catch (Exception e)
@@ -59,16 +64,21 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, parentPath);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
-                    var result = await this.Service.MoveUserItemAsync(this.Path, parentPath);
+                    var path = base.Path;
+                    return (items, oldPaths, oldParentPaths, path);
+                });
+                var result = await this.Service.MoveUserItemAsync(tuple.path, parentPath);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     this.Parent = this.Container[parentPath];
-                    this.Container.InvokeCategoriesMovedEvent(authentication, items, oldPaths, oldParentPaths);
+                    this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths);
                 });
             }
             catch (Exception e)
@@ -83,16 +93,21 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
+                    var path = base.Path;
+                    return (items, oldPaths, path);
+                });
+                var result = await this.Service.DeleteUserItemAsync(tuple.path);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     var container = this.Container;
-                    var result = await this.Service.DeleteUserItemAsync(this.Path);
                     this.CremaHost.Sign(authentication, result);
                     this.Dispose();
-                    container.InvokeCategoriesDeletedEvent(authentication, items, oldPaths);
+                    container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
                 });
             }
             catch (Exception e)

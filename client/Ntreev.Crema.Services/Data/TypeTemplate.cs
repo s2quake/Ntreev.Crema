@@ -52,19 +52,20 @@ namespace Ntreev.Crema.Services.Data
 
         public override IPermission Permission => this.type;
 
-        protected override async Task OnBeginEditAsync(Authentication authentication, DomainMetaData metaData)
+        protected override async Task OnBeginEditAsync(Authentication authentication)
         {
-            await base.OnBeginEditAsync(authentication, metaData);
+            await base.OnBeginEditAsync(authentication);
             this.type.IsBeingEdited = true;
             this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
         }
 
-        protected override async Task OnEndEditAsync(Authentication authentication, TypeInfo typeInfo)
+        protected override async Task<TypeInfo> OnEndEditAsync(Authentication authentication)
         {
-            await base.OnEndEditAsync(authentication, typeInfo);
+            var typeInfo = await base.OnEndEditAsync(authentication);
             this.type.UpdateTypeInfo(typeInfo);
             this.type.IsBeingEdited = false;
             this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
+            return typeInfo;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)

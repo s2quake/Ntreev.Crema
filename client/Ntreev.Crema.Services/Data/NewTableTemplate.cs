@@ -74,14 +74,14 @@ namespace Ntreev.Crema.Services.Data
 		
 		public IDataBaseService Service { get; }
 
-        protected override async Task OnBeginEditAsync(Authentication authentication, DomainMetaData metaData)
+        protected override async Task OnBeginEditAsync(Authentication authentication)
         {
-            await base.OnBeginEditAsync(authentication, metaData);
+            await base.OnBeginEditAsync(authentication);
         }
 
-        protected override async Task OnEndEditAsync(Authentication authentication, TableInfo[] tableInfos)
+        protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication)
         {
-            await base.OnEndEditAsync(authentication, tableInfos);
+            var tableInfos = await base.OnEndEditAsync(authentication);
             if (this.parent is TableCategory category)
             {
                 var tables = category.GetService(typeof(TableCollection)) as TableCollection;
@@ -93,6 +93,7 @@ namespace Ntreev.Crema.Services.Data
                 this.tables = tables.AddNew(authentication, tableInfos);
             }
             this.parent = null;
+            return tableInfos;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)

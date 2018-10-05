@@ -72,10 +72,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(InheritAsync), this, table, newTableName, categoryPath, copyContent);
-                    var result = await this.Service.InheritTableAsync(table.Name, newTableName, categoryPath, copyContent);
+                    return table.Name;
+                });
+                var result = await this.Service.InheritTableAsync(name, newTableName, categoryPath, copyContent);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     this.AddNew(authentication, result.Value);
                     return this[newTableName];
@@ -93,10 +97,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), this, table, newTableName, categoryPath, copyContent);
-                    var result = await this.Service.CopyTableAsync(table.Name, newTableName, categoryPath, copyContent);
+                    return table.Name;
+                });
+                var result = await this.Service.CopyTableAsync(name, newTableName, categoryPath, copyContent);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     this.AddNew(authentication, result.Value);
                     return this[newTableName];

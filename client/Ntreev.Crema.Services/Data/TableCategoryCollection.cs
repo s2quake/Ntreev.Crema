@@ -46,11 +46,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);
-                    var categoryName = new CategoryName(parentPath, name);
-                    var result = await this.Service.NewTableCategoryAsync(categoryName);
+                });
+                var categoryName = new CategoryName(parentPath, name);
+                var result = await this.Service.NewTableCategoryAsync(categoryName);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     var category = this.BaseAddNew(name, parentPath, authentication);
                     var items = EnumerableUtility.One(category).ToArray();

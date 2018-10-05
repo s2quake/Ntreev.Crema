@@ -57,10 +57,13 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
-                    var result = await this.Service.NewUserAsync(userID, categoryPath, UserContext.Encrypt(userID, password), userName, authority);
+                });
+                var result = await this.Service.NewUserAsync(userID, categoryPath, UserContext.Encrypt(userID, password), userName, authority);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     var user = this.BaseAddNew(userID, categoryPath);
                     user.Initialize(result.Value, BanInfo.Empty);

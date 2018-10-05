@@ -75,10 +75,13 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), typeName, newTypeName, categoryPath);
-                    var result = await this.Context.Service.CopyTypeAsync(typeName, newTypeName, categoryPath);
+                });
+                var result = await this.Context.Service.CopyTypeAsync(typeName, newTypeName, categoryPath);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     return this.AddNew(authentication, result.Value);
                 });

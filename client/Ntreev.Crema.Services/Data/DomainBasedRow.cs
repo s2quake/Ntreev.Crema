@@ -82,18 +82,27 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
+                int count =0 ;
                 var tuple = await this.domain.Dispatcher.InvokeAsync(() =>
                 {
                     if (this.Row != null)
                         throw new InvalidOperationException();
                     var fields = this.fields.Values.ToArray();
                     var name = this.table.TableName;
+                    count = this.table.Rows.Count;
                     return (fields, name);
                 });
                 var keys = await this.domain.NewRowAsync(authentication, tuple.name, tuple.fields);
+                var fields11 = tuple.fields;
                 await this.domain.Dispatcher.InvokeAsync(() =>
                 {
+                    var sss = fields11;
                     this.Row = this.table.Rows.Find(keys);
+                    if (this.Row == null)
+                    {
+                        var row = this.table.Rows.Find(keys);
+                        int qwer = 0;
+                    }
                     this.fields = null;
                 });
             }

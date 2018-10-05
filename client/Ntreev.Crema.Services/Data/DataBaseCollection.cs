@@ -143,10 +143,13 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewDataBaseAsync), dataBaseName, comment);
-                    var result = await this.service.CreateAsync(dataBaseName, comment);
+                });
+                var result = await this.service.CreateAsync(dataBaseName, comment);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     var dataBase = new DataBase(this, result.Value);
                     this.AddBase(dataBase.Name, dataBase);
@@ -212,10 +215,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyDataBaseAsync), dataBase, newDataBaseName, comment, force);
-                    var result = await this.service.CopyAsync(dataBase.Name, newDataBaseName, comment, force);
+                    return dataBase.Name;
+                });
+                var result = await this.service.CopyAsync(name, newDataBaseName, comment, force);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     var dataBaseInfo = result.Value;
                     var newDataBase = new DataBase(this, dataBaseInfo);

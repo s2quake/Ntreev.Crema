@@ -256,16 +256,21 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                 {
+                     this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, categoryPath);
+                     var items = EnumerableUtility.FamilyTree(this, item => item.Childs).ToArray();
+                     var oldPaths = items.Select(item => item.Path).ToArray();
+                     var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
+                     var path = base.Path;
+                     return (items, oldPaths, oldCategoryPaths, path);
+                 });
+                var result = await this.Service.MoveTableItemAsync(tuple.path, categoryPath);
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, categoryPath);
-                    var items = EnumerableUtility.FamilyTree(this, item => item.Childs).ToArray();
-                    var oldPaths = items.Select(item => item.Path).ToArray();
-                    var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
-                    var result = await this.Service.MoveTableItemAsync(base.Path, categoryPath);
                     this.CremaHost.Sign(authentication, result);
                     base.Move(authentication, categoryPath);
-                    this.Container.InvokeTablesMovedEvent(authentication, items, oldPaths, oldCategoryPaths);
+                    this.Container.InvokeTablesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths);
                 });
             }
             catch (Exception e)
@@ -280,16 +285,21 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this, base.Path);
                     var items = EnumerableUtility.FamilyTree(this, item => item.Childs).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
+                    var path = base.Path;
+                    return (items, oldPaths, path);
+                });
+                var result = await this.Service.DeleteTableItemAsync(tuple.path);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     var container = this.Container;
-                    var result = await this.Service.DeleteTableItemAsync(base.Path);
                     this.CremaHost.Sign(authentication, result);
                     base.Delete(authentication);
-                    container.InvokeTablesDeletedEvent(authentication, items, oldPaths);
+                    container.InvokeTablesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
                 });
             }
             catch (Exception e)
@@ -314,13 +324,13 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                var template = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(NewChildAsync), this);
-                    var template = new NewTableTemplate(this);
-                    await template.BeginEditAsync(authentication);
-                    return template;
+                    return new NewTableTemplate(this);
                 });
+                await template.BeginEditAsync(authentication);
+                return template;
             }
             catch (Exception e)
             {
@@ -334,10 +344,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                var path = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, revision);
-                    var result = await this.Service.GetTableItemDataSetAsync(base.Path, revision);
+                    return base.Path;
+                });
+                var result = await this.Service.GetTableItemDataSetAsync(path, revision);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     return result.Value;
                 });
@@ -354,12 +368,16 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                var path = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetLogAsync), this);
-                    var result = await this.Service.GetTableItemLogAsync(base.Path, revision);
+                    return base.Path;
+                });
+                var result = await this.Service.GetTableItemLogAsync(path, revision);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
-                    return result.Value ?? new LogInfo[] { };
+                    return result.Value;
                 });
             }
             catch (Exception e)
@@ -374,12 +392,16 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                var path = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(FindAsync), this, text, options);
-                    var result = await this.Service.FindTableItemAsync(base.Path, text, options);
+                    return base.Path;
+                });
+                var result = await this.Service.FindTableItemAsync(path, text, options);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
-                    return result.Value ?? new FindResultInfo[] { };
+                    return result.Value;
                 });
             }
             catch (Exception e)

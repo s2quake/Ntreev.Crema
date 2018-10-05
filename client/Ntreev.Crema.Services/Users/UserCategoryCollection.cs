@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.UserService;
+using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections;
@@ -45,13 +46,18 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var categoryName = new CategoryName(parentPath, name);
-                    var result = await this.Context.Service.NewUserCategoryAsync(categoryName);
-                    result.Validate(authentication);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);
+                });
+                var categoryName = new CategoryName(parentPath, name);
+                var result = await this.Context.Service.NewUserCategoryAsync(categoryName);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
                     var category = this.BaseAddNew(name, parentPath, authentication);
-                    this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
+                    var items = EnumerableUtility.One(category).ToArray();
+                    this.InvokeCategoriesCreatedEvent(authentication, items);
                     return category;
                 });
             }

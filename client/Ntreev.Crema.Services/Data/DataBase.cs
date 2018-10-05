@@ -90,10 +90,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
-                    var result = await this.DataBases.Service.SetPublicAsync(base.Name);
+                    return base.Name;
+                });
+                var result = await this.DataBases.Service.SetPublicAsync(name);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.SetPublic(authentication);
                     this.metaData.AccessInfo = base.AccessInfo;
@@ -112,10 +116,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
-                    var result = await this.DataBases.Service.SetPrivateAsync(base.Name);
+                    return base.Name;
+                });
+                var result = await this.DataBases.Service.SetPrivateAsync(name);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.SetPrivate(authentication);
                     this.metaData.AccessInfo = base.AccessInfo;
@@ -134,10 +142,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMember), this, memberID, accessType);
-                    var result = await this.DataBases.Service.AddAccessMemberAsync(base.Name, memberID, accessType);
+                    return base.Name;
+                });
+                var result = await this.DataBases.Service.AddAccessMemberAsync(name, memberID, accessType);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.AddAccessMember(authentication, memberID, accessType);
                     this.metaData.AccessInfo = base.AccessInfo;
@@ -156,10 +168,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
-                    var result = await this.DataBases.Service.SetAccessMemberAsync(base.Name, memberID, accessType);
+                    return base.Name;
+                });
+                var result = await this.DataBases.Service.SetAccessMemberAsync(name, memberID, accessType);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.SetAccessMember(authentication, memberID, accessType);
                     this.metaData.AccessInfo = base.AccessInfo;
@@ -178,10 +194,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
+               {
+                   this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
+                   return base.Name;
+               });
+                var result = await this.DataBases.Service.RemoveAccessMemberAsync(name, memberID);
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
-                    var result = await this.DataBases.Service.RemoveAccessMemberAsync(base.Name, memberID);
                     this.CremaHost.Sign(authentication, result);
                     base.RemoveAccessMember(authentication, memberID);
                     this.metaData.AccessInfo = base.AccessInfo;
@@ -1058,7 +1078,7 @@ namespace Ntreev.Crema.Services.Data
             this.timer?.Dispose();
             this.timer = null;
             this.service = null;
-            
+
             result.Validate();
             await this.CremaHost.RemoveServiceAsync(this);
             return result.SignatureDate;

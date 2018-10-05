@@ -71,6 +71,10 @@ namespace Ntreev.Crema.Services.Domains
             base.OnInitialize(metaData);
 
             var xml = Encoding.UTF8.GetString(metaData.Data).Decompress();
+            if(this.DataSet != null)
+            {
+                int qwer = 0;
+            }
             this.DataSet = XmlSerializerUtility.ReadString<CremaDataSet>(xml);
             this.DataSet.AcceptChanges();
             this.views.Clear();
@@ -112,7 +116,13 @@ namespace Ntreev.Crema.Services.Domains
                     foreach (var item in rows)
                     {
                         var view = this.views[item.TableName];
+                        var table = view.Table;
+                        var count = table.Rows.Count;
                         CremaDomainUtility.AddNew(view, item.Fields);
+                        if(table.Rows.Count == count)
+                        {
+                            int qwer = 0;
+                        }
                         this.tables[view].ContentsInfo = signatureDate;
                     }
                 }

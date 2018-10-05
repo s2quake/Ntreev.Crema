@@ -76,16 +76,21 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
+                    var path = base.Path;
+                    return (items, oldPaths, path);
+                });
+                var result = await this.Service.DeleteUserItemAsync(tuple.path);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     var container = this.Container;
-                    var result = await this.Service.DeleteUserItemAsync(this.Path);
                     this.CremaHost.Sign(authentication, result);
                     base.Delete(authentication);
-                    container.InvokeUsersDeletedEvent(authentication, items, oldPaths);
+                    container.InvokeUsersDeletedEvent(authentication, tuple.items, tuple.oldPaths);
                 });
             }
             catch (Exception e)
@@ -100,17 +105,22 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(KickAsync), this, comment);
-                    var users = new User[] { this };
-                    var comments = Enumerable.Repeat(comment, users.Length).ToArray();
-                    var result = await this.Service.KickAsync(this.ID, comment ?? string.Empty);
+                    var items = new User[] { this };
+                    var comments = Enumerable.Repeat(comment, items.Length).ToArray();
+                    var id = this.ID;
+                    return (items, comments, id);
+                });
+                var result = await this.Service.KickAsync(tuple.id, comment ?? string.Empty);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     this.IsOnline = false;
-                    this.Container.InvokeUsersKickedEvent(authentication, users, comments);
-                    this.Container.InvokeUsersStateChangedEvent(authentication, users);
-                    this.Container.InvokeUsersLoggedOutEvent(authentication, users, new CloseInfo(CloseReason.Kicked, comment));
+                    this.Container.InvokeUsersKickedEvent(authentication, tuple.items, tuple.comments);
+                    this.Container.InvokeUsersStateChangedEvent(authentication, tuple.items);
+                    this.Container.InvokeUsersLoggedOutEvent(authentication, tuple.items, new CloseInfo(CloseReason.Kicked, comment));
                 });
             }
             catch (Exception e)
@@ -125,20 +135,25 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BanAsync), this, comment);
-                    var users = new User[] { this };
-                    var comments = Enumerable.Repeat(comment, users.Length).ToArray();
-                    var result = await this.Service.BanAsync(this.ID, comment ?? string.Empty);
+                    var items = new User[] { this };
+                    var comments = Enumerable.Repeat(comment, items.Length).ToArray();
+                    var id = this.ID;
+                    return (items, comments, id);
+                });
+                var result = await this.Service.BanAsync(tuple.id, comment ?? string.Empty);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.Ban(authentication, result.Value);
-                    this.Container.InvokeUsersBannedEvent(authentication, users, comments);
+                    this.Container.InvokeUsersBannedEvent(authentication, tuple.items, tuple.comments);
                     if (this.IsOnline == true)
                     {
                         this.IsOnline = false;
-                        this.Container.InvokeUsersStateChangedEvent(authentication, users);
-                        this.Container.InvokeUsersLoggedOutEvent(authentication, users, new CloseInfo(CloseReason.Banned, comment));
+                        this.Container.InvokeUsersStateChangedEvent(authentication, tuple.items);
+                        this.Container.InvokeUsersLoggedOutEvent(authentication, tuple.items, new CloseInfo(CloseReason.Banned, comment));
                     }
                 });
             }
@@ -154,15 +169,20 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnbanAsync), this);
-                    var users = new User[] { this };
-                    var result = await this.Service.UnbanAsync(this.ID);
+                    var items = new User[] { this };
+                    var id = this.ID;
+                    return (items, id);
+                });
+                var result = await this.Service.UnbanAsync(tuple.id);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.Unban(authentication);
-                    this.Container.InvokeUsersUnbannedEvent(authentication, users);
-                    this.Container.InvokeUsersStateChangedEvent(authentication, users);
+                    this.Container.InvokeUsersUnbannedEvent(authentication, tuple.items);
+                    this.Container.InvokeUsersStateChangedEvent(authentication, tuple.items);
                 });
             }
             catch (Exception e)
@@ -177,16 +197,20 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var userInfo = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(ChangeUserInfoAsync), this, userName, authority);
-                    if (this.ID == authentication.ID && password == null && newPassword != null)
-                        throw new ArgumentNullException(nameof(password));
-                    if (newPassword == null && password != null)
-                        throw new ArgumentNullException(nameof(newPassword));
-                    var p1 = password == null ? null : UserContext.Encrypt(this.ID, password);
-                    var p2 = newPassword == null ? null : UserContext.Encrypt(this.ID, newPassword);
-                    var result = await this.Service.ChangeUserInfoAsync(this.UserInfo.ID, p1, p2, userName, authority);
+                    return base.UserInfo;
+                });
+                if (userInfo.ID == authentication.ID && password == null && newPassword != null)
+                    throw new ArgumentNullException(nameof(password));
+                if (newPassword == null && password != null)
+                    throw new ArgumentNullException(nameof(newPassword));
+                var p1 = password == null ? null : UserContext.Encrypt(userInfo.ID, password);
+                var p2 = newPassword == null ? null : UserContext.Encrypt(userInfo.ID, newPassword);
+                var result = await this.Service.ChangeUserInfoAsync(userInfo.ID, p1, p2, userName, authority);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     base.UpdateUserInfo(result.Value);
                     this.Container.InvokeUsersChangedEvent(authentication, new User[] { this });
@@ -204,10 +228,14 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var userInfo = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SendMessageAsync), this, message);
-                    var result = await this.Service.SendMessageAsync(this.UserInfo.ID, message);
+                    return base.UserInfo;
+                });
+                var result = await this.Service.SendMessageAsync(userInfo.ID, message);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication, result);
                     this.Container.InvokeSendMessageEvent(authentication, this, message);
                 });

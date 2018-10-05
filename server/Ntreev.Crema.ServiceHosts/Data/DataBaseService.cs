@@ -469,8 +469,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             {
                 var table = await this.GetTableAsync(tableName);
                 var content = table.Content;
-                if (content.Domain == null)
-                    await content.BeginEditAsync(this.authentication);
+                await content.BeginEditAsync(this.authentication);
                 var domain = content.Domain;
                 result.Value = await domain.GetMetaDataAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;

@@ -92,12 +92,13 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync));
-                    var result = await this.BeginDomainAsync(authentication);
-                    this.CremaHost.Sign(authentication, result);
-                    await this.OnBeginEditAsync(authentication, result.Value);
+                });
+                await this.OnBeginEditAsync(authentication);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.OnEditBegun(EventArgs.Empty);
                 });
             }
@@ -113,12 +114,13 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync));
-                    var result = await this.EndDomainAsync(authentication, this.domain.ID);
-                    this.CremaHost.Sign(authentication, result);
-                    await this.OnEndEditAsync(authentication, result.Value);
+                });
+                await this.OnEndEditAsync(authentication);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.OnEditEnded(EventArgs.Empty);
                 });
             }
@@ -134,12 +136,13 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync));
-                    var result = await this.CancelDomainAsync(authentication, this.domain.ID);
-                    this.CremaHost.Sign(authentication, result);
-                    await this.OnCancelEditAsync(authentication);
+                });
+                await this.OnCancelEditAsync(authentication);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.OnEditCanceled(EventArgs.Empty);
                 });
             }
@@ -285,8 +288,11 @@ namespace Ntreev.Crema.Services.Data
             this.changed?.Invoke(this, e);
         }
 
-        protected virtual async Task OnBeginEditAsync(Authentication authentication, DomainMetaData metaData)
+        protected virtual async Task OnBeginEditAsync(Authentication authentication)
         {
+            var result = await this.BeginDomainAsync(authentication);
+            this.CremaHost.Sign(authentication, result);
+            var metaData = result.Value;
             this.domain = await this.DomainContext.CreateAsync(authentication, metaData) as TypeDomain;
             this.domain.IsNew = this.IsNew;
             this.domain.Host = this;
@@ -307,8 +313,11 @@ namespace Ntreev.Crema.Services.Data
             await this.AttachDomainEventAsync();
         }
 
-        protected virtual async Task OnEndEditAsync(Authentication authentication, TypeInfo typeInfo)
+        protected virtual async Task<TypeInfo> OnEndEditAsync(Authentication authentication)
         {
+            var result = await this.EndDomainAsync(authentication, this.domain.ID);
+            this.CremaHost.Sign(authentication, result);
+            var typeInfo = result.Value;
             if (this.domain != null)
             {
                 await this.DetachDomainEventAsync();
@@ -324,10 +333,13 @@ namespace Ntreev.Crema.Services.Data
             this.table = null;
             this.items = null;
             this.rowsToAdd.Clear();
+            return typeInfo;
         }
 
         protected virtual async Task OnCancelEditAsync(Authentication authentication)
         {
+            var result = await this.CancelDomainAsync(authentication, this.domain.ID);
+            this.CremaHost.Sign(authentication, result);
             if (this.domain != null)
             {
                 await this.DetachDomainEventAsync();
@@ -408,7 +420,7 @@ namespace Ntreev.Crema.Services.Data
         {
             if (e.IsCanceled == false)
             {
-                await this.OnEndEditAsync(e.Authentication, TypeInfo.Empty);
+                await this.OnEndEditAsync(e.Authentication);
                 await this.Dispatcher.InvokeAsync(() => this.OnEditEnded(e));
             }
             else

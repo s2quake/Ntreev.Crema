@@ -232,10 +232,13 @@ namespace Ntreev.Crema.Services
         {
             try
             {
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, shutdownType, message);
-                    var result = await this.UserContext.Service.ShutdownAsync(milliseconds, shutdownType, message);
+                });
+                var result = await this.UserContext.Service.ShutdownAsync(milliseconds, shutdownType, message);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.Sign(authentication, result);
                 });
             }
@@ -250,10 +253,13 @@ namespace Ntreev.Crema.Services
         {
             try
             {
-                await await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.DebugMethod(authentication, this, nameof(CancelShutdownAsync));
-                    var result = await this.UserContext.Service.CancelShutdownAsync();
+                });
+                var result = await this.UserContext.Service.CancelShutdownAsync();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.Sign(authentication, result);
                 });
             }

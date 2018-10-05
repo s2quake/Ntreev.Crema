@@ -41,10 +41,14 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await await this.Dispatcher.InvokeAsync(async () =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
+                 {
+                     this.dataBase.VerifyAccess(authentication);
+                     return this.dataBase.Name;
+                 });
+                var result = await this.service.EndTransactionAsync(name);
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.dataBase.VerifyAccess(authentication);
-                    var result = await this.service.EndTransactionAsync(this.dataBase.Name);
                     this.CremaHost.Sign(authentication, result);
                     this.OnDisposed(EventArgs.Empty);
                 });
