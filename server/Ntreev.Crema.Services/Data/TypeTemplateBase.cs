@@ -43,6 +43,8 @@ namespace Ntreev.Crema.Services.Data
         private EventHandler editCanceled;
         private EventHandler changed;
 
+        private string[] itemPaths;
+
         public abstract AccessType GetAccessType(Authentication authentication);
 
         public async Task<TypeMember> AddNewAsync(Authentication authentication)
@@ -286,6 +288,8 @@ namespace Ntreev.Crema.Services.Data
 
         public ServiceState ServiceState { get; private set; }
 
+        public string[] ItemPaths => this.itemPaths;
+
         public event EventHandler EditBegun
         {
             add
@@ -370,6 +374,7 @@ namespace Ntreev.Crema.Services.Data
                 IsNew = this.IsNew,
                 Host = this
             };
+            this.itemPaths = this.domain.ItemPaths;
             await this.DomainContext.AddAsync(authentication, this.domain, this.DataBase);
 
             this.table = this.TypeSource.View.Table;

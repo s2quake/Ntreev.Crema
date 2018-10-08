@@ -33,7 +33,6 @@ namespace Ntreev.Crema.Services.Data
         private Table[] tables;
         private IPermission permission;
         private string[] tableNames;
-        private string[] itemPaths;
 
         public NewTableTemplate(TableCategory category)
         {
@@ -47,7 +46,6 @@ namespace Ntreev.Crema.Services.Data
             this.Permission = category;
             this.IsNew = true;
             this.Container = category.GetService(typeof(TableCollection)) as TableCollection;
-            this.Repository = category.Repository;
             category.Attach(this);
         }
 
@@ -63,7 +61,6 @@ namespace Ntreev.Crema.Services.Data
             this.Permission = parent;
             this.IsNew = true;
             this.Container = parent.GetService(typeof(TableCollection)) as TableCollection;
-            this.Repository = parent.Repository;
             parent.Attach(this);
         }
 
@@ -154,8 +151,8 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
+            await this.Repository.UnlockAsync(this.ItemPaths);
             await base.OnCancelEditAsync(authentication);
-            await this.Repository.UnlockAsync(this.itemPaths);
             this.parent = null;
             this.permission = null;
         }
@@ -169,7 +166,6 @@ namespace Ntreev.Crema.Services.Data
                 var newName = NameUtility.GenerateNewName(nameof(Table), category.Context.Tables.Select((Table item) => item.Name));
                 var templateSource = CremaTemplate.Create(dataSet, newName, category.Path);
                 this.tableNames = new string[] { };
-                this.itemPaths = dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] as string[] ?? new string[] { };
                 return templateSource;
             }
             else if (this.parent is Table table)
@@ -177,7 +173,6 @@ namespace Ntreev.Crema.Services.Data
                 var dataSet = await table.ReadDataForTemplateAsync(authentication, true);
                 var dataTable = dataSet.Tables[table.Name, table.Category.Path];
                 this.tableNames = dataSet.Tables.Select(item => item.Name).ToArray();
-                this.itemPaths = dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] as string[] ?? new string[] { };
                 return CremaTemplate.Create(dataTable);
             }
             throw new NotImplementedException();
@@ -185,6 +180,6 @@ namespace Ntreev.Crema.Services.Data
 
         private TableCollection Container { get; }
 
-        private DataBaseRepositoryHost Repository { get; }
+        private DataBaseRepositoryHost Repository => this.DataBase.Repository;
     }
 }

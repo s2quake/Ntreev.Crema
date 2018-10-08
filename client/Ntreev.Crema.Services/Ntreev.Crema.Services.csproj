@@ -75,7 +75,6 @@
     <Compile Include="Data\TableColumn.cs" />
     <Compile Include="Data\TableContent.cs" />
     <Compile Include="Data\NewTableTemplate.cs" />
-    <Compile Include="Data\TableContentBase.cs" />
     <Compile Include="Data\TableContentDomainHost.cs" />
     <Compile Include="Data\TableRow.cs" />
     <Compile Include="Data\TableTemplate.cs" />

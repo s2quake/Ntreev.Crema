@@ -45,6 +45,10 @@ namespace Ntreev.Crema.Services.Domains
             this.IsNew = (bool)serializationInfo.GetProperty(nameof(IsNew));
             this.template = source as CremaTemplate;
             this.view = this.template.View;
+
+            var dataSet = this.template.TargetTable.DataSet;
+            var itemPaths = (string)serializationInfo.GetProperty(nameof(ItemPaths));
+            dataSet.SetItemPaths(StringUtility.Split(itemPaths, ';'));
         }
 
         public TableTemplateDomain(Authentication authentication, CremaTemplate templateSource, DataBase dataBase, string itemPath, string itemType)
@@ -55,6 +59,8 @@ namespace Ntreev.Crema.Services.Domains
         }
 
         public bool IsNew { get; set; }
+
+        public string[] ItemPaths => this.template.TargetTable.DataSet.GetItemPaths();
 
         protected override byte[] SerializeSource(object source)
         {
@@ -72,6 +78,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             base.OnSerializaing(properties);
             properties.Add(nameof(IsNew), this.IsNew);
+            properties.Add(nameof(this.ItemPaths), string.Join(";", this.ItemPaths));
         }
 
         protected override async Task<DomainRowInfo[]> OnNewRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)

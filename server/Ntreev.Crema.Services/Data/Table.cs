@@ -515,8 +515,8 @@ namespace Ntreev.Crema.Services.Data
                 var tables = this.CollectChilds().OrderBy(item => item.Name).ToArray();
                 var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
                 var typeItemPaths = types.Select(item => item.ItemPath).ToArray();
-                var tableItemPaths = tables.Select(item => item.ItemPath).Concat(targetItemPaths).ToArray();
-                var itemPaths = typeItemPaths.Concat(tableItemPaths).ToArray();
+                var tableItemPaths = tables.Select(item => item.ItemPath).ToArray();
+                var itemPaths = typeItemPaths.Concat(tableItemPaths).Concat(targetItemPaths).ToArray();
                 var props = new CremaDataSetSerializerSettings(authentication, typeItemPaths, tableItemPaths);
                 var itemPath = this.ItemPath;
                 return (itemPaths, props, itemPath);

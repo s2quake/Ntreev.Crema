@@ -88,10 +88,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             try
             {
                 await this.DetachEventHandlersAsync();
-                await this.UserContext.Dispatcher.InvokeAsync(() =>
-                {
-                    this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                });
                 await this.authentication.RemoveRefAsync(this);
                 this.authentication = null;
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
@@ -364,7 +360,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
                 this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                this.authentication = null;
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(DetachEventHandlersAsync)}");
         }

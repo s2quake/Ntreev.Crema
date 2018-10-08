@@ -43,6 +43,8 @@ namespace Ntreev.Crema.Services.Data
         private EventHandler editCanceled;
         private EventHandler changed;
 
+        private string[] itemPaths;
+
         public abstract AccessType GetAccessType(Authentication authentication);
 
         public async Task<TableColumn> AddNewAsync(Authentication authentication)
@@ -242,6 +244,8 @@ namespace Ntreev.Crema.Services.Data
 
         public string[] SelectableTypes => this.TemplateSource.Types;
 
+        public string[] ItemPaths => this.itemPaths;
+
         public IEnumerable<TableColumn> PrimaryKey
         {
             get
@@ -344,6 +348,7 @@ namespace Ntreev.Crema.Services.Data
                 IsNew = this.IsNew,
                 Host = this
             };
+            this.itemPaths = this.domain.ItemPaths;
             await this.DomainContext.AddAsync(authentication, this.domain, this.DataBase);
 
             this.table = this.TemplateSource.View.Table;

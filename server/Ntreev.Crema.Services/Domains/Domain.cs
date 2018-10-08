@@ -48,32 +48,6 @@ namespace Ntreev.Crema.Services.Domains
         private EventHandler<DomainPropertyEventArgs> propertyChanged;
         private EventHandler<DomainDeletedEventArgs> deleted;
 
-        protected Domain(SerializationInfo info, StreamingContext context)
-        {
-            var domainInfo = (DomainInfo)info.GetValue(typeof(DomainInfo).Name, typeof(DomainInfo));
-            var userInfos = FindUsersValue();
-            this.Initialize(domainInfo);
-            this.Name = base.DomainInfo.DomainID.ToString();
-            this.data = (byte[])info.GetValue(dataKey, typeof(byte[]));
-            this.Source = this.DerializeSource(this.data);
-            this.Users = new DomainUserCollection(this);
-            this.InitializeUsers(userInfos);
-
-            DomainUserInfo[] FindUsersValue()
-            {
-                var enumerator = info.GetEnumerator();
-                while (enumerator.MoveNext())
-                {
-                    var item = enumerator.Current;
-                    if (item.Name == usersKey)
-                    {
-                        return XmlSerializerUtility.ReadString<DomainUserInfo[]>(item.Value as string);
-                    }
-                }
-                return null;
-            }
-        }
-
         protected Domain(DomainSerializationInfo serializationInfo, object source)
         {
             this.Source = source;

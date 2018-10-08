@@ -289,12 +289,12 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var repository = await Task.Run(() => this.repositoryProvider.CreateInstance(repositorySetting));
                 this.Dispatcher = new CremaDispatcher(this);
+                this.Repository = new DataBaseRepositoryHost(this, repository);
+                this.Repository.Changed += Repository_Changed;
                 var cache = await this.ReadCacheAsync(repository.RepositoryInfo);
                 await this.ResetDataBaseAsync(authentication, cache.Item1, cache.Item2);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.Repository = new DataBaseRepositoryHost(this, repository);
-                    this.Repository.Changed += Repository_Changed;
                     this.CremaHost.Sign(authentication);
                     base.DataBaseState = DataBaseState.Loaded;
                     base.Load(authentication);

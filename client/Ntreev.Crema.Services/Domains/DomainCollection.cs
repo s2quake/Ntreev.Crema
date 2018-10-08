@@ -204,10 +204,8 @@ namespace Ntreev.Crema.Services.Domains
             return null;
         }
 
-        public async Task<Domain> AddDomainAsync(DomainInfo domainInfo)
+        public async Task<Domain> AddDomainAsync(Authentication authentication, DomainInfo domainInfo)
         {
-            var userConext = this.CremaHost.UserContext;
-            var authentication = await userConext.AuthenticateAsync(domainInfo.CreationInfo);
             var domain = this.CreateDomain(domainInfo);
             var dataBase = await this.Dispatcher.InvokeAsync(() =>
             {

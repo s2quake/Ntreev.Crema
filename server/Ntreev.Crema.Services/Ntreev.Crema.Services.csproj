@@ -64,6 +64,7 @@
     <Compile Include="CremaString.cs" />
     <Compile Include="Data\DataBaseImporter.cs" />
     <Compile Include="Data\DataBaseItemState.cs" />
+    <Compile Include="Data\DataSetExtensions.cs" />
     <Compile Include="Data\DataServiceItemInfo.cs" />
     <Compile Include="Data\Serializations\DataBaseStateSerializationInfo.cs" />
     <Compile Include="Data\DataBaseSet.cs" />

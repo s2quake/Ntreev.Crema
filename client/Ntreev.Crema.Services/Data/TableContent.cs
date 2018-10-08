@@ -106,17 +106,9 @@ namespace Ntreev.Crema.Services.Data
                 var domainHost = new TableContentDomainHost(this.Container);
                 var signatureDate = await domainHost.BeginContentAsync(authentication, name);
                 this.domainHost = domainHost;
-                //var result = await this.Service.BeginTableContentEditAsync(name);
-                //if (this.domain == null)
-                //{
-                //    this.domain = await this.DomainContext.CreateAsync(authentication, result.Value);
-                //    this.domain.Host = new TableContentDomainHost(this.Container, this.domain, this.domain.DomainInfo.ItemPath);
-                //    await this.domainHost.AttachDomainEventAsync();
-                //}
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, signatureDate);
-                    //this.domainHost.BeginContent(authentication, this.domain);
                     this.domainHost.InvokeEditBegunEvent(EventArgs.Empty);
                 });
             }

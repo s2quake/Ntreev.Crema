@@ -144,7 +144,8 @@ namespace Ntreev.Crema.Services.Domains
         {
             foreach (var item in metaDatas)
             {
-                var domain = await this.Domains.AddDomainAsync(item.DomainInfo);
+                var authentication = await this.userContext.AuthenticateAsync(item.DomainInfo.CreationInfo);
+                var domain = await this.Domains.AddDomainAsync(authentication, item.DomainInfo);
                 if (domain == null)
                     continue;
 
@@ -156,7 +157,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             if (this.Dispatcher == null)
                 return;
-            this.Dispatcher.Invoke(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 this.timer?.Dispose();
                 this.timer = null;
@@ -323,12 +324,12 @@ namespace Ntreev.Crema.Services.Domains
                     }
                 }
             });
-            var userContext = this.CremaHost.UserContext;
+
             foreach (var item in metaData.Domains)
             {
                 var domainInfo = item.DomainInfo;
-                //var authentication = await userContext.AuthenticateAsync(domainInfo.CreationInfo);
-                var domain = await this.Domains.AddDomainAsync(domainInfo);
+                var authentication = await this.userContext.AuthenticateAsync(domainInfo.CreationInfo);
+                var domain = await this.Domains.AddDomainAsync(authentication, domainInfo);
                 if (domain == null)
                     continue;
 
@@ -497,12 +498,17 @@ namespace Ntreev.Crema.Services.Domains
 
         #region IDomainServiceCallback
 
+        private static readonly object lockobj = new object();
+        int index = 0;
+        private readonly HashSet<int> hash = new HashSet<int>();
+        int last = 0;
+
         async void IDomainServiceCallback.OnDomainCreated(SignatureDate signatureDate, DomainInfo domainInfo, DomainState domainState)
         {
             try
             {
                 var authentication = await this.userContext.AuthenticateAsync(signatureDate);
-                var domain = await this.Domains.AddDomainAsync(domainInfo);
+                var domain = await this.Domains.AddDomainAsync(authentication, domainInfo);
                 await domain.InvokeDomainStateChangedAsync(authentication, domainState);
             }
             catch (Exception e)
@@ -516,7 +522,7 @@ namespace Ntreev.Crema.Services.Domains
             try
             {
                 var authentication = await this.userContext.AuthenticateAsync(signatureDate);
-                var domain = await this.Dispatcher.InvokeAsync(() => this.Domains[domainID]);
+                var domain = await this.GetDomainAsync(domainID);
                 await domain.Dispatcher.InvokeAsync(() => domain.Dispose(authentication, isCanceled));
             }
             catch (Exception e)

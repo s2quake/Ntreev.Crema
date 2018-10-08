@@ -41,6 +41,9 @@ namespace Ntreev.Crema.Services.Domains.Serializations
         [DataMember]
         public DomainPropertySerializationInfo[] Properties { get; set; }
 
+        [DataMember]
+        public string[] ItemPaths { get; set; }
+
         public void AddProperty(string name, object value)
         {
             var property = new DomainPropertySerializationInfo(name, value);

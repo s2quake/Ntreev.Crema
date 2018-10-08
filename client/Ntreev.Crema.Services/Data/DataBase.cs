@@ -1211,6 +1211,7 @@ namespace Ntreev.Crema.Services.Data
                         var tableInfo = tableInfos[i];
                         var table = this.TableContext.Tables[tableInfo.Name];
                         table.SetTableInfo(tableInfo);
+                        tables[i] = table;
                     }
                     this.TableContext.Tables.InvokeTablesTemplateChangedEvent(authentication, tables);
                 });
@@ -1234,6 +1235,7 @@ namespace Ntreev.Crema.Services.Data
                         var table = this.TableContext.Tables[tableNames[i]];
                         var state = states[i];
                         table.SetTableState(state);
+                        tables[i] = table;
                     }
                     this.TableContext.Tables.InvokeTablesStateChangedEvent(authentication, tables);
                 });
@@ -1634,6 +1636,7 @@ namespace Ntreev.Crema.Services.Data
                         var typeInfo = typeInfos[i];
                         var type = this.TypeContext.Types[typeInfo.Name];
                         type.SetTypeInfo(typeInfo);
+                        types[i] = type;
                     }
                     this.TypeContext.Types.InvokeTypesChangedEvent(authentication, types);
                 });
@@ -1657,6 +1660,7 @@ namespace Ntreev.Crema.Services.Data
                         var type = this.TypeContext.Types[typeNames[i]];
                         var state = states[i];
                         type.SetTypeState(state);
+                        types[i] = type;
                     }
                     this.TypeContext.Types.InvokeTypesStateChangedEvent(authentication, types);
                 });

@@ -93,6 +93,7 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
+            await this.Repository.UnlockAsync(this.ItemPaths);
             await base.OnCancelEditAsync(authentication);
         }
 
@@ -106,6 +107,6 @@ namespace Ntreev.Crema.Services.Data
             return dataType;
         }
 
-        private DataBaseRepositoryHost Repository => this.category.Repository;
+        private DataBaseRepositoryHost Repository => this.DataBase.Repository;
     }
 }

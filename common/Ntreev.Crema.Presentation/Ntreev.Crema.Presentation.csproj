@@ -128,7 +128,6 @@
     <Compile Include="Controls\BrowserItemsControl.cs" />
     <Compile Include="Controls\BrowserItemsControlItemTemplateSelector.cs" />
     <Compile Include="Controls\ContentServiceControl.cs" />
-    <None Include="Controls\CremaDataSetControl.cs" />
     <Compile Include="Controls\CremaDataTableItemControl.cs" />
     <Compile Include="Controls\CremaDataTableControl.cs" />
     <Compile Include="Controls\CremaDataTypeControl.cs" />

@@ -83,6 +83,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
+        public Task LockAsync(params string[] itemPaths)
+        {
+            return this.Dispatcher.InvokeAsync(() => this.Lock(itemPaths));
+        }
+
         public Task UnlockAsync(params string[] itemPaths)
         {
             return this.Dispatcher.InvokeAsync(() => this.Unlock(itemPaths));

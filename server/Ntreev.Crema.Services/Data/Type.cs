@@ -393,7 +393,7 @@ namespace Ntreev.Crema.Services.Data
                     this.Context.GeneratePath(targetName),
                     this.ItemPath
                 };
-                var props = new CremaDataSetSerializerSettings(authentication, itemPaths, null);
+                var props = new CremaDataSetSerializerSettings(authentication, new string[] { this.ItemPath }, null);
                 var itemPath = this.ItemPath;
                 return (itemPaths, props, itemPath);
             });

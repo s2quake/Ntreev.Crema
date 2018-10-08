@@ -47,6 +47,9 @@ namespace Ntreev.Crema.Services.Domains
                 var view = item.AsDataView();
                 this.views.Add(item.Name, view);
             }
+
+            var itemPaths = (string)serializationInfo.GetProperty(nameof(ItemPaths));
+            this.dataSet.SetItemPaths(StringUtility.Split(itemPaths, ';'));
         }
 
         public TableContentDomain(Authentication authentication, CremaDataSet dataSet, DataBase dataBase, string itemPath, string itemType, IDomainHost domainHost)
@@ -63,6 +66,8 @@ namespace Ntreev.Crema.Services.Domains
             this.Host = domainHost;
         }
 
+        public string[] ItemPaths => this.dataSet.GetItemPaths();
+
         protected override byte[] SerializeSource(object source)
         {
             var xml = XmlSerializerUtility.GetString(source);
@@ -73,6 +78,12 @@ namespace Ntreev.Crema.Services.Domains
         {
             var xml = Encoding.UTF8.GetString(data).Decompress();
             return XmlSerializerUtility.ReadString<CremaDataSet>(xml);
+        }
+
+        protected override void OnSerializaing(IDictionary<string, object> properties)
+        {
+            base.OnSerializaing(properties);
+            properties.Add(nameof(this.ItemPaths), string.Join(";", this.ItemPaths));
         }
 
         protected override async Task<DomainRowInfo[]> OnNewRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
