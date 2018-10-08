@@ -215,18 +215,18 @@ namespace Ntreev.Crema.Client.Types
             this.IsVisible = false;
         }
 
-        private void Shell_ServiceChanged(object sender, EventArgs e)
+        private async void Shell_ServiceChanged(object sender, EventArgs e)
         {
             if (this.Shell.SelectedService == this)
             {
                 if (this.cremaAppHost.GetService(typeof(IDataBase)) is IDataBase dataBase)
                 {
-                    this.Dispatcher.InvokeAsync(() => this.Restore(dataBase), DispatcherPriority.Background);
+                    await this.RestoreAsync(dataBase);
                 }
             }
         }
 
-        private async void Restore(IDataBase dataBase)
+        private async Task RestoreAsync(IDataBase dataBase)
         {
             if (this.isFirst == true)
                 return;
@@ -234,10 +234,11 @@ namespace Ntreev.Crema.Client.Types
             this.isFirst = true;
 
             var domainContext = dataBase.GetService(typeof(IDomainContext)) as IDomainContext;
-            var items = await  await domainContext.Dispatcher.InvokeAsync(async () =>
+            var items = await await domainContext.Dispatcher.InvokeAsync(async () =>
             {
+                var domains = domainContext.Domains.Where(item => item.DataBaseID == dataBase.ID)
+                                                   .ToArray();
                 var restoreList = new List<System.Action>();
-                var domains = domainContext.Domains.Where(item => item.DataBaseID == dataBase.ID).ToArray();
 
                 foreach (var item in domains)
                 {
@@ -252,13 +253,13 @@ namespace Ntreev.Crema.Client.Types
                         if (itemType == "NewTypeTemplate")
                         {
                             var category = dataBase.TypeContext[itemPath] as ITypeCategory;
-                            var dialog = new NewTypeViewModel(this.authenticator, category, template);
+                            var dialog = await category.Dispatcher.InvokeAsync(() => new NewTypeViewModel(this.authenticator, category, template));
                             restoreList.Add(new System.Action(() => dialog.ShowDialog()));
                         }
                         else if (itemType == "TypeTemplate")
                         {
                             var type = dataBase.TypeContext[itemPath] as IType;
-                            var dialog = new EditTemplateViewModel(this.authenticator, type, template);
+                            var dialog = await type.Dispatcher.InvokeAsync(() => new EditTemplateViewModel(this.authenticator, type, template));
                             restoreList.Add(new System.Action(() => dialog.ShowDialog()));
                         }
                     }

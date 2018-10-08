@@ -115,9 +115,22 @@ namespace Ntreev.Crema.Services.Data
 
             public async Task BeginContentAsync(Authentication authentication)
             {
-                this.dataSet = await this.Container.ReadDataForContentAsync(authentication, this.Tables);
-                this.domain = new TableContentDomain(authentication, dataSet, this.DataBase, this.itemPath, typeof(TableContent).Name, this);
-                this.dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
+                try
+                {
+                    this.dataSet = await this.Container.ReadDataForContentAsync(authentication, this.Tables);
+                    this.domain = new TableContentDomain(authentication, dataSet, this.DataBase, this.itemPath, typeof(TableContent).Name, this);
+                    this.dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
+                    await this.DomainContext.AddAsync(authentication, this.domain, this.DataBase);
+                }
+                catch
+                {
+                    if (this.dataBaseSet != null)
+                        await this.Repository.UnlockAsync(this.dataBaseSet.ItemPaths);
+                    this.dataSet = null;
+                    this.domain = null;
+                    this.dataBaseSet = null;
+                    throw;
+                }
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     foreach (var item in this.Contents)
@@ -129,7 +142,6 @@ namespace Ntreev.Crema.Services.Data
                         item.IsModified = this.domain.ModifiedTables.Contains(item.dataTable.Name);
                     }
                 });
-                await this.DomainContext.AddAsync(authentication, this.domain, this.DataBase);
                 await this.AttachDomainEventAsync();
                 await this.Dispatcher.InvokeAsync(() =>
                 {

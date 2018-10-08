@@ -32,6 +32,7 @@ namespace Ntreev.Crema.Services.Data
         public NewTableTemplate(TableCategory category)
         {
             this.parent = category ?? throw new ArgumentNullException(nameof(category));
+            this.DispatcherObject = category;
             this.DomainContext = category.GetService(typeof(DomainContext)) as DomainContext;
             this.ItemPath = category.Path;
             this.CremaHost = category.CremaHost;
@@ -44,6 +45,7 @@ namespace Ntreev.Crema.Services.Data
         public NewTableTemplate(Table parent)
         {
             this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            this.DispatcherObject = parent;
             this.DomainContext = parent.GetService(typeof(DomainContext)) as DomainContext;
             this.ItemPath = parent.Path;
             this.CremaHost = parent.CremaHost;

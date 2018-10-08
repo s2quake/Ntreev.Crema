@@ -246,19 +246,19 @@ namespace Ntreev.Crema.Client.Tables
                     if (itemType == "NewTableTemplate")
                     {
                         var category = dataBase.TableContext[itemPath] as ITableCategory;
-                        var dialog = new NewTableViewModel(this.authenticator, category, template);
+                        var dialog = await category.Dispatcher.InvokeAsync(() => new NewTableViewModel(this.authenticator, category, template));
                         restoreList.Add(new System.Action(() => dialog.ShowDialog()));
                     }
                     else if (itemType == "NewChildTableTemplate")
                     {
                         var table = dataBase.TableContext[itemPath] as ITable;
-                        var dialog = new NewChildTableViewModel(this.authenticator, table, template);
+                        var dialog = await table.Dispatcher.InvokeAsync(() => new NewChildTableViewModel(this.authenticator, table, template));
                         restoreList.Add(new System.Action(() => dialog.ShowDialog()));
                     }
                     else if (itemType == "TableTemplate")
                     {
                         var table = dataBase.TableContext[itemPath] as ITable;
-                        var dialog = new EditTemplateViewModel(this.authenticator, table, template);
+                        var dialog = await table.Dispatcher.InvokeAsync(() => new EditTemplateViewModel(this.authenticator, table, template));
                         restoreList.Add(new System.Action(() => dialog.ShowDialog()));
                     }
                 }

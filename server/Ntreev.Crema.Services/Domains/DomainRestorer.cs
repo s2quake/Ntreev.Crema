@@ -31,7 +31,7 @@ using System.Xml;
 
 namespace Ntreev.Crema.Services.Domains
 {
-    class DomainRestorer : IDisposable
+    class DomainRestorer
     {
         private readonly static XmlReaderSettings readerSettings = new XmlReaderSettings()
         {
@@ -39,7 +39,6 @@ namespace Ntreev.Crema.Services.Domains
             IgnoreWhitespace = true,
         };
 
-        //private readonly Authentication authentication;
         private readonly DomainContext domainContext;
         private readonly string workingPath;
 
@@ -58,23 +57,19 @@ namespace Ntreev.Crema.Services.Domains
 
         public async Task RestoreAsync()
         {
-            //using (var restorer = new DomainRestorer(authentication, domainContext, workingPath))
+            try
             {
-                try
+                await Task.Run(async () =>
                 {
-                    await Task.Run(async () =>
-                    {
-                        //await this.CollectAuthenticationsAsync();
-                        await this.DeserializeDomainAsync();
-                        this.CollectCompletedActions();
-                        this.CollectPostedActions();
-                        await this.RestoreDomainAsync();
-                    });
-                }
-                finally
-                {
-                    this.Dispose();
-                }
+                    await this.DeserializeDomainAsync();
+                    this.CollectCompletedActions();
+                    this.CollectPostedActions();
+                    await this.RestoreDomainAsync();
+                });
+            }
+            finally
+            {
+                this.Dispose();
             }
         }
 
@@ -121,23 +116,6 @@ namespace Ntreev.Crema.Services.Domains
             this.domain.Logger = domainLogger;
             await this.domainContext.RestoreAsync(this.authentications[domainInfo.CreationInfo.ID], this.domain);
         }
-
-        //private async Task CollectAuthenticationsAsync()
-        //{
-        //    var creatorID = this.domain.DomainInfo.CreationInfo.ID;
-        //    var userContext = this.domainContext.CremaHost.UserContext;
-        //    var userIDs = this.actionList.Select(item => item.UserID).Concat(Enumerable.Repeat(creatorID, 1)).Distinct();
-
-        //    var users = await userContext.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        var query = from userID in userIDs
-        //                    join User user in userContext.Users on userID equals user.ID
-        //                    select new Authentication(new UserAuthenticationProvider(user, true));
-        //        return query.ToArray();
-        //    });
-
-        //    this.authentications = users.ToDictionary(item => item.ID);
-        //}
 
         private async Task RestoreDomainAsync()
         {
@@ -224,14 +202,31 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDisposable.Dispose()
+        #region DummyDomainHost
+
+        class DummyDomainHost : IDomainHost
         {
-            if (this.authentications == null)
-                return;
-            foreach (var item in this.authentications)
+            public DummyDomainHost(Domain domain)
             {
-                item.Value.InvokeExpiredEvent(Authentication.SystemID);
+
+            }
+
+            public Task RestoreAsync(Authentication authentication, Domain domain)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task DetachAsync()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void ValidateDelete(Authentication authentication, bool isCanceled)
+            {
+                throw new NotImplementedException();
             }
         }
+
+        #endregion
     }
 }

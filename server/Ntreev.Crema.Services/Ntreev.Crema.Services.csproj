@@ -94,7 +94,6 @@
     <Compile Include="Domains\Actions\JoinAction.cs" />
     <Compile Include="Domains\Actions\SetOwnerAction.cs" />
     <Compile Include="Domains\Actions\KickAction.cs" />
-    <Compile Include="Domains\DummyDomainHost.cs" />
     <Compile Include="Data\DataServiceBase.cs" />
     <Compile Include="Data\DataServiceItemBase.cs" />
     <Compile Include="Data\DataBaseRepositoryHost.cs" />

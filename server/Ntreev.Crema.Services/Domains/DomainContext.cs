@@ -362,61 +362,70 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        private void DataBases_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
+        private async void DataBases_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
         {
-            var categoryList = new List<DomainCategory>(e.Items.Length);
-            var categoryNameList = new List<string>(e.Items.Length);
-            var categoryPathList = new List<string>(e.Items.Length);
-            for (var i = 0; i < e.Items.Length; i++)
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                var dataBase = e.Items[i];
-                var categoryName = CategoryName.Create(dataBase.Name);
-                var category = this.Categories.AddNew(categoryName);
-                category.DataBase = dataBase;
-                categoryList.Add(category);
-            }
-            Authentication.System.Sign();
-            this.Categories.InvokeCategoriesCreatedEvent(Authentication.System, categoryList.ToArray());
+                var categoryList = new List<DomainCategory>(e.Items.Length);
+                var categoryNameList = new List<string>(e.Items.Length);
+                var categoryPathList = new List<string>(e.Items.Length);
+                for (var i = 0; i < e.Items.Length; i++)
+                {
+                    var dataBase = e.Items[i];
+                    var categoryName = CategoryName.Create(dataBase.Name);
+                    var category = this.Categories.AddNew(categoryName);
+                    category.DataBase = dataBase;
+                    categoryList.Add(category);
+                }
+                this.CremaHost.Sign(Authentication.System);
+                this.Categories.InvokeCategoriesCreatedEvent(Authentication.System, categoryList.ToArray());
+            });
         }
 
-        private void DataBases_ItemsRenamed(object sender, ItemsRenamedEventArgs<IDataBase> e)
+        private async void DataBases_ItemsRenamed(object sender, ItemsRenamedEventArgs<IDataBase> e)
         {
-            var categoryList = new List<DomainCategory>(e.Items.Length);
-            var categoryNameList = new List<string>(e.Items.Length);
-            var categoryPathList = new List<string>(e.Items.Length);
-            for (var i = 0; i < e.Items.Length; i++)
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                var oldName = e.OldNames[i];
-                var newName = e.Items[i].Name;
-                var category = this.Root.Categories[oldName];
-                var categoryName = category.Name;
-                var categoryPath = category.Path;
-                category.Name = newName;
-                categoryList.Add(category);
-                categoryNameList.Add(categoryName);
-                categoryPathList.Add(categoryPath);
-            }
-            Authentication.System.Sign();
-            this.Categories.InvokeCategoriesRenamedEvent(Authentication.System, categoryList.ToArray(), categoryNameList.ToArray(), categoryPathList.ToArray());
+                var categoryList = new List<DomainCategory>(e.Items.Length);
+                var categoryNameList = new List<string>(e.Items.Length);
+                var categoryPathList = new List<string>(e.Items.Length);
+                for (var i = 0; i < e.Items.Length; i++)
+                {
+                    var oldName = e.OldNames[i];
+                    var newName = e.Items[i].Name;
+                    var category = this.Root.Categories[oldName];
+                    var categoryName = category.Name;
+                    var categoryPath = category.Path;
+                    category.Name = newName;
+                    categoryList.Add(category);
+                    categoryNameList.Add(categoryName);
+                    categoryPathList.Add(categoryPath);
+                }
+                this.CremaHost.Sign(Authentication.System);
+                this.Categories.InvokeCategoriesRenamedEvent(Authentication.System, categoryList.ToArray(), categoryNameList.ToArray(), categoryPathList.ToArray());
+            });
         }
 
-        private void DataBases_ItemDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
+        private async void DataBases_ItemDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
         {
-            var categoryList = new List<DomainCategory>(e.Items.Length);
-            var categoryPathList = new List<string>(e.Items.Length);
-            foreach (var item in e.Items)
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                this.DeleteDomains(item);
-                var category = this.Root.Categories[item.Name];
-                var categoryPath = category.Path;
-                var localPath = Path.Combine(this.BasePath, $"{item.ID}");
-                DirectoryUtility.Delete(localPath);
-                category.Dispose();
-                categoryList.Add(category);
-                categoryPathList.Add(categoryPath);
-            }
-            Authentication.System.Sign();
-            this.Categories.InvokeCategoriesDeletedEvent(Authentication.System, categoryList.ToArray(), categoryPathList.ToArray());
+                var categoryList = new List<DomainCategory>(e.Items.Length);
+                var categoryPathList = new List<string>(e.Items.Length);
+                foreach (var item in e.Items)
+                {
+                    this.DeleteDomains(item);
+                    var category = this.Root.Categories[item.Name];
+                    var categoryPath = category.Path;
+                    var localPath = Path.Combine(this.BasePath, $"{item.ID}");
+                    DirectoryUtility.Delete(localPath);
+                    category.Dispose();
+                    categoryList.Add(category);
+                    categoryPathList.Add(categoryPath);
+                }
+                this.CremaHost.Sign(Authentication.System);
+                this.Categories.InvokeCategoriesDeletedEvent(Authentication.System, categoryList.ToArray(), categoryPathList.ToArray());
+            });
         }
 
         private void DeleteDomains(IDataBase dataBase)

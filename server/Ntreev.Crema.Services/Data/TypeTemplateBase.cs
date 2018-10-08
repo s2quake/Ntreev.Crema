@@ -370,6 +370,7 @@ namespace Ntreev.Crema.Services.Data
                 IsNew = this.IsNew,
                 Host = this
             };
+            await this.DomainContext.AddAsync(authentication, this.domain, this.DataBase);
 
             this.table = this.TypeSource.View.Table;
             this.items = new List<TypeMember>(this.table.Rows.Count);
@@ -381,7 +382,6 @@ namespace Ntreev.Crema.Services.Data
             this.table.RowDeleted += Table_RowDeleted;
             this.table.RowChanged += Table_RowChanged;
 
-            await this.DomainContext.AddAsync(authentication, this.domain, this.DataBase);
             await this.domain.AddUserAsync(authentication, DomainAccessType.ReadWrite);
             await this.AttachDomainEventAsync();
         }

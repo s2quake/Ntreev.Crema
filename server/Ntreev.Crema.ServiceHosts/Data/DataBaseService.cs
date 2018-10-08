@@ -556,7 +556,10 @@ namespace Ntreev.Crema.ServiceHosts.Data
                     result.Value = await domain.GetMetaDataAsync(this.authentication);
                     result.SignatureDate = this.authentication.SignatureDate;
                 }
-                throw new NotImplementedException();
+                else
+                {
+                    throw new NotImplementedException();
+                }
             }
             catch (Exception e)
             {
