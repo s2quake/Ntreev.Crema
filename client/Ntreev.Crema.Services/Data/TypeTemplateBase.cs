@@ -308,8 +308,6 @@ namespace Ntreev.Crema.Services.Data
             this.table.RowDeleted += Table_RowDeleted;
             this.table.RowChanged += Table_RowChanged;
 
-            //await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
-            //await this.domain.AddUserAsync(authentication, DomainAccessType.ReadWrite);
             await this.AttachDomainEventAsync();
         }
 

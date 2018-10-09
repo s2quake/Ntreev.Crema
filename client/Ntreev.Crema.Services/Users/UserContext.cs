@@ -56,7 +56,7 @@ namespace Ntreev.Crema.Services.Users
         public async Task<Guid> InitializeAsync(string address, ServiceInfo serviceInfo, string userID, SecureString password)
         {
             var version = typeof(CremaHost).Assembly.GetName().Version;
-            await this.Dispatcher.InvokeAsync(() =>
+            return await this.Dispatcher.InvokeAsync(() =>
             {
                 this.service = UserServiceFactory.CreateServiceClient(address, serviceInfo, this);
                 this.service.Open();
@@ -64,28 +64,22 @@ namespace Ntreev.Crema.Services.Users
                 {
                     service.Faulted += Service_Faulted;
                 }
-            });
-            try
-            {
-                var result = await this.service.SubscribeAsync(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}");
-                result.Validate();
-#if !DEBUG
-                this.timer = new Timer(30000);
-                this.timer.Elapsed += Timer_Elapsed;
-                this.timer.Start();
-#endif
-                var metaData = result.Value;
-                //this.CremaHost.AuthenticationToken = metaData.AuthenticationToken;
 
-                await this.Dispatcher.InvokeAsync(() =>
+                try
                 {
+                    var result = this.service.Subscribe(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}");
+#if !DEBUG
+                    this.timer = new Timer(30000);
+                    this.timer.Elapsed += Timer_Elapsed;
+                    this.timer.Start();
+#endif
+                    var metaData = result.GetValue();
                     foreach (var item in metaData.Categories)
                     {
                         if (item == this.Root.Path)
                             continue;
                         this.Categories.Prepare(item);
                     }
-
                     foreach (var item in metaData.Users)
                     {
                         var itemName = new ItemName(item.Path);
@@ -96,27 +90,19 @@ namespace Ntreev.Crema.Services.Users
 
                     this.CurrentUser = this.Users[userID];
                     this.CurrentUser.SetUserState(UserState.Online);
-                });
-                //await this.InitializeAsync(metaData);
-                await this.CremaHost.AddServiceAsync(this);
-                return metaData.AuthenticationToken;
-            }
-            catch
-            {
-                if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                    this.service.Close();
-                else
-                    this.service.Abort();
-                this.Dispatcher.Dispose();
-                throw;
-            }
-            //});
-
-
-
-            //var user = this.Users[userID];
-            //user.SetUserState(UserState.Online);
-            //return user;
+                    this.CremaHost.AddService(this);
+                    return metaData.AuthenticationToken;
+                }
+                catch
+                {
+                    if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                        this.service.Close();
+                    else
+                        this.service.Abort();
+                    this.Dispatcher.Dispose();
+                    throw;
+                }
+            });
         }
 
         public static byte[] Encrypt(string userID, SecureString value)
@@ -143,32 +129,34 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
+        public Authentication Authenticate(SignatureDate signatureDate)
+        {
+            if (signatureDate.ID == Authentication.SystemID)
+            {
+                Authentication.System.SignatureDate = signatureDate;
+                return Authentication.System;
+            }
+
+            var user = this.Users[signatureDate.ID];
+            if (user != null)
+            {
+                user.Authentication.SignatureDate = signatureDate;
+                return user.Authentication;
+            }
+
+            if (this.customAuthentications.ContainsKey(signatureDate.ID) == false)
+            {
+                this.customAuthentications.Add(signatureDate.ID, new Authentication(new AuthenticationProvider(signatureDate.ID)));
+            }
+
+            var authentication = this.customAuthentications[signatureDate.ID];
+            authentication.SignatureDate = signatureDate;
+            return authentication;
+        }
+
         public Task<Authentication> AuthenticateAsync(SignatureDate signatureDate)
         {
-            return this.Dispatcher.InvokeAsync(() =>
-            {
-                if (signatureDate.ID == Authentication.SystemID)
-                {
-                    Authentication.System.SignatureDate = signatureDate;
-                    return Authentication.System;
-                }
-
-                var user = this.Users[signatureDate.ID];
-                if (user != null)
-                {
-                    user.Authentication.SignatureDate = signatureDate;
-                    return user.Authentication;
-                }
-
-                if (this.customAuthentications.ContainsKey(signatureDate.ID) == false)
-                {
-                    this.customAuthentications.Add(signatureDate.ID, new Authentication(new AuthenticationProvider(signatureDate.ID)));
-                }
-
-                var authentication = this.customAuthentications[signatureDate.ID];
-                authentication.SignatureDate = signatureDate;
-                return authentication;
-            });
+            return this.Dispatcher.InvokeAsync(() => this.Authenticate(signatureDate));
         }
 
         public Authentication Authenticate(AuthenticationInfo authenticationInfo)
@@ -260,16 +248,8 @@ namespace Ntreev.Crema.Services.Users
 
         public async Task CloseAsync(CloseInfo closeInfo)
         {
-            if (this.Dispatcher == null)
-                return;
-
-            this.Dispatcher.Invoke(() =>
-            {
-                this.timer?.Dispose();
-                this.timer = null;
-                this.Dispatcher?.Dispose();
-                this.Dispatcher = null;
-            });
+            this.timer?.Dispose();
+            this.timer = null;
             if (this.service != null)
             {
                 try
@@ -293,9 +273,12 @@ namespace Ntreev.Crema.Services.Users
                 }
                 this.service = null;
             }
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Dispatcher?.Dispose();
+                this.Dispatcher = null;
+            });
         }
-
-        //public Guid AuthenticationToken { get; private set; }
 
         public User CurrentUser { get; private set; }
 
@@ -496,8 +479,11 @@ namespace Ntreev.Crema.Services.Users
             this.service = null;
             this.timer?.Dispose();
             this.timer = null;
-            this.Dispatcher?.Dispose();
-            this.Dispatcher = null;
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Dispatcher?.Dispose();
+                this.Dispatcher = null;
+            });
             await this.CremaHost.RemoveServiceAsync(this, closeInfo);
         }
 
@@ -505,9 +491,9 @@ namespace Ntreev.Crema.Services.Users
         {
             try
             {
-                var authentication = await this.AuthenticateAsync(signatureDate);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    var authentication = this.Authenticate(signatureDate);
                     var users = new User[userInfos.Length];
                     for (var i = 0; i < userInfos.Length; i++)
                     {
@@ -529,9 +515,9 @@ namespace Ntreev.Crema.Services.Users
         {
             try
             {
-                var authentication = await this.AuthenticateAsync(signatureDate);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    var authentication = this.Authenticate(signatureDate);
                     var users = new User[userIDs.Length];
                     for (var i = 0; i < userIDs.Length; i++)
                     {
@@ -552,9 +538,9 @@ namespace Ntreev.Crema.Services.Users
         {
             try
             {
-                var authentication = await this.AuthenticateAsync(signatureDate);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    var authentication = this.Authenticate(signatureDate);
                     var userItems = new IUserItem[itemPaths.Length];
                     var categories = new List<UserCategory>(itemPaths.Length);
                     var users = new List<User>(itemPaths.Length);
@@ -600,9 +586,9 @@ namespace Ntreev.Crema.Services.Users
         {
             try
             {
-                var authentication = await this.AuthenticateAsync(signatureDate);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    var authentication = this.Authenticate(signatureDate);
                     {
                         var items = new List<UserCategory>(itemPaths.Length);
                         var oldNames = new List<string>(itemPaths.Length);
@@ -674,9 +660,9 @@ namespace Ntreev.Crema.Services.Users
         {
             try
             {
-                var authentication = await this.AuthenticateAsync(signatureDate);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    var authentication = this.Authenticate(signatureDate);
                     {
                         var items = new List<UserCategory>(itemPaths.Length);
                         var oldPaths = new List<string>(itemPaths.Length);
@@ -749,9 +735,9 @@ namespace Ntreev.Crema.Services.Users
         {
             try
             {
-                var authentication = await this.AuthenticateAsync(signatureDate);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    var authentication = this.Authenticate(signatureDate);
                     {
                         var items = new List<UserCategory>(itemPaths.Length);
                         var oldPaths = new List<string>(itemPaths.Length);
@@ -818,9 +804,9 @@ namespace Ntreev.Crema.Services.Users
         {
             try
             {
-                var authentication = await this.AuthenticateAsync(signatureDate);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    var authentication = this.Authenticate(signatureDate);
                     var users = new User[userIDs.Length];
                     for (var i = 0; i < userIDs.Length; i++)
                     {
@@ -841,9 +827,9 @@ namespace Ntreev.Crema.Services.Users
         {
             try
             {
-                var authentication = await this.AuthenticateAsync(signatureDate);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    var authentication = this.Authenticate(signatureDate);
                     var users = new User[userIDs.Length];
                     for (var i = 0; i < userIDs.Length; i++)
                     {
@@ -864,9 +850,9 @@ namespace Ntreev.Crema.Services.Users
         {
             try
             {
-                var authentication = await this.AuthenticateAsync(signatureDate);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    var authentication = this.Authenticate(signatureDate);
                     var users = new User[userIDs.Length];
                     for (var i = 0; i < userIDs.Length; i++)
                     {
@@ -887,9 +873,9 @@ namespace Ntreev.Crema.Services.Users
         {
             try
             {
-                var authentication = await this.AuthenticateAsync(signatureDate);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    var authentication = this.Authenticate(signatureDate);
                     var users = new User[banInfos.Length];
                     for (var i = 0; i < banInfos.Length; i++)
                     {
@@ -920,9 +906,9 @@ namespace Ntreev.Crema.Services.Users
         {
             try
             {
-                var authentication = await this.AuthenticateAsync(signatureDate);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    var authentication = this.Authenticate(signatureDate);
                     if (messageType == MessageType.None)
                     {
                         foreach (var item in userIDs)

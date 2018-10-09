@@ -158,7 +158,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.Repository.Lock(tuple.itemPaths);
                 var dataSet = this.Serializer.Deserialize(this.DataBase.BasePath, typeof(CremaDataSet), tuple.props) as CremaDataSet;
-                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = tuple.itemPaths;
+                dataSet.SetItemPaths(tuple.itemPaths);
                 return dataSet;
             });
         }

@@ -290,7 +290,7 @@ namespace Ntreev.Crema.Services.Data
                 var repository = await Task.Run(() => this.repositoryProvider.CreateInstance(repositorySetting));
                 this.Dispatcher = new CremaDispatcher(this);
                 this.Repository = new DataBaseRepositoryHost(this, repository);
-                this.Repository.Changed += Repository_Changed;
+                //this.Repository.Changed += Repository_Changed;
                 var cache = await this.ReadCacheAsync(repository.RepositoryInfo);
                 await this.ResetDataBaseAsync(authentication, cache.Item1, cache.Item2);
                 await this.Dispatcher.InvokeAsync(() =>
@@ -331,7 +331,7 @@ namespace Ntreev.Crema.Services.Data
                     this.typeContext.Dispose();
                     this.typeContext = null;
                     this.ClearAuthentications();
-                    this.Repository.Changed -= Repository_Changed;
+                    //this.Repository.Changed -= Repository_Changed;
                     this.Repository.Dispose();
                     this.Repository = null;
                     this.Dispatcher.Dispose(false);
@@ -622,9 +622,19 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.CremaHost.Sign(authentication);
                 this.typeContext = new TypeContext(this, typeInfos);
+                this.typeContext.ItemsCreated += TypeContext_ItemsCreated;
+                this.typeContext.ItemsRenamed += TypeContext_ItemsRenamed;
+                this.typeContext.ItemsMoved += TypeContext_ItemsMoved;
+                this.typeContext.ItemsDeleted += TypeContext_ItemsDeleted;
+                this.typeContext.ItemsChanged += TypeContext_ItemsChanged;
                 this.typeContext.ItemsLockChanged += TypeContext_ItemsLockChanged;
                 this.typeContext.ItemsAccessChanged += TypeContext_ItemsAccessChanged;
                 this.tableContext = new TableContext(this, tableInfos);
+                this.tableContext.ItemsCreated += TableContext_ItemsCreated;
+                this.tableContext.ItemsRenamed += TableContext_ItemsRenamed;
+                this.tableContext.ItemsMoved += TableContext_ItemsMoved;
+                this.tableContext.ItemsDeleted += TableContext_ItemsDeleted;
+                this.tableContext.ItemsChanged += TableContext_ItemsChanged;
                 this.tableContext.ItemsLockChanged += TableContext_ItemsLockChanged;
                 this.tableContext.ItemsAccessChanged += TableContext_ItemsAccessChanged;
                 this.metaData.TypeCategories = this.typeContext.GetCategoryMetaDatas();
@@ -660,6 +670,56 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.DataBases.InvokeItemsResetEvent(authentication, new IDataBase[] { this }, metaDataList.ToArray());
             });
+        }
+
+        private void TableContext_ItemsCreated(object sender, ItemsCreatedEventArgs<ITableItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TableContext_ItemsRenamed(object sender, ItemsRenamedEventArgs<ITableItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TableContext_ItemsMoved(object sender, ItemsMovedEventArgs<ITableItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TableContext_ItemsDeleted(object sender, ItemsDeletedEventArgs<ITableItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TableContext_ItemsChanged(object sender, ItemsEventArgs<ITableItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TypeContext_ItemsCreated(object sender, ItemsCreatedEventArgs<ITypeItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TypeContext_ItemsRenamed(object sender, ItemsRenamedEventArgs<ITypeItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TypeContext_ItemsMoved(object sender, ItemsMovedEventArgs<ITypeItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TypeContext_ItemsDeleted(object sender, ItemsDeletedEventArgs<ITypeItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TypeContext_ItemsChanged(object sender, ItemsEventArgs<ITypeItem> e)
+        {
+            this.RefreshDataBaseInfo();
         }
 
         public Task<IDomainHost> FindDomainHostAsync(Domain domain)
@@ -1278,7 +1338,12 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        private async void Repository_Changed(object sender, EventArgs e)
+        //private async void Repository_Changed(object sender, EventArgs e)
+        //{
+
+        //}
+
+        private async void RefreshDataBaseInfo()
         {
             await this.Dispatcher.InvokeAsync(() =>
             {

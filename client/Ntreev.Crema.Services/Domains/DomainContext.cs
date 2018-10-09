@@ -57,8 +57,6 @@ namespace Ntreev.Crema.Services.Domains
                 var binding = CremaHost.CreateBinding(serviceInfo);
                 var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/DomainService");
                 var instanceContext = new InstanceContext(this);
-                if (Environment.OSVersion.Platform != PlatformID.Unix)
-                    instanceContext.SynchronizationContext = System.Threading.SynchronizationContext.Current;
 
                 this.service = new DomainServiceClient(instanceContext, binding, endPointAddress);
                 this.service.Open();
@@ -66,26 +64,23 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     service.Faulted += Service_Faulted;
                 }
-            });
-            var result = await this.service.SubscribeAsync(authenticationToken);
-            result.Validate();
+
+                var result = this.service.Subscribe(authenticationToken);
 #if !DEBUG
                 this.timer = new Timer(30000);
                 this.timer.Elapsed += Timer_Elapsed;
                 this.timer.Start();
 #endif
-            var metaData = result.Value;
-
-            //});
-
-            await this.InitializeAsync(metaData);
-            await this.CremaHost.DataBases.Dispatcher.InvokeAsync(() =>
-            {
-                this.CremaHost.DataBases.ItemsCreated += DataBases_ItemsCreated;
-                this.CremaHost.DataBases.ItemsRenamed += DataBases_ItemsRenamed;
-                this.CremaHost.DataBases.ItemsDeleted += DataBases_ItemDeleted;
+                var metaData = result.GetValue();
+                this.Initialize(metaData);
+                this.CremaHost.DataBases.Dispatcher.Invoke(() =>
+                {
+                    this.CremaHost.DataBases.ItemsCreated += DataBases_ItemsCreated;
+                    this.CremaHost.DataBases.ItemsRenamed += DataBases_ItemsRenamed;
+                    this.CremaHost.DataBases.ItemsDeleted += DataBases_ItemDeleted;
+                });
+                this.CremaHost.AddService(this);
             });
-            await this.CremaHost.AddServiceAsync(this);
         }
 
         public async Task<DomainMetaData[]> RestoreAsync(Authentication authentication, DataBase dataBase)
@@ -135,11 +130,6 @@ namespace Ntreev.Crema.Services.Domains
             return this.Domains.DeleteAsync(authentication, domain, isCanceled);
         }
 
-        //public Domain AddDomain(Authentication authentication, DomainInfo domainInfo)
-        //{
-        //    return this.Domains.AddDomain(authentication, domainInfo);
-        //}
-
         public async Task AddDomainsAsync(DomainMetaData[] metaDatas)
         {
             foreach (var item in metaDatas)
@@ -149,21 +139,15 @@ namespace Ntreev.Crema.Services.Domains
                 if (domain == null)
                     continue;
 
-                await domain.InitializeAsync(Authentication.System, item);
+
+                await this.Dispatcher.InvokeAsync(() => domain.Initialize(Authentication.System, item));
             }
         }
 
         public async Task CloseAsync(CloseInfo closeInfo)
         {
-            if (this.Dispatcher == null)
-                return;
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.timer?.Dispose();
-                this.timer = null;
-                this.Dispatcher.Dispose();
-                this.Dispatcher = null;
-            });
+            this.timer?.Dispose();
+            this.timer = null;
             if (this.service != null)
             {
                 try
@@ -187,6 +171,11 @@ namespace Ntreev.Crema.Services.Domains
                 }
                 this.service = null;
             }
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Dispatcher.Dispose();
+                this.Dispatcher = null;
+            });
         }
 
         public async Task<DomainContextMetaData> GetMetaDataAsync(Authentication authentication)
@@ -199,6 +188,22 @@ namespace Ntreev.Crema.Services.Domains
                     DomainCategories = this.Categories.GetMetaData(authentication),
                     Domains = domains,
                 };
+            });
+        }
+
+        public Domain[] GetDomains(Guid dataBaseID)
+        {
+            return this.Dispatcher.Invoke(() =>
+            {
+                var domainList = new List<Domain>(this.Domains.Count);
+                foreach (var item in this.Domains)
+                {
+                    if (item.DataBaseID == dataBaseID)
+                    {
+                        domainList.Add(item);
+                    }
+                }
+                return domainList.ToArray();
             });
         }
 
@@ -223,11 +228,18 @@ namespace Ntreev.Crema.Services.Domains
             return this.Dispatcher.InvokeAsync(() => this.Domains[domainID]);
         }
 
+        public Domain GetDomain(Guid domainID)
+        {
+            return this.Domains[domainID];
+        }
+
         public CremaHost CremaHost { get; }
 
         public DomainCollection Domains => this.Items;
 
         public CremaDispatcher Dispatcher { get; set; }
+
+        public CremaDispatcher CallbackDispatcher { get; set; }
 
         public IDomainService Service => this.service;
 
@@ -307,33 +319,26 @@ namespace Ntreev.Crema.Services.Domains
             this.itemsDeleted?.Invoke(this, e);
         }
 
-        private async Task InitializeAsync(DomainContextMetaData metaData)
+        private void Initialize(DomainContextMetaData metaData)
         {
-            await this.Dispatcher.InvokeAsync(() =>
+            foreach (var item in metaData.DomainCategories)
             {
-                var dataBases = this.CremaHost.DataBases;
-                foreach (var item in metaData.DomainCategories)
+                if (item != this.Root.Path)
                 {
-                    if (item != this.Root.Path)
+                    var category = this.Categories.AddNew(item);
+                    if (category.Parent == this.Root)
                     {
-                        var category = this.Categories.AddNew(item);
-                        if (category.Parent == this.Root)
-                        {
-                            category.DataBase = this.CremaHost.DataBases[category.Name];
-                        }
+                        category.DataBase = this.CremaHost.DataBases[category.Name];
                     }
                 }
-            });
+            }
 
             foreach (var item in metaData.Domains)
             {
                 var domainInfo = item.DomainInfo;
-                var authentication = await this.userContext.AuthenticateAsync(domainInfo.CreationInfo);
-                var domain = await this.Domains.AddDomainAsync(authentication, domainInfo);
-                if (domain == null)
-                    continue;
-
-                await domain.InitializeAsync(Authentication.System, item);
+                var authentication = this.userContext.Authenticate(domainInfo.CreationInfo);
+                var domain = this.Domains.AddDomain(authentication, domainInfo);
+                domain.Initialize(authentication, item);
             }
         }
 
@@ -428,66 +433,66 @@ namespace Ntreev.Crema.Services.Domains
             await this.CremaHost.RemoveServiceAsync(this);
         }
 
-        private async void InvokeAsync(Action action, string callbackName)
-        {
-            var count = 0;
-        _Invoke:
-            try
-            {
+        //private async void InvokeAsync(Action action, string callbackName)
+        //{
+        //    var count = 0;
+        //_Invoke:
+        //    try
+        //    {
 
-                await this.Dispatcher.InvokeAsync(action);
-            }
-            catch (NullReferenceException e)
-            {
-                await Task.Delay(1);
-                if (count == 0)
-                {
-                    count++;
-                    goto _Invoke;
-                }
-                this.CremaHost.Error(callbackName);
-                this.CremaHost.Error(e);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(callbackName);
-                this.CremaHost.Error(e);
-            }
-        }
+        //        await this.Dispatcher.InvokeAsync(action);
+        //    }
+        //    catch (NullReferenceException e)
+        //    {
+        //        await Task.Delay(1);
+        //        if (count == 0)
+        //        {
+        //            count++;
+        //            goto _Invoke;
+        //        }
+        //        this.CremaHost.Error(callbackName);
+        //        this.CremaHost.Error(e);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        this.CremaHost.Error(callbackName);
+        //        this.CremaHost.Error(e);
+        //    }
+        //}
 
-        private async void InvokeAsync<T>(Func<T> action, string callbackName)
-        {
-            var count = 0;
-        _Invoke:
-            try
-            {
+        //private async void InvokeAsync<T>(Func<T> action, string callbackName)
+        //{
+        //    var count = 0;
+        //_Invoke:
+        //    try
+        //    {
 
-                await this.Dispatcher.InvokeAsync(action);
-            }
-            catch (NullReferenceException e)
-            {
-                await Task.Delay(1);
-                if (count == 0)
-                {
-                    count++;
-                    goto _Invoke;
-                }
-                this.CremaHost.Error(callbackName);
-                this.CremaHost.Error(e);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(callbackName);
-                this.CremaHost.Error(e);
-            }
-        }
+        //        await this.Dispatcher.InvokeAsync(action);
+        //    }
+        //    catch (NullReferenceException e)
+        //    {
+        //        await Task.Delay(1);
+        //        if (count == 0)
+        //        {
+        //            count++;
+        //            goto _Invoke;
+        //        }
+        //        this.CremaHost.Error(callbackName);
+        //        this.CremaHost.Error(e);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        this.CremaHost.Error(callbackName);
+        //        this.CremaHost.Error(e);
+        //    }
+        //}
 
         private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             this.timer?.Stop();
             try
             {
-                await this.Dispatcher.InvokeAsync(() => this.service.IsAlive());
+                await this.service.IsAliveAsync();
                 this.timer?.Start();
             }
             catch
@@ -498,18 +503,12 @@ namespace Ntreev.Crema.Services.Domains
 
         #region IDomainServiceCallback
 
-        private static readonly object lockobj = new object();
-        int index = 0;
-        private readonly HashSet<int> hash = new HashSet<int>();
-        int last = 0;
-
         async void IDomainServiceCallback.OnDomainCreated(SignatureDate signatureDate, DomainInfo domainInfo, DomainState domainState)
         {
             try
             {
                 var authentication = await this.userContext.AuthenticateAsync(signatureDate);
-                var domain = await this.Domains.AddDomainAsync(authentication, domainInfo);
-                await domain.InvokeDomainStateChangedAsync(authentication, domainState);
+                await this.Domains.AddDomainAsync(authentication, domainInfo);
             }
             catch (Exception e)
             {
@@ -522,8 +521,12 @@ namespace Ntreev.Crema.Services.Domains
             try
             {
                 var authentication = await this.userContext.AuthenticateAsync(signatureDate);
-                var domain = await this.GetDomainAsync(domainID);
-                await domain.Dispatcher.InvokeAsync(() => domain.Dispose(authentication, isCanceled));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var domain = this.GetDomain(domainID);
+                    domain.Dispose(authentication, isCanceled);
+                    this.Domains.InvokeDomainDeletedEvent(authentication, domain, isCanceled);
+                });
             }
             catch (Exception e)
             {
@@ -536,8 +539,11 @@ namespace Ntreev.Crema.Services.Domains
             try
             {
                 var authentication = await this.userContext.AuthenticateAsync(signatureDate);
-                var domain = await this.GetDomainAsync(domainID);
-                await domain.InvokeDomainInfoChangedAsync(authentication, domainInfo);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var domain = this.GetDomain(domainID);
+                    domain.InvokeDomainInfoChanged(authentication, domainInfo);
+                });
             }
             catch (Exception e)
             {
@@ -550,8 +556,11 @@ namespace Ntreev.Crema.Services.Domains
             try
             {
                 var authentication = await this.userContext.AuthenticateAsync(signatureDate);
-                var domain = await this.GetDomainAsync(domainID);
-                await domain.InvokeDomainStateChangedAsync(authentication, domainState);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var domain = this.GetDomain(domainID);
+                    domain.InvokeDomainStateChanged(authentication, domainState);
+                });
             }
             catch (Exception e)
             {
@@ -564,8 +573,11 @@ namespace Ntreev.Crema.Services.Domains
             try
             {
                 var authentication = await this.userContext.AuthenticateAsync(signatureDate);
-                var domain = await this.GetDomainAsync(domainID);
-                await domain.InvokeUserAddedAsync(authentication, domainUserInfo, domainUserState);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var domain = this.GetDomain(domainID);
+                    domain.InvokeUserAdded(authentication, domainUserInfo, domainUserState);
+                });
             }
             catch (Exception e)
             {
@@ -578,8 +590,11 @@ namespace Ntreev.Crema.Services.Domains
             try
             {
                 var authentication = await this.userContext.AuthenticateAsync(signatureDate);
-                var domain = await this.GetDomainAsync(domainID);
-                await domain.InvokeUserRemovedAsync(authentication, domainUserInfo, removeInfo);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var domain = this.GetDomain(domainID);
+                    domain.InvokeUserRemoved(authentication, domainUserInfo, removeInfo);
+                });
             }
             catch (Exception e)
             {
@@ -592,8 +607,11 @@ namespace Ntreev.Crema.Services.Domains
             try
             {
                 var authentication = await this.userContext.AuthenticateAsync(signatureDate);
-                var domain = await this.GetDomainAsync(domainID);
-                await domain.InvokeUserChangedAsync(authentication, domainUserInfo, domainUserState);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var domain = this.GetDomain(domainID);
+                    domain.InvokeUserChanged(authentication, domainUserInfo, domainUserState);
+                });
             }
             catch (Exception e)
             {

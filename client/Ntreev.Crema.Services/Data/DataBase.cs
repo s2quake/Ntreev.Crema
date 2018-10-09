@@ -333,12 +333,7 @@ namespace Ntreev.Crema.Services.Data
                     if (this.IsLoaded == false)
                         throw new InvalidOperationException(Resources.Exception_CannotEnter);
                     this.authentications.Add(authentication);
-                    return this.authentications.Any(item => ((Authentication)item).ID == authentication.ID) && this.Dispatcher.Owner is DataBase == false;
-                });
-
-                if (value == true)
-                {
-                    await this.Dispatcher.InvokeAsync(() =>
+                    if (this.authentications.Any(item => ((Authentication)item).ID == authentication.ID) && this.Dispatcher.Owner is DataBase == false)
                     {
                         this.service = DataServiceFactory.CreateServiceClient(this.CremaHost.IPAddress, this.CremaHost.ServiceInfos[nameof(DataBaseService)], this);
                         this.service.Open();
@@ -346,30 +341,31 @@ namespace Ntreev.Crema.Services.Data
                         {
                             service.Faulted += Service_Faulted;
                         }
-                    });
-                    var result = await this.service.SubscribeAsync(this.CremaHost.AuthenticationToken, base.Name);
+                        var result = this.service.Subscribe(this.CremaHost.AuthenticationToken, base.Name);
 #if !DEBUG
                         this.timer = new Timer(30000);
                         this.timer.Elapsed += Timer_Elapsed;
                         this.timer.Start();
 #endif
-                    await this.Dispatcher.InvokeAsync(() =>
-                    {
+                        var metaData = result.GetValue();
                         this.CremaHost.Sign(authentication, result);
-                        this.TypeContext = new TypeContext(this, result.Value);
-                        this.TableContext = new TableContext(this, result.Value);
-                    });
-                    await this.AttachDomainHostAsync();
-                    await this.CremaHost.AddServiceAsync(this);
-                    await this.Dispatcher.InvokeAsync(() =>
-                    {
+                        this.TypeContext = new TypeContext(this, metaData);
+                        this.TableContext = new TableContext(this, metaData);
+                        this.AttachDomainHost();
+                        this.CremaHost.AddService(this);
                         this.Dispatcher = new CremaDispatcher(this);
                         base.UpdateAccessParent();
                         base.UpdateLockParent();
                         this.authenticationEntered?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
                         this.DataBases.InvokeItemsAuthenticationEnteredEvent(authentication, new IDataBase[] { this });
-                    });
-                }
+                        return true;
+                    }
+                    return false;
+                });
+                //if (value == true)
+                //{
+                //    await this.AttachDomainHostAsync();
+                //}
             }
             catch (Exception e)
             {
@@ -750,13 +746,8 @@ namespace Ntreev.Crema.Services.Data
         {
             if (this.Dispatcher.Owner is DataBase == false)
                 return;
-            await this.Dispatcher?.InvokeAsync(() =>
-            {
-                this.timer?.Dispose();
-                this.timer = null;
-                this.Dispatcher.Dispose();
-                this.Dispatcher = null;
-            });
+            this.timer?.Dispose();
+            this.timer = null;
             if (this.service != null)
             {
                 try
@@ -780,6 +771,11 @@ namespace Ntreev.Crema.Services.Data
                 }
                 this.service = null;
             }
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Dispatcher.Dispose();
+                this.Dispatcher = null;
+            });
         }
 
         public void Delete()
@@ -789,6 +785,47 @@ namespace Ntreev.Crema.Services.Data
             this.TableContext = null;
             this.TypeContext = null;
             this.OnDeleted(EventArgs.Empty);
+        }
+
+        public IDomainHost FindDomainHost(Domain domain)
+        {
+            var domainInfo = domain.DomainInfo;
+            var itemPath = domainInfo.ItemPath;
+            var itemType = domainInfo.ItemType;
+
+            if (itemType == nameof(TableContent))
+            {
+                return new TableContent.TableContentDomainHost(this.TableContext.Tables, domain, itemPath);
+            }
+            else if (itemType == nameof(NewTableTemplate))
+            {
+                if (this.TableContext[itemPath] is TableCategory category)
+                {
+                    return new NewTableTemplate(category);
+                }
+                else if (this.TableContext[itemPath] is Table table)
+                {
+                    return new NewTableTemplate(table);
+                }
+                throw new NotImplementedException();
+            }
+            else if (itemType == nameof(TableTemplate))
+            {
+                var table = this.TableContext[itemPath] as Table;
+                return table.Template;
+            }
+            else if (itemType == nameof(NewTypeTemplate))
+            {
+                var category = this.TypeContext[itemPath] as TypeCategory;
+                return new NewTypeTemplate(category);
+            }
+            else if (itemType == nameof(TypeTemplate))
+            {
+                var type = this.TypeContext[itemPath] as Type;
+                return type.Template;
+            }
+
+            return null;
         }
 
         public Task<IDomainHost> FindDomainHostAsync(Domain domain)
@@ -1039,6 +1076,30 @@ namespace Ntreev.Crema.Services.Data
         {
             this.metaData.DataBaseState = base.DataBaseState;
             base.OnDataBaseStateChanged(e);
+        }
+
+        private void AttachDomainHost()
+        {
+            var domains = this.DomainContext.GetDomains(this.ID);
+            foreach (var item in domains)
+            {
+                var target = this.FindDomainHost(item);
+                Func(target, item);
+            }
+
+            async void Func(IDomainHost domainHost, Domain domain)
+            {
+                try
+                {
+                    await domainHost.RestoreAsync(Authentication.System, domain);
+                    domain.Host = domainHost;
+                    await domain.AttachUserAsync();
+                }
+                catch (Exception e)
+                {
+                    this.CremaHost.Error(e);
+                }
+            }
         }
 
         private async Task AttachDomainHostAsync()

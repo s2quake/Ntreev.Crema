@@ -481,16 +481,21 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task<CremaDataSet> ReadDataForContentAsync(Authentication authentication)
+        public async Task<CremaDataSet> ReadDataForContentAsync(Authentication authentication, ItemName targetName)
         {
             var tuple = await this.Dispatcher.InvokeAsync(() =>
             {
+                var targetItemPaths = new string[]
+                {
+                    this.Context.GenerateCategoryPath(targetName.CategoryPath),
+                    this.Context.GeneratePath(targetName),
+                };
                 var tables = this.GetRelations().Distinct().OrderBy(item => item.Name).ToArray();
                 var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
-                var typePaths = types.Select(item => item.ItemPath).ToArray();
-                var tablePaths = tables.Select(item => item.ItemPath).ToArray();
-                var itemPaths = typePaths.Concat(tablePaths).ToArray();
-                var props = new CremaDataSetSerializerSettings(authentication, typePaths, tablePaths);
+                var typeItemPaths = types.Select(item => item.ItemPath).ToArray();
+                var tableItemPaths = tables.Select(item => item.ItemPath).ToArray();
+                var itemPaths = typeItemPaths.Concat(tableItemPaths).Concat(targetItemPaths).Distinct().ToArray();
+                var props = new CremaDataSetSerializerSettings(authentication, typeItemPaths, tableItemPaths);
                 var itemPath = this.ItemPath;
                 return (itemPaths, props, itemPath);
             });
@@ -498,7 +503,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.Repository.Lock(tuple.itemPaths);
                 var dataSet = this.Serializer.Deserialize(tuple.itemPath, typeof(CremaDataSet), tuple.props) as CremaDataSet;
-                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = tuple.itemPaths;
+                dataSet.SetItemPaths(tuple.itemPaths);
                 return dataSet;
             });
         }
@@ -516,7 +521,7 @@ namespace Ntreev.Crema.Services.Data
                 var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
                 var typeItemPaths = types.Select(item => item.ItemPath).ToArray();
                 var tableItemPaths = tables.Select(item => item.ItemPath).ToArray();
-                var itemPaths = typeItemPaths.Concat(tableItemPaths).Concat(targetItemPaths).ToArray();
+                var itemPaths = typeItemPaths.Concat(tableItemPaths).Concat(targetItemPaths).Distinct().ToArray();
                 var props = new CremaDataSetSerializerSettings(authentication, typeItemPaths, tableItemPaths);
                 var itemPath = this.ItemPath;
                 return (itemPaths, props, itemPath);
@@ -525,7 +530,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.Repository.Lock(tuple.itemPaths);
                 var dataSet = this.Serializer.Deserialize(tuple.itemPath, typeof(CremaDataSet), tuple.props) as CremaDataSet;
-                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = tuple.itemPaths;
+                dataSet.SetItemPaths(tuple.itemPaths);
                 return dataSet;
             });
         }
@@ -553,7 +558,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.Repository.Lock(tuple.itemPaths);
                 var dataSet = this.Serializer.Deserialize(tuple.itemPath, typeof(CremaDataSet), tuple.props) as CremaDataSet;
-                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = tuple.itemPaths;
+                dataSet.SetItemPaths(tuple.itemPaths);
                 return dataSet;
             });
         }
@@ -576,7 +581,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.Repository.Lock(tuple.itemPaths);
                 var dataSet = this.Serializer.Deserialize(tuple.itemPath, typeof(CremaDataSet), tuple.props) as CremaDataSet;
-                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = tuple.itemPaths;
+                dataSet.SetItemPaths(tuple.itemPaths);
                 return dataSet;
             });
         }

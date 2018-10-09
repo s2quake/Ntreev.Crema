@@ -39,8 +39,8 @@ namespace Ntreev.Crema.Services.Data
 
             var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/DataBaseCollectionService");
             var instanceContext = new InstanceContext(callback ?? empty);
-            if (Environment.OSVersion.Platform != PlatformID.Unix)
-                instanceContext.SynchronizationContext = SynchronizationContext.Current;
+            //if (Environment.OSVersion.Platform != PlatformID.Unix)
+            //    instanceContext.SynchronizationContext = SynchronizationContext.Current;
 
             return new DataBaseCollectionServiceClient(instanceContext, binding, endPointAddress);
         }

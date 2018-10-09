@@ -349,13 +349,14 @@ namespace Ntreev.Crema.Repository.Git
             }
 
             var query = from item in DirectoryUtility.GetAllFiles(basePath, "*", true)
-                        select item;
+                        select (GitPath)item;
+            var itemList = query.ToList();
 
-            var addCommand = new GitCommand(basePath, "add");
-            foreach (var item in DirectoryUtility.GetAllFiles(basePath, "*", true))
-            {
-                addCommand.Add((GitPath)item);
-            }
+            var addCommand = new GitAddCommand(basePath, query.ToArray());
+            //foreach (var item in DirectoryUtility.GetAllFiles(basePath, "*", true))
+            //{
+            //    addCommand.Add((GitPath)item);
+            //}
             addCommand.Run();
 
             var commitCommand = new GitCommitCommand(basePath, Environment.UserName, "first commit");

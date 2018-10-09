@@ -103,14 +103,23 @@ namespace Ntreev.Crema.Services
             return null;
         }
 
-        public Task AddServiceAsync(ICremaService service)
+        public void AddService(ICremaService service)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            this.Dispatcher.Invoke(() =>
             {
                 this.services.Add(service);
                 CremaLog.Debug($"{service.GetType().Name} Initialized.");
             });
         }
+
+        //public Task AddServiceAsync(ICremaService service)
+        //{
+        //    return this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        this.services.Add(service);
+        //        CremaLog.Debug($"{service.GetType().Name} Initialized.");
+        //    });
+        //}
 
         public async Task RemoveServiceAsync(ICremaService service)
         {

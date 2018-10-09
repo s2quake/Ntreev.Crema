@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Services.Data
                 var table = dataBase.TableContext.Tables[item.Name, item.CategoryPath];
                 if (table == null && allowCreation == false)
                 {
-                    throw new TypeNotFoundException(item.Name);
+                    throw new TableNotFoundException(item.Name);
                 }
                 if (table != null)
                 {

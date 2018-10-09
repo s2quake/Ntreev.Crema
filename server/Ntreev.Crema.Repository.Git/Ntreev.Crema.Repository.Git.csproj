@@ -46,6 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GitAddCommand.cs" />
     <Compile Include="GitAuthor.cs" />
     <Compile Include="GitBranchCollection.cs" />
     <Compile Include="GitBranchDescription.cs" />

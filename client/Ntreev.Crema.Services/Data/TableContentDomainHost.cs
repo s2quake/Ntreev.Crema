@@ -206,7 +206,7 @@ namespace Ntreev.Crema.Services.Data
             public async Task EnterContentAsync(Authentication authentication, string name)
             {
                 var result = await this.Service.EnterTableContentEditAsync(name);
-                await this.domain.InitializeAsync(authentication, result.Value);
+                this.domain.Initialize(authentication, result.Value);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var dataSet = domain.Source as CremaDataSet;

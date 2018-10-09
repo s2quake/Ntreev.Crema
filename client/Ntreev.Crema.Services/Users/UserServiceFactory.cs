@@ -36,8 +36,8 @@ namespace Ntreev.Crema.Services.Users
             this.binding = CremaHost.CreateBinding(serviceInfo);
             this.endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/UserService");
             this.instanceContext = new InstanceContext(userServiceCallback ?? (this));
-            if (Environment.OSVersion.Platform != PlatformID.Unix)
-                this.instanceContext.SynchronizationContext = SynchronizationContext.Current;
+            //if (Environment.OSVersion.Platform != PlatformID.Unix)
+            //    this.instanceContext.SynchronizationContext = SynchronizationContext.Current;
         }
 
         public static UserServiceClient CreateServiceClient(string address, ServiceInfo serviceInfo, IUserServiceCallback userServiceCallback)

@@ -67,22 +67,18 @@ namespace Ntreev.Crema.Services.Data
                 if (this.service is ICommunicationObject service)
                 {
                     service.Faulted += Service_Faulted;
-
                 }
-            });
-            var result = await this.service.SubscribeAsync(authenticationToken);
-            result.Validate();
-            var metaData = result.Value;
-#if !DEBUG
-            this.timer = new Timer(30000);
-            this.timer.Elapsed += Timer_Elapsed;
-            this.timer.Start();
-#endif
-            //return result.Value;
-            // });
 
-            await this.InitializeAsync(metaData);
-            await this.CremaHost.AddServiceAsync(this);
+                var result = this.service.Subscribe(authenticationToken);
+                var metaData = result.GetValue();
+#if !DEBUG
+                this.timer = new Timer(30000);
+                this.timer.Elapsed += Timer_Elapsed;
+                this.timer.Start();
+#endif
+                this.Initialize(metaData);
+                this.CremaHost.AddService(this);
+            });
         }
 
         public LockInfo InvokeDataBaseLock(Authentication authentication, DataBase dataBase, string comment)
@@ -437,40 +433,36 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task CloseAsync(CloseInfo closeInfo)
         {
-            if (this.Dispatcher == null)
-                return;
+            this.timer?.Dispose();
+            this.timer = null;
+            if (this.service != null)
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                try
                 {
-                    this.timer?.Dispose();
-                    this.timer = null;
-                    this.Dispatcher.Dispose();
-                    this.Dispatcher = null;
-                });
-                if (this.service != null)
-                {
-                    try
+                    if (closeInfo.Reason != CloseReason.NoResponding)
                     {
-                        if (closeInfo.Reason != CloseReason.NoResponding)
-                        {
-                            await this.service.UnsubscribeAsync();
-                            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                                this.service.Close();
-                            else
-                                this.service.Abort();
-                        }
+                        await this.service.UnsubscribeAsync();
+                        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                            this.service.Close();
                         else
-                        {
                             this.service.Abort();
-                        }
                     }
-                    catch
+                    else
                     {
                         this.service.Abort();
                     }
-                    this.service = null;
                 }
+                catch
+                {
+                    this.service.Abort();
+                }
+                this.service = null;
             }
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Dispatcher.Dispose();
+                this.Dispatcher = null;
+            });
         }
 
         public ResultBase LoadDataBase(DataBase dataBase)
@@ -744,17 +736,14 @@ namespace Ntreev.Crema.Services.Data
             this.itemsLockChanged?.Invoke(this, e);
         }
 
-        private Task InitializeAsync(DataBaseCollectionMetaData metaData)
+        private void Initialize(DataBaseCollectionMetaData metaData)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            for (var i = 0; i < metaData.DataBases.Length; i++)
             {
-                for (var i = 0; i < metaData.DataBases.Length; i++)
-                {
-                    var dataBaseInfo = metaData.DataBases[i];
-                    var dataBase = new DataBase(this, dataBaseInfo);
-                    this.AddBase(dataBase.Name, dataBase);
-                }
-            });
+                var dataBaseInfo = metaData.DataBases[i];
+                var dataBase = new DataBase(this, dataBaseInfo);
+                this.AddBase(dataBase.Name, dataBase);
+            }
         }
 
         //private async void InvokeAsync(Action action, string callbackName)

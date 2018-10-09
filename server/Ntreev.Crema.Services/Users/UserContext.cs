@@ -307,10 +307,26 @@ namespace Ntreev.Crema.Services.Users
                 users.Add(guest);
             }
 
+            for (var i = 0; i < 1000; i++)
+            {
+                var autobot = new UserSerializationInfo()
+                {
+                    ID = "autobot" + i,
+                    Name = "Autobot" + i,
+                    CategoryName = "autobots",
+                    Authority = Authority.Admin,
+                    Password = "1111".Encrypt(),
+                    CreationInfo = designedInfo,
+                    ModificationInfo = designedInfo,
+                    BanInfo = (BanSerializationInfo)BanInfo.Empty,
+                };
+                users.Add(autobot);
+            }
+
             var serializationInfo = new UserContextSerializationInfo()
             {
                 Version = CremaSchema.VersionValue,
-                Categories = new string[] { "/Administrators/", "/Members/", "/Guests/" },
+                Categories = new string[] { "/Administrators/", "/Members/", "/Guests/", "autobots" },
                 Users = users.ToArray(),
             };
 #else

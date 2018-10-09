@@ -153,11 +153,11 @@ namespace Ntreev.Crema.Services.Domains
                     this.Add(domain);
                     domain.Category = this.Context.Categories.Prepare(metaData.DomainInfo.CategoryPath);
                     this.InvokeDomainCreatedEvent(authentication, domain);
-                    await domain.InitializeAsync(authentication, metaData);
+                    domain.Initialize(authentication, metaData);
                 }
                 else
                 {
-                    await domain.InitializeAsync(authentication, metaData);
+                    domain.Initialize(authentication, metaData);
                 }
 
                 return domain;
@@ -202,6 +202,27 @@ namespace Ntreev.Crema.Services.Domains
                 return new TableTemplateDomain(domainInfo);
             }
             return null;
+        }
+
+        public Domain AddDomain(Authentication authentication, DomainInfo domainInfo)
+        {
+            var domain = this.CreateDomain(domainInfo);
+            var category = this.Context.Categories.Prepare(domainInfo.CategoryPath);
+            domain.Category = category;
+            var dataBase = category.DataBase as DataBase;
+            var isLoaded = dataBase.Service != null;
+            if (domain.DataBaseID == dataBase.ID && isLoaded == true && dataBase.IsResetting == false)
+            {
+                var target = dataBase.FindDomainHost(domain);
+                if (target != null)
+                {
+                    var restoreTask = target.RestoreAsync(authentication, domain);
+                    restoreTask.Wait();
+                    domain.Host = target;
+                }
+            }
+            this.InvokeDomainCreatedEvent(authentication, domain);
+            return domain;
         }
 
         public async Task<Domain> AddDomainAsync(Authentication authentication, DomainInfo domainInfo)
@@ -272,27 +293,13 @@ namespace Ntreev.Crema.Services.Domains
             return metaDataList.ToArray();
         }
 
-        public Domain this[Guid domainID]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[domainID.ToString()];
-            }
-        }
+        public Domain this[Guid domainID] => this[domainID.ToString()];
 
         public CremaHost CremaHost => this.Context.CremaHost;
 
         public CremaDispatcher Dispatcher => this.Context.Dispatcher;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public new int Count => base.Count;
 
         public event EventHandler<DomainEventArgs> DomainCreated
         {

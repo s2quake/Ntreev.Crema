@@ -59,9 +59,17 @@ namespace Ntreev.Crema.Services
         {
             if (dataBase.IsLoaded == false)
                 await dataBase.LoadAsync(authentication);
-            if (await dataBase.ContainsAsync(authentication) == false)
+            var contains = await dataBase.ContainsAsync(authentication);
+            if (contains == false)
                 await dataBase.EnterAsync(authentication);
-            return new UsingDataBase(() => dataBase.LeaveAsync(authentication).Wait()) { DataBase = dataBase };
+            return new UsingDataBase(() =>
+            {
+                if (contains == false)
+                    dataBase.LeaveAsync(authentication).Wait();
+            })
+            {
+                DataBase = dataBase
+            };
         }
 
         public static Task<UsingDataBase> SetAsync(IServiceProvider serviceProvider, Authentication authentication)

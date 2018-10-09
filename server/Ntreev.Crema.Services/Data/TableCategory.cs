@@ -412,9 +412,6 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        /// <summary>
-        /// 폴더내에 모든 테이블과 상속된 테이블을 읽어들입니다.
-        /// </summary>
         public async Task<CremaDataSet> ReadDataForPathAsync(Authentication authentication, CategoryName targetName)
         {
             var tuple = await this.Dispatcher.InvokeAsync(() =>
@@ -447,7 +444,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.Repository.Lock(tuple.itemPaths);
                 var dataSet = this.Serializer.Deserialize(tuple.itemPath, typeof(CremaDataSet), tuple.props) as CremaDataSet;
-                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = tuple.itemPaths;
+                dataSet.SetItemPaths(tuple.itemPaths);
                 dataSet.ExtendedProperties["TableNames"] = tuple.tableNames;
                 return dataSet;
             });
@@ -469,7 +466,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.Repository.Lock(tuple.itemPaths);
                 var dataSet = this.Serializer.Deserialize(tuple.itemPath, typeof(CremaDataSet), tuple.props) as CremaDataSet;
-                dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = tuple.itemPaths;
+                dataSet.SetItemPaths(tuple.itemPaths);
                 return dataSet;
             });
         }

@@ -116,7 +116,7 @@ namespace Ntreev.Crema.ServiceHosts
             await this.cremaHost.CloseAsync(this.token);
             this.cremaHost.SaveConfigs();
             this.token = await this.cremaHost.OpenAsync();
-            this.StartServicesAsync();
+            await this.StartServicesAsync();
         }
 
         public int Port { get; set; } = AddressUtility.DefaultPort;

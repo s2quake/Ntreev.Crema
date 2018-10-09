@@ -31,12 +31,11 @@ namespace Ntreev.Crema.ServiceModel
     {
         private Dispatcher dispatcher;
         private DispatcherFrame dispatcherFrame;
-        private readonly object owner;
 
         public CremaDispatcher(object owner)
         {
             var eventSet = new ManualResetEvent(false);
-            this.owner = owner;
+            this.Owner = owner;
             var thread = new Thread(() =>
             {
                 this.dispatcher = Dispatcher.CurrentDispatcher;
@@ -62,7 +61,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public CremaDispatcher(object owner, Dispatcher dispatcher)
         {
-            this.owner = owner;
+            this.Owner = owner;
             this.dispatcher = dispatcher;
         }
 
@@ -78,73 +77,64 @@ namespace Ntreev.Crema.ServiceModel
 
         public void Invoke(Action action)
         {
-            this.Invoke(action, DispatcherPriority.Send);
-        }
-
-        [Obsolete]
-        public void Invoke(Action action, DispatcherPriority priority)
-        {
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
-                this.InvokeUnix(action, priority);
+                this.InvokeUnix(action);
             }
             else
             {
-                this.InvokeDefault(action, priority);
+                this.InvokeDefault(action);
             }
         }
 
         public Task InvokeAsync(Action action)
         {
-            return this.InvokeAsync(action, DispatcherPriority.Send);
-        }
-
-        [Obsolete]
-        public Task InvokeAsync(Action action, DispatcherPriority priority)
-        {
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
-                return this.InvokeAsyncUnix(action, priority);
+                return this.InvokeAsyncUnix(action);
             }
             else
             {
-                return this.InvokeAsyncDefault(action, priority);
+                return this.InvokeAsyncDefault(action);
             }
+        }
+
+        public void InvokeTask(Func<Task> callback)
+        {
+            this.dispatcher.Invoke(callback, DispatcherPriority.Send).Wait();
+        }
+
+        public Task InvokeTaskAsync(Func<Task> callback)
+        {
+            return this.dispatcher.Invoke(callback, DispatcherPriority.Send);
+        }
+
+        public Task<TResult> InvokeTaskAsync<TResult>(Func<Task<TResult>> callback)
+        {
+            return this.dispatcher.Invoke(callback, DispatcherPriority.Send);
         }
 
         public TResult Invoke<TResult>(Func<TResult> callback)
         {
-            return this.Invoke<TResult>(callback, DispatcherPriority.Send);
-        }
-
-        [Obsolete]
-        public TResult Invoke<TResult>(Func<TResult> callback, DispatcherPriority priority)
-        {
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
-                return this.InvokeUnix<TResult>(callback, priority);
+                return this.InvokeUnix(callback);
             }
             else
             {
-                return this.InvokeDefault<TResult>(callback, priority);
+                return this.InvokeDefault(callback);
             }
         }
 
         public Task<TResult> InvokeAsync<TResult>(Func<TResult> callback)
         {
-            return this.InvokeAsync(callback, DispatcherPriority.Send);
-        }
-
-        [Obsolete]
-        public Task<TResult> InvokeAsync<TResult>(Func<TResult> callback, DispatcherPriority priority)
-        {
             if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
-                return this.InvokeAsyncUnix<TResult>(callback, priority);
+                return this.InvokeAsyncUnix(callback);
             }
             else
             {
-                return this.InvokeAsyncDefault<TResult>(callback, priority);
+                return this.InvokeAsyncDefault(callback);
             }
         }
 
@@ -184,37 +174,37 @@ namespace Ntreev.Crema.ServiceModel
 
         public string Name
         {
-            get { return this.owner.ToString(); }
+            get { return this.Owner.ToString(); }
         }
 
-        public object Owner => this.owner;
+        public object Owner { get; }
 
         public static implicit operator Dispatcher(CremaDispatcher dispatcher)
         {
             return dispatcher.dispatcher;
         }
 
-        private void InvokeDefault(Action action, DispatcherPriority priority)
+        private void InvokeDefault(Action action)
         {
-            this.dispatcher.Invoke(action, priority);
+            this.dispatcher.Invoke(action, DispatcherPriority.Send);
         }
 
-        private Task InvokeAsyncDefault(Action action, DispatcherPriority priority)
+        private Task InvokeAsyncDefault(Action action)
         {
-            return this.dispatcher.InvokeAsync(action, priority).Task;
+            return this.dispatcher.InvokeAsync(action, DispatcherPriority.Send).Task;
         }
 
-        private TResult InvokeDefault<TResult>(Func<TResult> callback, DispatcherPriority priority)
+        private TResult InvokeDefault<TResult>(Func<TResult> callback)
         {
-            return this.dispatcher.Invoke<TResult>(callback, priority);
+            return this.dispatcher.Invoke(callback, DispatcherPriority.Send);
         }
 
-        private Task<TResult> InvokeAsyncDefault<TResult>(Func<TResult> callback, DispatcherPriority priority)
+        private Task<TResult> InvokeAsyncDefault<TResult>(Func<TResult> callback)
         {
-            return this.dispatcher.InvokeAsync<TResult>(callback, priority).Task;
+            return this.dispatcher.InvokeAsync(callback, DispatcherPriority.Send).Task;
         }
 
-        private void InvokeUnix(Action action, DispatcherPriority priority)
+        private void InvokeUnix(Action action)
         {
             if (this.dispatcher.CheckAccess() == true)
             {
@@ -236,7 +226,7 @@ namespace Ntreev.Crema.ServiceModel
                     return null;
                 });
                 var eventSet = new ManualResetEvent(false);
-                var result = this.dispatcher.BeginInvoke(priority, func);
+                var result = this.dispatcher.BeginInvoke(DispatcherPriority.Send, func);
                 result.Completed += (s, e) => eventSet.Set();
                 if (result.Status != DispatcherOperationStatus.Completed)
                     eventSet.WaitOne();
@@ -245,12 +235,12 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
-        private Task InvokeAsyncUnix(Action action, DispatcherPriority priority)
+        private Task InvokeAsyncUnix(Action action)
         {
-            return Task.Run(() => this.Invoke(action, priority));
+            return Task.Run(() => this.Invoke(action));
         }
 
-        private TResult InvokeUnix<TResult>(Func<TResult> callback, DispatcherPriority priority)
+        private TResult InvokeUnix<TResult>(Func<TResult> callback)
         {
             if (this.dispatcher.CheckAccess() == true)
             {
@@ -270,7 +260,7 @@ namespace Ntreev.Crema.ServiceModel
                     }
                 });
                 var eventSet = new ManualResetEvent(false);
-                var result = this.dispatcher.BeginInvoke(priority, func);
+                var result = this.dispatcher.BeginInvoke(DispatcherPriority.Send, func);
                 result.Completed += (s, e) => eventSet.Set();
                 if (result.Status != DispatcherOperationStatus.Completed)
                     eventSet.WaitOne();
@@ -280,9 +270,9 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
-        private Task<TResult> InvokeAsyncUnix<TResult>(Func<TResult> callback, DispatcherPriority priority)
+        private Task<TResult> InvokeAsyncUnix<TResult>(Func<TResult> callback)
         {
-            return Task<TResult>.Run(() => this.Invoke<TResult>(callback, priority));
+            return Task.Run(() => this.Invoke(callback));
         }
 
         private void Dispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -294,17 +284,12 @@ namespace Ntreev.Crema.ServiceModel
 
         class ExceptionHost
         {
-            private readonly Exception exception;
-
             public ExceptionHost(Exception exception)
             {
-                this.exception = exception;
+                this.Exception = exception;
             }
 
-            public Exception Exception
-            {
-                get { return this.exception; }
-            }
+            public Exception Exception { get; }
         }
 
         #endregion
