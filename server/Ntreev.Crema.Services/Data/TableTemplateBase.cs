@@ -43,8 +43,6 @@ namespace Ntreev.Crema.Services.Data
         private EventHandler editCanceled;
         private EventHandler changed;
 
-        private string[] itemPaths;
-
         public abstract AccessType GetAccessType(Authentication authentication);
 
         public async Task<TableColumn> AddNewAsync(Authentication authentication)
@@ -244,7 +242,7 @@ namespace Ntreev.Crema.Services.Data
 
         public string[] SelectableTypes => this.TemplateSource.Types;
 
-        public string[] ItemPaths => this.itemPaths;
+        public string[] ItemPaths { get; private set; }
 
         public IEnumerable<TableColumn> PrimaryKey
         {
@@ -348,7 +346,7 @@ namespace Ntreev.Crema.Services.Data
                 IsNew = this.IsNew,
                 Host = this
             };
-            this.itemPaths = this.domain.ItemPaths;
+            this.ItemPaths = this.domain.ItemPaths;
             await this.DomainContext.AddAsync(authentication, this.domain, this.DataBase);
 
             this.table = this.TemplateSource.View.Table;
@@ -492,17 +490,6 @@ namespace Ntreev.Crema.Services.Data
 
         protected abstract Task<CremaTemplate> CreateSourceAsync(Authentication authentication);
 
-        //protected virtual void OnDomainDeleted(Authentication authentication)
-        //{
-        //    this.domain = null;
-        //    this.table.RowDeleted -= Table_RowDeleted;
-        //    this.table.RowChanged -= Table_RowChanged;
-        //    this.IsModified = false;
-        //    this.table = null;
-        //    this.columns.Clear();
-        //    this.OnEditCanceled(EventArgs.Empty);
-        //}
-
         protected void Sign(Authentication authentication)
         {
             authentication.Sign();
@@ -530,29 +517,6 @@ namespace Ntreev.Crema.Services.Data
                 });
             }
         }
-
-        //private async void Domain_Deleted(object sender, DomainDeletedEventArgs e)
-        //{
-        //    var isCanceled = e.IsCanceled;
-        //    if (isCanceled == false)
-        //    {
-        //        await this.OnEndEditAsync(e.Authentication);
-        //        await this.Dispatcher.InvokeAsync(() =>
-        //        {
-        //            this.ServiceState = ServiceState.Closed;
-        //            this.OnEditEnded(e);
-        //        });
-        //    }
-        //    else
-        //    {
-        //        await this.OnCancelEditAsync(e.Authentication);
-        //        await this.Dispatcher.InvokeAsync(() =>
-        //        {
-        //            this.ServiceState = ServiceState.Closed;
-        //            this.OnEditCanceled(e);
-        //        });
-        //    }
-        //}
 
         private async void Domain_RowAdded(object sender, DomainRowEventArgs e)
         {
@@ -582,7 +546,6 @@ namespace Ntreev.Crema.Services.Data
         {
             return this.domain.Dispatcher.InvokeAsync(() =>
             {
-                //this.domain.Deleted += Domain_Deleted;
                 this.domain.RowAdded += Domain_RowAdded;
                 this.domain.RowChanged += Domain_RowChanged;
                 this.domain.RowRemoved += Domain_RowRemoved;
@@ -594,7 +557,6 @@ namespace Ntreev.Crema.Services.Data
         {
             return this.domain.Dispatcher.InvokeAsync(() =>
             {
-                //this.domain.Deleted -= Domain_Deleted;
                 this.domain.RowAdded -= Domain_RowAdded;
                 this.domain.RowChanged -= Domain_RowChanged;
                 this.domain.RowRemoved -= Domain_RowRemoved;
@@ -641,14 +603,6 @@ namespace Ntreev.Crema.Services.Data
             await this.OnDetachAsync();
         }
 
-        //void IDomainHost.ValidateDelete(Authentication authentication, bool isCanceled)
-        //{
-        //    if (isCanceled == false)
-        //    {
-        //        this.Dispatcher.Invoke(() => this.ValidateEndEdit(authentication));
-        //    }
-        //}
-
         async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)
         {
             if (isCanceled == false)
@@ -689,7 +643,7 @@ namespace Ntreev.Crema.Services.Data
             return this.items.GetEnumerator();
         }
 
-        
+
 
         #endregion
     }

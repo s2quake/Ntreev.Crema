@@ -315,7 +315,7 @@ namespace Ntreev.Crema.Services.Data
 
         protected virtual async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
-            var typeInfos = await this.EndDomainAsync(authentication, this.domain.ID);
+            var typeInfos = await this.EndDomainAsync(authentication, args);
             if (this.domain != null)
             {
                 await this.DetachDomainEventAsync();

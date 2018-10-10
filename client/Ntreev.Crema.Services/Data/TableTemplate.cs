@@ -61,9 +61,9 @@ namespace Ntreev.Crema.Services.Data
             this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table, });
         }
 
-        protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication)
+        protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
-            var tableInfos = await base.OnEndEditAsync(authentication);
+            var tableInfos = await base.OnEndEditAsync(authentication, args);
             var tableInfo = tableInfos.First();
             this.table.UpdateTemplate(tableInfo);
             this.table.UpdateTags(tableInfo.Tags);
@@ -88,9 +88,14 @@ namespace Ntreev.Crema.Services.Data
             return this.Service.BeginTableTemplateEditAsync(this.table.Name);
         }
 
-        protected override Task<ResultBase<TableInfo[]>> EndDomainAsync(Authentication authentication, Guid domainID)
+        protected override async Task<TableInfo[]> EndDomainAsync(Authentication authentication, object args)
         {
-            return this.Service.EndTableTemplateEditAsync(domainID);
+            if (args is Guid domainID)
+            {
+                var result = await this.Service.EndTableTemplateEditAsync(domainID);
+                return result.GetValue();
+            }
+            return args as TableInfo[];
         }
 
         protected override Task<ResultBase> CancelDomainAsync(Authentication authentication, Guid domainID)

@@ -43,8 +43,6 @@ namespace Ntreev.Crema.Services.Data
         private EventHandler editCanceled;
         private EventHandler changed;
 
-        private string[] itemPaths;
-
         public abstract AccessType GetAccessType(Authentication authentication);
 
         public async Task<TypeMember> AddNewAsync(Authentication authentication)
@@ -288,7 +286,7 @@ namespace Ntreev.Crema.Services.Data
 
         public ServiceState ServiceState { get; private set; }
 
-        public string[] ItemPaths => this.itemPaths;
+        public string[] ItemPaths { get; private set; }
 
         public event EventHandler EditBegun
         {
@@ -374,7 +372,7 @@ namespace Ntreev.Crema.Services.Data
                 IsNew = this.IsNew,
                 Host = this
             };
-            this.itemPaths = this.domain.ItemPaths;
+            this.ItemPaths = this.domain.ItemPaths;
             await this.DomainContext.AddAsync(authentication, this.domain, this.DataBase);
 
             this.table = this.TypeSource.View.Table;
@@ -511,28 +509,6 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        //private async void Domain_Deleted(object sender, DomainDeletedEventArgs e)
-        //{
-        //    if (e.IsCanceled == false)
-        //    {
-        //        await this.OnEndEditAsync(e.Authentication, null);
-        //        await this.Dispatcher.InvokeAsync(() =>
-        //        {
-        //            this.ServiceState = ServiceState.Closed;
-        //            this.OnEditEnded(e);
-        //        });
-        //    }
-        //    else
-        //    {
-        //        await this.OnCancelEditAsync(e.Authentication);
-        //        await this.Dispatcher.InvokeAsync(() =>
-        //        {
-        //            this.ServiceState = ServiceState.Closed;
-        //            this.OnEditCanceled(e);
-        //        });
-        //    }
-        //}
-
         private async void Domain_RowAdded(object sender, DomainRowEventArgs e)
         {
             this.IsModified = this.domain.IsModified;
@@ -566,7 +542,6 @@ namespace Ntreev.Crema.Services.Data
                 {
                     System.Diagnostics.Debugger.Launch();
                 }
-                //this.domain.Deleted += Domain_Deleted;
                 this.domain.RowAdded += Domain_RowAdded;
                 this.domain.RowChanged += Domain_RowChanged;
                 this.domain.RowRemoved += Domain_RowRemoved;
@@ -579,7 +554,6 @@ namespace Ntreev.Crema.Services.Data
         {
             return this.domain.Dispatcher.InvokeAsync(() =>
             {
-                //this.domain.Deleted -= Domain_Deleted;
                 this.domain.RowAdded -= Domain_RowAdded;
                 this.domain.RowChanged -= Domain_RowChanged;
                 this.domain.RowRemoved -= Domain_RowRemoved;
@@ -629,28 +603,6 @@ namespace Ntreev.Crema.Services.Data
             await this.OnDetachedAsync();
         }
 
-        //void IDomainHost.ValidateDelete(Authentication authentication, bool isCanceled)
-        //{
-        //    if (isCanceled == false)
-        //    {
-        //        this.Dispatcher.Invoke(() => this.ValidateEndEdit(authentication));
-        //    }
-        //}
-
-        #endregion
-
-        #region IEnumerable
-
-        IEnumerator<ITypeMember> IEnumerable<ITypeMember>.GetEnumerator()
-        {
-            return this.items.GetEnumerator();
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return this.items.GetEnumerator();
-        }
-
         async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)
         {
             if (isCanceled == false)
@@ -675,6 +627,20 @@ namespace Ntreev.Crema.Services.Data
                 });
                 return null;
             }
+        }
+
+        #endregion
+
+        #region IEnumerable
+
+        IEnumerator<ITypeMember> IEnumerable<ITypeMember>.GetEnumerator()
+        {
+            return this.items.GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return this.items.GetEnumerator();
         }
 
         #endregion

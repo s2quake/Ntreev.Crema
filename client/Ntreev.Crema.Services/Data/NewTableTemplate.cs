@@ -81,9 +81,9 @@ namespace Ntreev.Crema.Services.Data
             await base.OnBeginEditAsync(authentication);
         }
 
-        protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication)
+        protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
-            var tableInfos = await base.OnEndEditAsync(authentication);
+            var tableInfos = await base.OnEndEditAsync(authentication, args);
             if (this.parent is TableCategory category)
             {
                 var tables = category.GetService(typeof(TableCollection)) as TableCollection;
@@ -109,9 +109,15 @@ namespace Ntreev.Crema.Services.Data
             return this.Service.BeginNewTableAsync(this.ItemPath);
         }
 
-        protected override Task<ResultBase<TableInfo[]>> EndDomainAsync(Authentication authentication, Guid domainID)
+        protected override async Task<TableInfo[]> EndDomainAsync(Authentication authentication, object args)
         {
-            return this.Service.EndTableTemplateEditAsync(domainID);
+            if (args is Guid domainID)
+            {
+                var result = await this.Service.EndTableTemplateEditAsync(domainID);
+                var value = result.GetValue();
+                return value;
+            }
+            return args as TableInfo[];
         }
 
         protected override Task<ResultBase> CancelDomainAsync(Authentication authentication, Guid domainID)
