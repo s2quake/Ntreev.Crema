@@ -248,13 +248,13 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return result;
         }
 
-        public async Task<ResultBase> DeleteDomainAsync(Guid domainID, bool force)
+        public async Task<ResultBase<object>> DeleteDomainAsync(Guid domainID, bool force)
         {
-            var result = new ResultBase();
+            var result = new ResultBase<object>();
             try
             {
                 var domain = await this.GetDomainAsync(domainID);
-                await domain.DeleteAsync(this.authentication, force);
+                result.Value = await domain.DeleteAsync(this.authentication, force);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -381,7 +381,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var signatureDate = e.SignatureDate;
             var domainID = e.DomainInfo.DomainID;
             var isCanceled = e.IsCanceled;
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnDomainDeleted(signatureDate, domainID, isCanceled));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnDomainDeleted(signatureDate, domainID, isCanceled, e.Result));
         }
 
         private void DomainContext_DomainInfoChanged(object sender, DomainEventArgs e)

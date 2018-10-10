@@ -19,6 +19,7 @@ using Ntreev.Crema.ServiceModel;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {

@@ -10,6 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AuthenticationEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CloseRequestedEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CloseRequestedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClosedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClosedEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceState.cs" />

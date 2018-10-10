@@ -31,8 +31,7 @@ namespace Ntreev.Crema.Data
             this.table = table;
             this.table.RowChanged += Table_RowChanged;
             this.table.RowDeleted += Table_RowDeleted;
-            if (this.table.ColumnRelation != null)
-                this[this.table.ColumnRelation] = this.table.GenerateRelationID(this);
+            this[this.table.ColumnRelation] = this.table.GenerateRelationID(this);
         }
 
         public SignatureDate CreationInfo

@@ -24,4 +24,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("Ntreev.Crema.Services")]
 [assembly: ComVisible(false)]
 [assembly: Guid("5797d747-3c6a-4f97-a63a-7998f9a8b165")]
-//[assembly: InternalsVisibleTo("Ntreev.Crema.ServiceHosts")]
+

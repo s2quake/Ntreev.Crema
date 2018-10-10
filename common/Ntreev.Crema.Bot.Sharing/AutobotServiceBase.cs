@@ -40,9 +40,12 @@ namespace Ntreev.Crema.Bot
         protected AutobotServiceBase(ICremaHost cremaHost, IEnumerable<ITaskProvider> taskProviders)
         {
             this.cremaHost = cremaHost;
+            this.cremaHost.CloseRequested += CremaHost_CloseRequested;
             this.cremaHost.Closing += CremaHost_Closing;
             this.taskProviders = taskProviders;
         }
+
+        
 
         public async Task CreateAutobotAsync(Authentication authentication, string autobotID)
         {
@@ -157,10 +160,18 @@ namespace Ntreev.Crema.Bot
             }
         }
 
-        private void CremaHost_Closing(object sender, EventArgs e)
+        private void CremaHost_CloseRequested(object sender, CloseRequestedEventArgs e)
         {
             if (this.IsPlaying == true)
-                this.StopAsync().Wait();
+            {
+                e.AddTask(this.StopAsync());
+            }
+        }
+
+        private void CremaHost_Closing(object sender, EventArgs e)
+        {
+            //if (this.IsPlaying == true)
+            //    this.StopAsync().Wait();
         }
     }
 }

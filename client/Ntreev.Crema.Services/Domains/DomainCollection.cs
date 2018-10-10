@@ -54,9 +54,9 @@ namespace Ntreev.Crema.Services.Domains
             this.Context.InvokeItemsCreatedEvent(authentication, new IDomainItem[] { domain }, new object[] { domainInfo });
         }
 
-        public void InvokeDomainDeletedEvent(Authentication authentication, Domain domain, bool isCanceled)
+        public void InvokeDomainDeletedEvent(Authentication authentication, Domain domain, bool isCanceled, object result)
         {
-            var args = new DomainDeletedEventArgs(authentication, domain, isCanceled);
+            var args = new DomainDeletedEventArgs(authentication, domain, isCanceled, result);
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainDeletedEvent), domain, isCanceled);
             var comment = isCanceled == false ? EventMessageBuilder.EndDomain(authentication, domain) : EventMessageBuilder.CancelDomain(authentication, domain);
             this.CremaHost.Debug(eventLog);
@@ -131,7 +131,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public async Task<Domain> CreateAsync(Authentication authentication, DomainMetaData metaData)
         {
-            return await await this.Dispatcher.InvokeAsync(async () =>
+            return await this.Dispatcher.InvokeAsync(() =>
             {
                 var domain = this[metaData.DomainID];
 
@@ -164,13 +164,13 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public async Task DeleteAsync(Authentication authentication, Domain domain, bool isCanceled)
+        public async Task DeleteAsync(Authentication authentication, Domain domain, bool isCanceled, object result)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.Remove(domain);
-                domain.Dispose(authentication, isCanceled);
-                this.InvokeDomainDeletedEvent(authentication, domain, isCanceled);
+                domain.Dispose(authentication, isCanceled, result);
+                this.InvokeDomainDeletedEvent(authentication, domain, isCanceled, result);
             });
 
             //return this.Dispatcher.InvokeAsync(() =>
@@ -261,7 +261,7 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public async Task RemoveAsync(Authentication authentication, Domain domain, bool isCanceled)
+        public async Task RemoveAsync(Authentication authentication, Domain domain, bool isCanceled, object result)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
@@ -270,9 +270,9 @@ namespace Ntreev.Crema.Services.Domains
                 //domain.Dispatcher = null;
                 //domain.Logger?.Dispose(true);
                 //domain.Logger = null;
-                domain.Dispose(authentication, isCanceled);
+                domain.Dispose(authentication, isCanceled, result);
                 //dispatcher.Dispose();
-                this.InvokeDomainDeletedEvent(authentication, domain, isCanceled);
+                this.InvokeDomainDeletedEvent(authentication, domain, isCanceled, result);
             });
         }
 

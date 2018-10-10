@@ -49,7 +49,7 @@ namespace Ntreev.Crema.Services.Domains
             this.Users = new DomainUserCollection(this);
         }
 
-        public async Task DeleteAsync(Authentication authentication, bool isCanceled)
+        public async Task<object> DeleteAsync(Authentication authentication, bool isCanceled)
         {
             try
             {
@@ -59,14 +59,24 @@ namespace Ntreev.Crema.Services.Domains
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, isCanceled);
                 });
                 var result = await this.Service.DeleteDomainAsync(this.ID, isCanceled);
-                await this.Dispatcher.InvokeAsync(() =>
+                if (this.Host != null)
                 {
-                    var container = this.Container;
-                    this.CremaHost.Sign(authentication, result);
-                    this.Dispose();
-                    this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
-                    container.InvokeDomainDeletedEvent(authentication, this, isCanceled);
-                });
+                    await this.Host.DeleteAsync(authentication, isCanceled, result.GetValue());
+                    return result.Value;
+                }
+                else
+                {
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        var container = this.Container;
+                        this.CremaHost.Sign(authentication, result);
+                        this.Dispose();
+                        this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled, result.Value));
+                        container.InvokeDomainDeletedEvent(authentication, this, isCanceled, result.Value);
+                    });
+                    return null;
+                }
+                
             }
             catch (Exception e)
             {
@@ -384,6 +394,11 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
+        public Task InitializeAsync(Authentication authentication, DomainMetaData metaData)
+        {
+            return this.Dispatcher.InvokeAsync(() => this.Initialize(authentication, metaData));
+        }
+
         public UserContext UserContext => this.CremaHost.UserContext;
 
         public async Task ReleaseAsync(Authentication authentication, DomainMetaData metaData)
@@ -411,12 +426,12 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public void Dispose(Authentication authentication, bool isCanceled)
+        public void Dispose(Authentication authentication, bool isCanceled, object result)
         {
             this.DataDispatcher?.Dispose();
             this.DataDispatcher = null;
             this.Dispose();
-            this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
+            this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled, result));
         }
 
         public Task AttachUserAsync()

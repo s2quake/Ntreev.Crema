@@ -230,7 +230,7 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             if (this.cremaAppHost.IsOpened == true)
             {
                 this.cremaAppHost.Closed += (s, e) => closed = true;
-                this.cremaAppHost.Logout();
+                await this.cremaAppHost.LogoutAsync();
                 while (closed == false)
                 {
                     await Task.Delay(1);

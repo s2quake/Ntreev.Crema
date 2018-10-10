@@ -400,6 +400,8 @@ namespace Ntreev.Crema.Services
 
         public event EventHandler Opened;
 
+        public event CloseRequestedEventHandler CloseRequested;
+
         public event EventHandler Closing;
 
         public event ClosedEventHandler Closed;
@@ -414,6 +416,11 @@ namespace Ntreev.Crema.Services
         protected virtual void OnOpened(EventArgs e)
         {
             this.Opened?.Invoke(this, e);
+        }
+
+        protected virtual void OnCloseRequested(CloseRequestedEventArgs e)
+        {
+            this.CloseRequested?.Invoke(this, e);
         }
 
         protected virtual void OnClosing(EventArgs e)
@@ -441,9 +448,17 @@ namespace Ntreev.Crema.Services
 
         private async Task CloseAsync(CloseInfo closeInfo)
         {
+            var waiter = await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.ServiceState != ServiceState.Opened)
+                    throw new InvalidOperationException();
+                this.ServiceState = ServiceState.Closing;
+                var closer = new InternalCloseRequestedEventArgs();
+                this.OnCloseRequested(closer);
+                return closer.WhenAll();
+            });
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.ServiceState = ServiceState.Closing;
                 this.OnClosing(EventArgs.Empty);
             });
             foreach (var item in this.services.Reverse<ICremaService>())

@@ -295,7 +295,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
             }
         }
 
-        private void ConnectWithSettings()
+        private async void ConnectWithSettings()
         {
             if (this.FindResource("bootstrapper") is AppBootstrapper bootstrapper && Uri.TryCreate(bootstrapper.Settings.Address, UriKind.Absolute, out var uri))
             {
@@ -303,7 +303,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
                 {
                     var ss = uri.UserInfo.Split(':');
                     var dataBaseName = uri.LocalPath.TrimStart(PathUtility.SeparatorChar);
-                    this.cremaAppHost.Login(uri.Authority, ss[0], ss[1], dataBaseName);
+                    await this.cremaAppHost.LoginAsync(uri.Authority, ss[0], ss[1], dataBaseName);
                 }
                 catch (Exception e)
                 {

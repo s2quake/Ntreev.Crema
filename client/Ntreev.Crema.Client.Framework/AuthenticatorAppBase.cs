@@ -35,7 +35,10 @@ namespace Ntreev.Crema.Client.Framework
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Loaded += CremaAppHost_Loaded;
             this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
+            this.cremaAppHost.CloseRequested += CremaAppHost_CloseRequested;
         }
+
+
 
         protected AuthenticatorAppBase(ICremaAppHost cremaAppHost, string name)
             : base(name)
@@ -54,12 +57,16 @@ namespace Ntreev.Crema.Client.Framework
             }
         }
 
-        private async void CremaAppHost_Unloaded(object sender, EventArgs e)
+        private void CremaAppHost_Unloaded(object sender, EventArgs e)
+        {
+            this.dataBase = null;
+        }
+
+        private void CremaAppHost_CloseRequested(object sender, CloseRequestedEventArgs e)
         {
             if ((Authentication)this is Authentication authentication)
             {
-                await this.dataBase?.LeaveAsync(authentication);
-                this.dataBase = null;
+                e.AddTask(this.dataBase.LeaveAsync(authentication));
             }
         }
     }

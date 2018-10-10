@@ -585,7 +585,7 @@
   <xs:element name="EndTypeTemplateEditResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q51="http://schemas.ntreev.com" minOccurs="0" name="EndTypeTemplateEditResult" type="q51:ResultBaseOfTypeInfoq8erDhHE" />
+        <xs:element xmlns:q51="http://schemas.ntreev.com" minOccurs="0" name="EndTypeTemplateEditResult" type="q51:ResultBaseOfArrayOfTypeInfoq8erDhHE" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

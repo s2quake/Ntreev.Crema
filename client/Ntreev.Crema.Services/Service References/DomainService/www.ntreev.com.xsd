@@ -187,7 +187,7 @@
   <xs:element name="DeleteDomainResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q29="http://schemas.ntreev.com" minOccurs="0" name="DeleteDomainResult" type="q29:ResultBase" />
+        <xs:element xmlns:q29="http://schemas.ntreev.com" minOccurs="0" name="DeleteDomainResult" type="q29:ResultBaseOfanyType" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -226,6 +226,7 @@
         <xs:element xmlns:q35="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q35:SignatureDate" />
         <xs:element xmlns:q36="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q36:guid" />
         <xs:element minOccurs="0" name="IsCanceled" type="xs:boolean" />
+        <xs:element minOccurs="0" name="result" nillable="true" type="xs:anyType" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

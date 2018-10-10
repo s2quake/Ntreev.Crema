@@ -142,7 +142,7 @@ namespace Ntreev.Crema.Services.Data
                 });
                 try
                 {
-                    await this.domainHost.EndContentAsync(authentication, name);
+                    await this.domainHost.EndContentAsync(authentication, null);
                 }
                 catch
                 {
@@ -178,7 +178,7 @@ namespace Ntreev.Crema.Services.Data
                 });
                 try
                 {
-                    await this.domainHost.CancelContentAsync(authentication, name);
+                    await this.domainHost.CancelContentAsync(authentication);
                 }
                 catch
                 {

@@ -218,6 +218,7 @@ namespace Ntreev.Crema.Data.Test
         }
 
         [TestMethod]
+        [ExpectedException(typeof(Exception), AllowDerivedTypes = true)]
         public void Remove_Add()
         {
             var member = this.dataType.Members.Random();

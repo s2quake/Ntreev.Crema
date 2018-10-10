@@ -25,6 +25,7 @@ using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
 using Ntreev.Library;
 using Ntreev.Crema.Data.Xml.Schema;
+using Ntreev.Crema.Data;
 
 namespace Ntreev.Crema.ServiceHosts.Domains
 {
@@ -69,7 +70,11 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         Task<ResultBase> SetOwnerAsync(Guid domainID, string userID);
 
         [OperationContract]
-        Task<ResultBase> DeleteDomainAsync(Guid domainID, bool force);
+        [ServiceKnownType(typeof(TableInfo))]
+        [ServiceKnownType(typeof(TableInfo[]))]
+        [ServiceKnownType(typeof(TypeInfo))]
+        [ServiceKnownType(typeof(TypeInfo[]))]
+        Task<ResultBase<object>> DeleteDomainAsync(Guid domainID, bool force);
 
         [OperationContract]
         Task<bool> IsAliveAsync();

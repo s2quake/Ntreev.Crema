@@ -30,8 +30,6 @@ namespace Ntreev.Crema.Services
 
         Task DetachAsync();
 
-#if SERVER
-        void ValidateDelete(Authentication authentication, bool isCanceled);
-#endif
+        Task<object> DeleteAsync(Authentication authentication, bool isCanceled, object result);
     }
 }

@@ -50,6 +50,8 @@ namespace Ntreev.Crema.Services
 
         event EventHandler Opened;
 
+        event CloseRequestedEventHandler CloseRequested;
+
         event EventHandler Closing;
 
         event ClosedEventHandler Closed;

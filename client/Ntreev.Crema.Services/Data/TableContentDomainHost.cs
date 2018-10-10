@@ -70,8 +70,8 @@ namespace Ntreev.Crema.Services.Data
             {
                 return this.domain.Dispatcher.InvokeAsync(() =>
                 {
-                    this.domain.Deleted += Domain_Deleted;
-                    this.domain.RowAdded += Domain_RowAdded;
+                    //this.domain.Deleted += Domain_Deleted;
+                    //this.domain.RowAdded += Domain_RowAdded;
                     this.domain.RowChanged += Domain_RowChanged;
                     this.domain.RowRemoved += Domain_RowRemoved;
                     this.domain.PropertyChanged += Domain_PropertyChanged;
@@ -83,7 +83,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 return this.domain.Dispatcher.InvokeAsync(() =>
                 {
-                    this.domain.Deleted -= Domain_Deleted;
+                    //this.domain.Deleted -= Domain_Deleted;
                     this.domain.RowAdded -= Domain_RowAdded;
                     this.domain.RowChanged -= Domain_RowChanged;
                     this.domain.RowRemoved -= Domain_RowRemoved;
@@ -148,22 +148,28 @@ namespace Ntreev.Crema.Services.Data
                 return result.SignatureDate;
             }
 
-            public async Task EndContentAsync(Authentication authentication, string name)
+            private async Task<TableInfo[]> EndDomainAsync(object args)
             {
-                var tableInfoByName = new Dictionary<string, TableInfo>();
-                if (name != null)
+                if (args is string name)
                 {
                     var result = await this.Service.EndTableContentEditAsync(name);
-                    var tableInfos = result.Value;
-                    foreach (var item in tableInfos)
-                    {
-                        tableInfoByName.Add(item.Name, item);
-                    }
-                    if (this.domain != null)
-                    {
-                        await this.DetachDomainEventAsync();
-                        await this.DomainContext.DeleteAsync(authentication, this.domain, false);
-                    }
+                    return result.GetValue();
+                }
+                return args as TableInfo[];                
+            }
+
+            public async Task<TableInfo[]> EndContentAsync(Authentication authentication, object args)
+            {
+                var tableInfos = await this.EndDomainAsync(args);
+                var tableInfoByName = new Dictionary<string, TableInfo>();
+                foreach (var item in tableInfos)
+                {
+                    tableInfoByName.Add(item.Name, item);
+                }
+                if (this.domain != null)
+                {
+                    await this.DetachDomainEventAsync();
+                    await this.DomainContext.DeleteAsync(authentication, this.domain, false, tableInfos);
                 }
                 await this.Container.Dispatcher.InvokeAsync(() =>
                 {
@@ -180,33 +186,38 @@ namespace Ntreev.Crema.Services.Data
                     this.Container.InvokeTablesContentChangedEvent(authentication, this.Tables);
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
+                return tableInfos;
             }
 
-            public async Task CancelContentAsync(Authentication authentication, string name)
+            public async Task CancelContentAsync(Authentication authentication, object args)
             {
-                if (name != null)
+                if (args is string name)
                 {
                     var result = await this.Service.CancelTableContentEditAsync(name);
-                    if (this.domain != null)
-                    {
-                        await this.DetachDomainEventAsync();
-                        await this.DomainContext.DeleteAsync(authentication, this.domain, true);
-                    }
                 }
-                foreach (var item in this.Contents)
+                if (this.domain != null)
                 {
-                    item.domain = null;
-                    item.IsModified = false;
-                    item.dataTable = null;
-                    item.Table.SetTableState(TableState.None);
+                    await this.DetachDomainEventAsync();
+                    await this.DomainContext.DeleteAsync(authentication, this.domain, true, null);
                 }
-                this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
+                await this.Container.Dispatcher.InvokeAsync(() =>
+                {
+
+                    foreach (var item in this.Contents)
+                    {
+                        item.domain = null;
+                        item.IsModified = false;
+                        item.dataTable = null;
+                        item.Table.SetTableState(TableState.None);
+                    }
+                    this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
+                });
             }
 
             public async Task EnterContentAsync(Authentication authentication, string name)
             {
                 var result = await this.Service.EnterTableContentEditAsync(name);
-                this.domain.Initialize(authentication, result.Value);
+                await this.domain.InitializeAsync(authentication, result.Value);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var dataSet = domain.Source as CremaDataSet;
@@ -247,19 +258,19 @@ namespace Ntreev.Crema.Services.Data
 
             public TableCollection Container { get; }
 
-            private async void Domain_Deleted(object sender, DomainDeletedEventArgs e)
-            {
-                if (e.IsCanceled == false)
-                {
-                    await this.EndContentAsync(e.Authentication, null);
-                    await this.Dispatcher.InvokeAsync(() => this.InvokeEditEndedEvent(e));
-                }
-                else
-                {
-                    await this.CancelContentAsync(e.Authentication, null);
-                    await this.Dispatcher.InvokeAsync(() => this.InvokeEditCanceledEvent(e));
-                }
-            }
+            //private async void Domain_Deleted(object sender, DomainDeletedEventArgs e)
+            //{
+            //    if (e.IsCanceled == false)
+            //    {
+            //        await this.EndContentAsync(e.Authentication, null);
+            //        await this.Dispatcher.InvokeAsync(() => this.InvokeEditEndedEvent(e));
+            //    }
+            //    else
+            //    {
+            //        await this.CancelContentAsync(e.Authentication, null);
+            //        await this.Dispatcher.InvokeAsync(() => this.InvokeEditCanceledEvent(e));
+            //    }
+            //}
 
             private void Domain_RowAdded(object sender, DomainRowEventArgs e)
             {
@@ -376,7 +387,28 @@ namespace Ntreev.Crema.Services.Data
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                     this.InvokeEditBegunEvent(EventArgs.Empty);
                 });
+            }
 
+            async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)
+            {
+                if (isCanceled == false)
+                {
+                    result = await this.EndContentAsync(authentication, result as TableInfo[]);
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.InvokeEditEndedEvent(new DomainDeletedEventArgs(authentication, this.domain, isCanceled, result));
+                    });
+                    return result;
+                }
+                else
+                {
+                    await this.CancelContentAsync(authentication, null);
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.InvokeEditCanceledEvent(new DomainDeletedEventArgs(authentication, this.domain, isCanceled, null));
+                    });
+                    return null;
+                }
             }
 
             #endregion

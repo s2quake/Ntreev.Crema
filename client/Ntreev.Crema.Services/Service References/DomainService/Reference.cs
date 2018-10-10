@@ -80,6 +80,16 @@ namespace Ntreev.Crema.Services.DomainService {
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowInfo))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]>))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainUserInfo>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TableInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.ColumnInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.ColumnInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Library.TagInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TableInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeMemberInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeMemberInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<object>))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.CloseInfo))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.CloseReason))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.RemoveInfo))]
@@ -115,10 +125,46 @@ namespace Ntreev.Crema.Services.DomainService {
         System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> SetOwnerAsync(System.Guid domainID, string userID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/DeleteDomain", ReplyAction="http://www.ntreev.com/IDomainService/DeleteDomainResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase DeleteDomain(System.Guid domainID, bool force);
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(System.DBNull))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainContextMetaData>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.CremaFault))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Library.SignatureDate))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainContextMetaData))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainMetaData[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainMetaData))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainState))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainUserMetaData[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainUserMetaData))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainUserInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainAccessType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainLocationInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainFieldInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainFieldInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainUserState))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainUserInfo>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TableInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.ColumnInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.ColumnInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Library.TagInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TableInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeMemberInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeMemberInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.CloseInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.CloseReason))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.RemoveInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.RemoveReason))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(string[]))]
+        Ntreev.Crema.ServiceModel.ResultBase<object> DeleteDomain(System.Guid domainID, bool force);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/DeleteDomain", ReplyAction="http://www.ntreev.com/IDomainService/DeleteDomainResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> DeleteDomainAsync(System.Guid domainID, bool force);
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<object>> DeleteDomainAsync(System.Guid domainID, bool force);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/IsAlive", ReplyAction="http://www.ntreev.com/IDomainService/IsAliveResponse")]
         bool IsAlive();
@@ -137,7 +183,44 @@ namespace Ntreev.Crema.Services.DomainService {
         void OnDomainCreated(Ntreev.Library.SignatureDate signatureDate, Ntreev.Crema.ServiceModel.DomainInfo domainInfo, Ntreev.Crema.ServiceModel.DomainState domainState);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainService/OnDomainDeleted")]
-        void OnDomainDeleted(Ntreev.Library.SignatureDate signatureDate, System.Guid domainID, bool IsCanceled);
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(System.DBNull))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainContextMetaData>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.CremaFault))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Library.SignatureDate))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainContextMetaData))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainMetaData[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainMetaData))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainState))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainUserMetaData[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainUserMetaData))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainUserInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainAccessType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainLocationInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainFieldInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainFieldInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainUserState))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainUserInfo>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TableInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.ColumnInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.ColumnInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Library.TagInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TableInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeMemberInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeMemberInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<object>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.CloseInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.CloseReason))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.RemoveInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.RemoveReason))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(string[]))]
+        void OnDomainDeleted(Ntreev.Library.SignatureDate signatureDate, System.Guid domainID, bool IsCanceled, object result);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainService/OnDomainInfoChanged")]
         void OnDomainInfoChanged(Ntreev.Library.SignatureDate signatureDate, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainInfo domainInfo);
@@ -186,6 +269,16 @@ namespace Ntreev.Crema.Services.DomainService {
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowInfo))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]>))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainUserInfo>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TableInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.ColumnInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.ColumnInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Library.TagInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TableInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeMemberInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeMemberInfo))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TypeInfo[]))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<object>))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.CloseInfo))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.CloseReason))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.RemoveInfo))]
@@ -318,11 +411,11 @@ namespace Ntreev.Crema.Services.DomainService {
             return base.Channel.SetOwnerAsync(domainID, userID);
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase DeleteDomain(System.Guid domainID, bool force) {
+        public Ntreev.Crema.ServiceModel.ResultBase<object> DeleteDomain(System.Guid domainID, bool force) {
             return base.Channel.DeleteDomain(domainID, force);
         }
         
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> DeleteDomainAsync(System.Guid domainID, bool force) {
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<object>> DeleteDomainAsync(System.Guid domainID, bool force) {
             return base.Channel.DeleteDomainAsync(domainID, force);
         }
         

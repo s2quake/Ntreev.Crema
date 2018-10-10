@@ -333,7 +333,7 @@ namespace Ntreev.Crema.Services.Data
             if (this.domain != null)
             {
                 await this.DetachDomainEventAsync();
-                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false);
+                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false, result.Value);
                 this.domain = null;
             }
             if (this.table != null)
@@ -355,7 +355,7 @@ namespace Ntreev.Crema.Services.Data
             if (this.domain != null)
             {
                 await this.DetachDomainEventAsync();
-                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true);
+                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true, null);
                 this.domain = null;
             }
             if (this.table != null)
@@ -527,6 +527,11 @@ namespace Ntreev.Crema.Services.Data
         async Task IDomainHost.DetachAsync()
         {
             await this.OnDetachAsync();
+        }
+
+        async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

@@ -65,19 +65,21 @@ namespace Ntreev.Crema.Services.Data
             this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
         }
 
-        protected override async Task OnEndEditAsync(Authentication authentication)
+        protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, TableInfo[] tableInfos)
         {
             var template = this.TemplateSource;
             var dataSet = template.TargetTable.DataSet;
             var dataBaseSet = await DataBaseSet.CreateAsync(this.table.DataBase, dataSet, false);
+            tableInfos = new TableInfo[] { template.TableInfo };
             await this.Container.InvokeTableEndTemplateEditAsync(authentication, this.tableInfo, dataBaseSet);
-            await base.OnEndEditAsync(authentication);
+            await base.OnEndEditAsync(authentication, tableInfos);
             this.table.UpdateTemplate(template.TableInfo);
             this.table.UpdateTags(template.Tags);
             this.table.UpdateComment(template.Comment);
             this.table.IsBeingSetup = true;
             this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
             this.Container.InvokeTablesTemplateChangedEvent(authentication, this.tables, dataSet);
+            return tableInfos;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)

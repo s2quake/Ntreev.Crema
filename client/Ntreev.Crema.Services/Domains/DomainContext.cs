@@ -125,9 +125,9 @@ namespace Ntreev.Crema.Services.Domains
             return this.Domains.CreateAsync(authentication, metaData);
         }
 
-        public Task DeleteAsync(Authentication authentication, Domain domain, bool isCanceled)
+        public Task DeleteAsync(Authentication authentication, Domain domain, bool isCanceled, object result)
         {
-            return this.Domains.DeleteAsync(authentication, domain, isCanceled);
+            return this.Domains.DeleteAsync(authentication, domain, isCanceled, result);
         }
 
         public async Task AddDomainsAsync(DomainMetaData[] metaDatas)
@@ -516,17 +516,24 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnDomainDeleted(SignatureDate signatureDate, Guid domainID, bool isCanceled)
+        async void IDomainServiceCallback.OnDomainDeleted(SignatureDate signatureDate, Guid domainID, bool isCanceled, object result)
         {
             try
             {
                 var authentication = await this.userContext.AuthenticateAsync(signatureDate);
-                await this.Dispatcher.InvokeAsync(() =>
+                var domain = await this.Dispatcher.InvokeAsync(() => this.GetDomain(domainID));
+                if (domain.Host != null)
                 {
-                    var domain = this.GetDomain(domainID);
-                    domain.Dispose(authentication, isCanceled);
-                    this.Domains.InvokeDomainDeletedEvent(authentication, domain, isCanceled);
-                });
+                    await domain.Host.DeleteAsync(authentication, isCanceled, result);
+                }
+                else
+                {
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        domain.Dispose(authentication, isCanceled, null);
+                        this.Domains.InvokeDomainDeletedEvent(authentication, domain, isCanceled, null);
+                    });
+                }
             }
             catch (Exception e)
             {

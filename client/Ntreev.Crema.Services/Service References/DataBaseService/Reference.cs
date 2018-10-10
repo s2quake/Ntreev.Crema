@@ -250,10 +250,10 @@ namespace Ntreev.Crema.Services.DataBaseService {
         System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData>> BeginNewTypeAsync(string categoryPath);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseService/EndTypeTemplateEdit", ReplyAction="http://www.ntreev.com/IDataBaseService/EndTypeTemplateEditResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.TypeInfo> EndTypeTemplateEdit(System.Guid domainID);
+        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.TypeInfo[]> EndTypeTemplateEdit(System.Guid domainID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseService/EndTypeTemplateEdit", ReplyAction="http://www.ntreev.com/IDataBaseService/EndTypeTemplateEditResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.TypeInfo>> EndTypeTemplateEditAsync(System.Guid domainID);
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.TypeInfo[]>> EndTypeTemplateEditAsync(System.Guid domainID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseService/CancelTypeTemplateEdit", ReplyAction="http://www.ntreev.com/IDataBaseService/CancelTypeTemplateEditResponse")]
         Ntreev.Crema.ServiceModel.ResultBase CancelTypeTemplateEdit(System.Guid domainID);
@@ -717,11 +717,11 @@ namespace Ntreev.Crema.Services.DataBaseService {
             return base.Channel.BeginNewTypeAsync(categoryPath);
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.TypeInfo> EndTypeTemplateEdit(System.Guid domainID) {
+        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.TypeInfo[]> EndTypeTemplateEdit(System.Guid domainID) {
             return base.Channel.EndTypeTemplateEdit(domainID);
         }
         
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.TypeInfo>> EndTypeTemplateEditAsync(System.Guid domainID) {
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.TypeInfo[]>> EndTypeTemplateEditAsync(System.Guid domainID) {
             return base.Channel.EndTypeTemplateEditAsync(domainID);
         }
         

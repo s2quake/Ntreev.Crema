@@ -137,7 +137,7 @@ namespace Ntreev.Crema.Services.Data
                 });
                 try
                 {
-                    await this.OnEndEditAsync(authentication);
+                    await this.OnEndEditAsync(authentication, null);
                 }
                 catch
                 {
@@ -365,12 +365,12 @@ namespace Ntreev.Crema.Services.Data
             await this.AttachDomainEventAsync();
         }
 
-        protected virtual async Task OnEndEditAsync(Authentication authentication)
+        protected virtual async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, TableInfo[] tableInfos)
         {
             if (this.domain != null)
             {
                 await this.DetachDomainEventAsync();
-                await this.DomainContext.RemoveAsync(authentication, this.domain, false);
+                await this.DomainContext.RemoveAsync(authentication, this.domain, false, tableInfos);
                 this.domain = null;
             }
             if (this.table != null)
@@ -382,6 +382,7 @@ namespace Ntreev.Crema.Services.Data
             this.table = null;
             this.items = null;
             this.rowsToAdd.Clear();
+            return tableInfos;
         }
 
         protected virtual async Task OnCancelEditAsync(Authentication authentication)
@@ -389,7 +390,7 @@ namespace Ntreev.Crema.Services.Data
             if (this.domain != null)
             {
                 await this.DetachDomainEventAsync();
-                await this.DomainContext.RemoveAsync(authentication, this.domain, true);
+                await this.DomainContext.RemoveAsync(authentication, this.domain, true, null);
                 this.domain = null;
             }
             if (this.table != null)
@@ -530,20 +531,28 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        private async void Domain_Deleted(object sender, DomainDeletedEventArgs e)
-        {
-            var isCanceled = e.IsCanceled;
-            if (isCanceled == false)
-            {
-                await this.OnEndEditAsync(e.Authentication);
-                await this.Dispatcher.InvokeAsync(() => this.OnEditEnded(e));
-            }
-            else
-            {
-                await this.OnCancelEditAsync(e.Authentication);
-                await this.Dispatcher.InvokeAsync(() => this.OnEditCanceled(e));
-            }
-        }
+        //private async void Domain_Deleted(object sender, DomainDeletedEventArgs e)
+        //{
+        //    var isCanceled = e.IsCanceled;
+        //    if (isCanceled == false)
+        //    {
+        //        await this.OnEndEditAsync(e.Authentication);
+        //        await this.Dispatcher.InvokeAsync(() =>
+        //        {
+        //            this.ServiceState = ServiceState.Closed;
+        //            this.OnEditEnded(e);
+        //        });
+        //    }
+        //    else
+        //    {
+        //        await this.OnCancelEditAsync(e.Authentication);
+        //        await this.Dispatcher.InvokeAsync(() =>
+        //        {
+        //            this.ServiceState = ServiceState.Closed;
+        //            this.OnEditCanceled(e);
+        //        });
+        //    }
+        //}
 
         private async void Domain_RowAdded(object sender, DomainRowEventArgs e)
         {
@@ -573,7 +582,7 @@ namespace Ntreev.Crema.Services.Data
         {
             return this.domain.Dispatcher.InvokeAsync(() =>
             {
-                this.domain.Deleted += Domain_Deleted;
+                //this.domain.Deleted += Domain_Deleted;
                 this.domain.RowAdded += Domain_RowAdded;
                 this.domain.RowChanged += Domain_RowChanged;
                 this.domain.RowRemoved += Domain_RowRemoved;
@@ -585,7 +594,7 @@ namespace Ntreev.Crema.Services.Data
         {
             return this.domain.Dispatcher.InvokeAsync(() =>
             {
-                this.domain.Deleted -= Domain_Deleted;
+                //this.domain.Deleted -= Domain_Deleted;
                 this.domain.RowAdded -= Domain_RowAdded;
                 this.domain.RowChanged -= Domain_RowChanged;
                 this.domain.RowRemoved -= Domain_RowRemoved;
@@ -632,11 +641,37 @@ namespace Ntreev.Crema.Services.Data
             await this.OnDetachAsync();
         }
 
-        void IDomainHost.ValidateDelete(Authentication authentication, bool isCanceled)
+        //void IDomainHost.ValidateDelete(Authentication authentication, bool isCanceled)
+        //{
+        //    if (isCanceled == false)
+        //    {
+        //        this.Dispatcher.Invoke(() => this.ValidateEndEdit(authentication));
+        //    }
+        //}
+
+        async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)
         {
             if (isCanceled == false)
             {
-                this.Dispatcher.Invoke(() => this.ValidateEndEdit(authentication));
+                await this.Dispatcher.InvokeAsync(() => this.ValidateEndEdit(authentication));
+                result = await this.OnEndEditAsync(authentication, result as TableInfo[]);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ServiceState = ServiceState.Closed;
+                    this.OnEditEnded(new DomainDeletedEventArgs(authentication, this.domain, isCanceled, result));
+                });
+                return result;
+            }
+            else
+            {
+                await this.Dispatcher.InvokeAsync(() => this.ValidateCancelEdit(authentication));
+                await this.OnCancelEditAsync(authentication);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ServiceState = ServiceState.Closed;
+                    this.OnEditCanceled(new DomainDeletedEventArgs(authentication, this.domain, isCanceled, null));
+                });
+                return null;
             }
         }
 
@@ -653,6 +688,8 @@ namespace Ntreev.Crema.Services.Data
         {
             return this.items.GetEnumerator();
         }
+
+        
 
         #endregion
     }

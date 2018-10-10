@@ -78,7 +78,7 @@ namespace Ntreev.Crema.Services.Domains
             this.Users = new DomainUserCollection(this);
         }
 
-        public async Task DeleteAsync(Authentication authentication, bool isCanceled)
+        public async Task<object> DeleteAsync(Authentication authentication, bool isCanceled)
         {
             try
             {
@@ -88,16 +88,24 @@ namespace Ntreev.Crema.Services.Domains
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, isCanceled);
                     this.ValidateDelete(authentication, isCanceled);
                 });
-                this.Logger?.DisposeAsync(true);
-                await this.Dispatcher.InvokeAsync(() =>
+                if (this.Host != null)
                 {
-                    var container = this.Container;
-                    this.Sign(authentication, true);
-                    this.Logger = null;
-                    this.Dispose();
-                    this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
-                    container.InvokeDomainDeletedEvent(authentication, this, isCanceled);
-                });
+                    return await this.Host.DeleteAsync(authentication, isCanceled, null);
+                }
+                else
+                {
+                    await this.Logger?.DisposeAsync(true);
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        var container = this.Container;
+                        this.Sign(authentication, true);
+                        this.Logger = null;
+                        this.Dispose();
+                        this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled, null));
+                        container.InvokeDomainDeletedEvent(authentication, this, isCanceled, null);
+                    });
+                    return null;
+                }
             }
             catch (Exception e)
             {
@@ -405,10 +413,10 @@ namespace Ntreev.Crema.Services.Domains
             base.Dispose();
         }
 
-        public void Dispose(Authentication authentication, bool isCanceled)
+        public void Dispose(Authentication authentication, bool isCanceled, object result)
         {
             base.Dispose();
-            this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
+            this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled, result));
         }
 
         public Task AttachAsync(params Authentication[] authentications)
@@ -797,8 +805,8 @@ namespace Ntreev.Crema.Services.Domains
             var isOwner = this.Users.OwnerUserID == authentication.ID;
             if (authentication.IsAdmin == false && isOwner == false)
                 throw new PermissionDeniedException();
-            if (this.Host is IDomainHost domainHost)
-                domainHost.ValidateDelete(authentication, isCanceled);
+            //if (this.Host is IDomainHost domainHost)
+            //    domainHost.ValidateDelete(authentication, isCanceled);
         }
 
         private void ValidateAdd(Authentication authentication)

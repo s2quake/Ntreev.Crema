@@ -222,6 +222,10 @@ namespace Ntreev.Crema.Data
                 var item = this.itemList[index];
                 this.tables.Remove(item);
             }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(name));
+            }
 
             void Validate()
             {
@@ -238,6 +242,10 @@ namespace Ntreev.Crema.Data
             {
                 var item = this.itemList[index];
                 this.tables.Remove(item);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(name));
             }
 
             void Validate()

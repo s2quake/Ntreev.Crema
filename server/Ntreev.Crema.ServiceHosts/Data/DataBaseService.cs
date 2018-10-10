@@ -66,10 +66,6 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 this.authentication = await this.UserContext.AuthenticateAsync(authenticationToken);
                 await this.authentication.AddRefAsync(this);
                 this.OwnerID = this.authentication.ID;
-                await this.UserContext.Dispatcher.InvokeAsync(() =>
-                {
-                    this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
-                });
                 await this.DataBases.Dispatcher.InvokeAsync(() =>
                 {
                     this.dataBase = this.DataBases[dataBaseName];
@@ -96,12 +92,8 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 await this.DetachEventHandlersAsync();
-                await this.dataBase?.LeaveAsync(this.authentication);
+                await this.dataBase.LeaveAsync(this.authentication);
                 this.dataBase = null;
-                await this.UserContext.Dispatcher.InvokeAsync(() =>
-                {
-                    this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                });
                 await this.authentication.RemoveRefAsync(this);
                 this.authentication = null;
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
@@ -747,15 +739,15 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return result;
         }
 
-        public async Task<ResultBase<TypeInfo>> EndTypeTemplateEditAsync(Guid domainID)
+        public async Task<ResultBase<TypeInfo[]>> EndTypeTemplateEditAsync(Guid domainID)
         {
-            var result = new ResultBase<TypeInfo>();
+            var result = new ResultBase<TypeInfo[]>();
             try
             {
                 var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
                 var template = domain.Host as ITypeTemplate;
                 await template.EndEditAsync(this.authentication);
-                result.Value = await template.Dispatcher.InvokeAsync(() => template.Type.TypeInfo);
+                result.Value = await template.Dispatcher.InvokeAsync(() => new TypeInfo[] { template.Type.TypeInfo });
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -1190,6 +1182,10 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private async Task AttachEventHandlersAsync()
         {
+            await this.UserContext.Dispatcher.InvokeAsync(() =>
+            {
+                this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
+            });
             await this.dataBase.Dispatcher.InvokeAsync(() =>
             {
                 this.TableContext.Tables.TablesStateChanged += Tables_TablesStateChanged;
@@ -1212,7 +1208,6 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
                 this.dataBase.Unloaded += DataBase_Unloaded;
             });
-
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(AttachEventHandlersAsync)}");
         }
 
@@ -1220,9 +1215,6 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             await this.dataBase.Dispatcher.InvokeAsync(() =>
             {
-                if (this.dataBase == null || this.dataBase.IsLoaded == false)
-                    return;
-
                 this.TableContext.Tables.TablesStateChanged -= Tables_TablesStateChanged;
                 this.TableContext.Tables.TablesChanged -= Tables_TablesChanged;
                 this.TableContext.ItemsCreated -= TableContext_ItemCreated;
@@ -1242,6 +1234,10 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 this.TypeContext.ItemsLockChanged -= TypeContext_ItemsLockChanged;
 
                 this.dataBase.Unloaded -= DataBase_Unloaded;
+            });
+            await this.UserContext.Dispatcher.InvokeAsync(() =>
+            {
+                this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(DetachEventHandlersAsync)}");
         }

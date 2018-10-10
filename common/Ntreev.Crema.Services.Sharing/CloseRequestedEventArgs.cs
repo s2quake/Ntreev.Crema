@@ -16,29 +16,35 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Library;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
-    public class DomainDeletedEventArgs : DomainEventArgs
+    public class CloseRequestedEventArgs : EventArgs
     {
-        public DomainDeletedEventArgs(Authentication authentication, IDomain domain, bool isCanceled, object result)
-            : base(authentication, domain)
+        private readonly List<Task> taskList = new List<Task>();
+
+        public CloseRequestedEventArgs()
         {
-            this.IsCanceled = isCanceled;
-            this.Result = result;
-            this.Authentication = authentication;
+            
         }
 
-        public bool IsCanceled { get; }
+        public void AddTask(Task task)
+        {
+            this.taskList.Add(task);
+        }
 
-        public object Result { get; }
+        protected Task[] Tasks => this.taskList.ToArray();
+    }
 
-        internal Authentication Authentication { get; }
+    public class InternalCloseRequestedEventArgs : CloseRequestedEventArgs
+    {
+        public Task WhenAll()
+        {
+            return Task.WhenAll(this.Tasks);
+        }
     }
 }

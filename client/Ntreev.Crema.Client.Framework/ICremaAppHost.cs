@@ -24,14 +24,15 @@ using System.Windows.Media;
 using System.Security;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Client.Framework
 {
     public interface ICremaAppHost : IServiceProvider
     {
-        void Login(string address, string userID, string password, string dataBaseName);
+        Task LoginAsync(string address, string userID, string password, string dataBaseName);
 
-        void Logout();
+        Task LogoutAsync();
 
         void SelectDataBase(string dataBaseName);
         
@@ -66,6 +67,8 @@ namespace Ntreev.Crema.Client.Framework
         event EventHandler Reset;
 
         event EventHandler Opened;
+
+        event CloseRequestedEventHandler CloseRequested;
 
         event EventHandler Closed;
     }

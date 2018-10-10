@@ -152,7 +152,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         Task<ResultBase<DomainMetaData>> BeginNewTypeAsync(string categoryPath);
 
         [OperationContract]
-        Task<ResultBase<TypeInfo>> EndTypeTemplateEditAsync(Guid domainID);
+        Task<ResultBase<TypeInfo[]>> EndTypeTemplateEditAsync(Guid domainID);
 
         [OperationContract]
         Task<ResultBase> CancelTypeTemplateEditAsync(Guid domainID);

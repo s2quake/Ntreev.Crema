@@ -24,6 +24,7 @@ using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
 using Ntreev.Library;
+using Ntreev.Crema.Data;
 
 namespace Ntreev.Crema.ServiceHosts.Domains
 {
@@ -37,7 +38,11 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         void OnDomainCreated(SignatureDate signatureDate, DomainInfo domainInfo, DomainState domainState);
 
         [OperationContract(IsOneWay = true)]
-        void OnDomainDeleted(SignatureDate signatureDate, Guid domainID, bool IsCanceled);
+        [ServiceKnownType(typeof(TableInfo))]
+        [ServiceKnownType(typeof(TableInfo[]))]
+        [ServiceKnownType(typeof(TypeInfo))]
+        [ServiceKnownType(typeof(TypeInfo[]))]
+        void OnDomainDeleted(SignatureDate signatureDate, Guid domainID, bool IsCanceled, object result);
 
         [OperationContract(IsOneWay = true)]
         void OnDomainInfoChanged(SignatureDate signatureDate, Guid domainID, DomainInfo domainInfo);

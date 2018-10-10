@@ -130,20 +130,8 @@ namespace Ntreev.Crema.Services.Data
                     return this.Table.Name;
                 });
                 await this.domainHost.EndContentAsync(authentication, name);
-                //var result = await this.Service.EndTableContentEditAsync(name);
-                //if (this.domain != null)
-                //{
-                //    await this.domainHost.DetachDomainEventAsync();
-                //    await this.domain.DisposeAsync(authentication, false);
-                //}
-                //else
-                //{
-                //    await this.DomainContext.DeleteAsync(authentication, this.domain, false);
-                //}
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    //this.CremaHost.Sign(authentication, result);
-                    //this.domainHost.EndContent(authentication, result.Value);
                     this.domainHost.InvokeEditEndedEvent(EventArgs.Empty);
                     this.domainHost = null;
                 });

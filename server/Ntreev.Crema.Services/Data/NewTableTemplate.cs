@@ -132,7 +132,7 @@ namespace Ntreev.Crema.Services.Data
             await base.OnBeginEditAsync(authentication);
         }
 
-        protected override async Task OnEndEditAsync(Authentication authentication)
+        protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, TableInfo[] tableInfos)
         {
             var dataSet = this.TemplateSource.TargetTable.DataSet;
             var tableNames = dataSet.Tables.Select(item => item.Name).ToArray();
@@ -143,10 +143,12 @@ namespace Ntreev.Crema.Services.Data
                         select dataTable;
 
             var dataTables = query.ToArray();
+            tableInfos = dataTables.Select(item => item.TableInfo).ToArray();
             this.tables = await this.Container.AddNewAsync(authentication, dataSet, dataTables);
-            await base.OnEndEditAsync(authentication);
+            await base.OnEndEditAsync(authentication, tableInfos);
             this.parent = null;
             this.permission = null;
+            return tableInfos;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)

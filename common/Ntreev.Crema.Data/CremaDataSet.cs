@@ -823,12 +823,15 @@ namespace Ntreev.Crema.Data
 
             foreach (var item in this.Tables)
             {
-                if (item.TemplateNamespace != string.Empty && item.TemplatedParent == null)
+                if (item.TemplateNamespace != string.Empty)
                 {
-                    var relativePath = UriUtility.MakeRelativeOfDirectory(this.InternalObject.Namespace, item.TemplateNamespace);
-                    var filename = Path.Combine(path, relativePath + CremaSchema.SchemaExtension);
-                    FileUtility.Prepare(filename);
-                    item.WriteXmlSchema(filename);
+                    if (item.TemplatedParent == null)
+                    {
+                        var relativePath = UriUtility.MakeRelativeOfDirectory(this.InternalObject.Namespace, item.TemplateNamespace);
+                        var filename = Path.Combine(path, relativePath + CremaSchema.SchemaExtension);
+                        FileUtility.Prepare(filename);
+                        item.WriteXmlSchema(filename);
+                    }
                 }
                 else
                 {

@@ -109,7 +109,7 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
             this.compositionService = compositionService;
             this.theme = Themes.Keys.FirstOrDefault();
             this.themeColor = FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor;
-            this.loginCommand = new DelegateCommand((p) => this.Login(), (p) => this.CanLogin);
+            this.loginCommand = new DelegateCommand((p) => this.LoginAsync(), (p) => this.CanLogin);
             this.connectionItems = ConnectionItemCollection.Read(AppUtility.GetDocumentFilename("ConnectionList.xml"));
             this.compositionService.SatisfyImportsOnce(this.connectionItems);
             this.ConnectionItem = this.connectionItems.FirstOrDefault(item => item.IsDefault);
@@ -143,12 +143,12 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
             Process.Start("https://github.com/NtreevSoft/Crema/wiki");
         }
 
-        public void Login()
+        public Task LoginAsync()
         {
-            this.Login(this.ConnectionItem.Address, this.ConnectionItem.ID, this.securePassword, this.ConnectionItem.DataBaseName);
+            return this.LoginAsync(this.ConnectionItem.Address, this.ConnectionItem.ID, this.securePassword, this.ConnectionItem.DataBaseName);
         }
 
-        public async void Login(string address, string userID, SecureString password, string dataBaseName)
+        public async Task LoginAsync(string address, string userID, SecureString password, string dataBaseName)
         {
             this.HasError = false;
             this.BeginProgress();
@@ -204,8 +204,12 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
             }
         }
 
-        public async void Logout()
+        public async Task LogoutAsync()
         {
+            var closer = new InternalCloseRequestedEventArgs();
+            this.OnCloseRequested(closer);
+            await closer.WhenAll();
+
             this.ErrorMessage = string.Empty;
             if (this.DataBaseName != string.Empty)
                 await this.UnloadAsync();
@@ -610,6 +614,8 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
 
         public event EventHandler Opened;
 
+        public event CloseRequestedEventHandler CloseRequested;
+
         public event EventHandler Closed;
 
         protected virtual void OnLoading(EventArgs e)
@@ -645,6 +651,11 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
         protected virtual void OnOpened(EventArgs e)
         {
             this.Opened?.Invoke(this, e);
+        }
+
+        protected virtual void OnCloseRequested(CloseRequestedEventArgs e)
+        {
+            this.CloseRequested?.Invoke(this, e);
         }
 
         protected virtual void OnClosed(EventArgs e)
@@ -885,7 +896,7 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
 
         #region ICremaAppHost
 
-        void ICremaAppHost.Login(string address, string userID, string password, string dataBaseName)
+        async Task ICremaAppHost.LoginAsync(string address, string userID, string password, string dataBaseName)
         {
             var connectionItem = new ConnectionItemViewModel()
             {
@@ -901,7 +912,7 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
 
             this.ConnectionItems.Add(connectionItem);
             this.ConnectionItem = connectionItem;
-            this.Login();
+            await this.LoginAsync();
         }
 
         IEnumerable<IConnectionItem> ICremaAppHost.ConnectionItems

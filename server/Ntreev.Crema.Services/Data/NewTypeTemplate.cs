@@ -85,10 +85,12 @@ namespace Ntreev.Crema.Services.Data
             await base.OnBeginEditAsync(authentication);
         }
 
-        protected override async Task OnEndEditAsync(Authentication authentication)
+        protected override async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, TypeInfo[] typeInfos)
         {
             this.type = await this.Types.AddNewAsync(authentication, this.TypeSource);
-            await base.OnEndEditAsync(authentication);
+            typeInfos = new TypeInfo[] { this.type.TypeInfo };
+            await base.OnEndEditAsync(authentication, typeInfos);
+            return typeInfos;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)

@@ -45,7 +45,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        [CommandMethodProperty(nameof(DomainID))]
+        [CommandMethodProperty(nameof(DomainID), nameof(IsForce))]
         public Task DeleteAsync()
         {
             if (this.DataBaseName == null)
@@ -89,6 +89,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private async Task DeleteAsync(string domainID)
         {
+            var authentication = this.CommandContext.GetAuthentication(this);
             var domain = await this.GetDomainAsync(Guid.Parse(domainID));
             var dataBase = await this.DataBases.Dispatcher.InvokeAsync(() => this.DataBases.FirstOrDefault(item => item.ID == domain.DataBaseID));
             var isLoaded = dataBase.Dispatcher.Invoke(() => dataBase.IsLoaded);
@@ -96,7 +97,6 @@ namespace Ntreev.Crema.Commands.Consoles
             if (isLoaded == false && this.IsForce == false)
                 throw new ArgumentException($"'{dataBase}' database is not loaded.");
 
-            var authentication = this.CommandContext.GetAuthentication(this);
             await domain.DeleteAsync(authentication, this.IsCancelled);
         }
 

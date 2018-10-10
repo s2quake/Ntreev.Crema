@@ -20,6 +20,7 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.DataBaseService;
 using Ntreev.Crema.Services.Domains;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
@@ -59,13 +60,14 @@ namespace Ntreev.Crema.Services.Data
             this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
         }
 
-        protected override async Task<TypeInfo> OnEndEditAsync(Authentication authentication)
+        protected override async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
-            var typeInfo = await base.OnEndEditAsync(authentication);
+            var typeInfos = await base.OnEndEditAsync(authentication, args);
+            var typeInfo = typeInfos.First();
             this.type.UpdateTypeInfo(typeInfo);
             this.type.IsBeingEdited = false;
             this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
-            return typeInfo;
+            return typeInfos;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
@@ -80,9 +82,14 @@ namespace Ntreev.Crema.Services.Data
             return this.Service.BeginTypeTemplateEditAsync(this.type.Name);
         }
 
-        protected override Task<ResultBase<TypeInfo>> EndDomainAsync(Authentication authentication, Guid domainID)
+        protected override async Task<TypeInfo[]> EndDomainAsync(Authentication authentication, object args)
         {
-            return this.Service.EndTypeTemplateEditAsync(domainID);
+            if (args is Guid domainID)
+            {
+                var result = await this.Service.EndTypeTemplateEditAsync(domainID);
+                return result.GetValue();
+            }
+            return args as TypeInfo[];
         }
 
         protected override Task<ResultBase> CancelDomainAsync(Authentication authentication, Guid domainID)

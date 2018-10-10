@@ -59,9 +59,9 @@ namespace Ntreev.Crema.Services.Domains
             this.Context.InvokeItemsCreatedEvent(authentication, new IDomainItem[] { domain }, new object[] { domainInfo });
         }
 
-        public void InvokeDomainDeletedEvent(Authentication authentication, Domain domain, bool isCanceled)
+        public void InvokeDomainDeletedEvent(Authentication authentication, Domain domain, bool isCanceled, object result)
         {
-            var args = new DomainDeletedEventArgs(authentication, domain, isCanceled);
+            var args = new DomainDeletedEventArgs(authentication, domain, isCanceled, result);
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainDeletedEvent), domain, isCanceled);
             var comment = isCanceled == false ? EventMessageBuilder.EndDomain(authentication, domain) : EventMessageBuilder.CancelDomain(authentication, domain);
             this.CremaHost.Debug(eventLog);

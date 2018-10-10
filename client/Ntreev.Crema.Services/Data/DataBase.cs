@@ -652,7 +652,7 @@ namespace Ntreev.Crema.Services.Data
             }
 
             var domains = await this.DomainContext.GetDomainsAsync(this.ID);
-            var tasks = domains.Select(item => item.Dispatcher.InvokeAsync(() => item.Dispose(authentication, true)));
+            var tasks = domains.Select(item => item.Dispatcher.InvokeAsync(() => item.Dispose(authentication, true, null)));
             await Task.WhenAll(tasks);
         }
 

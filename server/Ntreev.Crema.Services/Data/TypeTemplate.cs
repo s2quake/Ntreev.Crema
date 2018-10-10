@@ -67,11 +67,12 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        protected override async Task OnEndEditAsync(Authentication authentication)
+        protected override async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, TypeInfo[] typeInfos)
         {
             var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, this.TypeSource.DataSet, false);
+            typeInfos = new TypeInfo[] { this.TypeSource.TypeInfo };
             await this.Container.InvokeTypeEndTemplateEditAsync(authentication, this.type.Name, dataBaseSet);
-            await base.OnEndEditAsync(authentication);
+            await base.OnEndEditAsync(authentication, typeInfos);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.type.UpdateTypeInfo(this.typeInfo);
@@ -79,6 +80,7 @@ namespace Ntreev.Crema.Services.Data
                 this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
                 this.Container.InvokeTypesChangedEvent(authentication, this.types, dataBaseSet.DataSet);
             });
+            return typeInfos;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)

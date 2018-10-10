@@ -29,7 +29,7 @@ namespace Ntreev.Crema.Services
 {
     public interface IDomain : IServiceProvider, IDispatcherObject, IExtendedProperties
     {
-        Task DeleteAsync(Authentication authentication, bool isCancel);
+        Task<object> DeleteAsync(Authentication authentication, bool isCancel);
 
         Task BeginUserEditAsync(Authentication authentication, DomainLocationInfo location);
 
