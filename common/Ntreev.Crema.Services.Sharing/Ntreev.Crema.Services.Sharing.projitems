@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CloseRequestedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClosedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClosedEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITableContentExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventMetaDataBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IStateProvider.cs" />

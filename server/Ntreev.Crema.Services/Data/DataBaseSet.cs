@@ -346,7 +346,7 @@ namespace Ntreev.Crema.Services.Data
 
         public CremaDataSet DataSet => this.dataSet;
 
-        public string[] ItemPaths => this.dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] as string[] ?? new string[] { };
+        public string[] ItemPaths => this.dataSet.GetItemPaths();
 
         private void Serialize()
         {

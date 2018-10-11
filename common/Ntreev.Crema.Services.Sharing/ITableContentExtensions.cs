@@ -15,39 +15,45 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Properties;
-using Ntreev.Library.ObjectModel;
+using Ntreev.Crema.Data;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.IO;
-using Ntreev.Library;
-using Ntreev.Library.IO;
-using Ntreev.Crema.Data.Xml.Schema;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services.Data
+namespace Ntreev.Crema.Services
 {
-    static class DataSetExtensions
+    public static class ITableContentExtensions
     {
-        public static string[] GetItemPaths(this CremaDataSet dataSet)
+        public static Task<string> GenerateFilterExpressionAsync(this ITableRow tableRow, params string[] columnNames)
         {
-            return dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] as string[] ?? new string[] { };
-        }
-
-        public static void AddItemPaths(this CremaDataSet dataSet, params string[] itemPaths)
-        {
-            var itemList = dataSet.GetItemPaths().ToList();
-            itemList.AddRange(itemPaths);
-            dataSet.SetItemPaths(itemList.Distinct().ToArray());
-        }
-
-        public static void SetItemPaths(this CremaDataSet dataSet, string[] itemPaths)
-        {
-            dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] = itemPaths;
+            return tableRow.Dispatcher.InvokeAsync(() =>
+            {
+                var fieldList = new List<object>(columnNames.Length);
+                foreach (var item in columnNames)
+                {
+                    var field = tableRow[item];
+                    if (field is TimeSpan duration)
+                    {
+                        fieldList.Add($"Convert(Column1,System.String)>='{duration}'");
+                    }
+                    else if (field is string || field is DateTime || field is Guid)
+                    {
+                        fieldList.Add($"{item}='{field}'");
+                    }
+                    else if (field == null)
+                    {
+                        fieldList.Add($"({item}) is null");
+                    }
+                    else
+                    {
+                        fieldList.Add($"{item}={field}");
+                    }
+                }
+                return string.Join(" and ", fieldList);
+            });
         }
     }
 }

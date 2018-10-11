@@ -315,7 +315,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
                 this.DomainContext.Domains.DomainRowChanged += DomainContext_DomainRowChanged;
                 this.DomainContext.Domains.DomainRowRemoved += DomainContext_DomainRowRemoved;
                 this.DomainContext.Domains.DomainPropertyChanged += DomainContext_DomainPropertyChanged;
-
             });
             await this.DataBases.Dispatcher.InvokeAsync(() =>
             {
@@ -327,6 +326,11 @@ namespace Ntreev.Crema.ServiceHosts.Domains
 
         private async Task DetachEventHandlersAsync()
         {
+            await this.DataBases.Dispatcher.InvokeAsync(() =>
+            {
+                this.DataBases.ItemsResetting -= DataBases_ItemsResetting;
+                this.DataBases.ItemsReset -= DataBases_ItemsReset;
+            });
             await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
                 this.DomainContext.Domains.DomainCreated -= DomainContext_DomainCreated;
@@ -340,11 +344,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
                 this.DomainContext.Domains.DomainRowChanged -= DomainContext_DomainRowChanged;
                 this.DomainContext.Domains.DomainRowRemoved -= DomainContext_DomainRowRemoved;
                 this.DomainContext.Domains.DomainPropertyChanged -= DomainContext_DomainPropertyChanged;
-            });
-            await this.DataBases.Dispatcher.InvokeAsync(() =>
-            {
-                this.DataBases.ItemsResetting -= DataBases_ItemsResetting;
-                this.DataBases.ItemsReset -= DataBases_ItemsReset;
             });
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {

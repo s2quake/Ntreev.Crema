@@ -88,6 +88,11 @@ namespace Ntreev.Crema.Bot.Tasks
         public async Task SetIndexAsync(ITableColumn column, TaskContext context)
         {
             var authentication = context.Authentication;
+            if (context.AllowException == false)
+            {
+                if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
+                    return;
+            }
             var index = RandomUtility.Next(column.Template.Count);
             await column.SetIndexAsync(authentication, index);
         }

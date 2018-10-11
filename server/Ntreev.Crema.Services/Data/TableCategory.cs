@@ -477,7 +477,6 @@ namespace Ntreev.Crema.Services.Data
             base.OnValidateRename(authentication, target, oldPath, newPath);
             if (this.templateList.Any() == true)
                 throw new InvalidOperationException(Resources.Exception_CannotRenameOnCreateTable);
-
             var categoryName = new CategoryName(Regex.Replace(this.Path, $"^{oldPath}", newPath));
             this.Context.ValidateCategoryPath(categoryName);
         }

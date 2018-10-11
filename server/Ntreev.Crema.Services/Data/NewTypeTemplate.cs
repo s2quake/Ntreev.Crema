@@ -80,6 +80,8 @@ namespace Ntreev.Crema.Services.Data
 
         public TypeCollection Types => this.category.Context.Types;
 
+        public TypeContext Context => this.category.Context;
+
         protected override async Task OnBeginEditAsync(Authentication authentication)
         {
             await base.OnBeginEditAsync(authentication);
@@ -87,7 +89,12 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, TypeInfo[] typeInfos)
         {
-            this.type = await this.Types.AddNewAsync(authentication, this.TypeSource);
+            var dataType = this.TypeSource;
+            var dataSet = dataType.DataSet;
+            var itemPath = this.Context.GeneratePath(dataType.Path);
+            await this.Repository.LockAsync(itemPath);
+            dataSet.AddItemPaths(itemPath);
+            this.type = await this.Types.AddNewAsync(authentication, dataType);
             typeInfos = new TypeInfo[] { this.type.TypeInfo };
             await base.OnEndEditAsync(authentication, typeInfos);
             return typeInfos;

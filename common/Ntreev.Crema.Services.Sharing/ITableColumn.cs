@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ITableColumn
+    public interface ITableColumn : IDispatcherObject
     {
         Task DeleteAsync(Authentication authentication);
 
@@ -74,7 +74,5 @@ namespace Ntreev.Crema.Services
         bool AllowNull { get; }
 
         ITableTemplate Template { get; }
-
-        CremaDispatcher Dispatcher { get; }
     }
 }

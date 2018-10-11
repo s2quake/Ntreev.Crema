@@ -27,6 +27,7 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.Threading.Tasks;
 using Ntreev.Library.ObjectModel;
+using Ntreev.Library.Linq;
 
 namespace Ntreev.Crema.Bot.Tasks
 {
@@ -169,16 +170,20 @@ namespace Ntreev.Crema.Bot.Tasks
             }
         }
 
+
+
         [TaskMethod]
         public async Task RenameAsync(ITableCategory category, TaskContext context)
         {
             var authentication = context.Authentication;
+            var categoryName = RandomUtility.NextIdentifier();
             if (context.AllowException == false)
             {
                 if (category.Parent == null)
                     return;
+                if ((await this.GetTablesAsync(category, item => item.TableState != TableState.None)).Any() == true)
+                    return;
             }
-            var categoryName = RandomUtility.NextIdentifier();
             await category.RenameAsync(authentication, categoryName);
         }
 
@@ -196,6 +201,10 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
                 if (category.Parent.Path == categoryPath)
                     return;
+                if (categoryPath.StartsWith(category.Path) == true)
+                    return;
+                if ((await this.GetTablesAsync(category, item => item.TableState != TableState.None)).Any() == true)
+                    return;
             }
             await category.MoveAsync(authentication, categoryPath);
         }
@@ -204,6 +213,13 @@ namespace Ntreev.Crema.Bot.Tasks
         public async Task DeleteAsync(ITableCategory category, TaskContext context)
         {
             var authentication = context.Authentication;
+            if (context.AllowException == false)
+            {
+                if (category.Parent == null)
+                    return;
+                if ((await this.GetTablesAsync(category, item => true)).Any() == true)
+                    return;
+            }
             await category.DeleteAsync(authentication);
             context.Pop(category);
         }
@@ -250,6 +266,18 @@ namespace Ntreev.Crema.Bot.Tasks
             var text = RandomUtility.NextWord();
             var option = RandomUtility.NextEnum<FindOptions>();
             await category.FindAsync(authentication, text, option);
+        }
+
+        public Task<ITable[]> GetTablesAsync(ITableCategory category, Func<ITable, bool> predicate)
+        {
+            return category.Dispatcher.InvokeAsync(() =>
+            {
+                var query = from item in EnumerableUtility.FamilyTree<ITableItem, ITable>(category as ITableItem, item => item.Childs)
+                            where predicate(item)
+                            select item;
+
+                return query.ToArray();
+            });
         }
     }
 }

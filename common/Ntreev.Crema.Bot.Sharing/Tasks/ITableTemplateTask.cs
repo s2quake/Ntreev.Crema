@@ -76,6 +76,12 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
                 }
 
+                if (await template.Dispatcher.InvokeAsync(() => template.Target is ITable table && table.TableState != TableState.None) == true)
+                {
+                    context.Pop(template);
+                    return;
+                }
+
                 var domain = template.Domain;
                 if (domain == null)
                 {

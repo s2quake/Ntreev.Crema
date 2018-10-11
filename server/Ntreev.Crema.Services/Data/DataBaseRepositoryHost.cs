@@ -75,7 +75,10 @@ namespace Ntreev.Crema.Services.Data
             foreach (var item in itemPaths)
             {
                 if (this.itemPaths.Contains(item) == false)
+                {
+                    System.Diagnostics.Debugger.Launch();
                     throw new ItemNotFoundException(item);
+                }
             }
             foreach (var item in itemPaths)
             {
@@ -360,8 +363,6 @@ namespace Ntreev.Crema.Services.Data
                     throw new ItemAlreadyExistsException(item);
             }
             dataBaseSet.CreateType();
-            //var typesDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);
-            //var typesItemPaths = this.dataBase.Serializer.GetItemPaths(typesDirectory, typeof(CremaDataType), ObjectSerializerSettings.Empty);
         }
 
         public void RenameType(DataBaseSet dataBaseSet, string typePath, string typeName)

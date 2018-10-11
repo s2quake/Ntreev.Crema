@@ -85,6 +85,11 @@ namespace Ntreev.Crema.Bot.Tasks
         public async Task SetIndexAsync(ITypeMember member, TaskContext context)
         {
             var authentication = context.Authentication;
+            if (context.AllowException == false)
+            {
+                if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
+                    return;
+            }
             var index = RandomUtility.Next(member.Template.Count);
             await member.SetIndexAsync(authentication, index);
         }

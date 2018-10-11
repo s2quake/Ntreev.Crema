@@ -185,6 +185,9 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
                 if (await table.Dispatcher.InvokeAsync(() => table.Category.Path) == categoryPath)
                     return;
+                var tableState = await table.Dispatcher.InvokeAsync(() => table.TableState);
+                if (tableState != TableState.None)
+                    return;
             }
             await table.MoveAsync(authentication, categoryPath);
         }

@@ -131,7 +131,6 @@ namespace Ntreev.Crema.Services.Data
                 try
                 {
                     var signatureDate = authentication.Sign();
-                    this.Repository.Lock(itemPaths);
                     this.Repository.CreateType(dataBaseSet, typePaths);
                     this.Repository.Commit(authentication, message);
                     return signatureDate;
@@ -143,7 +142,6 @@ namespace Ntreev.Crema.Services.Data
                 }
                 finally
                 {
-                    this.Repository.Unlock(itemPaths);
                     this.Repository.Unlock(dataBaseSet.ItemPaths);
                 }
             });

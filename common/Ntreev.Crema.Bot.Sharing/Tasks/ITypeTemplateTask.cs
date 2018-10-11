@@ -72,6 +72,14 @@ namespace Ntreev.Crema.Bot.Tasks
                 var domain = template.Domain;
                 if (domain == null)
                 {
+                    if (context.AllowException == false)
+                    {
+                        if ((await this.GetTablesAsync(template, item => item.TableState != TableState.None)).Any() == true)
+                        {
+                            context.Pop(template);
+                            return;
+                        }
+                    }
                     await template.BeginEditAsync(authentication);
                 }
 
@@ -134,6 +142,23 @@ namespace Ntreev.Crema.Bot.Tasks
             if (query.Any() == true)
                 return false;
             return true;
+        }
+
+        private Task<ITable[]> GetTablesAsync(ITypeTemplate template, Func<ITable, bool> predicate)
+        {
+            return template.Dispatcher.InvokeAsync(()=>
+            {
+                var type = template.Type;
+                var typePath = type.Path;
+                var tables = type.GetService(typeof(ITableCollection)) as ITableCollection;
+
+                var query = from item in tables
+                            from columnInfo in item.TableInfo.Columns
+                            where columnInfo.DataType == typePath
+                            select item;
+
+                return query.Distinct().Where(predicate).ToArray();
+            });
         }
     }
 }

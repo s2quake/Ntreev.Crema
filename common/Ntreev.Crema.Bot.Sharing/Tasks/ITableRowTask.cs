@@ -42,39 +42,48 @@ namespace Ntreev.Crema.Bot.Tasks
             var content = row.Content;
             if (context.IsCompleted(row) == true)
             {
-                if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
+                try
                 {
-                    try
+                    if (context.AllowException == false)
                     {
-                        if (Verify() == true)
-                            await content.EndNewAsync(authentication, row);
-                    }
-                    catch
-                    {
+                        if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
+                        {
+                            var tableInfo = await content.Dispatcher.InvokeAsync(() => content.Table.TableInfo);
+                            var keys = tableInfo.Columns.Where(item => item.IsKey).Select(item => item.Name).ToArray();
+                            var keyFilterExpression = await row.GenerateFilterExpressionAsync(keys);
+                            if ((await content.SelectAsync(authentication, keyFilterExpression)).Any() == true)
+                                return;
 
+                            var uniques = tableInfo.Columns.Where(item => item.IsUnique && item.IsKey == false).Select(item => item.Name).ToArray();
+                            foreach (var item in uniques)
+                            {
+                                var itemExpression = await row.GenerateFilterExpressionAsync(item);
+                                if ((await content.SelectAsync(authentication, itemExpression)).Any() == true)
+                                    return;
+                            }
+
+                            var allowNulls = tableInfo.Columns.Where(item => item.AllowNull).Select(item => item.Name).ToArray();
+                            foreach (var item in allowNulls)
+                            {
+                                if (row[item] == null)
+                                    return;
+                            }
+                        }
+                    }
+                    if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
+                    {
+                        await content.EndNewAsync(authentication, row);
                     }
                 }
-
-                context.State = null;
-                context.Pop(row);
-            }
-
-            bool Verify()
-            {
-                if (context.AllowException == true)
-                    return true;
-
-                var domain = content.Domain;
-                var dataSet = domain.Source as CremaDataSet;
-                var dataTable = dataSet.Tables[content.Table.Name];
-
-                foreach (var item in dataTable.Columns)
+                catch
                 {
-                    if (item.AllowDBNull == false && row[item.ColumnName] == null)
-                        return false;
-                }
 
-                return true;
+                }
+                finally
+                {
+                    context.State = null;
+                    context.Pop(row);
+                }
             }
         }
 

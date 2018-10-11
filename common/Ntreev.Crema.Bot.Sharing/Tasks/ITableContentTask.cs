@@ -69,14 +69,19 @@ namespace Ntreev.Crema.Bot.Tasks
             else
             {
                 var table = content.Table;
-                var canEdit = await table.Dispatcher.InvokeAsync(() => table.TableState == TableState.None);
-                if (canEdit == true)
+                var tableState = await table.Dispatcher.InvokeAsync(() => table.TableState);
+                if (tableState == TableState.None)
                 {
                     await content.BeginEditAsync(authentication);
                 }
+                else if (tableState.HasFlag(TableState.IsBeingSetup) == true)
+                {
+                    context.Pop(content);
+                    context.Complete(context.Target);
+                    return;
+                }
 
                 var domain = content.Domain;
-
                 if (await domain.Users.ContainsAsync(authentication.ID) == false)
                 {
                     await content.EnterEditAsync(authentication);

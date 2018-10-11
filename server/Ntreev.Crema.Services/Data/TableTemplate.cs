@@ -31,7 +31,6 @@ namespace Ntreev.Crema.Services.Data
     {
         private readonly Table table;
         private readonly Table[] tables;
-        private TableInfo tableInfo;
 
         public TableTemplate(Table table)
         {
@@ -70,8 +69,9 @@ namespace Ntreev.Crema.Services.Data
             var template = this.TemplateSource;
             var dataSet = template.TargetTable.DataSet;
             var dataBaseSet = await DataBaseSet.CreateAsync(this.table.DataBase, dataSet, false);
-            tableInfos = new TableInfo[] { template.TableInfo };
-            await this.Container.InvokeTableEndTemplateEditAsync(authentication, this.tableInfo, dataBaseSet);
+            var tableInfo = template.TableInfo;
+            tableInfos = new TableInfo[] { tableInfo };
+            await this.Container.InvokeTableEndTemplateEditAsync(authentication, tableInfo, dataBaseSet);
             await base.OnEndEditAsync(authentication, tableInfos);
             this.table.UpdateTemplate(template.TableInfo);
             this.table.UpdateTags(template.Tags);
@@ -103,7 +103,6 @@ namespace Ntreev.Crema.Services.Data
             var dataTable = dataSet.Tables[this.table.Name, this.table.Category.Path];
             if (dataTable == null)
                 throw new TableNotFoundException(tablePath);
-            this.tableInfo = this.table.TableInfo;
             return new CremaTemplate(dataTable);
         }
 

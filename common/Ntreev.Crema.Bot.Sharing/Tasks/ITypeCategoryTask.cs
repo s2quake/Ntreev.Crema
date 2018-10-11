@@ -255,6 +255,8 @@ namespace Ntreev.Crema.Bot.Tasks
                     return;
                 if (category.Path == categoryPath)
                     return;
+                if (categoryPath.StartsWith(category.Path) == true)
+                    return;
                 if (await category.Dispatcher.InvokeAsync(() => category.VerifyAccessType(authentication, AccessType.Master)) == false)
                     return;
             }

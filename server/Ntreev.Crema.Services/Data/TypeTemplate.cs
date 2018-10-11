@@ -29,7 +29,6 @@ namespace Ntreev.Crema.Services.Data
     {
         private readonly Type type;
         private readonly Type[] types;
-        private TypeInfo typeInfo;
         private string[] itemPaths;
 
         public TypeTemplate(Type type)
@@ -70,12 +69,13 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, TypeInfo[] typeInfos)
         {
             var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, this.TypeSource.DataSet, false);
-            typeInfos = new TypeInfo[] { this.TypeSource.TypeInfo };
+            var typeInfo = this.TypeSource.TypeInfo;
+            typeInfos = new TypeInfo[] { typeInfo };
             await this.Container.InvokeTypeEndTemplateEditAsync(authentication, this.type.Name, dataBaseSet);
             await base.OnEndEditAsync(authentication, typeInfos);
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.type.UpdateTypeInfo(this.typeInfo);
+                this.type.UpdateTypeInfo(typeInfo);
                 this.type.IsBeingEdited = false;
                 this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
                 this.Container.InvokeTypesChangedEvent(authentication, this.types, dataBaseSet.DataSet);
@@ -107,7 +107,6 @@ namespace Ntreev.Crema.Services.Data
             var dataType = dataSet.Types[this.type.Name, this.type.Category.Path];
             if (dataType == null)
                 throw new TypeNotFoundException(typePath);
-            this.typeInfo = this.type.TypeInfo;
             this.itemPaths = dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] as string[] ?? new string[] { };
             return dataType;
         }

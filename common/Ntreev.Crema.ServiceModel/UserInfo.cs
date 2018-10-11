@@ -73,7 +73,7 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
-        public string Path => this.CategoryPath + this.Name;
+        public string Path => this.CategoryPath + this.ID;
 
         public IDictionary<string, object> ToDictionary()
         {

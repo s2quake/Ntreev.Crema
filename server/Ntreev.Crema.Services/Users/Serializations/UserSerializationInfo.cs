@@ -76,7 +76,7 @@ namespace Ntreev.Crema.Services.Users.Serializations
             }
         }
 
-        public string Path => this.CategoryPath + this.Name;
+        public string Path => this.CategoryPath + this.ID;
 
         public static explicit operator UserInfo(UserSerializationInfo value)
         {

@@ -273,7 +273,7 @@ namespace Ntreev.Crema.Services.Data
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
                     var tableInfo = base.TableInfo;
-                    var targetName = new ItemName(categoryPath, base.Path);
+                    var targetName = new ItemName(categoryPath, base.Name);
                     return (items, oldPaths, oldCategoryPaths, tableInfo, targetName);
                 });
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);

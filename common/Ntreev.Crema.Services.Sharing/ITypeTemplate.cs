@@ -65,8 +65,6 @@ namespace Ntreev.Crema.Services
 
         bool IsModified { get; }
 
-        //ServiceState ServiceState{ get; }
-
         event EventHandler EditBegun;
 
         event EventHandler EditEnded;
@@ -74,6 +72,5 @@ namespace Ntreev.Crema.Services
         event EventHandler EditCanceled;
 
         event EventHandler Changed;
-
     }
 }
