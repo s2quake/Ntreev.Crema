@@ -18,6 +18,7 @@
 using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.Library;
 using Ntreev.Library.Random;
 using System;
@@ -161,16 +162,29 @@ namespace Ntreev.Crema.Bot.Tasks
         public async Task RenameAsync(ITable table, TaskContext context)
         {
             var authentication = context.Authentication;
+            var tableName = RandomUtility.NextIdentifier();
             if (context.AllowException == false)
             {
-                if (await table.Dispatcher.InvokeAsync(() => table.Parent != null && table.TemplatedParent != null) == true)
-                    return;
-                var tableState = await table.Dispatcher.InvokeAsync(() => table.TableState);
-                if (tableState != TableState.None)
+                if (await VerifyAsync() == false)
                     return;
             }
-            var tableName = RandomUtility.NextIdentifier();
             await table.RenameAsync(authentication, tableName);
+
+            Task<bool> VerifyAsync()
+            {
+                return table.Dispatcher.InvokeAsync(() =>
+                {
+                    if (table.Name == tableName)
+                        return false;
+                    if (table.TableState != TableState.None)
+                        return false;
+                    if (table.TemplatedParent != null && table.TemplatedParent.TableState != TableState.None)
+                        return false;
+                    if (table.Parent != null && table.TemplatedParent != null)
+                        return false;
+                    return true;
+                });
+            }
         }
 
         [TaskMethod]
@@ -181,21 +195,55 @@ namespace Ntreev.Crema.Bot.Tasks
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
             if (context.AllowException == false)
             {
-                if (await table.Dispatcher.InvokeAsync(() => table.Parent) != null)
-                    return;
-                if (await table.Dispatcher.InvokeAsync(() => table.Category.Path) == categoryPath)
-                    return;
-                var tableState = await table.Dispatcher.InvokeAsync(() => table.TableState);
-                if (tableState != TableState.None)
+                if (await VerifyAsync() == false)
                     return;
             }
             await table.MoveAsync(authentication, categoryPath);
+
+            Task<bool> VerifyAsync()
+            {
+                return table.Dispatcher.InvokeAsync(() =>
+                {
+                    if (table.Parent != null)
+                        return false;
+                    if (table.Category.Path == categoryPath)
+                        return false;
+                    if (table.TableState != TableState.None)
+                        return false;
+                    return true;
+                });
+            }
         }
 
-        //[TaskMethod(Weight = 1)]
+        [TaskMethod(Weight = 1)]
         public async Task DeleteAsync(ITable table, TaskContext context)
         {
-            await Task.Delay(0);
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
+            {
+                if (await VerifyAsync() == false)
+                    return;
+                if ((await table.GetTypesAsync(item => true)).Any() == true)
+                    return;
+            }
+            await table.DeleteAsync(authentication);
+            context.Pop(table);
+
+            Task<bool> VerifyAsync()
+            {
+                return table.Dispatcher.InvokeAsync(() =>
+                {
+                    if (table.TableState != TableState.None)
+                        return false;
+                    if (table.Childs.Any() == true)
+                        return false;
+                    if (table.DerivedTables.Any() == true)
+                        return false;
+                    if (table.TemplatedParent != null)
+                        return false;
+                    return true;
+                });
+            }
         }
 
         [TaskMethod]
@@ -224,10 +272,22 @@ namespace Ntreev.Crema.Bot.Tasks
             var copyData = RandomUtility.NextBoolean();
             if (context.AllowException == false)
             {
-                if (await table.Dispatcher.InvokeAsync(() => table.Parent) != null)
+                if (await VerifyAsync() == false)
                     return;
             }
             await table.InheritAsync(authentication, tableName, categoryPath, copyData);
+
+            Task<bool> VerifyAsync()
+            {
+                return table.Dispatcher.InvokeAsync(() =>
+                {
+                    if (table.Parent != null)
+                        return false;
+                    if (table.TemplatedParent != null)
+                        return false;
+                    return true;
+                });
+            }
         }
 
         [TaskMethod]
@@ -237,6 +297,9 @@ namespace Ntreev.Crema.Bot.Tasks
             if (context.AllowException == false)
             {
                 if (await table.Dispatcher.InvokeAsync(() => table.TemplatedParent) != null)
+                    return;
+                var tableState = await table.Dispatcher.InvokeAsync(() => table.TableState);
+                if (tableState != TableState.None)
                     return;
             }
             var template = await table.NewTableAsync(authentication);

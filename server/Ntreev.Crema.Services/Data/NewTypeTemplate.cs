@@ -95,7 +95,7 @@ namespace Ntreev.Crema.Services.Data
             await this.Repository.LockAsync(itemPath);
             dataSet.AddItemPaths(itemPath);
             this.type = await this.Types.AddNewAsync(authentication, dataType);
-            typeInfos = new TypeInfo[] { this.type.TypeInfo };
+            typeInfos = new TypeInfo[] { dataType.TypeInfo };
             await base.OnEndEditAsync(authentication, typeInfos);
             return typeInfos;
         }

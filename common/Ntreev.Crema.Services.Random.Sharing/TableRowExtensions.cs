@@ -84,12 +84,10 @@ namespace Ntreev.Crema.Services.Random
             var dataSet = domain.Source as CremaDataSet;
             var dataTable = dataSet.Tables[table.Name, table.Category.Path];
 
-            if (dataTable.Columns[columnName].Unique == true && value is TimeSpan == false)
+            if (dataTable.Columns[columnName].Unique == true)
             {
-                var text = $"{value}";
-                if (value is string || value is DateTime || value is Guid)
-                    text = $"'{value}'";
-                var items = dataTable.Select($"{columnName}={text}");
+                var expression = CremaDataExtensions.GenerateFieldExpression(columnName, value);
+                var items = dataTable.Select(expression);
                 if (items.Any() == true)
                     return false;
             }

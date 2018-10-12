@@ -111,6 +111,7 @@ namespace Ntreev.Crema.Bot.Tasks
         //public async Task DeleteAsync(IDataBase dataBase, Authentication authentication)
         //{
         //    await dataBase.DeleteAsync(authentication);
+        //    context.Pop(dataBase);
         //}
 
         //[TaskMethod(Weight = 5)]

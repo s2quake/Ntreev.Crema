@@ -32,6 +32,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
+    // TODO: 상태를 더 추가하는 방법을 생각해야 할것 같음. TableState.HasContent, 
     class Table : TableBase<Table, TableCategory, TableCollection, TableCategoryCollection, TableContext>,
         ITable, ITableItem, IInfoProvider, IStateProvider
     {

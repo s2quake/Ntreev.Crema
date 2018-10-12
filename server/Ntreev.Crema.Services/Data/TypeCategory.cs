@@ -457,7 +457,7 @@ namespace Ntreev.Crema.Services.Data
                 var types = typeCollection.ToArray<Type>();
                 var props = new CremaDataSetSerializerSettings(authentication, null, null);
                 var itemPath = this.ItemPath;
-                var itemPaths = new string[] { itemPath };
+                var itemPaths = new string[] { };
                 return (itemPaths, props, itemPath);
             });
             return await this.Repository.Dispatcher.InvokeAsync(() =>

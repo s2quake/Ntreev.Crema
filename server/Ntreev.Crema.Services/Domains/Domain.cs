@@ -438,6 +438,22 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
+        public void Detach(params Authentication[] authentications)
+        {
+            foreach (var item in authentications)
+            {
+                if (this.Users[item.ID] is DomainUser user && user.IsOnline == true)
+                {
+                    this.Sign(item, true);
+                    this.InvokeDetach(item, out var domainUser);
+                    this.OnUserChanged(new DomainUserEventArgs(item, this, domainUser));
+                    this.OnDomainStateChanged(new DomainEventArgs(item, this));
+                    this.Container.InvokeDomainUserChangedEvent(item, this, domainUser);
+                    this.Container.InvokeDomainStateChangedEvent(item, this);
+                }
+            }
+        }
+
         public Task DetachAsync(params Authentication[] authentications)
         {
             return this.Dispatcher.InvokeAsync(() =>

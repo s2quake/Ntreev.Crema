@@ -66,7 +66,10 @@ namespace Ntreev.Crema.Client.Framework
         {
             if ((Authentication)this is Authentication authentication)
             {
-                e.AddTask(this.dataBase.LeaveAsync(authentication));
+                if (this.dataBase != null)
+                {
+                    e.AddTask(this.dataBase.LeaveAsync(authentication));
+                }
             }
         }
     }

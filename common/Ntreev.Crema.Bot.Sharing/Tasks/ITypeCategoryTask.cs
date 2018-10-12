@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.Library;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Random;
@@ -249,24 +250,59 @@ namespace Ntreev.Crema.Bot.Tasks
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
             if (context.AllowException == false)
             {
-                if (category.Parent == null)
-                    return;
-                if (category.Parent.Path == categoryPath)
-                    return;
-                if (category.Path == categoryPath)
-                    return;
-                if (categoryPath.StartsWith(category.Path) == true)
-                    return;
-                if (await category.Dispatcher.InvokeAsync(() => category.VerifyAccessType(authentication, AccessType.Master)) == false)
+                if (await VerifyAsync() == false)
                     return;
             }
             await category.MoveAsync(authentication, categoryPath);
+
+            async Task<bool> VerifyAsync()
+            {
+                if ((await category.GetAllTypesAsync(item => item.TypeState != TypeState.None)).Any() == true)
+                    return false;
+
+                if ((await category.GetAllUsingTablesAsync(item => item.TableState != TableState.None)).Any() == true)
+                    return false;
+
+                return await category.Dispatcher.InvokeAsync(() =>
+                {
+                    if (category.Parent == null)
+                        return false;
+                    if (category.Parent.Path == categoryPath)
+                        return false;
+                    if (category.Path == categoryPath)
+                        return false;
+                    if (categoryPath.StartsWith(category.Path) == true)
+                        return false;
+                    if (category.VerifyAccessType(authentication, AccessType.Master) == false)
+                        return false;
+                    return true;
+                });
+            }
         }
 
         [TaskMethod(Weight = 1)]
         public async Task DeleteAsync(ITypeCategory category, TaskContext context)
         {
-            await Task.Delay(0);
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
+            {
+                if (await VerifyAsync() == true)
+                    return;
+            }
+            await category.DeleteAsync(authentication);
+            context.Pop(category);
+
+            async Task<bool> VerifyAsync()
+            {
+                if ((await category.GetAllTypesAsync(item => true)).Any() == true)
+                    return false;
+                return await category.Dispatcher.InvokeAsync(() =>
+                {
+                    if (category.Parent == null)
+                        return false;
+                    return true;
+                });
+            }
         }
 
         [TaskMethod]

@@ -96,7 +96,7 @@ namespace Ntreev.Crema.Client.Framework
             if (this.notifyList.Any() == true)
             {
 #if DEBUG
-                System.Diagnostics.Trace.WriteLine($"notified: {string.Join(", ", this.notifyList.ToArray())}");
+                // System.Diagnostics.Trace.WriteLine($"notified: {string.Join(", ", this.notifyList.ToArray())}");
 #endif
                 this.Notify();
             }

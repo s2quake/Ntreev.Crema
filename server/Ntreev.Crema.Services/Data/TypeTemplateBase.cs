@@ -52,6 +52,7 @@ namespace Ntreev.Crema.Services.Data
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
+                    this.ValidateAddNew(authentication);
                 });
                 var member = await TypeMember.CreateAsync(authentication, this, this.TypeSource.View.Table);
                 return member;

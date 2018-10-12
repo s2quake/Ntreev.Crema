@@ -28,6 +28,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Linq;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Bot.Tasks
 {
@@ -104,7 +105,7 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 if (category.Parent == null)
                     return;
-                if (await category.Dispatcher.InvokeAsync(()=> category.IsLocked) == false)
+                if (await category.Dispatcher.InvokeAsync(() => category.IsLocked) == false)
                     return;
             }
             await category.UnlockAsync(authentication);
@@ -170,8 +171,6 @@ namespace Ntreev.Crema.Bot.Tasks
             }
         }
 
-
-
         [TaskMethod]
         public async Task RenameAsync(ITableCategory category, TaskContext context)
         {
@@ -179,12 +178,24 @@ namespace Ntreev.Crema.Bot.Tasks
             var categoryName = RandomUtility.NextIdentifier();
             if (context.AllowException == false)
             {
-                if (category.Parent == null)
-                    return;
-                if ((await this.GetTablesAsync(category, item => item.TableState != TableState.None)).Any() == true)
+                if (await VerifyAsync() == false)
                     return;
             }
             await category.RenameAsync(authentication, categoryName);
+
+            async Task<bool> VerifyAsync()
+            {
+                if ((await category.GetAllRelationTablesAsync(item => item.TableState != TableState.None)).Any() == true)
+                    return false;
+                return await category.Dispatcher.InvokeAsync(() =>
+                {
+                    if (category.Parent == null)
+                        return false;
+                    if (category.Name == categoryName)
+                        return false;
+                    return true;
+                });
+            }
         }
 
         [TaskMethod]
@@ -195,33 +206,53 @@ namespace Ntreev.Crema.Bot.Tasks
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
             if (context.AllowException == false)
             {
-                if (category.Parent == null)
-                    return;
-                if (categoryPath.StartsWith(category.Path) == true)
-                    return;
-                if (category.Parent.Path == categoryPath)
-                    return;
-                if (categoryPath.StartsWith(category.Path) == true)
-                    return;
-                if ((await this.GetTablesAsync(category, item => item.TableState != TableState.None)).Any() == true)
+                if (await VerifyAsync() == false)
                     return;
             }
             await category.MoveAsync(authentication, categoryPath);
+
+            async Task<bool> VerifyAsync()
+            {
+                if ((await category.GetAllTablesAsync(item => item.TableState != TableState.None)).Any() == true)
+                    return false;
+                return await category.Dispatcher.InvokeAsync(() =>
+                {
+                    if (category.Parent == null)
+                        return false;
+                    if (categoryPath.StartsWith(category.Path) == true)
+                        return false;
+                    if (category.Parent.Path == categoryPath)
+                        return false;
+                    if (categoryPath.StartsWith(category.Path) == true)
+                        return false;
+                    return true;
+                });
+            }
         }
 
-        //[TaskMethod(Weight = 1)]
+        [TaskMethod(Weight = 1)]
         public async Task DeleteAsync(ITableCategory category, TaskContext context)
         {
             var authentication = context.Authentication;
             if (context.AllowException == false)
             {
-                if (category.Parent == null)
-                    return;
-                if ((await this.GetTablesAsync(category, item => true)).Any() == true)
+                if (await VerifyAsync() == true)
                     return;
             }
             await category.DeleteAsync(authentication);
             context.Pop(category);
+
+            async Task<bool> VerifyAsync()
+            {
+                if ((await category.GetAllTablesAsync(item => true)).Any() == true)
+                    return false;
+                return await category.Dispatcher.InvokeAsync(() =>
+                {
+                    if (category.Parent == null)
+                        return false;
+                    return true;
+                });
+            }
         }
 
         [TaskMethod(Weight = 10)]
@@ -245,39 +276,27 @@ namespace Ntreev.Crema.Bot.Tasks
             context.Push(template);
         }
 
-        //[TaskMethod]
+        [TaskMethod]
         public async Task GetDataSetAsync(ITableCategory category, TaskContext context)
         {
             var authentication = context.Authentication;
             await category.GetDataSetAsync(authentication, null);
         }
 
-        //[TaskMethod]
+        [TaskMethod]
         public async Task GetLogAsync(ITableCategory category, TaskContext context)
         {
             var authentication = context.Authentication;
             await category.GetLogAsync(authentication, null);
         }
 
-        //[TaskMethod]
+        [TaskMethod]
         public async Task FindAsync(ITableCategory category, TaskContext context)
         {
             var authentication = context.Authentication;
             var text = RandomUtility.NextWord();
             var option = RandomUtility.NextEnum<FindOptions>();
             await category.FindAsync(authentication, text, option);
-        }
-
-        public Task<ITable[]> GetTablesAsync(ITableCategory category, Func<ITable, bool> predicate)
-        {
-            return category.Dispatcher.InvokeAsync(() =>
-            {
-                var query = from item in EnumerableUtility.FamilyTree<ITableItem, ITable>(category as ITableItem, item => item.Childs)
-                            where predicate(item)
-                            select item;
-
-                return query.ToArray();
-            });
         }
     }
 }

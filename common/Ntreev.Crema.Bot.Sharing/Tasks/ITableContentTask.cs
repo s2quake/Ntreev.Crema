@@ -100,9 +100,11 @@ namespace Ntreev.Crema.Bot.Tasks
                     var row = await this.AddNewRowAsync(authentication, content);
                     if (row != null)
                     {
-                        await row.InitializeRandomAsync(authentication);
-                        context.Push(row);
-                        context.State = System.Data.DataRowState.Detached;
+                        if (await row.InitializeRandomAsync(authentication) == true)
+                        {
+                            context.Push(row);
+                            context.State = System.Data.DataRowState.Detached;
+                        }
                     }
                 }
                 else

@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
@@ -70,6 +71,41 @@ namespace Ntreev.Crema.Data
             {
                 var view = AsDataViewNormal(template.InternalObject);
                 return view;
+            }
+        }
+
+        public static string GenerateFilterExpression(this CremaDataRow dataRow, params string[] columnNames)
+        {
+            var fieldList = new List<object>(columnNames.Length);
+            foreach (var item in columnNames)
+            {
+                var field = dataRow.Field<object>(item);
+                fieldList.Add(GenerateFieldExpression(item, field));
+            }
+            return string.Join(" and ", fieldList);
+        }
+
+        public static string GenerateFieldExpression(string columnName, object field)
+        {
+            if (field is TimeSpan duration)
+            {
+                return $"Convert({columnName},System.String)>='{duration}'";
+            }
+            else if (field is ulong uint64)
+            {
+                return $"Convert({columnName},System.String)='{uint64}'";
+            }
+            else if (field is string || field is DateTime || field is Guid)
+            {
+                return $"{columnName}='{field}'";
+            }
+            else if (field == null)
+            {
+                return $"({columnName}) is null";
+            }
+            else
+            {
+                return $"{columnName}={field}";
             }
         }
 

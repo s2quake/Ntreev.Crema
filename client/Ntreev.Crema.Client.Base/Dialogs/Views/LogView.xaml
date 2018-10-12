@@ -51,11 +51,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         </Grid.RowDefinitions>
         <nmfc:ExpandableToolBar ItemsSource="{Binding ToolBarItems}" />
 
-        <nmgc:ModernDataGridControl x:Name="gridControl" Grid.Row="1" ReadOnly="True" SelectionMode="Single" SelectionUnit="Row" AutoCreateColumns="False"
-                                    BorderThickness="1" BorderBrush="{DynamicResource ItemBorder}"
-                                    ItemsSource="{Binding ItemsSource}"
-                                    SelectedItem="{Binding SelectedItem, Mode=TwoWay}" >
-            <nmgc:ModernDataGridControl.Columns>
+        <nmgc:ModernDataGridControl >
+            <!--<nmgc:ModernDataGridControl.Columns>
                 <xcdg:Column Title="{x:Static p:Resources.Label_UserID}" FieldName="UserID" />
                 <xcdg:Column Title="{x:Static p:Resources.Label_Revision}" FieldName="Revision" />
                 <xcdg:Column Title="{x:Static p:Resources.Label_DateTime}" FieldName="DateTime" Width="150" />
@@ -68,7 +65,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <i:EventTrigger EventName="PreviewMouseDoubleClick">
                     <i:InvokeCommandAction Command="{Binding PreviewCommand}" />
                 </i:EventTrigger>
-            </i:Interaction.Triggers>
+            </i:Interaction.Triggers>-->
         </nmgc:ModernDataGridControl>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 5 0 0">

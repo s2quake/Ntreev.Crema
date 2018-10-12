@@ -149,6 +149,19 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
+        public Domain[] GetDomains(Guid dataBaseID)
+        {
+            var domainList = new List<Domain>(this.Domains.Count);
+            foreach (var item in this.Domains)
+            {
+                if (item.DataBaseID == dataBaseID)
+                {
+                    domainList.Add(item);
+                }
+            }
+            return domainList.ToArray();
+        }
+
         public Task<Domain[]> GetDomainsAsync(Guid dataBaseID)
         {
             return this.Dispatcher.InvokeAsync(() =>
@@ -162,6 +175,18 @@ namespace Ntreev.Crema.Services.Domains
                     }
                 }
                 return domainList.ToArray();
+            });
+        }
+
+        public Task DetachUsersAsync(Authentication authentication, Guid dataBaseID)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                var domains = this.GetDomains(dataBaseID);
+                foreach (var item in domains)
+                {
+                    item.Detach(authentication);
+                }
             });
         }
 

@@ -14,6 +14,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)CloseRequestedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClosedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClosedEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeCategoryExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableCategoryExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableContentExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventMetaDataBuilder.cs" />

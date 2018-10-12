@@ -60,6 +60,10 @@ namespace Ntreev.Crema.Bot
             this.stacks.Peek().Count--;
         }
 
+        /// <summary>
+        /// 작업 스택에 대상 인스턴스가 push 될때 일정 수준의 작업 횟수가 지정되는데 
+        /// 작업 횟수를 다 완료했다고 강제로 설정한다.
+        /// </summary>
         public void Complete(object target)
         {
             if (this.stacks.Peek().Target != target)
@@ -67,6 +71,9 @@ namespace Ntreev.Crema.Bot
             this.stacks.Peek().Count = 0;
         }
 
+        /// <summary>
+        /// 현재 작업 스택에서 에서 즉시 대상 인스턴스를 제거한다.
+        /// </summary>
         public void Pop(object target)
         {
             if (this.stacks.Peek().Target != target)

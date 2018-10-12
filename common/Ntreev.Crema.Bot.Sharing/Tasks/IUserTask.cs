@@ -82,6 +82,7 @@ namespace Ntreev.Crema.Bot.Tasks
         {
             var authentication = context.Authentication;
             await user.DeleteAsync(authentication);
+            context.Pop(user);
         }
 
         [TaskMethod]

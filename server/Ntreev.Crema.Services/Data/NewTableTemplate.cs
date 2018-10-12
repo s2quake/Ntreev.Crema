@@ -143,8 +143,12 @@ namespace Ntreev.Crema.Services.Data
                         select dataTable;
 
             var dataTables = query.ToArray();
-            tableInfos = dataTables.Select(item => item.TableInfo).ToArray();
+            
+            var itemPaths = dataTables.Select(item => this.Context.GeneratePath(item.Path)).ToArray();
+            await this.Repository.LockAsync(itemPaths);
+            dataSet.AddItemPaths(itemPaths);
             this.tables = await this.Container.AddNewAsync(authentication, dataSet, dataTables);
+            tableInfos = dataTables.Select(item => item.TableInfo).ToArray();
             await base.OnEndEditAsync(authentication, tableInfos);
             this.parent = null;
             this.permission = null;
@@ -183,5 +187,7 @@ namespace Ntreev.Crema.Services.Data
         private TableCollection Container { get; }
 
         private DataBaseRepositoryHost Repository => this.DataBase.Repository;
+
+        public TableContext Context => this.Container.Context;
     }
 }

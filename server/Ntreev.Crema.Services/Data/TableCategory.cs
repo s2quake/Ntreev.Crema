@@ -32,6 +32,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
+    // TODO: 카테고리에도 상태를 추가하는 방법을 생각해야 할것 같음. CategoryState.HasNew, 
     class TableCategory : TableCategoryBase<Table, TableCategory, TableCollection, TableCategoryCollection, TableContext>,
         ITableCategory, ITableItem
     {
@@ -459,7 +460,7 @@ namespace Ntreev.Crema.Services.Data
                 var typePaths = types.Select(item => item.ItemPath).ToArray();
                 var props = new CremaDataSetSerializerSettings(authentication, typePaths, null);
                 var itemPath = this.ItemPath;
-                var itemPaths = new string[] { itemPath };
+                var itemPaths = new string[] { };
                 return (itemPaths, props, itemPath);
             });
             return await this.Repository.Dispatcher.InvokeAsync(() =>

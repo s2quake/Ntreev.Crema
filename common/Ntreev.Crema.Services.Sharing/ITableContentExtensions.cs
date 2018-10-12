@@ -35,22 +35,7 @@ namespace Ntreev.Crema.Services
                 foreach (var item in columnNames)
                 {
                     var field = tableRow[item];
-                    if (field is TimeSpan duration)
-                    {
-                        fieldList.Add($"Convert(Column1,System.String)>='{duration}'");
-                    }
-                    else if (field is string || field is DateTime || field is Guid)
-                    {
-                        fieldList.Add($"{item}='{field}'");
-                    }
-                    else if (field == null)
-                    {
-                        fieldList.Add($"({item}) is null");
-                    }
-                    else
-                    {
-                        fieldList.Add($"{item}={field}");
-                    }
+                    fieldList.Add(CremaDataExtensions.GenerateFieldExpression(item, field));
                 }
                 return string.Join(" and ", fieldList);
             });

@@ -1213,13 +1213,9 @@ namespace Ntreev.Crema.Services.Data
             this.metaData.Authentications = this.authenticationInfos = new AuthenticationInfo[] { };
         }
 
-        private async Task DetachUsersAsync(Authentication authentication)
+        private Task DetachUsersAsync(Authentication authentication)
         {
-            var domains = await this.DomainContext.GetDomainsAsync(this.ID);
-            foreach (var item in domains)
-            {
-                await item.DetachAsync(authentication);
-            }
+            return this.DomainContext.DetachUsersAsync(authentication, this.ID);
         }
 
         private async Task WriteCacheAsync()

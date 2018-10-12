@@ -103,7 +103,6 @@ namespace Ntreev.Crema.Services.Data
                 var typeInfo = (TypeInfo)item.ExtendedProperties[typeof(TypeInfo)];
                 if (typeInfo.Path != item.Path)
                 {
-                    int wer = 0;
                     System.Diagnostics.Debugger.Launch();
                 }
                 if (typeInfo.CategoryPath.StartsWith(categoryPath) == false)
@@ -114,7 +113,6 @@ namespace Ntreev.Crema.Services.Data
                 item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
                 if (item.CategoryPath == cc)
                 {
-                    int qwer = 0;
                     System.Diagnostics.Debugger.Launch();
                 }
                 this.ValidateTypeNotExists(item.Path);
@@ -378,11 +376,9 @@ namespace Ntreev.Crema.Services.Data
 
                     var files = DirectoryUtility.GetAllFiles(this.dataBase.BasePath, sss + ".*");
                     if (files.Any())
-
                     {
-                        int qwer = 0;
+                        System.Diagnostics.Debugger.Launch();
                     }
-
 
                     this.Serializer.Serialize(itemPath, item, ObjectSerializerSettings.Empty);
                 }
@@ -439,7 +435,7 @@ namespace Ntreev.Crema.Services.Data
                     var files = DirectoryUtility.GetAllFiles(this.dataBase.BasePath, sss + ".*");
                     if (files.Any())
                     {
-                        int qwer = 0;
+                        System.Diagnostics.Debugger.Launch();
                     }
 
                     var props = new CremaDataTableSerializerSettings(item.Namespace, item.TemplateNamespace);

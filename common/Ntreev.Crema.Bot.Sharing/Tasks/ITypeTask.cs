@@ -18,6 +18,7 @@
 using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.Library;
 using Ntreev.Library.Random;
 using System;
@@ -146,14 +147,25 @@ namespace Ntreev.Crema.Bot.Tasks
         public async Task RenameAsync(IType type, TaskContext context)
         {
             var authentication = context.Authentication;
+            var typeName = RandomUtility.NextIdentifier();
             if (context.AllowException == false)
             {
-                var typeState = await type.Dispatcher.InvokeAsync(() => type.TypeState);
-                if (typeState != TypeState.None)
+                if (await VerifyAsync() == false)
                     return;
             }
-            var typeName = RandomUtility.NextIdentifier();
             await type.RenameAsync(authentication, typeName);
+
+            async Task<bool> VerifyAsync()
+            {
+                if ((await type.GetTablesAsync(item => item.TableState != TableState.None)).Any() == true)
+                    return false;
+                return await type.Dispatcher.InvokeAsync(() =>
+                {
+                    if (type.TypeState != TypeState.None)
+                        return false;
+                    return true;
+                });
+            }
         }
 
         [TaskMethod(Weight = 25)]
@@ -164,10 +176,22 @@ namespace Ntreev.Crema.Bot.Tasks
             var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
             if (context.AllowException == false)
             {
-                if (await type.Dispatcher.InvokeAsync(() => type.Category.Path) == categoryPath)
+                if (await VerifyAsync() == false)
                     return;
             }
             await type.MoveAsync(authentication, categoryPath);
+
+            async Task<bool> VerifyAsync()
+            {
+                if ((await type.GetTablesAsync(item => item.TableState != TableState.None)).Any() == true)
+                    return false;
+                return await type.Dispatcher.InvokeAsync(() =>
+                {
+                    if (type.TypeState != TypeState.None)
+                        return false;
+                    return true;
+                });
+            }
         }
 
         [TaskMethod(Weight = 5)]
@@ -176,11 +200,23 @@ namespace Ntreev.Crema.Bot.Tasks
             var authentication = context.Authentication;
             if (context.AllowException == false)
             {
-                var typeState = await type.Dispatcher.InvokeAsync(() => type.TypeState);
-                if (typeState.HasFlag(TypeState.IsBeingEdited) == true)
+                if (await VerifyAsync() == false)
                     return;
             }
             await type.DeleteAsync(authentication);
+            context.Pop(type);
+
+            async Task<bool> VerifyAsync()
+            {
+                if ((await type.GetTablesAsync(item => true)).Any() == true)
+                    return false;
+                return await type.Dispatcher.InvokeAsync(() =>
+                {
+                    if (type.TypeState != TypeState.None)
+                        return false;
+                    return true;
+                });
+            }
         }
 
         //[TaskMethod]

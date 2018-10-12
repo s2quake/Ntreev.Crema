@@ -111,6 +111,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
+        // TODO: 상속된 테이블 복사시 에러가 발생
         public async Task<Table> CopyAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
         {
             try
@@ -177,7 +178,6 @@ namespace Ntreev.Crema.Services.Data
                 try
                 {
                     var signatureDate = authentication.Sign();
-                    this.Repository.Lock(itemPaths);
                     this.Repository.CreateTable(dataBaseSet, tablePaths);
                     this.Repository.Commit(authentication, message);
                     return signatureDate;
@@ -189,7 +189,6 @@ namespace Ntreev.Crema.Services.Data
                 }
                 finally
                 {
-                    this.Repository.Unlock(itemPaths);
                     this.Repository.Unlock(dataBaseSet.ItemPaths);
                 }
             });
