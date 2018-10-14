@@ -81,7 +81,15 @@ namespace Ntreev.Crema.Bot.Tasks
                         }
                     }
                     await template.BeginEditAsync(authentication);
+                    domain = template.Domain;
                 }
+
+                if (await domain.Users.ContainsAsync(authentication.ID) == false)
+                {
+                    context.Pop(template);
+                    return;
+                }
+
 
                 if (template.IsNew == true ||
                     await template.Dispatcher.InvokeAsync(() => template.Any()) == false ||

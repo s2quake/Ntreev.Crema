@@ -186,8 +186,8 @@ namespace Ntreev.Crema.Services.Data
 
         public void ValidateAddNew(Authentication authentication)
         {
-            if (this.domain != null)
-                throw new InvalidOperationException(Resources.Exception_ItIsAlreadyBeingEdited);
+            if (this.ServiceState != ServiceState.Opened)
+                throw new InvalidOperationException(Resources.Exception_TypeIsNotBeingEdited);
             this.OnValidateAddNew(authentication, this);
         }
 

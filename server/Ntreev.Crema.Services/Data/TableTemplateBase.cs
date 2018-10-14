@@ -52,6 +52,7 @@ namespace Ntreev.Crema.Services.Data
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
+                    this.ValidateAddNew(authentication);
                 });
                 return await TableColumn.CreateAsync(authentication, this, this.TemplateSource.View.Table);
             }
@@ -420,6 +421,14 @@ namespace Ntreev.Crema.Services.Data
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public void ValidateAddNew(Authentication authentication)
+        {
+            if (this.ServiceState != ServiceState.Opened)
+                throw new InvalidOperationException(Resources.Exception_TypeIsNotBeingEdited);
+            this.OnValidateAddNew(authentication, this);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public void ValidateBeginEdit(Authentication authentication)
         {
             if (this.domain != null)
@@ -450,6 +459,12 @@ namespace Ntreev.Crema.Services.Data
                 throw new InvalidOperationException(Resources.Exception_TableTemplateIsNotBeingEdited);
             this.ValidateAccessType(authentication, AccessType.Developer);
             this.OnValidateCancelEdit(authentication, this);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public virtual void OnValidateAddNew(Authentication authentication, object target)
+        {
+
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]

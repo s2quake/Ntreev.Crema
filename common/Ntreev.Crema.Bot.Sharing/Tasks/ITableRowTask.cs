@@ -105,7 +105,7 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 await row.DeleteAsync(authentication);
                 context.State = System.Data.DataRowState.Deleted;
-                context.Complete(row);
+                context.Pop(row);
             }
         }
 

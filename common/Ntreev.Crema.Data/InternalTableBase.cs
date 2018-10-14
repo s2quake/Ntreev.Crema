@@ -746,8 +746,6 @@ namespace Ntreev.Crema.Data
                     this.parent.AddChild(this);
                     this.InternalName = $"{this.parent.Name}.{this.LocalName}";
 
-                    //this.CreateParentColumn();
-
                     var relationName = InternalSetBase.GenerateRelationName(this);
                     if (this.DataSet?.Relations.Contains(relationName) == false)
                     {
@@ -768,7 +766,6 @@ namespace Ntreev.Crema.Data
 
         private void AddChild(InternalTableBase child)
         {
-            //this.CreateRelationColumn();
             this.childItems.Add(child);
         }
 
@@ -1164,27 +1161,6 @@ namespace Ntreev.Crema.Data
                 }
             }
         }
-
-        //internal void CreateRelationColumn()
-        //{
-        //    if (this.ColumnRelation == null)
-        //    {
-        //        this.ColumnRelation = new InternalRelation(CremaSchema.__RelationID__, typeof(string)) { ReadOnly = true, };
-        //        this.Columns.Add(this.ColumnRelation);
-        //        this.RefreshRelationID();
-        //        this.ColumnRelation.InternalUnique = true;
-        //        this.ColumnRelation.InternalAllowDBNull = false;
-        //    }
-        //}
-
-        //internal void CreateParentColumn()
-        //{
-        //    if (this.ParentRelation == null)
-        //    {
-        //        this.ParentRelation = new InternalRelation(CremaSchema.__ParentID__, typeof(string));
-        //        this.Columns.Add(this.ParentRelation);
-        //    }
-        //}
 
         internal IFieldStack<bool> AcceptChangesStack
         {

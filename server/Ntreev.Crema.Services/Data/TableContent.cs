@@ -35,8 +35,9 @@ namespace Ntreev.Crema.Services.Data
         private CremaDataTable dataTable;
         private DataTable internalTable;
 
+        private List<TableRow> items;
         //private readonly Dictionary<DataRow, TableRow> rows = new Dictionary<DataRow, TableRow>();
-        private readonly HashSet<DataRow> rowsToAdd = new HashSet<DataRow>();
+        //private readonly HashSet<DataRow> rowsToAdd = new HashSet<DataRow>();
 
         private EventHandler editBegun;
         private EventHandler editEnded;
@@ -53,14 +54,14 @@ namespace Ntreev.Crema.Services.Data
             return this.Table.ToString();
         }
 
-        protected Task AddAsync(TableRow row)
-        {
-            return this.Dispatcher.InvokeAsync(() =>
-            {
-                this.dataTable.ExtendedProperties[row.Row] = row;
-                this.rowsToAdd.Remove(row.Row);
-            });
-        }
+        //protected Task AddAsync(TableRow row)
+        //{
+        //    return this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        this.items.Add(row);
+        //        this.dataTable.ExtendedProperties[row.Row] = row;
+        //    });
+        //}
 
         protected void Clear()
         {
@@ -283,7 +284,6 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
                 });
                 var row = await this.domain.Dispatcher.InvokeAsync(() => new TableRow(this, this.dataTable.DefaultView.Table, relationID));
-                await this.Dispatcher.InvokeAsync(() => this.rowsToAdd.Add(row.Row));
                 return row;
             }
             catch (Exception e)
@@ -303,7 +303,6 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndNewAsync));
                 });
                 await row.EndNewAsync(authentication);
-                await this.AddAsync(row);
             }
             catch (Exception e)
             {
@@ -449,7 +448,7 @@ namespace Ntreev.Crema.Services.Data
 
         public CremaDispatcher Dispatcher => this.DispatcherObject.Dispatcher;
 
-        public int Count => this.dataTable.Rows.Count;
+        public int Count => this.items.Count;
 
         public CremaDataTable DataTable
         {
@@ -458,10 +457,39 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.dataTable = value;
                 this.internalTable = this.dataTable.DefaultView.Table;
-                foreach (DataRow item in this.internalTable.Rows)
+                this.items = new List<TableRow>(this.internalTable.Rows.Count);
+                for (var i = 0; i < this.internalTable.Rows.Count; i++)
                 {
-                    this.dataTable.ExtendedProperties[item] = new TableRow(this, item);
+                    var dataRow = this.internalTable.Rows[i];
+                    var row = new TableRow(this, dataRow);
+                    this.items.Add(row);
+                    this.internalTable.ExtendedProperties[dataRow] = row;
                 }
+                this.internalTable.RowDeleted += InternalTable_RowDeleted;
+                this.internalTable.RowChanged += InternalTable_RowChanged;
+            }
+        }
+
+        private async void InternalTable_RowDeleted(object sender, DataRowChangeEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                var row = this.internalTable.ExtendedProperties[e.Row] as TableRow;
+                this.items.Remove(row);
+                this.internalTable.ExtendedProperties.Remove(e.Row);
+            });
+        }
+
+        private async void InternalTable_RowChanged(object sender, DataRowChangeEventArgs e)
+        {
+            if (e.Action == DataRowAction.Add)
+            {
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var row = new TableRow(this, e.Row);
+                    this.items.Add(row);
+                    this.internalTable.ExtendedProperties[e.Row] = row;
+                });
             }
         }
 
@@ -618,18 +646,12 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITableRow> IEnumerable<ITableRow>.GetEnumerator()
         {
-            foreach (DataRow item in this.internalTable.Rows)
-            {
-                yield return this.dataTable.ExtendedProperties[item] as TableRow;
-            }
+            return this.items.GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            foreach (DataRow item in this.internalTable.Rows)
-            {
-                yield return this.dataTable.ExtendedProperties[item] as TableRow;
-            }
+            return this.items.GetEnumerator();
         }
 
         #endregion
