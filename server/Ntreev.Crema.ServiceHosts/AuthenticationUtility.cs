@@ -209,7 +209,7 @@ namespace Ntreev.Crema.ServiceHosts
             private async Task AbortServieItemsAsync(bool disconnect)
             {
                 var items = this.serviceItems.ToArray().Reverse();
-                var tasks = items.Select(item => item.AbortAsync(disconnect)).ToArray();
+                var tasks = items.Select(item => item.CloseAsync(disconnect)).ToArray();
                 await Task.WhenAll(tasks);
             }
         }

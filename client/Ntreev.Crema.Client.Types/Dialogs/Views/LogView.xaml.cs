@@ -42,6 +42,7 @@ namespace Ntreev.Crema.Client.Types.Dialogs.Views
         private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             this.configs.Update(this);
+            this.gridControl.Visibility = Visibility.Visible;
         }
 
         private void UserControl_Unloaded(object sender, System.Windows.RoutedEventArgs e)

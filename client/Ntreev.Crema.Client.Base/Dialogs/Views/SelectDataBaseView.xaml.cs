@@ -90,5 +90,10 @@ namespace Ntreev.Crema.Client.Base.Dialogs.Views
                 }
             });
         }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.gridControl.Visibility = Visibility.Visible;
+        }
     }
 }

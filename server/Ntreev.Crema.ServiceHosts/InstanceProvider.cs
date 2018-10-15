@@ -53,7 +53,7 @@ namespace Ntreev.Crema.ServiceHosts
 
             if (instance is ICremaServiceItem serviceItem)
             {
-                await serviceItem.AbortAsync(true);
+                await serviceItem.CloseAsync(true);
             }
         }
     }

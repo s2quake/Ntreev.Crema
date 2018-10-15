@@ -28,7 +28,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:p="clr-namespace:Ntreev.Crema.Client.Base.Properties"
              mc:Ignorable="d" nmfc:DialogWindow.DesiredWidth="500" nmfc:DialogWindow.DesiredHeight="250" 
              Tag="{Binding SupportsDescriptor}"
-             nmfc:DialogWindow.DesiredResizeMode="CanResizeWithGrip">
+             nmfc:DialogWindow.DesiredResizeMode="CanResizeWithGrip"
+             Loaded="UserControl_Loaded">
 
     <UserControl.Resources>
 
@@ -95,8 +96,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <!--wpftoolkit 버그로 인해 예외가 발생하여 처음에는 Collapsed로 설정-->
         <nmgc:ModernDataGridControl x:Name="gridControl"  Grid.Row="0" ItemsSource="{Binding ItemsSource}" ReadOnly="True" 
-                                    BorderThickness="1" BorderBrush="{DynamicResource ItemBorder}" 
+                                    BorderThickness="1" BorderBrush="{DynamicResource ItemBorder}"  Visibility="Collapsed"
                                     AutoCreateColumns="False" SelectionUnit="Row" 
                                     SelectionMode="Single"
                                     SelectedItem="{Binding SelectedItem}" Tag="{Binding ConnectableOnly}" 

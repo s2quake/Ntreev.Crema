@@ -495,8 +495,9 @@ namespace Ntreev.Crema.ServiceHosts.Domains
 
         #region ICremaServiceItem
 
-        protected override async Task OnAbortAsync(bool disconnect)
+        protected override async Task OnCloseAsync(bool disconnect)
         {
+            this.LogService.Info($"{nameof(DomainService)}.{nameof(OnCloseAsync)}");
             await this.DetachEventHandlersAsync();
             await CremaService.Dispatcher.InvokeAsync(() =>
             {

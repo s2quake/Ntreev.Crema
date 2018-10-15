@@ -87,18 +87,16 @@ namespace Ntreev.Crema.ServiceHosts
             }
         }
 
-        protected abstract Task OnAbortAsync(bool disconnect);
+        protected abstract Task OnCloseAsync(bool disconnect);
 
-        async Task ICremaServiceItem.AbortAsync(bool disconnect)
+        async Task ICremaServiceItem.CloseAsync(bool disconnect)
         {
             if (this.host != null)
             {
-                await this.OnAbortAsync(disconnect);
-                //this.host.Closing -= Host_Closing;
+                await this.OnCloseAsync(disconnect);
                 this.host = null;
                 this.Channel = null;
                 this.Callback = default(T);
-                //this.OnDisposed(EventArgs.Empty);
                 this.logService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(IDisposable.Dispose)}");
             }
         }

@@ -644,10 +644,10 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         #region ICremaServiceItem
 
-        protected override async Task OnAbortAsync(bool disconnect)
+        protected override async Task OnCloseAsync(bool disconnect)
         {
+            this.LogService.Info($"{nameof(DataBaseCollectionService)}.{nameof(OnCloseAsync)}");
             await this.DetachEventHandlersAsync();
-            
             this.authentication = null;
             await CremaService.Dispatcher.InvokeAsync(() =>
             {

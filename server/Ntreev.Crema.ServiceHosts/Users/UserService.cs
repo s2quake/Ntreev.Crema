@@ -593,8 +593,9 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         #region ICremaServiceItem
 
-        protected override async Task OnAbortAsync(bool disconnect)
+        protected override async Task OnCloseAsync(bool disconnect)
         {
+            this.LogService.Info($"{nameof(UserService)}.{nameof(OnCloseAsync)}");
             await this.DetachEventHandlersAsync();
             if (this.authentication != null)
             {
