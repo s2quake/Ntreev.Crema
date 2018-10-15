@@ -68,7 +68,7 @@ namespace Ntreev.Crema.Services.Data
         {
             var template = this.TemplateSource;
             var dataSet = template.TargetTable.DataSet;
-            var dataBaseSet = await DataBaseSet.CreateAsync(this.table.DataBase, dataSet, false);
+            var dataBaseSet = await DataBaseSet.CreateAsync(this.table.DataBase, dataSet, false, false);
             var tableInfo = template.TableInfo;
             tableInfos = new TableInfo[] { tableInfo };
             await this.Container.InvokeTableEndTemplateEditAsync(authentication, tableInfo, dataBaseSet);

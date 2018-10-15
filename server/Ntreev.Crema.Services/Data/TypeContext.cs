@@ -173,7 +173,7 @@ namespace Ntreev.Crema.Services.Data
                 }
             });
         }
-        
+
         public void InvokeItemsSetPublicEvent(Authentication authentication, ITypeItem[] items)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetPublicEvent), items);
@@ -373,7 +373,8 @@ namespace Ntreev.Crema.Services.Data
             }
 
             authentication.Sign();
-            this.OnItemsLockChanged(new ItemsEventArgs<ITypeItem>(authentication, items));
+            var metaData = EventMetaDataBuilder.Build(items, LockChangeType.Unlock);
+            this.OnItemsLockChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData));
         }
 
         public object GetService(System.Type serviceType)

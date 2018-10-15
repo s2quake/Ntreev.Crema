@@ -43,6 +43,6 @@ namespace Ntreev.Crema.Services
 
         event ItemsDeletedEventHandler<IDomainItem> ItemsDeleted;
 
-        Task<DomainContextMetaData> GetMetaDataAsync(Authentication authentication);
+        DomainContextMetaData GetMetaData(Authentication authentication);
     }
 }

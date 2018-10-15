@@ -26,7 +26,7 @@ namespace Ntreev.Crema.Services
 {
     public interface IUserContext : IEnumerable<IUserItem>, IServiceProvider, IDispatcherObject
     {
-        Task<UserContextMetaData> GetMetaDataAsync(Authentication authentication);
+        UserContextMetaData GetMetaData(Authentication authentication);
 
         Task NotifyMessageAsync(Authentication authentication, string[] userIDs, string message);
 

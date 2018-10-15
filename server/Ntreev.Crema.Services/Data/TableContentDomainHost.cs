@@ -117,7 +117,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.dataSet = await this.Container.ReadDataForContentAsync(authentication, this.Tables);
                     this.domain = new TableContentDomain(authentication, dataSet, this.DataBase, this.path, typeof(TableContent).Name, this);
-                    this.dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
+                    this.dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
                     this.itemPaths = this.dataSet.GetItemPaths();
                     await this.DomainContext.AddAsync(authentication, this.domain, this.DataBase);
                 }
@@ -309,7 +309,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.dataSet = domain.Source as CremaDataSet;
                 this.domain = domain;
-                this.dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
+                this.dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
                 this.itemPaths = this.dataSet.GetItemPaths();
                 await this.Repository.LockAsync(this.itemPaths);
                 await this.Dispatcher.InvokeAsync(() =>

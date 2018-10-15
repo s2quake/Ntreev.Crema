@@ -383,6 +383,28 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
+        public DomainMetaData GetMetaData(Authentication authentication)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
+            var metaData = new DomainMetaData()
+            {
+                DomainID = Guid.Parse(this.Name),
+                DomainInfo = base.DomainInfo,
+                Users = this.Users.Select<DomainUser, DomainUserMetaData>(item => item.GetMetaData(authentication)).ToArray(),
+                DomainState = base.DomainState,
+                ModifiedTables = this.modifiedTableList.ToArray(),
+            };
+            if (this.Users.ContainsKey(authentication.ID) == true)
+            {
+                if (this.data == null)
+                    this.data = this.SerializeSource(this.Source);
+                metaData.Data = this.data;
+            }
+            return metaData;
+        }
+
         public Task<DomainMetaData> GetMetaDataAsync(Authentication authentication)
         {
             this.ValidateExpired();

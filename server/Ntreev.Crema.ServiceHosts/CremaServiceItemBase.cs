@@ -35,9 +35,22 @@ namespace Ntreev.Crema.ServiceHosts
             this.logService = logService;
             OperationContext.Current.Host.Closing += Host_Closing;
             this.host = OperationContext.Current.Host;
+            this.host.Faulted += Host_Faulted;
             this.Channel = OperationContext.Current.Channel;
             this.sessionID = OperationContext.Current.Channel.SessionId;
             this.Callback = OperationContext.Current.GetCallbackChannel<T>();
+
+            OperationContext.Current.Channel.Faulted += Channel_Faulted;
+        }
+
+        private void Host_Faulted(object sender, EventArgs e)
+        {
+            Console.WriteLine($"{this.GetType().Name}: Host_Faulted");
+        }
+
+        private void Channel_Faulted(object sender, EventArgs e)
+        {
+            Console.WriteLine($"{this.GetType().Name}: Channel_Faulted");
         }
 
         //public event EventHandler Disposed;
@@ -75,7 +88,7 @@ namespace Ntreev.Crema.ServiceHosts
 
         protected string OwnerID { get; set; }
 
-        private void Host_Closing(object sender, EventArgs e)
+        private async void Host_Closing(object sender, EventArgs e)
         {
             if (this.Callback != null)
             {
@@ -93,8 +106,8 @@ namespace Ntreev.Crema.ServiceHosts
         {
             if (this.host != null)
             {
-                await this.OnCloseAsync(disconnect);
                 this.host = null;
+                await this.OnCloseAsync(disconnect);
                 this.Channel = null;
                 this.Callback = default(T);
                 this.logService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(IDisposable.Dispose)}");

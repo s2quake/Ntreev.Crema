@@ -605,6 +605,13 @@ namespace Ntreev.Crema.Services.Data
             return this.authentications.Contains(authentication);
         }
 
+        public DataBaseMetaData GetMetaData(Authentication authentication)
+        {
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
+            return this.metaData;
+        }
+
         public Task<DataBaseMetaData> GetMetaDataAsync(Authentication authentication)
         {
             this.ValidateExpired();

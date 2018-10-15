@@ -281,6 +281,22 @@ namespace Ntreev.Crema.Services.Domains
             return this.Dispatcher.InvokeAsync(() => this.Contains(domainID.ToString()));
         }
 
+        public DomainMetaData[] GetMetaData(Authentication authentication)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
+
+            var domains = this.ToArray<Domain>();
+            var metaDataList = new List<DomainMetaData>(domains.Length);
+            foreach (var item in domains)
+            {
+                var metaData = item.GetMetaData(authentication);
+                metaDataList.Add(metaData);
+            }
+            return metaDataList.ToArray();
+        }
+
         public async Task<DomainMetaData[]> GetMetaDataAsync(Authentication authentication)
         {
             var domains = await this.Dispatcher.InvokeAsync(() => this.ToArray<Domain>());

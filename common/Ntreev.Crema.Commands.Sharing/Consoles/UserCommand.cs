@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Commands.Consoles
         public async Task ListAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var metaData = await this.UserContext.GetMetaDataAsync(authentication);
+            var metaData = await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.GetMetaData(authentication));
             var query = from item in metaData.Users
                         let userID = item.UserInfo.ID
                         orderby userID

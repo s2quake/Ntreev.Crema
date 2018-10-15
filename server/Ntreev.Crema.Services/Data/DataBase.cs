@@ -290,7 +290,6 @@ namespace Ntreev.Crema.Services.Data
                 var repository = await Task.Run(() => this.repositoryProvider.CreateInstance(repositorySetting));
                 this.Dispatcher = new CremaDispatcher(this);
                 this.Repository = new DataBaseRepositoryHost(this, repository);
-                //this.Repository.Changed += Repository_Changed;
                 var cache = await this.ReadCacheAsync(repository.RepositoryInfo);
                 await this.ResetDataBaseAsync(authentication, cache.Item1, cache.Item2);
                 await this.Dispatcher.InvokeAsync(() =>
@@ -572,15 +571,11 @@ namespace Ntreev.Crema.Services.Data
             new FileInfo(path);
         }
 
-        public Task<DataBaseMetaData> GetMetaDataAsync(Authentication authentication)
+        public DataBaseMetaData GetMetaData(Authentication authentication)
         {
-            this.ValidateExpired();
-            return this.Dispatcher.InvokeAsync(() =>
-            {
-                if (authentication == null)
-                    throw new ArgumentNullException(nameof(authentication));
-                return this.metaData;
-            });
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
+            return this.metaData;
         }
 
         public async Task DisposeAsync()

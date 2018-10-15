@@ -62,6 +62,6 @@ namespace Ntreev.Crema.Services
 
         event ItemsEventHandler<IDataBase> ItemsLockChanged;
 
-        Task<DataBaseCollectionMetaData> GetMetaDataAsync(Authentication authentication);
+        DataBaseCollectionMetaData GetMetaData(Authentication authentication);
     }
 }

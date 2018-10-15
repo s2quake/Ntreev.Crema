@@ -178,6 +178,18 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
+        public DomainContextMetaData GetMetaData(Authentication authentication)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
+            return new DomainContextMetaData()
+            {
+                DomainCategories = this.Categories.GetMetaData(authentication),
+                Domains = this.Domains.GetMetaData(authentication),
+            };
+        }
+
         public async Task<DomainContextMetaData> GetMetaDataAsync(Authentication authentication)
         {
             var domains = await this.Domains.GetMetaDataAsync(authentication);

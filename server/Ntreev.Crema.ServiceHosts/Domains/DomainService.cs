@@ -36,8 +36,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
     class DomainService : CremaServiceItemBase<IDomainEventCallback>, IDomainService
     {
         private Authentication authentication;
-        //private readonly HashSet<Guid> domains = new HashSet<Guid>();
-        //private readonly HashSet<Guid> resettings = new HashSet<Guid>();
 
         public DomainService(ICremaHost cremaHost)
             : base(cremaHost.GetService(typeof(ILogService)) as ILogService)
@@ -47,7 +45,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             this.UserContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
             this.DomainContext = cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
             this.DataBases = cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
-
             this.LogService.Debug($"{nameof(DomainService)} Constructor");
         }
 
@@ -58,9 +55,8 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             {
                 this.authentication = await this.UserContext.AuthenticateAsync(authenticationToken);
                 await this.authentication.AddRefAsync(this);
-                await this.AttachEventHandlersAsync();
                 this.OwnerID = this.authentication.ID;
-                result.Value = await this.DomainContext.GetMetaDataAsync(this.authentication);
+                result.Value = await this.AttachEventHandlersAsync();
                 result.SignatureDate = this.authentication.SignatureDate;
                 this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(SubscribeAsync)}");
             }
@@ -94,7 +90,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var result = new ResultBase<DomainContextMetaData>();
             try
             {
-                result.Value = await this.DomainContext.GetMetaDataAsync(this.authentication);
+                result.Value = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.GetMetaData(this.authentication));
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -296,13 +292,18 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return domain;
         }
 
-        private async Task AttachEventHandlersAsync()
+        private async Task<DomainContextMetaData> AttachEventHandlersAsync()
         {
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
                 this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
             });
-            await this.DomainContext.Dispatcher.InvokeAsync(() =>
+            await this.DataBases.Dispatcher.InvokeAsync(() =>
+            {
+                this.DataBases.ItemsResetting += DataBases_ItemsResetting;
+                this.DataBases.ItemsReset += DataBases_ItemsReset;
+            });
+            var metaData = await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
                 this.DomainContext.Domains.DomainCreated += DomainContext_DomainCreated;
                 this.DomainContext.Domains.DomainDeleted += DomainContext_DomainDeleted;
@@ -315,13 +316,10 @@ namespace Ntreev.Crema.ServiceHosts.Domains
                 this.DomainContext.Domains.DomainRowChanged += DomainContext_DomainRowChanged;
                 this.DomainContext.Domains.DomainRowRemoved += DomainContext_DomainRowRemoved;
                 this.DomainContext.Domains.DomainPropertyChanged += DomainContext_DomainPropertyChanged;
-            });
-            await this.DataBases.Dispatcher.InvokeAsync(() =>
-            {
-                this.DataBases.ItemsResetting += DataBases_ItemsResetting;
-                this.DataBases.ItemsReset += DataBases_ItemsReset;
+                return this.DomainContext.GetMetaData(this.authentication);
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(AttachEventHandlersAsync)}");
+            return metaData;
         }
 
         private async Task DetachEventHandlersAsync()
@@ -330,6 +328,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             {
                 this.DataBases.ItemsResetting -= DataBases_ItemsResetting;
                 this.DataBases.ItemsReset -= DataBases_ItemsReset;
+                Console.WriteLine(1);
             });
             await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
@@ -344,10 +343,12 @@ namespace Ntreev.Crema.ServiceHosts.Domains
                 this.DomainContext.Domains.DomainRowChanged -= DomainContext_DomainRowChanged;
                 this.DomainContext.Domains.DomainRowRemoved -= DomainContext_DomainRowRemoved;
                 this.DomainContext.Domains.DomainPropertyChanged -= DomainContext_DomainPropertyChanged;
+                Console.WriteLine(2);
             });
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
                 this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+                Console.WriteLine(3);
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainService)} {nameof(DetachEventHandlersAsync)}");
         }
@@ -497,8 +498,12 @@ namespace Ntreev.Crema.ServiceHosts.Domains
 
         protected override async Task OnCloseAsync(bool disconnect)
         {
-            this.LogService.Info($"{nameof(DomainService)}.{nameof(OnCloseAsync)}");
-            await this.DetachEventHandlersAsync();
+            if (this.authentication != null)
+            {
+                Console.WriteLine($"{nameof(DomainService)}.{nameof(DetachEventHandlersAsync)}");
+                await this.DetachEventHandlersAsync();
+                this.authentication = null;
+            }
             await CremaService.Dispatcher.InvokeAsync(() =>
             {
                 if (disconnect == false)
@@ -518,6 +523,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
                     this.Channel?.Abort();
                 }
             });
+            Console.WriteLine($"{nameof(DomainService)}.{nameof(OnCloseAsync)}");
         }
 
         #endregion

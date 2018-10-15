@@ -255,6 +255,25 @@ namespace Ntreev.Crema.Services.Data
             this.InvokeItemsRevertedEvent(authentication, new DataBase[] { dataBase }, new string[] { revision });
         }
 
+        public DataBaseCollectionMetaData GetMetaData(Authentication authentication)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
+
+            var dataBases = this.ToArray<DataBase>();
+            var metaList = new List<DataBaseMetaData>(this.Count);
+            foreach (var item in dataBases)
+            {
+                var metaData = item.Dispatcher.Invoke(() => item.GetMetaData(authentication));
+                metaList.Add(metaData);
+            }
+            return new DataBaseCollectionMetaData()
+            {
+                DataBases = metaList.ToArray(),
+            };
+        }
+
         public async Task<DataBaseCollectionMetaData> GetMetaDataAsync(Authentication authentication)
         {
             if (authentication == null)

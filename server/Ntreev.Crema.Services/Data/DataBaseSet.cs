@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Services.Data
         private readonly List<CremaDataTable> tables = new List<CremaDataTable>();
         private readonly List<string> itemPathList;
 
-        private DataBaseSet(DataBase dataBase, CremaDataSet dataSet, bool allowCreation)
+        private DataBaseSet(DataBase dataBase, CremaDataSet dataSet, bool typeCreation, bool tableCreation)
         {
             this.dataBase = dataBase ?? throw new ArgumentNullException(nameof(dataBase));
             this.dataSet = dataSet ?? throw new ArgumentNullException(nameof(dataSet));
@@ -49,7 +49,7 @@ namespace Ntreev.Crema.Services.Data
             foreach (var item in dataSet.Types)
             {
                 var type = dataBase.TypeContext.Types[item.Name, item.CategoryPath];
-                if (type == null && allowCreation == false)
+                if (type == null && typeCreation == false)
                 {
                     throw new TypeNotFoundException(item.Name);
                 }
@@ -64,7 +64,7 @@ namespace Ntreev.Crema.Services.Data
             foreach (var item in dataSet.Tables)
             {
                 var table = dataBase.TableContext.Tables[item.Name, item.CategoryPath];
-                if (table == null && allowCreation == false)
+                if (table == null && tableCreation == false)
                 {
                     throw new TableNotFoundException(item.Name);
                 }
@@ -78,9 +78,9 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public static Task<DataBaseSet> CreateAsync(DataBase dataBase, CremaDataSet dataSet, bool allowCreation)
+        public static Task<DataBaseSet> CreateAsync(DataBase dataBase, CremaDataSet dataSet, bool typeCreation, bool tableCreation)
         {
-            return dataBase.Dispatcher.InvokeAsync(() => new DataBaseSet(dataBase, dataSet, allowCreation));
+            return dataBase.Dispatcher.InvokeAsync(() => new DataBaseSet(dataBase, dataSet, typeCreation, tableCreation));
         }
 
         public void SetTypeCategoryPath(string categoryPath, string newCategoryPath)
@@ -309,7 +309,7 @@ namespace Ntreev.Crema.Services.Data
 
         public static void Modify(CremaDataSet dataSet, DataBase dataBase)
         {
-            var dataBaseSet = new DataBaseSet(dataBase, dataSet, false);
+            var dataBaseSet = new DataBaseSet(dataBase, dataSet, false, false);
             dataBaseSet.Serialize();
         }
 

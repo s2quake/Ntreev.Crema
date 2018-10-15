@@ -72,10 +72,9 @@ namespace Ntreev.Crema.ServiceHosts.Data
                     this.dataBaseName = dataBaseName;
                 });
                 await this.dataBase.EnterAsync(this.authentication);
-                await this.AttachEventHandlersAsync();
-                this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(SubscribeAsync)} : {dataBaseName}");
-                result.Value = await this.dataBase.GetMetaDataAsync(this.authentication);
+                result.Value = await this.AttachEventHandlersAsync();
                 result.SignatureDate = this.authentication.SignatureDate;
+                this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(SubscribeAsync)} : {dataBaseName}");
             }
             catch (Exception e)
             {
@@ -93,8 +92,8 @@ namespace Ntreev.Crema.ServiceHosts.Data
             {
                 await this.DetachEventHandlersAsync();
                 await this.dataBase.LeaveAsync(this.authentication);
-                this.dataBase = null;
                 await this.authentication.RemoveRefAsync(this);
+                this.dataBase = null;
                 this.authentication = null;
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
                 this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(UnsubscribeAsync)} : {this.dataBaseName}");
@@ -111,7 +110,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var result = new ResultBase<DataBaseMetaData>();
             try
             {
-                result.Value = await this.dataBase.GetMetaDataAsync(this.authentication);
+                result.Value = await this.dataBase.Dispatcher.InvokeAsync(() => this.dataBase.GetMetaData(this.authentication));
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -1180,13 +1179,13 @@ namespace Ntreev.Crema.ServiceHosts.Data
             this.dataBase = null;
         }
 
-        private async Task AttachEventHandlersAsync()
+        private async Task<DataBaseMetaData> AttachEventHandlersAsync()
         {
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
                 this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
             });
-            await this.dataBase.Dispatcher.InvokeAsync(() =>
+            var metaData = await this.dataBase.Dispatcher.InvokeAsync(() =>
             {
                 this.TableContext.Tables.TablesStateChanged += Tables_TablesStateChanged;
                 this.TableContext.Tables.TablesChanged += Tables_TablesChanged;
@@ -1207,8 +1206,10 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 this.TypeContext.ItemsLockChanged += TypeContext_ItemsLockChanged;
 
                 this.dataBase.Unloaded += DataBase_Unloaded;
+                return this.dataBase.GetMetaData(this.authentication);
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(AttachEventHandlersAsync)}");
+            return metaData;
         }
 
         private async Task DetachEventHandlersAsync()
@@ -1316,16 +1317,11 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         protected override async Task OnCloseAsync(bool disconnect)
         {
-            this.LogService.Info($"{nameof(DataBaseService)}.{nameof(OnCloseAsync)}");
-            if (this.dataBase != null)
-            {
+            if (this.authentication != null)
+            { 
                 await this.DetachEventHandlersAsync();
                 this.dataBase = null;
-                this.UserContext.Dispatcher.Invoke(() =>
-                {
-                    this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                    this.authentication = null;
-                });
+                this.authentication = null;
             }
             await CremaService.Dispatcher.InvokeAsync(() =>
             {
@@ -1346,6 +1342,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                     this.Channel?.Abort();
                 }
             });
+            Console.WriteLine($"{nameof(DataBaseService)}.{nameof(OnCloseAsync)}");
         }
 
         #endregion

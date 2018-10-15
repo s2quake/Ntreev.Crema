@@ -211,6 +211,38 @@ namespace Ntreev.Crema.Services.Users
             });
         }
 
+        public UserContextMetaData GetMetaData(Authentication authentication)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
+
+            var metaData = new UserContextMetaData();
+            {
+                var query = from UserCategory item in this.Categories
+                            orderby item.Path
+                            select item.Path;
+
+                metaData.Categories = query.ToArray();
+            }
+
+            {
+                var query = from User item in this.Users
+                            orderby item.Category.Path
+                            select new UserMetaData()
+                            {
+                                Path = item.Path,
+                                UserInfo = item.UserInfo,
+                                UserState = item.UserState,
+                                BanInfo = item.BanInfo,
+                            };
+                metaData.Users = query.ToArray();
+            }
+
+            metaData.AuthenticationToken = authentication.Token;
+            return metaData;
+        }
+
         public async Task<UserContextMetaData> GetMetaDataAsync(Authentication authentication)
         {
             this.ValidateExpired();

@@ -215,6 +215,24 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
+        public DataBaseCollectionMetaData GetMetaData(Authentication authentication)
+        {
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
+
+            var dataBases = this.ToArray<DataBase>();
+            var metaList = new List<DataBaseMetaData>(this.Count);
+            foreach (var item in dataBases)
+            {
+                var metaData = item.Dispatcher.Invoke(() => item.GetMetaData(authentication));
+                metaList.Add(metaData);
+            }
+            return new DataBaseCollectionMetaData()
+            {
+                DataBases = metaList.ToArray(),
+            };
+        }
+
         public async Task<DataBaseCollectionMetaData> GetMetaDataAsync(Authentication authentication)
         {
             if (authentication == null)
@@ -224,7 +242,8 @@ namespace Ntreev.Crema.Services.Data
             var metaList = new List<DataBaseMetaData>(this.Count);
             foreach (var item in dataBases)
             {
-                metaList.Add(await item.GetMetaDataAsync(authentication));
+                var metaData = await item.Dispatcher.InvokeAsync(() => item.GetMetaData(authentication));
+                metaList.Add(metaData);
             }
             return new DataBaseCollectionMetaData()
             {

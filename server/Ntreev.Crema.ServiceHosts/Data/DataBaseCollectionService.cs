@@ -61,10 +61,9 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 this.authentication = await this.UserContext.AuthenticateAsync(authenticationToken);
                 await this.authentication.AddRefAsync(this);
                 this.OwnerID = this.authentication.ID;
-                await this.AttachEventHandlersAsync();
-                this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseCollectionService)} {nameof(SubscribeAsync)}");
-                result.Value = await this.DataBases.GetMetaDataAsync(this.authentication);
+                result.Value = await this.AttachEventHandlersAsync();
                 result.SignatureDate = this.authentication.SignatureDate;
+                this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseCollectionService)} {nameof(SubscribeAsync)}");
             }
             catch (Exception e)
             {
@@ -584,13 +583,13 @@ namespace Ntreev.Crema.ServiceHosts.Data
             this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnDataBasesLockChanged(signatureDate, changeType, values, comments));
         }
 
-        private async Task AttachEventHandlersAsync()
+        private async Task<DataBaseCollectionMetaData> AttachEventHandlersAsync()
         {
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
                 this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
             });
-            await this.DataBases.Dispatcher.InvokeAsync(() =>
+            var metaData = await this.DataBases.Dispatcher.InvokeAsync(() =>
             {
                 this.DataBases.ItemsCreated += DataBases_ItemsCreated;
                 this.DataBases.ItemsRenamed += DataBases_ItemsRenamed;
@@ -605,8 +604,10 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 this.DataBases.ItemsStateChanged += DataBases_ItemsStateChanged;
                 this.DataBases.ItemsAccessChanged += DataBases_ItemsAccessChanged;
                 this.DataBases.ItemsLockChanged += DataBases_ItemsLockChanged;
+                return this.DataBases.GetMetaData(this.authentication);
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseCollectionService)} {nameof(AttachEventHandlersAsync)}");
+            return metaData;
         }
 
         private async Task DetachEventHandlersAsync()
@@ -646,9 +647,11 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         protected override async Task OnCloseAsync(bool disconnect)
         {
-            this.LogService.Info($"{nameof(DataBaseCollectionService)}.{nameof(OnCloseAsync)}");
-            await this.DetachEventHandlersAsync();
-            this.authentication = null;
+            if (this.authentication != null)
+            {
+                await this.DetachEventHandlersAsync();
+                this.authentication = null;
+            }
             await CremaService.Dispatcher.InvokeAsync(() =>
             {
                 if (disconnect == false)
@@ -668,6 +671,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                     this.Channel?.Abort();
                 }
             });
+            Console.WriteLine($"{nameof(DataBaseCollectionService)}.{nameof(OnCloseAsync)}");
         }
 
         #endregion

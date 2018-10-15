@@ -135,23 +135,23 @@ namespace Ntreev.Crema.Data
 
         private void Table_RowDeleted(object sender, DataRowChangeEventArgs e)
         {
-            this.Index = this.table.Rows.Count;
+            //this.Index = this.table.Rows.Count;
         }
 
         private void Table_RowChanged(object sender, DataRowChangeEventArgs e)
         {
-            if (e.Action == DataRowAction.Add)
-            {
-                if (e.Row == this)
-                {
-                    this.table.RowChanged -= Table_RowChanged;
-                    this.table.RowDeleted -= Table_RowDeleted;
-                }
-                else
-                {
-                    this.Index = this.table.Rows.Count;
-                }
-            }
+            //if (e.Action == DataRowAction.Add)
+            //{
+            //    if (e.Row == this)
+            //    {
+            //        this.table.RowChanged -= Table_RowChanged;
+            //        this.table.RowDeleted -= Table_RowDeleted;
+            //    }
+            //    else
+            //    {
+            //        this.Index = this.table.Rows.Count;
+            //    }
+            //}
         }
     }
 
@@ -177,6 +177,8 @@ namespace Ntreev.Crema.Data
             get
             {
                 if (this.RowState == DataRowState.Deleted || this.RowState == DataRowState.Detached)
+                    return -1;
+                if (this.Field<object>(this.table.attributeIndex) is DBNull value)
                     return -1;
                 return this.Field<int>(this.table.attributeIndex);
             }

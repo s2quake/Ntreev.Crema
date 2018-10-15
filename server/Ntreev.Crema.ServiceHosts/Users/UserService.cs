@@ -67,10 +67,8 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
                 this.authentication = await this.UserContext.LoginAsync(userID, ToSecureString(userID, password));
                 await this.authentication.AddRefAsync(this, (a) => this.UserContext.LogoutAsync(a));
-
                 this.OwnerID = this.authentication.ID;
-                await this.AttachEventHandlersAsync();
-                result.Value = await this.UserContext.GetMetaDataAsync(this.authentication);
+                result.Value = await this.AttachEventHandlersAsync();
                 result.SignatureDate = this.authentication.SignatureDate;
                 this.LogService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(SubscribeAsync)}");
             }
@@ -341,9 +339,9 @@ namespace Ntreev.Crema.ServiceHosts.Users
             this.Callback.OnServiceClosed(signatureDate, closeInfo);
         }
 
-        private async Task AttachEventHandlersAsync()
+        private async Task<UserContextMetaData> AttachEventHandlersAsync()
         {
-            await this.UserContext.Dispatcher.InvokeAsync(() =>
+            var metaData = await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
                 this.UserContext.Users.UsersStateChanged += Users_UsersStateChanged;
                 this.UserContext.Users.UsersChanged += Users_UsersChanged;
@@ -356,8 +354,10 @@ namespace Ntreev.Crema.ServiceHosts.Users
                 this.UserContext.Users.UsersKicked += Users_UsersKicked;
                 this.UserContext.Users.UsersBanChanged += Users_UsersBanChanged;
                 this.UserContext.Users.MessageReceived += UserContext_MessageReceived;
+                return this.UserContext.GetMetaData(this.authentication);
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(UserService)} {nameof(AttachEventHandlersAsync)}");
+            return metaData;
         }
 
         private async Task DetachEventHandlersAsync()
@@ -595,13 +595,13 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         protected override async Task OnCloseAsync(bool disconnect)
         {
-            this.LogService.Info($"{nameof(UserService)}.{nameof(OnCloseAsync)}");
-            await this.DetachEventHandlersAsync();
             if (this.authentication != null)
             {
+                await this.DetachEventHandlersAsync();
                 await this.UserContext.LogoutAsync(this.authentication);
+                this.authentication = null;
             }
-            this.authentication = null;
+
             await CremaService.Dispatcher.InvokeAsync(() =>
             {
                 if (disconnect == false)
@@ -621,6 +621,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
                     this.Channel?.Abort();
                 }
             });
+            Console.WriteLine($"{nameof(UserService)}.{nameof(OnCloseAsync)}");
         }
 
         #endregion

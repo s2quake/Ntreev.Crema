@@ -1185,7 +1185,7 @@ namespace Ntreev.Crema.Data
             this.attributeIndex = new InternalAttribute(CremaSchema.Index, typeof(int))
             {
                 AllowDBNull = false,
-                DefaultValue = 0,
+                DefaultValue = -1,
                 ColumnMapping = MappingType.Hidden,
             };
             this.Columns.Add(this.attributeIndex);
@@ -1279,7 +1279,7 @@ namespace Ntreev.Crema.Data
                         }
                     }
                     this.RowEventStack.Pop();
-                    this.attributeIndex.InternalDefaultValue = this.Rows.Count;
+                    //this.attributeIndex.InternalDefaultValue = this.Rows.Count;
                 }
                 else if (e.Action == DataRowAction.Commit)
                 {
@@ -1305,7 +1305,7 @@ namespace Ntreev.Crema.Data
                     }
 
                     this.rowList.Sort((x, y) => x.Index.CompareTo(y.Index));
-                    this.attributeIndex.InternalDefaultValue = this.rowList.Count;
+                    //this.attributeIndex.InternalDefaultValue = this.rowList.Count;
                 }
             }
             base.OnRowChanged(e);
@@ -1320,14 +1320,14 @@ namespace Ntreev.Crema.Data
                 this.rowList.Remove(rowItem);
             }
             this.UpdateIndex(null);
-            this.attributeIndex.InternalDefaultValue = this.rowList.Count;
+            //this.attributeIndex.InternalDefaultValue = this.rowList.Count;
         }
 
         protected override void OnTableCleared(DataTableClearEventArgs e)
         {
             base.OnTableCleared(e);
             this.rowList.Clear();
-            this.attributeIndex.InternalDefaultValue = (int)0;
+            //this.attributeIndex.InternalDefaultValue = (int)-1;
         }
 
         private void UpdateIndex(DataRow row)

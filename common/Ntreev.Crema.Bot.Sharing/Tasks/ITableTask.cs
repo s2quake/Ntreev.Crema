@@ -296,14 +296,25 @@ namespace Ntreev.Crema.Bot.Tasks
             var authentication = context.Authentication;
             if (context.AllowException == false)
             {
-                if (await table.Dispatcher.InvokeAsync(() => table.TemplatedParent) != null)
-                    return;
-                var tableState = await table.Dispatcher.InvokeAsync(() => table.TableState);
-                if (tableState != TableState.None)
+                if (await VerifyAsync() == false)
                     return;
             }
             var template = await table.NewTableAsync(authentication);
             context.Push(template);
+
+            async Task<bool> VerifyAsync()
+            {
+                if ((await table.GetAllRelationTablesAsync(item => item.TableState != TableState.None)).Any() == true)
+                    return false;
+                return await table.Dispatcher.InvokeAsync(() =>
+                {
+                    if (table.TemplatedParent != null)
+                        return false;
+                    if (table.TableState != TableState.None)
+                        return false;
+                    return true;
+                });
+            }
         }
 
         //[TaskMethod]

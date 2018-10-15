@@ -245,7 +245,7 @@ namespace Ntreev.Crema.Services.Data
                     return (items, oldNames, oldPaths, tableInfo, targetName);
                 });
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
+                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
                 var result = await this.Container.InvokeTableRenameAsync(authentication, tuple.tableInfo, name, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -278,7 +278,7 @@ namespace Ntreev.Crema.Services.Data
                     return (items, oldPaths, oldCategoryPaths, tableInfo, targetName);
                 });
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
+                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
                 var result = await this.Container.InvokeTableMoveAsync(authentication, tuple.tableInfo, categoryPath, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -310,7 +310,7 @@ namespace Ntreev.Crema.Services.Data
                     return (items, oldPaths, tableInfo);
                 });
                 var dataSet = await this.ReadDataForPathAsync(authentication, new ItemName(tuple.tableInfo.Path));
-                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
+                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
                 var result = await container.InvokeTableDeleteAsync(authentication, tuple.tableInfo, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -336,15 +336,15 @@ namespace Ntreev.Crema.Services.Data
             return this.Container.InheritAsync(authentication, this, newTableName, categoryPath, copyContent);
         }
 
-        public async Task<NewTableTemplate> NewChildAsync(Authentication authentication)
+        public async Task<NewTableTemplate> NewTableAsync(Authentication authentication)
         {
             try
             {
                 this.ValidateExpired();
                 var template = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(NewChildAsync), this);
-                    this.ValidateNewChild(authentication);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(NewTableAsync), this);
+                    this.ValidateNewTable(authentication);
                     return new NewTableTemplate(this);
                 });
                 await template.BeginEditAsync(authentication);
@@ -618,12 +618,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void ValidateNewChild(Authentication authentication)
+        public void ValidateNewTable(Authentication authentication)
         {
             if (this.TemplatedParent != null)
                 throw new InvalidOperationException(Resources.Exception_InheritedTableCannotNewChild);
             this.ValidateAccessType(authentication, AccessType.Master);
-            this.OnValidateNewChild(authentication, this);
+            this.OnValidateNewTable(authentication, this);
         }
 
         public void ValidateLockInternal(Authentication authentication)
@@ -886,19 +886,19 @@ namespace Ntreev.Crema.Services.Data
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public virtual void OnValidateNewChild(IAuthentication authentication, object target)
+        public virtual void OnValidateNewTable(IAuthentication authentication, object target)
         {
             this.ValidateIsNotBeingEdited();
             this.ValidateHasNotBeingEditedType();
 
             foreach (var item in this.Childs)
             {
-                item.OnValidateNewChild(authentication, target);
+                item.OnValidateNewTable(authentication, target);
             }
 
             foreach (var item in this.DerivedTables)
             {
-                item.OnValidateNewChild(authentication, null);
+                item.OnValidateNewTable(authentication, null);
             }
         }
 
@@ -938,7 +938,7 @@ namespace Ntreev.Crema.Services.Data
 
         async Task<ITableTemplate> ITable.NewTableAsync(Authentication authentication)
         {
-            return await this.NewChildAsync(authentication);
+            return await this.NewTableAsync(authentication);
         }
 
         ITable ITable.TemplatedParent => this.TemplatedParent;

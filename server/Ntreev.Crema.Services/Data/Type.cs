@@ -240,7 +240,7 @@ namespace Ntreev.Crema.Services.Data
                     return (items, oldNames, oldPaths, typeInfo, targetName);
                 });
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
+                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
                 var result = await this.Container.InvokeTypeRenameAsync(authentication, tuple.typeInfo, name, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -273,7 +273,7 @@ namespace Ntreev.Crema.Services.Data
                     return (items, oldPaths, oldCategoryPaths, typeInfo, targetName);
                 });
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
+                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
                 var result = await this.Container.InvokeTypeMoveAsync(authentication, tuple.typeInfo, categoryPath, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -305,7 +305,7 @@ namespace Ntreev.Crema.Services.Data
                     return (items, oldPaths, typeInfo, targetName);
                 });
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false);
+                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
                 var result = await this.Container.InvokeTypeDeleteAsync(authentication, tuple.typeInfo, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
