@@ -39,9 +39,9 @@ namespace Ntreev.Crema.ServiceHosts
             this.cremaHost = cremaHost;
         }
 
-        public ServiceInfo[] GetServiceInfos()
+        public Task<ServiceInfo[]> GetServiceInfosAsync()
         {
-            return this.service.ServiceInfos;
+            return Task.Run(() => this.service.ServiceInfos);
         }
 
         public Task<DataBaseInfo[]> GetDataBaseInfosAsync()

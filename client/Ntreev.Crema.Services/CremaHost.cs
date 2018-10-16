@@ -228,7 +228,7 @@ namespace Ntreev.Crema.Services
                 if (this.ServiceState != ServiceState.Opened)
                     throw new InvalidOperationException(Resources.Exception_NotConnected);
                 await this.CloseAsync(CloseInfo.Empty);
-                
+
             }
             catch (Exception e)
             {
@@ -497,6 +497,7 @@ namespace Ntreev.Crema.Services
             try
             {
                 var version = await serviceClient.GetVersionAsync();
+                Console.WriteLine(version);
                 var serviceInfos = await serviceClient.GetServiceInfosAsync();
                 return serviceInfos.ToDictionary(item => item.Name);
             }

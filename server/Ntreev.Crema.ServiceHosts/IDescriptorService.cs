@@ -28,7 +28,7 @@ namespace Ntreev.Crema.ServiceHosts
     [ServiceContract(Namespace = CremaService.Namespace)]
     public interface IDescriptorService
     {
-        [OperationContract(IsInitiating = true)]
+        [OperationContract]
         Task<string> GetVersionAsync();
 
         [OperationContract]
@@ -38,6 +38,6 @@ namespace Ntreev.Crema.ServiceHosts
         Task<DataBaseInfo[]> GetDataBaseInfosAsync();
 
         [OperationContract]
-        ServiceInfo[] GetServiceInfos();
+        Task<ServiceInfo[]> GetServiceInfosAsync();
     }
 }
