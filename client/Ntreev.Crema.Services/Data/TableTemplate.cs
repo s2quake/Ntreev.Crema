@@ -85,14 +85,14 @@ namespace Ntreev.Crema.Services.Data
 
         protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
         {
-            return this.Service.BeginTableTemplateEditAsync(this.table.Name);
+            return Task.Run(() => this.Service.BeginTableTemplateEdit(this.table.Name));
         }
 
         protected override async Task<TableInfo[]> EndDomainAsync(Authentication authentication, object args)
         {
             if (args is Guid domainID)
             {
-                var result = await this.Service.EndTableTemplateEditAsync(domainID);
+                var result = await Task.Run(() => this.Service.EndTableTemplateEdit(domainID));
                 return result.GetValue();
             }
             return args as TableInfo[];
@@ -100,7 +100,7 @@ namespace Ntreev.Crema.Services.Data
 
         protected override Task<ResultBase> CancelDomainAsync(Authentication authentication, Guid domainID)
         {
-            return this.Service.CancelTableTemplateEditAsync(domainID);
+            return Task.Run(() => this.Service.CancelTableTemplateEdit(domainID));
         }
 
         private TableCollection Container => this.table.Container;

@@ -44,7 +44,7 @@ namespace Ntreev.Crema.Services.Users
                     var path = base.Path;
                     return (items, oldNames, oldPaths, path);
                 });
-                var result = await this.Service.RenameUserItemAsync(tuple.path, name);
+                var result = await Task.Run(() => this.Service.RenameUserItem(tuple.path, name));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -73,7 +73,7 @@ namespace Ntreev.Crema.Services.Users
                     var path = base.Path;
                     return (items, oldPaths, oldParentPaths, path);
                 });
-                var result = await this.Service.MoveUserItemAsync(tuple.path, parentPath);
+                var result = await Task.Run(() => this.Service.MoveUserItem(tuple.path, parentPath));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -101,7 +101,7 @@ namespace Ntreev.Crema.Services.Users
                     var path = base.Path;
                     return (items, oldPaths, path);
                 });
-                var result = await this.Service.DeleteUserItemAsync(tuple.path);
+                var result = await Task.Run(() => this.Service.DeleteUserItem(tuple.path));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var container = this.Container;

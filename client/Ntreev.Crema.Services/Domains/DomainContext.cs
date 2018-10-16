@@ -85,7 +85,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public async Task<DomainMetaData[]> RestoreAsync(Authentication authentication, DataBase dataBase)
         {
-            var result = await this.service.GetMetaDataAsync();
+            var result = await Task.Run(() => this.service.GetMetaData());
             this.CremaHost.Sign(authentication, result);
 
             var metaData = result.Value;
@@ -154,7 +154,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     if (closeInfo.Reason != CloseReason.NoResponding)
                     {
-                        await this.service.UnsubscribeAsync();
+                        await Task.Run(() => this.service.Unsubscribe());
                         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                             this.service.Close();
                         else
@@ -504,7 +504,7 @@ namespace Ntreev.Crema.Services.Domains
             this.timer?.Stop();
             try
             {
-                await this.service.IsAliveAsync();
+                await Task.Run(() => this.service.IsAlive());
                 this.timer?.Start();
             }
             catch

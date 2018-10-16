@@ -118,7 +118,7 @@ namespace Ntreev.Crema.Services.Data
 
             public async Task<SignatureDate> BeginContentAsync(Authentication authentication, string name)
             {
-                var result = await this.Service.BeginTableContentEditAsync(name);
+                var result = await Task.Run(() => this.Service.BeginTableContentEdit(name));
                 if (this.domain == null)
                 {
                     this.domain = await this.DomainContext.CreateAsync(authentication, result.Value);
@@ -152,7 +152,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (args is string name)
                 {
-                    var result = await this.Service.EndTableContentEditAsync(name);
+                    var result = await Task.Run(() => this.Service.EndTableContentEdit(name));
                     return result.GetValue();
                 }
                 return args as TableInfo[];                
@@ -193,7 +193,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (args is string name)
                 {
-                    var result = await this.Service.CancelTableContentEditAsync(name);
+                    var result = await Task.Run(() => this.Service.CancelTableContentEdit(name));
                 }
                 if (this.domain != null)
                 {
@@ -216,7 +216,7 @@ namespace Ntreev.Crema.Services.Data
 
             public async Task EnterContentAsync(Authentication authentication, string name)
             {
-                var result = await this.Service.EnterTableContentEditAsync(name);
+                var result = await Task.Run(() => this.Service.EnterTableContentEdit(name));
                 await this.domain.InitializeAsync(authentication, result.Value);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -237,7 +237,7 @@ namespace Ntreev.Crema.Services.Data
 
             public async Task LeaveContentAsync(Authentication authentication, string name)
             {
-                var result = await this.Service.LeaveTableContentEditAsync(name);
+                var result = await Task.Run(() => this.Service.LeaveTableContentEdit(name));
                 await this.domain.ReleaseAsync(authentication, result.Value);
                 await this.Dispatcher.InvokeAsync(() =>
                 {

@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
                     return base.Path;
                 });
-                var result = await this.Service.SetPublicTableItemAsync(path);
+                var result = await Task.Run(() => this.Service.SetPublicTableItem(path));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -79,7 +79,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
                     return base.Path;
                 });
-                var result = await this.Service.SetPrivateTableItemAsync(path);
+                var result = await Task.Run(() => this.Service.SetPrivateTableItem(path));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -104,7 +104,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMemberAsync), this, memberID, accessType);
                     return base.Path;
                 });
-                var result = await this.Service.AddAccessMemberTableItemAsync(path, memberID, accessType);
+                var result = await Task.Run(() => this.Service.AddAccessMemberTableItem(path, memberID, accessType));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -129,7 +129,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
                     return base.Path;
                 });
-                var result = await this.Service.SetAccessMemberTableItemAsync(path, memberID, accessType);
+                var result = await Task.Run(() => this.Service.SetAccessMemberTableItem(path, memberID, accessType));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -154,7 +154,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
                     return base.Path;
                 });
-                var result = await this.Service.RemoveAccessMemberTableItemAsync(path, memberID);
+                var result = await Task.Run(() => this.Service.RemoveAccessMemberTableItem(path, memberID));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -179,7 +179,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(LockAsync), this, comment);
                     return base.Path;
                 });
-                var result = await this.Service.LockTableItemAsync(path, comment);
+                var result = await Task.Run(() => this.Service.LockTableItem(path, comment));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -204,7 +204,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnlockAsync), this);
                     return base.Path;
                 });
-                var result = await this.Service.UnlockTableItemAsync(path);
+                var result = await Task.Run(() => this.Service.UnlockTableItem(path));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -233,7 +233,7 @@ namespace Ntreev.Crema.Services.Data
                     var path = base.Path;
                     return (items, oldNames, oldPaths, path);
                 });
-                var result = await this.Service.RenameTableItemAsync(tuple.path, name);
+                var result = await Task.Run(() => this.Service.RenameTableItem(tuple.path, name));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -262,7 +262,7 @@ namespace Ntreev.Crema.Services.Data
                     var path = base.Path;
                     return (items, oldPaths, oldParentPaths, path);
                 });
-                var result = await this.Service.MoveTableItemAsync(tuple.path, parentPath);
+                var result = await Task.Run(() => this.Service.MoveTableItem(tuple.path, parentPath));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -290,7 +290,7 @@ namespace Ntreev.Crema.Services.Data
                     var path = base.Path;
                     return (items, oldPaths, path);
                 });
-                var result = await this.Service.DeleteTableItemAsync(tuple.path);
+                var result = await Task.Run(() => this.Service.DeleteTableItem(tuple.path));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var container = this.Container;
@@ -336,7 +336,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, revision);
                     return base.Path;
                 });
-                var result = await this.Service.GetTableItemDataSetAsync(path, revision);
+                var result = await Task.Run(() => this.Service.GetTableItemDataSet(path, revision));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -360,7 +360,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetLogAsync), this);
                     return base.Path;
                 });
-                var result = await this.Service.GetTableItemLogAsync(path, revision);
+                var result = await Task.Run(() => this.Service.GetTableItemLog(path, revision));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -384,7 +384,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(FindAsync), this, text, options);
                     return base.Path;
                 });
-                var result = await this.Service.FindTableItemAsync(path, text, options);
+                var result = await Task.Run(() => this.Service.FindTableItem(path, text, options));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);

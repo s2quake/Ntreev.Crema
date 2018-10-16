@@ -61,7 +61,7 @@ namespace Ntreev.Crema.Services
             serviceClient.Open();
             try
             {
-                return await serviceClient.IsOnlineAsync(userID, UserContext.Encrypt(userID, password));
+                return await Task.Run(() => serviceClient.IsOnline(userID, UserContext.Encrypt(userID, password)));
             }
             finally
             {

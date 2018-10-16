@@ -245,7 +245,7 @@ namespace Ntreev.Crema.Services
                 {
                     this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, shutdownType, message);
                 });
-                var result = await this.UserContext.Service.ShutdownAsync(milliseconds, shutdownType, message);
+                var result = await Task.Run(() => this.UserContext.Service.Shutdown(milliseconds, shutdownType, message));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Sign(authentication, result);
@@ -266,7 +266,7 @@ namespace Ntreev.Crema.Services
                 {
                     this.DebugMethod(authentication, this, nameof(CancelShutdownAsync));
                 });
-                var result = await this.UserContext.Service.CancelShutdownAsync();
+                var result = await Task.Run(() => this.UserContext.Service.CancelShutdown());
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Sign(authentication, result);
@@ -496,9 +496,9 @@ namespace Ntreev.Crema.Services
             serviceClient.Open();
             try
             {
-                var version = await serviceClient.GetVersionAsync();
+                var version = serviceClient.GetVersion();
                 Console.WriteLine(version);
-                var serviceInfos = await serviceClient.GetServiceInfosAsync();
+                var serviceInfos = serviceClient.GetServiceInfos();
                 return serviceInfos.ToDictionary(item => item.Name);
             }
             finally

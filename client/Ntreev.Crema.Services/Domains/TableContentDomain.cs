@@ -40,7 +40,7 @@ namespace Ntreev.Crema.Services.Domains
         public TableContentDomain(DomainInfo domainInfo)
             : base(domainInfo)
         {
-            
+
         }
 
         public override object Source => this.DataSet;
@@ -71,7 +71,7 @@ namespace Ntreev.Crema.Services.Domains
             base.OnInitialize(metaData);
 
             var xml = Encoding.UTF8.GetString(metaData.Data).Decompress();
-            if(this.DataSet != null)
+            if (this.DataSet != null)
             {
                 int qwer = 0;
             }
@@ -119,7 +119,7 @@ namespace Ntreev.Crema.Services.Domains
                         var table = view.Table;
                         var count = table.Rows.Count;
                         CremaDomainUtility.AddNew(view, item.Fields);
-                        if(table.Rows.Count == count)
+                        if (table.Rows.Count == count)
                         {
                             int qwer = 0;
                         }

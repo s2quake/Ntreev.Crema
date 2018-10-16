@@ -149,7 +149,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewDataBaseAsync), dataBaseName, comment);
                 });
-                var result = await this.service.CreateAsync(dataBaseName, comment);
+                var result = await Task.Run(() => this.service.Create(dataBaseName, comment));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -222,7 +222,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyDataBaseAsync), dataBase, newDataBaseName, comment, force);
                     return dataBase.Name;
                 });
-                var result = await this.service.CopyAsync(name, newDataBaseName, comment, force);
+                var result = await Task.Run(() => this.service.Copy(name, newDataBaseName, comment, force));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -466,7 +466,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     if (closeInfo.Reason != CloseReason.NoResponding)
                     {
-                        await this.service.UnsubscribeAsync();
+                        await Task.Run(() => this.service.Unsubscribe());
                         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                             this.service.Close();
                         else

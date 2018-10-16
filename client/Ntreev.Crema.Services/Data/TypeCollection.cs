@@ -79,7 +79,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), typeName, newTypeName, categoryPath);
                 });
-                var result = await this.Context.Service.CopyTypeAsync(typeName, newTypeName, categoryPath);
+                var result = await Task.Run(() => this.Context.Service.CopyType(typeName, newTypeName, categoryPath));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);

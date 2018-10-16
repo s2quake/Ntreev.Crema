@@ -33,7 +33,7 @@ using Ntreev.Library;
 namespace Ntreev.Crema.ServiceHosts.Domains
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    class DomainService : CremaServiceItemBase<IDomainEventCallback>, IDomainService
+    partial class DomainService : CremaServiceItemBase<IDomainEventCallback>, IDomainService
     {
         private Authentication authentication;
 

@@ -18,26 +18,14 @@ namespace Ntreev.Crema.Services.DescriptorService {
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDescriptorService/GetVersion", ReplyAction="http://www.ntreev.com/IDescriptorService/GetVersionResponse")]
         string GetVersion();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDescriptorService/GetVersion", ReplyAction="http://www.ntreev.com/IDescriptorService/GetVersionResponse")]
-        System.Threading.Tasks.Task<string> GetVersionAsync();
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDescriptorService/IsOnline", ReplyAction="http://www.ntreev.com/IDescriptorService/IsOnlineResponse")]
         bool IsOnline(string userID, byte[] password);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDescriptorService/IsOnline", ReplyAction="http://www.ntreev.com/IDescriptorService/IsOnlineResponse")]
-        System.Threading.Tasks.Task<bool> IsOnlineAsync(string userID, byte[] password);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDescriptorService/GetDataBaseInfos", ReplyAction="http://www.ntreev.com/IDescriptorService/GetDataBaseInfosResponse")]
         Ntreev.Crema.ServiceModel.DataBaseInfo[] GetDataBaseInfos();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDescriptorService/GetDataBaseInfos", ReplyAction="http://www.ntreev.com/IDescriptorService/GetDataBaseInfosResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.DataBaseInfo[]> GetDataBaseInfosAsync();
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDescriptorService/GetServiceInfos", ReplyAction="http://www.ntreev.com/IDescriptorService/GetServiceInfosResponse")]
         Ntreev.Crema.ServiceModel.ServiceInfo[] GetServiceInfos();
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDescriptorService/GetServiceInfos", ReplyAction="http://www.ntreev.com/IDescriptorService/GetServiceInfosResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ServiceInfo[]> GetServiceInfosAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -71,32 +59,16 @@ namespace Ntreev.Crema.Services.DescriptorService {
             return base.Channel.GetVersion();
         }
         
-        public System.Threading.Tasks.Task<string> GetVersionAsync() {
-            return base.Channel.GetVersionAsync();
-        }
-        
         public bool IsOnline(string userID, byte[] password) {
             return base.Channel.IsOnline(userID, password);
-        }
-        
-        public System.Threading.Tasks.Task<bool> IsOnlineAsync(string userID, byte[] password) {
-            return base.Channel.IsOnlineAsync(userID, password);
         }
         
         public Ntreev.Crema.ServiceModel.DataBaseInfo[] GetDataBaseInfos() {
             return base.Channel.GetDataBaseInfos();
         }
         
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.DataBaseInfo[]> GetDataBaseInfosAsync() {
-            return base.Channel.GetDataBaseInfosAsync();
-        }
-        
         public Ntreev.Crema.ServiceModel.ServiceInfo[] GetServiceInfos() {
             return base.Channel.GetServiceInfos();
-        }
-        
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ServiceInfo[]> GetServiceInfosAsync() {
-            return base.Channel.GetServiceInfosAsync();
         }
     }
 }

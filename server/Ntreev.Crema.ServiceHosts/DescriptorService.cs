@@ -39,26 +39,28 @@ namespace Ntreev.Crema.ServiceHosts
             this.cremaHost = cremaHost;
         }
 
-        public Task<ServiceInfo[]> GetServiceInfosAsync()
+        public ServiceInfo[] GetServiceInfos()
         {
-            return Task.Run(() => this.service.ServiceInfos);
+            return this.service.ServiceInfos;
         }
 
-        public Task<DataBaseInfo[]> GetDataBaseInfosAsync()
+        public DataBaseInfo[] GetDataBaseInfos()
         {
-            return this.DataBases.Dispatcher.InvokeAsync(() => this.DataBases.Select(item => item.DataBaseInfo).ToArray());
+            return this.DataBases.Dispatcher.Invoke(() => this.DataBases.Select(item => item.DataBaseInfo).ToArray());
         }
 
-        public Task<string> GetVersionAsync()
+        public string GetVersion()
         {
-            return Task.Run(() => AppUtility.ProductVersion.ToString());
+            return AppUtility.ProductVersion.ToString();
         }
 
-        public Task<bool> IsOnlineAsync(string userID, byte[] password)
+        public bool IsOnline(string userID, byte[] password)
         {
             var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
             var text = Encoding.UTF8.GetString(password);
-            return userContext.IsOnlineUserAsync(userID, StringUtility.ToSecureString(StringUtility.Decrypt(text, userID)));
+            var task = userContext.IsOnlineUserAsync(userID, StringUtility.ToSecureString(StringUtility.Decrypt(text, userID)));
+            task.Wait();
+            return task.Result;
         }
 
         private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;

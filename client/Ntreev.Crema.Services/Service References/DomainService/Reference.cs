@@ -18,44 +18,23 @@ namespace Ntreev.Crema.Services.DomainService {
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/Subscribe", ReplyAction="http://www.ntreev.com/IDomainService/SubscribeResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainContextMetaData> Subscribe(System.Guid authenticationToken);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/Subscribe", ReplyAction="http://www.ntreev.com/IDomainService/SubscribeResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainContextMetaData>> SubscribeAsync(System.Guid authenticationToken);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/Unsubscribe", ReplyAction="http://www.ntreev.com/IDomainService/UnsubscribeResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Unsubscribe();
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/Unsubscribe", ReplyAction="http://www.ntreev.com/IDomainService/UnsubscribeResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> UnsubscribeAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/GetMetaData", ReplyAction="http://www.ntreev.com/IDomainService/GetMetaDataResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainContextMetaData> GetMetaData();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/GetMetaData", ReplyAction="http://www.ntreev.com/IDomainService/GetMetaDataResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainContextMetaData>> GetMetaDataAsync();
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/SetUserLocation", ReplyAction="http://www.ntreev.com/IDomainService/SetUserLocationResponse")]
         Ntreev.Crema.ServiceModel.ResultBase SetUserLocation(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo location);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/SetUserLocation", ReplyAction="http://www.ntreev.com/IDomainService/SetUserLocationResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> SetUserLocationAsync(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo location);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/NewRow", ReplyAction="http://www.ntreev.com/IDomainService/NewRowResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]> NewRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/NewRow", ReplyAction="http://www.ntreev.com/IDomainService/NewRowResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]>> NewRowAsync(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/RemoveRow", ReplyAction="http://www.ntreev.com/IDomainService/RemoveRowResponse")]
         Ntreev.Crema.ServiceModel.ResultBase RemoveRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/RemoveRow", ReplyAction="http://www.ntreev.com/IDomainService/RemoveRowResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> RemoveRowAsync(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/SetRow", ReplyAction="http://www.ntreev.com/IDomainService/SetRowResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]> SetRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/SetRow", ReplyAction="http://www.ntreev.com/IDomainService/SetRowResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]>> SetRowAsync(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/SetProperty", ReplyAction="http://www.ntreev.com/IDomainService/SetPropertyResponse")]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(System.DBNull))]
@@ -97,32 +76,17 @@ namespace Ntreev.Crema.Services.DomainService {
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(string[]))]
         Ntreev.Crema.ServiceModel.ResultBase SetProperty(System.Guid domainID, string propertyName, object value);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/SetProperty", ReplyAction="http://www.ntreev.com/IDomainService/SetPropertyResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> SetPropertyAsync(System.Guid domainID, string propertyName, object value);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/BeginUserEdit", ReplyAction="http://www.ntreev.com/IDomainService/BeginUserEditResponse")]
         Ntreev.Crema.ServiceModel.ResultBase BeginUserEdit(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo location);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/BeginUserEdit", ReplyAction="http://www.ntreev.com/IDomainService/BeginUserEditResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> BeginUserEditAsync(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo location);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/EndUserEdit", ReplyAction="http://www.ntreev.com/IDomainService/EndUserEditResponse")]
         Ntreev.Crema.ServiceModel.ResultBase EndUserEdit(System.Guid domainID);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/EndUserEdit", ReplyAction="http://www.ntreev.com/IDomainService/EndUserEditResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> EndUserEditAsync(System.Guid domainID);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/Kick", ReplyAction="http://www.ntreev.com/IDomainService/KickResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainUserInfo> Kick(System.Guid domainID, string userID, string comment);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/Kick", ReplyAction="http://www.ntreev.com/IDomainService/KickResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainUserInfo>> KickAsync(System.Guid domainID, string userID, string comment);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/SetOwner", ReplyAction="http://www.ntreev.com/IDomainService/SetOwnerResponse")]
         Ntreev.Crema.ServiceModel.ResultBase SetOwner(System.Guid domainID, string userID);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/SetOwner", ReplyAction="http://www.ntreev.com/IDomainService/SetOwnerResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> SetOwnerAsync(System.Guid domainID, string userID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/DeleteDomain", ReplyAction="http://www.ntreev.com/IDomainService/DeleteDomainResponse")]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(System.DBNull))]
@@ -163,14 +127,8 @@ namespace Ntreev.Crema.Services.DomainService {
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(string[]))]
         Ntreev.Crema.ServiceModel.ResultBase<object> DeleteDomain(System.Guid domainID, bool force);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/DeleteDomain", ReplyAction="http://www.ntreev.com/IDomainService/DeleteDomainResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<object>> DeleteDomainAsync(System.Guid domainID, bool force);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/IsAlive", ReplyAction="http://www.ntreev.com/IDomainService/IsAliveResponse")]
         bool IsAlive();
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/IsAlive", ReplyAction="http://www.ntreev.com/IDomainService/IsAliveResponse")]
-        System.Threading.Tasks.Task<bool> IsAliveAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -319,112 +277,56 @@ namespace Ntreev.Crema.Services.DomainService {
             return base.Channel.Subscribe(authenticationToken);
         }
         
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainContextMetaData>> SubscribeAsync(System.Guid authenticationToken) {
-            return base.Channel.SubscribeAsync(authenticationToken);
-        }
-        
         public Ntreev.Crema.ServiceModel.ResultBase Unsubscribe() {
             return base.Channel.Unsubscribe();
-        }
-        
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> UnsubscribeAsync() {
-            return base.Channel.UnsubscribeAsync();
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainContextMetaData> GetMetaData() {
             return base.Channel.GetMetaData();
         }
         
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainContextMetaData>> GetMetaDataAsync() {
-            return base.Channel.GetMetaDataAsync();
-        }
-        
         public Ntreev.Crema.ServiceModel.ResultBase SetUserLocation(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo location) {
             return base.Channel.SetUserLocation(domainID, location);
-        }
-        
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> SetUserLocationAsync(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo location) {
-            return base.Channel.SetUserLocationAsync(domainID, location);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]> NewRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows) {
             return base.Channel.NewRow(domainID, rows);
         }
         
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]>> NewRowAsync(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows) {
-            return base.Channel.NewRowAsync(domainID, rows);
-        }
-        
         public Ntreev.Crema.ServiceModel.ResultBase RemoveRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows) {
             return base.Channel.RemoveRow(domainID, rows);
-        }
-        
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> RemoveRowAsync(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows) {
-            return base.Channel.RemoveRowAsync(domainID, rows);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]> SetRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows) {
             return base.Channel.SetRow(domainID, rows);
         }
         
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]>> SetRowAsync(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows) {
-            return base.Channel.SetRowAsync(domainID, rows);
-        }
-        
         public Ntreev.Crema.ServiceModel.ResultBase SetProperty(System.Guid domainID, string propertyName, object value) {
             return base.Channel.SetProperty(domainID, propertyName, value);
-        }
-        
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> SetPropertyAsync(System.Guid domainID, string propertyName, object value) {
-            return base.Channel.SetPropertyAsync(domainID, propertyName, value);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase BeginUserEdit(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo location) {
             return base.Channel.BeginUserEdit(domainID, location);
         }
         
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> BeginUserEditAsync(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo location) {
-            return base.Channel.BeginUserEditAsync(domainID, location);
-        }
-        
         public Ntreev.Crema.ServiceModel.ResultBase EndUserEdit(System.Guid domainID) {
             return base.Channel.EndUserEdit(domainID);
-        }
-        
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> EndUserEditAsync(System.Guid domainID) {
-            return base.Channel.EndUserEditAsync(domainID);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainUserInfo> Kick(System.Guid domainID, string userID, string comment) {
             return base.Channel.Kick(domainID, userID, comment);
         }
         
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainUserInfo>> KickAsync(System.Guid domainID, string userID, string comment) {
-            return base.Channel.KickAsync(domainID, userID, comment);
-        }
-        
         public Ntreev.Crema.ServiceModel.ResultBase SetOwner(System.Guid domainID, string userID) {
             return base.Channel.SetOwner(domainID, userID);
-        }
-        
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> SetOwnerAsync(System.Guid domainID, string userID) {
-            return base.Channel.SetOwnerAsync(domainID, userID);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<object> DeleteDomain(System.Guid domainID, bool force) {
             return base.Channel.DeleteDomain(domainID, force);
         }
         
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<object>> DeleteDomainAsync(System.Guid domainID, bool force) {
-            return base.Channel.DeleteDomainAsync(domainID, force);
-        }
-        
         public bool IsAlive() {
             return base.Channel.IsAlive();
-        }
-        
-        public System.Threading.Tasks.Task<bool> IsAliveAsync() {
-            return base.Channel.IsAliveAsync();
         }
     }
 }

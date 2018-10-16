@@ -94,7 +94,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
                     return base.Name;
                 });
-                var result = await this.DataBases.Service.SetPublicAsync(name);
+                var result = await Task.Run(() => this.DataBases.Service.SetPublic(name));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -120,7 +120,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
                     return base.Name;
                 });
-                var result = await this.DataBases.Service.SetPrivateAsync(name);
+                var result = await Task.Run(() => this.DataBases.Service.SetPrivate(name));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -146,7 +146,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMember), this, memberID, accessType);
                     return base.Name;
                 });
-                var result = await this.DataBases.Service.AddAccessMemberAsync(name, memberID, accessType);
+                var result = await Task.Run(() => this.DataBases.Service.AddAccessMember(name, memberID, accessType));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -172,7 +172,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
                     return base.Name;
                 });
-                var result = await this.DataBases.Service.SetAccessMemberAsync(name, memberID, accessType);
+                var result = await Task.Run(() => this.DataBases.Service.SetAccessMember(name, memberID, accessType));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -198,7 +198,7 @@ namespace Ntreev.Crema.Services.Data
                    this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
                    return base.Name;
                });
-                var result = await this.DataBases.Service.RemoveAccessMemberAsync(name, memberID);
+                var result = await Task.Run(() => this.DataBases.Service.RemoveAccessMember(name, memberID));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -224,7 +224,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(LockAsync), this);
                     return base.Name;
                 });
-                var result = await this.DataBases.Service.LockAsync(name, comment);
+                var result = await Task.Run(() => this.DataBases.Service.Lock(name, comment));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -250,7 +250,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnlockAsync), this);
                     return base.Name;
                 });
-                var result = await this.DataBases.Service.UnlockAsync(name);
+                var result = await Task.Run(() => this.DataBases.Service.Unlock(name));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -275,7 +275,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(LoadAsync), this);
                 });
-                var result = await this.DataBases.Service.LoadAsync(base.Name);
+                var result = await Task.Run(() => this.DataBases.Service.Load(base.Name));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -301,7 +301,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnloadAsync), this);
                 });
-                var result = await this.DataBases.Service.UnloadAsync(base.Name);
+                var result = await Task.Run(() => this.DataBases.Service.Unload(base.Name));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -419,7 +419,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
                     return base.Name;
                 });
-                var result = await this.DataBases.Service.RenameAsync(oldName, name);
+                var result = await Task.Run(() => this.DataBases.Service.Rename(oldName, name));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -445,7 +445,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     return base.Name;
                 });
-                var result = await this.DataBases.Service.DeleteAsync(name);
+                var result = await Task.Run(() => this.DataBases.Service.Delete(name));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -475,7 +475,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetLogAsync), this);
                     return base.Name;
                 });
-                var result = await this.DataBases.Service.GetLogAsync(name, revision);
+                var result = await Task.Run(() => this.DataBases.Service.GetLog(name, revision));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -499,7 +499,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(RevertAsync), this, revision);
                     return base.Name;
                 });
-                var result = await this.DataBases.Service.RevertAsync(name, revision);
+                var result = await Task.Run(() => this.DataBases.Service.Revert(name, revision));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -521,7 +521,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(ImportAsync), this, comment);
                 });
-                var result = await this.Service.ImportDataSetAsync(dataSet, comment);
+                var result = await Task.Run(() => this.Service.ImportDataSet(dataSet, comment));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -543,7 +543,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, dataSetType, filterExpression, revision);
                 });
-                var result = await this.Service.GetDataSetAsync(dataSetType, filterExpression, revision);
+                var result = await Task.Run(() => this.Service.GetDataSet(dataSetType, filterExpression, revision));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -564,7 +564,7 @@ namespace Ntreev.Crema.Services.Data
                 this.ValidateExpired();
                 return await await this.Dispatcher.InvokeAsync(async () =>
                 {
-                    var result = await this.DataBases.Service.BeginTransactionAsync(base.Name);
+                    var result = await Task.Run(() => this.DataBases.Service.BeginTransaction(base.Name));
                     this.CremaHost.Sign(authentication, result);
                     if (this.IsLocked == false)
                     {
@@ -669,7 +669,7 @@ namespace Ntreev.Crema.Services.Data
             await this.CremaHost.DomainContext.AddDomainsAsync(domains);
             if (this.Dispatcher.Owner is DataBase)
             {
-                var result = await this.service.GetMetaDataAsync();
+                var result = await Task.Run(() => this.service.GetMetaData());
                 this.TypeContext = new TypeContext(this, result.Value);
                 this.TableContext = new TableContext(this, result.Value);
                 await this.AttachDomainHostAsync();
@@ -761,7 +761,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     if (closeInfo.Reason != CloseReason.NoResponding)
                     {
-                        await this.service.UnsubscribeAsync();
+                        await Task.Run(() => this.service.Unsubscribe());
                         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                             this.service.Close();
                         else
@@ -1141,7 +1141,7 @@ namespace Ntreev.Crema.Services.Data
 
         private async Task<SignatureDate> ReleaseServiceAsync()
         {
-            var result = await this.service.UnsubscribeAsync();
+            var result = await Task.Run(() => this.service.Unsubscribe());
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                 this.service.Close();
             else

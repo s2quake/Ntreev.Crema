@@ -46,7 +46,7 @@ namespace Ntreev.Crema.Services.Data
                      this.dataBase.VerifyAccess(authentication);
                      return this.dataBase.Name;
                  });
-                var result = await this.service.EndTransactionAsync(name);
+                var result = await Task.Run(() => this.service.EndTransaction(name));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -70,7 +70,7 @@ namespace Ntreev.Crema.Services.Data
                     this.dataBase.VerifyAccess(authentication);
                     return this.dataBase.Name;
                 });
-                var result = await this.service.CancelTransactionAsync(this.dataBase.Name);
+                var result = await Task.Run(() => this.service.CancelTransaction(this.dataBase.Name));
                 this.CremaHost.Sign(authentication, result);
                 await this.RollbackDomainsAsync(authentication);
                 await this.Dispatcher.InvokeAsync(() =>

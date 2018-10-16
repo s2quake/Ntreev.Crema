@@ -78,14 +78,14 @@ namespace Ntreev.Crema.Services.Data
 
         protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
         {
-            return this.Service.BeginNewTypeAsync(this.category.Path);
+            return Task.Run(() => this.Service.BeginNewType(this.category.Path));
         }
 
         protected override async Task<TypeInfo[]> EndDomainAsync(Authentication authentication, object args)
         {
             if (args is Guid domainID)
             {
-                var result = await this.Service.EndTypeTemplateEditAsync(domainID);
+                var result = await Task.Run(() => this.Service.EndTypeTemplateEdit(domainID));
                 return result.GetValue();
             }
             return args as TypeInfo[];
@@ -93,7 +93,7 @@ namespace Ntreev.Crema.Services.Data
 
         protected override Task<ResultBase> CancelDomainAsync(Authentication authentication, Guid domainID)
         {
-            return this.Service.CancelTypeTemplateEditAsync(domainID);
+            return Task.Run(() => this.Service.CancelTypeTemplateEdit(domainID));
         }
 
         public IDataBaseService Service => this.category.Service;

@@ -33,7 +33,7 @@ using Ntreev.Library;
 namespace Ntreev.Crema.ServiceHosts.Data
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    class DataBaseCollectionService : CremaServiceItemBase<IDataBaseCollectionEventCallback>, IDataBaseCollectionService
+    partial class DataBaseCollectionService : CremaServiceItemBase<IDataBaseCollectionEventCallback>, IDataBaseCollectionService
     {
         private Authentication authentication;
 

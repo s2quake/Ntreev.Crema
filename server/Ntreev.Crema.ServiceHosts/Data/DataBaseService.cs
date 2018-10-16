@@ -35,7 +35,7 @@ using System.Text;
 namespace Ntreev.Crema.ServiceHosts.Data
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    class DataBaseService : CremaServiceItemBase<IDataBaseEventCallback>, IDataBaseService
+    partial class DataBaseService : CremaServiceItemBase<IDataBaseEventCallback>, IDataBaseService
     {
         private IDataBase dataBase;
         private Authentication authentication;

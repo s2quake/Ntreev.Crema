@@ -61,7 +61,7 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
                 });
-                var result = await this.Service.NewUserAsync(userID, categoryPath, UserContext.Encrypt(userID, password), userName, authority);
+                var result = await Task.Run(() => this.Service.NewUser(userID, categoryPath, UserContext.Encrypt(userID, password), userName, authority));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);

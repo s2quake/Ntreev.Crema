@@ -51,7 +51,7 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);
                 });
                 var categoryName = new CategoryName(parentPath, name);
-                var result = await this.Context.Service.NewUserCategoryAsync(categoryName);
+                var result = await Task.Run(() => this.Context.Service.NewUserCategory(categoryName));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
