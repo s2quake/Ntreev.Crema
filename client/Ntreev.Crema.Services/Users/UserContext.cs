@@ -506,7 +506,7 @@ namespace Ntreev.Crema.Services.Users
 
         async void IUserServiceCallback.OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
-            this.service.Abort();
+            this.service.Close();
             this.service = null;
             this.timer?.Dispose();
             this.timer = null;
@@ -854,7 +854,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUsersLoggedOut(SignatureDate signatureDate, string[] userIDs)
+        async void IUserServiceCallback.OnUsersLoggedOut(SignatureDate signatureDate, string[] userIDs, CloseInfo closeInfo)
         {
             try
             {
@@ -868,7 +868,7 @@ namespace Ntreev.Crema.Services.Users
                         user.IsOnline = false;
                         users[i] = user;
                     }
-                    this.Users.InvokeUsersLoggedOutEvent(authentication, users, CloseInfo.Empty);
+                    this.Users.InvokeUsersLoggedOutEvent(authentication, users, closeInfo);
                 });
             }
             catch (Exception e)
@@ -964,11 +964,6 @@ namespace Ntreev.Crema.Services.Users
             {
                 this.CremaHost.Error(e);
             }
-        }
-
-        bool IUserServiceCallback.OnPing()
-        {
-            return true;
         }
 
         #endregion

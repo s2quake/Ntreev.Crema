@@ -20,6 +20,7 @@ using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Data.Serializations;
 using Ntreev.Crema.Services.Properties;
+using Ntreev.Crema.Services.Users;
 using Ntreev.Library;
 using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
@@ -52,15 +53,14 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.Debug(Resources.Message_TableContextInitialize);
             this.BasePath = Path.Combine(dataBase.BasePath, CremaSchema.TableDirectory);
             this.Initialize(tableInfos);
-            this.CremaHost.UserContext.Dispatcher.Invoke(() => this.CremaHost.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
+            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
             this.CremaHost.Debug(Resources.Message_TableContextIsCreated);
         }
 
         public void Dispose()
         {
-            var userContext = this.CremaHost.UserContext;
+            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
             this.dataBase = null;
-            userContext.Dispatcher.Invoke(() => userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
         }
 
         public Task<SignatureDate> InvokeTableItemSetPublicAsync(Authentication authentication, string tableItemPath)
@@ -412,6 +412,8 @@ namespace Ntreev.Crema.Services.Data
         }
 
         public CremaHost CremaHost => this.DataBase.CremaHost;
+
+        public UserContext UserContext => this.CremaHost.UserContext;
 
         public CremaDispatcher Dispatcher => this.dataBase?.Dispatcher;
 

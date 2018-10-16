@@ -583,6 +583,8 @@ namespace Ntreev.Crema.Services.Data
             if (this.IsLoaded == true)
             {
                 await this.WriteCacheAsync();
+                this.tableContext.Dispose();
+                this.typeContext.Dispose();
                 this.Repository.Dispose();
                 this.Dispatcher.Dispose();
             }

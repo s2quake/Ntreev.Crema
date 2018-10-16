@@ -54,7 +54,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
         void OnUsersLoggedIn(SignatureDate signatureDate, string[] userIDs);
 
         [OperationContract(IsOneWay = true)]
-        void OnUsersLoggedOut(SignatureDate signatureDate, string[] userIDs);
+        void OnUsersLoggedOut(SignatureDate signatureDate, string[] userIDs, CloseInfo closeInfo);
 
         [OperationContract(IsOneWay = true)]
         void OnUsersKicked(SignatureDate signatureDate, string[] userIDs, string[] comments);
@@ -64,8 +64,5 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         [OperationContract(IsOneWay = true)]
         void OnMessageReceived(SignatureDate signatureDate, string[] userIDs, string message, MessageType messageType);
-
-        [OperationContract]
-        bool OnPing();
     }
 }

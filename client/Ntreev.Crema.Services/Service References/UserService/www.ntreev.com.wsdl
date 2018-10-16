@@ -141,12 +141,6 @@
   <wsdl:message name="IUserService_OnMessageReceived_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnMessageReceived" />
   </wsdl:message>
-  <wsdl:message name="IUserService_OnPing_OutputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:OnPing" />
-  </wsdl:message>
-  <wsdl:message name="IUserService_OnPing_InputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:OnPingResponse" />
-  </wsdl:message>
   <wsdl:portType msc:usingSession="true" name="IUserService">
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Subscribe">
       <wsdl:input wsaw:Action="http://www.ntreev.com/IUserService/Subscribe" message="tns:IUserService_Subscribe_InputMessage" />
@@ -247,10 +241,6 @@
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnMessageReceived">
       <wsdl:output wsaw:Action="http://www.ntreev.com/IUserService/OnMessageReceived" message="tns:IUserService_OnMessageReceived_OutputCallbackMessage" />
-    </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnPing">
-      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserService/OnPing" message="tns:IUserService_OnPing_OutputCallbackMessage" />
-      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserService/OnPingResponse" message="tns:IUserService_OnPing_InputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
 </wsdl:definitions>

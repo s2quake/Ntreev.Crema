@@ -944,20 +944,19 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
-            this.Callback.OnServiceClosed(signatureDate, closeInfo);
+            this.Callback?.OnServiceClosed(signatureDate, closeInfo);
         }
 
-        private void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
+        private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
             var actionUserID = e.UserID;
             var contains = e.Items.Any(item => item.ID == this.authentication.ID);
             var closeInfo = (CloseInfo)e.MetaData;
             if (actionUserID != this.authentication.ID && contains == true)
             {
-                if (this.dataBase != null)
-                {
-                    this.InvokeEvent(null, null, () => this.Callback.OnServiceClosed(e.SignatureDate, (CloseInfo)e.MetaData));
-                }
+                await this.DetachEventHandlersAsync();
+                this.authentication = null;
+                this.Channel.Abort();
             }
         }
 
@@ -968,7 +967,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var signatureDate = e.SignatureDate;
             var tableNames = e.Items.Select(item => item.Name).ToArray();
             var states = e.Items.Select(item => item.TableState).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTablesStateChanged(signatureDate, tableNames, states));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTablesStateChanged(signatureDate, tableNames, states));
         }
 
         private void Tables_TablesChanged(object sender, ItemsEventArgs<ITable> e)
@@ -977,7 +976,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var exceptionUserID = e.UserID;
             var signatureDate = e.SignatureDate;
             var values = e.Items.Select(item => item.TableInfo).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTablesChanged(signatureDate, values));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTablesChanged(signatureDate, values));
         }
 
         private void TableContext_ItemCreated(object sender, ItemsCreatedEventArgs<ITableItem> e)
@@ -987,7 +986,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var signatureDate = e.SignatureDate;
             var paths = e.Items.Select(item => item.Path).ToArray();
             var arguments = e.Arguments.Select(item => item is TableInfo tableInfo ? (TableInfo?)tableInfo : null).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTableItemsCreated(signatureDate, paths, arguments));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTableItemsCreated(signatureDate, paths, arguments));
         }
 
         private void TableContext_ItemRenamed(object sender, ItemsRenamedEventArgs<ITableItem> e)
@@ -997,7 +996,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var signatureDate = e.SignatureDate;
             var oldPaths = e.OldPaths;
             var itemNames = e.Items.Select(item => item.Name).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTableItemsRenamed(signatureDate, oldPaths, itemNames));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTableItemsRenamed(signatureDate, oldPaths, itemNames));
         }
 
         private void TableContext_ItemMoved(object sender, ItemsMovedEventArgs<ITableItem> e)
@@ -1007,7 +1006,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var signatureDate = e.SignatureDate;
             var oldPaths = e.OldPaths;
             var parentPaths = e.Items.Select(item => item.Parent.Path).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTableItemsMoved(signatureDate, oldPaths, parentPaths));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTableItemsMoved(signatureDate, oldPaths, parentPaths));
         }
 
         private void TableContext_ItemDeleted(object sender, ItemsDeletedEventArgs<ITableItem> e)
@@ -1016,7 +1015,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var exceptionUserID = e.UserID;
             var signatureDate = e.SignatureDate;
             var itemPaths = e.ItemPaths;
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTableItemsDeleted(signatureDate, itemPaths));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTableItemsDeleted(signatureDate, itemPaths));
         }
 
         private void TableContext_ItemsAccessChanged(object sender, ItemsEventArgs<ITableItem> e)
@@ -1041,7 +1040,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var memberIDs = metaData[1] as string[];
             var accessTypes = metaData[2] as AccessType[];
 
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTableItemsAccessChanged(signatureDate, changeType, values, memberIDs, accessTypes));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTableItemsAccessChanged(signatureDate, changeType, values, memberIDs, accessTypes));
         }
 
         private void TableContext_ItemsLockChanged(object sender, ItemsEventArgs<ITableItem> e)
@@ -1065,7 +1064,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var changeType = (LockChangeType)metaData[0];
             var comments = metaData[1] as string[];
 
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTableItemsLockChanged(signatureDate, changeType, values, comments));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTableItemsLockChanged(signatureDate, changeType, values, comments));
         }
 
         private void Types_TypesStateChanged(object sender, ItemsEventArgs<IType> e)
@@ -1075,7 +1074,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var signatureDate = e.SignatureDate;
             var typeNames = e.Items.Select(item => item.Name).ToArray();
             var states = e.Items.Select(item => item.TypeState).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTypesStateChanged(signatureDate, typeNames, states));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypesStateChanged(signatureDate, typeNames, states));
         }
 
         private void Types_TypesChanged(object sender, ItemsEventArgs<IType> e)
@@ -1084,7 +1083,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var exceptionUserID = e.UserID;
             var signatureDate = e.SignatureDate;
             var values = e.Items.Select(item => item.TypeInfo).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTypesChanged(signatureDate, values));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypesChanged(signatureDate, values));
         }
 
         private void TypeContext_ItemCreated(object sender, ItemsCreatedEventArgs<ITypeItem> e)
@@ -1094,7 +1093,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var signatureDate = e.SignatureDate;
             var itemPaths = e.Items.Select(item => item.Path).ToArray();
             var arguments = e.Arguments.Select(item => item is TypeInfo typeInfo ? (TypeInfo?)typeInfo : null).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTypeItemsCreated(signatureDate, itemPaths, arguments));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypeItemsCreated(signatureDate, itemPaths, arguments));
         }
 
         private void TypeContext_ItemRenamed(object sender, ItemsRenamedEventArgs<ITypeItem> e)
@@ -1104,7 +1103,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var signatureDate = e.SignatureDate;
             var oldPaths = e.OldPaths;
             var itemNames = e.Items.Select(item => item.Name).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTypeItemsRenamed(signatureDate, oldPaths, itemNames));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypeItemsRenamed(signatureDate, oldPaths, itemNames));
         }
 
         private void TypeContext_ItemMoved(object sender, ItemsMovedEventArgs<ITypeItem> e)
@@ -1114,7 +1113,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var signatureDate = e.SignatureDate;
             var oldPaths = e.OldPaths;
             var parentPaths = e.Items.Select(item => item.Parent.Path).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTypeItemsMoved(signatureDate, oldPaths, parentPaths));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypeItemsMoved(signatureDate, oldPaths, parentPaths));
         }
 
         private void TypeContext_ItemDeleted(object sender, ItemsDeletedEventArgs<ITypeItem> e)
@@ -1123,7 +1122,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var exceptionUserID = e.UserID;
             var signatureDate = e.SignatureDate;
             var itemPaths = e.ItemPaths;
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTypeItemsDeleted(signatureDate, itemPaths));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypeItemsDeleted(signatureDate, itemPaths));
         }
 
         private void TypeContext_ItemsAccessChanged(object sender, ItemsEventArgs<ITypeItem> e)
@@ -1148,7 +1147,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var memberIDs = metaData[1] as string[];
             var accessTypes = metaData[2] as AccessType[];
 
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTypeItemsAccessChanged(signatureDate, changeType, values, memberIDs, accessTypes));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypeItemsAccessChanged(signatureDate, changeType, values, memberIDs, accessTypes));
         }
 
         private void TypeContext_ItemsLockChanged(object sender, ItemsEventArgs<ITypeItem> e)
@@ -1171,7 +1170,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var metaData = e.MetaData as object[];
             var changeType = (LockChangeType)metaData[0];
             var comments = metaData[1] as string[];
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnTypeItemsLockChanged(signatureDate, changeType, values, comments));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypeItemsLockChanged(signatureDate, changeType, values, comments));
         }
 
         private void DataBase_Unloaded(object sender, EventArgs e)
@@ -1313,38 +1312,13 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private ITypeContext TypeContext => this.dataBase.TypeContext;
 
-        #region ICremaServiceItem
-
         protected override async Task OnCloseAsync(bool disconnect)
         {
             if (this.authentication != null)
             { 
                 await this.DetachEventHandlersAsync();
-                this.dataBase = null;
                 this.authentication = null;
             }
-            await CremaService.Dispatcher.InvokeAsync(() =>
-            {
-                if (disconnect == false)
-                {
-                    this.Callback?.OnServiceClosed(SignatureDate.Empty, CloseInfo.Empty);
-                    try
-                    {
-                        this.Channel?.Close(TimeSpan.FromSeconds(10));
-                    }
-                    catch
-                    {
-                        this.Channel?.Abort();
-                    }
-                }
-                else
-                {
-                    this.Channel?.Abort();
-                }
-            });
-            Console.WriteLine($"{nameof(DataBaseService)}.{nameof(OnCloseAsync)}");
         }
-
-        #endregion
     }
 }

@@ -314,47 +314,36 @@
       <xs:sequence>
         <xs:element xmlns:q40="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q40:SignatureDate" />
         <xs:element xmlns:q41="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q41:ArrayOfstring" />
+        <xs:element xmlns:q42="http://schemas.ntreev.com" minOccurs="0" name="closeInfo" type="q42:CloseInfo" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnUsersKicked">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q42="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q42:SignatureDate" />
-        <xs:element xmlns:q43="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q43:ArrayOfstring" />
-        <xs:element xmlns:q44="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="comments" nillable="true" type="q44:ArrayOfstring" />
+        <xs:element xmlns:q43="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q43:SignatureDate" />
+        <xs:element xmlns:q44="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q44:ArrayOfstring" />
+        <xs:element xmlns:q45="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="comments" nillable="true" type="q45:ArrayOfstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnUsersBanChanged">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q45="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q45:SignatureDate" />
-        <xs:element xmlns:q46="http://schemas.ntreev.com" minOccurs="0" name="banInfos" nillable="true" type="q46:ArrayOfBanInfo" />
-        <xs:element xmlns:q47="http://schemas.ntreev.com" minOccurs="0" name="changeType" type="q47:BanChangeType" />
-        <xs:element xmlns:q48="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="comments" nillable="true" type="q48:ArrayOfstring" />
+        <xs:element xmlns:q46="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q46:SignatureDate" />
+        <xs:element xmlns:q47="http://schemas.ntreev.com" minOccurs="0" name="banInfos" nillable="true" type="q47:ArrayOfBanInfo" />
+        <xs:element xmlns:q48="http://schemas.ntreev.com" minOccurs="0" name="changeType" type="q48:BanChangeType" />
+        <xs:element xmlns:q49="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="comments" nillable="true" type="q49:ArrayOfstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnMessageReceived">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q49="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q49:SignatureDate" />
-        <xs:element xmlns:q50="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q50:ArrayOfstring" />
+        <xs:element xmlns:q50="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q50:SignatureDate" />
+        <xs:element xmlns:q51="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q51:ArrayOfstring" />
         <xs:element minOccurs="0" name="message" nillable="true" type="xs:string" />
-        <xs:element xmlns:q51="http://schemas.ntreev.com" minOccurs="0" name="messageType" type="q51:MessageType" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="OnPing">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="OnPingResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="OnPingResult" type="xs:boolean" />
+        <xs:element xmlns:q52="http://schemas.ntreev.com" minOccurs="0" name="messageType" type="q52:MessageType" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

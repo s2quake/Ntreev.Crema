@@ -468,11 +468,21 @@ namespace Ntreev.Crema.Services.Users
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                //foreach (var item in this.Users)
-                //{
-                //    if (item.Authentication != null)
-                //        item.Authentication.InvokeExpiredEvent(Authentication.System.ID);
-                //}
+                var query = from User item in this.Users
+                            where item.IsOnline
+                            select item;
+                var users = query.ToArray();
+
+                foreach(var item in users)
+                {
+                    item.Authentication.InvokeExpiredEvent(Authentication.System.ID, string.Empty);
+                    item.Authentication = null;
+                    item.IsOnline = false;
+                }
+                
+                this.Users.InvokeUsersStateChangedEvent(Authentication.System, users);
+                this.Users.InvokeUsersLoggedOutEvent(Authentication.System, users, CloseInfo.Empty);
+                
                 base.Clear();
             });
             this.Repository.Dispose();

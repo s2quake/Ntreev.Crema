@@ -140,7 +140,7 @@ namespace Ntreev.Crema.Services.UserService {
         void OnUsersLoggedIn(Ntreev.Library.SignatureDate signatureDate, string[] userIDs);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnUsersLoggedOut")]
-        void OnUsersLoggedOut(Ntreev.Library.SignatureDate signatureDate, string[] userIDs);
+        void OnUsersLoggedOut(Ntreev.Library.SignatureDate signatureDate, string[] userIDs, Ntreev.Crema.ServiceModel.CloseInfo closeInfo);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnUsersKicked")]
         void OnUsersKicked(Ntreev.Library.SignatureDate signatureDate, string[] userIDs, string[] comments);
@@ -150,9 +150,6 @@ namespace Ntreev.Crema.Services.UserService {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnMessageReceived")]
         void OnMessageReceived(Ntreev.Library.SignatureDate signatureDate, string[] userIDs, string message, Ntreev.Crema.ServiceModel.MessageType messageType);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserService/OnPing", ReplyAction="http://www.ntreev.com/IUserService/OnPingResponse")]
-        bool OnPing();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]

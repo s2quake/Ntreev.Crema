@@ -56,6 +56,12 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost = cremaHost;
             this.UserContext = cremaHost.UserContext;
             this.Dispatcher = new CremaDispatcher(this);
+            this.CremaHost.CloseRequested += CremaHost_CloseRequested;
+        }
+
+        private void CremaHost_CloseRequested(object sender, CloseRequestedEventArgs e)
+        {
+            
         }
 
         public async Task InitializeAsync(string address, Guid authenticationToken, ServiceInfo serviceInfo)
@@ -830,7 +836,7 @@ namespace Ntreev.Crema.Services.Data
 
         async void IDataBaseCollectionServiceCallback.OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
-            this.service.Abort();
+            this.service.Close();
             this.service = null;
             this.timer?.Dispose();
             this.timer = null;

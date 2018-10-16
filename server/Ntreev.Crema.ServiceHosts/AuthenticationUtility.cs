@@ -175,7 +175,7 @@ namespace Ntreev.Crema.ServiceHosts
                 {
                     authentications.Remove(authentication);
                 });
-                await this.AbortServieItemsAsync(false);
+                //await this.AbortServieItemsAsync(false);
             }
 
             public void Ping()
@@ -186,7 +186,7 @@ namespace Ntreev.Crema.ServiceHosts
             public async Task DisposeAsync()
             {
                 this.authentication.Expired -= Authentication_Expired;
-                await this.AbortServieItemsAsync(true);
+                //await this.AbortServieItemsAsync(true);
                 if (this.serviceItems.Any() == true)
                     this.action(this.authentication);
             }

@@ -34,26 +34,22 @@ namespace Ntreev.Crema.ServiceHosts
         {
             this.logService = logService;
             OperationContext.Current.Host.Closing += Host_Closing;
+            OperationContext.Current.Channel.Faulted += Channel_Faulted;
+            OperationContext.Current.Channel.Closed += Channel_Closed;
             this.host = OperationContext.Current.Host;
-            this.host.Faulted += Host_Faulted;
             this.Channel = OperationContext.Current.Channel;
             this.sessionID = OperationContext.Current.Channel.SessionId;
             this.Callback = OperationContext.Current.GetCallbackChannel<T>();
-
-            OperationContext.Current.Channel.Faulted += Channel_Faulted;
         }
 
-        private void Host_Faulted(object sender, EventArgs e)
+        private void Channel_Closed(object sender, EventArgs e)
         {
-            Console.WriteLine($"{this.GetType().Name}: Host_Faulted");
+            this.host.Closing -= Host_Closing;
+            this.host = null;
+            this.Channel = null;
+            this.Callback = default(T);
+            this.logService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(ICremaServiceItem.CloseAsync)}");
         }
-
-        private void Channel_Faulted(object sender, EventArgs e)
-        {
-            Console.WriteLine($"{this.GetType().Name}: Channel_Faulted");
-        }
-
-        //public event EventHandler Disposed;
 
         protected void InvokeEvent(string userID, string exceptionUserID, Action action)
         {
@@ -75,11 +71,6 @@ namespace Ntreev.Crema.ServiceHosts
             });
         }
 
-        //protected virtual void OnDisposed(EventArgs e)
-        //{
-        //    this.Disposed?.Invoke(this, e);
-        //}
-
         protected T Callback { get; private set; }
 
         protected IContextChannel Channel { get; private set; }
@@ -88,44 +79,25 @@ namespace Ntreev.Crema.ServiceHosts
 
         protected string OwnerID { get; set; }
 
-        private async void Host_Closing(object sender, EventArgs e)
+        private void Host_Closing(object sender, EventArgs e)
         {
-            if (this.Callback != null)
-            {
-                if (this.Channel.State == CommunicationState.Opened)
-                {
-                    this.OnServiceClosed(SignatureDate.Empty, CloseInfo.Empty);
-                }
-                this.Callback = default(T);
-            }
+            this.OnServiceClosed(SignatureDate.Empty, CloseInfo.Empty);
+            this.Callback = default(T);
+        }
+
+        private void Channel_Faulted(object sender, EventArgs e)
+        {
+            this.Channel.Abort();
+            this.Channel = null;
+            this.Callback = default(T);
         }
 
         protected abstract Task OnCloseAsync(bool disconnect);
 
         async Task ICremaServiceItem.CloseAsync(bool disconnect)
         {
-            if (this.host != null)
-            {
-                this.host = null;
-                await this.OnCloseAsync(disconnect);
-                this.Channel = null;
-                this.Callback = default(T);
-                this.logService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(IDisposable.Dispose)}");
-            }
+            await this.OnCloseAsync(disconnect);
+            this.logService.Debug($"{this.GetType().Name}.{nameof(OnCloseAsync)}");
         }
-
-        #region IDisposable
-
-        //void IDisposable.Dispose()
-        //{
-        //    this.host.Closing -= Host_Closing;
-        //    this.host = null;
-        //    this.Channel = null;
-        //    this.Callback = default(T);
-        //    this.OnDisposed(EventArgs.Empty);
-        //    this.logService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(IDisposable.Dispose)}");
-        //}
-
-        #endregion
     }
 }

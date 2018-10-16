@@ -88,7 +88,7 @@ namespace Ntreev.Crema.Services.Users
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUsersLoggedOut(SignatureDate signatureDate, string[] userIDs)
+        void IUserServiceCallback.OnUsersLoggedOut(SignatureDate signatureDate, string[] userIDs, CloseInfo closeInfo)
         {
             throw new NotImplementedException();
         }
@@ -104,11 +104,6 @@ namespace Ntreev.Crema.Services.Users
         }
 
         void IUserServiceCallback.OnMessageReceived(SignatureDate signatureDate, string[] userIDs, string message, MessageType messageType)
-        {
-            throw new NotImplementedException();
-        }
-
-        bool IUserServiceCallback.OnPing()
         {
             throw new NotImplementedException();
         }

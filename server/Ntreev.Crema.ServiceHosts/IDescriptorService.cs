@@ -29,7 +29,7 @@ namespace Ntreev.Crema.ServiceHosts
     public interface IDescriptorService
     {
         [OperationContract(IsInitiating = true)]
-        string GetVersion();
+        Task<string> GetVersionAsync();
 
         [OperationContract]
         Task<bool> IsOnlineAsync(string userID, byte[] password);

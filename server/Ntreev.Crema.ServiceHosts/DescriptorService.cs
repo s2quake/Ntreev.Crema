@@ -49,9 +49,9 @@ namespace Ntreev.Crema.ServiceHosts
             return this.DataBases.Dispatcher.InvokeAsync(() => this.DataBases.Select(item => item.DataBaseInfo).ToArray());
         }
 
-        public string GetVersion()
+        public Task<string> GetVersionAsync()
         {
-            return AppUtility.ProductVersion.ToString();
+            return Task.Run(() => AppUtility.ProductVersion.ToString());
         }
 
         public Task<bool> IsOnlineAsync(string userID, byte[] password)

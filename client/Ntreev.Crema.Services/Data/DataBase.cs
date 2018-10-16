@@ -1256,7 +1256,7 @@ namespace Ntreev.Crema.Services.Data
 
         async void IDataBaseServiceCallback.OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
-            this.service.Abort();
+            this.service.Close();
             this.service = null;
             this.timer?.Dispose();
             this.timer = null;

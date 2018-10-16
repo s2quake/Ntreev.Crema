@@ -696,7 +696,7 @@ namespace Ntreev.Crema.Services.Domains
 
         async void IDomainServiceCallback.OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
-            this.service.Abort();
+            this.service.Close();
             this.service = null;
             this.timer?.Dispose();
             this.timer = null;

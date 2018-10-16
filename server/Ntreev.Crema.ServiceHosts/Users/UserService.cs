@@ -332,11 +332,21 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         public ILogService LogService { get; }
 
-        public IUserContext UserContext { get; }
+        public IUserContext UserContext { get; set; }
+
+        protected override async Task OnCloseAsync(bool disconnect)
+        {
+            if (this.authentication != null)
+            {
+                await this.DetachEventHandlersAsync();
+                await this.UserContext.LogoutAsync(this.authentication);
+                this.authentication = null;
+            }
+        }
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
-            this.Callback.OnServiceClosed(signatureDate, closeInfo);
+            this.Callback?.OnServiceClosed(signatureDate, closeInfo);
         }
 
         private async Task<UserContextMetaData> AttachEventHandlersAsync()
@@ -386,7 +396,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var signatureDate = e.SignatureDate;
             var userIDs = e.Items.Select(item => item.ID).ToArray();
             var states = e.Items.Select(item => item.UserState).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnUsersStateChanged(e.SignatureDate, userIDs, states));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnUsersStateChanged(e.SignatureDate, userIDs, states));
         }
 
         private void Users_UsersChanged(object sender, Services.ItemsEventArgs<IUser> e)
@@ -395,7 +405,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var exceptionUserID = e.UserID;
             var signatureDate = e.SignatureDate;
             var values = e.Items.Select(item => item.UserInfo).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnUsersChanged(signatureDate, values));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnUsersChanged(signatureDate, values));
         }
 
         private void UserContext_ItemsCreated(object sender, Services.ItemsCreatedEventArgs<IUserItem> e)
@@ -405,7 +415,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var signatureDate = e.SignatureDate;
             var itemPaths = e.Items.Select(item => item.Path).ToArray();
             var arguments = e.Arguments.Select(item => item is UserInfo userInfo ? (UserInfo?)userInfo : null).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnUserItemsCreated(signatureDate, itemPaths, arguments));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnUserItemsCreated(signatureDate, itemPaths, arguments));
         }
 
         private void UserContext_ItemsRenamed(object sender, Services.ItemsRenamedEventArgs<IUserItem> e)
@@ -415,7 +425,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var signatureDate = e.SignatureDate;
             var oldPaths = e.OldPaths;
             var itemNames = e.Items.Select(item => item.Name).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnUserItemsRenamed(signatureDate, oldPaths, itemNames));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnUserItemsRenamed(signatureDate, oldPaths, itemNames));
         }
 
         private void UserContext_ItemsMoved(object sender, Services.ItemsMovedEventArgs<IUserItem> e)
@@ -425,7 +435,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var signatureDate = e.SignatureDate;
             var oldPaths = e.OldPaths;
             var parentPaths = e.Items.Select(item => item.Parent.Path).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnUserItemsMoved(signatureDate, oldPaths, parentPaths));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnUserItemsMoved(signatureDate, oldPaths, parentPaths));
         }
 
         private void UserContext_ItemsDeleted(object sender, Services.ItemsDeletedEventArgs<IUserItem> e)
@@ -434,7 +444,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var exceptionUserID = e.UserID;
             var signatureDate = e.SignatureDate;
             var itemPaths = e.ItemPaths;
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnUserItemsDeleted(signatureDate, itemPaths));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnUserItemsDeleted(signatureDate, itemPaths));
         }
 
         private void UserContext_MessageReceived(object sender, MessageEventArgs e)
@@ -446,7 +456,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var message = e.Message;
             var messageType = e.MessageType;
 
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnMessageReceived(signatureDate, userIDs, message, messageType));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnMessageReceived(signatureDate, userIDs, message, messageType));
         }
 
         private void Users_UsersLoggedIn(object sender, Services.ItemsEventArgs<IUser> e)
@@ -455,7 +465,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var exceptionUserID = e.UserID;
             var signatureDate = e.SignatureDate;
             var userIDs = e.Items.Select(item => item.ID).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnUsersLoggedIn(signatureDate, userIDs));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnUsersLoggedIn(signatureDate, userIDs));
         }
 
         private async void Users_UsersLoggedOut(object sender, Services.ItemsEventArgs<IUser> e)
@@ -463,19 +473,34 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var actionUserID = e.UserID;
             var contains = e.Items.Any(item => item.ID == this.authentication.ID);
             var closeInfo = (CloseInfo)e.MetaData;
+            var signatureDate = e.SignatureDate;
+            //if (actionUserID != this.authentication.ID && contains == true)
+            //{
+            //    
+            //    this.InvokeEvent(null, null, () =>
+            //    {
+            //        this.Callback?.OnServiceClosed(signatureDate, closeInfo);
+            //        this.Channel.Close(TimeSpan.FromSeconds(10));
+            //    });
+            //}
+            //else
             if (actionUserID != this.authentication.ID && contains == true)
             {
-                var signatureDate = e.SignatureDate;
-                await this.DetachEventHandlersAsync();
-                this.InvokeEvent(null, null, () => this.Callback.OnServiceClosed(signatureDate, closeInfo));
+
             }
-            else
+
             {
                 var userID = this.authentication.ID;
                 var exceptionUserID = e.UserID;
-                var signatureDate = e.SignatureDate;
                 var userIDs = e.Items.Select(item => item.ID).ToArray();
-                this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnUsersLoggedOut(signatureDate, userIDs));
+                this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnUsersLoggedOut(signatureDate, userIDs, closeInfo));
+
+            }
+            if (actionUserID != this.authentication.ID && contains == true)
+            {
+                await this.DetachEventHandlersAsync();
+                this.authentication = null;
+                this.Channel.Abort();
             }
         }
 
@@ -486,7 +511,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var signatureDate = e.SignatureDate;
             var userIDs = e.Items.Select(item => item.ID).ToArray();
             var comments = e.MetaData as string[];
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnUsersKicked(signatureDate, userIDs, comments));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnUsersKicked(signatureDate, userIDs, comments));
         }
 
         private void Users_UsersBanChanged(object sender, ItemsEventArgs<IUser> e)
@@ -509,7 +534,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var metaData = e.MetaData as object[];
             var changeType = (BanChangeType)metaData[0];
             var comments = metaData[1] as string[];
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback.OnUsersBanChanged(signatureDate, values, changeType, comments));
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnUsersBanChanged(signatureDate, values, changeType, comments));
         }
 
         private static SecureString ToSecureString(string userID, byte[] password)
@@ -591,39 +616,6 @@ namespace Ntreev.Crema.ServiceHosts.Users
             });
         }
 
-        #region ICremaServiceItem
-
-        protected override async Task OnCloseAsync(bool disconnect)
-        {
-            if (this.authentication != null)
-            {
-                await this.DetachEventHandlersAsync();
-                await this.UserContext.LogoutAsync(this.authentication);
-                this.authentication = null;
-            }
-
-            await CremaService.Dispatcher.InvokeAsync(() =>
-            {
-                if (disconnect == false)
-                {
-                    this.Callback?.OnServiceClosed(SignatureDate.Empty, CloseInfo.Empty);
-                    try
-                    {
-                        this.Channel?.Close(TimeSpan.FromSeconds(10));
-                    }
-                    catch
-                    {
-                        this.Channel?.Abort();
-                    }
-                }
-                else
-                {
-                    this.Channel?.Abort();
-                }
-            });
-            Console.WriteLine($"{nameof(UserService)}.{nameof(OnCloseAsync)}");
-        }
-
-        #endregion
+        
     }
 }

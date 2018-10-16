@@ -46,14 +46,9 @@ namespace Ntreev.Crema.ServiceHosts
 
         public async void ReleaseInstance(InstanceContext instanceContext, object instance)
         {
-            if (instance is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-
             if (instance is ICremaServiceItem serviceItem)
             {
-                await serviceItem.CloseAsync(true);
+                await serviceItem.CloseAsync(false);
             }
         }
     }
