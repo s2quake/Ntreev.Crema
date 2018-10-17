@@ -83,6 +83,11 @@ namespace Ntreev.Crema.Services.Data
             return dataBase.Dispatcher.InvokeAsync(() => new DataBaseSet(dataBase, dataSet, typeCreation, tableCreation));
         }
 
+        public static DataBaseSet Create(DataBase dataBase, CremaDataSet dataSet, bool typeCreation, bool tableCreation)
+        {
+            return new DataBaseSet(dataBase, dataSet, typeCreation, tableCreation);
+        }
+
         public void SetTypeCategoryPath(string categoryPath, string newCategoryPath)
         {
             var itemPath1 = this.TypeContext.GenerateCategoryPath(categoryPath);

@@ -216,8 +216,7 @@ namespace Ntreev.Crema.Services.Domains
                 var target = dataBase.FindDomainHost(domain);
                 if (target != null)
                 {
-                    var restoreTask = target.RestoreAsync(authentication, domain);
-                    restoreTask.Wait();
+                    target.Attach(domain);
                     domain.Host = target;
                 }
             }
@@ -240,7 +239,7 @@ namespace Ntreev.Crema.Services.Domains
                 var target = await dataBase.FindDomainHostAsync(domain);
                 if (target != null)
                 {
-                    await target.RestoreAsync(authentication, domain);
+                    target.Attach(domain);
                     domain.Host = target;
                 }
             }

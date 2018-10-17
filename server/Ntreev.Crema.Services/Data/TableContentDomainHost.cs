@@ -65,6 +65,28 @@ namespace Ntreev.Crema.Services.Data
                 this.path = itemPath;
             }
 
+            public void AttachDomainEvent()
+            {
+                this.domain.Dispatcher.Invoke(() =>
+                {
+                    this.domain.RowAdded += Domain_RowAdded;
+                    this.domain.RowChanged += Domain_RowChanged;
+                    this.domain.RowRemoved += Domain_RowRemoved;
+                    this.domain.PropertyChanged += Domain_PropertyChanged;
+                });
+            }
+
+            public void DetachDomainEvent()
+            {
+                this.domain.Dispatcher.Invoke(() =>
+                {
+                    this.domain.RowAdded -= Domain_RowAdded;
+                    this.domain.RowChanged -= Domain_RowChanged;
+                    this.domain.RowRemoved -= Domain_RowRemoved;
+                    this.domain.PropertyChanged -= Domain_PropertyChanged;
+                });
+            }
+
             public Task AttachDomainEventAsync()
             {
                 return this.domain.Dispatcher.InvokeAsync(() =>
@@ -291,45 +313,36 @@ namespace Ntreev.Crema.Services.Data
 
             #region IDomainHost
 
-            async Task IDomainHost.DetachAsync()
+            void IDomainHost.Detach()
             {
-                await this.DetachDomainEventAsync();
-                await this.Dispatcher.InvokeAsync(() =>
+                this.DetachDomainEvent();
+                this.domain = null;
+                foreach (var item in this.Contents)
                 {
-                    this.domain = null;
-                    foreach (var item in this.Contents)
-                    {
-                        item.domain = null;
-                        item.dataTable = null;
-                    }
-                });
+                    item.domain = null;
+                    item.dataTable = null;
+                }
             }
 
-            async Task IDomainHost.RestoreAsync(Authentication authentication, Domain domain)
+            void IDomainHost.Attach(Domain domain)
             {
                 this.dataSet = domain.Source as CremaDataSet;
                 this.domain = domain;
-                this.dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
+                this.dataBaseSet = DataBaseSet.Create(this.DataBase, dataSet, false, false);
                 this.itemPaths = this.dataSet.GetItemPaths();
-                await this.Repository.LockAsync(this.itemPaths);
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Repository.Dispatcher.Invoke(() => this.Repository.Lock(this.itemPaths));
+                foreach (var item in this.Contents)
                 {
-                    foreach (var item in this.Contents)
-                    {
-                        item.domainHost = this;
-                        item.domain = domain;
-                        item.DataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
-                        item.Table.IsBeingEdited = true;
-                        item.ServiceState = ServiceState.Opened;
-                        item.IsModified = domain.ModifiedTables.Contains(item.dataTable.Name);
-                    }
-                });
-                await this.AttachDomainEventAsync();
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
-                    this.InvokeEditBegunEvent(EventArgs.Empty);
-                });
+                    item.domainHost = this;
+                    item.domain = domain;
+                    item.DataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
+                    item.Table.IsBeingEdited = true;
+                    item.ServiceState = ServiceState.Opened;
+                    item.IsModified = domain.ModifiedTables.Contains(item.dataTable.Name);
+                }
+                this.AttachDomainEvent();
+                //this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
+                this.InvokeEditBegunEvent(EventArgs.Empty);
             }
 
             async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)

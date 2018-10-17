@@ -367,7 +367,7 @@ namespace Ntreev.Crema.Services.Data
             this.rowsToAdd.Clear();
         }
 
-        protected virtual async Task OnRestoreAsync(Domain domain)
+        protected virtual void OnAttach(Domain domain)
         {
             this.TemplateSource = domain.Source as CremaTemplate;
             this.domain = domain as TableTemplateDomain;
@@ -385,12 +385,12 @@ namespace Ntreev.Crema.Services.Data
                 this.table.RowChanged += Table_RowChanged;
             }
             this.IsModified = this.domain.IsModified;
-            await this.AttachDomainEventAsync();
+            this.AttachDomainEvent();
         }
 
-        protected virtual async Task OnDetachAsync()
+        protected virtual void OnDetach()
         {
-            await this.DetachDomainEventAsync();
+            this.DetachDomainEvent();
             this.domain = null;
         }
 
@@ -464,6 +464,28 @@ namespace Ntreev.Crema.Services.Data
             await this.Dispatcher.InvokeAsync(() => this.OnChanged(e));
         }
 
+        private void AttachDomainEvent()
+        {
+            this.domain.Dispatcher.Invoke(() =>
+            {
+                this.domain.RowAdded += Domain_RowAdded;
+                this.domain.RowChanged += Domain_RowChanged;
+                this.domain.RowRemoved += Domain_RowRemoved;
+                this.domain.PropertyChanged += Domain_PropertyChanged;
+            });
+        }
+
+        private void DetachDomainEvent()
+        {
+            this.domain.Dispatcher.Invoke(() =>
+            {
+                this.domain.RowAdded -= Domain_RowAdded;
+                this.domain.RowChanged -= Domain_RowChanged;
+                this.domain.RowRemoved -= Domain_RowRemoved;
+                this.domain.PropertyChanged -= Domain_PropertyChanged;
+            });
+        }
+
         private Task AttachDomainEventAsync()
         {
             return this.domain.Dispatcher.InvokeAsync(() =>
@@ -516,15 +538,15 @@ namespace Ntreev.Crema.Services.Data
 
         #region IDomainHost
 
-        async Task IDomainHost.RestoreAsync(Authentication authentication, Domain domain)
+        void IDomainHost.Attach(Domain domain)
         {
-            await this.OnRestoreAsync(domain);
-            await this.Dispatcher.InvokeAsync(() => this.OnEditBegun(EventArgs.Empty));
+            this.OnAttach(domain);
+            this.OnEditBegun(EventArgs.Empty);
         }
 
-        async Task IDomainHost.DetachAsync()
+        void IDomainHost.Detach()
         {
-            await this.OnDetachAsync();
+            this.OnDetach();
         }
 
         async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)

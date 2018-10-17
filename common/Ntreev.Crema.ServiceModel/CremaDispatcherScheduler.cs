@@ -32,49 +32,24 @@ namespace Ntreev.Crema.ServiceModel
 
         protected override bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued)
         {
-            if (taskWasPreviouslyQueued) return false;
+            if (taskWasPreviouslyQueued)
+                return false;
 
-            return isExecuting && TryExecuteTask(task);
+            return this.isExecuting && TryExecuteTask(task);
         }
 
         internal void Run()
         {
-            
             while (this.cancellation.IsCancellationRequested == false)
             {
-                isExecuting = true;
+                this.isExecuting = true;
 
-                if (taskQueue.TryTake(out var task) == true)
+                if (this.taskQueue.TryTake(out var task) == true)
                 {
-                    //var task = taskQueue.Take(this.cancellation);
-                    TryExecuteTask(task);
+                    this.TryExecuteTask(task);
                 }
-                
-                //try
-                //{
-                //foreach (var task in taskQueue.GetConsumingEnumerable(this.cancellation))
-                //{
-
-                //}
-                //}
-                //catch (OperationCanceledException)
-                //{ }
-                //finally
-                //{
-                //    isExecuting = false;
-                //}
                 Thread.Sleep(1);
             }
-
-            //Task[] GetTask()
-            //{
-            //    lock (lockobj) return this.taskList.ToArray();
-            //}
         }
-
-        //protected sealed override bool TryDequeue(Task task)
-        //{
-        //    lock (lockobj) return this.taskQueue...Remove(task);
-        //}
     }
 }

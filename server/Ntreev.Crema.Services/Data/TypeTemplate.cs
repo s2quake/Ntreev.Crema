@@ -94,10 +94,10 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        protected override async Task OnRestoreAsync(Domain domain)
+        protected override void OnAttach(Domain domain)
         {
             this.type.IsBeingEdited = true;
-            await base.OnRestoreAsync(domain);
+            base.OnAttach(domain);
         }
 
         protected override async Task<CremaDataType> CreateSourceAsync(Authentication authentication)

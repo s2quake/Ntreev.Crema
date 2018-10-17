@@ -328,12 +328,20 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                var value = await this.Dispatcher.InvokeAsync(() =>
+                var value =  await this.Dispatcher.InvokeAsync(() =>
                 {
                     if (this.IsLoaded == false)
                         throw new InvalidOperationException(Resources.Exception_CannotEnter);
+                    if (this.authentications.Contains(authentication) == true)
+                        throw new ArgumentException("AlreadyInDataBase", nameof(authentication));
                     this.authentications.Add(authentication);
-                    if (this.authentications.Any(item => ((Authentication)item).ID == authentication.ID) && this.Dispatcher.Owner is DataBase == false)
+                    return this.authentications.Any(item => ((Authentication)item).ID == authentication.ID) && this.Dispatcher.Owner is DataBase == false;
+                });
+
+                if (value == true)
+                {
+                    this.Dispatcher = new CremaDispatcher(this);
+                    await this.Dispatcher.InvokeAsync(() =>
                     {
                         this.service = DataServiceFactory.CreateServiceClient(this.CremaHost.IPAddress, this.CremaHost.ServiceInfos[nameof(DataBaseService)], this);
                         this.service.Open();
@@ -351,21 +359,15 @@ namespace Ntreev.Crema.Services.Data
                         this.CremaHost.Sign(authentication, result);
                         this.TypeContext = new TypeContext(this, metaData);
                         this.TableContext = new TableContext(this, metaData);
-                        this.AttachDomainHost();
-                        this.CremaHost.AddService(this);
-                        this.Dispatcher = new CremaDispatcher(this);
                         base.UpdateAccessParent();
                         base.UpdateLockParent();
+                        this.AttachDomainHost();
+                        this.CremaHost.AddService(this);
                         this.authenticationEntered?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
                         this.DataBases.InvokeItemsAuthenticationEnteredEvent(authentication, new IDataBase[] { this });
                         return true;
-                    }
-                    return false;
-                });
-                //if (value == true)
-                //{
-                //    await this.AttachDomainHostAsync();
-                //}
+                    });
+                }
             }
             catch (Exception e)
             {
@@ -381,6 +383,8 @@ namespace Ntreev.Crema.Services.Data
                 this.ValidateExpired();
                 var value = await this.Dispatcher.InvokeAsync(() =>
                 {
+                    if (authentication == null)
+                        throw new ArgumentNullException(nameof(authentication));
                     this.authentications.Remove(authentication);
                     return this.authentications.Any(item => ((Authentication)item).ID == authentication.ID) == false && this.Dispatcher.Owner is DataBase;
                 });
@@ -388,9 +392,9 @@ namespace Ntreev.Crema.Services.Data
                 {
                     var signatureDate = await this.ReleaseServiceAsync();
                     authentication.SignatureDate = signatureDate;
-                    await this.DetachDomainHostAsync();
                     await this.Dispatcher.InvokeAsync(() =>
                     {
+                        this.DetachDomainHost();
                         this.TypeContext.Dispose();
                         this.TypeContext = null;
                         this.TableContext.Dispose();
@@ -633,7 +637,7 @@ namespace Ntreev.Crema.Services.Data
         {
             if (this.Dispatcher.Owner is DataBase)
             {
-                await this.DetachDomainHostAsync();
+                this.DetachDomainHost();
                 await this.ReleaseServiceAsync();
             }
             this.authentications.Clear();
@@ -655,7 +659,7 @@ namespace Ntreev.Crema.Services.Data
 
             if (this.Dispatcher.Owner is DataBase)
             {
-                await this.DetachDomainHostAsync();
+                this.DetachDomainHost();
             }
 
             var domains = await this.DomainContext.GetDomainsAsync(this.ID);
@@ -672,7 +676,7 @@ namespace Ntreev.Crema.Services.Data
                 var result = await Task.Run(() => this.service.GetMetaData());
                 this.TypeContext = new TypeContext(this, result.Value);
                 this.TableContext = new TableContext(this, result.Value);
-                await this.AttachDomainHostAsync();
+                this.AttachDomainHost();
                 base.UpdateLockParent();
                 base.UpdateAccessParent();
             }
@@ -792,6 +796,44 @@ namespace Ntreev.Crema.Services.Data
             this.TableContext = null;
             this.TypeContext = null;
             this.OnDeleted(EventArgs.Empty);
+        }
+
+        private void AttachDomainHost()
+        {
+            var domains = this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.GetDomains(this.ID));
+            var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
+            var domainHostByDomain = this.FindDomainHosts(domains);
+            foreach (var item in domainHostByDomain)
+            {
+                var domain = item.Key;
+                var domainHost = item.Value;
+                domainHost.Attach(domain);
+            }
+            this.DomainContext.AttachDomainHost(authentications, domainHostByDomain);
+        }
+
+        private void DetachDomainHost()
+        {
+            var domains = this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.GetDomains(this.ID));
+            var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
+            var domainHostByDomain = domains.ToDictionary(item => item, item => item.Host);
+            this.DomainContext.DetachDomainHost(authentications, domainHostByDomain);
+            foreach (var item in domainHostByDomain)
+            {
+                var domain = item.Key;
+                var domainHost = item.Value;
+                domainHost.Detach();
+            }
+        }
+
+        public IDictionary<Domain, IDomainHost> FindDomainHosts(Domain[] domains)
+        {
+            var dictionary = new Dictionary<Domain, IDomainHost>(domains.Length);
+            foreach (var item in domains)
+            {
+                dictionary.Add(item, this.FindDomainHost(item));
+            }
+            return dictionary;
         }
 
         public IDomainHost FindDomainHost(Domain domain)
@@ -1085,59 +1127,59 @@ namespace Ntreev.Crema.Services.Data
             base.OnDataBaseStateChanged(e);
         }
 
-        private void AttachDomainHost()
-        {
-            var domains = this.DomainContext.GetDomains(this.ID);
-            foreach (var item in domains)
-            {
-                var target = this.FindDomainHost(item);
-                Func(target, item);
-            }
+        //private void AttachDomainHost()
+        //{
+        //    var domains = this.DomainContext.GetDomains(this.ID);
+        //    foreach (var item in domains)
+        //    {
+        //        var target = this.FindDomainHost(item);
+        //        Func(target, item);
+        //    }
 
-            async void Func(IDomainHost domainHost, Domain domain)
-            {
-                try
-                {
-                    await domainHost.RestoreAsync(Authentication.System, domain);
-                    domain.Host = domainHost;
-                    await domain.AttachUserAsync();
-                }
-                catch (Exception e)
-                {
-                    this.CremaHost.Error(e);
-                }
-            }
-        }
+        //    async void Func(IDomainHost domainHost, Domain domain)
+        //    {
+        //        try
+        //        {
+        //            domainHost.Attach(domain);
+        //            domain.Host = domainHost;
+        //            await domain.AttachUserAsync();
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            this.CremaHost.Error(e);
+        //        }
+        //    }
+        //}
 
-        private async Task AttachDomainHostAsync()
-        {
-            var domains = await this.DomainContext.GetDomainsAsync(this.ID);
-            foreach (var item in domains)
-            {
-                try
-                {
-                    var target = await this.FindDomainHostAsync(item);
-                    await target.RestoreAsync(Authentication.System, item);
-                    item.Host = target;
-                    await item.AttachUserAsync();
-                }
-                catch (Exception e)
-                {
-                    this.CremaHost.Error(e);
-                }
-            }
-        }
+        //private async Task AttachDomainHostAsync()
+        //{
+        //    var domains = await this.DomainContext.GetDomainsAsync(this.ID);
+        //    foreach (var item in domains)
+        //    {
+        //        try
+        //        {
+        //            var target = await this.FindDomainHostAsync(item);
+        //            target.Attach(item);
+        //            item.Host = target;
+        //            await item.AttachUserAsync();
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            this.CremaHost.Error(e);
+        //        }
+        //    }
+        //}
 
-        private async Task DetachDomainHostAsync()
-        {
-            var domains = await this.DomainContext.GetDomainsAsync(this.ID);
-            foreach (var item in domains)
-            {
-                await item.Host?.DetachAsync();
-                item.Host = null;
-                await item.DetachUserAsync();
-            }
-        }
+        //private async Task DetachDomainHostAsync()
+        //{
+        //    var domains = await this.DomainContext.GetDomainsAsync(this.ID);
+        //    foreach (var item in domains)
+        //    {
+        //        item.Host?.Detach();
+        //        item.Host = null;
+        //        await item.DetachUserAsync();
+        //    }
+        //}
 
         private async Task<SignatureDate> ReleaseServiceAsync()
         {

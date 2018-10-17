@@ -420,7 +420,7 @@ namespace Ntreev.Crema.Services.Data
             this.items = null;
         }
 
-        protected virtual async Task OnRestoreAsync(Domain domain)
+        protected virtual void OnAttach(Domain domain)
         {
             this.TypeSource = domain.Source as CremaDataType;
             this.domain = domain as TypeDomain;
@@ -439,13 +439,13 @@ namespace Ntreev.Crema.Services.Data
             }
 
             this.IsModified = this.domain.IsModified;
-            await this.AttachDomainEventAsync();
+            this.AttachDomainEvent();
             this.ServiceState = ServiceState.Opened;
         }
 
-        protected virtual async Task OnDetachedAsync()
+        protected virtual void OnDetach()
         {
-            await this.DetachDomainEventAsync();
+            this.DetachDomainEvent();
             this.domain = null;
         }
 
@@ -525,6 +525,39 @@ namespace Ntreev.Crema.Services.Data
         }
 
         int refcount;
+
+        private void AttachDomainEvent()
+        {
+            this.domain.Dispatcher.Invoke(() =>
+            {
+                if (refcount != 0)
+                {
+                    System.Diagnostics.Debugger.Launch();
+                }
+                this.domain.RowAdded += Domain_RowAdded;
+                this.domain.RowChanged += Domain_RowChanged;
+                this.domain.RowRemoved += Domain_RowRemoved;
+                this.domain.PropertyChanged += Domain_PropertyChanged;
+                refcount++;
+            });
+        }
+
+        private void DetachDomainEvent()
+        {
+            this.domain.Dispatcher.Invoke(() =>
+            {
+                this.domain.RowAdded -= Domain_RowAdded;
+                this.domain.RowChanged -= Domain_RowChanged;
+                this.domain.RowRemoved -= Domain_RowRemoved;
+                this.domain.PropertyChanged -= Domain_PropertyChanged;
+                if (refcount != 1)
+                {
+                    System.Diagnostics.Debugger.Launch();
+                }
+                refcount--;
+            });
+        }
+
         private Task AttachDomainEventAsync()
         {
             return this.domain.Dispatcher.InvokeAsync(() =>
@@ -583,15 +616,15 @@ namespace Ntreev.Crema.Services.Data
 
         #region IDomainHost
 
-        async Task IDomainHost.RestoreAsync(Authentication authentication, Domain domain)
+        void IDomainHost.Attach(Domain domain)
         {
-            await this.OnRestoreAsync(domain);
-            await this.Dispatcher.InvokeAsync(() => this.OnEditBegun(EventArgs.Empty));
+            this.OnAttach(domain);
+            this.OnEditBegun(EventArgs.Empty);
         }
 
-        async Task IDomainHost.DetachAsync()
+        void IDomainHost.Detach()
         {
-            await this.OnDetachedAsync();
+            this.OnDetach();
         }
 
         async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)

@@ -393,7 +393,9 @@ namespace Ntreev.Crema.Services.Domains
             {
                 foreach (var item in metaData.Users)
                 {
-                    this.InvokeUserAdded(authentication, item.DomainUserInfo, item.DomainUserState);
+                    var signatureDate = new SignatureDate(item.DomainUserInfo.UserID, authentication.SignatureDate.DateTime);
+                    var userAuthentication = this.UserContext.Authenticate(signatureDate);
+                    this.InvokeUserAdded(userAuthentication, item.DomainUserInfo, item.DomainUserState);
                 }
             }
             else
@@ -600,6 +602,75 @@ namespace Ntreev.Crema.Services.Domains
                 this.OnPropertyChanged(new DomainPropertyEventArgs(authentication, this, propertyName, value));
                 this.Container.InvokeDomainPropertyChangedEvent(authentication, this, propertyName, value);
             });
+        }
+
+        public void SetDomainHost(Authentication authentication, IDomainHost host)
+        {
+            this.Dispatcher.VerifyAccess();
+            this.Host = host;
+            if (this.Host != null)
+            {
+                base.DomainState |= DomainState.IsActivated;
+            }
+            else
+            {
+                base.DomainState &= ~DomainState.IsActivated;
+            }
+            this.OnDomainStateChanged(new DomainEventArgs(authentication, this));
+            this.Container.InvokeDomainStateChangedEvent(authentication, this);
+        }
+
+        public void Attach(params Authentication[] authentications)
+        {
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in authentications)
+            {
+                if (this.Users.ContainsKey(item.ID) == true)
+                {
+                    //this.Sign(item, true);
+                    //this.InvokeAttach(item, out var domainUser);
+                    var domainUser = this.Users[item.ID];
+                    this.OnUserChanged(new DomainUserEventArgs(item, this, domainUser));
+                    this.OnDomainStateChanged(new DomainEventArgs(item, this));
+                    this.Container.InvokeDomainUserChangedEvent(item, this, domainUser);
+                    this.Container.InvokeDomainStateChangedEvent(item, this);
+                }
+            }
+        }
+
+        //public Task AttachAsync(params Authentication[] authentications)
+        //{
+        //    return this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        foreach (var item in authentications)
+        //        {
+        //            if (this.Users.ContainsKey(item.ID) == true)
+        //            {
+        //                this.Sign(item, true);
+        //                this.InvokeAttach(item, out var domainUser);
+        //                this.OnUserChanged(new DomainUserEventArgs(item, this, domainUser));
+        //                this.OnDomainStateChanged(new DomainEventArgs(item, this));
+        //                this.Container.InvokeDomainUserChangedEvent(item, this, domainUser);
+        //                this.Container.InvokeDomainStateChangedEvent(item, this);
+        //            }
+        //        }
+        //    });
+        //}
+
+        public void Detach(params Authentication[] authentications)
+        {
+            foreach (var item in authentications)
+            {
+                if (this.Users[item.ID] is DomainUser domainUser && domainUser.IsOnline == true)
+                {
+                    //this.Sign(item, true);
+                    //this.InvokeDetach(item, out var domainUser);
+                    this.OnUserChanged(new DomainUserEventArgs(item, this, domainUser));
+                    this.OnDomainStateChanged(new DomainEventArgs(item, this));
+                    this.Container.InvokeDomainUserChangedEvent(item, this, domainUser);
+                    this.Container.InvokeDomainStateChangedEvent(item, this);
+                }
+            }
         }
 
         public abstract object Source { get; }

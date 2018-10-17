@@ -160,8 +160,23 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
+        public DomainMetaData[] GetDomainMetaDatas(Authentication authentication, Guid dataBaseID)
+        {
+            return this.Dispatcher.Invoke(() =>
+            {
+                var domains = this.GetDomains(dataBaseID);
+                var metaDataList = new List<DomainMetaData>(domains.Length);
+                foreach (var item in domains)
+                {
+                    metaDataList.Add(item.GetMetaData(authentication));
+                }
+                return metaDataList.ToArray();
+            });
+        }
+
         public Domain[] GetDomains(Guid dataBaseID)
         {
+            this.Dispatcher.VerifyAccess();
             var domainList = new List<Domain>(this.Domains.Count);
             foreach (var item in this.Domains)
             {
@@ -189,6 +204,18 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
+        public Task AttachUsersAsync(Authentication authentication, Guid dataBaseID)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                var domains = this.GetDomains(dataBaseID);
+                foreach (var item in domains)
+                {
+                    item.Attach(authentication);
+                }
+            });
+        }
+
         public Task DetachUsersAsync(Authentication authentication, Guid dataBaseID)
         {
             return this.Dispatcher.InvokeAsync(() =>
@@ -197,6 +224,34 @@ namespace Ntreev.Crema.Services.Domains
                 foreach (var item in domains)
                 {
                     item.Detach(authentication);
+                }
+            });
+        }
+
+        public  void AttachDomainHost(Authentication[] authentications, IDictionary<Domain, IDomainHost> domainHostByDomain)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                foreach (var item in domainHostByDomain)
+                {
+                    var domain = item.Key;
+                    var domainHost = item.Value;
+                    domain.SetDomainHost(Authentication.System, domainHost);
+                    domain.Attach(authentications);
+                }
+            });
+        }
+
+        public void DetachDomainHost(Authentication[] authentications, IDictionary<Domain, IDomainHost> domainHostByDomain)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                foreach (var item in domainHostByDomain)
+                {
+                    var domain = item.Key;
+                    var domainHost = item.Value;
+                    domain.Detach(authentications);
+                    domain.SetDomainHost(Authentication.System, null);
                 }
             });
         }
@@ -540,6 +595,8 @@ namespace Ntreev.Crema.Services.Domains
         {
             return (this.CremaHost as ICremaHost).GetService(serviceType);
         }
+
+        
 
         #endregion
     }

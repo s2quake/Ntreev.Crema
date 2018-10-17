@@ -41,15 +41,9 @@ namespace Ntreev.Crema.Services.Data
         IDataBase, IInfoProvider, IStateProvider
     {
         private readonly IRepositoryProvider repositoryProvider;
-        private readonly IObjectSerializer serializer;
         private readonly string cachePath;
-        private TypeContext typeContext;
-        private TableContext tableContext;
-        private UserContext userContext;
         private CremaDataSet dataSet;
         private DataBaseMetaData metaData = DataBaseMetaData.Empty;
-        private AuthenticationInfo[] authenticationInfos;
-
         private EventHandler<AuthenticationEventArgs> authenticationEntered;
         private EventHandler<AuthenticationEventArgs> authenticationLeft;
 
@@ -60,25 +54,22 @@ namespace Ntreev.Crema.Services.Data
             this.DataBases = dataBases;
             this.Dispatcher = dataBases.Dispatcher;
             this.repositoryProvider = this.CremaHost.RepositoryProvider;
-            this.serializer = this.CremaHost.Serializer;
+            this.Serializer = this.CremaHost.Serializer;
             base.Name = name;
             this.cachePath = this.CremaHost.GetPath(CremaPath.Caches, DataBaseCollection.DataBasesString);
-            this.userContext = this.CremaHost.UserContext;
-            this.userContext.Dispatcher.Invoke(() => this.userContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
+            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
             this.Initialize();
         }
 
         public DataBase(DataBaseCollection dataBases, string name, DataBaseSerializationInfo dataBaseInfo)
-            : this(dataBases, name)
         {
             this.DataBases = dataBases;
             this.Dispatcher = dataBases.Dispatcher;
             this.repositoryProvider = this.CremaHost.RepositoryProvider;
-            this.serializer = this.CremaHost.Serializer;
+            this.Serializer = this.CremaHost.Serializer;
             base.Name = name;
             this.cachePath = this.CremaHost.GetPath(CremaPath.Caches, DataBaseCollection.DataBasesString);
-            this.userContext = this.CremaHost.UserContext;
-            this.userContext.Dispatcher.Invoke(() => this.userContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
+            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
             base.DataBaseInfo = (DataBaseInfo)dataBaseInfo;
             this.Initialize();
         }
@@ -320,21 +311,20 @@ namespace Ntreev.Crema.Services.Data
                     this.ValidateUnload(authentication);
                     base.DataBaseState = DataBaseState.Unloading;
                 });
-                await this.DetachDomainHostAsync();
                 await this.WriteCacheAsync();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
-                    this.tableContext.Dispose();
-                    this.tableContext = null;
-                    this.typeContext.Dispose();
-                    this.typeContext = null;
+                    this.DetachDomainHost();
+                    this.TableContext.Dispose();
+                    this.TableContext = null;
+                    this.TypeContext.Dispose();
+                    this.TypeContext = null;
                     this.ClearAuthentications();
-                    //this.Repository.Changed -= Repository_Changed;
                     this.Repository.Dispose();
                     this.Repository = null;
                     this.Dispatcher.Dispose();
-                    this.Dispatcher = this.CremaHost.Dispatcher;
+                    this.Dispatcher = this.DataBases.Dispatcher;
                     base.DataBaseState = DataBaseState.Unloaded;
                     base.Unload(authentication);
                     this.CremaHost.Sign(authentication);
@@ -358,11 +348,11 @@ namespace Ntreev.Crema.Services.Data
                     this.ValidateEnter(authentication);
                     this.CremaHost.DebugMethod(authentication, this, nameof(EnterAsync), this);
                 });
-                await this.AttachUsersAsync(authentication);
+                await this.DomainContext.AttachUsersAsync(authentication, this.ID);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.authentications.Add(authentication);
-                    this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
+                    this.AuthenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
                     authentication.Expired += Authentication_Expired;
                     this.CremaHost.Sign(authentication);
                     this.authenticationEntered?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
@@ -386,11 +376,11 @@ namespace Ntreev.Crema.Services.Data
                     this.ValidateLeave(authentication);
                     this.CremaHost.DebugMethod(authentication, this, nameof(LeaveAsync), this);
                 });
-                await this.DetachUsersAsync(authentication);
+                await this.DomainContext.DetachUsersAsync(authentication, this.ID);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.authentications.Remove(authentication);
-                    this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
+                    this.AuthenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
                     authentication.Expired -= Authentication_Expired;
                     this.CremaHost.Sign(authentication);
                     this.authenticationLeft?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
@@ -440,7 +430,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
                     base.ValidateDelete(authentication);
-                    return (this.DataBaseInfo, base.Name);
+                    return (base.DataBaseInfo, base.Name);
                 });
                 var result = await this.DataBases.InvokeDataBaseDeleteAsync(authentication, tuple.DataBaseInfo);
                 await this.Dispatcher.InvokeAsync(() =>
@@ -580,24 +570,27 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task DisposeAsync()
         {
+            await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
             if (this.IsLoaded == true)
             {
                 await this.WriteCacheAsync();
-                this.tableContext.Dispose();
-                this.typeContext.Dispose();
+                this.TableContext.Dispose();
+                this.TypeContext.Dispose();
                 this.Repository.Dispose();
                 this.Dispatcher.Dispose();
             }
             base.DataBaseState = DataBaseState.None;
-            this.tableContext = null;
-            this.typeContext = null;
+            this.TableContext = null;
+            this.TypeContext = null;
         }
 
         public async Task ResettingDataBaseAsync(Authentication authentication)
         {
-            var isLoaded = await this.Dispatcher.InvokeAsync(() => this.IsLoaded);
-            if (isLoaded == true)
-                await this.DetachDomainHostAsync();
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.IsLoaded == true)
+                    this.DetachDomainHost();
+            });
 
             var domains = await this.DomainContext.GetDomainsAsync(this.ID);
             foreach (var item in domains)
@@ -606,8 +599,10 @@ namespace Ntreev.Crema.Services.Data
             }
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.typeContext?.Dispose();
-                this.tableContext?.Dispose();
+                this.TypeContext?.Dispose();
+                this.TypeContext = null;
+                this.TableContext?.Dispose();
+                this.TableContext = null;
                 base.ResettingDataBase(authentication);
                 this.DataBases.InvokeItemsResettingEvent(authentication, new IDataBase[] { this });
             });
@@ -618,165 +613,51 @@ namespace Ntreev.Crema.Services.Data
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.CremaHost.Sign(authentication);
-                this.typeContext = new TypeContext(this, typeInfos);
-                this.typeContext.ItemsCreated += TypeContext_ItemsCreated;
-                this.typeContext.ItemsRenamed += TypeContext_ItemsRenamed;
-                this.typeContext.ItemsMoved += TypeContext_ItemsMoved;
-                this.typeContext.ItemsDeleted += TypeContext_ItemsDeleted;
-                this.typeContext.ItemsChanged += TypeContext_ItemsChanged;
-                this.typeContext.ItemsLockChanged += TypeContext_ItemsLockChanged;
-                this.typeContext.ItemsAccessChanged += TypeContext_ItemsAccessChanged;
-                this.tableContext = new TableContext(this, tableInfos);
-                this.tableContext.ItemsCreated += TableContext_ItemsCreated;
-                this.tableContext.ItemsRenamed += TableContext_ItemsRenamed;
-                this.tableContext.ItemsMoved += TableContext_ItemsMoved;
-                this.tableContext.ItemsDeleted += TableContext_ItemsDeleted;
-                this.tableContext.ItemsChanged += TableContext_ItemsChanged;
-                this.tableContext.ItemsLockChanged += TableContext_ItemsLockChanged;
-                this.tableContext.ItemsAccessChanged += TableContext_ItemsAccessChanged;
-                this.metaData.TypeCategories = this.typeContext.GetCategoryMetaDatas();
-                this.metaData.Types = this.typeContext.GetTypeMetaDatas();
-                this.metaData.TableCategories = this.tableContext.GetCategoryMetaDatas();
-                this.metaData.Tables = this.tableContext.GetTableMetaDatas();
+                this.TypeContext = new TypeContext(this, typeInfos);
+                this.TypeContext.ItemsCreated += TypeContext_ItemsCreated;
+                this.TypeContext.ItemsRenamed += TypeContext_ItemsRenamed;
+                this.TypeContext.ItemsMoved += TypeContext_ItemsMoved;
+                this.TypeContext.ItemsDeleted += TypeContext_ItemsDeleted;
+                this.TypeContext.ItemsChanged += TypeContext_ItemsChanged;
+                this.TypeContext.ItemsLockChanged += TypeContext_ItemsLockChanged;
+                this.TypeContext.ItemsAccessChanged += TypeContext_ItemsAccessChanged;
+                this.TableContext = new TableContext(this, tableInfos);
+                this.TableContext.ItemsCreated += TableContext_ItemsCreated;
+                this.TableContext.ItemsRenamed += TableContext_ItemsRenamed;
+                this.TableContext.ItemsMoved += TableContext_ItemsMoved;
+                this.TableContext.ItemsDeleted += TableContext_ItemsDeleted;
+                this.TableContext.ItemsChanged += TableContext_ItemsChanged;
+                this.TableContext.ItemsLockChanged += TableContext_ItemsLockChanged;
+                this.TableContext.ItemsAccessChanged += TableContext_ItemsAccessChanged;
+                this.metaData.TypeCategories = this.TypeContext.GetCategoryMetaDatas();
+                this.metaData.Types = this.TypeContext.GetTypeMetaDatas();
+                this.metaData.TableCategories = this.TableContext.GetCategoryMetaDatas();
+                this.metaData.Tables = this.TableContext.GetTableMetaDatas();
                 base.ResetDataBase(authentication);
                 base.UpdateLockParent();
                 base.UpdateAccessParent();
-            });
 
-            var domains = await this.DomainContext.GetDomainsAsync(this.ID);
-            var metaDataList = new List<DomainMetaData>(domains.Length);
-            var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
-            foreach (var item in domains)
-            {
-                try
-                {
-                    var target = await this.FindDomainHostAsync(item);
-                    await target.RestoreAsync(Authentication.System, item);
-                    await item.SetDomainHostAsync(target);
-                    await item.AttachAsync(authentications);
-                    var metaData = await item.GetMetaDataAsync(authentication);
-                    metaDataList.Add(metaData);
-                }
-                catch (Exception e)
-                {
-                    this.CremaHost.Error(e);
-                }
-            }
+                this.AttachDomainHost();
+                var metaDatas = this.DomainContext.GetDomainMetaDatas(authentication, this.ID);
 
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.DataBases.InvokeItemsResetEvent(authentication, new IDataBase[] { this }, metaDataList.ToArray());
-            });
-        }
-
-        private void TableContext_ItemsCreated(object sender, ItemsCreatedEventArgs<ITableItem> e)
-        {
-            this.RefreshDataBaseInfo();
-        }
-
-        private void TableContext_ItemsRenamed(object sender, ItemsRenamedEventArgs<ITableItem> e)
-        {
-            this.RefreshDataBaseInfo();
-        }
-
-        private void TableContext_ItemsMoved(object sender, ItemsMovedEventArgs<ITableItem> e)
-        {
-            this.RefreshDataBaseInfo();
-        }
-
-        private void TableContext_ItemsDeleted(object sender, ItemsDeletedEventArgs<ITableItem> e)
-        {
-            this.RefreshDataBaseInfo();
-        }
-
-        private void TableContext_ItemsChanged(object sender, ItemsEventArgs<ITableItem> e)
-        {
-            this.RefreshDataBaseInfo();
-        }
-
-        private void TypeContext_ItemsCreated(object sender, ItemsCreatedEventArgs<ITypeItem> e)
-        {
-            this.RefreshDataBaseInfo();
-        }
-
-        private void TypeContext_ItemsRenamed(object sender, ItemsRenamedEventArgs<ITypeItem> e)
-        {
-            this.RefreshDataBaseInfo();
-        }
-
-        private void TypeContext_ItemsMoved(object sender, ItemsMovedEventArgs<ITypeItem> e)
-        {
-            this.RefreshDataBaseInfo();
-        }
-
-        private void TypeContext_ItemsDeleted(object sender, ItemsDeletedEventArgs<ITypeItem> e)
-        {
-            this.RefreshDataBaseInfo();
-        }
-
-        private void TypeContext_ItemsChanged(object sender, ItemsEventArgs<ITypeItem> e)
-        {
-            this.RefreshDataBaseInfo();
-        }
-
-        public Task<IDomainHost> FindDomainHostAsync(Domain domain)
-        {
-            var domainInfo = domain.DomainInfo;
-            var itemPath = domainInfo.ItemPath;
-            var itemType = domainInfo.ItemType;
-
-            return this.Dispatcher.InvokeAsync<IDomainHost>(() =>
-            {
-                if (itemType == nameof(TableContent))
-                {
-                    return new TableContent.TableContentDomainHost(this.tableContext.Tables, itemPath);
-                }
-                else if (itemType == nameof(NewTableTemplate))
-                {
-                    if (this.tableContext[itemPath] is TableCategory category)
-                    {
-                        return new NewTableTemplate(category);
-                    }
-                    else if (this.tableContext[itemPath] is Table table)
-                    {
-                        return new NewTableTemplate(table);
-                    }
-                    throw new NotImplementedException();
-                }
-                else if (itemType == nameof(TableTemplate))
-                {
-                    var table = this.tableContext[itemPath] as Table;
-                    return table.Template;
-                }
-                else if (itemType == nameof(NewTypeTemplate))
-                {
-                    var category = this.typeContext[itemPath] as TypeCategory;
-                    return new NewTypeTemplate(category);
-                }
-                else if (itemType == nameof(TypeTemplate))
-                {
-                    var type = this.typeContext[itemPath] as Type;
-                    return type.Template;
-                }
-
-                return null;
+                this.DataBases.InvokeItemsResetEvent(authentication, new IDataBase[] { this }, metaDatas);
             });
         }
 
         public object GetService(System.Type serviceType)
         {
             if (serviceType == typeof(TableContext))
-                return this.tableContext;
+                return this.TableContext;
             else if (serviceType == typeof(TableCategoryCollection))
-                return this.tableContext.Categories;
+                return this.TableContext.Categories;
             else if (serviceType == typeof(TableCollection))
-                return this.tableContext.Tables;
+                return this.TableContext.Tables;
             else if (serviceType == typeof(TypeContext))
-                return this.typeContext;
+                return this.TypeContext;
             else if (serviceType == typeof(TypeCategoryCollection))
-                return this.typeContext.Categories;
+                return this.TypeContext.Categories;
             else if (serviceType == typeof(TypeCollection))
-                return this.typeContext.Types;
+                return this.TypeContext.Types;
             else if (serviceType == typeof(DomainContext))
                 return this.CremaHost.DomainContext;
             else
@@ -844,13 +725,15 @@ namespace Ntreev.Crema.Services.Data
 
         public DataBaseCollection DataBases { get; }
 
-        public TableContext TableContext => this.tableContext;
+        public TableContext TableContext { get; private set; }
 
-        public TypeContext TypeContext => this.typeContext;
+        public TypeContext TypeContext { get; private set; }
+
+        public UserContext UserContext => this.CremaHost.UserContext;
 
         public CremaDispatcher Dispatcher { get; private set; }
 
-        public IObjectSerializer Serializer => this.serializer;
+        public IObjectSerializer Serializer { get; }
 
         public DataBaseRepositoryHost Repository { get; private set; }
 
@@ -858,16 +741,16 @@ namespace Ntreev.Crema.Services.Data
 
         public new DataBaseState DataBaseState => base.DataBaseState;
 
-        public AuthenticationInfo[] AuthenticationInfos => this.authenticationInfos;
+        public AuthenticationInfo[] AuthenticationInfos { get; private set; }
 
         public override TypeCategoryBase<Type, TypeCategory, TypeCollection, TypeCategoryCollection, TypeContext> TypeCategory
         {
-            get { return this.typeContext?.Root; }
+            get { return this.TypeContext?.Root; }
         }
 
         public override TableCategoryBase<Table, TableCategory, TableCollection, TableCategoryCollection, TableContext> TableCategory
         {
-            get { return this.tableContext?.Root; }
+            get { return this.TableContext?.Root; }
         }
 
         public new string Name => base.Name;
@@ -1034,7 +917,7 @@ namespace Ntreev.Crema.Services.Data
             if (target == this)
             {
                 var userID = authentication.ID;
-                var userInfo = this.userContext.Dispatcher.Invoke(() => this.userContext.Users[userID].UserInfo);
+                var userInfo = this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users[userID].UserInfo);
                 if (userInfo.Authority == Authority.Guest)
                 {
                     throw new PermissionException();
@@ -1052,7 +935,7 @@ namespace Ntreev.Crema.Services.Data
             if (target == this)
             {
                 var userID = authentication.ID;
-                var userInfo = this.userContext.Dispatcher.Invoke(() => this.userContext.Users[userID].UserInfo);
+                var userInfo = this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users[userID].UserInfo);
                 if (userInfo.Authority == Authority.Guest)
                 {
                     throw new PermissionException();
@@ -1070,7 +953,7 @@ namespace Ntreev.Crema.Services.Data
 
             if (target == this)
             {
-                var userInfo = this.userContext.Dispatcher.Invoke(() => this.userContext.Users[memberID].UserInfo);
+                var userInfo = this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users[memberID].UserInfo);
                 if (userInfo.Authority == Authority.Guest && accessType != AccessType.Guest)
                 {
                     throw new PermissionException($"'{memberID}' 은(는) '{Authority.Guest}' 계정이기 때문에 '{accessType}' 권한을 설정할 수 없습니다.");
@@ -1088,7 +971,7 @@ namespace Ntreev.Crema.Services.Data
 
             if (target == this)
             {
-                var userInfo = this.userContext.Dispatcher.Invoke(() => this.userContext.Users[memberID].UserInfo);
+                var userInfo = this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users[memberID].UserInfo);
                 if (accessType >= AccessType.Editor && userInfo.Authority == Authority.Guest)
                 {
                     throw new PermissionException($"'{memberID}' 은(는) '{Authority.Guest}' 계정이기 때문에 '{accessType}' 권한을 설정할 수 없습니다.");
@@ -1149,33 +1032,31 @@ namespace Ntreev.Crema.Services.Data
             base.OnDataBaseStateChanged(e);
         }
 
-        private async Task AttachDomainHostAsync()
+        private void AttachDomainHost()
         {
-            var domains = await this.DomainContext.GetDomainsAsync(this.ID);
-            foreach (var item in domains)
+            var domains = this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.GetDomains(this.ID));
+            var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
+            var domainHostByDomain = this.FindDomainHosts(domains);
+            foreach (var item in domainHostByDomain)
             {
-                try
-                {
-                    var target = await this.FindDomainHostAsync(item);
-                    await target.RestoreAsync(Authentication.System, item);
-                    await item.SetDomainHostAsync(target);
-                }
-                catch (Exception e)
-                {
-                    this.CremaHost.Error(e);
-                }
+                var domain = item.Key;
+                var domainHost = item.Value;
+                domainHost.Attach(domain);
             }
+            this.DomainContext.AttachDomainHost(authentications, domainHostByDomain);
         }
 
-        private async Task DetachDomainHostAsync()
+        private void DetachDomainHost()
         {
+            var domains = this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.GetDomains(this.ID));
             var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
-            var domains = await this.DomainContext.GetDomainsAsync(this.ID);
-            foreach (var item in domains)
+            var domainHostByDomain = domains.ToDictionary(item => item, item => item.Host);
+            this.DomainContext.DetachDomainHost(authentications, domainHostByDomain);
+            foreach (var item in domainHostByDomain)
             {
-                await item.DetachAsync(authentications);
-                await item.Host.DetachAsync();
-                await item.SetDomainHostAsync(null);
+                var domain = item.Key;
+                var domainHost = item.Value;
+                domainHost.Detach();
             }
         }
 
@@ -1188,15 +1069,6 @@ namespace Ntreev.Crema.Services.Data
             this.DataBases.InvokeItemsStateChangedEvent(authentication, new IDataBase[] { this });
         }
 
-        private async Task AttachUsersAsync(Authentication authentication)
-        {
-            var domains = await this.DomainContext.GetDomainsAsync(this.ID);
-            foreach (var item in domains)
-            {
-                await item.AttachAsync(authentication);
-            }
-        }
-
         private void ClearAuthentications()
         {
             foreach (var item in this.authentications.ToArray())
@@ -1207,12 +1079,7 @@ namespace Ntreev.Crema.Services.Data
                 }
             }
             this.authentications.Clear();
-            this.metaData.Authentications = this.authenticationInfos = new AuthenticationInfo[] { };
-        }
-
-        private Task DetachUsersAsync(Authentication authentication)
-        {
-            return this.DomainContext.DetachUsersAsync(authentication, this.ID);
+            this.metaData.Authentications = this.AuthenticationInfos = new AuthenticationInfo[] { };
         }
 
         private async Task WriteCacheAsync()
@@ -1224,8 +1091,8 @@ namespace Ntreev.Crema.Services.Data
                 return new DataBaseDataSerializationInfo()
                 {
                     Revision = this.Repository.RepositoryInfo.Revision,
-                    TypeInfos = this.typeContext.Types.Select((Type item) => item.TypeInfo).ToArray(),
-                    TableInfos = this.tableContext.Tables.Select((Table item) => item.TableInfo).ToArray(),
+                    TypeInfos = this.TypeContext.Types.Select((Type item) => item.TypeInfo).ToArray(),
+                    TableInfos = this.TableContext.Tables.Select((Table item) => item.TableInfo).ToArray(),
                 };
             });
             await this.Repository.Dispatcher.InvokeAsync(() =>
@@ -1285,7 +1152,18 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.CremaHost.Debug($"initialize database : {base.Name}");
                 var repositoryInfo = this.repositoryProvider.GetRepositoryInfo(remotePath, base.Name);
-                var itemList = this.repositoryProvider.GetRepositoryItemList(remotePath, this.Name);
+                var basePath = this.CremaHost.GetPath(CremaPath.DataBases, $"{repositoryInfo.ID}");
+                var itemList = new string[] { };
+                if (Directory.Exists(basePath) == true)
+                {
+                    repositoryInfo = this.repositoryProvider.GetRepositoryInfo(basePath, base.Name);
+                    itemList = this.repositoryProvider.GetRepositoryItemList(basePath, base.Name);
+                }
+                else
+                {
+                    itemList = this.repositoryProvider.GetRepositoryItemList(remotePath, base.Name);
+                }
+
                 var categories = from item in itemList
                                  where item.EndsWith(PathUtility.Separator) == true
                                  select item;
@@ -1322,7 +1200,7 @@ namespace Ntreev.Crema.Services.Data
 
         private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
         {
-            await this.CremaHost.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 if (e.UserID == this.LockInfo.UserID)
                 {
@@ -1330,11 +1208,6 @@ namespace Ntreev.Crema.Services.Data
                 }
             });
         }
-
-        //private async void Repository_Changed(object sender, EventArgs e)
-        //{
-
-        //}
 
         private async void RefreshDataBaseInfo()
         {
@@ -1350,10 +1223,10 @@ namespace Ntreev.Crema.Services.Data
                     TablesHashValue = CremaDataSet.GenerateHashValue((from Table item in this.TableContext.Tables select item.TableInfo).ToArray()),
                 };
                 this.dataSet = null;
-                this.metaData.TypeCategories = this.typeContext.GetCategoryMetaDatas();
-                this.metaData.Types = this.typeContext.GetTypeMetaDatas();
-                this.metaData.TableCategories = this.tableContext.GetCategoryMetaDatas();
-                this.metaData.Tables = this.tableContext.GetTableMetaDatas();
+                this.metaData.TypeCategories = this.TypeContext.GetCategoryMetaDatas();
+                this.metaData.Types = this.TypeContext.GetTypeMetaDatas();
+                this.metaData.TableCategories = this.TableContext.GetCategoryMetaDatas();
+                this.metaData.Tables = this.TableContext.GetTableMetaDatas();
                 base.DataBaseInfo = this.metaData.DataBaseInfo = dataBaseInfo;
                 this.DataBases.InvokeItemsChangedEvent(Authentication.System, new IDataBase[] { this });
             });
@@ -1369,7 +1242,7 @@ namespace Ntreev.Crema.Services.Data
                     {
                         this.CremaHost.Sign(authentication);
                         this.authentications.Remove(authentication);
-                        this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
+                        this.AuthenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
                         authentication.Expired -= Authentication_Expired;
                         return true;
                     }
@@ -1377,7 +1250,7 @@ namespace Ntreev.Crema.Services.Data
                 });
                 if (value == true)
                 {
-                    await this.DetachUsersAsync(authentication);
+                    await this.DomainContext.DetachUsersAsync(authentication, this.ID);
                     await this.Dispatcher.InvokeAsync(() =>
                     {
                         this.authenticationLeft?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
@@ -1502,13 +1375,6 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        //private void ValidateDispatcher()
-        //{
-        //    if (this.Dispatcher == null)
-        //        throw new InvalidOperationException(Resources.Exception_InvalidObject);
-        //    //this.Dispatcher.VerifyAccess();
-        //}
-
         private void ValidateEnter(Authentication authentication)
         {
             if (this.IsLoaded == false)
@@ -1563,34 +1429,14 @@ namespace Ntreev.Crema.Services.Data
                 throw new InvalidOperationException(Resources.Exception_LoadedDataBaseCannotRevert);
         }
 
-        //private async Task OnEnterAsync(Authentication authentication)
-        //{
-        //    this.CremaHost.Sign(authentication);
-        //    this.authentications.Add(authentication);
-        //    this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
-        //    authentication.Expired += Authentication_Expired;
-        //    await this.AttachUsersAsync(authentication);
-        //    this.authenticationEntered?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
-        //}
-
-        //private async Task OnLeaveAsync(Authentication authentication)
-        //{
-        //    this.CremaHost.Sign(authentication);
-        //    this.authentications.Remove(authentication);
-        //    this.authenticationInfos = this.metaData.Authentications = this.authentications.Select(item => ((Authentication)item).AuthenticationInfo).ToArray();
-        //    authentication.Expired -= Authentication_Expired;
-        //    await this.DetachUsersAsync(authentication);
-        //    this.authenticationLeft?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
-        //}
-
         private void ReadAccessInfo()
         {
             var itemPath = this.BasePath + Path.DirectorySeparatorChar;
             try
             {
-                if (this.serializer.Exists(itemPath, typeof(AccessSerializationInfo), AccessSerializationInfo.Settings) == true)
+                if (this.Serializer.Exists(itemPath, typeof(AccessSerializationInfo), AccessSerializationInfo.Settings) == true)
                 {
-                    var accessInfo = (AccessSerializationInfo)this.serializer.Deserialize(itemPath, typeof(AccessSerializationInfo), AccessSerializationInfo.Settings);
+                    var accessInfo = (AccessSerializationInfo)this.Serializer.Deserialize(itemPath, typeof(AccessSerializationInfo), AccessSerializationInfo.Settings);
                     this.SetAccessInfo((AccessInfo)accessInfo);
                 }
             }
@@ -1600,40 +1446,141 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
+        private IDictionary<Domain, IDomainHost> FindDomainHosts(Domain[] domains)
+        {
+            var dictionary = new Dictionary<Domain, IDomainHost>(domains.Length);
+            foreach (var item in domains)
+            {
+                dictionary.Add(item, this.FindDomainHost(item));
+            }
+            return dictionary;
+        }
+
+        private IDomainHost FindDomainHost(Domain domain)
+        {
+            var domainInfo = domain.DomainInfo;
+            var itemPath = domainInfo.ItemPath;
+            var itemType = domainInfo.ItemType;
+
+            if (itemType == nameof(TableContent))
+            {
+                return new TableContent.TableContentDomainHost(this.TableContext.Tables, itemPath);
+            }
+            else if (itemType == nameof(NewTableTemplate))
+            {
+                if (this.TableContext[itemPath] is TableCategory category)
+                {
+                    return new NewTableTemplate(category);
+                }
+                else if (this.TableContext[itemPath] is Table table)
+                {
+                    return new NewTableTemplate(table);
+                }
+                throw new NotImplementedException();
+            }
+            else if (itemType == nameof(TableTemplate))
+            {
+                var table = this.TableContext[itemPath] as Table;
+                return table.Template;
+            }
+            else if (itemType == nameof(NewTypeTemplate))
+            {
+                var category = this.TypeContext[itemPath] as TypeCategory;
+                return new NewTypeTemplate(category);
+            }
+            else if (itemType == nameof(TypeTemplate))
+            {
+                var type = this.TypeContext[itemPath] as Type;
+                return type.Template;
+            }
+
+            return null;
+        }
+
+        private void TableContext_ItemsCreated(object sender, ItemsCreatedEventArgs<ITableItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TableContext_ItemsRenamed(object sender, ItemsRenamedEventArgs<ITableItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TableContext_ItemsMoved(object sender, ItemsMovedEventArgs<ITableItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TableContext_ItemsDeleted(object sender, ItemsDeletedEventArgs<ITableItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TableContext_ItemsChanged(object sender, ItemsEventArgs<ITableItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TypeContext_ItemsCreated(object sender, ItemsCreatedEventArgs<ITypeItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TypeContext_ItemsRenamed(object sender, ItemsRenamedEventArgs<ITypeItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TypeContext_ItemsMoved(object sender, ItemsMovedEventArgs<ITypeItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TypeContext_ItemsDeleted(object sender, ItemsDeletedEventArgs<ITypeItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
+        private void TypeContext_ItemsChanged(object sender, ItemsEventArgs<ITypeItem> e)
+        {
+            this.RefreshDataBaseInfo();
+        }
+
         private void TypeContext_ItemsLockChanged(object sender, ItemsEventArgs<ITypeItem> e)
         {
-            this.metaData.TypeCategories = this.typeContext.GetCategoryMetaDatas();
-            this.metaData.Types = this.typeContext.GetTypeMetaDatas();
+            this.metaData.TypeCategories = this.TypeContext.GetCategoryMetaDatas();
+            this.metaData.Types = this.TypeContext.GetTypeMetaDatas();
         }
 
         private void TypeContext_ItemsAccessChanged(object sender, ItemsEventArgs<ITypeItem> e)
         {
-            this.metaData.TypeCategories = this.typeContext.GetCategoryMetaDatas();
-            this.metaData.Types = this.typeContext.GetTypeMetaDatas();
+            this.metaData.TypeCategories = this.TypeContext.GetCategoryMetaDatas();
+            this.metaData.Types = this.TypeContext.GetTypeMetaDatas();
         }
 
         private void TableContext_ItemsLockChanged(object sender, ItemsEventArgs<ITableItem> e)
         {
-            this.metaData.TableCategories = this.tableContext.GetCategoryMetaDatas();
-            this.metaData.Tables = this.tableContext.GetTableMetaDatas();
+            this.metaData.TableCategories = this.TableContext.GetCategoryMetaDatas();
+            this.metaData.Tables = this.TableContext.GetTableMetaDatas();
         }
 
         private void TableContext_ItemsAccessChanged(object sender, ItemsEventArgs<ITableItem> e)
         {
-            this.metaData.TableCategories = this.tableContext.GetCategoryMetaDatas();
-            this.metaData.Tables = this.tableContext.GetTableMetaDatas();
+            this.metaData.TableCategories = this.TableContext.GetCategoryMetaDatas();
+            this.metaData.Tables = this.TableContext.GetTableMetaDatas();
         }
 
         private IEnumerable<string> GetItemPaths()
         {
             yield return PathUtility.Separator;
             yield return PathUtility.Separator + CremaSchema.TypeDirectory + PathUtility.Separator;
-            foreach (var item in this.typeContext)
+            foreach (var item in this.TypeContext)
             {
                 yield return PathUtility.Separator + CremaSchema.TypeDirectory + item.Path;
             }
             yield return PathUtility.Separator + CremaSchema.TableDirectory + PathUtility.Separator;
-            foreach (var item in this.tableContext)
+            foreach (var item in this.TableContext)
             {
                 yield return PathUtility.Separator + CremaSchema.TableDirectory + item.Path;
             }
@@ -1669,17 +1616,17 @@ namespace Ntreev.Crema.Services.Data
             if (base.DataBaseState.HasFlag(DataBaseState.Loaded) == true)
             {
                 if (serviceType == typeof(ITableContext))
-                    return this.tableContext;
+                    return this.TableContext;
                 else if (serviceType == typeof(ITableCategoryCollection))
-                    return this.tableContext.Categories;
+                    return this.TableContext.Categories;
                 else if (serviceType == typeof(ITableCollection))
-                    return this.tableContext.Tables;
+                    return this.TableContext.Tables;
                 else if (serviceType == typeof(ITypeContext))
-                    return this.typeContext;
+                    return this.TypeContext;
                 else if (serviceType == typeof(ITypeCategoryCollection))
-                    return this.typeContext.Categories;
+                    return this.TypeContext.Categories;
                 else if (serviceType == typeof(ITypeCollection))
-                    return this.typeContext.Types;
+                    return this.TypeContext.Types;
             }
 
             return this.CremaHost.GetService(serviceType);

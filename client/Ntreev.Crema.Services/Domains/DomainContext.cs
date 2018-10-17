@@ -203,20 +203,46 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
+        public void AttachDomainHost(Authentication[] authentications, IDictionary<Domain, IDomainHost> domainHostByDomain)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                foreach (var item in domainHostByDomain)
+                {
+                    var domain = item.Key;
+                    var domainHost = item.Value;
+                    domain.SetDomainHost(Authentication.System, domainHost);
+                    domain.Attach(authentications);
+                }
+            });
+        }
+
+        public void DetachDomainHost(Authentication[] authentications, IDictionary<Domain, IDomainHost> domainHostByDomain)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                foreach (var item in domainHostByDomain)
+                {
+                    var domain = item.Key;
+                    var domainHost = item.Value;
+                    domain.Detach(authentications);
+                    domain.SetDomainHost(Authentication.System, null);
+                }
+            });
+        }
+
         public Domain[] GetDomains(Guid dataBaseID)
         {
-            return this.Dispatcher.Invoke(() =>
+            this.Dispatcher.VerifyAccess();
+            var domainList = new List<Domain>(this.Domains.Count);
+            foreach (var item in this.Domains)
             {
-                var domainList = new List<Domain>(this.Domains.Count);
-                foreach (var item in this.Domains)
+                if (item.DataBaseID == dataBaseID)
                 {
-                    if (item.DataBaseID == dataBaseID)
-                    {
-                        domainList.Add(item);
-                    }
+                    domainList.Add(item);
                 }
-                return domainList.ToArray();
-            });
+            }
+            return domainList.ToArray();
         }
 
         public Task<Domain[]> GetDomainsAsync(Guid dataBaseID)

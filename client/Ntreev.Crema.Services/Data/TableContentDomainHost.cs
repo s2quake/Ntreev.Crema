@@ -66,6 +66,30 @@ namespace Ntreev.Crema.Services.Data
                 }
             }
 
+            private void AttachDomainEvent()
+            {
+                this.domain.Dispatcher.Invoke(() =>
+                {
+                    this.domain.RowAdded += Domain_RowAdded;
+                    this.domain.RowChanged += Domain_RowChanged;
+                    this.domain.RowRemoved += Domain_RowRemoved;
+                    this.domain.PropertyChanged += Domain_PropertyChanged;
+                    this.domain.UserChanged += Domain_UserChanged;
+                });
+            }
+
+            private void DetachDomainEvent()
+            {
+                this.domain.Dispatcher.Invoke(() =>
+                {
+                    this.domain.RowAdded -= Domain_RowAdded;
+                    this.domain.RowChanged -= Domain_RowChanged;
+                    this.domain.RowRemoved -= Domain_RowRemoved;
+                    this.domain.PropertyChanged -= Domain_PropertyChanged;
+                    this.domain.UserChanged -= Domain_UserChanged;
+                });
+            }
+
             public Task AttachDomainEventAsync()
             {
                 return this.domain.Dispatcher.InvokeAsync(() =>
@@ -349,9 +373,9 @@ namespace Ntreev.Crema.Services.Data
 
             #region IDomainHost
 
-            async Task IDomainHost.DetachAsync()
+            void IDomainHost.Detach()
             {
-                await this.DetachDomainEventAsync();
+                this.DetachDomainEvent();
                 this.domain = null;
                 foreach (var item in this.Contents)
                 {
@@ -360,7 +384,7 @@ namespace Ntreev.Crema.Services.Data
                 }
             }
 
-            async Task IDomainHost.RestoreAsync(Authentication authentication, Domain domain)
+            void IDomainHost.Attach(Domain domain)
             {
                 var dataSet = domain.Source as CremaDataSet;
                 this.domain = domain;
@@ -375,18 +399,15 @@ namespace Ntreev.Crema.Services.Data
                         item.dataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
                         if (dataSet != null)
                             tableState |= TableState.IsMember;
-                        if (this.masterUserID == authentication.ID)
+                        if (this.masterUserID == this.DataBase.CremaHost.UserID)
                             tableState |= TableState.IsOwner;
                     }
                     item.Table.SetTableState(tableState);
                     item.IsModified = domain.ModifiedTables.Contains(item.Table.Name);
                 }
-                await this.AttachDomainEventAsync();
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
-                    this.InvokeEditBegunEvent(EventArgs.Empty);
-                });
+                this.AttachDomainEvent();
+                //this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
+                this.InvokeEditBegunEvent(EventArgs.Empty);
             }
 
             async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)

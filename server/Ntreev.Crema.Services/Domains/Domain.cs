@@ -441,24 +441,41 @@ namespace Ntreev.Crema.Services.Domains
             this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled, result));
         }
 
-        public Task AttachAsync(params Authentication[] authentications)
+        public void Attach(params Authentication[] authentications)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in authentications)
             {
-                foreach (var item in authentications)
+                if (this.Users.ContainsKey(item.ID) == true)
                 {
-                    if (this.Users.ContainsKey(item.ID) == true)
-                    {
-                        this.Sign(item, true);
-                        this.InvokeAttach(item, out var domainUser);
-                        this.OnUserChanged(new DomainUserEventArgs(item, this, domainUser));
-                        this.OnDomainStateChanged(new DomainEventArgs(item, this));
-                        this.Container.InvokeDomainUserChangedEvent(item, this, domainUser);
-                        this.Container.InvokeDomainStateChangedEvent(item, this);
-                    }
+                    this.Sign(item, true);
+                    this.InvokeAttach(item, out var domainUser);
+                    this.OnUserChanged(new DomainUserEventArgs(item, this, domainUser));
+                    this.OnDomainStateChanged(new DomainEventArgs(item, this));
+                    this.Container.InvokeDomainUserChangedEvent(item, this, domainUser);
+                    this.Container.InvokeDomainStateChangedEvent(item, this);
                 }
-            });
+            }
         }
+
+        //public Task AttachAsync(params Authentication[] authentications)
+        //{
+        //    return this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        foreach (var item in authentications)
+        //        {
+        //            if (this.Users.ContainsKey(item.ID) == true)
+        //            {
+        //                this.Sign(item, true);
+        //                this.InvokeAttach(item, out var domainUser);
+        //                this.OnUserChanged(new DomainUserEventArgs(item, this, domainUser));
+        //                this.OnDomainStateChanged(new DomainEventArgs(item, this));
+        //                this.Container.InvokeDomainUserChangedEvent(item, this, domainUser);
+        //                this.Container.InvokeDomainStateChangedEvent(item, this);
+        //            }
+        //        }
+        //    });
+        //}
 
         public void Detach(params Authentication[] authentications)
         {
@@ -476,24 +493,24 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public Task DetachAsync(params Authentication[] authentications)
-        {
-            return this.Dispatcher.InvokeAsync(() =>
-            {
-                foreach (var item in authentications)
-                {
-                    if (this.Users[item.ID] is DomainUser user && user.IsOnline == true)
-                    {
-                        this.Sign(item, true);
-                        this.InvokeDetach(item, out var domainUser);
-                        this.OnUserChanged(new DomainUserEventArgs(item, this, domainUser));
-                        this.OnDomainStateChanged(new DomainEventArgs(item, this));
-                        this.Container.InvokeDomainUserChangedEvent(item, this, domainUser);
-                        this.Container.InvokeDomainStateChangedEvent(item, this);
-                    }
-                }
-            });
-        }
+        //public Task DetachAsync(params Authentication[] authentications)
+        //{
+        //    return this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        foreach (var item in authentications)
+        //        {
+        //            if (this.Users[item.ID] is DomainUser user && user.IsOnline == true)
+        //            {
+        //                this.Sign(item, true);
+        //                this.InvokeDetach(item, out var domainUser);
+        //                this.OnUserChanged(new DomainUserEventArgs(item, this, domainUser));
+        //                this.OnDomainStateChanged(new DomainEventArgs(item, this));
+        //                this.Container.InvokeDomainUserChangedEvent(item, this, domainUser);
+        //                this.Container.InvokeDomainStateChangedEvent(item, this);
+        //            }
+        //        }
+        //    });
+        //}
 
         public async Task AddUserAsync(Authentication authentication, DomainAccessType accessType)
         {
@@ -536,6 +553,22 @@ namespace Ntreev.Crema.Services.Domains
                     this.Container.InvokeDomainUserChangedEvent(authentication, this, this.Users.Owner);
                 }
             });
+        }
+
+        public void SetDomainHost(Authentication authentication, IDomainHost host)
+        {
+            this.Dispatcher.VerifyAccess();
+            this.Host = host;
+            if (this.Host != null)
+            {
+                base.DomainState |= DomainState.IsActivated;
+            }
+            else
+            {
+                base.DomainState &= ~DomainState.IsActivated;
+            }
+            this.OnDomainStateChanged(new DomainEventArgs(authentication, this));
+            this.Container.InvokeDomainStateChangedEvent(authentication, this);
         }
 
         public async Task SetDomainHostAsync(IDomainHost host)

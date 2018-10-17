@@ -211,12 +211,12 @@ namespace Ntreev.Crema.Services.Domains
 
             }
 
-            public Task RestoreAsync(Authentication authentication, Domain domain)
+            public void Attach(Domain domain)
             {
                 throw new NotImplementedException();
             }
 
-            public Task DetachAsync()
+            public void Detach()
             {
                 throw new NotImplementedException();
             }
