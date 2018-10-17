@@ -285,11 +285,10 @@ namespace Ntreev.Crema.Services
 
             if (Environment.ExitCode != 0 && this.ServiceState == ServiceState.Opened)
             {
-                var task = this.CloseAsync(CloseInfo.Empty);
-                task.Wait();
+                throw new InvalidOperationException("server is not closed.");
             }
 
-            this.Dispatcher.Dispose(false);
+            this.Dispatcher.Dispose();
             this.Dispatcher = null;
             this.OnDisposed(EventArgs.Empty);
             CremaLog.Debug("Crema disposed.");

@@ -73,10 +73,7 @@ namespace Ntreev.Crema.Services
             };
             CremaLog.Debug("crema log service initialized.");
             CremaLog.Debug($"available tags : {string.Join(", ", TagInfoUtility.Names)}");
-            if (settings.MultiThreading == true)
-                this.Dispatcher = new CremaDispatcher(this);
-            else
-                this.Dispatcher = new CremaDispatcher(this, System.Windows.Threading.Dispatcher.CurrentDispatcher);
+            this.Dispatcher = new CremaDispatcher(this);
             this.RepositoryDispatcher = new CremaDispatcher(this.RepositoryProvider);
             CremaLog.Debug("crema dispatcher initialized.");
         }

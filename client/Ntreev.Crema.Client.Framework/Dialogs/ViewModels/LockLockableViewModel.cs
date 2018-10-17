@@ -53,10 +53,9 @@ namespace Ntreev.Crema.Client.Framework.Dialogs.ViewModels
             if (descriptor == null)
                 throw new ArgumentNullException(nameof(descriptor));
 
-            if (descriptor.Target is ILockable lockable)
+            if (descriptor.Target is ILockable lockable && lockable is IDispatcherObject dispatcherObject)
             {
-                var dispatcher = lockable is IDispatcherObject dispatcherObject ? dispatcherObject.Dispatcher : Application.Current.Dispatcher;
-                return await dispatcher.InvokeAsync(() =>
+                return await dispatcherObject.Dispatcher.InvokeAsync(() =>
                 {
                     return new LockLockableViewModel(authentication, lockable);
                 });
@@ -69,7 +68,6 @@ namespace Ntreev.Crema.Client.Framework.Dialogs.ViewModels
 
         protected override Task LockAsync(string comment)
         {
-            var dispatcher = lockable is IDispatcherObject dispatcherObject ? dispatcherObject.Dispatcher : Application.Current.Dispatcher;
             return this.lockable.LockAsync(this.authentication, comment);
         }
 

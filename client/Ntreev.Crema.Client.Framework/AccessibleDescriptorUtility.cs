@@ -94,7 +94,6 @@ namespace Ntreev.Crema.Client.Framework
         {
             if (descriptor.Target is IAccessible accessible)
             {
-                var dispatcher = accessible is IDispatcherObject dispatcherObject ? dispatcherObject.Dispatcher : Application.Current.Dispatcher;
                 try
                 {
                     await accessible.SetPrivateAsync(authentication);
@@ -116,7 +115,6 @@ namespace Ntreev.Crema.Client.Framework
         {
             if (descriptor.Target is IAccessible accessible)
             {
-                var dispatcher = accessible is IDispatcherObject dispatcherObject ? dispatcherObject.Dispatcher : Application.Current.Dispatcher;
                 try
                 {
                     await accessible.SetPublicAsync(authentication);

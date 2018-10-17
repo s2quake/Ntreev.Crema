@@ -33,8 +33,6 @@ namespace Ntreev.Crema.Services
 
         public string BasePath { get; set; }
 
-        public bool MultiThreading { get; set; }
-
         public string RepositoryModule => FileUtility.ReadAllText(this.BasePath, CremaString.Repository, CremaString.Repo);
 
         public string FileType => FileUtility.ReadAllText(this.BasePath, CremaString.Repository, CremaString.File);

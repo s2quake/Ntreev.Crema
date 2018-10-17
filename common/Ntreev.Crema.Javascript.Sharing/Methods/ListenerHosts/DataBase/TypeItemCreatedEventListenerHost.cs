@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
-using System.Windows.Threading;
 
 namespace Ntreev.Crema.Javascript.Methods.ListenerHosts.DataBases
 {

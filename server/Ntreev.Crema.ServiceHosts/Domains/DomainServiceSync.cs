@@ -27,7 +27,6 @@ using Ntreev.Crema.ServiceModel;
 using System.Collections.Specialized;
 using System.Threading.Tasks;
 using Ntreev.Crema.Services.Properties;
-using System.Windows.Threading;
 using Ntreev.Library;
 
 namespace Ntreev.Crema.ServiceHosts.Domains

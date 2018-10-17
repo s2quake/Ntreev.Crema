@@ -298,12 +298,6 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        public bool MultiThreading
-        {
-            get => this.settings.MultiThreading;
-            set => this.settings.MultiThreading = value;
-        }
-
         public LogVerbose Verbose
         {
             get => this.settings.Verbose;
@@ -407,7 +401,7 @@ namespace Ntreev.Crema.Services
         internal static IRepositoryProvider GetRepositoryProvider(IServiceProvider serviceProvider, string repositoryModule)
         {
             var repositoryProviders = serviceProvider.GetService(typeof(IEnumerable<IRepositoryProvider>)) as IEnumerable<IRepositoryProvider>;
-            var repositoryProvider = repositoryProviders.FirstOrDefault(item => item.Name == (repositoryModule ?? "svn"));
+            var repositoryProvider = repositoryProviders.FirstOrDefault(item => item.Name == (repositoryModule ?? "git"));
             if (repositoryProvider == null)
                 throw new InvalidOperationException(Resources.Exception_NoRepositoryModule);
             return repositoryProvider;

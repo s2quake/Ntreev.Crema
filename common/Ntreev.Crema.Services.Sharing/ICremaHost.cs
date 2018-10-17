@@ -22,7 +22,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Security;
 using System.Threading.Tasks;
-using System.Windows.Threading;
+
 namespace Ntreev.Crema.Services
 {
     public interface ICremaHost : IServiceProvider, IDisposable, IDispatcherObject

@@ -23,153 +23,95 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 
 namespace Ntreev.Crema.ServiceModel
 {
     public sealed class CremaDispatcher
     {
-        private Dispatcher dispatcher;
-        private DispatcherFrame dispatcherFrame;
+        private readonly CremaDispatcherScheduler scheduler;
+        private readonly TaskFactory factory;
+        private readonly CancellationTokenSource cancellationToken;
 
         public CremaDispatcher(object owner)
         {
             var eventSet = new ManualResetEvent(false);
+            this.cancellationToken = new CancellationTokenSource();
+            this.scheduler = new CremaDispatcherScheduler(this.cancellationToken.Token);
+            this.factory = new TaskFactory(this.cancellationToken.Token, TaskCreationOptions.None, TaskContinuationOptions.None, this.scheduler);
             this.Owner = owner;
-            var thread = new Thread(() =>
+            this.Thread = new Thread(() =>
             {
-                this.dispatcher = Dispatcher.CurrentDispatcher;
-                this.dispatcher.UnhandledException += Dispatcher_UnhandledException;
-                this.dispatcherFrame = new DispatcherFrame(true);
                 eventSet.Set();
-                try
-                {
-                    Dispatcher.PushFrame(this.dispatcherFrame);
-                }
-                catch
-                {
-                    this.dispatcher = null;
-                    this.dispatcherFrame = null;
-                }
+                this.scheduler.Run();
+                this.Disposed?.Invoke(this, EventArgs.Empty);
             })
             {
                 Name = owner.ToString()
             };
-            thread.Start();
+            this.Thread.Start();
             eventSet.WaitOne();
-        }
-
-        public CremaDispatcher(object owner, Dispatcher dispatcher)
-        {
-            this.Owner = owner;
-            this.dispatcher = dispatcher;
         }
 
         public void VerifyAccess()
         {
-            this.dispatcher.VerifyAccess();
+            if (!this.CheckAccess())
+            {
+                throw new InvalidOperationException("The calling thread cannot access this object because a different thread owns it.");
+            }
         }
 
         public bool CheckAccess()
         {
-            return this.dispatcher.CheckAccess();
+            return this.Thread == Thread.CurrentThread;
         }
 
         public void Invoke(Action action)
         {
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            if (this.CheckAccess() == true)
             {
-                this.InvokeUnix(action);
+                action();
             }
             else
             {
-                this.InvokeDefault(action);
+                var task = this.factory.StartNew(action);
+                task.Wait();
             }
         }
 
         public Task InvokeAsync(Action action)
         {
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
-            {
-                return this.InvokeAsyncUnix(action);
-            }
-            else
-            {
-                return this.InvokeAsyncDefault(action);
-            }
-        }
-
-        public void InvokeTask(Func<Task> callback)
-        {
-            this.dispatcher.Invoke(callback, DispatcherPriority.Send).Wait();
-        }
-
-        public Task InvokeTaskAsync(Func<Task> callback)
-        {
-            return this.dispatcher.Invoke(callback, DispatcherPriority.Send);
-        }
-
-        public Task<TResult> InvokeTaskAsync<TResult>(Func<Task<TResult>> callback)
-        {
-            return this.dispatcher.Invoke(callback, DispatcherPriority.Send);
+            return this.factory.StartNew(action);
         }
 
         public TResult Invoke<TResult>(Func<TResult> callback)
         {
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            if (this.CheckAccess() == true)
             {
-                return this.InvokeUnix(callback);
+                return callback();
             }
             else
             {
-                return this.InvokeDefault(callback);
+                var task = this.factory.StartNew(callback);
+                task.Wait();
+                return task.Result;
             }
         }
 
         public Task<TResult> InvokeAsync<TResult>(Func<TResult> callback)
         {
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
-            {
-                return this.InvokeAsyncUnix(callback);
-            }
-            else
-            {
-                return this.InvokeAsyncDefault(callback);
-            }
+            return this.factory.StartNew(callback);
         }
 
         public void Dispose()
         {
-            this.Dispose(true);
+            this.cancellationToken.Cancel();
         }
 
-        public void Dispose(bool sync)
+        public async Task DisposeAsync()
         {
-            if (this.dispatcher != null)
-            {
-                if (this.dispatcherFrame != null)
-                {
-                    if (Environment.OSVersion.Platform == PlatformID.Unix)
-                    {
-                        this.dispatcherFrame.Continue = false;
-                        this.dispatcher.InvokeShutdown();
-                        this.dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(() => { }));
-                    }
-                    else
-                    {
-                        if (sync == true)
-                        {
-                            this.dispatcher.InvokeShutdown();
-                        }
-                        else
-                        {
-                            this.dispatcherFrame.Continue = false;
-                        }
-                    }
-                    this.dispatcherFrame = null;
-                }
-                this.dispatcher = null;
-            }
+            var task = this.factory.StartNew(() => { });
+            this.cancellationToken.Cancel();
+            await task;
         }
 
         public string Name
@@ -179,119 +121,276 @@ namespace Ntreev.Crema.ServiceModel
 
         public object Owner { get; }
 
-        public static implicit operator Dispatcher(CremaDispatcher dispatcher)
-        {
-            return dispatcher.dispatcher;
-        }
+        public Thread Thread { get; }
 
-        private void InvokeDefault(Action action)
-        {
-            this.dispatcher.Invoke(action, DispatcherPriority.Send);
-        }
-
-        private Task InvokeAsyncDefault(Action action)
-        {
-            return this.dispatcher.InvokeAsync(action, DispatcherPriority.Send).Task;
-        }
-
-        private TResult InvokeDefault<TResult>(Func<TResult> callback)
-        {
-            return this.dispatcher.Invoke(callback, DispatcherPriority.Send);
-        }
-
-        private Task<TResult> InvokeAsyncDefault<TResult>(Func<TResult> callback)
-        {
-            return this.dispatcher.InvokeAsync(callback, DispatcherPriority.Send).Task;
-        }
-
-        private void InvokeUnix(Action action)
-        {
-            if (this.dispatcher.CheckAccess() == true)
-            {
-                action();
-                return;
-            }
-            else
-            {
-                var func = new Func<object>(() =>
-                {
-                    try
-                    {
-                        action();
-                    }
-                    catch (Exception e)
-                    {
-                        return e;
-                    }
-                    return null;
-                });
-                var eventSet = new ManualResetEvent(false);
-                var result = this.dispatcher.BeginInvoke(DispatcherPriority.Send, func);
-                result.Completed += (s, e) => eventSet.Set();
-                if (result.Status != DispatcherOperationStatus.Completed)
-                    eventSet.WaitOne();
-                if (result.Result is Exception ex)
-                    throw ex;
-            }
-        }
-
-        private Task InvokeAsyncUnix(Action action)
-        {
-            return Task.Run(() => this.Invoke(action));
-        }
-
-        private TResult InvokeUnix<TResult>(Func<TResult> callback)
-        {
-            if (this.dispatcher.CheckAccess() == true)
-            {
-                return callback();
-            }
-            else
-            {
-                var func = new Func<object>(() =>
-                {
-                    try
-                    {
-                        return callback();
-                    }
-                    catch (Exception e)
-                    {
-                        return new ExceptionHost(e);
-                    }
-                });
-                var eventSet = new ManualResetEvent(false);
-                var result = this.dispatcher.BeginInvoke(DispatcherPriority.Send, func);
-                result.Completed += (s, e) => eventSet.Set();
-                if (result.Status != DispatcherOperationStatus.Completed)
-                    eventSet.WaitOne();
-                if (result.Result is ExceptionHost host)
-                    throw host.Exception;
-                return (TResult)result.Result;
-            }
-        }
-
-        private Task<TResult> InvokeAsyncUnix<TResult>(Func<TResult> callback)
-        {
-            return Task.Run(() => this.Invoke(callback));
-        }
-
-        private void Dispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-        {
-            e.Handled = true;
-        }
-
-        #region classes
-
-        class ExceptionHost
-        {
-            public ExceptionHost(Exception exception)
-            {
-                this.Exception = exception;
-            }
-
-            public Exception Exception { get; }
-        }
-
-        #endregion
+        public event EventHandler Disposed;
     }
+
+    //public sealed class CremaDispatcher
+    //{
+    //    private Dispatcher dispatcher;
+    //    private DispatcherFrame dispatcherFrame;
+
+    //    public CremaDispatcher(object owner)
+    //    {
+    //        var eventSet = new ManualResetEvent(false);
+    //        this.Owner = owner;
+    //        var thread = new Thread(() =>
+    //        {
+    //            this.dispatcher = Dispatcher.CurrentDispatcher;
+    //            this.dispatcher.UnhandledException += Dispatcher_UnhandledException;
+    //            this.dispatcherFrame = new DispatcherFrame(true);
+    //            eventSet.Set();
+    //            try
+    //            {
+    //                Dispatcher.PushFrame(this.dispatcherFrame);
+    //            }
+    //            catch
+    //            {
+    //                this.dispatcher = null;
+    //                this.dispatcherFrame = null;
+    //            }
+    //        })
+    //        {
+    //            Name = owner.ToString()
+    //        };
+    //        thread.Start();
+    //        eventSet.WaitOne();
+    //    }
+
+    //    public CremaDispatcher(object owner, Dispatcher dispatcher)
+    //    {
+    //        this.Owner = owner;
+    //        this.dispatcher = dispatcher;
+    //    }
+
+    //    public void VerifyAccess()
+    //    {
+    //        this.dispatcher.VerifyAccess();
+    //    }
+
+    //    public bool CheckAccess()
+    //    {
+    //        return this.dispatcher.CheckAccess();
+    //    }
+
+    //    public void Invoke(Action action)
+    //    {
+    //        if (Environment.OSVersion.Platform == PlatformID.Unix)
+    //        {
+    //            this.InvokeUnix(action);
+    //        }
+    //        else
+    //        {
+    //            this.InvokeDefault(action);
+    //        }
+    //    }
+
+    //    public Task InvokeAsync(Action action)
+    //    {
+    //        if (Environment.OSVersion.Platform == PlatformID.Unix)
+    //        {
+    //            return this.InvokeAsyncUnix(action);
+    //        }
+    //        else
+    //        {
+    //            return this.InvokeAsyncDefault(action);
+    //        }
+    //    }
+
+    //    public void InvokeTask(Func<Task> callback)
+    //    {
+    //        this.dispatcher.Invoke(callback, DispatcherPriority.Send).Wait();
+    //    }
+
+    //    public Task InvokeTaskAsync(Func<Task> callback)
+    //    {
+    //        return this.dispatcher.Invoke(callback, DispatcherPriority.Send);
+    //    }
+
+    //    public Task<TResult> InvokeTaskAsync<TResult>(Func<Task<TResult>> callback)
+    //    {
+    //        return this.dispatcher.Invoke(callback, DispatcherPriority.Send);
+    //    }
+
+    //    public TResult Invoke<TResult>(Func<TResult> callback)
+    //    {
+    //        if (Environment.OSVersion.Platform == PlatformID.Unix)
+    //        {
+    //            return this.InvokeUnix(callback);
+    //        }
+    //        else
+    //        {
+    //            return this.InvokeDefault(callback);
+    //        }
+    //    }
+
+    //    public Task<TResult> InvokeAsync<TResult>(Func<TResult> callback)
+    //    {
+    //        if (Environment.OSVersion.Platform == PlatformID.Unix)
+    //        {
+    //            return this.InvokeAsyncUnix(callback);
+    //        }
+    //        else
+    //        {
+    //            return this.InvokeAsyncDefault(callback);
+    //        }
+    //    }
+
+    //    public void Dispose()
+    //    {
+    //        this.Dispose(true);
+    //    }
+
+    //    public void Dispose(bool sync)
+    //    {
+    //        if (this.dispatcher != null)
+    //        {
+    //            if (this.dispatcherFrame != null)
+    //            {
+    //                if (Environment.OSVersion.Platform == PlatformID.Unix)
+    //                {
+    //                    this.dispatcherFrame.Continue = false;
+    //                    this.dispatcher.InvokeShutdown();
+    //                    this.dispatcher.BeginInvoke(DispatcherPriority.Send, new Action(() => { }));
+    //                }
+    //                else
+    //                {
+    //                    if (sync == true)
+    //                    {
+    //                        this.dispatcher.InvokeShutdown();
+    //                    }
+    //                    else
+    //                    {
+    //                        this.dispatcherFrame.Continue = false;
+    //                    }
+    //                }
+    //                this.dispatcherFrame = null;
+    //            }
+    //            this.dispatcher = null;
+    //        }
+    //    }
+
+    //    public string Name
+    //    {
+    //        get { return this.Owner.ToString(); }
+    //    }
+
+    //    public object Owner { get; }
+
+    //    public static implicit operator Dispatcher(CremaDispatcher dispatcher)
+    //    {
+    //        return dispatcher.dispatcher;
+    //    }
+
+    //    private void InvokeDefault(Action action)
+    //    {
+    //        this.dispatcher.Invoke(action, DispatcherPriority.Send);
+    //    }
+
+    //    private Task InvokeAsyncDefault(Action action)
+    //    {
+    //        return this.dispatcher.InvokeAsync(action, DispatcherPriority.Send).Task;
+    //    }
+
+    //    private TResult InvokeDefault<TResult>(Func<TResult> callback)
+    //    {
+    //        return this.dispatcher.Invoke(callback, DispatcherPriority.Send);
+    //    }
+
+    //    private Task<TResult> InvokeAsyncDefault<TResult>(Func<TResult> callback)
+    //    {
+    //        return this.dispatcher.InvokeAsync(callback, DispatcherPriority.Send).Task;
+    //    }
+
+    //    private void InvokeUnix(Action action)
+    //    {
+    //        if (this.dispatcher.CheckAccess() == true)
+    //        {
+    //            action();
+    //            return;
+    //        }
+    //        else
+    //        {
+    //            var func = new Func<object>(() =>
+    //            {
+    //                try
+    //                {
+    //                    action();
+    //                }
+    //                catch (Exception e)
+    //                {
+    //                    return e;
+    //                }
+    //                return null;
+    //            });
+    //            var eventSet = new ManualResetEvent(false);
+    //            var result = this.dispatcher.BeginInvoke(DispatcherPriority.Send, func);
+    //            result.Completed += (s, e) => eventSet.Set();
+    //            if (result.Status != DispatcherOperationStatus.Completed)
+    //                eventSet.WaitOne();
+    //            if (result.Result is Exception ex)
+    //                throw ex;
+    //        }
+    //    }
+
+    //    private Task InvokeAsyncUnix(Action action)
+    //    {
+    //        return Task.Run(() => this.Invoke(action));
+    //    }
+
+    //    private TResult InvokeUnix<TResult>(Func<TResult> callback)
+    //    {
+    //        if (this.dispatcher.CheckAccess() == true)
+    //        {
+    //            return callback();
+    //        }
+    //        else
+    //        {
+    //            var func = new Func<object>(() =>
+    //            {
+    //                try
+    //                {
+    //                    return callback();
+    //                }
+    //                catch (Exception e)
+    //                {
+    //                    return new ExceptionHost(e);
+    //                }
+    //            });
+    //            var eventSet = new ManualResetEvent(false);
+    //            var result = this.dispatcher.BeginInvoke(DispatcherPriority.Send, func);
+    //            result.Completed += (s, e) => eventSet.Set();
+    //            if (result.Status != DispatcherOperationStatus.Completed)
+    //                eventSet.WaitOne();
+    //            if (result.Result is ExceptionHost host)
+    //                throw host.Exception;
+    //            return (TResult)result.Result;
+    //        }
+    //    }
+
+    //    private Task<TResult> InvokeAsyncUnix<TResult>(Func<TResult> callback)
+    //    {
+    //        return Task.Run(() => this.Invoke(callback));
+    //    }
+
+    //    private void Dispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    //    {
+    //        e.Handled = true;
+    //    }
+
+    //    #region classes
+
+    //    class ExceptionHost
+    //    {
+    //        public ExceptionHost(Exception exception)
+    //        {
+    //            this.Exception = exception;
+    //        }
+
+    //        public Exception Exception { get; }
+    //    }
+
+    //    #endregion
+    //}
 }

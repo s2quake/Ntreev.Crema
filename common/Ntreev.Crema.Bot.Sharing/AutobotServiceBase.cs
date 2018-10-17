@@ -153,10 +153,10 @@ namespace Ntreev.Crema.Bot
         {
             if (sender is AutobotBase autobot)
             {
-                this.Dispatcher.InvokeAsync(() =>
-                {
+                //this.Dispatcher.InvokeAsync(() =>
+                //{
                     this.botByID.Remove(autobot.AutobotID);
-                });
+                //});
             }
         }
 

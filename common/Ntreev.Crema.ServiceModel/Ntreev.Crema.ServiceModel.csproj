@@ -52,7 +52,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccessChangeType.cs" />
@@ -60,6 +59,7 @@
     <Compile Include="AuthenticationInfo.cs" />
     <Compile Include="AuthenticationType.cs" />
     <Compile Include="Authority.cs" />
+    <Compile Include="CremaDispatcherScheduler.cs" />
     <Compile Include="DataSetType.cs" />
     <Compile Include="DispatcherExpiredException.cs" />
     <Compile Include="DispatcherScopeAttribute.cs" />

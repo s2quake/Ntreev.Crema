@@ -58,7 +58,7 @@ namespace Ntreev.Crema.ServiceHosts
 
         public CremaService()
         {
-            this.MultiThreading = true;
+            
         }
 
         public async Task OpenAsync()

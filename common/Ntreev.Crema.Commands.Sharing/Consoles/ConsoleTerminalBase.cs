@@ -72,8 +72,12 @@ namespace Ntreev.Crema.Commands.Consoles
                 }
                 else
                 {
-                    var uri = new Uri(prompt);
-                    //var match = Regex.Match(prompt, $"(.+)([:])({PathUtility.Separator}.*)({postfixPattern})$");
+                    var p1 = prompt.TrimStart();
+                    var p2 = prompt.TrimEnd();
+                    var prefix = prompt.Substring(p1.Length);
+                    var postfix = prompt.Substring(p2.Length);
+                    var uri = new Uri(prompt.Trim());
+                    writer.Write(prefix);
                     using (TerminalColor.SetForeground(ConsoleColor.Green))
                     {
                         writer.Write(uri.Scheme);
@@ -90,6 +94,7 @@ namespace Ntreev.Crema.Commands.Consoles
                     }
                     Console.ResetColor();
                     writer.Write(uri.LocalPath);
+                    writer.Write(postfix);
                 }
             }
         }

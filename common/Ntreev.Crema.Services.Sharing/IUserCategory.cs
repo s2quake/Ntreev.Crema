@@ -20,7 +20,6 @@ using Ntreev.Crema.ServiceModel;
 using System;
 using System.Threading.Tasks;
 using System.Data;
-using System.Windows.Threading;
 using System.Security;
 
 namespace Ntreev.Crema.Services

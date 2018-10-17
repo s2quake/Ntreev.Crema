@@ -28,7 +28,6 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 using System.Security;
 using System.Runtime.InteropServices;
 using Ntreev.Crema.ServiceHosts.Properties;

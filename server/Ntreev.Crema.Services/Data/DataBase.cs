@@ -333,7 +333,7 @@ namespace Ntreev.Crema.Services.Data
                     //this.Repository.Changed -= Repository_Changed;
                     this.Repository.Dispose();
                     this.Repository = null;
-                    this.Dispatcher.Dispose(false);
+                    this.Dispatcher.Dispose();
                     this.Dispatcher = this.CremaHost.Dispatcher;
                     base.DataBaseState = DataBaseState.Unloaded;
                     base.Unload(authentication);
