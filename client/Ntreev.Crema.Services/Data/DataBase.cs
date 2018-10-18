@@ -765,7 +765,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     if (closeInfo.Reason != CloseReason.NoResponding)
                     {
-                        await Task.Run(() => this.service.Unsubscribe());
+                        this.service.Unsubscribe();
                         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                             this.service.Close();
                         else
@@ -1183,7 +1183,7 @@ namespace Ntreev.Crema.Services.Data
 
         private async Task<SignatureDate> ReleaseServiceAsync()
         {
-            var result = await Task.Run(() => this.service.Unsubscribe());
+            var result = this.service.Unsubscribe();
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                 this.service.Close();
             else

@@ -480,6 +480,7 @@ namespace Ntreev.Crema.Services.Data
                 var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RevertAsync), this, revision);
+                    this.ValidateRevert(authentication, revision);
                     return base.Name;
                 });
                 var result = await this.DataBases.InvokeDataBaseRevertAsync(authentication, name, revision);
@@ -574,10 +575,14 @@ namespace Ntreev.Crema.Services.Data
             if (this.IsLoaded == true)
             {
                 await this.WriteCacheAsync();
-                this.TableContext.Dispose();
-                this.TypeContext.Dispose();
-                this.Repository.Dispose();
-                this.Dispatcher.Dispose();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ClearAuthentications();
+                    this.TableContext.Dispose();
+                    this.TypeContext.Dispose();
+                    this.Repository.Dispose();
+                    this.Dispatcher.Dispose();
+                });
             }
             base.DataBaseState = DataBaseState.None;
             this.TableContext = null;
@@ -591,7 +596,6 @@ namespace Ntreev.Crema.Services.Data
                 if (this.IsLoaded == true)
                     this.DetachDomainHost();
             });
-
             var domains = await this.DomainContext.GetDomainsAsync(this.ID);
             foreach (var item in domains)
             {
@@ -667,7 +671,7 @@ namespace Ntreev.Crema.Services.Data
         public Task<CremaDataSet> GetDataSetAsync(Authentication authentication, DataSetType dataSetType, string filterExpression, string revision)
         {
             this.ValidateGetDataSet(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSet), this, dataSetType, filterExpression, revision);
+            this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, dataSetType, filterExpression, revision);
             switch (dataSetType)
             {
                 case DataSetType.All:
@@ -743,19 +747,13 @@ namespace Ntreev.Crema.Services.Data
 
         public AuthenticationInfo[] AuthenticationInfos { get; private set; }
 
-        public override TypeCategoryBase<Type, TypeCategory, TypeCollection, TypeCategoryCollection, TypeContext> TypeCategory
-        {
-            get { return this.TypeContext?.Root; }
-        }
+        public override TypeCategoryBase<Type, TypeCategory, TypeCollection, TypeCategoryCollection, TypeContext> TypeCategory => this.TypeContext?.Root;
 
-        public override TableCategoryBase<Table, TableCategory, TableCollection, TableCategoryCollection, TableContext> TableCategory
-        {
-            get { return this.TableContext?.Root; }
-        }
+        public override TableCategoryBase<Table, TableCategory, TableCollection, TableCategoryCollection, TableContext> TableCategory => this.TableContext?.Root;
 
         public new string Name => base.Name;
 
-        public bool IsLoaded => this.DataBaseState.HasFlag(DataBaseState.Loaded);
+        public bool IsLoaded => base.DataBaseState == DataBaseState.Loaded;
 
         public new bool IsLocked => base.IsLocked;
 
@@ -1425,7 +1423,7 @@ namespace Ntreev.Crema.Services.Data
         {
             if (authentication.IsSystem == false && authentication.IsAdmin == false)
                 throw new PermissionDeniedException();
-            if (this.IsLoaded == true)
+            if (base.DataBaseState != DataBaseState.Unloaded)
                 throw new InvalidOperationException(Resources.Exception_LoadedDataBaseCannotRevert);
         }
 

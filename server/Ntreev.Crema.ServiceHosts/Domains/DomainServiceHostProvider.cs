@@ -38,10 +38,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             this.cremaHost = cremaHost;
         }
 
-        public string Name
-        {
-            get { return nameof(DomainService); }
-        }
+        public string Name => nameof(DomainService);
 
         public ServiceHost CreateInstance(int port)
         {

@@ -576,7 +576,10 @@ namespace Ntreev.Crema.ServiceHosts.Data
                     result.Value = await template.Dispatcher.InvokeAsync(() => tables.Select(item => item.TableInfo).ToArray());
                     result.SignatureDate = this.authentication.SignatureDate;
                 }
-                throw new NotImplementedException();
+                else
+                {
+                    throw new NotImplementedException();
+                }
             }
             catch (Exception e)
             {
@@ -591,6 +594,8 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
+                if (domain == null)
+                    throw new DomainNotFoundException(domainID);
                 var template = domain.Host as ITableTemplate;
                 await template.CancelEditAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;

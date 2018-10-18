@@ -42,7 +42,7 @@ namespace Ntreev.Crema.Services.Domains
         private readonly DomainContext domainContext;
         private readonly string workingPath;
 
-        private readonly List<DomainPostItemSerializationInfo> postedList = new List<DomainPostItemSerializationInfo>();
+        //private readonly List<DomainPostItemSerializationInfo> postedList = new List<DomainPostItemSerializationInfo>();
         private readonly Dictionary<long, DomainCompleteItemSerializationInfo> completedList = new Dictionary<long, DomainCompleteItemSerializationInfo>();
         private readonly List<DomainActionBase> actionList = new List<DomainActionBase>();
         private Dictionary<string, Authentication> authentications;
@@ -180,7 +180,7 @@ namespace Ntreev.Crema.Services.Domains
                 }
             }
 
-            this.domain.Logger.ID = this.postedList.Count;
+            this.domain.Logger.ID = this.domain.Logger.PostedList.Count;
             this.domain.Logger.IsEnabled = true;
             this.domain.Host = null;
         }

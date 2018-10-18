@@ -473,16 +473,16 @@ namespace Ntreev.Crema.Services.Users
                             select item;
                 var users = query.ToArray();
 
-                foreach(var item in users)
+                foreach (var item in users)
                 {
                     item.Authentication.InvokeExpiredEvent(Authentication.System.ID, string.Empty);
                     item.Authentication = null;
                     item.IsOnline = false;
                 }
-                
+
                 this.Users.InvokeUsersStateChangedEvent(Authentication.System, users);
                 this.Users.InvokeUsersLoggedOutEvent(Authentication.System, users, CloseInfo.Empty);
-                
+
                 base.Clear();
             });
             this.Repository.Dispose();

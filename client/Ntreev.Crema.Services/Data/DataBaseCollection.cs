@@ -466,7 +466,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     if (closeInfo.Reason != CloseReason.NoResponding)
                     {
-                        await Task.Run(() => this.service.Unsubscribe());
+                        this.service.Unsubscribe();
                         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                             this.service.Close();
                         else

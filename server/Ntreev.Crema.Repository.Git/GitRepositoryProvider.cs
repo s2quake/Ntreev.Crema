@@ -81,6 +81,9 @@ namespace Ntreev.Crema.Repository.Git
                     "refs/notes/*:refs/notes/*",
                 };
                 fetchCommand.Run();
+
+                var id = this.GetID(settings.BasePath, repositoryName);
+                this.SetID(settings.WorkingPath, repositoryName, id);
             }
             else
             {
@@ -174,7 +177,7 @@ namespace Ntreev.Crema.Repository.Git
         {
             var baseUri = new Uri(basePath);
             var repositoryPath = baseUri.LocalPath;
-            
+
             this.CheckoutBranch(repositoryPath, repositoryName);
 
             try

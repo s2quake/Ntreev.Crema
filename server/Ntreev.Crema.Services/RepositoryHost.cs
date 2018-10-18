@@ -161,7 +161,7 @@ namespace Ntreev.Crema.Services
 
         public void Dispose()
         {
-            this.Repository.Dispose();
+            //this.Repository.Dispose();
             if (this.Dispatcher.Owner == this)
                 this.Dispatcher.Dispose();
         }

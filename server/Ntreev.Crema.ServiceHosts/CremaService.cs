@@ -41,24 +41,22 @@ namespace Ntreev.Crema.ServiceHosts
     {
         public const string Namespace = "http://www.ntreev.com";
         private const string cremaString = "Crema";
-        private static readonly CremaDispatcher dispatcher;
-
         private readonly List<ServiceHost> hosts = new List<ServiceHost>();
+        private readonly List<ServiceInfo> serviceInfos = new List<ServiceInfo>();
         private ICremaHost cremaHost;
         private ILogService logService;
         private DescriptorService descriptorService;
         private DescriptorServiceHost descriptorServiceHost;
-        private List<ServiceInfo> serviceInfos = new List<ServiceInfo>();
         private Guid token;
 
         static CremaService()
         {
-            dispatcher = new CremaDispatcher(typeof(CremaServiceItemHost));
+            Dispatcher = new CremaDispatcher(typeof(CremaServiceItemHost));
         }
 
         public CremaService()
         {
-            
+
         }
 
         public async Task OpenAsync()
@@ -121,15 +119,9 @@ namespace Ntreev.Crema.ServiceHosts
 
         public int Port { get; set; } = AddressUtility.DefaultPort;
 
-        public ServiceInfo[] ServiceInfos
-        {
-            get { return this.serviceInfos.ToArray(); }
-        }
+        public ServiceInfo[] ServiceInfos => this.serviceInfos.ToArray();
 
-        public static CremaDispatcher Dispatcher
-        {
-            get { return dispatcher; }
-        }
+        public static CremaDispatcher Dispatcher { get; private set; }
 
         public ServiceState ServiceState { get; set; }
 
@@ -174,7 +166,7 @@ namespace Ntreev.Crema.ServiceHosts
         protected override void OnDisposed(EventArgs e)
         {
             base.OnDisposed(e);
-            dispatcher.Dispose();
+            Dispatcher.Dispose();
             AuthenticationUtility.Dispose();
         }
 

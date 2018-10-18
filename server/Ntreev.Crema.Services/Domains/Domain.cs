@@ -399,7 +399,7 @@ namespace Ntreev.Crema.Services.Domains
             if (this.Users.ContainsKey(authentication.ID) == true)
             {
                 if (this.data == null)
-                    this.data = this.SerializeSource(this.Source);
+                    this.data = this.DataDispatcher.Invoke(() => this.SerializeSource(this.Source));
                 metaData.Data = this.data;
             }
             return metaData;
@@ -408,26 +408,7 @@ namespace Ntreev.Crema.Services.Domains
         public Task<DomainMetaData> GetMetaDataAsync(Authentication authentication)
         {
             this.ValidateExpired();
-            return this.Dispatcher.InvokeAsync(() =>
-            {
-                var metaData = new DomainMetaData()
-                {
-                    DomainID = Guid.Parse(this.Name),
-                    DomainInfo = base.DomainInfo,
-                    Users = this.Users.Select<DomainUser, DomainUserMetaData>(item => item.GetMetaData(authentication)).ToArray(),
-                    DomainState = base.DomainState,
-                    ModifiedTables = this.modifiedTableList.ToArray(),
-                };
-
-                if (this.Users.ContainsKey(authentication.ID) == true)
-                {
-                    if (this.data == null)
-                        this.data = this.SerializeSource(this.Source);
-                    metaData.Data = this.data;
-                }
-
-                return metaData;
-            });
+            return this.Dispatcher.InvokeAsync(() => this.GetMetaData(authentication));
         }
 
         public void Dispose(DomainContext domainContext)
@@ -524,6 +505,7 @@ namespace Ntreev.Crema.Services.Domains
             await this.Logger.CompleteAsync(id);
             await this.Dispatcher.InvokeAsync(() =>
             {
+                domainUser.DomainUserState &= ~DomainUserState.Detached;
                 this.CremaHost.Sign(authentication);
                 this.OnUserAdded(new DomainUserEventArgs(authentication, this, domainUser));
                 this.Container.InvokeDomainUserAddedEvent(authentication, this, domainUser);
@@ -1110,6 +1092,7 @@ namespace Ntreev.Crema.Services.Domains
                 var domainUser = new DomainUser(this, authentication.ID, authentication.Name, accessType)
                 {
                     IsOnline = authentication.Types.HasFlag(AuthenticationType.User),
+                    DomainUserState = DomainUserState.Detached,
                 };
                 this.Users.Add(domainUser);
                 domainUser.Authentication = authentication;

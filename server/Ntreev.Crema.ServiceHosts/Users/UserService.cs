@@ -552,36 +552,6 @@ namespace Ntreev.Crema.ServiceHosts.Users
             return secureString;
         }
 
-        private ResultBase<T> Invoke<T>(Func<T> func)
-        {
-            var result = new ResultBase<T>();
-            try
-            {
-                result.Value = this.UserContext.Dispatcher.Invoke(func);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
-            return result;
-        }
-
-        private ResultBase Invoke(Action action)
-        {
-            var result = new ResultBase();
-            try
-            {
-                this.UserContext.Dispatcher.Invoke(action);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
-            return result;
-        }
-
         private Task<IUserItem> GetUserItemAsync(string itemPath)
         {
             return this.UserContext.Dispatcher.InvokeAsync(() =>
@@ -614,7 +584,5 @@ namespace Ntreev.Crema.ServiceHosts.Users
                 return category;
             });
         }
-
-        
     }
 }

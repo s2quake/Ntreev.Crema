@@ -156,24 +156,22 @@ namespace Ntreev.Crema.ServiceHosts
 
         class Description
         {
-            private readonly List<ICremaServiceItem> serviceItems = new List<ICremaServiceItem>();
-            private readonly Authentication authentication;
             private readonly Action<Authentication> action;
 
             public Description(Authentication authentication, Action<Authentication> action)
             {
-                this.authentication = authentication;
-                this.authentication.Expired += Authentication_Expired;
+                this.Authentication = authentication;
+                this.Authentication.Expired += Authentication_Expired;
                 this.action = action;
                 this.DateTime = DateTime.Now;
             }
 
             private async void Authentication_Expired(object sender, EventArgs e)
             {
-                this.authentication.Expired -= Authentication_Expired;
+                this.Authentication.Expired -= Authentication_Expired;
                 await Dispatcher.InvokeAsync(() =>
                 {
-                    authentications.Remove(authentication);
+                    authentications.Remove(Authentication);
                 });
                 //await this.AbortServieItemsAsync(false);
             }
@@ -185,30 +183,21 @@ namespace Ntreev.Crema.ServiceHosts
 
             public async Task DisposeAsync()
             {
-                this.authentication.Expired -= Authentication_Expired;
+                this.Authentication.Expired -= Authentication_Expired;
                 //await this.AbortServieItemsAsync(true);
-                if (this.serviceItems.Any() == true)
-                    this.action(this.authentication);
+                if (this.ServiceItems.Any() == true)
+                    this.action(this.Authentication);
             }
 
-            public Authentication Authentication
-            {
-                get { return this.authentication; }
-            }
+            public Authentication Authentication { get; }
 
-            public List<ICremaServiceItem> ServiceItems
-            {
-                get { return this.serviceItems; }
-            }
+            public List<ICremaServiceItem> ServiceItems { get; } = new List<ICremaServiceItem>();
 
-            public DateTime DateTime
-            {
-                get; private set;
-            }
+            public DateTime DateTime { get; private set; }
 
             private async Task AbortServieItemsAsync(bool disconnect)
             {
-                var items = this.serviceItems.ToArray().Reverse();
+                var items = this.ServiceItems.ToArray().Reverse();
                 var tasks = items.Select(item => item.CloseAsync(disconnect)).ToArray();
                 await Task.WhenAll(tasks);
             }

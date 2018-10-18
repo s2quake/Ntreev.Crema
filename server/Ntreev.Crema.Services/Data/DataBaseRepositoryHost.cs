@@ -115,19 +115,6 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        //public void Initialize()
-        //{
-        //    foreach (var item in this.dataBase.TypeContext.Types)
-        //    {
-        //        this.types.Add(item.Name);
-        //    }
-
-        //    foreach (var item in this.dataBase.TableContext.Tables)
-        //    {
-        //        this.tables.Add(item.Name);
-        //    }
-        //}
-
         public void Commit(Authentication authentication, string comment)
         {
             this.Dispatcher.VerifyAccess();

@@ -37,13 +37,13 @@ namespace Ntreev.Crema.ServiceModel
         [EnumMember]
         Online = 2,
 
-        [Obsolete]
-        HasChanges = 4,
-
         [EnumMember]
         IsModified = 4,
 
         [EnumMember]
         IsOwner = 8,
+
+        [EnumMember]
+        Detached = 16,
     }
 }

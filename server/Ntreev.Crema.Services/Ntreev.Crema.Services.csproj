@@ -65,7 +65,6 @@
     <Compile Include="Data\DataBaseItemState.cs" />
     <Compile Include="Data\DataSetExtensions.cs" />
     <Compile Include="Data\DataServiceItemInfo.cs" />
-    <Compile Include="Data\Serializations\DataBaseStateSerializationInfo.cs" />
     <Compile Include="Data\DataBaseSet.cs" />
     <Compile Include="Data\TableContentDomainHost.cs" />
     <Compile Include="Domains\Serializations\DomainCompleteSerializationInfo.cs" />

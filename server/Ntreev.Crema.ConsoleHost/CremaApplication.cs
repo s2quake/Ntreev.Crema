@@ -64,6 +64,7 @@ namespace Ntreev.Crema.ConsoleHost
                 {
                     item.Publish(e.ExceptionObject);
                 }
+                Console.WriteLine(e.ExceptionObject);
             }
             catch (Exception)
             {

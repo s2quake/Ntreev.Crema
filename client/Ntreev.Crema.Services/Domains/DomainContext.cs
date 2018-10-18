@@ -122,6 +122,10 @@ namespace Ntreev.Crema.Services.Domains
 
         public Task<Domain> CreateAsync(Authentication authentication, DomainMetaData metaData)
         {
+            if (metaData.DomainID == Guid.Empty)
+            {
+                int wer = 0;
+            }
             return this.Domains.CreateAsync(authentication, metaData);
         }
 
@@ -154,7 +158,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     if (closeInfo.Reason != CloseReason.NoResponding)
                     {
-                        await Task.Run(() => this.service.Unsubscribe());
+                        this.service.Unsubscribe();
                         if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                             this.service.Close();
                         else

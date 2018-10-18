@@ -143,9 +143,10 @@ namespace Ntreev.Crema.Services.Data
             public async Task<SignatureDate> BeginContentAsync(Authentication authentication, string name)
             {
                 var result = await Task.Run(() => this.Service.BeginTableContentEdit(name));
+                this.CremaHost.Sign(authentication, result);
                 if (this.domain == null)
                 {
-                    this.domain = await this.DomainContext.CreateAsync(authentication, result.Value);
+                    this.domain = await this.DomainContext.CreateAsync(authentication, result.GetValue());
                     this.domain.Host = this;
                 }
                 var domainInfo = this.domain.DomainInfo;
@@ -279,6 +280,8 @@ namespace Ntreev.Crema.Services.Data
             public TableContent[] Contents { get; private set; }
 
             public DataBase DataBase => this.Container.DataBase;
+
+            public CremaHost CremaHost => this.Container.CremaHost;
 
             public TableCollection Container { get; }
 
