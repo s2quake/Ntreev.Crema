@@ -31,19 +31,15 @@ namespace Ntreev.Crema.ServiceModel
         private readonly CremaDispatcherScheduler scheduler;
         private readonly TaskFactory factory;
         private readonly CancellationTokenSource cancellationToken;
-        private readonly CancellationTokenSource cancellationToken2;
 
         public CremaDispatcher(object owner)
         {
-            var eventSet = new ManualResetEvent(false);
             this.cancellationToken = new CancellationTokenSource();
-            this.cancellationToken2 = new CancellationTokenSource();
             this.scheduler = new CremaDispatcherScheduler(this.cancellationToken.Token);
-            this.factory = new TaskFactory(this.cancellationToken2.Token, TaskCreationOptions.None, TaskContinuationOptions.None, this.scheduler);
+            this.factory = new TaskFactory(new CancellationToken(false), TaskCreationOptions.None, TaskContinuationOptions.None, this.scheduler);
             this.Owner = owner;
             this.Thread = new Thread(() =>
             {
-                eventSet.Set();
                 this.scheduler.Run();
                 this.Disposed?.Invoke(this, EventArgs.Empty);
             })
@@ -51,7 +47,6 @@ namespace Ntreev.Crema.ServiceModel
                 Name = owner.ToString()
             };
             this.Thread.Start();
-            eventSet.WaitOne();
         }
 
         public override string ToString()
@@ -112,14 +107,14 @@ namespace Ntreev.Crema.ServiceModel
         public void Dispose()
         {
             this.cancellationToken.Cancel();
-            this.scheduler.eventSet.Set();
+            this.scheduler.Continue();
         }
 
         public async Task DisposeAsync()
         {
             var task = this.factory.StartNew(() => { });
             this.cancellationToken.Cancel();
-            this.scheduler.eventSet.Set();
+            this.scheduler.Continue();
             await task;
         }
 

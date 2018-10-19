@@ -68,7 +68,6 @@ namespace Ntreev.Crema.ConsoleHost
 #if DEBUG
                     commandContext.VerifyName = false;
 #endif
-
                     commandContext.Execute(Environment.CommandLine);
                     configs.Write();
                 }

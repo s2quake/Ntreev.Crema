@@ -661,12 +661,12 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITypeMember> IEnumerable<ITypeMember>.GetEnumerator()
         {
-            return this.items.GetEnumerator();
+            return (this.items ?? Enumerable.Empty<ITypeMember>()).GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return this.items.GetEnumerator();
+            return (this.items ?? Enumerable.Empty<ITypeMember>()).GetEnumerator();
         }
 
         #endregion

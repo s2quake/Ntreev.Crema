@@ -447,6 +447,7 @@ namespace Ntreev.Crema.Services.Data
 
         #region IEnumerable
 
+        // TODO: this.items 로 변경이 가능한지 확인(서버랑 코드가 다름)
         IEnumerator<ITableRow> IEnumerable<ITableRow>.GetEnumerator()
         {
             foreach (DataRow item in this.internalTable.Rows)

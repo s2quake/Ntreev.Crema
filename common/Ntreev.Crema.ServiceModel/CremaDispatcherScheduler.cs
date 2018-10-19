@@ -13,6 +13,7 @@ namespace Ntreev.Crema.ServiceModel
         private static readonly object lockobj = new object();
         private readonly CancellationToken cancellation;
         private readonly BlockingCollection<Task> taskQueue = new BlockingCollection<Task>();
+        private ManualResetEvent eventSet = new ManualResetEvent(false);
         private bool isExecuting;
 
         public CremaDispatcherScheduler(CancellationToken cancellation)
@@ -38,7 +39,12 @@ namespace Ntreev.Crema.ServiceModel
 
             return this.isExecuting && TryExecuteTask(task);
         }
-        public ManualResetEvent eventSet = new ManualResetEvent(false);
+
+        internal void Continue()
+        {
+            this.eventSet.Set();
+        }
+
         internal void Run()
         {
             while (true)
@@ -50,15 +56,15 @@ namespace Ntreev.Crema.ServiceModel
                     this.isExecuting = false;
                     this.eventSet.Set();
                 }
-                else if(this.cancellation.IsCancellationRequested == true)
+                else if (this.cancellation.IsCancellationRequested == true)
                 {
                     break;
                 }
-                else{
+                else
+                {
                     eventSet.WaitOne();
                     eventSet.Reset();
                 }
-               
             }
         }
     }

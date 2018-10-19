@@ -646,12 +646,12 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITableRow> IEnumerable<ITableRow>.GetEnumerator()
         {
-            return this.items.GetEnumerator();
+            return (this.items ?? Enumerable.Empty<ITableRow>()).GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return this.items.GetEnumerator();
+            return (this.items ?? Enumerable.Empty<ITableRow>()).GetEnumerator();
         }
 
         #endregion

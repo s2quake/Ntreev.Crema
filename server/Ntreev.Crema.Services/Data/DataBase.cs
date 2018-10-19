@@ -458,10 +458,16 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                var remotePath = this.CremaHost.GetPath(CremaPath.RepositoryDataBases);
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(GetLogAsync), this);
+                    this.ValidateGetLog(authentication);
+                    var remotePath = this.IsLoaded == true ? this.BasePath : this.CremaHost.GetPath(CremaPath.RepositoryDataBases);
+                    return (remotePath, base.Name);
+                });
                 var logs = await this.CremaHost.RepositoryDispatcher.InvokeAsync(() =>
                 {
-                    return this.repositoryProvider.GetLog(remotePath, this.Name, revision);
+                    return this.repositoryProvider.GetLog(tuple.remotePath, tuple.Name, revision);
                 });
                 return logs.ToArray();
             }
@@ -1416,6 +1422,12 @@ namespace Ntreev.Crema.Services.Data
             if (authentication.IsSystem == false && authentication.IsAdmin == false)
                 throw new PermissionDeniedException();
             if (this.VerifyAccessType(authentication, AccessType.Owner) == false)
+                throw new PermissionDeniedException();
+        }
+
+        private void ValidateGetLog(Authentication authentication)
+        {
+            if (this.VerifyAccessType(authentication, AccessType.Guest) == false)
                 throw new PermissionDeniedException();
         }
 
