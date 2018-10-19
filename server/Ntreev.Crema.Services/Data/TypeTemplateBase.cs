@@ -424,7 +424,7 @@ namespace Ntreev.Crema.Services.Data
         {
             this.TypeSource = domain.Source as CremaDataType;
             this.domain = domain as TypeDomain;
-
+            this.ItemPaths = this.domain.ItemPaths;
             if (this.TypeSource != null)
             {
                 this.table = this.TypeSource.View.Table;
@@ -631,23 +631,25 @@ namespace Ntreev.Crema.Services.Data
         {
             if (isCanceled == false)
             {
+                var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, result);
                 await this.Dispatcher.InvokeAsync(() => this.ValidateEndEdit(authentication));
                 result = await this.OnEndEditAsync(authentication, result as TypeInfo[]);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ServiceState = ServiceState.Closed;
-                    this.OnEditEnded(new DomainDeletedEventArgs(authentication, this.domain, isCanceled, result));
+                    this.OnEditEnded(args);
                 });
                 return result;
             }
             else
             {
+                var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, null);
                 await this.Dispatcher.InvokeAsync(() => this.ValidateCancelEdit(authentication));
                 await this.OnCancelEditAsync(authentication);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ServiceState = ServiceState.Closed;
-                    this.OnEditCanceled(new DomainDeletedEventArgs(authentication, this.domain, isCanceled, null));
+                    this.OnEditCanceled(args);
                 });
                 return null;
             }

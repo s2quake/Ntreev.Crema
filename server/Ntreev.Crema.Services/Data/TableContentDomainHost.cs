@@ -349,21 +349,23 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (isCanceled == false)
                 {
+                    var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, result);
                     result = await this.EndContentAsync(authentication, result as TableInfo[]);
                     await this.Dispatcher.InvokeAsync(() =>
                     {
                         this.SetServiceState(ServiceState.Closed);
-                        this.InvokeEditEndedEvent(new DomainDeletedEventArgs(authentication, this.domain, isCanceled, result));
+                        this.InvokeEditEndedEvent(args);
                     });
                     return result;
                 }
                 else
                 {
+                    var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, null);
                     await this.CancelContentAsync(authentication);
                     await this.Dispatcher.InvokeAsync(() =>
                     {
                         this.SetServiceState(ServiceState.Closed);
-                        this.InvokeEditCanceledEvent(new DomainDeletedEventArgs(authentication, this.domain, isCanceled, null));
+                        this.InvokeEditCanceledEvent(args);
                     });
                     return null;
                 }

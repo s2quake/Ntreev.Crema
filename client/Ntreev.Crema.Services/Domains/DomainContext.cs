@@ -200,8 +200,8 @@ namespace Ntreev.Crema.Services.Domains
 
         public void DetachDomainHost(Authentication[] authentications, IDictionary<Domain, IDomainHost> domainHostByDomain)
         {
-            this.Dispatcher.Invoke(() =>
-            {
+            //this.Dispatcher.Invoke(() =>
+            //{
                 foreach (var item in domainHostByDomain)
                 {
                     var domain = item.Key;
@@ -209,7 +209,7 @@ namespace Ntreev.Crema.Services.Domains
                     domain.Detach(authentications);
                     domain.SetDomainHost(Authentication.System, null);
                 }
-            });
+            //});
         }
 
         public void DeleteDomains(Authentication authentication, Guid dataBaseID)

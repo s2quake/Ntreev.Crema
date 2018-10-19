@@ -211,15 +211,15 @@ namespace Ntreev.Crema.Services.Domains
             domain.Category = category;
             var dataBase = category.DataBase as DataBase;
             var isLoaded = dataBase.Service != null;
-            if (domain.DataBaseID == dataBase.ID && isLoaded == true && dataBase.IsResetting == false)
-            {
-                var target = dataBase.Dispatcher.Invoke(() => dataBase.FindDomainHost(domain));
-                if (target != null)
-                {
-                    target.Attach(domain);
-                    domain.Host = target;
-                }
-            }
+            //if (domain.DataBaseID == dataBase.ID && isLoaded == true && dataBase.IsResetting == false)
+            //{
+            //    var target = dataBase.Dispatcher.Invoke(() => dataBase.FindDomainHost(domain));
+            //    if (target != null)
+            //    {
+            //        target.Attach(domain);
+            //        domain.Host = target;
+            //    }
+            //}
             this.InvokeDomainCreatedEvent(authentication, domain);
             return domain;
         }

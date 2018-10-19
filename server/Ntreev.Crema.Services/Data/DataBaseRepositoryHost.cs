@@ -96,7 +96,7 @@ namespace Ntreev.Crema.Services.Data
 
         public Task UnlockAsync(params string[] itemPaths)
         {
-            return this.Dispatcher.InvokeAsync(() =>    this.Unlock(itemPaths));
+            return this.Dispatcher.InvokeAsync(() => this.Unlock(itemPaths));
         }
 
         public void RefreshItems()

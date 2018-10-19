@@ -579,12 +579,12 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITableColumn> IEnumerable<ITableColumn>.GetEnumerator()
         {
-            return this.items.GetEnumerator();
+            return this.items?.GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return this.items.GetEnumerator();
+            return this.items?.GetEnumerator();
         }
 
         #endregion

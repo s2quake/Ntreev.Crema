@@ -796,16 +796,19 @@ namespace Ntreev.Crema.Services.Data
 
         private void DetachDomainHost()
         {
-            var domains = this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.GetDomains(this.ID));
-            var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
-            var domainHostByDomain = domains.ToDictionary(item => item, item => item.Host);
-            this.DomainContext.DetachDomainHost(authentications, domainHostByDomain);
-            foreach (var item in domainHostByDomain)
+            this.DomainContext.Dispatcher.Invoke(() =>
             {
-                var domain = item.Key;
-                var domainHost = item.Value;
-                domainHost.Detach();
-            }
+                var domains = this.DomainContext.GetDomains(this.ID);
+                var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
+                var domainHostByDomain = domains.ToDictionary(item => item, item => item.Host);
+                this.DomainContext.DetachDomainHost(authentications, domainHostByDomain);
+                foreach (var item in domainHostByDomain)
+                {
+                    var domain = item.Key;
+                    var domainHost = item.Value;
+                    domainHost.Detach();
+                }
+            });
         }
 
         public IDictionary<Domain, IDomainHost> FindDomainHosts(Domain[] domains)
