@@ -56,7 +56,7 @@ namespace Ntreev.Crema.ServiceModel
         public void Validate()
         {
             if (this.Fault != null)
-                throw new Exception(this.Fault.Message);
+                throw new CremaFaultException(this.Fault.Message);
         }
     }
 
@@ -79,7 +79,7 @@ namespace Ntreev.Crema.ServiceModel
         {
             if (this.Fault != null)
             {
-                throw new Exception(this.Fault.Message);
+                throw new CremaFaultException(this.Fault.Message);
             }
         }
 
@@ -112,7 +112,7 @@ namespace Ntreev.Crema.ServiceModel
         {
             if (this.Fault != null)
             {
-                throw new Exception(this.Fault.Message);
+                throw new CremaFaultException(this.Fault.Message);
             }
         }
     }

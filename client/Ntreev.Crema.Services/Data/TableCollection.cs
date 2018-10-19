@@ -81,7 +81,7 @@ namespace Ntreev.Crema.Services.Data
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    this.AddNew(authentication, result.Value);
+                    this.AddNew(authentication, result.GetValue());
                     return this[newTableName];
                 });
             }
@@ -106,7 +106,7 @@ namespace Ntreev.Crema.Services.Data
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    this.AddNew(authentication, result.Value);
+                    this.AddNew(authentication, result.GetValue());
                     return this[newTableName];
                 });
             }

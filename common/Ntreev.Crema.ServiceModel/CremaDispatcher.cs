@@ -31,13 +31,15 @@ namespace Ntreev.Crema.ServiceModel
         private readonly CremaDispatcherScheduler scheduler;
         private readonly TaskFactory factory;
         private readonly CancellationTokenSource cancellationToken;
+        private readonly CancellationTokenSource cancellationToken2;
 
         public CremaDispatcher(object owner)
         {
             var eventSet = new ManualResetEvent(false);
             this.cancellationToken = new CancellationTokenSource();
+            this.cancellationToken2 = new CancellationTokenSource();
             this.scheduler = new CremaDispatcherScheduler(this.cancellationToken.Token);
-            this.factory = new TaskFactory(this.cancellationToken.Token, TaskCreationOptions.None, TaskContinuationOptions.None, this.scheduler);
+            this.factory = new TaskFactory(this.cancellationToken2.Token, TaskCreationOptions.None, TaskContinuationOptions.None, this.scheduler);
             this.Owner = owner;
             this.Thread = new Thread(() =>
             {
@@ -119,10 +121,7 @@ namespace Ntreev.Crema.ServiceModel
             await task;
         }
 
-        public string Name
-        {
-            get { return this.Owner.ToString(); }
-        }
+        public string Name => this.Owner.ToString();
 
         public object Owner { get; }
 

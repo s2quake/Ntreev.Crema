@@ -287,7 +287,7 @@ namespace Ntreev.Crema.Services
             {
                 throw new InvalidOperationException("server is not closed.");
             }
-
+            this.log?.Dispose();
             this.Dispatcher.Dispose();
             this.Dispatcher = null;
             this.OnDisposed(EventArgs.Empty);
@@ -456,14 +456,22 @@ namespace Ntreev.Crema.Services
                 this.OnCloseRequested(closer);
                 return closer.WhenAll();
             });
+            await waiter;
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.OnClosing(EventArgs.Empty);
             });
+            if (this.services.Contains(this.DomainContext) == true)
+                await this.DomainContext.CloseAsync(closeInfo);
             foreach (var item in this.services.Reverse<ICremaService>())
             {
-                await item.CloseAsync(closeInfo);
+                if (item is DataBase)
+                    await item.CloseAsync(closeInfo);
             }
+            if (this.services.Contains(this.DataBases) == true)
+                await this.DataBases.CloseAsync(closeInfo);
+            if (this.services.Contains(this.UserContext) == true)
+                await this.UserContext.CloseAsync(closeInfo);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.services.Clear();

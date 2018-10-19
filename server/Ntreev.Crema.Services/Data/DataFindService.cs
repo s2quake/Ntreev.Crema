@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Services.Data
             this.cremaHost = cremaHost;
             this.domainContext = cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
 
-            this.cremaHost.Closing += CremaHost_Closing;
+            this.cremaHost.CloseRequested += CremaHost_CloseRequested;
             this.cremaHost.Closed += CremaHost_Closed;
             this.cremaHost.Opened += CremaHost_Opened;
         }
@@ -99,9 +99,9 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        private void CremaHost_Closing(object sender, EventArgs e)
+        private void CremaHost_CloseRequested(object sender, CloseRequestedEventArgs e)
         {
-            this.Dispatcher.Invoke(() => this.Dispatcher.Dispose());
+            e.AddTask(this.Dispatcher.DisposeAsync());
         }
 
         private void CremaHost_Closed(object sender, EventArgs e)

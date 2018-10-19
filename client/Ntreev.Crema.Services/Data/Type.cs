@@ -320,7 +320,7 @@ namespace Ntreev.Crema.Services.Data
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    return result.Value;
+                    return result.GetValue();
                 });
             }
             catch (Exception e)
@@ -344,7 +344,7 @@ namespace Ntreev.Crema.Services.Data
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    return result.Value;
+                    return result.GetValue();
                 });
             }
             catch (Exception e)
@@ -368,7 +368,7 @@ namespace Ntreev.Crema.Services.Data
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    return result.Value;
+                    return result.GetValue();
                 });
             }
             catch (Exception e)

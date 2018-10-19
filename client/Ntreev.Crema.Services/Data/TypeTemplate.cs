@@ -63,10 +63,13 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
             var typeInfos = await base.OnEndEditAsync(authentication, args);
-            var typeInfo = typeInfos.First();
-            this.type.UpdateTypeInfo(typeInfo);
-            this.type.IsBeingEdited = false;
-            this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
+            if (args is Guid)
+            {
+                var typeInfo = typeInfos.First();
+                this.type.UpdateTypeInfo(typeInfo);
+                this.type.IsBeingEdited = false;
+                this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
+            }
             return typeInfos;
         }
 

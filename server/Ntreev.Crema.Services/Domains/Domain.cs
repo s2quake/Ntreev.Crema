@@ -1085,9 +1085,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        private async Task<DomainUser> InvokeAddUserAsync(Authentication authentication, DomainAccessType accessType)
+        private Task<DomainUser> InvokeAddUserAsync(Authentication authentication, DomainAccessType accessType)
         {
-            return await this.Dispatcher.InvokeAsync(() =>
+            return this.Dispatcher.InvokeAsync(() =>
             {
                 var domainUser = new DomainUser(this, authentication.ID, authentication.Name, accessType)
                 {

@@ -64,15 +64,18 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
             var tableInfos = await base.OnEndEditAsync(authentication, args);
-            var tableInfo = tableInfos.First();
-            this.table.UpdateTemplate(tableInfo);
-            this.table.UpdateTags(tableInfo.Tags);
-            this.table.UpdateComment(tableInfo.Comment);
-            this.table.SetTableState(TableState.None);
+            if (args is Guid)
+            {
+                var tableInfo = tableInfos.First();
+                this.table.UpdateTemplate(tableInfo);
+                this.table.UpdateTags(tableInfo.Tags);
+                this.table.UpdateComment(tableInfo.Comment);
+                this.table.SetTableState(TableState.None);
 
-            var items = EnumerableUtility.One(this.table).ToArray();
-            this.Container.InvokeTablesStateChangedEvent(authentication, items);
-            this.Container.InvokeTablesTemplateChangedEvent(authentication, items);
+                var items = EnumerableUtility.One(this.table).ToArray();
+                this.Container.InvokeTablesStateChangedEvent(authentication, items);
+                this.Container.InvokeTablesTemplateChangedEvent(authentication, items);
+            }
             return tableInfos;
         }
 

@@ -115,6 +115,7 @@ namespace Ntreev.Crema.Services
             this.container.Dispose();
             this.container = null;
             this.OnDisposed(EventArgs.Empty);
+            CremaLog.Release();
         }
 
         public LogVerbose Verbose

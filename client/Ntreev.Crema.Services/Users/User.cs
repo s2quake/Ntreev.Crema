@@ -147,7 +147,7 @@ namespace Ntreev.Crema.Services.Users
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    base.Ban(authentication, result.Value);
+                    base.Ban(authentication, result.GetValue());
                     this.Container.InvokeUsersBannedEvent(authentication, tuple.items, tuple.comments);
                     if (this.IsOnline == true)
                     {
@@ -212,7 +212,7 @@ namespace Ntreev.Crema.Services.Users
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    base.UpdateUserInfo(result.Value);
+                    base.UpdateUserInfo(result.GetValue());
                     this.Container.InvokeUsersChangedEvent(authentication, new User[] { this });
                 });
             }

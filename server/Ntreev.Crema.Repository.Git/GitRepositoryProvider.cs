@@ -84,14 +84,14 @@ namespace Ntreev.Crema.Repository.Git
 
                 var id = this.GetID(settings.BasePath, repositoryName);
                 this.SetID(settings.WorkingPath, repositoryName, id);
+                var repositoryInfo = this.GetRepositoryInfo(settings.BasePath, repositoryName);
+                return new GitRepository(this, settings.LogService, settings.WorkingPath, settings.TransactionPath, repositoryInfo);
             }
             else
             {
-                //GitHost.Run("update", workingPath.ToGitPath());
+                var repositoryInfo = this.GetRepositoryInfo(settings.WorkingPath, repositoryName);
+                return new GitRepository(this, settings.LogService, settings.WorkingPath, settings.TransactionPath, repositoryInfo);
             }
-
-            var repositoryInfo = this.GetRepositoryInfo(settings.BasePath, repositoryName);
-            return new GitRepository(this, settings.LogService, settings.WorkingPath, settings.TransactionPath, repositoryInfo);
         }
 
         public void CreateRepository(string author, string basePath, string initPath, string comment, params LogPropertyInfo[] properties)

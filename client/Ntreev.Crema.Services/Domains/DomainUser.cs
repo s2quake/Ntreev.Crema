@@ -25,12 +25,14 @@ namespace Ntreev.Crema.Services.Domains
     class DomainUser : DomainUserBase, IDomainUser
     {
         private readonly Domain domain;
+        bool metadata;
 
-        public DomainUser(Domain domain, DomainUserInfo domainUserInfo, DomainUserState domainUserState)
+        public DomainUser(Domain domain, DomainUserInfo domainUserInfo, DomainUserState domainUserState, bool metadata)
         {
             this.domain = domain;
             base.DomainUserInfo = domainUserInfo;
             base.DomainUserState = domainUserState;
+            this.metadata = metadata;
         }
 
         public Task BeginEditAsync(Authentication authentication, DomainLocationInfo location)

@@ -67,7 +67,10 @@ namespace Ntreev.Crema.Services.Data
         {
             var typeInfos = await base.OnEndEditAsync(authentication, args);
             var typeInfo = typeInfos.First();
-            this.type = this.Types.AddNew(authentication, typeInfo);
+            if (args is Guid)
+            {
+                this.type = this.Types.AddNew(authentication, typeInfo);
+            }
             return typeInfos;
         }
 

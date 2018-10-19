@@ -53,21 +53,33 @@ namespace Ntreev.Crema.ServiceHosts
 
         protected void InvokeEvent(string userID, string exceptionUserID, Action action)
         {
-            CremaService.Dispatcher?.InvokeAsync(() =>
+            if (userID != null && userID == exceptionUserID)
+                return;
+                
+            CremaService.Dispatcher.InvokeAsync(() =>
             {
-                if (this.sessionID == null || (userID != null && userID == exceptionUserID))
-                    return;
-                if (this.Channel != null)
+                try
                 {
-                    try
-                    {
-                        action();
-                    }
-                    catch (Exception e)
-                    {
-                        this.logService.Error(e);
-                    }
+                    action();
                 }
+                catch (Exception e)
+                {
+                    this.logService.Error(e);
+                }
+
+                //if (this.sessionID == null || (userID != null && userID == exceptionUserID))
+                //    return;
+                //if (this.Channel != null)
+                //{
+                //    try
+                //    {
+                //        action();
+                //    }
+                //    catch (Exception e)
+                //    {
+                //        this.logService.Error(e);
+                //    }
+                //}
             });
         }
 

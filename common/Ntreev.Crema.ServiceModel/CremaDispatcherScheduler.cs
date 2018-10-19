@@ -40,13 +40,17 @@ namespace Ntreev.Crema.ServiceModel
 
         internal void Run()
         {
-            while (this.cancellation.IsCancellationRequested == false)
+            while (true)
             {
-                this.isExecuting = true;
-
                 if (this.taskQueue.TryTake(out var task) == true)
                 {
+                    this.isExecuting = true;
                     this.TryExecuteTask(task);
+                    this.isExecuting = false;
+                }
+                else if(this.cancellation.IsCancellationRequested == true)
+                {
+                    break;
                 }
                 Thread.Sleep(1);
             }

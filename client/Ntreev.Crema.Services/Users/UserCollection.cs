@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.CremaHost.Sign(authentication, result);
                     var user = this.BaseAddNew(userID, categoryPath);
-                    user.Initialize(result.Value, BanInfo.Empty);
+                    user.Initialize(result.GetValue(), BanInfo.Empty);
                     this.InvokeUsersCreatedEvent(authentication, new User[] { user });
                     return user;
                 });

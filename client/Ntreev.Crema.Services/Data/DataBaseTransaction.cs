@@ -87,9 +87,9 @@ namespace Ntreev.Crema.Services.Data
 
         private async Task RollbackDomainsAsync(Authentication authentication)
         {
-            await this.dataBase.SetResettingAsync(authentication);
+            this.dataBase.SetResetting(authentication);
             var metaDatas = await this.DomainContext.RestoreAsync(authentication, this.dataBase);
-            await this.dataBase.SetResetAsync(authentication, metaDatas);
+            this.dataBase.SetReset(authentication, metaDatas);
         }
 
         public void Dispose()

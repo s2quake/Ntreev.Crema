@@ -201,8 +201,8 @@ namespace Ntreev.Crema.Services
                         item.Release();
                     }
                 });
-                await this.DataBases.DisposeAsync();
                 await this.DomainContext.DisposeAsync();
+                await this.DataBases.DisposeAsync();
                 await this.UserContext.DisposeAsync();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -327,12 +327,12 @@ namespace Ntreev.Crema.Services
             {
                 throw new InvalidOperationException(Resources.Exception_NotClosed);
             }
+            this.log.Dispose();
             this.RepositoryDispatcher.Dispose();
             this.RepositoryDispatcher = null;
             this.Dispatcher.Dispose();
             this.Dispatcher = null;
             this.OnDisposed(EventArgs.Empty);
-            CremaLog.Release();
         }
 
         public void Sign(Authentication authentication)

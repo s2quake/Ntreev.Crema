@@ -52,7 +52,7 @@ namespace Ntreev.Crema.Services.Data
             this.Dispatcher.VerifyAccess();
             if (itemPaths.Distinct().Count() != itemPaths.Length)
             {
-                System.Diagnostics.Debugger.Launch();
+                System.Diagnostics.Debugger.Break();
             }
             foreach (var item in itemPaths)
             {
@@ -63,6 +63,8 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.itemPaths.Add(item);
             }
+
+            this.dataBase.CremaHost.Debug($"Lock{Environment.NewLine}{string.Join(Environment.NewLine, itemPaths)}");
         }
 
         public void Unlock(params string[] itemPaths)
@@ -70,13 +72,13 @@ namespace Ntreev.Crema.Services.Data
             this.Dispatcher.VerifyAccess();
             if (itemPaths.Distinct().Count() != itemPaths.Length)
             {
-                System.Diagnostics.Debugger.Launch();
+                System.Diagnostics.Debugger.Break();
             }
             foreach (var item in itemPaths)
             {
                 if (this.itemPaths.Contains(item) == false)
                 {
-                    System.Diagnostics.Debugger.Launch();
+                    System.Diagnostics.Debugger.Break();
                     throw new ItemNotFoundException(item);
                 }
             }
@@ -84,6 +86,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.itemPaths.Remove(item);
             }
+            this.dataBase.CremaHost.Debug($"Unlock{Environment.NewLine}{string.Join(Environment.NewLine, itemPaths)}");
         }
 
         public Task LockAsync(params string[] itemPaths)
@@ -93,7 +96,7 @@ namespace Ntreev.Crema.Services.Data
 
         public Task UnlockAsync(params string[] itemPaths)
         {
-            return this.Dispatcher.InvokeAsync(() => this.Unlock(itemPaths));
+            return this.Dispatcher.InvokeAsync(() =>    this.Unlock(itemPaths));
         }
 
         public void RefreshItems()

@@ -228,7 +228,7 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public  void AttachDomainHost(Authentication[] authentications, IDictionary<Domain, IDomainHost> domainHostByDomain)
+        public void AttachDomainHost(Authentication[] authentications, IDictionary<Domain, IDomainHost> domainHostByDomain)
         {
             this.Dispatcher.Invoke(() =>
             {
@@ -410,7 +410,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     if (item.Logger != null)
                     {
-                        taskList.Add(item.Logger.DisposeAsync(true));
+                        taskList.Add(item.Logger.DisposeAsync(false));
                     }
                 }
                 return taskList.ToArray();
@@ -595,8 +595,6 @@ namespace Ntreev.Crema.Services.Domains
         {
             return (this.CremaHost as ICremaHost).GetService(serviceType);
         }
-
-        
 
         #endregion
     }

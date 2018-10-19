@@ -49,6 +49,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public Task<bool> ContainsAsync(string userID)
         {
+            this.ValidateExpired();
             return this.Dispatcher.InvokeAsync(() => base.ContainsKey(userID));
         }
 

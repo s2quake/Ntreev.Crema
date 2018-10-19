@@ -45,11 +45,12 @@ namespace Ntreev.Crema.Services
 
         static CremaLog()
         {
-            
+
         }
 
         public static void Release()
         {
+            log?.Dispose();
             log4net.LogManager.Shutdown();
         }
 

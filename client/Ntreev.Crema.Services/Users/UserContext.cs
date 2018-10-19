@@ -131,6 +131,11 @@ namespace Ntreev.Crema.Services.Users
 
         public Authentication Authenticate(SignatureDate signatureDate)
         {
+            return this.Dispatcher.Invoke(() => this.AuthenticateInternal(signatureDate));
+        }
+
+        private Authentication AuthenticateInternal(SignatureDate signatureDate)
+        {
             if (signatureDate.ID == Authentication.SystemID)
             {
                 Authentication.System.SignatureDate = signatureDate;
@@ -277,38 +282,17 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
+        private string b;
         public async Task CloseAsync(CloseInfo closeInfo)
         {
+            await this.Dispatcher.DisposeAsync();
+            this.service.Unsubscribe();
+            this.service.Close();
+            this.service = null;
             this.timer?.Dispose();
             this.timer = null;
-            if (this.service != null)
-            {
-                try
-                {
-                    if (closeInfo.Reason != CloseReason.NoResponding)
-                    {
-                        this.service.Unsubscribe();
-                        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                            this.service.Close();
-                        else
-                            this.service.Abort();
-                    }
-                    else
-                    {
-                        this.service.Abort();
-                    }
-                }
-                catch
-                {
-                    this.service.Abort();
-                }
-                this.service = null;
-            }
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.Dispatcher?.Dispose();
-                this.Dispatcher = null;
-            });
+            this.Dispatcher = null;
+            this.b = nameof(CloseAsync);
         }
 
         public User CurrentUser { get; private set; }
@@ -416,76 +400,15 @@ namespace Ntreev.Crema.Services.Users
             this.itemsChanged?.Invoke(this, e);
         }
 
-        //private Task InitializeAsync(UserContextMetaData metaData)
-        //{
-        //    return this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        foreach (var item in metaData.Categories)
-        //        {
-        //            if (item == this.Root.Path)
-        //                continue;
-        //            this.Categories.Prepare(item);
-        //        }
-
-        //        foreach (var item in metaData.Users)
-        //        {
-        //            var itemName = new ItemName(item.Path);
-        //            var user = this.Users.BaseAddNew(itemName.Name, itemName.CategoryPath);
-        //            user.Initialize(item.UserInfo, item.BanInfo);
-        //            user.SetUserState(item.UserState);
-        //        }
-
-        //        var currentUser = this.Users[userID];
-        //        user.SetUserState(UserState.Online);
-        //        return user;
-        //    });
-        //}
-
         private async void Service_Faulted(object sender, EventArgs e)
         {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                try
-                {
-                    this.service.Abort();
-                    this.service = null;
-                }
-                catch
-                {
-
-                }
-                this.timer?.Dispose();
-                this.timer = null;
-                this.Dispatcher.Dispose();
-                this.Dispatcher = null;
-            });
+            this.service.Abort();
+            this.service = null;
+            this.timer?.Dispose();
+            this.timer = null;
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
             await this.CremaHost.RemoveServiceAsync(this, new CloseInfo(CloseReason.Faulted, "서버와의 연결이 끊어졌습니다."));
-        }
-
-        private async Task InvokeAsync(Action action, string callbackName)
-        {
-            try
-            {
-                await this.Dispatcher.InvokeAsync(action);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(callbackName);
-                this.CremaHost.Error(e);
-            }
-        }
-
-        private async void InvokeAsync<T>(Func<T> action, string callbackName)
-        {
-            try
-            {
-                await this.Dispatcher.InvokeAsync(action);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(callbackName);
-                this.CremaHost.Error(e);
-            }
         }
 
         private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -510,21 +433,18 @@ namespace Ntreev.Crema.Services.Users
             this.service = null;
             this.timer?.Dispose();
             this.timer = null;
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.Dispatcher?.Dispose();
-                this.Dispatcher = null;
-            });
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
             await this.CremaHost.RemoveServiceAsync(this, closeInfo);
         }
 
-        async void IUserServiceCallback.OnUsersChanged(SignatureDate signatureDate, UserInfo[] userInfos)
+        void IUserServiceCallback.OnUsersChanged(SignatureDate signatureDate, UserInfo[] userInfos)
         {
             try
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                 this.Dispatcher.Invoke(() =>
                 {
-                    var authentication = this.Authenticate(signatureDate);
+                    var authentication = this.AuthenticateInternal(signatureDate);
                     var users = new User[userInfos.Length];
                     for (var i = 0; i < userInfos.Length; i++)
                     {
@@ -542,13 +462,13 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUsersStateChanged(SignatureDate signatureDate, string[] userIDs, UserState[] states)
+        void IUserServiceCallback.OnUsersStateChanged(SignatureDate signatureDate, string[] userIDs, UserState[] states)
         {
             try
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
-                    var authentication = this.Authenticate(signatureDate);
+                    var authentication = this.AuthenticateInternal(signatureDate);
                     var users = new User[userIDs.Length];
                     for (var i = 0; i < userIDs.Length; i++)
                     {
@@ -565,13 +485,13 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUserItemsCreated(SignatureDate signatureDate, string[] itemPaths, UserInfo?[] args)
+        void IUserServiceCallback.OnUserItemsCreated(SignatureDate signatureDate, string[] itemPaths, UserInfo?[] args)
         {
             try
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
-                    var authentication = this.Authenticate(signatureDate);
+                    var authentication = this.AuthenticateInternal(signatureDate);
                     var userItems = new IUserItem[itemPaths.Length];
                     var categories = new List<UserCategory>(itemPaths.Length);
                     var users = new List<User>(itemPaths.Length);
@@ -613,13 +533,13 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUserItemsRenamed(SignatureDate signatureDate, string[] itemPaths, string[] newNames)
+        void IUserServiceCallback.OnUserItemsRenamed(SignatureDate signatureDate, string[] itemPaths, string[] newNames)
         {
             try
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
-                    var authentication = this.Authenticate(signatureDate);
+                    var authentication = this.AuthenticateInternal(signatureDate);
                     {
                         var items = new List<UserCategory>(itemPaths.Length);
                         var oldNames = new List<string>(itemPaths.Length);
@@ -687,13 +607,13 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUserItemsMoved(SignatureDate signatureDate, string[] itemPaths, string[] parentPaths)
+        void IUserServiceCallback.OnUserItemsMoved(SignatureDate signatureDate, string[] itemPaths, string[] parentPaths)
         {
             try
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
-                    var authentication = this.Authenticate(signatureDate);
+                    var authentication = this.AuthenticateInternal(signatureDate);
                     {
                         var items = new List<UserCategory>(itemPaths.Length);
                         var oldPaths = new List<string>(itemPaths.Length);
@@ -762,13 +682,13 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUserItemsDeleted(SignatureDate signatureDate, string[] itemPaths)
+        void IUserServiceCallback.OnUserItemsDeleted(SignatureDate signatureDate, string[] itemPaths)
         {
             try
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
-                    var authentication = this.Authenticate(signatureDate);
+                    var authentication = this.AuthenticateInternal(signatureDate);
                     {
                         var items = new List<UserCategory>(itemPaths.Length);
                         var oldPaths = new List<string>(itemPaths.Length);
@@ -831,13 +751,13 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUsersLoggedIn(SignatureDate signatureDate, string[] userIDs)
+        void IUserServiceCallback.OnUsersLoggedIn(SignatureDate signatureDate, string[] userIDs)
         {
             try
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
-                    var authentication = this.Authenticate(signatureDate);
+                    var authentication = this.AuthenticateInternal(signatureDate);
                     var users = new User[userIDs.Length];
                     for (var i = 0; i < userIDs.Length; i++)
                     {
@@ -854,13 +774,13 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUsersLoggedOut(SignatureDate signatureDate, string[] userIDs, CloseInfo closeInfo)
+        void IUserServiceCallback.OnUsersLoggedOut(SignatureDate signatureDate, string[] userIDs, CloseInfo closeInfo)
         {
             try
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
-                    var authentication = this.Authenticate(signatureDate);
+                    var authentication = this.AuthenticateInternal(signatureDate);
                     var users = new User[userIDs.Length];
                     for (var i = 0; i < userIDs.Length; i++)
                     {
@@ -877,13 +797,13 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUsersKicked(SignatureDate signatureDate, string[] userIDs, string[] comments)
+        void IUserServiceCallback.OnUsersKicked(SignatureDate signatureDate, string[] userIDs, string[] comments)
         {
             try
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
-                    var authentication = this.Authenticate(signatureDate);
+                    var authentication = this.AuthenticateInternal(signatureDate);
                     var users = new User[userIDs.Length];
                     for (var i = 0; i < userIDs.Length; i++)
                     {
@@ -900,13 +820,13 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUsersBanChanged(SignatureDate signatureDate, BanInfo[] banInfos, BanChangeType changeType, string[] comments)
+        void IUserServiceCallback.OnUsersBanChanged(SignatureDate signatureDate, BanInfo[] banInfos, BanChangeType changeType, string[] comments)
         {
             try
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
-                    var authentication = this.Authenticate(signatureDate);
+                    var authentication = this.AuthenticateInternal(signatureDate);
                     var users = new User[banInfos.Length];
                     for (var i = 0; i < banInfos.Length; i++)
                     {
@@ -933,13 +853,13 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnMessageReceived(SignatureDate signatureDate, string[] userIDs, string message, MessageType messageType)
+        void IUserServiceCallback.OnMessageReceived(SignatureDate signatureDate, string[] userIDs, string message, MessageType messageType)
         {
             try
             {
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
-                    var authentication = this.Authenticate(signatureDate);
+                    var authentication = this.AuthenticateInternal(signatureDate);
                     if (messageType == MessageType.None)
                     {
                         foreach (var item in userIDs)

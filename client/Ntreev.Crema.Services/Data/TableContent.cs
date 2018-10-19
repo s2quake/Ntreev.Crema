@@ -200,7 +200,7 @@ namespace Ntreev.Crema.Services.Data
                 await this.domainHost.LeaveContentAsync(authentication, name);
                 //    var result = await Task.Run(() => this.Service.LeaveTableContentEdit(this.Table.Name));
                 //    this.CremaHost.Sign(authentication, result);
-                //    this.domain.Dispatcher.Invoke(() => this.domain.Release(authentication, result.Value));
+                //    this.domain.Dispatcher.Invoke(() => this.domain.Release(authentication, result.GetValue()));
                 //    this.domainHost.LeaveContent(authentication);
                 //});
             }
@@ -243,6 +243,7 @@ namespace Ntreev.Crema.Services.Data
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
+                    this.ValidateAddNew(authentication);
                 });
                 var row = await this.domain.Dispatcher.InvokeAsync(() => new TableRow(this, this.dataTable.DefaultView.Table, relationID));
                 await this.Dispatcher.InvokeAsync(() => this.rowsToAdd.Add(row.Row));
@@ -396,6 +397,14 @@ namespace Ntreev.Crema.Services.Data
         protected virtual void OnChanged(EventArgs e)
         {
             this.changed?.Invoke(this, e);
+        }
+
+        private void ValidateAddNew(Authentication authentication)
+        {
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
+            if (this.domain == null)
+                throw new InvalidOperationException("domain is null");
         }
 
         private TableCollection Container => this.Table.Container;

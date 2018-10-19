@@ -71,7 +71,7 @@ namespace Ntreev.Crema.Services.Domains
         public DomainUserMetaData GetMetaData(Authentication authentication)
         {
             this.Dispatcher.VerifyAccess();
-            if(base.DomainUserState.HasFlag(DomainUserState.Detached) == true)
+            if (base.DomainUserState.HasFlag(DomainUserState.Detached) == true)
             {
                 int qwer = 0;
             }

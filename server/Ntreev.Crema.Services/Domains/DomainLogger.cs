@@ -107,13 +107,28 @@ namespace Ntreev.Crema.Services.Domains
             return $"{this.domainInfo.DomainInfo.CategoryPath}{this.domainInfo.DomainInfo.DomainID}";
         }
 
+
+        private bool d;
         public Task DisposeAsync(bool delete)
         {
+            if(this.d == true)
+            {
+                int qwer = 0;
+            }
+            this.d = true;
+            if (Directory.Exists(this.basePath) == false)
+            {
+                int qwer = 0;
+            }
             return this.Dispatcher.InvokeAsync(() =>
             {
                 if (delete == true)
                 {
                     DirectoryUtility.Delete(this.basePath);
+                    if(Directory.Exists(this.basePath) == true)
+                    {
+                        int qwer = 0;
+                    }
                 }
                 this.Dispatcher.Dispose();
                 this.Dispatcher = null;

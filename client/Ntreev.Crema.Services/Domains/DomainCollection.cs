@@ -213,7 +213,7 @@ namespace Ntreev.Crema.Services.Domains
             var isLoaded = dataBase.Service != null;
             if (domain.DataBaseID == dataBase.ID && isLoaded == true && dataBase.IsResetting == false)
             {
-                var target = dataBase.FindDomainHost(domain);
+                var target = dataBase.Dispatcher.Invoke(() => dataBase.FindDomainHost(domain));
                 if (target != null)
                 {
                     target.Attach(domain);

@@ -82,6 +82,14 @@ namespace Ntreev.Crema.Bot.Tasks
                 }
 
                 var domain = content.Domain;
+
+                if (domain == null)
+                {
+                    context.Pop(content);
+                    context.Complete(context.Target);
+                    return;
+                }
+
                 if (await domain.Users.ContainsAsync(authentication.ID) == false)
                 {
                     await content.EnterEditAsync(authentication);
@@ -92,6 +100,8 @@ namespace Ntreev.Crema.Bot.Tasks
                     if (userState.HasFlag(DomainUserState.Online) == false)
                     {
                         await content.EndEditAsync(authentication);
+                        context.Pop(content);
+                        return;
                     }
                 }
 

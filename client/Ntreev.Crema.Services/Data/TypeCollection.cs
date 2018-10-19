@@ -83,7 +83,7 @@ namespace Ntreev.Crema.Services.Data
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    return this.AddNew(authentication, result.Value);
+                    return this.AddNew(authentication, result.GetValue());
                 });
             }
             catch (Exception e)

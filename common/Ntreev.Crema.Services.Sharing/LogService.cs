@@ -27,6 +27,7 @@ using log4net.Layout;
 using log4net.Appender;
 using System.IO;
 using log4net.Core;
+using Ntreev.Crema.ServiceModel;
 
 namespace Ntreev.Crema.Services
 {
@@ -96,6 +97,7 @@ namespace Ntreev.Crema.Services
 
             this.log = log4net.LogManager.GetLogger(repositoryName, name);
             this.name = name;
+            this.Dispatcher = new CremaDispatcher(this);
         }
 
         public LogService(string name, string path, bool isSingle)
@@ -145,6 +147,7 @@ namespace Ntreev.Crema.Services
 
             this.log = log4net.LogManager.GetLogger(name);
             this.name = name;
+            this.Dispatcher = new CremaDispatcher(this);
         }
 
         public LogService(string repositoryName, string name, string path)
@@ -201,42 +204,53 @@ namespace Ntreev.Crema.Services
 
             this.log = log4net.LogManager.GetLogger(repositoryName, name);
             this.name = name;
+            this.Dispatcher = new CremaDispatcher(this);
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(LogService)}: {this.name}";
         }
 
         public void Debug(object message)
         {
-            this.log.Debug(message);
+            this.Dispatcher.InvokeAsync(() => this.log.Debug(message));
         }
 
         public void Info(object message)
         {
-            this.log.Info(message);
+            this.Dispatcher.InvokeAsync(() => this.log.Info(message));
         }
 
         public void Error(object message)
         {
-            if (message is Exception e)
+            this.Dispatcher?.InvokeAsync(() =>
             {
-                this.log.Error(e.Message, e);
-            }
-            else
-            {
-                this.log.Error(message);
-            }
+                if (message is Exception e)
+                {
+                    this.log.Error(e.Message, e);
+                }
+                else
+                {
+                    this.log.Error(message);
+                }
+            });
         }
 
         public void Warn(object message)
         {
-            this.log.Warn(message);
+            this.Dispatcher.InvokeAsync(() => this.log.Warn(message));
         }
 
         public void Fatal(object message)
         {
-            this.log.Fatal(message);
+            this.Dispatcher.InvokeAsync(() => this.log.Fatal(message));
         }
 
         public void Dispose()
         {
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
             this.consoleAppender = null;
             this.redirectionWriter = null;
             this.hierarchy?.Shutdown();
@@ -314,6 +328,8 @@ namespace Ntreev.Crema.Services
         {
 
         }
+
+        private CremaDispatcher Dispatcher { get; set; }
     }
 
     static class LogServiceExtensions

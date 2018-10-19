@@ -87,12 +87,18 @@ namespace Ntreev.Crema.Services.Data
             if (this.parent is TableCategory category)
             {
                 var tables = category.GetService(typeof(TableCollection)) as TableCollection;
-                this.tables = tables.AddNew(authentication, tableInfos);
+                if (args is Guid)
+                {
+                    this.tables = tables.AddNew(authentication, tableInfos);
+                }
             }
             else if (this.parent is Table table)
             {
                 var tables = table.GetService(typeof(TableCollection)) as TableCollection;
-                this.tables = tables.AddNew(authentication, tableInfos);
+                if (args is Guid)
+                {
+                    this.tables = tables.AddNew(authentication, tableInfos);
+                }
             }
             this.parent = null;
             return tableInfos;

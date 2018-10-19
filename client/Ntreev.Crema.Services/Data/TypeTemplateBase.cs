@@ -292,7 +292,7 @@ namespace Ntreev.Crema.Services.Data
         {
             var result = await this.BeginDomainAsync(authentication);
             this.CremaHost.Sign(authentication, result);
-            var metaData = result.Value;
+            var metaData = result.GetValue();
             this.domain = await this.DomainContext.CreateAsync(authentication, metaData) as TypeDomain;
             this.domain.IsNew = this.IsNew;
             this.domain.Host = this;
@@ -539,20 +539,16 @@ namespace Ntreev.Crema.Services.Data
         {
             if (isCanceled == false)
             {
+                var arg = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, result);
                 result = await this.OnEndEditAsync(authentication, result);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.OnEditEnded(new DomainDeletedEventArgs(authentication, this.domain, isCanceled, result));
-                });
+                await this.Dispatcher.InvokeAsync(() => this.OnEditEnded(arg));
                 return result;
             }
             else
             {
+                var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, null);
                 await this.OnCancelEditAsync(authentication);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.OnEditCanceled(new DomainDeletedEventArgs(authentication, this.domain, isCanceled, null));
-                });
+                await this.Dispatcher.InvokeAsync(() => this.OnEditCanceled(args));
                 return null;
             }
         }

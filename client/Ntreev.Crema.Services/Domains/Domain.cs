@@ -62,7 +62,7 @@ namespace Ntreev.Crema.Services.Domains
                 if (this.Host != null)
                 {
                     await this.Host.DeleteAsync(authentication, isCanceled, result.GetValue());
-                    return result.Value;
+                    return result.GetValue();
                 }
                 else
                 {
@@ -71,8 +71,8 @@ namespace Ntreev.Crema.Services.Domains
                         var container = this.Container;
                         this.CremaHost.Sign(authentication, result);
                         this.Dispose();
-                        this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled, result.Value));
-                        container.InvokeDomainDeletedEvent(authentication, this, isCanceled, result.Value);
+                        this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled, result.GetValue()));
+                        container.InvokeDomainDeletedEvent(authentication, this, isCanceled, result.GetValue());
                     });
                     return null;
                 }
@@ -145,18 +145,18 @@ namespace Ntreev.Crema.Services.Domains
                     this.CremaHost.DebugMethod(authentication, this, nameof(NewRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                 });
                 var result = await Task.Run(() => this.Service.NewRow(this.ID, rows));
-                await this.InvokeNewRowAsync(authentication, result.Value);
+                await this.InvokeNewRowAsync(authentication, result.GetValue());
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
                     this.IsModified = true;
                     base.UpdateModificationInfo(authentication.SignatureDate);
-                    this.OnRowAdded(new DomainRowEventArgs(authentication, this, result.Value));
-                    this.Container.InvokeDomainRowAddedEvent(authentication, this, result.Value);
+                    this.OnRowAdded(new DomainRowEventArgs(authentication, this, result.GetValue()));
+                    this.Container.InvokeDomainRowAddedEvent(authentication, this, result.GetValue());
                     this.Container.InvokeDomainStateChangedEvent(authentication, this);
                     this.Container.InvokeDomainInfoChangedEvent(authentication, this);
                 });
-                return result.Value;
+                return result.GetValue();
             }
             catch (Exception e)
             {
@@ -175,18 +175,18 @@ namespace Ntreev.Crema.Services.Domains
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                 });
                 var result = await Task.Run(() => this.Service.SetRow(this.ID, rows));
-                await this.InvokeSetRowAsync(authentication, result.Value);
+                await this.InvokeSetRowAsync(authentication, result.GetValue());
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
                     this.IsModified = true;
                     base.UpdateModificationInfo(authentication.SignatureDate);
-                    this.OnRowChanged(new DomainRowEventArgs(authentication, this, result.Value));
-                    this.Container.InvokeDomainRowChangedEvent(authentication, this, result.Value);
+                    this.OnRowChanged(new DomainRowEventArgs(authentication, this, result.GetValue()));
+                    this.Container.InvokeDomainRowChangedEvent(authentication, this, result.GetValue());
                     this.Container.InvokeDomainStateChangedEvent(authentication, this);
                     this.Container.InvokeDomainInfoChangedEvent(authentication, this);
                 });
-                return result.Value;
+                return result.GetValue();
             }
             catch (Exception e)
             {
@@ -295,7 +295,7 @@ namespace Ntreev.Crema.Services.Domains
                     this.OnUserRemoved(new DomainUserRemovedEventArgs(authentication, this, domainUser, removeInfo));
                     this.Container.InvokeDomainUserRemovedEvent(authentication, this, domainUser, removeInfo);
                 });
-                return result.Value;
+                return result.GetValue();
             }
             catch (Exception e)
             {
@@ -395,7 +395,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     var signatureDate = new SignatureDate(item.DomainUserInfo.UserID, authentication.SignatureDate.DateTime);
                     var userAuthentication = this.UserContext.Authenticate(signatureDate);
-                    this.InvokeUserAdded(userAuthentication, item.DomainUserInfo, item.DomainUserState);
+                    this.InvokeUserAdded(userAuthentication, item.DomainUserInfo, item.DomainUserState, true);
                 }
             }
             else
@@ -410,7 +410,7 @@ namespace Ntreev.Crema.Services.Domains
                     {
                         var signatureDate = new SignatureDate(item.DomainUserInfo.UserID, authentication.SignatureDate.DateTime);
                         var userAuthentication = this.UserContext.Authenticate(signatureDate);
-                        this.InvokeUserAdded(userAuthentication, item.DomainUserInfo, item.DomainUserState);
+                        this.InvokeUserAdded(userAuthentication, item.DomainUserInfo, item.DomainUserState, true);
                     }
                 }
             }
@@ -497,9 +497,11 @@ namespace Ntreev.Crema.Services.Domains
             this.Container.InvokeDomainStateChangedEvent(authentication, this);
         }
 
-        public void InvokeUserAdded(Authentication authentication, DomainUserInfo domainUserInfo, DomainUserState domainUserState)
+        public void InvokeUserAdded(Authentication authentication, DomainUserInfo domainUserInfo, DomainUserState domainUserState, bool metadata)
         {
-            var domainUser = new DomainUser(this, domainUserInfo, domainUserState);
+            if (domainUserState.HasFlag(DomainUserState.Detached) == true)
+                return;
+            var domainUser = new DomainUser(this, domainUserInfo, domainUserState, metadata);
             this.Users.Add(domainUser);
             if (domainUser.IsOwner == true)
                 this.Users.Owner = domainUser;

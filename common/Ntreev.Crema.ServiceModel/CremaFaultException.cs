@@ -15,35 +15,32 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
+using Ntreev.Library.Serialization;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.ServiceModel;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.ServiceModel
 {
-    static class ResultBaseExtensions
+    public class CremaFaultException : Exception
     {
-        public static void Validate(this ResultBase result, Authentication authentication)
+        public CremaFaultException()
         {
-            Validate(result);
-            authentication.SignatureDate = result.SignatureDate;
+
         }
 
-        public static void Validate(this ResultBase result)
+        public CremaFaultException(string message)
+            : base(message)
         {
-            if (result.Fault != null)
-                throw new CremaFaultException(result.Fault.Message);
-        }
 
-        public static void Validate<T>(this ResultBase<T> result, Authentication authentication)
-        {
-            Validate<T>(result);
-            authentication.SignatureDate = result.SignatureDate;
-        }
-
-        public static void Validate<T>(this ResultBase<T> result)
-        {
-            if (result.Fault != null)
-                throw new CremaFaultException(result.Fault.Message);
         }
     }
 }

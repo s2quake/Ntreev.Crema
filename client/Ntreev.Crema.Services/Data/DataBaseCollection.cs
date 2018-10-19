@@ -92,7 +92,7 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseLock), dataBase, comment);
             var result = this.service.Lock(dataBase.Name, comment);
             result.Validate(authentication);
-            return result.Value;
+            return result.GetValue();
         }
 
         public void InvokeDataBaseUnlock(Authentication authentication, DataBase dataBase)
@@ -107,7 +107,7 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseSetPrivate), dataBase);
             var result = this.service.SetPrivate(dataBase.Name);
             result.Validate(authentication);
-            return result.Value;
+            return result.GetValue();
         }
 
         public void InvokeDataBaseSetPublic(Authentication authentication, DataBase dataBase)
@@ -122,7 +122,7 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseAddAccessMember), dataBase, memberID, accessType);
             var result = this.service.AddAccessMember(dataBase.Name, memberID, accessType);
             result.Validate(authentication);
-            return result.Value;
+            return result.GetValue();
         }
 
         public AccessMemberInfo InvokeDataBaseSetAccessMember(Authentication authentication, DataBase dataBase, string memberID, AccessType accessType)
@@ -130,7 +130,7 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseSetAccessMember), dataBase, memberID, accessType);
             var result = this.service.SetAccessMember(dataBase.Name, memberID, accessType);
             result.Validate(authentication);
-            return result.Value;
+            return result.GetValue();
         }
 
         public void InvokeDataBaseRemoveAccessMember(Authentication authentication, DataBase dataBase, string memberID)
@@ -153,7 +153,7 @@ namespace Ntreev.Crema.Services.Data
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    var dataBase = new DataBase(this, result.Value);
+                    var dataBase = new DataBase(this, result.GetValue());
                     this.AddBase(dataBase.Name, dataBase);
                     this.InvokeItemsCreateEvent(authentication, new DataBase[] { dataBase }, comment);
                     return dataBase;
@@ -226,7 +226,7 @@ namespace Ntreev.Crema.Services.Data
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    var dataBaseInfo = result.Value;
+                    var dataBaseInfo = result.GetValue();
                     var newDataBase = new DataBase(this, dataBaseInfo);
                     this.AddBase(newDataBase.Name, newDataBase);
                     this.InvokeItemsCreateEvent(authentication, new DataBase[] { newDataBase }, comment);
@@ -247,7 +247,7 @@ namespace Ntreev.Crema.Services.Data
 
             var result = this.service.GetLog(dataBase.Name, revision);
             result.Validate(authentication);
-            return result.Value ?? new LogInfo[] { };
+            return result.GetValue() ?? new LogInfo[] { };
         }
 
         public void Revert(Authentication authentication, DataBase dataBase, string revision)
@@ -257,7 +257,7 @@ namespace Ntreev.Crema.Services.Data
 
             var result = this.service.Revert(dataBase.Name, revision);
             result.Validate(authentication);
-            dataBase.SetDataBaseInfo(result.Value);
+            dataBase.SetDataBaseInfo(result.GetValue());
             this.InvokeItemsRevertedEvent(authentication, new DataBase[] { dataBase }, new string[] { revision });
         }
 
@@ -456,38 +456,17 @@ namespace Ntreev.Crema.Services.Data
             this.OnItemsLockChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData));
         }
 
+        private string b;
         public async Task CloseAsync(CloseInfo closeInfo)
         {
+            await this.Dispatcher.DisposeAsync();
+            this.service.Unsubscribe();
+            this.service.Close();
+            this.service = null;
             this.timer?.Dispose();
             this.timer = null;
-            if (this.service != null)
-            {
-                try
-                {
-                    if (closeInfo.Reason != CloseReason.NoResponding)
-                    {
-                        this.service.Unsubscribe();
-                        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                            this.service.Close();
-                        else
-                            this.service.Abort();
-                    }
-                    else
-                    {
-                        this.service.Abort();
-                    }
-                }
-                catch
-                {
-                    this.service.Abort();
-                }
-                this.service = null;
-            }
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.Dispatcher.Dispose();
-                this.Dispatcher = null;
-            });
+            this.Dispatcher = null;
+            this.b = nameof(CloseAsync);
         }
 
         public ResultBase LoadDataBase(DataBase dataBase)
@@ -771,32 +750,6 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        //private async void InvokeAsync(Action action, string callbackName)
-        //{
-        //    try
-        //    {
-        //        await this.Dispatcher.InvokeAsync(action);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        this.CremaHost.Error(callbackName);
-        //        this.CremaHost.Error(e);
-        //    }
-        //}
-
-        //private async void InvokeAsync<T>(Func<T> action, string callbackName)
-        //{
-        //    try
-        //    {
-        //        await this.Dispatcher.InvokeAsync(action);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        this.CremaHost.Error(callbackName);
-        //        this.CremaHost.Error(e);
-        //    }
-        //}
-
         private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             this.timer?.Stop();
@@ -813,22 +766,12 @@ namespace Ntreev.Crema.Services.Data
 
         private async void Service_Faulted(object sender, EventArgs e)
         {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                try
-                {
-                    this.service.Abort();
-                    this.service = null;
-                }
-                catch
-                {
-
-                }
-                this.timer?.Dispose();
-                this.timer = null;
-                this.Dispatcher.Dispose();
-                this.Dispatcher = null;
-            });
+            this.service.Abort();
+            this.service = null;
+            this.timer?.Dispose();
+            this.timer = null;
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
             await this.CremaHost.RemoveServiceAsync(this);
         }
 
@@ -845,12 +788,12 @@ namespace Ntreev.Crema.Services.Data
             await this.CremaHost.RemoveServiceAsync(this);
         }
 
-        async void IDataBaseCollectionServiceCallback.OnDataBasesCreated(SignatureDate signatureDate, string[] dataBaseNames, DataBaseInfo[] dataBaseInfos, string comment)
+        void IDataBaseCollectionServiceCallback.OnDataBasesCreated(SignatureDate signatureDate, string[] dataBaseNames, DataBaseInfo[] dataBaseInfos, string comment)
         {
             try
             {
-                var authentication = await this.UserContext.AuthenticateAsync(signatureDate);
-                await this.Dispatcher.InvokeAsync(() =>
+                var authentication = this.UserContext.Authenticate(signatureDate);
+                this.Dispatcher.Invoke(() =>
                 {
                     var dataBases = new DataBase[dataBaseNames.Length];
                     for (var i = 0; i < dataBaseNames.Length; i++)
@@ -870,12 +813,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseCollectionServiceCallback.OnDataBasesRenamed(SignatureDate signatureDate, string[] dataBaseNames, string[] newDataBaseNames)
+        void IDataBaseCollectionServiceCallback.OnDataBasesRenamed(SignatureDate signatureDate, string[] dataBaseNames, string[] newDataBaseNames)
         {
             try
             {
-                var authentication = await this.UserContext.AuthenticateAsync(signatureDate);
-                await this.Dispatcher.InvokeAsync(() =>
+                var authentication = this.UserContext.Authenticate(signatureDate);
+                this.Dispatcher.Invoke(() =>
                 {
                     var dataBases = new DataBase[dataBaseNames.Length];
                     for (var i = 0; i < dataBaseNames.Length; i++)
@@ -896,12 +839,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseCollectionServiceCallback.OnDataBasesDeleted(SignatureDate signatureDate, string[] dataBaseNames)
+        void IDataBaseCollectionServiceCallback.OnDataBasesDeleted(SignatureDate signatureDate, string[] dataBaseNames)
         {
             try
             {
-                var authentication = await this.UserContext.AuthenticateAsync(signatureDate);
-                await this.Dispatcher.InvokeAsync(() =>
+                var authentication = this.UserContext.Authenticate(signatureDate);
+                this.Dispatcher.Invoke(() =>
                 {
                     var dataBases = new DataBase[dataBaseNames.Length];
                     for (var i = 0; i < dataBaseNames.Length; i++)
@@ -920,12 +863,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseCollectionServiceCallback.OnDataBasesLoaded(SignatureDate signatureDate, string[] dataBaseNames)
+        void IDataBaseCollectionServiceCallback.OnDataBasesLoaded(SignatureDate signatureDate, string[] dataBaseNames)
         {
             try
             {
-                var authentication = await this.UserContext.AuthenticateAsync(signatureDate);
-                await this.Dispatcher.InvokeAsync(() =>
+                var authentication = this.UserContext.Authenticate(signatureDate);
+                this.Dispatcher.Invoke(() =>
                 {
                     var dataBases = new DataBase[dataBaseNames.Length];
                     for (var i = 0; i < dataBaseNames.Length; i++)
@@ -944,25 +887,21 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseCollectionServiceCallback.OnDataBasesUnloaded(SignatureDate signatureDate, string[] dataBaseNames)
+        void IDataBaseCollectionServiceCallback.OnDataBasesUnloaded(SignatureDate signatureDate, string[] dataBaseNames)
         {
             try
             {
-                var authentication = await this.UserContext.AuthenticateAsync(signatureDate);
+                var authentication = this.UserContext.Authenticate(signatureDate);
                 var dataBases = new DataBase[dataBaseNames.Length];
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
                     for (var i = 0; i < dataBaseNames.Length; i++)
                     {
                         var dataBaseName = dataBaseNames[i];
                         var dataBase = this[dataBaseName];
                         dataBases[i] = dataBase;
+                        dataBase.SetUnloaded(authentication);
                     }
-                });
-                var tasks = dataBases.Select(item => item.SetUnloadedAsync(authentication)).ToArray();
-                await Task.WhenAll(tasks);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
                     this.InvokeItemsUnloadedEvent(authentication, dataBases);
                 });
             }
@@ -972,24 +911,23 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseCollectionServiceCallback.OnDataBasesResetting(SignatureDate signatureDate, string[] dataBaseNames)
+        void IDataBaseCollectionServiceCallback.OnDataBasesResetting(SignatureDate signatureDate, string[] dataBaseNames)
         {
             try
             {
-                var authentication = await this.UserContext.AuthenticateAsync(signatureDate);
+                var authentication = this.UserContext.Authenticate(signatureDate);
                 var dataBases = new DataBase[dataBaseNames.Length];
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
                     for (var i = 0; i < dataBaseNames.Length; i++)
                     {
                         var dataBaseName = dataBaseNames[i];
                         var dataBase = this[dataBaseName];
                         dataBases[i] = dataBase;
+                        dataBase.SetResetting(authentication);
                     }
+                    this.InvokeItemsResettingEvent(authentication, dataBases);
                 });
-                var tasks = dataBases.Select(item => item.SetResettingAsync(authentication)).ToArray();
-                await Task.WhenAll(tasks);
-                await this.Dispatcher.InvokeAsync(() => this.InvokeItemsResettingEvent(authentication, dataBases));
             }
             catch (Exception e)
             {
@@ -1010,12 +948,8 @@ namespace Ntreev.Crema.Services.Data
                         var dataBaseName = dataBaseNames[i];
                         var dataBase = this[dataBaseName];
                         dataBases[i] = dataBase;
+                        dataBase.SetReset(authentication, metaDatas);
                     }
-                });
-                var tasks = dataBases.Select(item => item.SetResetAsync(authentication, metaDatas)).ToArray();
-                await Task.WhenAll(tasks);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
                     this.InvokeItemsResetEvent(authentication, dataBases);
                 });
             }
@@ -1025,23 +959,21 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseCollectionServiceCallback.OnDataBasesAuthenticationEntered(SignatureDate signatureDate, string[] dataBaseNames, AuthenticationInfo authenticationInfo)
+        void IDataBaseCollectionServiceCallback.OnDataBasesAuthenticationEntered(SignatureDate signatureDate, string[] dataBaseNames, AuthenticationInfo authenticationInfo)
         {
             try
             {
-                var authentication = await this.UserContext.AuthenticateAsync(signatureDate);
-                var dataBases = new DataBase[dataBaseNames.Length];
-                await this.Dispatcher.InvokeAsync(() =>
+                var authentication = this.UserContext.Dispatcher.Invoke(() => this.UserContext.Authenticate(signatureDate));
+                this.ValidateExpired();
+                this.Dispatcher.Invoke(() =>
                 {
                     for (var i = 0; i < dataBaseNames.Length; i++)
                     {
                         var dataBaseName = dataBaseNames[i];
                         var dataBase = this[dataBaseName];
-                        dataBases[i] = dataBase;
+                        dataBase.SetAuthenticationEntered(authentication);
                     }
                 });
-                var tasks = dataBases.Select(item => item.SetAuthenticationEnteredAsync(authentication)).ToArray();
-                await Task.WhenAll(tasks);
             }
             catch (Exception e)
             {
@@ -1049,25 +981,23 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseCollectionServiceCallback.OnDataBasesAuthenticationLeft(SignatureDate signatureDate, string[] dataBaseNames, AuthenticationInfo authenticationInfo)
+        void IDataBaseCollectionServiceCallback.OnDataBasesAuthenticationLeft(SignatureDate signatureDate, string[] dataBaseNames, AuthenticationInfo authenticationInfo)
         {
             try
             {
-                var authentication = await this.UserContext.AuthenticateAsync(signatureDate);
+                var authentication = this.UserContext.Authenticate(signatureDate);
                 var dataBases = new DataBase[dataBaseNames.Length];
-                await this.Dispatcher.InvokeAsync(() =>
+                this.ValidateExpired();
+                this.Dispatcher.Invoke(() =>
                 {
                     for (var i = 0; i < dataBaseNames.Length; i++)
                     {
                         var dataBaseName = dataBaseNames[i];
                         var dataBase = this[dataBaseName];
-                        
                         dataBases[i] = dataBase;
+                        dataBase.SetAuthenticationLeft(authentication);
                     }
                 });
-                var tasks = dataBases.Select(item => item.SetAuthenticationLeftAsync(authentication)).ToArray();
-                await Task.WhenAll(tasks);
-
             }
             catch (Exception e)
             {
@@ -1075,12 +1005,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseCollectionServiceCallback.OnDataBasesInfoChanged(SignatureDate signatureDate, DataBaseInfo[] dataBaseInfos)
+        void IDataBaseCollectionServiceCallback.OnDataBasesInfoChanged(SignatureDate signatureDate, DataBaseInfo[] dataBaseInfos)
         {
             try
             {
-                var authentication = await this.UserContext.AuthenticateAsync(signatureDate);
-                await this.Dispatcher.InvokeAsync(() =>
+                var authentication = this.UserContext.Authenticate(signatureDate);
+                this.Dispatcher.Invoke(() =>
                 {
                     var dataBases = new DataBase[dataBaseInfos.Length];
                     for (var i = 0; i < dataBaseInfos.Length; i++)
@@ -1099,12 +1029,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseCollectionServiceCallback.OnDataBasesStateChanged(SignatureDate signatureDate, string[] dataBaseNames, DataBaseState[] dataBaseStates)
+        void IDataBaseCollectionServiceCallback.OnDataBasesStateChanged(SignatureDate signatureDate, string[] dataBaseNames, DataBaseState[] dataBaseStates)
         {
             try
             {
-                var authentication = await this.UserContext.AuthenticateAsync(signatureDate);
-                await this.Dispatcher.InvokeAsync(() =>
+                var authentication = this.UserContext.Authenticate(signatureDate);
+                this.Dispatcher.Invoke(() =>
                 {
                     var dataBases = new DataBase[dataBaseNames.Length];
                     for (var i = 0; i < dataBaseNames.Length; i++)
@@ -1124,12 +1054,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseCollectionServiceCallback.OnDataBasesAccessChanged(SignatureDate signatureDate, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes)
+        void IDataBaseCollectionServiceCallback.OnDataBasesAccessChanged(SignatureDate signatureDate, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes)
         {
             try
             {
-                var authentication = await this.UserContext.AuthenticateAsync(signatureDate);
-                await this.Dispatcher.InvokeAsync(() =>
+                var authentication = this.UserContext.Authenticate(signatureDate);
+                this.Dispatcher.Invoke(() =>
                 {
                     var dataBases = new DataBase[accessInfos.Length];
                     for (var i = 0; i < accessInfos.Length; i++)
@@ -1165,12 +1095,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseCollectionServiceCallback.OnDataBasesLockChanged(SignatureDate signatureDate, LockChangeType changeType, LockInfo[] lockInfos, string[] comments)
+        void IDataBaseCollectionServiceCallback.OnDataBasesLockChanged(SignatureDate signatureDate, LockChangeType changeType, LockInfo[] lockInfos, string[] comments)
         {
             try
             {
-                var authentication = await this.UserContext.AuthenticateAsync(signatureDate);
-                await this.Dispatcher.InvokeAsync(() =>
+                var authentication = this.UserContext.Authenticate(signatureDate);
+                this.Dispatcher.Invoke(() =>
                 {
                     var dataBases = new DataBase[lockInfos.Length];
                     for (var i = 0; i < lockInfos.Length; i++)
