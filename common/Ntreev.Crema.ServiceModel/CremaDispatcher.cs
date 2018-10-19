@@ -112,12 +112,14 @@ namespace Ntreev.Crema.ServiceModel
         public void Dispose()
         {
             this.cancellationToken.Cancel();
+            this.scheduler.eventSet.Set();
         }
 
         public async Task DisposeAsync()
         {
             var task = this.factory.StartNew(() => { });
             this.cancellationToken.Cancel();
+            this.scheduler.eventSet.Set();
             await task;
         }
 

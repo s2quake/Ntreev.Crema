@@ -28,6 +28,7 @@ namespace Ntreev.Crema.ServiceModel
         protected override void QueueTask(Task task)
         {
             this.taskQueue.Add(task, this.cancellation);
+            this.eventSet.Set();
         }
 
         protected override bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued)
@@ -37,7 +38,7 @@ namespace Ntreev.Crema.ServiceModel
 
             return this.isExecuting && TryExecuteTask(task);
         }
-
+        public ManualResetEvent eventSet = new ManualResetEvent(false);
         internal void Run()
         {
             while (true)
@@ -47,12 +48,17 @@ namespace Ntreev.Crema.ServiceModel
                     this.isExecuting = true;
                     this.TryExecuteTask(task);
                     this.isExecuting = false;
+                    this.eventSet.Set();
                 }
                 else if(this.cancellation.IsCancellationRequested == true)
                 {
                     break;
                 }
-                Thread.Sleep(1);
+                else{
+                    eventSet.WaitOne();
+                    eventSet.Reset();
+                }
+               
             }
         }
     }
