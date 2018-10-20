@@ -41,7 +41,7 @@ namespace Ntreev.Crema.Javascript
 
         protected bool ContainsDataBase(string dataBaseName)
         {
-            return this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases.Contains(dataBaseName));
+            return this.cremaHost.Dispatcher.Invoke(() => this.DataBases.Contains(dataBaseName));
         }
 
         protected bool ContainsTable(string dataBaseName, string tableName)
@@ -74,9 +74,9 @@ namespace Ntreev.Crema.Javascript
                 throw new ArgumentNullException(nameof(dataBaseName));
             return this.cremaHost.Dispatcher.Invoke(() =>
             {
-                if (this.cremaHost.DataBases.Contains(dataBaseName) == false)
+                if (this.DataBases.Contains(dataBaseName) == false)
                     throw new DataBaseNotFoundException(dataBaseName);
-                return this.cremaHost.DataBases[dataBaseName];
+                return this.DataBases[dataBaseName];
             });
         }
 
@@ -88,9 +88,9 @@ namespace Ntreev.Crema.Javascript
                 throw new ArgumentNullException(nameof(tableName));
             var dataBase = this.cremaHost.Dispatcher.Invoke(() =>
             {
-                if (this.cremaHost.DataBases.Contains(dataBaseName) == false)
+                if (this.DataBases.Contains(dataBaseName) == false)
                     throw new DataBaseNotFoundException(dataBaseName);
-                return this.cremaHost.DataBases[dataBaseName];
+                return this.DataBases[dataBaseName];
             });
 
             return dataBase.Dispatcher.Invoke(() =>
@@ -110,9 +110,9 @@ namespace Ntreev.Crema.Javascript
                 throw new ArgumentNullException(nameof(tableItemPath));
             var dataBase = this.cremaHost.Dispatcher.Invoke(() =>
             {
-                if (this.cremaHost.DataBases.Contains(dataBaseName) == false)
+                if (this.DataBases.Contains(dataBaseName) == false)
                     throw new DataBaseNotFoundException(dataBaseName);
-                return this.cremaHost.DataBases[dataBaseName];
+                return this.DataBases[dataBaseName];
             });
 
             return dataBase.Dispatcher.Invoke(() =>
@@ -132,9 +132,9 @@ namespace Ntreev.Crema.Javascript
                 throw new ArgumentNullException(nameof(categoryPath));
             var dataBase = this.cremaHost.Dispatcher.Invoke(() =>
             {
-                if (this.cremaHost.DataBases.Contains(dataBaseName) == false)
+                if (this.DataBases.Contains(dataBaseName) == false)
                     throw new DataBaseNotFoundException(dataBaseName);
-                return this.cremaHost.DataBases[dataBaseName];
+                return this.DataBases[dataBaseName];
             });
 
             return dataBase.Dispatcher.Invoke(() =>
@@ -154,9 +154,9 @@ namespace Ntreev.Crema.Javascript
                 throw new ArgumentNullException(nameof(typeName));
             var dataBase = this.cremaHost.Dispatcher.Invoke(() =>
             {
-                if (this.cremaHost.DataBases.Contains(dataBaseName) == false)
+                if (this.DataBases.Contains(dataBaseName) == false)
                     throw new DataBaseNotFoundException(dataBaseName);
-                return this.cremaHost.DataBases[dataBaseName];
+                return this.DataBases[dataBaseName];
             });
 
             return dataBase.Dispatcher.Invoke(() =>
@@ -176,9 +176,9 @@ namespace Ntreev.Crema.Javascript
                 throw new ArgumentNullException(nameof(typeItemPath));
             var dataBase = this.cremaHost.Dispatcher.Invoke(() =>
             {
-                if (this.cremaHost.DataBases.Contains(dataBaseName) == false)
+                if (this.DataBases.Contains(dataBaseName) == false)
                     throw new DataBaseNotFoundException(dataBaseName);
-                return this.cremaHost.DataBases[dataBaseName];
+                return this.DataBases[dataBaseName];
             });
 
             return dataBase.Dispatcher.Invoke(() =>
@@ -198,9 +198,9 @@ namespace Ntreev.Crema.Javascript
                 throw new ArgumentNullException(nameof(categoryPath));
             var dataBase = this.cremaHost.Dispatcher.Invoke(() =>
             {
-                if (this.cremaHost.DataBases.Contains(dataBaseName) == false)
+                if (this.DataBases.Contains(dataBaseName) == false)
                     throw new DataBaseNotFoundException(dataBaseName);
-                return this.cremaHost.DataBases[dataBaseName];
+                return this.DataBases[dataBaseName];
             });
 
             return dataBase.Dispatcher.Invoke(() =>
@@ -213,5 +213,7 @@ namespace Ntreev.Crema.Javascript
         }
 
         protected ICremaHost CremaHost => this.cremaHost;
+
+        protected IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
     }
 }

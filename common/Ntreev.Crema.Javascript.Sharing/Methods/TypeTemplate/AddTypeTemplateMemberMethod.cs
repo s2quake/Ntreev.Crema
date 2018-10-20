@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 {
@@ -45,15 +46,18 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
         {
             var template = this.GetDomainHost<ITypeTemplate>(domainID);
             var authentication = this.Context.GetAuthentication(this);
-            template.Dispatcher.Invoke(() =>
+            var task = InvokeAsync();
+            task.Wait();
+
+            async Task InvokeAsync()
             {
-                var typeMember = template.AddNew(authentication);
-                typeMember.SetName(authentication, memberName);
-                typeMember.SetValue(authentication, value);
+                var typeMember = await template.AddNewAsync(authentication);
+                await typeMember.SetNameAsync(authentication, memberName);
+                await typeMember.SetValueAsync(authentication, value);
                 if (comment != null)
-                    typeMember.SetComment(authentication, comment);
-                template.EndNew(authentication, typeMember);
-            });
+                    await typeMember.SetCommentAsync(authentication, comment);
+                await template.EndNewAsync(authentication, typeMember);
+            };
         }
     }
 }

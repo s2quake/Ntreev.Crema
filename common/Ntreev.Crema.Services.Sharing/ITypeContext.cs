@@ -26,7 +26,7 @@ namespace Ntreev.Crema.Services
 {
     public interface ITypeContext : IEnumerable<ITypeItem>, IServiceProvider, IDispatcherObject
     {
-        Task<bool> ContainsAsync(string itemPath);
+        bool Contains(string itemPath);
 
         ITypeCollection Types { get; }
 

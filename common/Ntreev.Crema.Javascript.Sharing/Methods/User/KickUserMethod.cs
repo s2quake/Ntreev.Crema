@@ -47,7 +47,8 @@ namespace Ntreev.Crema.Javascript.Methods.User
         {
             var user = this.GetUser(userID);
             var authentication = this.Context.GetAuthentication(this);
-            user.Dispatcher.Invoke(() => user.Kick(authentication, comment));
+            var task = user.KickAsync(authentication, comment);
+            task.Wait();
         }
     }
 }

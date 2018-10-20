@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 {
@@ -47,25 +48,28 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
         {
             var template = this.GetDomainHost<ITableTemplate>(domainID);
             var authentication = this.Context.GetAuthentication(this);
-            template.Dispatcher.Invoke(() =>
+            var task = InvokeAsync();
+            task.Wait();
+            
+            async Task InvokeAsync()
             {
                 if (propertyName == TableProperties.Name)
                 {
-                    template.SetTableName(authentication, (string)value);
+                    await template.SetTableNameAsync(authentication, (string)value);
                 }
                 else if (propertyName == TableProperties.Tags)
                 {
-                    template.SetTags(authentication, (TagInfo)(string)value);
+                    await template.SetTagsAsync(authentication, (TagInfo)(string)value);
                 }
                 else if (propertyName == TableProperties.Comment)
                 {
-                    template.SetComment(authentication, (string)value);
+                    await template.SetCommentAsync(authentication, (string)value);
                 }
                 else
                 {
                     throw new NotImplementedException();
                 }
-            });
+            };
         }
     }
 }

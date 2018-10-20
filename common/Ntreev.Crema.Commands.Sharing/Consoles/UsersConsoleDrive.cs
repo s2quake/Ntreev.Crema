@@ -25,6 +25,7 @@ using Ntreev.Library.IO;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library.ObjectModel;
 using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Commands.Consoles
 {

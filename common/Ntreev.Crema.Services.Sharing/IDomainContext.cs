@@ -25,7 +25,7 @@ namespace Ntreev.Crema.Services
 {
     public interface IDomainContext : IEnumerable<IDomainItem>, IServiceProvider, IDispatcherObject
     {
-        Task<bool> ContainsAsync(string itemPath);
+        bool Contains(string itemPath);
 
         IDomainCategoryCollection Categories { get; }
 

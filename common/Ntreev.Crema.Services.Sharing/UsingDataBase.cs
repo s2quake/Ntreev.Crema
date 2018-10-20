@@ -59,7 +59,7 @@ namespace Ntreev.Crema.Services
         {
             if (dataBase.IsLoaded == false)
                 await dataBase.LoadAsync(authentication);
-            var contains = await dataBase.ContainsAsync(authentication);
+            var contains = await dataBase.Dispatcher.InvokeAsync(() => dataBase.Contains(authentication));
             if (contains == false)
                 await dataBase.EnterAsync(authentication);
             return new UsingDataBase(() =>

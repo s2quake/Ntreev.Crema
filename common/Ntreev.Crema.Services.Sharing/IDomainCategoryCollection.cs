@@ -25,7 +25,7 @@ namespace Ntreev.Crema.Services
 {
     public interface IDomainCategoryCollection : IReadOnlyCollection<IDomainCategory>, IEnumerable<IDomainCategory>, IServiceProvider, IDispatcherObject
     {
-        Task<bool> ContainsAsync(string categoryPath);
+        bool Contains(string categoryPath);
 
         string[] GetMetaData(Authentication authentication);
 

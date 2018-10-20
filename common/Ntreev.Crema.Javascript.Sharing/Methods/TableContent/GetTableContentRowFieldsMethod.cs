@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableContent
 {
@@ -53,9 +54,12 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
             if (content == null)
                 throw new TableNotFoundException(tableName);
             var authentication = this.Context.GetAuthentication(this);
-            return content.Dispatcher.Invoke(() =>
+            var task = InvokeAsync();
+            task.Wait();
+
+            async Task<IDictionary< string, object>> InvokeAsync()
             {
-                var row = content.Find(authentication, keys);
+                var row = await content.FindAsync(authentication, keys);
                 var tableInfo = content.Table.TableInfo;
                 var fields = new Dictionary<string, object>(tableInfo.Columns.Length);
                 foreach (var item in tableInfo.Columns)
@@ -63,7 +67,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
                     fields.Add(item.Name, row[item.Name]);
                 }
                 return fields;
-            });
+            };
         }
     }
 }

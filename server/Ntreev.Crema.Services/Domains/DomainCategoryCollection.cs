@@ -178,9 +178,9 @@ namespace Ntreev.Crema.Services.Domains
 
         #region IDomainCategoryCollection
 
-        Task<bool> IDomainCategoryCollection.ContainsAsync(string categoryPath)
+        bool IDomainCategoryCollection.Contains(string categoryPath)
         {
-            return this.Dispatcher.InvokeAsync(() => this.Contains(categoryPath));
+            return this.Contains(categoryPath);
         }
 
         IDomainCategory IDomainCategoryCollection.Root => this.Root;

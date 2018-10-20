@@ -47,11 +47,9 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
         {
             var template = this.GetDomainHost<ITypeTemplate>(domainID);
             var authentication = this.Context.GetAuthentication(this);
-            return template.Dispatcher.Invoke(() =>
-            {
-                template.EndEdit(authentication);
-                return template.TypeName;
-            });
+            var task = template.EndEditAsync(authentication);
+            task.Wait();
+            return template.TypeName;
         }
     }
 }

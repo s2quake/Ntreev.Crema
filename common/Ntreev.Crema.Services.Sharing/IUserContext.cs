@@ -29,7 +29,7 @@ namespace Ntreev.Crema.Services
 
         Task NotifyMessageAsync(Authentication authentication, string[] userIDs, string message);
 
-        Task<bool> ContainsAsync(string itemPath);
+        bool Contains(string itemPath);
 
         IUserCollection Users { get; }
 

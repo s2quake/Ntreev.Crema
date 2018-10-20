@@ -315,9 +315,9 @@ namespace Ntreev.Crema.Services.Users
 
         #region IUserCategoryCollection
 
-        Task<bool> IUserCategoryCollection.ContainsAsync(string categoryPath)
+        bool IUserCategoryCollection.Contains(string categoryPath)
         {
-            return this.Dispatcher.InvokeAsync(() => this.Contains(categoryPath));
+            return this.Contains(categoryPath);
         }
 
         IUserCategory IUserCategoryCollection.Root => this.Root;

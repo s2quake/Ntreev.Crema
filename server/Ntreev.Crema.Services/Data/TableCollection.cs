@@ -599,9 +599,9 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITableCollection
 
-        Task<bool> ITableCollection.ContainsAsync(string tableName)
+        bool ITableCollection.Contains(string tableName)
         {
-            return this.Dispatcher.InvokeAsync(() => this.Contains(tableName));
+            return this.Contains(tableName);
         }
 
         ITable ITableCollection.this[string tableName] => this[tableName];

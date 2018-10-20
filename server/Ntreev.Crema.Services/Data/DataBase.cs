@@ -448,9 +448,9 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task<bool> ContainsAsync(Authentication authentication)
+        public bool Contains(Authentication authentication)
         {
-            return await this.Dispatcher.InvokeAsync(() => this.authentications.Contains(authentication));
+            return this.authentications.Contains(authentication);
         }
 
         public async Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision)

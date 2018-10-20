@@ -28,14 +28,13 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class CreateDataBaseMethod : ScriptMethodBase
+    class CreateDataBaseMethod : DataBaseScriptMethodBase
     {
-        private readonly ICremaHost cremaHost;
-
         [ImportingConstructor]
         public CreateDataBaseMethod(ICremaHost cremaHost)
+            : base(cremaHost)
         {
-            this.cremaHost = cremaHost;
+            
         }
 
         protected override Delegate CreateDelegate()
@@ -46,7 +45,8 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
         private void CreateDataBase(string dataBaseName, string comment)
         {
             var authentication = this.Context.GetAuthentication(this);
-            this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases.AddNewDataBase(authentication, dataBaseName, comment));
+            var task = this.DataBases.AddNewDataBaseAsync(authentication, dataBaseName, comment);
+            task.Wait();
         }
     }
 }

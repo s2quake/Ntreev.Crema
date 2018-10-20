@@ -48,7 +48,8 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
             var contents = this.GetDomainHost<IEnumerable<ITableContent>>(domainID);
             var authentication = this.Context.GetAuthentication(this);
             var content = contents.First();
-            content.Dispatcher.Invoke(() => content.EndEdit(authentication));
+            var task = content.EndEditAsync(authentication);
+            task.Wait();
         }
     }
 }

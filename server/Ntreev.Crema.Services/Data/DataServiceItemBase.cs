@@ -124,23 +124,23 @@ namespace Ntreev.Crema.Services.Data
                 this.DataBase.Renamed -= DataBase_Renamed;
                 this.DataBase.Unloaded -= DataBase_Unloaded;
             });
-            
-                if (this.DataBase.IsLoaded == false)
-                    await this.DataBase.LoadAsync(this.Authentication);
-                var contains = await this.DataBase.ContainsAsync(this.Authentication);
-                if (contains == false)
-                    await this.DataBase.EnterAsync(this.Authentication);
+
+            if (this.DataBase.IsLoaded == false)
+                await this.DataBase.LoadAsync(this.Authentication);
+            var contains = await this.DataBase.Dispatcher.InvokeAsync(() => this.DataBase.Contains(this.Authentication));
+            if (contains == false)
+                await this.DataBase.EnterAsync(this.Authentication);
 
             var dataSet = null as CremaDataSet;
-                try
-                {
-                    dataSet = await this.DataBase.GetDataSetAsync(this.Authentication, DataSetType.All, null, null);
-                }
-                finally
-                {
-                    if (contains == false)
-                        await this.DataBase.LeaveAsync(this.Authentication);
-                }
+            try
+            {
+                dataSet = await this.DataBase.GetDataSetAsync(this.Authentication, DataSetType.All, null, null);
+            }
+            finally
+            {
+                if (contains == false)
+                    await this.DataBase.LeaveAsync(this.Authentication);
+            }
 
             DirectoryUtility.Delete(this.BasePath);
             this.Serialize(dataSet, this.info.Revision);
@@ -589,7 +589,7 @@ namespace Ntreev.Crema.Services.Data
                 var result = await Task.Run(async () =>
                 {
                     var revision = this.DataBase.DataBaseInfo.Revision;
-                    var contains = await this.DataBase.ContainsAsync(this.Authentication);
+                    var contains = await this.DataBase.Dispatcher.InvokeAsync(() => this.DataBase.Contains(this.Authentication));
                     if (contains == false)
                         await this.DataBase.EnterAsync(this.Authentication);
                     var dataSet = await this.DataBase.GetDataSetAsync(this.Authentication, DataSetType.All, null, null);

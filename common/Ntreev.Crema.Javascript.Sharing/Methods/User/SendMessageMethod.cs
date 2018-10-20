@@ -49,7 +49,9 @@ namespace Ntreev.Crema.Javascript.Methods.User
         {
             var category = this.GetUserCategory(parentPath);
             var authentication = this.Context.GetAuthentication(this);
-            return category.Dispatcher.Invoke(() => category.AddNewCategory(authentication, categoryName).Path);
+            var task = category.AddNewCategoryAsync(authentication, categoryName);
+            task.Wait();
+            return task.Result.Path;
         }
     }
 }

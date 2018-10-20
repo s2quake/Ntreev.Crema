@@ -24,6 +24,7 @@ using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
@@ -48,10 +49,13 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
         {
             var typeItem = this.GetTypeItem(dataBaseName, typeItemPath);
             var authentication = this.Context.GetAuthentication(this);
+            var task = InvokeAsync();
+            task.Wait();
+            return task.Result;
 
-            return typeItem.Dispatcher.Invoke(() =>
+            async Task<IDictionary<string, IDictionary<int, object>>> InvokeAsync()
             {
-                var dataSet = typeItem.GetDataSet(authentication, revision);
+                var dataSet = await typeItem.GetDataSetAsync(authentication, revision);
                 var types = new Dictionary<string, IDictionary<int, object>>(dataSet.Types.Count);
                 foreach (var item in dataSet.Types)
                 {
@@ -59,7 +63,7 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
                     types.Add(item.Name, members);
                 }
                 return types;
-            });
+            };
         }
 
         private IDictionary<int, object> GetTypeMembers(CremaDataType dataType)

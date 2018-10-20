@@ -47,7 +47,8 @@ namespace Ntreev.Crema.Javascript.Methods.User
         {
             var category = this.GetUserCategory(userItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            category.Dispatcher.Invoke(() => category.Delete(authentication));
+            var task = category.DeleteAsync(authentication);
+            task.Wait();
         }
     }
 }

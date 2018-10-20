@@ -26,7 +26,7 @@ namespace Ntreev.Crema.Services
 {
     public interface ITableContext : IEnumerable<ITableItem>, IServiceProvider
     {
-        Task<bool> ContainsAsync(string itemPath);
+        bool Contains(string itemPath);
 
         ITableCollection Tables { get; }
 

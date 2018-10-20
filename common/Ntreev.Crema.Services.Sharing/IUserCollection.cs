@@ -26,7 +26,7 @@ namespace Ntreev.Crema.Services
 {
     public interface IUserCollection : IReadOnlyCollection<IUser>, IEnumerable<IUser>, IServiceProvider, IDispatcherObject
     {
-        Task<bool> ContainsAsync(string userID);
+        bool Contains(string userID);
 
         IUser this[string userID] { get; }
 

@@ -45,9 +45,9 @@ namespace Ntreev.Crema.Services.Domains
             this.RemoveBase(userID);
         }
 
-        public Task<bool> ContainsAsync(string userID)
+        public bool Contains(string userID)
         {
-            return this.Dispatcher.InvokeAsync(() => base.ContainsKey(userID));
+            return base.ContainsKey(userID);
         }
 
         public DomainUser Owner

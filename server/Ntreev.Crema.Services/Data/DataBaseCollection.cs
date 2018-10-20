@@ -785,9 +785,9 @@ namespace Ntreev.Crema.Services.Data
             return await this.AddNewDataBaseAsync(authentication, dataBaseName, comment);
         }
 
-        Task<bool> IDataBaseCollection.ContainsAsync(string dataBaseName)
+        bool IDataBaseCollection.Contains(string dataBaseName)
         {
-            return this.Dispatcher.InvokeAsync(() => this.ContainsKey(dataBaseName));
+            return this.ContainsKey(dataBaseName);
         }
 
         IDataBase IDataBaseCollection.this[string dataBaseName] => this[dataBaseName];

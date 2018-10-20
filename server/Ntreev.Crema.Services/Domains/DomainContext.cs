@@ -554,9 +554,9 @@ namespace Ntreev.Crema.Services.Domains
 
         #region IDomainContext
 
-        Task<bool> IDomainContext.ContainsAsync(string itemPath)
+        bool IDomainContext.Contains(string itemPath)
         {
-            return this.Dispatcher.InvokeAsync(() => this.Contains(itemPath));
+            return this.Contains(itemPath);
         }
 
         IDomainCollection IDomainContext.Domains => this.Domains;

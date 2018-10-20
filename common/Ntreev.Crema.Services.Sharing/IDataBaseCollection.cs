@@ -30,7 +30,7 @@ namespace Ntreev.Crema.Services
     {
         Task<IDataBase> AddNewDataBaseAsync(Authentication authentication, string dataBaseName, string comment);
 
-        Task<bool> ContainsAsync(string dataBaseName);
+        bool Contains(string dataBaseName);
 
         IDataBase this[string dataBaseName] { get; }
 

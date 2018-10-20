@@ -28,10 +28,14 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class GetDataBaseListMethod : ScriptMethodBase
+    class GetDataBaseListMethod : DataBaseScriptMethodBase
     {
-        [Import]
-        private Lazy<ICremaHost> cremaHost = null;
+        [ImportingConstructor]
+        public GetDataBaseListMethod(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+            
+        }
 
         protected override Delegate CreateDelegate()
         {
@@ -40,12 +44,10 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         private string[] GetDataBaseList()
         {
-            return this.CremaHost.Dispatcher.Invoke(() =>
+            return this.DataBases.Dispatcher.Invoke(() =>
             {
-                return this.CremaHost.DataBases.Select(item => item.Name).ToArray();
+                return this.DataBases.Select(item => item.Name).ToArray();
             });
         }
-
-        private ICremaHost CremaHost => this.cremaHost.Value;
     }
 }

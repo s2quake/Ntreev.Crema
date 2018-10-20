@@ -46,7 +46,8 @@ namespace Ntreev.Crema.Javascript.Methods.Permission
         {
             var tableItem = this.GetTableItem(dataBaseName, tableItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            tableItem.Dispatcher.Invoke(() => tableItem.Lock(authentication, comment));
+            var task = tableItem.LockAsync(authentication, comment);
+            task.Wait();
         }
     }
 }

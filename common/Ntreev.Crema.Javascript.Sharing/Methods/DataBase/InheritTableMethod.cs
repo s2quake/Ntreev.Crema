@@ -47,7 +47,8 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
         {
             var table = this.GetTable(dataBaseName, tableName);
             var authentication = this.Context.GetAuthentication(this);
-            table.Dispatcher.Invoke(() => table.Inherit(authentication, newTableName, categoryPath ?? "/", copyContent ?? false));
+            var task = table.InheritAsync(authentication, newTableName, categoryPath ?? "/", copyContent ?? false);
+            task.Wait();
         }
     }
 }

@@ -53,11 +53,10 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
             if (content == null)
                 throw new TableNotFoundException(tableName);
             var authentication = this.Context.GetAuthentication(this);
-            return content.Dispatcher.Invoke(() =>
-            {
-                var row = content.Find(authentication, keys);
-                return row[columnName];
-            });
+            var task = content.FindAsync(authentication, keys);
+            task.Wait();
+            var row = task.Result;
+            return row[columnName];
         }
     }
 }

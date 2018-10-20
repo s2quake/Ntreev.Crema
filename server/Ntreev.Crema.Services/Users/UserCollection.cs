@@ -608,9 +608,9 @@ namespace Ntreev.Crema.Services.Users
 
         #region IUserCollection
 
-        Task<bool> IUserCollection.ContainsAsync(string userID)
+        bool IUserCollection.Contains(string userID)
         {
-            return this.Dispatcher.InvokeAsync(() => base.Contains(userID));
+            return base.Contains(userID);
         }
 
         IUser IUserCollection.this[string userID] => this[userID];

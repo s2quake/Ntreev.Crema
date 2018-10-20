@@ -45,7 +45,7 @@ namespace Ntreev.Crema.Services
 
         Task EndNewAsync(Authentication authentication, ITableColumn column);
 
-        Task<bool> ContainsAsync(string columnName);
+        bool Contains(string columnName);
 
         IDomain Domain { get; }
 

@@ -26,7 +26,7 @@ namespace Ntreev.Crema.Services
 {
     public interface IDomainCollection : IReadOnlyCollection<IDomain>, IEnumerable<IDomain>, IServiceProvider, IDispatcherObject
     {
-        Task<bool> ContainsAsync(Guid domainID);
+        bool Contains(Guid domainID);
 
         IDomain this[Guid domainID] { get; }
 

@@ -37,7 +37,7 @@ namespace Ntreev.Crema.Services
 
         Task DeleteAsync(Authentication authentication);
 
-        Task<bool> ContainsAsync(Authentication authentication);
+        bool Contains(Authentication authentication);
 
         Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision);
 

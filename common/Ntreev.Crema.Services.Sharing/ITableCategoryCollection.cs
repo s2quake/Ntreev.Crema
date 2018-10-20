@@ -26,7 +26,7 @@ namespace Ntreev.Crema.Services
 {
     public interface ITableCategoryCollection : IReadOnlyCollection<ITableCategory>, IEnumerable<ITableCategory>, IServiceProvider, IDispatcherObject
     {
-        Task<bool> ContainsAsync(string categoryPath);
+        bool Contains(string categoryPath);
 
         ITableCategory Root { get; }
 
