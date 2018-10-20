@@ -46,7 +46,8 @@ namespace Ntreev.Crema.Javascript.Methods.Domain
         {
             var domain = this.GetDomain(domainID);
             var authentication = this.Context.GetAuthentication(this);
-            domain.DeleteAsync(authentication, isCancel).Wait();
+            var task = domain.DeleteAsync(authentication, isCancel);
+            task.Wait();
         }
     }
 }

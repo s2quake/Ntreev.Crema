@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
 {

@@ -275,9 +275,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public Task<bool> ContainsAsync(Guid domainID)
+        public bool Contains(Guid domainID)
         {
-            return this.Dispatcher.InvokeAsync(() => this.Contains(domainID.ToString()));
+            return this.Contains(domainID.ToString());
         }
 
         public DomainMetaData[] GetMetaData(Authentication authentication)

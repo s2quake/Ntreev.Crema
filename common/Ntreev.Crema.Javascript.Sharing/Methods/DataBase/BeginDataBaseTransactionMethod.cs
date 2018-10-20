@@ -48,12 +48,11 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.Context.GetAuthentication(this);
-            return dataBase.Dispatcher.Invoke(() =>
-            {
-                var transaction = dataBase.BeginTransaction(authentication);
-                this.Context.Properties[$"{dataBase.ID}"] = transaction;
-                return $"{dataBase.ID}";
-            });
+            var task = dataBase.BeginTransactionAsync(authentication);
+            task.Wait();
+            var transaction = task.Result;
+            this.Context.Properties[$"{dataBase.ID}"] = transaction;
+            return $"{dataBase.ID}";
         }
     }
 }

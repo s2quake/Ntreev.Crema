@@ -168,9 +168,11 @@ namespace Ntreev.Crema.Services.Data
             return this.domain.SetPropertyAsync(authentication, CremaSchema.Comment, value);
         }
 
-        public Task<bool> ContainsAsync(string columnName)
+        public bool Contains(string columnName)
         {
-            return this.Dispatcher.InvokeAsync(() => this.items.Any(item => item.Name == columnName));
+            if (this.items == null)
+                return false;
+            return this.items.Any(item => item.Name == columnName);
         }
 
         public bool IsNew { get; set; }

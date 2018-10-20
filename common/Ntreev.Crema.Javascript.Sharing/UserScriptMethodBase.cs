@@ -26,17 +26,15 @@ namespace Ntreev.Crema.Javascript
 {
     public abstract class UserScriptMethodBase : ScriptMethodBase
     {
-        private readonly ICremaHost cremaHost;
-
         protected UserScriptMethodBase(ICremaHost cremaHost)
         {
-            this.cremaHost = cremaHost;
+            this.CremaHost = cremaHost;
         }
 
         protected UserScriptMethodBase(ICremaHost cremaHost, string name)
             : base(name)
         {
-            this.cremaHost = cremaHost;
+            this.CremaHost = cremaHost;
         }
 
         protected IUser GetUser(string userID)
@@ -84,6 +82,8 @@ namespace Ntreev.Crema.Javascript
             throw new NotImplementedException();
         }
 
-        protected ICremaHost CremaHost => this.cremaHost;
+        protected ICremaHost CremaHost { get; }
+
+        protected IUserContext UserContext => this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
     }
 }

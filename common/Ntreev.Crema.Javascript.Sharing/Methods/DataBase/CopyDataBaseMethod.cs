@@ -47,7 +47,8 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.Context.GetAuthentication(this);
-            dataBase.Dispatcher.Invoke(() => dataBase.Copy(authentication, newDataBaseName, comment, force ?? false));
+            var task = dataBase.CopyAsync(authentication, newDataBaseName, comment, force ?? false);
+            task.Wait();
         }
     }
 }

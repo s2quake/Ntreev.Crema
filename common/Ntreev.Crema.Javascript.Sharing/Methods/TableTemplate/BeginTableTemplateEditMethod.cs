@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 {
@@ -45,16 +46,17 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
         [ReturnParameterName("domainID")]
         private string BeginTableTemplateEdit(string dataBaseName, string tableName)
         {
-            var dataBase = this.GetDataBase(dataBaseName);
-            return dataBase.Dispatcher.Invoke(() =>
+            var table = this.GetTable(dataBaseName, tableName);
+            var authentication = this.Context.GetAuthentication(this);
+            var task = InvokeAsync();
+            task.Wait();
+            return task.Result;
+
+            async Task<string> InvokeAsync()
             {
-                var table = dataBase.TableContext.Tables[tableName];
-                if (table == null)
-                    throw new TableNotFoundException(tableName);
-                var authentication = this.Context.GetAuthentication(this);
-                table.Template.BeginEdit(authentication);
+                await table.Template.BeginEditAsync(authentication);
                 return $"{table.Template.Domain.ID}";
-            });
+            };
         }
     }
 }

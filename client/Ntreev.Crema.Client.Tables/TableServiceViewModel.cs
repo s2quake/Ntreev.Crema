@@ -35,6 +35,7 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Ntreev.Crema.Client.Tables.BrowserItems.ViewModels;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Client.Tables
 {

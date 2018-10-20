@@ -26,6 +26,7 @@ using System;
 using Ntreev.Library.IO;
 using Ntreev.ModernUI.Framework;
 using Ntreev.Library.ObjectModel;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 {

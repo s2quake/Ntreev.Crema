@@ -48,11 +48,9 @@ namespace Ntreev.Crema.Javascript.Methods.User
         {
             var userItem = this.GetUserItem(userItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            return userItem.Dispatcher.Invoke(() =>
-            {
-                userItem.Rename(authentication, newName);
-                return userItem.Path;
-            });
+            var task = userItem.RenameAsync(authentication, newName);
+            task.Wait();
+            return userItem.Path;
         }
     }
 }

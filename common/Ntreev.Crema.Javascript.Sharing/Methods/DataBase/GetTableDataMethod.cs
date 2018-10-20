@@ -24,6 +24,7 @@ using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
@@ -49,13 +50,16 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
             var table = this.GetTable(dataBaseName, tableName);
             var revisionValue = revision;
             var authentication = this.Context.GetAuthentication(this);
+            var task = InvokeAsync();
+            task.Wait();
+            return task.Result;
 
-            return table.Dispatcher.Invoke(() =>
+            async Task<IDictionary<int, object>> InvokeAsync()
             {
-                var dataSet = table.GetDataSet(authentication, revisionValue);
+                var dataSet = await table.GetDataSetAsync(authentication, revisionValue);
                 var dataTable = dataSet.Tables[tableName];
                 return this.GetDataRows(dataTable);
-            });
+            };
         }
 
         private IDictionary<int, object> GetDataRows(CremaDataTable dataTable)

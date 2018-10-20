@@ -28,10 +28,14 @@ namespace Ntreev.Crema.Javascript.Methods.User
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class ContainsUserItemMethod : ScriptMethodBase
+    class ContainsUserItemMethod : UserScriptMethodBase
     {
-        [Import]
-        private ICremaHost cremaHost = null;
+        [ImportingConstructor]
+        public ContainsUserItemMethod(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+
+        }
 
         protected override Delegate CreateDelegate()
         {
@@ -40,11 +44,7 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         private bool ContainsUserItem(string userItemPath)
         {
-            if (this.cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
-            {
-                return userContext.Dispatcher.Invoke(() => userContext.Contains(userItemPath));
-            }
-            throw new NotImplementedException();
+            return this.UserContext.Dispatcher.Invoke(() => this.UserContext.Contains(userItemPath));
         }
     }
 }

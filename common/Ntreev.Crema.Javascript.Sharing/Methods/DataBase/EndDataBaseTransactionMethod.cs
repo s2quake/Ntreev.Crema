@@ -51,11 +51,9 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
                 throw new ItemNotFoundException(transactionID);
             if (this.Context.Properties[transactionID] is ITransaction transaction)
             {
-                transaction.Dispatcher.Invoke(() =>
-                {
-                    var authentication = this.Context.GetAuthentication(this);
-                    transaction.Commit(authentication);
-                });
+                var authentication = this.Context.GetAuthentication(this);
+                var task = transaction.CommitAsync(authentication);
+                task.Wait();
                 this.Context.Properties.Remove(transactionID);
             }
             else

@@ -418,9 +418,9 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITypeContext
 
-        Task<bool> ITypeContext.ContainsAsync(string itemPath)
+        bool ITypeContext.Contains(string itemPath)
         {
-            return this.Dispatcher.InvokeAsync(() => this.Contains(itemPath));
+            return this.Contains(itemPath);
         }
 
         ITypeCollection ITypeContext.Types => this.Types;

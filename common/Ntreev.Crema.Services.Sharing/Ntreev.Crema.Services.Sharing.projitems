@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CloseRequestedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClosedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClosedEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\DataBaseCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableCategoryCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\DataBaseExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeCategoryCollectionExtensions.cs" />

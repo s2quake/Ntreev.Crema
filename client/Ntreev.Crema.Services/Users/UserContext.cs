@@ -890,9 +890,9 @@ namespace Ntreev.Crema.Services.Users
 
         #region IUserContext
 
-        Task<bool> IUserContext.ContainsAsync(string itemPath)
+        bool IUserContext.Contains(string itemPath)
         {
-            return this.Dispatcher.InvokeAsync(() => this.Contains(itemPath));
+            return this.Contains(itemPath);
         }
 
         IUserCollection IUserContext.Users => this.Users;

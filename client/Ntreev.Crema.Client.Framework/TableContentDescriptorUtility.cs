@@ -19,6 +19,7 @@ using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
 using Ntreev.Crema.Client.Framework.Properties;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;

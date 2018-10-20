@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 {
@@ -53,17 +54,20 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 
             var template = this.GetDomainHost<ITableTemplate>(domainID);
             var authentication = this.Context.GetAuthentication(this);
-            template.Dispatcher.Invoke(() =>
+            var task = InvokeAsync();
+            task.Wait();
+
+            async Task InvokeAsync()
             {
-                var column = template.AddNew(authentication);
-                column.SetName(authentication, columnName);
-                column.SetDataType(authentication, typeName);
+                var column = await template.AddNewAsync(authentication);
+                await column.SetNameAsync(authentication, columnName);
+                await column.SetDataTypeAsync(authentication, typeName);
                 if (comment != null)
-                    column.SetComment(authentication, comment);
+                    await column.SetCommentAsync(authentication, comment);
                 if (isKey != null)
-                    column.SetIsKey(authentication, isKey.Value);
-                template.EndNew(authentication, column);
-            });
+                    await column.SetIsKeyAsync(authentication, isKey.Value);
+                await template.EndNewAsync(authentication, column);
+            };
         }
 
         class TypeNamesDescriptionAttribute : DescriptionAttribute

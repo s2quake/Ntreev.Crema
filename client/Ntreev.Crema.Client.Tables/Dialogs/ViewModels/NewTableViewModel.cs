@@ -30,6 +30,7 @@ using Ntreev.ModernUI.Framework;
 using Ntreev.Crema.Client.Tables.Properties;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 {

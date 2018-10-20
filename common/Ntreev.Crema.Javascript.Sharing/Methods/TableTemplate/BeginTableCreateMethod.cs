@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 {
@@ -47,7 +48,11 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
         private string BeginTableCreate(string dataBaseName, string parentPath)
         {
             var dataBase = this.GetDataBase(dataBaseName);
-            return dataBase.Dispatcher.Invoke(() =>
+            var task = InvokeAsync();
+            task.Wait();
+            return task.Result;
+
+            async Task<string> InvokeAsync()
             {
                 if (NameValidator.VerifyCategoryPath(parentPath) == true)
                 {
@@ -55,7 +60,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
                     if (category == null)
                         throw new CategoryNotFoundException(parentPath);
                     var authentication = this.Context.GetAuthentication(this);
-                    var template = category.NewTable(authentication);
+                    var template = await category.NewTableAsync(authentication);
                     return $"{template.Domain.ID}";
                 }
                 else if (NameValidator.VerifyItemPath(parentPath) == true)
@@ -64,7 +69,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
                     if (table == null)
                         throw new CategoryNotFoundException(parentPath);
                     var authentication = this.Context.GetAuthentication(this);
-                    var template = table.NewTable(authentication);
+                    var template = await table.NewTableAsync(authentication);
                     return $"{template.Domain.ID}";
                 }
                 else
@@ -73,10 +78,10 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
                     if (table == null)
                         throw new CategoryNotFoundException(parentPath);
                     var authentication = this.Context.GetAuthentication(this);
-                    var template = table.NewTable(authentication);
+                    var template = await table.NewTableAsync(authentication);
                     return $"{template.Domain.ID}";
                 }
-            });
+            };
         }
     }
 }

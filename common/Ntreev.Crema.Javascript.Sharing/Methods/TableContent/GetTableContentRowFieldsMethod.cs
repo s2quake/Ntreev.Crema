@@ -56,6 +56,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
             var authentication = this.Context.GetAuthentication(this);
             var task = InvokeAsync();
             task.Wait();
+            return task.Result;
 
             async Task<IDictionary< string, object>> InvokeAsync()
             {

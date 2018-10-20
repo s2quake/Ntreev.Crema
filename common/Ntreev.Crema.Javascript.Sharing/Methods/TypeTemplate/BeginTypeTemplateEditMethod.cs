@@ -45,16 +45,11 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
         [ReturnParameterName("domainID")]
         private string BeginTypeTemplateEdit(string dataBaseName, string typeName)
         {
-            var dataBase = this.GetDataBase(dataBaseName);
-            return dataBase.Dispatcher.Invoke(() =>
-            {
-                var type = dataBase.TypeContext.Types[typeName];
-                if (type == null)
-                    throw new TypeNotFoundException(typeName);
-                var authentication = this.Context.GetAuthentication(this);
-                type.Template.BeginEdit(authentication);
-                return $"{type.Template.Domain.ID}";
-            });
+            var type = this.GetType(dataBaseName, typeName);
+            var authentication = this.Context.GetAuthentication(this);
+            var task = type.Template.BeginEditAsync(authentication);
+            task.Wait();
+            return $"{type.Template.Domain.ID}";
         }
     }
 }

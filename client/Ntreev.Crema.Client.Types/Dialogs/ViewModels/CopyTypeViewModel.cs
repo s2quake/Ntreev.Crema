@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using System;
 using Ntreev.ModernUI.Framework;
 using Ntreev.Library.ObjectModel;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
 {
