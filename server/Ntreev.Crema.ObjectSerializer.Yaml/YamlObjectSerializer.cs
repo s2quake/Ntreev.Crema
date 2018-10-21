@@ -35,7 +35,7 @@ namespace Ntreev.Crema.ObjectSerializer.Yaml
     {
         private const string extensions = ".yaml";
 
-        private static readonly Serializer propertySerializer;
+        private static readonly ISerializer propertySerializer;
         private static readonly Deserializer propertyDeserializer = new Deserializer();
 
         static YamlObjectSerializer()

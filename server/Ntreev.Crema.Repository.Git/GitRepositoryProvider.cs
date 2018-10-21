@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Repository.Git
         public const string KeepExtension = ".keep";
         private const string commentHeader = "# revision properties";
 
-        private static readonly Serializer propertySerializer = new SerializerBuilder().Build();
+        private static readonly ISerializer propertySerializer = new SerializerBuilder().Build();
         private static readonly Deserializer propertyDeserializer = new Deserializer();
 
         private readonly Dictionary<Uri, string> cacheRepositories = new Dictionary<Uri, string>();

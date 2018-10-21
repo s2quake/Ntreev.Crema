@@ -32,7 +32,7 @@ namespace Ntreev.Crema.Commands
 {
     public static class TextSerializer
     {
-        private readonly static Serializer yamlSerializer;
+        private readonly static ISerializer yamlSerializer;
 
         static TextSerializer()
         {

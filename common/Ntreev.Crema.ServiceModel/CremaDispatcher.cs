@@ -17,6 +17,7 @@
 
 #pragma warning disable 0612
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,104 +27,12 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ServiceModel
 {
-    public sealed class CremaDispatcher
+    public sealed class CremaDispatcher : Dispatcher
     {
-        private readonly CremaDispatcherScheduler scheduler;
-        private readonly TaskFactory factory;
-        private readonly CancellationTokenSource cancellationToken;
-
         public CremaDispatcher(object owner)
+        : base(owner)
         {
-            this.cancellationToken = new CancellationTokenSource();
-            this.scheduler = new CremaDispatcherScheduler(this.cancellationToken.Token);
-            this.factory = new TaskFactory(new CancellationToken(false), TaskCreationOptions.None, TaskContinuationOptions.None, this.scheduler);
-            this.Owner = owner;
-            this.Thread = new Thread(() =>
-            {
-                this.scheduler.Run();
-                this.Disposed?.Invoke(this, EventArgs.Empty);
-            })
-            {
-                Name = owner.ToString()
-            };
-            this.Thread.Start();
+
         }
-
-        public override string ToString()
-        {
-            return $"{this.Owner}";
-        }
-
-        public void VerifyAccess()
-        {
-            if (!this.CheckAccess())
-            {
-                throw new InvalidOperationException("The calling thread cannot access this object because a different thread owns it.");
-            }
-        }
-
-        public bool CheckAccess()
-        {
-            return this.Thread == Thread.CurrentThread;
-        }
-
-        public void Invoke(Action action)
-        {
-            if (this.CheckAccess() == true)
-            {
-                action();
-            }
-            else
-            {
-                var task = this.factory.StartNew(action);
-                task.Wait();
-            }
-        }
-
-        public Task InvokeAsync(Action action)
-        {
-            return this.factory.StartNew(action);
-        }
-
-        public TResult Invoke<TResult>(Func<TResult> callback)
-        {
-            if (this.CheckAccess() == true)
-            {
-                return callback();
-            }
-            else
-            {
-                var task = this.factory.StartNew(callback);
-                task.Wait();
-                return task.Result;
-            }
-        }
-
-        public Task<TResult> InvokeAsync<TResult>(Func<TResult> callback)
-        {
-            return this.factory.StartNew(callback);
-        }
-
-        public void Dispose()
-        {
-            this.cancellationToken.Cancel();
-            this.scheduler.Continue();
-        }
-
-        public async Task DisposeAsync()
-        {
-            var task = this.factory.StartNew(() => { });
-            this.cancellationToken.Cancel();
-            this.scheduler.Continue();
-            await task;
-        }
-
-        public string Name => this.Owner.ToString();
-
-        public object Owner { get; }
-
-        public Thread Thread { get; }
-
-        public event EventHandler Disposed;
     }
 }

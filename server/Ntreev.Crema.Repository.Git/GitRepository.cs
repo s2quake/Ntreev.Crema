@@ -34,7 +34,7 @@ namespace Ntreev.Crema.Repository.Git
 {
     class GitRepository : IRepository
     {
-        private static readonly Serializer propertySerializer = new SerializerBuilder().Build();
+        private static readonly ISerializer propertySerializer = new SerializerBuilder().Build();
         private static readonly Deserializer propertyDeserializer = new Deserializer();
 
         private readonly string repositoryPath;
