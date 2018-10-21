@@ -19,6 +19,7 @@ using Ntreev.Crema.Commands.Consoles;
 using Ntreev.Library.Commands;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
@@ -39,16 +40,24 @@ namespace Ntreev.Crema.Bot.Consoles
         }
 
         [CommandMethod]
-        public void Start()
+        [CommandMethodProperty(nameof(Count))]
+        public Task StartAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            this.autobotService.Value.Start(authentication);
+            return this.AutobotService.StartAsync(authentication, this.Count);
         }
 
         [CommandMethod]
-        public void Stop()
+        public Task StopAsync()
         {
-            this.autobotService.Value.Stop();
+            return this.AutobotService.StopAsync();
+        }
+
+        [CommandProperty]
+        [DefaultValue(0)]
+        public int Count
+        {
+            get; set;
         }
 
         public override bool IsEnabled
@@ -63,15 +72,17 @@ namespace Ntreev.Crema.Bot.Consoles
 
         protected override bool IsMethodEnabled(CommandMethodDescriptor descriptor)
         {
-            if (descriptor.DescriptorName == nameof(Start))
+            if (descriptor.DescriptorName == nameof(StartAsync))
             {
-                return this.autobotService.Value.IsPlaying == false;
+                return this.AutobotService.IsPlaying == false;
             }
-            else if (descriptor.DescriptorName == nameof(Stop))
+            else if (descriptor.DescriptorName == nameof(StopAsync))
             {
-                return this.autobotService.Value.IsPlaying == true;
+                return this.AutobotService.IsPlaying == true;
             }
             return base.IsMethodEnabled(descriptor);
         }
+
+        private AutobotService AutobotService => this.autobotService.Value;
     }
 }

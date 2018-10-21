@@ -39,16 +39,16 @@ namespace Ntreev.Crema.Services.Test
         private static Dictionary<ICremaHost, int> cremaHostToPort = new Dictionary<ICremaHost, int>();
         private static Dictionary<Authentication, Guid> authenticationToToken = new Dictionary<Authentication, Guid>();
 
-        public static void Initialize(this CremaBootstrapper app, TestContext context, string name)
+        public static void Initialize(this CremaBootstrapper boot, TestContext context, string name)
         {
 #if SERVER
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory + "_repo", name);
-            app.CreateRepository(repositoryPath, app.RepositoryName, false);
-            app.BasePath = repositoryPath;
-            app.MultiThreading = true;
+            CremaBootstrapper.CreateRepository(boot, repositoryPath, "svn", "xml", true);
+            boot.MultiThreading = true;
+            boot.BasePath = repositoryPath;
 #endif
 #if CLIENT
-            var cremaHost = app.GetService(typeof(ICremaHost)) as ICremaHost;
+            var cremaHost = boot.GetService(typeof(ICremaHost)) as ICremaHost;
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory + "_repo", name);
             CremaServeHost.Run("init", repositoryPath.WrapQuot());
             var process = CremaServeHost.RunAsync("run", repositoryPath.WrapQuot(), "--port", port);
@@ -61,7 +61,7 @@ namespace Ntreev.Crema.Services.Test
                     eventSet.Set();
             };
             eventSet.WaitOne();
-            app.Disposed += (s, e) =>
+            boot.Disposed += (s, e) =>
             {
                 process.StandardInput.WriteLine("exit");
                 process.WaitForExit(100);
@@ -102,7 +102,7 @@ namespace Ntreev.Crema.Services.Test
 #if SERVER
             cremaHost.Logout(authentication);
 #endif
-            cremaHost.Close(token);
+            cremaHost.CloseAsync(token);
             authenticationToToken.Remove(authentication);
         }
     }

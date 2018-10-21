@@ -27,4 +27,13 @@ namespace Ntreev.Crema.Services
     {
         CremaDispatcher Dispatcher { get; }
     }
+
+    public static class IDispatcherObjectExtensions
+    {
+        public static void ValidateExpired(this IDispatcherObject dispatcherObject)
+        {
+            if (dispatcherObject == null || dispatcherObject.Dispatcher == null)
+                throw new DispatcherExpiredException();
+        }
+    }
 }

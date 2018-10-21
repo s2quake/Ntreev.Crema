@@ -27,6 +27,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -53,20 +54,43 @@ namespace Ntreev.Crema.Services.Data
 
         public Type AddNew(Authentication authentication, TypeInfo typeInfo)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(AddNew), typeInfo.Name, typeInfo.CategoryPath);
-            this.InvokeTypeCreate(authentication, typeInfo.Name, typeInfo.CategoryPath);
-            var type = this.BaseAddNew(typeInfo.Name, typeInfo.CategoryPath, authentication);
-            type.Initialize(typeInfo);
-            var items = EnumerableUtility.One(type).ToArray();
-            this.InvokeTypesCreatedEvent(authentication, items);
-            return type;
+            try
+            {
+                this.CremaHost.DebugMethod(authentication, this, nameof(AddNew), typeInfo.Name, typeInfo.CategoryPath);
+                var type = this.BaseAddNew(typeInfo.Name, typeInfo.CategoryPath, authentication);
+                type.Initialize(typeInfo);
+                var items = EnumerableUtility.One(type).ToArray();
+                this.InvokeTypesCreatedEvent(authentication, items);
+                return type;
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public Type Copy(Authentication authentication, Type type, string newTypeName, string categoryPath)
+        public async Task<Type> CopyAsync(Authentication authentication, string typeName, string newTypeName, string categoryPath)
         {
-            var result = this.Context.Service.CopyType(type.Name, newTypeName, categoryPath);
-            this.Sign(authentication, result);
-            return this.AddNew(authentication, result.Value);
+            try
+            {
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), typeName, newTypeName, categoryPath);
+                });
+                var result = await Task.Run(() => this.Context.Service.CopyType(typeName, newTypeName, categoryPath));
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    return this.AddNew(authentication, result.GetValue());
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public object GetService(System.Type serviceType)
@@ -74,47 +98,13 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public void InvokeTypeCreate(Authentication authentication, string typeName, string categoryPath)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeCreate), typeName, categoryPath);
-        }
-
-        public void InvokeTypeRename(Authentication authentication, Type type, string newName)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeRename), type, newName);
-        }
-
-        public void InvokeTypeMove(Authentication authentication, Type type, string newCategoryPath)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeMove), type, newCategoryPath);
-        }
-
-        public void InvokeTypeDelete(Authentication authentication, Type type)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeDelete), type);
-        }
-
-        public void InvokeTypeBeginTemplateEdit(Authentication authentication, Type type)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeBeginTemplateEdit), type);
-        }
-
-        public void InvokeTypeEndTemplateEdit(Authentication authentication, Type type, TypeInfo typeInfo)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeEndTemplateEdit), type);
-        }
-
-        public void InvokeTypeSetTags(Authentication authentication, Type type, TagInfo tags)
-        {
-        }
-
         public void InvokeTypesCreatedEvent(Authentication authentication, Type[] types)
         {
             var args = types.Select(item => (object)item.TypeInfo).ToArray();
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesCreatedEvent), types);
-            var comment = EventMessageBuilder.CreateType(authentication, types);
+            var message = EventMessageBuilder.CreateType(authentication, types);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTypesCreated(new ItemsCreatedEventArgs<IType>(authentication, types, args));
             this.Context.InvokeItemsCreatedEvent(authentication, types, args);
         }
@@ -122,9 +112,9 @@ namespace Ntreev.Crema.Services.Data
         public void InvokeTypesRenamedEvent(Authentication authentication, Type[] types, string[] oldNames, string[] oldPaths)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesRenamedEvent), types, oldNames, oldPaths);
-            var comment = EventMessageBuilder.RenameType(authentication, types, oldNames);
+            var message = EventMessageBuilder.RenameType(authentication, types, oldNames);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTypesRenamed(new ItemsRenamedEventArgs<IType>(authentication, types, oldNames, oldPaths));
             this.Context.InvokeItemsRenamedEvent(authentication, types, oldNames, oldPaths);
         }
@@ -132,9 +122,9 @@ namespace Ntreev.Crema.Services.Data
         public void InvokeTypesMovedEvent(Authentication authentication, Type[] types, string[] oldPaths, string[] oldCategoryPaths)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesMovedEvent), types, oldPaths, oldCategoryPaths);
-            var comment = EventMessageBuilder.MoveType(authentication, types, oldCategoryPaths);
+            var message = EventMessageBuilder.MoveType(authentication, types, oldCategoryPaths);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTypesMoved(new ItemsMovedEventArgs<IType>(authentication, types, oldPaths, oldCategoryPaths));
             this.Context.InvokeItemsMovedEvent(authentication, types, oldPaths, oldCategoryPaths);
         }
@@ -142,9 +132,9 @@ namespace Ntreev.Crema.Services.Data
         public void InvokeTypesDeletedEvent(Authentication authentication, Type[] types, string[] oldPaths)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesDeletedEvent), oldPaths);
-            var comment = EventMessageBuilder.DeleteType(authentication, types);
+            var message = EventMessageBuilder.DeleteType(authentication, types);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTypesDeleted(new ItemsDeletedEventArgs<IType>(authentication, types, oldPaths));
             this.Context.InvokeItemsDeleteEvent(authentication, types, oldPaths);
         }
@@ -152,9 +142,9 @@ namespace Ntreev.Crema.Services.Data
         public void InvokeTypesChangedEvent(Authentication authentication, Type[] types)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesChangedEvent), types);
-            var comment = EventMessageBuilder.ChangeTypeTemplate(authentication, types);
+            var message = EventMessageBuilder.ChangeTypeTemplate(authentication, types);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTypesChanged(new ItemsEventArgs<IType>(authentication, types));
             this.Context.InvokeItemsChangedEvent(authentication, types);
         }
@@ -165,34 +155,15 @@ namespace Ntreev.Crema.Services.Data
             this.OnTypesStateChanged(new ItemsEventArgs<IType>(authentication, types));
         }
 
-        public IDataBaseService Service
-        {
-            get { return this.Context.Service; }
-        }
+        public IDataBaseService Service => this.Context.Service;
 
-        public CremaHost CremaHost
-        {
-            get { return this.Context.CremaHost; }
-        }
+        public CremaHost CremaHost => this.Context.CremaHost;
 
-        public DataBase DataBase
-        {
-            get { return this.Context.DataBase; }
-        }
+        public DataBase DataBase => this.Context.DataBase;
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.Context?.Dispatcher; }
-        }
+        public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public new int Count => base.Count;
 
         public event ItemsCreatedEventHandler<IType> TypesCreated
         {
@@ -264,7 +235,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        
+
 
         public event ItemsEventHandler<IType> TypesChanged
         {
@@ -293,7 +264,7 @@ namespace Ntreev.Crema.Services.Data
                 base.CollectionChanged -= value;
             }
         }
-        
+
         protected virtual void OnTypesCreated(ItemsCreatedEventArgs<IType> e)
         {
             this.typesCreated?.Invoke(this, e);
@@ -324,32 +295,14 @@ namespace Ntreev.Crema.Services.Data
             this.typesChanged?.Invoke(this, e);
         }
 
-        private void Sign(Authentication authentication, ResultBase result)
-        {
-            result.Validate(authentication);
-        }
-
-        private void Sign<T>(Authentication authentication, ResultBase<T> result)
-        {
-            result.Validate(authentication);
-        }
-
         #region ITypeCollection
 
         bool ITypeCollection.Contains(string typeName)
         {
-            this.Dispatcher?.VerifyAccess();
             return this.Contains(typeName);
         }
 
-        IType ITypeCollection.this[string typeName]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this[typeName];
-            }
-        }
+        IType ITypeCollection.this[string typeName] => this[typeName];
 
         #endregion
 

@@ -79,22 +79,22 @@ namespace Ntreev.Crema.WindowsServiceHost
                     {
                         BasePath = this.cremaService.BasePath,
                         Port = this.cremaService.Port,
-                        RepositoryModule = this.cremaService.RepositoryModule,
-                        RepositoryName = this.cremaService.RepositoryName,
+                        //RepositoryModule = this.cremaService.RepositoryModule,
+                        //RepositoryName = this.cremaService.RepositoryName,
                     };
                     var parser = new CommandLineParser("setting", settings);
                     parser.Parse(string.Join(" ", "setting", string.Join(" ", args)));
 
                     this.cremaService.BasePath = settings.BasePath;
                     this.cremaService.Port = settings.Port;
-                    this.cremaService.RepositoryModule = settings.RepositoryModule;
-                    this.cremaService.RepositoryName = settings.RepositoryName;
+                    //this.cremaService.RepositoryModule = settings.RepositoryModule;
+                    //this.cremaService.RepositoryName = settings.RepositoryName;
 
                     CremaLog.Debug("=========================================================");
                     CremaLog.Debug("new settings");
                     CremaLog.Debug("service base path : {0}", settings.BasePath);
                     CremaLog.Debug("service port : {0}", settings.Port);
-                    CremaLog.Debug("service repo name : {0}", settings.RepositoryName);
+                    //CremaLog.Debug("service repo name : {0}", settings.RepositoryName);
                     CremaLog.Debug("service repo module : {0}", settings.RepositoryModule);
                     CremaLog.Debug("=========================================================");
                 }
@@ -106,8 +106,8 @@ namespace Ntreev.Crema.WindowsServiceHost
             }
 
             CremaLog.Debug("service open");
-            this.cremaService.Open();
-            this.cremaHost = this.cremaService.CremaHost;
+            this.cremaService.OpenAsync().Wait();
+            this.cremaHost = this.cremaService.GetService(typeof(ICremaHost)) as ICremaHost;
             this.cremaHost.Closed += CremaHost_Closed;
             CremaLog.Debug("service opened.");
         }
@@ -116,7 +116,7 @@ namespace Ntreev.Crema.WindowsServiceHost
         {
             base.OnStop();
             CremaLog.Debug("service close");
-            this.cremaService.Close();
+            this.cremaService.CloseAsync();
             CremaLog.Debug("service closed.");
         }
 

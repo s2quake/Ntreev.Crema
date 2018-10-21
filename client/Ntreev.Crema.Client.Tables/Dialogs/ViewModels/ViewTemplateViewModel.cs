@@ -53,7 +53,7 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
             this.tags = this.template.Tags;
         }
 
-        public static Task<ViewTemplateViewModel> CreateInstanceAsync(Authentication authentication, ITableDescriptor descriptor)
+        public static async Task<ViewTemplateViewModel> CreateInstanceAsync(Authentication authentication, ITableDescriptor descriptor)
         {
             if (authentication == null)
                 throw new ArgumentNullException(nameof(authentication));
@@ -62,13 +62,10 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 
             if (descriptor.Target is ITable table)
             {
-                return table.Dispatcher.InvokeAsync(() =>
-                {
-                    var dataSet = table.GetDataSet(authentication, -1);
-                    var dataTable = dataSet.Tables[table.Name];
-                    var template = new CremaTemplate(dataTable);
-                    return new ViewTemplateViewModel(authentication, template);
-                });
+                var dataSet = await table.GetDataSetAsync(authentication, null);
+                var dataTable = dataSet.Tables[table.Name];
+                var template = new CremaTemplate(dataTable);
+                return new ViewTemplateViewModel(authentication, template);
             }
             else
             {

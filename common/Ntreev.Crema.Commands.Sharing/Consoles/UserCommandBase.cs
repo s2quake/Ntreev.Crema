@@ -33,8 +33,13 @@ using YamlDotNet.Serialization;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
-    abstract class UserCommandBase : ConsoleCommandBase
+    abstract class UserCommandBase : ConsoleCommandAsyncBase
     {
+        protected UserCommandBase()
+        {
+
+        }
+
         protected UserCommandBase(string name)
             : base(name)
         {
@@ -58,11 +63,11 @@ namespace Ntreev.Crema.Commands.Consoles
             return this.CommandContext.GetAbsolutePath(path);
         }
 
-        protected IUser GetUser(Authentication authentication, string userID)
+        protected Task<IUser> GetUserAsync(Authentication authentication, string userID)
         {
             if (this.CommandContext.Drive is UsersConsoleDrive drive)
             {
-                return drive.GetUser(userID);
+                return drive.GetUserAsync(userID);
             }
             throw new NotImplementedException();
         }
@@ -76,11 +81,11 @@ namespace Ntreev.Crema.Commands.Consoles
             throw new NotImplementedException();
         }
 
-        protected IUserItem GetObject(Authentication authentication, string path)
+        protected async Task<IUserItem> GetObjectAsync(Authentication authentication, string path)
         {
             if (this.CommandContext.Drive is UsersConsoleDrive drive)
             {
-                if (drive.GetObject(authentication, path) is IUserItem userItem)
+                if (await drive.GetObjectAsync(authentication, path) is IUserItem userItem)
                 {
                     return userItem;
                 }

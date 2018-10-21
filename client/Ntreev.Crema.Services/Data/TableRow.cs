@@ -15,115 +15,73 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services.Domains;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Ntreev.Crema.ServiceModel;
 using Ntreev.Library;
+using System;
+using System.Data;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
     class TableRow : DomainBasedRow, ITableRow
     {
-        private readonly TableContentBase content;
-
-        public TableRow(TableContentBase content, DataRow row)
+        public TableRow(TableContent content, DataRow row)
             : base(content.Domain, row)
         {
-            this.content = content;
+            this.Content = content;
         }
 
-        public TableRow(TableContentBase content, DataTable table)
+        public TableRow(TableContent content, DataTable table)
             : base(content.Domain, table)
         {
-            this.content = content;
+            this.Content = content;
         }
 
-        public TableRow(TableContentBase content, DataTable table, string parentID)
+        public TableRow(TableContent content, DataTable table, string parentID)
             : base(content.Domain, table, parentID)
         {
-            this.content = content;
+            this.Content = content;
         }
 
-        public void SetIsEnabled(Authentication authentication, bool value)
+        public Task SetIsEnabledAsync(Authentication authentication, bool value)
         {
-            this.SetField(authentication, CremaSchema.Enable, value);
+            return this.SetFieldAsync(authentication, CremaSchema.Enable, value);
         }
 
-        public void SetTags(Authentication authentication, TagInfo value)
+        public Task SetTagsAsync(Authentication authentication, TagInfo value)
         {
-            this.SetField(authentication, CremaSchema.Tags, value.ToString());
+            return this.SetFieldAsync(authentication, CremaSchema.Tags, value.ToString());
         }
 
-        public void SetField(Authentication authentication, string columnName, object value)
+        public Task SetFieldAsync(Authentication authentication, string columnName, object value)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            base.SetField(authentication, columnName, value);
+            return base.SetFieldAsync(authentication, columnName, value);
         }
 
-        public object this[string columnName]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.GetField<object>(columnName);
-            }
-        }
+        public object this[string columnName] => base.GetField<object>(columnName);
 
-        public TagInfo Tags
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return (TagInfo)(this.GetField<string>(CremaSchema.Tags));
-            }
-        }
+        public TagInfo Tags => (TagInfo)(this.GetField<string>(CremaSchema.Tags));
 
-        public bool IsEnabled
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<bool>(CremaSchema.Enable);
-            }
-        }
+        public bool IsEnabled => this.GetField<bool>(CremaSchema.Enable);
 
-        public TableContentBase Content
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.content;
-            }
-        }
+        public TableContent Content { get; }
 
-        public override DataBase DataBase
-        {
-            get { return this.content.DataBase; }
-        }
+        public override DataBase DataBase => this.Content.DataBase;
 
-        public override CremaDispatcher Dispatcher
-        {
-            get { return this.content.Dispatcher; }
-        }
+        public override CremaDispatcher Dispatcher => this.Content.Dispatcher;
+
+        public override CremaHost CremaHost => this.Content.CremaHost;
 
         public string RelationID
         {
             get
             {
-                this.Dispatcher?.VerifyAccess();
                 var dataRow = this.Row;
                 var table = dataRow.Table;
-
                 if (table.Columns.Contains(CremaSchema.__RelationID__) == false)
                     return string.Empty;
-
                 return dataRow.Field<string>(CremaSchema.__RelationID__);
             }
         }
@@ -132,23 +90,17 @@ namespace Ntreev.Crema.Services.Data
         {
             get
             {
-                this.Dispatcher?.VerifyAccess();
                 var dataRow = this.Row;
                 var table = dataRow.Table;
-
                 if (table.Columns.Contains(CremaSchema.__ParentID__) == false)
                     return string.Empty;
-
                 return dataRow.Field<string>(CremaSchema.__ParentID__);
             }
         }
 
         #region ITableRow
 
-        ITableContent ITableRow.Content
-        {
-            get { return this.Content as ITableContent; }
-        }
+        ITableContent ITableRow.Content => this.Content as ITableContent;
 
         #endregion
     }

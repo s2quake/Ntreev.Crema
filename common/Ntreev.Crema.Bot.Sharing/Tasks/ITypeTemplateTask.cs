@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Bot.Tasks
 {
@@ -34,70 +35,77 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     class ITypeTemplateTask : ITaskProvider
     {
-        public void InvokeTask(TaskContext context)
+        public async Task InvokeAsync(TaskContext context)
         {
+            var authentication = context.Authentication;
             var template = context.Target as ITypeTemplate;
-            template.Dispatcher.Invoke(() =>
+            if (context.IsCompleted(template) == true)
             {
-                if (context.IsCompleted(template) == true)
+                try
                 {
-                    try
+                    var domain = template.Domain;
+                    if (domain != null && await domain.Users.ContainsAsync(authentication.ID) == true)
                     {
-                        if (template.Domain != null)
-                        {
-                            if (Verify() == true)
-                                template.EndEdit(context.Authentication);
-                            else
-                                template.CancelEdit(context.Authentication);
-                        }
+                        if (await template.Dispatcher.InvokeAsync(() => template.Any()))
+                            await template.EndEditAsync(authentication);
+                        else
+                            await template.CancelEditAsync(authentication);
                     }
-                    catch
-                    {
-                        template.CancelEdit(context.Authentication);
-                    }
-
+                }
+                catch
+                {
+                    await template.CancelEditAsync(authentication);
+                }
+                finally
+                {
                     context.Pop(template);
                     context.Complete(context.Target);
+                }
+            }
+            else
+            {
+                if (await template.Dispatcher.InvokeAsync(() => template.VerifyAccessType(authentication, AccessType.Developer)) == false)
+                {
+                    context.Pop(template);
+                    return;
+                }
 
-                    bool Verify()
+                var domain = template.Domain;
+                if (domain == null)
+                {
+                    if (context.AllowException == false)
                     {
-                        if (context.AllowException == true)
-                            return true;
-                        if (template.Count == 0)
-                            return false;
-                        return true;
+                        if ((await this.GetTablesAsync(template, item => item.TableState != TableState.None)).Any() == true)
+                        {
+                            context.Pop(template);
+                            return;
+                        }
                     }
+                    await template.BeginEditAsync(authentication);
+                    domain = template.Domain;
+                }
+
+                if (await domain.Users.ContainsAsync(authentication.ID) == false)
+                {
+                    context.Pop(template);
+                    return;
+                }
+
+
+                if (template.IsNew == true ||
+                    await template.Dispatcher.InvokeAsync(() => template.Any()) == false ||
+                    RandomUtility.Within(25) == true)
+                {
+                    var member = await template.AddNewAsync(authentication);
+                    context.Push(member);
+                    context.State = System.Data.DataRowState.Detached;
                 }
                 else
                 {
-                    if (template.Domain == null)
-                    {
-                        if (Verify() == false)
-                            return;
-                        template.BeginEdit(context.Authentication);
-                    }
-                    if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
-                    {
-                        var member = template.AddNew(context.Authentication);
-                        context.Push(member);
-                        context.State = System.Data.DataRowState.Detached;
-                    }
-                    else
-                    {
-                        var member = template.Random();
-                        context.Push(member);
-                    }
-
-                    bool Verify()
-                    {
-                        if (context.AllowException == true)
-                            return true;
-                        if (this.CanEdit(template) == false)
-                            return false;
-                        return true;
-                    }
+                    var member = template.Random();
+                    context.Push(member);
                 }
-            });
+            }
         }
 
         public Type TargetType
@@ -105,39 +113,28 @@ namespace Ntreev.Crema.Bot.Tasks
             get { return typeof(ITypeTemplate); }
         }
 
-        public bool IsEnabled
+        [TaskMethod(Weight = 10)]
+        public async Task SetTypeNameAsync(ITypeTemplate template, TaskContext context)
         {
-            get { return false; }
+            var authentication = context.Authentication;
+            var tableName = RandomUtility.NextIdentifier();
+            await template.SetTypeNameAsync(authentication, tableName);
         }
 
         [TaskMethod(Weight = 10)]
-        public void SetTypeName(ITypeTemplate template, TaskContext context)
+        public async Task SetIsFlagAsync(ITypeTemplate template, TaskContext context)
         {
-            template.Dispatcher.Invoke(() =>
-            {
-                var tableName = RandomUtility.NextIdentifier();
-                template.SetTypeName(context.Authentication, tableName);
-            });
+            var authentication = context.Authentication;
+            var isFlag = RandomUtility.NextBoolean();
+            await template.SetIsFlagAsync(authentication, isFlag);
         }
 
         [TaskMethod(Weight = 10)]
-        public void SetIsFlag(ITypeTemplate template, TaskContext context)
+        public async Task SetCommentAsync(ITypeTemplate template, TaskContext context)
         {
-            template.Dispatcher.Invoke(() =>
-            {
-                var isFlag = RandomUtility.NextBoolean();
-                template.SetIsFlag(context.Authentication, isFlag);
-            });
-        }
-
-        [TaskMethod(Weight = 10)]
-        public void SetComment(ITypeTemplate template, TaskContext context)
-        {
-            template.Dispatcher.Invoke(() =>
-            {
-                var comment = RandomUtility.NextString();
-                template.SetComment(context.Authentication, comment);
-            });
+            var authentication = context.Authentication;
+            var comment = RandomUtility.NextString();
+            await template.SetCommentAsync(authentication, comment);
         }
 
         private bool CanEdit(ITypeTemplate template)
@@ -153,9 +150,24 @@ namespace Ntreev.Crema.Bot.Tasks
 
             if (query.Any() == true)
                 return false;
-
-
             return true;
+        }
+
+        private Task<ITable[]> GetTablesAsync(ITypeTemplate template, Func<ITable, bool> predicate)
+        {
+            return template.Dispatcher.InvokeAsync(()=>
+            {
+                var type = template.Type;
+                var typePath = type.Path;
+                var tables = type.GetService(typeof(ITableCollection)) as ITableCollection;
+
+                var query = from item in tables
+                            from columnInfo in item.TableInfo.Columns
+                            where columnInfo.DataType == typePath
+                            select item;
+
+                return query.Distinct().Where(predicate).ToArray();
+            });
         }
     }
 }

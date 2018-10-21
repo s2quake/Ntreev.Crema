@@ -24,11 +24,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
-using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Ntreev.Crema.Data
 {
@@ -40,12 +37,8 @@ namespace Ntreev.Crema.Data
         internal readonly InternalAttribute attributeCreatedDateTime;
         internal readonly InternalAttribute attributeModifier;
         internal readonly InternalAttribute attributeModifiedDateTime;
-        private object target;
         private string categoryPath;
-
-        private readonly Stack<DataRow> rowEventStack = new Stack<DataRow>();
         private readonly FieldStack<bool> omitSignatureDate = new FieldStack<bool>();
-        private bool isReadOnly;
         private bool isDiffMode;
         private bool isLoading;
 
@@ -55,24 +48,17 @@ namespace Ntreev.Crema.Data
         private InternalTableBase templatedParent;
         private readonly ObservableCollection<InternalTableBase> childItems = new ObservableCollection<InternalTableBase>();
         private readonly ObservableCollection<InternalTableBase> derivedItems = new ObservableCollection<InternalTableBase>();
-        private readonly ReadOnlyObservableCollection<InternalTableBase> childItems2;
-        private readonly ReadOnlyObservableCollection<InternalTableBase> derivedItems2;
         private readonly List<InternalAttribute> attributeList = new List<InternalAttribute>();
-        private InternalRelation columnRelation;
-        private InternalRelation parentRelation;
-
         private SignatureDateProvider signatureDateProvider;
-        private SignatureDate signatureDate;
-
-        private FieldStack<bool> acceptChangesStack = new FieldStack<bool>();
+        private readonly FieldStack<bool> acceptChangesStack = new FieldStack<bool>();
 
         protected InternalTableBase(string name, string categoryPath)
             : base(name)
         {
             Validate();
             this.CaseSensitive = true;
-            this.childItems2 = new ReadOnlyObservableCollection<InternalTableBase>(this.childItems);
-            this.derivedItems2 = new ReadOnlyObservableCollection<InternalTableBase>(this.derivedItems);
+            this.ChildItems = new ReadOnlyObservableCollection<InternalTableBase>(this.childItems);
+            this.DerivedItems = new ReadOnlyObservableCollection<InternalTableBase>(this.derivedItems);
             this.Columns.CollectionChanged += Columns_CollectionChanged;
 
             this.attributeCreator = new InternalAttribute(CremaSchema.Creator, typeof(string))
@@ -104,6 +90,14 @@ namespace Ntreev.Crema.Data
                 DateTimeMode = DataSetDateTime.Utc,
             };
             this.Columns.Add(this.attributeModifiedDateTime);
+
+            this.ColumnRelation = new InternalRelation(CremaSchema.__RelationID__, typeof(string)) { ReadOnly = true, };
+            this.ColumnRelation.InternalUnique = true;
+            this.ColumnRelation.InternalAllowDBNull = false;
+            this.Columns.Add(this.ColumnRelation);
+
+            this.ParentRelation = new InternalRelation(CremaSchema.__ParentID__, typeof(string));
+            this.Columns.Add(this.ParentRelation);
 
             this.categoryPath = categoryPath;
             this.BuildNamespace();
@@ -146,7 +140,7 @@ namespace Ntreev.Crema.Data
                     if (item.RowState == DataRowState.Deleted || item.RelationID != null)
                         continue;
                     this.RowEventStack.Push(item);
-                    if (this.PrimaryKey.Any() == true || item.RelationID == null)
+                    if (item.RelationID == null)
                         item.RelationID = this.GenerateRelationID(item);
                     this.RowEventStack.Pop();
                 }
@@ -461,11 +455,7 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        public object Target
-        {
-            get { return this.target; }
-            set { this.target = value; }
-        }
+        public object Target { get; set; }
 
         public bool HasChanges
         {
@@ -511,15 +501,11 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        public bool ReadOnly
-        {
-            get { return this.isReadOnly; }
-            set { this.isReadOnly = value; }
-        }
+        public bool ReadOnly { get; set; }
 
         public bool IsDiffMode
         {
-            get { return this.isDiffMode; }
+            get => this.isDiffMode;
             set
             {
                 if (this.isDiffMode == value)
@@ -539,7 +525,7 @@ namespace Ntreev.Crema.Data
 
         public InternalTableBase Parent
         {
-            get { return this.InternalParent; }
+            get => this.InternalParent;
             set
             {
                 if (this.InternalParent == value)
@@ -551,20 +537,23 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        public string ParentName
+        public string ParentName => this.parentName ?? string.Empty;
+
+        public string ParentNamespace
         {
-            get { return this.parentName ?? string.Empty; }
+            get
+            {
+                if (this.ParentName == string.Empty)
+                    return string.Empty;
+                var namePattern = this.Name.Replace(".", "[.]");
+                var parentNamespace = Regex.Replace(this.Namespace, $"(.+){namePattern}$", $"$1{this.ParentName}");
+                return parentNamespace;
+            }
         }
 
-        public IList<InternalAttribute> AttributeList
-        {
-            get { return this.attributeList; }
-        }
+        public IList<InternalAttribute> AttributeList => this.attributeList;
 
-        public ReadOnlyObservableCollection<InternalTableBase> ChildItems
-        {
-            get { return this.childItems2; }
-        }
+        public ReadOnlyObservableCollection<InternalTableBase> ChildItems { get; }
 
         public IEnumerable<InternalTableBase> FamilyItems
         {
@@ -580,29 +569,14 @@ namespace Ntreev.Crema.Data
 
         public InternalTableBase TemplatedParent
         {
-            get { return this.InternalTemplatedParent; }
-            set
-            {
-                this.InternalTemplatedParent = value;
-
-                foreach (var item in this.ChildItems)
-                {
-                    item.InternalTemplatedParent = value?.GetChild(item.LocalName);
-                }
-            }
+            get => this.InternalTemplatedParent;
+            set => this.InternalTemplatedParent = value;
         }
 
         public string TemplateNamespace
         {
-            get { return this.templateNamespace ?? string.Empty; }
-            set
-            {
-                this.templateNamespace = value;
-                foreach (var item in this.ChildItems)
-                {
-                    item.templateNamespace = templateNamespace + "." + item.LocalName;
-                }
-            }
+            get => this.templateNamespace ?? string.Empty;
+            set => this.templateNamespace = value;
         }
 
         public string TemplatedParentName
@@ -616,10 +590,7 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        public ReadOnlyObservableCollection<InternalTableBase> DerivedItems
-        {
-            get { return this.derivedItems2; }
-        }
+        public ReadOnlyObservableCollection<InternalTableBase> DerivedItems { get; }
 
         public IEnumerable<InternalTableBase> SiblingItems
         {
@@ -635,7 +606,7 @@ namespace Ntreev.Crema.Data
 
         public string CategoryPath
         {
-            get { return this.InternalCategoryPath ?? PathUtility.Separator; }
+            get => this.InternalCategoryPath ?? PathUtility.Separator;
             set
             {
                 if (this.InternalCategoryPath == value)
@@ -650,16 +621,10 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        public string Name
-        {
-            get { return base.TableName; }
-        }
+        public string Name => base.TableName;
 
         [Obsolete]
-        public new string TableName
-        {
-            get { return base.TableName; }
-        }
+        public new string TableName => base.TableName;
 
         public string LocalName
         {
@@ -672,27 +637,34 @@ namespace Ntreev.Crema.Data
             {
                 this.ValidateSetLocalName(value);
                 var childs = this.childItems.ToArray();
-                var derivedTable = this.parent != null ? this.derivedItems.ToArray() : new InternalTableBase[] { };
-                if (this.parent != null)
-                    this.InternalName = this.parent.Name + "." + value;
+                var derivedTables = this.derivedItems.ToArray();
+                if (this.ParentName != string.Empty)
+                    this.InternalName = this.ParentName + "." + value;
                 else
                     this.InternalName = value;
 
                 foreach (var item in childs)
                 {
-                    item.InternalName = base.TableName + "." + item.LocalName;
+                    item.InternalName = this.Name + "." + item.LocalName;
                 }
 
-                foreach (var item in derivedTable)
+                foreach (var item in derivedTables)
                 {
-                    item.InternalName = item.Parent.Name + "." + value;
+                    if (item.ParentName != string.Empty)
+                    {
+                        item.InternalName = item.ParentName + "." + value;
+                        foreach (var i in item.childItems.ToArray())
+                        {
+                            i.InternalName = item.Name + "." + i.LocalName;
+                        }
+                    }
                 }
             }
         }
 
         public string InternalName
         {
-            get { return base.TableName; }
+            get => base.TableName;
             set
             {
                 base.TableName = value;
@@ -707,28 +679,20 @@ namespace Ntreev.Crema.Data
                 }
 
                 this.BuildNamespace();
+                this.InvokePropertyChangedEvent(nameof(this.Name));
                 this.InvokePropertyChangedEvent(nameof(this.LocalName));
             }
         }
 
-        public InternalRelation ColumnRelation
-        {
-            get { return this.columnRelation; }
-        }
+        public InternalRelation ColumnRelation { get; private set; }
 
-        public InternalRelation ParentRelation
-        {
-            get { return this.parentRelation; }
-        }
+        public InternalRelation ParentRelation { get; private set; }
 
-        public new InternalSetBase DataSet
-        {
-            get { return base.DataSet as InternalSetBase; }
-        }
+        public new InternalSetBase DataSet => base.DataSet as InternalSetBase;
 
         public string InternalCategoryPath
         {
-            get { return this.categoryPath; }
+            get => this.categoryPath;
             set
             {
                 this.categoryPath = value;
@@ -738,7 +702,7 @@ namespace Ntreev.Crema.Data
 
         public InternalTableBase InternalTemplatedParent
         {
-            get { return this.templatedParent; }
+            get => this.templatedParent;
             set
             {
                 if (this.templatedParent != null)
@@ -764,19 +728,13 @@ namespace Ntreev.Crema.Data
 
         public InternalTableBase InternalParent
         {
-            get { return this.parent; }
+            get => this.parent;
             set
             {
                 if (this.parent != null)
                 {
                     this.parent.RemoveChild(this);
                     this.InternalName = this.LocalName;
-                    if (this.parentRelation != null)
-                    {
-                        this.Columns.Remove(this.parentRelation);
-                        this.parentRelation = null;
-                    }
-
                     if (this.parent.TemplatedParent != null)
                         this.InternalTemplatedParent = null;
                 }
@@ -788,10 +746,10 @@ namespace Ntreev.Crema.Data
                     this.parent.AddChild(this);
                     this.InternalName = $"{this.parent.Name}.{this.LocalName}";
 
-                    if (this.parentRelation == null)
+                    var relationName = InternalSetBase.GenerateRelationName(this);
+                    if (this.DataSet?.Relations.Contains(relationName) == false)
                     {
-                        this.parentRelation = new InternalRelation(CremaSchema.__ParentID__, typeof(string));
-                        this.Columns.Add(this.parentRelation);
+                        InternalSetBase.AddRelation(this.DataSet, this.parent, this);
                     }
 
                     if (this.parent.TemplatedParent != null)
@@ -800,28 +758,14 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        public SignatureDate SignatureDate
-        {
-            get { return this.signatureDate; }
-        }
+        public SignatureDate SignatureDate { get; private set; }
 
-        public object Editor
-        {
-            get; set;
-        }
+        public object Editor { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void AddChild(InternalTableBase child)
         {
-            if (this.childItems.Any() == false)
-            {
-                this.columnRelation = new InternalRelation(CremaSchema.__RelationID__, typeof(string)) { ReadOnly = true, };
-                this.Columns.Add(this.columnRelation);
-                this.RefreshRelationID();
-                this.columnRelation.InternalUnique = true;
-                this.columnRelation.InternalAllowDBNull = false;
-            }
             this.childItems.Add(child);
         }
 
@@ -835,8 +779,6 @@ namespace Ntreev.Crema.Data
                 {
                     this.Constraints.Remove(constraint);
                 }
-                this.Columns.Remove(this.columnRelation);
-                this.columnRelation = null;
             }
 
             Constraint FindConstraint()
@@ -847,7 +789,7 @@ namespace Ntreev.Crema.Data
                     {
                         for (var i = 0; i < uniqueConstraint.Columns.Length; i++)
                         {
-                            if (uniqueConstraint.Columns[i] == this.columnRelation)
+                            if (uniqueConstraint.Columns[i] == this.ColumnRelation)
                             {
                                 return uniqueConstraint;
                             }
@@ -864,7 +806,7 @@ namespace Ntreev.Crema.Data
             var signatureDate = this.SignatureDateProvider.Provide();
             foreach (var item in this.SiblingItems.ToArray())
             {
-                item.signatureDate = signatureDate;
+                item.SignatureDate = signatureDate;
             }
             return signatureDate;
         }
@@ -915,30 +857,6 @@ namespace Ntreev.Crema.Data
                                 {
                                     row.ModificationInfo = this.Sign();
                                 }
-
-                                //if (this.Parent == null && this.ColumnRelation != null)
-                                //{
-                                //    if (this.IsLoading == true && row.HasVersion(DataRowVersion.Original) == true)
-                                //    {
-                                //        var relations = this.GetChildRelations().ToArray();
-                                //        var oldRelationID = row.Field<string>(this.ColumnRelation, DataRowVersion.Original);
-                                //        var newRelationID = this.GenerateRelationID(row);
-                                //        var query = from item in relations
-                                //                    from InternalDataRow childRow in item.ChildTable.Rows
-                                //                    where childRow.RelationID == oldRelationID
-                                //                    select childRow as InternalDataRow;
-                                //        foreach (var item in query)
-                                //        {
-                                //            item.RelationID = newRelationID;
-                                //        }
-                                //        row.RelationID = newRelationID;
-                                //    }
-                                //    else
-                                //    {
-                                //        if (this.PrimaryKey.Any() == true || row.RelationID == null)
-                                //            row.RelationID = this.GenerateRelationID(row);
-                                //    }
-                                //}
                             }
                             break;
                     }
@@ -969,33 +887,16 @@ namespace Ntreev.Crema.Data
 
         protected override void OnColumnChanging(DataColumnChangeEventArgs e)
         {
-            if (this.isReadOnly == true)
+            if (this.ReadOnly == true)
                 throw new ReadOnlyException();
             if (e.Column.DataType == typeof(string) && e.ProposedValue is string textValue && textValue == string.Empty)
                 e.ProposedValue = DBNull.Value;
-
-            //if (e.Column == this.columnRelation && e.Row[this.columnRelation] is DBNull == false)
-            //{
-            //    e.ProposedValue = e.Row[this.columnRelation];
-            //}
 
             base.OnColumnChanging(e);
         }
 
         protected override void OnColumnChanged(DataColumnChangeEventArgs e)
         {
-            //if (e.Column is InternalColumnBase column && column.IsKey == true)
-            //{
-            //    var row = e.Row as InternalRowBase;
-            //    if (row.RowState == DataRowState.Detached && this.ColumnRelation != null)
-            //    {
-            //        if (this.IsLoading == false || row.RelationID == null)
-            //        {
-            //            row.RelationID = this.GenerateRelationID(row);
-            //        }
-            //    }
-            //}
-
             base.OnColumnChanged(e);
         }
 
@@ -1148,7 +1049,7 @@ namespace Ntreev.Crema.Data
 
         protected virtual void OnValidateClearAttributes()
         {
-            
+
         }
 
         protected void InvokePropertyChangedEvent(string propertyName)
@@ -1161,25 +1062,11 @@ namespace Ntreev.Crema.Data
             base.OnPropertyChanging(pcevent);
         }
 
-        protected abstract string BaseNamespace
-        {
-            get;
-        }
+        protected abstract string BaseNamespace { get; }
 
-        protected Stack<DataRow> RowEventStack
-        {
-            get { return this.rowEventStack; }
-        }
+        protected Stack<DataRow> RowEventStack { get; } = new Stack<DataRow>();
 
-        protected IFieldStack<bool> OmitSignatureDateStack
-        {
-            get { return this.omitSignatureDate; }
-        }
-
-        internal IFieldStack<bool> AcceptChangesStack
-        {
-            get { return this.acceptChangesStack; }
-        }
+        protected IFieldStack<bool> OmitSignatureDateStack => this.omitSignatureDate;
 
         private void TemplatedParent_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -1241,8 +1128,7 @@ namespace Ntreev.Crema.Data
 
         private void ValidateSign()
         {
-            //if (this.OmitSignatureDate == true)
-            //    throw new InvalidOperationException();
+
         }
 
         private void SetNormalMode()
@@ -1275,6 +1161,13 @@ namespace Ntreev.Crema.Data
                 }
             }
         }
+
+        internal IFieldStack<bool> AcceptChangesStack
+        {
+            get { return this.acceptChangesStack; }
+        }
+
+        public object Target1 { get => Target; set => Target = value; }
     }
 
     abstract class InternalTableBase<TableBase, RowBase> : InternalTableBase
@@ -1292,20 +1185,17 @@ namespace Ntreev.Crema.Data
             this.attributeIndex = new InternalAttribute(CremaSchema.Index, typeof(int))
             {
                 AllowDBNull = false,
-                DefaultValue = 0,
+                DefaultValue = -1,
                 ColumnMapping = MappingType.Hidden,
             };
             this.Columns.Add(this.attributeIndex);
         }
 
-        public IList<RowBase> RowList
-        {
-            get { return this.rowList; }
-        }
+        public IList<RowBase> RowList => this.rowList;
 
         public new int MinimumCapacity
         {
-            get { return base.MinimumCapacity; }
+            get => base.MinimumCapacity;
             set
             {
                 base.MinimumCapacity = value;
@@ -1323,7 +1213,7 @@ namespace Ntreev.Crema.Data
                 {
                     if (dateTime.Ticks % 10000000 != 0)
                     {
-                        //throw new FormatException("날짜 형식");
+                        // throw new FormatException("날짜 형식");
                     }
                 }
             }
@@ -1389,7 +1279,7 @@ namespace Ntreev.Crema.Data
                         }
                     }
                     this.RowEventStack.Pop();
-                    this.attributeIndex.InternalDefaultValue = this.Rows.Count;
+                    //this.attributeIndex.InternalDefaultValue = this.Rows.Count;
                 }
                 else if (e.Action == DataRowAction.Commit)
                 {
@@ -1415,7 +1305,7 @@ namespace Ntreev.Crema.Data
                     }
 
                     this.rowList.Sort((x, y) => x.Index.CompareTo(y.Index));
-                    this.attributeIndex.InternalDefaultValue = this.rowList.Count;
+                    //this.attributeIndex.InternalDefaultValue = this.rowList.Count;
                 }
             }
             base.OnRowChanged(e);
@@ -1430,14 +1320,14 @@ namespace Ntreev.Crema.Data
                 this.rowList.Remove(rowItem);
             }
             this.UpdateIndex(null);
-            this.attributeIndex.InternalDefaultValue = this.rowList.Count;
+            //this.attributeIndex.InternalDefaultValue = this.rowList.Count;
         }
 
         protected override void OnTableCleared(DataTableClearEventArgs e)
         {
             base.OnTableCleared(e);
             this.rowList.Clear();
-            this.attributeIndex.InternalDefaultValue = (int)0;
+            //this.attributeIndex.InternalDefaultValue = (int)-1;
         }
 
         private void UpdateIndex(DataRow row)
@@ -1488,8 +1378,7 @@ namespace Ntreev.Crema.Data
 
             if (row.RowState == DataRowState.Detached)
             {
-                //if (column == this.attributeIndex)
-                //    throw new ArgumentException();
+
             }
 
             if (row.RowState != DataRowState.Detached && this.RowEventStack.Any() == false && this.updateIndex == false && column == this.attributeIndex && e.ProposedValue is int index)

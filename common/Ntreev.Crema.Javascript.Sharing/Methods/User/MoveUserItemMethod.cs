@@ -40,14 +40,17 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         protected override Delegate CreateDelegate()
         {
-            return new Action<string, string>(this.MoveUserItem);
+            return new Func<string, string, string>(this.MoveUserItem);
         }
 
-        private void MoveUserItem(string userItemPath, string parentPath)
+        [ReturnParameterName("path")]
+        private string MoveUserItem(string userItemPath, string parentPath)
         {
             var userItem = this.GetUserItem(userItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            userItem.Dispatcher.Invoke(() => userItem.Move(authentication, parentPath));
+            var task = userItem.MoveAsync(authentication, parentPath);
+            task.Wait();
+            return userItem.Path;
         }
     }
 }

@@ -28,7 +28,7 @@ namespace Ntreev.Crema.Services
 {
     public static class IDomainExtensions
     {
-        public static object[] NewRow(this IDomain domain, Authentication authentication, string tableName, object[] fields)
+        public static async Task<object[]> NewRowAsync(this IDomain domain, Authentication authentication, string tableName, object[] fields)
         {
             var row = new DomainRowInfo()
             {
@@ -36,10 +36,11 @@ namespace Ntreev.Crema.Services
                 Fields = fields,
             };
 
-            return domain.NewRow(authentication, new DomainRowInfo[] { row }).First().Keys;
+            var result = await domain.NewRowAsync(authentication, new DomainRowInfo[] { row });
+            return result.First().Keys;
         }
 
-        public static void BeginEdit(this IDomain domain, Authentication authentication, object item, string fieldName)
+        public static Task BeginEditAsync(this IDomain domain, Authentication authentication, object item, string fieldName)
         {
             var location = new DomainLocationInfo()
             {
@@ -47,30 +48,30 @@ namespace Ntreev.Crema.Services
                 Keys = CremaDataRowUtility.GetKeys(item),
                 ColumnName = fieldName,
             };
-            domain.BeginUserEdit(authentication, location);
+            return domain.BeginUserEditAsync(authentication, location);
         }
 
-        public static void RemoveRow(this IDomain domain, Authentication authentication, string tableName, object[] keys)
+        public static Task RemoveRowAsync(this IDomain domain, Authentication authentication, string tableName, object[] keys)
         {
             var row = new DomainRowInfo()
             {
                 TableName = tableName,
                 Keys = keys,
             };
-            domain.RemoveRow(authentication, new DomainRowInfo[] { row });
+            return domain.RemoveRowAsync(authentication, new DomainRowInfo[] { row });
         }
 
-        public static void RemoveRow(this IDomain domain, Authentication authentication, object item)
+        public static Task RemoveRowAsync(this IDomain domain, Authentication authentication, object item)
         {
             var row = new DomainRowInfo()
             {
                 TableName = CremaDataRowUtility.GetTableName(item),
                 Keys = CremaDataRowUtility.GetKeys(item),
             };
-            domain.RemoveRow(authentication, new DomainRowInfo[] { row });
+            return domain.RemoveRowAsync(authentication, new DomainRowInfo[] { row });
         }
 
-        public static void RemoveRows(this IDomain domain, Authentication authentication, IEnumerable items)
+        public static Task RemoveRowsAsync(this IDomain domain, Authentication authentication, IEnumerable items)
         {
             var query = from object item in items
                         select new DomainRowInfo()
@@ -79,10 +80,10 @@ namespace Ntreev.Crema.Services
                             Keys = CremaDataRowUtility.GetKeys(item),
                         };
 
-            domain.RemoveRow(authentication, query.ToArray());
+            return domain.RemoveRowAsync(authentication, query.ToArray());
         }
 
-        public static void SetLocation(this IDomain domain, Authentication authentication, object item, string fieldName)
+        public static Task SetLocationAsync(this IDomain domain, Authentication authentication, object item, string fieldName)
         {
             var location = new DomainLocationInfo()
             {
@@ -90,15 +91,15 @@ namespace Ntreev.Crema.Services
                 Keys = CremaDataRowUtility.GetKeys(item),
                 ColumnName = fieldName,
             };
-            domain.SetUserLocation(authentication, location);
+            return domain.SetUserLocationAsync(authentication, location);
         }
 
-        public static void SetLocation(this IDomain domain, Authentication authentication)
+        public static Task SetLocationAsync(this IDomain domain, Authentication authentication)
         {
-            domain.SetUserLocation(authentication, DomainLocationInfo.Empty);
+            return domain.SetUserLocationAsync(authentication, DomainLocationInfo.Empty);
         }
 
-        public static void SetRow(this IDomain domain, Authentication authentication, string tableName, object[] keys, object[] fields)
+        public static Task SetRowAsync(this IDomain domain, Authentication authentication, string tableName, object[] keys, object[] fields)
         {
             var rowValue = new DomainRowInfo()
             {
@@ -106,10 +107,10 @@ namespace Ntreev.Crema.Services
                 Keys = keys,
                 Fields = fields,
             };
-            domain.SetRow(authentication, new DomainRowInfo[] { rowValue });
+            return domain.SetRowAsync(authentication, new DomainRowInfo[] { rowValue });
         }
 
-        public static void SetRow(this IDomain domain, Authentication authentication, object item, string fieldName, object value)
+        public static Task SetRowAsync(this IDomain domain, Authentication authentication, object item, string fieldName, object value)
         {
             var rowValue = new DomainRowInfo()
             {
@@ -117,7 +118,7 @@ namespace Ntreev.Crema.Services
                 Keys = CremaDataRowUtility.GetKeys(item),
                 Fields = CremaDataRowUtility.GetFields(item, fieldName, value),
             };
-            domain.SetRow(authentication, new DomainRowInfo[] { rowValue });
+            return domain.SetRowAsync(authentication, new DomainRowInfo[] { rowValue });
         }
     }
 }

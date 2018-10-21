@@ -50,9 +50,10 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
+        <!--wpftoolkit 버그로 인해 예외가 발생하여 처음에는 Collapsed로 설정-->
         <nmgc:ModernDataGridControl x:Name="gridControl" ReadOnly="True" SelectionMode="Single" SelectionUnit="Row" AutoCreateColumns="False"
                                     BorderThickness="1" BorderBrush="{DynamicResource ItemBorder}"
-                                    ItemsSource="{Binding Items}" 
+                                    ItemsSource="{Binding Items}" Visibility="Collapsed"
                                     SelectedItem="{Binding SelectedItem, Mode=TwoWay}" >
             <nmgc:ModernDataGridControl.Columns>
                 <xcdg:Column Title="{x:Static p:Resources.Label_UserID}" FieldName="UserID" />

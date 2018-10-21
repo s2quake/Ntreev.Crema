@@ -47,16 +47,16 @@ namespace Ntreev.Crema.ServiceHosts.Data
         ResultBase<DataBaseMetaData> GetMetaData();
 
         [OperationContract]
-        ResultBase<CremaDataSet> GetDataSet(long revision);
+        ResultBase<CremaDataSet> GetDataSet(DataSetType dataSetType, string filterExpression, string revision);
+
+        [OperationContract]
+        ResultBase ImportDataSet(CremaDataSet dataSet, string comment);
 
         [OperationContract]
         ResultBase NewTableCategory(string categoryPath);
 
         [OperationContract]
-        ResultBase<CremaDataSet> GetTableItemDataSet(string itemPath, long revision);
-
-        [OperationContract]
-        ResultBase ImportTables(CremaDataSet dataSet, string comment);
+        ResultBase<CremaDataSet> GetTableItemDataSet(string itemPath, string revision);
 
         [OperationContract]
         ResultBase RenameTableItem(string itemPath, string newName);
@@ -89,10 +89,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         ResultBase UnlockTableItem(string itemPath);
 
         [OperationContract]
-        ResultBase SetTableItemProperty(string itemPath, string propertyName, string value);
-
-        [OperationContract]
-        ResultBase<LogInfo[]> GetTableItemLog(string itemPath);
+        ResultBase<LogInfo[]> GetTableItemLog(string itemPath, string revision);
 
         [OperationContract]
         ResultBase<FindResultInfo[]> FindTableItem(string itemPath, string text, FindOptions options);
@@ -124,8 +121,8 @@ namespace Ntreev.Crema.ServiceHosts.Data
         [OperationContract]
         ResultBase<DomainMetaData> BeginNewTable(string itemPath);
 
-        [OperationContract(IsInitiating = true)]
-        ResultBase<TableInfo> EndTableTemplateEdit(Guid domainID);
+        [OperationContract]
+        ResultBase<TableInfo[]> EndTableTemplateEdit(Guid domainID);
 
         [OperationContract]
         ResultBase CancelTableTemplateEdit(Guid domainID);
@@ -134,10 +131,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         ResultBase NewTypeCategory(string categoryPath);
 
         [OperationContract]
-        ResultBase<CremaDataSet> GetTypeItemDataSet(string itemPath, long revision);
-
-        [OperationContract]
-        ResultBase ImportTypes(CremaDataSet dataSet, string comment);
+        ResultBase<CremaDataSet> GetTypeItemDataSet(string itemPath, string revision);
 
         [OperationContract]
         ResultBase RenameTypeItem(string itemPath, string newName);
@@ -158,7 +152,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         ResultBase<DomainMetaData> BeginNewType(string categoryPath);
 
         [OperationContract]
-        ResultBase<TypeInfo> EndTypeTemplateEdit(Guid domainID);
+        ResultBase<TypeInfo[]> EndTypeTemplateEdit(Guid domainID);
 
         [OperationContract]
         ResultBase CancelTypeTemplateEdit(Guid domainID);
@@ -185,10 +179,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         ResultBase UnlockTypeItem(string itemPath);
 
         [OperationContract]
-        ResultBase SetTypeItemProperty(string itemPath, string propertyName, string value);
-
-        [OperationContract]
-        ResultBase<LogInfo[]> GetTypeItemLog(string itemPath);
+        ResultBase<LogInfo[]> GetTypeItemLog(string itemPath, string revision);
 
         [OperationContract]
         ResultBase<FindResultInfo[]> FindTypeItem(string itemPath, string text, FindOptions options);

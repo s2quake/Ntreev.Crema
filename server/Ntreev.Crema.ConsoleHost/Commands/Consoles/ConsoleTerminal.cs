@@ -49,12 +49,12 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
         }
 
 #if DEBUG
-        public void Start(string authentication)
+        public async Task StartAsync(string authentication)
         {
             if (authentication != null)
             { 
                 var ss = StringUtility.Split(authentication, ':');
-                this.commandContext.Login(ss[0], ss[1]);
+                await this.commandContext.LoginAsync(ss[0], ss[1]);
             }
             this.SetPrompt();
             base.Start();

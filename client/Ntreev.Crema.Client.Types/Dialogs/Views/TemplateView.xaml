@@ -76,16 +76,17 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     <EventSetter Event="Unchecked" Handler="CheckBox_Unchecked" />-->
                 </Style>
             </ControlTemplate.Resources>
-            <ncfc:DomainDataGridControl x:Name="PART_DataGridControl" ReadOnly="{TemplateBinding ReadOnly}" 
+            <ncfc:DomainDataGridControl x:Name="PART_DataGridControl" 
                                         Loaded="PART_DataGridControl_Loaded"
                                         Unloaded="PART_DataGridControl_Unloaded"
                                         RowDrop="PART_DataGridControl_RowDrop"
                                         AllowRowDrag="True"
-                                        Domain="{Binding Domain}" 
                                         BorderBrush="{TemplateBinding BorderBrush}"
                                         BorderThickness="{TemplateBinding BorderThickness}"
+                                        Domain="{Binding Domain}" 
+                                        ReadOnly="{TemplateBinding ReadOnly}"
                                         View="{StaticResource CremaTypeControl_View}" >
-                <ncfc:DomainDataGridControl.Columns>
+                <!--<ncfc:DomainDataGridControl.Columns>
                     <xcdg:Column MaxWidth="40" MinWidth="40" xcdg:TableView.CanScrollHorizontally="False" Visible="False"
                                  CellEditor="{StaticResource TagSelector}" FieldName="Tags" 
                                  TitleTemplate="{StaticResource EmptyTitle_DataTemplate}"
@@ -106,16 +107,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     <xcdg:Column FieldName="CreatedDateTime" Title="{x:Static p:Resources.Label_CreatedDateTime}" 
                                  ReadOnly="True" 
                                  CellContentTemplate="{StaticResource DateTime_ContentTemplate}" />
-                </ncfc:DomainDataGridControl.Columns>
+                </ncfc:DomainDataGridControl.Columns>-->
             </ncfc:DomainDataGridControl>
         </ControlTemplate>
 
         <Style TargetType="{x:Type ncpc:CremaDataTypeControl}" BasedOn="{StaticResource {x:Type ncpc:CremaDataTypeControl}}">
-            <Style.Resources>
-                <!--<Style TargetType="{x:Type ncfc:DomainDataRow}" BasedOn="{StaticResource {x:Type nmgc:ModernDataRow}}" >
-                    <Setter Property="xcdg:RowSelector.RowSelectorStyle" Value="{StaticResource Draggable_DataRowSelector_Style}" />
-                </Style>-->
-            </Style.Resources>
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="BorderBrush" Value="{DynamicResource ItemBorder}" />
             <Setter Property="Margin" Value="0 5" />
@@ -206,9 +202,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <TextBox nmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_Comment}" 
                      Style="{StaticResource Comment_TextBox_Style}" LostKeyboardFocus="TextBox_LostKeyboardFocus" />
         </nmfc:PropertyItemsControl>
-
-        <ncpc:CremaDataTypeControl x:Name="typeControl" Grid.Row="1" Source="{Binding Source}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-
+        <ncpc:CremaDataTypeControl x:Name="typeControl" Grid.Row="1" Source="{Binding Source}" />
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button x:Name="Change" DockPanel.Dock="Right" IsDefault="True" Style="{StaticResource Change_Button_Style}" />
             <Border Width="4" />

@@ -20,13 +20,12 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ITypeContext : IEnumerable<ITypeItem>, IServiceProvider
+    public interface ITypeContext : IEnumerable<ITypeItem>, IServiceProvider, IDispatcherObject
     {
-        void Import(Authentication authentication, CremaDataSet dataSet, string comment);
-
         bool Contains(string itemPath);
 
         ITypeCollection Types { get; }

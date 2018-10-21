@@ -93,8 +93,11 @@ namespace Ntreev.Crema.Client.Framework
                 this.isActivated = dataBase.IsLoaded;
                 if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
                 {
-                    dataBase.Loaded += DataBase_Loaded;
-                    dataBase.Unloaded += DataBase_Unloaded;
+                    dataBase.Dispatcher.InvokeAsync(() =>
+                    {
+                        dataBase.Loaded += DataBase_Loaded;
+                        dataBase.Unloaded += DataBase_Unloaded;
+                    });
                 }
             }
         }

@@ -25,29 +25,31 @@ namespace Ntreev.Crema.Services
 {
     public interface IDataBase : IAccessible, IPermission, ILockable, IServiceProvider, IDispatcherObject, IExtendedProperties
     {
-        void Load(Authentication authentication);
+        Task LoadAsync(Authentication authentication);
 
-        void Unload(Authentication authentication);
+        Task UnloadAsync(Authentication authentication);
 
-        void Enter(Authentication authentication);
+        Task EnterAsync(Authentication authentication);
 
-        void Leave(Authentication authentication);
+        Task LeaveAsync(Authentication authentication);
 
-        void Rename(Authentication authentication, string name);
+        Task RenameAsync(Authentication authentication, string name);
 
-        void Delete(Authentication authentication);
+        Task DeleteAsync(Authentication authentication);
 
         bool Contains(Authentication authentication);
 
-        LogInfo[] GetLog(Authentication authentication);
+        Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision);
 
-        void Revert(Authentication authentication, long revision);
+        Task RevertAsync(Authentication authentication, string revision);
 
-        CremaDataSet GetDataSet(Authentication authentication, long revision);
+        Task ImportAsync(Authentication authentication, CremaDataSet dataSet, string comment);
 
-        ITransaction BeginTransaction(Authentication authentication);
+        Task<CremaDataSet> GetDataSetAsync(Authentication authentication, DataSetType dataSetType, string filterExpression, string revision);
 
-        IDataBase Copy(Authentication authentication, string newDataBaseName, string comment, bool force);
+        Task<ITransaction> BeginTransactionAsync(Authentication authentication);
+
+        Task<IDataBase> CopyAsync(Authentication authentication, string newDataBaseName, string comment, bool force);
 
         ITypeContext TypeContext { get; }
 

@@ -29,7 +29,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceDescription("Resources", IsShared = true)]
-    class ExitCommand : ConsoleCommandBase
+    class ExitCommand : ConsoleCommandAsyncBase
     {
         [Import]
         private Lazy<ConsoleTerminal> terminal = null;
@@ -40,9 +40,9 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
 
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
-            this.Terminal.Cancel();
+            await this.Terminal.CancelAsync();
         }
 
         private ConsoleTerminal Terminal => this.terminal.Value;

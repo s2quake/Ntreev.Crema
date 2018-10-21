@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Bot.Tasks
 {
@@ -34,55 +35,73 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     public class ITableTemplateTask : ITaskProvider
     {
-        public void InvokeTask(TaskContext context)
+        public async Task InvokeAsync(TaskContext context)
         {
+            var authentication = context.Authentication;
             var template = context.Target as ITableTemplate;
-            template.Dispatcher.Invoke(() =>
+            if (context.IsCompleted(template) == true)
             {
-                if (context.IsCompleted(template) == true)
+                try
                 {
-                    try
+                    var domain = template.Domain;
+                    if (domain != null && await domain.Users.ContainsAsync(authentication.ID) == true)
                     {
-                        if (Verify() == true)
-                        {
-                            template.EndEdit(context.Authentication);
-                        }
+                        var keys = await template.Dispatcher.InvokeAsync(() => template.PrimaryKey.ToArray());
+                        if (keys.Length > 0)
+                            await template.EndEditAsync(authentication);
+                        else
+                            await template.CancelEditAsync(authentication);
                     }
-                    catch
-                    {
-                        template.CancelEdit(context.Authentication);
-                    }
-
+                }
+                catch
+                {
+                    await template.CancelEditAsync(authentication);
+                }
+                finally
+                {
                     context.Pop(template);
                     context.Complete(context.Target);
                 }
+            }
+            else
+            {
+                if (await template.Dispatcher.InvokeAsync(() => template.VerifyAccessType(authentication, AccessType.Developer)) == false)
+                {
+                    context.Pop(template);
+                    return;
+                }
+
+                if (await template.Dispatcher.InvokeAsync(() => template.Target is ITable table && table.TemplatedParent != null) == true)
+                {
+                    context.Pop(template);
+                    return;
+                }
+
+                if (await template.Dispatcher.InvokeAsync(() => template.Target is ITable table && table.TableState != TableState.None) == true)
+                {
+                    context.Pop(template);
+                    return;
+                }
+
+                var domain = template.Domain;
+                if (domain == null)
+                {
+                    await template.BeginEditAsync(authentication);
+                }
+
+                if (template.IsNew == true ||
+                    await template.Dispatcher.InvokeAsync(() => template.Any()) == false ||
+                    RandomUtility.Within(25) == true)
+                {
+                    var member = await template.AddNewAsync(authentication);
+                    context.Push(member);
+                    context.State = System.Data.DataRowState.Detached;
+                }
                 else
                 {
-                    if (template.Domain == null)
-                        template.BeginEdit(context.Authentication);
-                    if (template.IsNew == true || template.Any() == false || RandomUtility.Within(25) == true)
-                    {
-                        var column = template.AddNew(context.Authentication);
-                        context.Push(column);
-                        context.State = System.Data.DataRowState.Detached;
-                    }
-                    else
-                    {
-                        var member = template.Random();
-                        context.Push(member);
-                    }
+                    var member = template.Random();
+                    context.Push(member);
                 }
-            });
-
-            bool Verify()
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (template.Domain == null)
-                    return false;
-                if (template.Any(item => item.IsKey) == false)
-                    return false;
-                return true;
             }
         }
 
@@ -97,33 +116,27 @@ namespace Ntreev.Crema.Bot.Tasks
         }
 
         [TaskMethod(Weight = 10)]
-        public void SetTableName(ITableTemplate template, TaskContext context)
+        public async Task SetTableNameAsync(ITableTemplate template, TaskContext context)
         {
-            template.Dispatcher.Invoke(() =>
-            {
-                var tableName = RandomUtility.NextIdentifier();
-                template.SetTableName(context.Authentication, tableName);
-            });
+            var authentication = context.Authentication;
+            var tableName = RandomUtility.NextIdentifier();
+            await template.SetTableNameAsync(authentication, tableName);
         }
 
         [TaskMethod(Weight = 10)]
-        public void SetTags(ITableTemplate template, TaskContext context)
+        public async Task SetTagsAsync(ITableTemplate template, TaskContext context)
         {
-            template.Dispatcher.Invoke(() =>
-            {
-                var tags = (TagInfo)TagInfoUtility.Names.Random();
-                template.SetTags(context.Authentication, tags);
-            });
+            var authentication = context.Authentication;
+            var tags = (TagInfo)TagInfoUtility.Names.Random();
+            await template.SetTagsAsync(authentication, tags);
         }
 
         [TaskMethod(Weight = 10)]
-        public void SetComment(ITableTemplate template, TaskContext context)
+        public async Task SetCommentAsync(ITableTemplate template, TaskContext context)
         {
-            template.Dispatcher.Invoke(() =>
-            {
-                var comment = RandomUtility.NextString();
-                template.SetComment(context.Authentication, comment);
-            });
+            var authentication = context.Authentication;
+            var comment = RandomUtility.NextString();
+            await template.SetCommentAsync(authentication, comment);
         }
     }
 }

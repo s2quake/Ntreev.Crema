@@ -27,6 +27,7 @@ using log4net.Layout;
 using log4net.Appender;
 using System.IO;
 using log4net.Core;
+using Ntreev.Crema.ServiceModel;
 
 namespace Ntreev.Crema.Services
 {
@@ -34,7 +35,7 @@ namespace Ntreev.Crema.Services
     {
         private const string conversionPattern = "%message%newline%exception";
         private readonly ILog log;
-        private LogVerbose verbose = LogVerbose.Info;
+        private LogVerbose verbose = LogVerbose.Info | LogVerbose.Error | LogVerbose.Warn | LogVerbose.Fatal;
         private ConsoleAppender consoleAppender;
         private RollingFileAppender rollingAppender;
         private Hierarchy hierarchy;
@@ -84,11 +85,7 @@ namespace Ntreev.Crema.Services
             {
                 Layout = patternLayout
             };
-            this.consoleAppender.AddFilter(new log4net.Filter.LevelRangeFilter()
-            {
-                LevelMin = GetLevel(this.verbose),
-                LevelMax = Level.Fatal,
-            });
+            this.consoleAppender.SetVerbose(this.verbose);
             this.consoleAppender.ActivateOptions();
 
             this.hierarchy.Root.AddAppender(this.consoleAppender);
@@ -100,9 +97,10 @@ namespace Ntreev.Crema.Services
 
             this.log = log4net.LogManager.GetLogger(repositoryName, name);
             this.name = name;
+            this.Dispatcher = new CremaDispatcher(this);
         }
 
-        public LogService(string name, string path)
+        public LogService(string name, string path, bool isSingle)
         {
             this.hierarchy = (Hierarchy)LogManager.GetRepository();
 
@@ -115,15 +113,17 @@ namespace Ntreev.Crema.Services
             this.rollingAppender = new RollingFileAppender()
             {
                 AppendToFile = true,
-                File = Path.Combine(path, $"logs", "log"),
-                DatePattern = "_yyyy-MM-dd'.xml'",
+                File = Path.Combine(path, name),
+                DatePattern= "-yyyy-MM-dd'.log'",
                 Layout = xmlLayout,
                 Encoding = Encoding.UTF8,
                 MaxSizeRollBackups = 5,
                 MaximumFileSize = "1GB",
-                RollingStyle = RollingFileAppender.RollingMode.Date,
                 StaticLogFileName = false
             };
+
+            this.rollingAppender.File = isSingle == true ? Path.Combine(path, $"{name}-{DateTime.Now:yyyy-MM-d--HH-mm-ss}.log") : Path.Combine(path, name);
+            this.rollingAppender.RollingStyle = isSingle == true ? RollingFileAppender.RollingMode.Once : RollingFileAppender.RollingMode.Date;
             this.rollingAppender.ActivateOptions();
 
             var patternLayout = new PatternLayout()
@@ -136,11 +136,7 @@ namespace Ntreev.Crema.Services
             {
                 Layout = patternLayout
             };
-            this.consoleAppender.AddFilter(new log4net.Filter.LevelRangeFilter()
-            {
-                LevelMin = GetLevel(this.verbose),
-                LevelMax = Level.Fatal,
-            });
+            this.consoleAppender.SetVerbose(this.verbose);
             this.consoleAppender.ActivateOptions();
 
             this.hierarchy.Root.AddAppender(this.consoleAppender);
@@ -151,6 +147,7 @@ namespace Ntreev.Crema.Services
 
             this.log = log4net.LogManager.GetLogger(name);
             this.name = name;
+            this.Dispatcher = new CremaDispatcher(this);
         }
 
         public LogService(string repositoryName, string name, string path)
@@ -196,11 +193,7 @@ namespace Ntreev.Crema.Services
             {
                 Layout = patternLayout
             };
-            this.consoleAppender.AddFilter(new log4net.Filter.LevelRangeFilter()
-            {
-                LevelMin = GetLevel(this.verbose),
-                LevelMax = Level.Fatal,
-            });
+            this.consoleAppender.SetVerbose(this.verbose);
             this.consoleAppender.ActivateOptions();
 
             this.hierarchy.Root.AddAppender(this.consoleAppender);
@@ -211,35 +204,53 @@ namespace Ntreev.Crema.Services
 
             this.log = log4net.LogManager.GetLogger(repositoryName, name);
             this.name = name;
+            this.Dispatcher = new CremaDispatcher(this);
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(LogService)}: {this.name}";
         }
 
         public void Debug(object message)
         {
-            this.log.Debug(message);
+            this.Dispatcher.InvokeAsync(() => this.log.Debug(message));
         }
 
         public void Info(object message)
         {
-            this.log.Info(message);
+            this.Dispatcher.InvokeAsync(() => this.log.Info(message));
         }
 
         public void Error(object message)
         {
-            this.log.Error(message);
+            this.Dispatcher?.InvokeAsync(() =>
+            {
+                if (message is Exception e)
+                {
+                    this.log.Error(e.Message, e);
+                }
+                else
+                {
+                    this.log.Error(message);
+                }
+            });
         }
 
         public void Warn(object message)
         {
-            this.log.Warn(message);
+            this.Dispatcher.InvokeAsync(() => this.log.Warn(message));
         }
 
         public void Fatal(object message)
         {
-            this.log.Fatal(message);
+            this.Dispatcher.InvokeAsync(() => this.log.Fatal(message));
         }
 
         public void Dispose()
         {
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
             this.consoleAppender = null;
             this.redirectionWriter = null;
             this.hierarchy?.Shutdown();
@@ -254,12 +265,7 @@ namespace Ntreev.Crema.Services
                 if (this.verbose == value)
                     return;
                 this.verbose = value;
-                this.consoleAppender.ClearFilters();
-                this.consoleAppender.AddFilter(new log4net.Filter.LevelRangeFilter()
-                {
-                    LevelMin = GetLevel(this.verbose),
-                    LevelMax = Level.Fatal,
-                });
+                this.consoleAppender.SetVerbose(this.verbose);
                 this.consoleAppender.ActivateOptions();
             }
         }
@@ -318,6 +324,35 @@ namespace Ntreev.Crema.Services
             }
         }
 
+        private void InitializeVerbose()
+        {
+
+        }
+
+        private CremaDispatcher Dispatcher { get; set; }
+    }
+
+    static class LogServiceExtensions
+    {
+        public static void SetVerbose(this ConsoleAppender appender, LogVerbose verbose)
+        {
+            appender.ClearFilters();
+            foreach (var item in Enum.GetValues(typeof(LogVerbose)))
+            {
+                var member = (LogVerbose)item;
+                var level = GetLevel(member);
+                if (level == null || verbose.HasFlag(member) == false)
+                    continue;
+
+                appender.AddFilter(new log4net.Filter.LevelMatchFilter()
+                {
+                    AcceptOnMatch = true,
+                    LevelToMatch = level,
+                });
+            }
+            appender.AddFilter(new log4net.Filter.DenyAllFilter());
+        }
+
         private static Level GetLevel(LogVerbose verbose)
         {
             if (verbose == LogVerbose.Debug)
@@ -328,8 +363,9 @@ namespace Ntreev.Crema.Services
                 return Level.Error;
             else if (verbose == LogVerbose.Warn)
                 return Level.Warn;
-            else
+            else if (verbose == LogVerbose.Fatal)
                 return Level.Fatal;
+            return null;
         }
     }
 }

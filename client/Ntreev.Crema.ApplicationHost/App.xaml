@@ -28,7 +28,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 </ResourceDictionary>
                 <ResourceDictionary Source="/Ntreev.ModernUI.Framework;component/Assets/ModernUI.xaml" />
                 <ResourceDictionary Source="/Ntreev.Crema.Presentation;component/Assets/CremaUI.xaml" />
-                <!--<ResourceDictionary Source="/Ntreev.Crema.Presentation;component/Assets/CremaUI.Dark.xaml" />-->
+                <ResourceDictionary Source="/Ntreev.Crema.Presentation;component/Assets/CremaUI.Dark.xaml" />
                 <ResourceDictionary Source="/Ntreev.Crema.Client.Framework;component/Assets/CremaUI.xaml" />
                 <ResourceDictionary Source="/Ntreev.Crema.Client.Framework;component/Assets/CremaUI.Dark.xaml" />
                 <ResourceDictionary Source="/crema;component/Assets/ShellView.xaml" />

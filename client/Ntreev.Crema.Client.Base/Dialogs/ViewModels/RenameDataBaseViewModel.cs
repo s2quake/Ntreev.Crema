@@ -26,6 +26,7 @@ using System.Windows.Threading;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Client.Base.Dialogs.ViewModels
 {
@@ -66,19 +67,14 @@ namespace Ntreev.Crema.Client.Base.Dialogs.ViewModels
 
         protected async override void VerifyRename(string newName, Action<bool> isVerify)
         {
-            var result = await this.dataBase.Dispatcher.InvokeAsync(() =>
-            {
-                var dataBases = this.dataBase.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
-
-                return dataBases.Contains(newName) == false;
-            });
-
+            var dataBases = this.dataBase.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
+            var result = await dataBases.ContainsAsync(newName) == false;
             isVerify(result);
         }
 
         protected override Task RenameAsync(string newName)
         {
-            return this.dataBase.Dispatcher.InvokeAsync(() => this.dataBase.Rename(this.authentication, newName));
+            return this.dataBase.RenameAsync(this.authentication, newName);
         }
 
         protected override void OnDeactivate(bool close)

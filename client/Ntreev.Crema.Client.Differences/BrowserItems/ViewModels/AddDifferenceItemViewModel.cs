@@ -19,6 +19,7 @@ using Ntreev.Crema.Client.Base.Dialogs.ViewModels;
 using Ntreev.Crema.Client.Framework;
 using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
 using Ntreev.Crema.Data.Diff;
+using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
@@ -46,7 +47,7 @@ namespace Ntreev.Crema.Client.Differences.BrowserItems.ViewModels
         [Import]
         private Lazy<BrowserService> browserService = null;
 
-        public void Add()
+        public async Task AddAsync()
         {
             var destDataBaseName = this.SelectDataBase();
             if (destDataBaseName == null)
@@ -54,34 +55,31 @@ namespace Ntreev.Crema.Client.Differences.BrowserItems.ViewModels
 
             var task = new BackgroundTask((p, c) =>
             {
-                p.Report(0, "현재 데이터 베이스 가져오는중");
-                var dataSet1 = this.cremaHost.Dispatcher.Invoke(() =>
-                {
-                    var dataBase = this.cremaHost.DataBases[this.cremaAppHost.DataBaseName];
-                    return dataBase.GetDataSet(this.authenticator, -1);
-                });
-                p.Report(0.33, "대상 데이터 베이스 가져오는중");
-                var dataSet2 = this.cremaHost.Dispatcher.Invoke(() =>
-                {
-                    var dataBase = this.cremaHost.DataBases[destDataBaseName];
-                    if (dataBase.IsLoaded == false)
-                        dataBase.Load(this.authenticator);
-                    dataBase.Enter(this.authenticator);
-                    try
-                    {
-                        return dataBase.GetDataSet(this.authenticator, -1);
-                    }
-                    finally
-                    {
-                        dataBase.Leave(this.authenticator);
-                    }
-                });
-                p.Report(0.66, "비교하는중");
-                return new DiffDataSet(dataSet2, dataSet1, DiffMergeTypes.ReadOnly2)
-                {
-                    Header1 = destDataBaseName,
-                    Header2 = this.cremaAppHost.DataBaseName
-                };
+                //p.Report(0, "현재 데이터 베이스 가져오는중");
+                //var dataBase = this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases[this.cremaAppHost.DataBaseName]);
+                //await dataBase.GetDataSetAsync(this.authenticator, DataSetType.All, null, null);
+                //p.Report(0.33, "대상 데이터 베이스 가져오는중");
+                //var dataSet2 = this.cremaHost.Dispatcher.Invoke(() =>
+                //{
+                //    var dataBase = this.cremaHost.DataBases[destDataBaseName];
+                //    if (dataBase.IsLoaded == false)
+                //        dataBase.Load(this.authenticator);
+                //    dataBase.Enter(this.authenticator);
+                //    try
+                //    {
+                //        return dataBase.GetDataSet(this.authenticator, DataSetType.All, null, null);
+                //    }
+                //    finally
+                //    {
+                //        dataBase.Leave(this.authenticator);
+                //    }
+                //});
+                //p.Report(0.66, "비교하는중");
+                //return new DiffDataSet(dataSet2, dataSet1, DiffMergeTypes.ReadOnly2)
+                //{
+                //    Header1 = destDataBaseName,
+                //    Header2 = this.cremaAppHost.DataBaseName
+                //};
             });
 
             task.ProgressChanged += Task_ProgressChanged;

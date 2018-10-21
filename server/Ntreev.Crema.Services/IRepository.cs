@@ -24,44 +24,36 @@ using Ntreev.Crema.Data;
 
 namespace Ntreev.Crema.Services
 {
-    public interface IRepository
+    public interface IRepository : IDisposable
     {
         void Add(string path);
 
-        void Add(string path, string contents);
-
-        void Modify(string path, string contents);
-
         void Move(string srcPath, string toPath);
 
-        void Delete(params string[] paths);
+        void Delete(string path);
 
         void Copy(string srcPath, string toPath);
 
-        DateTime Commit(string path, string message, IEnumerable<LogPropertyInfo> properties);
+        void Commit(string author, string comment, params LogPropertyInfo[] properties);
 
-        void Revert(string path);
+        void Revert();
 
-        void Revert(string path, long revision);
+        void BeginTransaction(string author, string name);
 
-        void BeginTransaction(string path, string name);
+        void EndTransaction();
 
-        void EndTransaction(string path);
+        void CancelTransaction();
 
-        void CancelTransaction(string path);
+        LogInfo[] GetLog(string[] paths, string revision);
 
-        void GetBranchInfo(string path, out long revision, out string source, out long sourceRevision);
-
-        long GetRevision(string path);
-
-        LogInfo[] GetLog(string path, long revision, int count);
-
-        Uri GetUri(string path, long revision);
-
-        IDictionary<string, string> Status(string path);
+        Uri GetUri(string path, string revision);
 
         string Export(Uri uri, string exportPath);
 
-        long Revision { get; }
+        RepositoryItem[] Status(params string[] paths);
+
+        RepositoryInfo RepositoryInfo { get; }
+
+        string BasePath { get; }
     }
 }

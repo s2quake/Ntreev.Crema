@@ -15,23 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Runtime.Serialization;
-using System.Xml;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
-using System.Xml.Serialization;
-using System.Data;
-using Ntreev.Library;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library.IO;
 using Ntreev.Crema.Data.Xml.Schema;
+using Ntreev.Library;
+using Ntreev.Library.IO;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Ntreev.Crema.Data
 {
@@ -72,36 +63,21 @@ namespace Ntreev.Crema.Data
         [DataMember]
         public string CategoryPath { get; set; }
 
+        public string Path => this.CategoryPath + this.Name;
+
         public string ParentName
         {
-            get
-            {
-                if (this.Name.Contains('.') == true)
-                {
-                    return StringUtility.Split(this.Name, '.').First();
-                }
-                return string.Empty;
-            }
+            get { return CremaDataTable.GetParentName(this.Name); }
         }
 
         public string CategoryName
         {
-            get
-            {
-                return this.CategoryPath.Trim(PathUtility.SeparatorChar);
-            }
+            get { return this.CategoryPath.Trim(PathUtility.SeparatorChar); }
         }
 
         public string TableName
         {
-            get
-            {
-                if (this.Name.Contains('.') == true)
-                {
-                    return StringUtility.Split(this.Name, '.')[1];
-                }
-                return this.Name;
-            }
+            get { return CremaDataTable.GetTableName(this.Name); }
         }
 
         [DataMember]

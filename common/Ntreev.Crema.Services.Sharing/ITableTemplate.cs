@@ -27,31 +27,29 @@ using Ntreev.Library;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ITableTemplate : IEnumerable<ITableColumn>, IDispatcherObject
+    public interface ITableTemplate : IEnumerable<ITableColumn>, IDispatcherObject, IPermission
     {
-        void BeginEdit(Authentication authentication);
+        Task BeginEditAsync(Authentication authentication);
 
-        void EndEdit(Authentication authentication);
+        Task EndEditAsync(Authentication authentication);
 
-        void CancelEdit(Authentication authentication);
+        Task CancelEditAsync(Authentication authentication);
 
-        void SetTableName(Authentication authentication, string value);
+        Task SetTableNameAsync(Authentication authentication, string value);
 
-        void SetTags(Authentication authentication, TagInfo tags);
+        Task SetTagsAsync(Authentication authentication, TagInfo tags);
 
-        void SetComment(Authentication authentication, string value);
+        Task SetCommentAsync(Authentication authentication, string value);
 
-        ITableColumn AddNew(Authentication authentication);
+        Task<ITableColumn> AddNewAsync(Authentication authentication);
 
-        void EndNew(Authentication authentication, ITableColumn column);
+        Task EndNewAsync(Authentication authentication, ITableColumn column);
 
         bool Contains(string columnName);
 
-        IType GetType(string typeName);
-
         IDomain Domain { get; }
 
-        ITable Table { get; }
+        object Target { get; }
 
         int Count { get; }
 
@@ -70,6 +68,8 @@ namespace Ntreev.Crema.Services
         bool IsNew { get; }
 
         bool IsModified { get; }
+
+        //ServiceState ServiceState { get; }
 
         event EventHandler EditBegun;
 

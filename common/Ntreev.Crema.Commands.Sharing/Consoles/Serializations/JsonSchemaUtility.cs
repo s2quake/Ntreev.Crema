@@ -36,12 +36,11 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
 
         static JsonSchemaUtility()
         {
-            
+
         }
 
         public static JSchema CreateSchema(Type type)
         {
-            
             var generator = new JSchemaGenerator();
             var schema = generator.Generate(type);
             return schema;

@@ -47,7 +47,8 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
         {
             var table = this.GetTable(dataBaseName, tableName);
             var authentication = this.Context.GetAuthentication(this);
-            table.Dispatcher.Invoke(() => table.Move(authentication, categoryPath));
+            var task = table.MoveAsync(authentication, categoryPath);
+            task.Wait();
         }
     }
 }

@@ -29,7 +29,7 @@ using System.Security;
 namespace Ntreev.Crema.ServiceHosts.Users
 {
     [ServiceContract(Namespace = CremaService.Namespace, SessionMode = SessionMode.Required, CallbackContract = typeof(IUserEventCallback))]
-    public interface IUserService
+    public partial interface IUserService
     {
         [OperationContract]
         ResultBase<UserContextMetaData> Subscribe(string userID, byte[] password, string version, string platformID, string culture);

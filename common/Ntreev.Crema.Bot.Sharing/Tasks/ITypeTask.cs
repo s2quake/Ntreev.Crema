@@ -18,6 +18,7 @@
 using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.Library;
 using Ntreev.Library.Random;
 using System;
@@ -34,7 +35,7 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     public class ITypeTask : ITaskProvider
     {
-        public void InvokeTask(TaskContext context)
+        public async Task InvokeAsync(TaskContext context)
         {
             var type = context.Target as IType;
             if (context.IsCompleted(type) == true)
@@ -43,9 +44,9 @@ namespace Ntreev.Crema.Bot.Tasks
             }
             else if (RandomUtility.Within(75) == true)
             {
-                var template = type.Dispatcher.Invoke(() => type.Template);
-                context.Push(template);
+                context.Push(type.Template);
             }
+            await Task.Delay(0);
         }
 
         public Type TargetType
@@ -53,254 +54,221 @@ namespace Ntreev.Crema.Bot.Tasks
             get { return typeof(IType); }
         }
 
-        public bool IsEnabled
-        {
-            get { return false; }
-        }
-
         [TaskMethod]
-        public void GetAccessType(IType type, TaskContext context)
+        public async Task GetAccessTypeAsync(IType type, TaskContext context)
         {
-            type.Dispatcher.Invoke(() =>
-            {
-                type.GetAccessType(context.Authentication);
-            });
+            var authentication = context.Authentication;
+            await type.Dispatcher.InvokeAsync(() => type.GetAccessType(authentication));
         }
-
-        //[TaskMethod]
-        //public void VerifyRead(IType type, TaskContext context)
-        //{
-        //    type.Dispatcher.Invoke(() =>
-        //    {
-        //        type.VerifyRead(context.Authentication);
-        //    });
-        //}
-
-        //[TaskMethod]
-        //public void VerifyOwner(IType type, TaskContext context)
-        //{
-        //    type.Dispatcher.Invoke(() =>
-        //    {
-        //        type.VerifyOwner(context.Authentication);
-        //    });
-        //}
-
-        //[TaskMethod]
-        //public void VerifyMember(IType type, TaskContext context)
-        //{
-        //    type.Dispatcher.Invoke(() =>
-        //    {
-        //        type.VerifyMember(context.Authentication);
-        //    });
-        //}
 
         [TaskMethod(Weight = 10)]
-        public void Lock(IType type, TaskContext context)
+        public async Task LockAsync(IType type, TaskContext context)
         {
-            type.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            var comment = RandomUtility.NextString();
+            if (context.AllowException == false)
             {
-                var comment = RandomUtility.NextString();
-                if (Verify(comment) == false)
-                    return;
-                type.Lock(context.Authentication, comment);
-            });
-
-            bool Verify(string comment)
-            {
-                if (context.AllowException == true)
-                    return true;
                 if (string.IsNullOrEmpty(comment) == true)
-                    return false;
-                if (type.IsLocked == true)
-                    return false;
-                return true;
+                    return;
+                var lockInfo = await type.Dispatcher.InvokeAsync(() => type.LockInfo);
+                if (lockInfo.IsLocked == true || lockInfo.IsInherited == true)
+                    return;
             }
+            await type.LockAsync(authentication, comment);
         }
 
         [TaskMethod]
-        public void Unlock(IType type, TaskContext context)
+        public async Task UnlockAsync(IType type, TaskContext context)
         {
-            type.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
             {
-                if (Verify() == false)
+                var lockInfo = await type.Dispatcher.InvokeAsync(() => type.LockInfo);
+                if (lockInfo.IsLocked == false || lockInfo.IsInherited == true)
                     return;
-                type.Unlock(context.Authentication);
-            });
-
-            bool Verify()
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (type.IsLocked == false)
-                    return false;
-                return true;
             }
+            await type.UnlockAsync(authentication);
         }
 
         [TaskMethod]
-        public void SetPublic(IType type, TaskContext context)
+        public async Task SetPublicAsync(IType type, TaskContext context)
         {
-            type.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
             {
-                if (Verify() == false)
+                if (await type.Dispatcher.InvokeAsync(() => type.IsPrivate) == false)
                     return;
-                type.SetPublic(context.Authentication);
-            });
-
-            bool Verify()
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (type.IsPrivate == false)
-                    return false;
-                return true;
             }
+            await type.SetPublicAsync(authentication);
         }
 
         [TaskMethod(Weight = 10)]
-        public void SetPrivate(IType type, TaskContext context)
+        public async Task SetPrivateAsync(IType type, TaskContext context)
         {
-            type.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
             {
-                type.SetPrivate(context.Authentication);
-            });
+                if (await type.Dispatcher.InvokeAsync(() => type.IsPrivate) == true)
+                    return;
+            }
+            await type.SetPrivateAsync(authentication);
         }
 
         [TaskMethod(Weight = 10)]
-        public void AddAccessMember(IType type, TaskContext context)
+        public async Task AddAccessMemberAsync(IType type, TaskContext context)
         {
-            type.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
             {
-                var userContext = type.GetService(typeof(IUserContext)) as IUserContext;
-                var memberID = userContext.Dispatcher.Invoke(() => userContext.Select(item => item.Path).Random());
-                var accessType = RandomUtility.NextEnum<AccessType>();
-                if (Verify() == false)
+                if (await type.Dispatcher.InvokeAsync(() => type.IsPrivate) == false)
                     return;
-                type.AddAccessMember(context.Authentication, memberID, accessType);
-            });
-
-            bool Verify()
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (type.IsPrivate == false)
-                    return false;
-                return true;
             }
+            var userContext = type.GetService(typeof(IUserContext)) as IUserContext;
+            var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Random().ID);
+            var accessType = RandomUtility.NextEnum<AccessType>();
+            await type.AddAccessMemberAsync(authentication, memberID, accessType);
         }
 
         [TaskMethod]
-        public void RemoveAccessMember(IType type, TaskContext context)
+        public async Task RemoveAccessMemberAsync(IType type, TaskContext context)
         {
-            type.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
             {
-                var userContext = type.GetService(typeof(IUserContext)) as IUserContext;
-                var memberID = userContext.Dispatcher.Invoke(() => userContext.Select(item => item.Path).Random());
-                if (Verify() == false)
+                if (await type.Dispatcher.InvokeAsync(() => type.IsPrivate) == false)
                     return;
-                type.RemoveAccessMember(context.Authentication, memberID);
-            });
+            }
+            var userContext = type.GetService(typeof(IUserContext)) as IUserContext;
+            var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Random().ID);
+            await type.RemoveAccessMemberAsync(authentication, memberID);
+        }
 
-            bool Verify()
+        [TaskMethod(Weight = 25)]
+        public async Task RenameAsync(IType type, TaskContext context)
+        {
+            var authentication = context.Authentication;
+            var typeName = RandomUtility.NextIdentifier();
+            if (context.AllowException == false)
             {
-                if (context.AllowException == true)
-                    return true;
-                if (type.IsPrivate == false)
+                if (await VerifyAsync() == false)
+                    return;
+            }
+            await type.RenameAsync(authentication, typeName);
+
+            async Task<bool> VerifyAsync()
+            {
+                if ((await type.GetTablesAsync(item => item.TableState != TableState.None)).Any() == true)
                     return false;
-                return true;
+                return await type.Dispatcher.InvokeAsync(() =>
+                {
+                    if (type.TypeState != TypeState.None)
+                        return false;
+                    return true;
+                });
             }
         }
 
         [TaskMethod(Weight = 25)]
-        public void Rename(IType type, TaskContext context)
+        public async Task MoveAsync(IType type, TaskContext context)
         {
-            type.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            var categories = type.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
+            var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
+            if (context.AllowException == false)
             {
-                var typeName = RandomUtility.NextIdentifier();
-                type.Rename(context.Authentication, typeName);
-            });
-        }
-
-        [TaskMethod(Weight = 25)]
-        public void Move(IType type, TaskContext context)
-        {
-            type.Dispatcher.Invoke(() =>
-            {
-                var categories = type.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
-                var categoryPath = categories.Random().Path;
-                if (Verify(categoryPath) == false)
+                if (await VerifyAsync() == false)
                     return;
-                type.Move(context.Authentication, categoryPath);
-            });
+            }
+            await type.MoveAsync(authentication, categoryPath);
 
-            bool Verify(string categoryPath)
+            async Task<bool> VerifyAsync()
             {
-                if (context.AllowException == true)
-                    return true;
-                if (type.Category.Path == categoryPath)
+                if ((await type.GetTablesAsync(item => item.TableState != TableState.None)).Any() == true)
                     return false;
-                return true;
+                return await type.Dispatcher.InvokeAsync(() =>
+                {
+                    if (type.TypeState != TypeState.None)
+                        return false;
+                    return true;
+                });
             }
         }
 
         [TaskMethod(Weight = 5)]
-        public void Delete(IType type, TaskContext context)
+        public async Task DeleteAsync(IType type, TaskContext context)
         {
-            type.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
             {
-                type.Delete(context.Authentication);
-            });
+                if (await VerifyAsync() == false)
+                    return;
+            }
+            await type.DeleteAsync(authentication);
+            context.Pop(type);
+
+            async Task<bool> VerifyAsync()
+            {
+                if ((await type.GetTablesAsync(item => true)).Any() == true)
+                    return false;
+                return await type.Dispatcher.InvokeAsync(() =>
+                {
+                    if (type.TypeState != TypeState.None)
+                        return false;
+                    return true;
+                });
+            }
+        }
+
+        //[TaskMethod]
+        public async Task SetTagsAsync(IType type, TaskContext context)
+        {
+            var authentication = context.Authentication;
+            var tags = (TagInfo)TagInfoUtility.Names.Random();
+            var template = type.Template;
+            await template.BeginEditAsync(authentication);
+            try
+            {
+                await template.SetTagsAsync(authentication, tags);
+                await template.EndEditAsync(authentication);
+            }
+            catch
+            {
+                await template.CancelEditAsync(authentication);
+                throw;
+            }
         }
 
         [TaskMethod]
-        public void SetTags(IType type, TaskContext context)
+        public async Task CopyAsync(IType type, TaskContext context)
         {
-            type.Dispatcher.Invoke(() =>
-            {
-                var tags = (TagInfo)TagInfoUtility.Names.Random();
-                type.SetTags(context.Authentication, tags);
-            });
+            var authentication = context.Authentication;
+            var categories = type.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
+            var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
+            var typeName = RandomUtility.NextIdentifier();
+            await type.CopyAsync(authentication, typeName, categoryPath);
         }
 
         [TaskMethod]
-        public void Copy(IType type, TaskContext context)
+        public async Task GetDataSetAsync(IType type, TaskContext context)
         {
-            type.Dispatcher.Invoke(() =>
-            {
-                var categories = type.GetService(typeof(ITypeCategoryCollection)) as ITypeCategoryCollection;
-                var categoryPath = categories.Random().Path;
-                var typeName = RandomUtility.NextIdentifier();
-                type.Copy(context.Authentication, typeName, categoryPath);
-            });
+            var authentication = context.Authentication;
+            await type.GetDataSetAsync(authentication, null);
         }
 
         [TaskMethod]
-        public void Preview(IType type, TaskContext context)
+        public async Task GetLogAsync(IType type, TaskContext context)
         {
-            type.Dispatcher.Invoke(() =>
-            {
-                type.GetDataSet(context.Authentication, -1);
-            });
+            var authentication = context.Authentication;
+            await type.GetLogAsync(authentication, null);
         }
 
         [TaskMethod]
-        public void GetLog(IType type, TaskContext context)
+        public async Task FindAsync(IType type, TaskContext context)
         {
-            type.Dispatcher.Invoke(() =>
-            {
-                type.GetLog(context.Authentication);
-            });
-        }
-
-        [TaskMethod]
-        public void Find(IType type, TaskContext context)
-        {
-            type.Dispatcher.Invoke(() =>
-            {
-                var text = RandomUtility.NextWord();
-                var option = RandomUtility.NextEnum<FindOptions>();
-                type.Find(context.Authentication, text, option);
-            });
+            var authentication = context.Authentication;
+            var text = RandomUtility.NextWord();
+            var option = RandomUtility.NextEnum<FindOptions>();
+            await type.FindAsync(authentication, text, option);
         }
     }
 }

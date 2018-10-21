@@ -15,12 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains
@@ -47,85 +43,57 @@ namespace Ntreev.Crema.Services.Domains
             return base.DomainUserInfo.UserID;
         }
 
-        public void BeginEdit(Authentication authentication, DomainLocationInfo location)
+        public Task BeginEditAsync(Authentication authentication, DomainLocationInfo location)
         {
-            this.domain.BeginUserEdit(authentication, location);
+            return this.domain.BeginUserEditAsync(authentication, location);
         }
 
-        public void EndEdit(Authentication authentication)
+        public Task EndEditAsync(Authentication authentication)
         {
-            this.domain.EndUserEdit(authentication);
+            return this.domain.EndUserEditAsync(authentication);
         }
 
-        public void SetLocation(Authentication authentication, DomainLocationInfo location)
+        public Task SetLocationAsync(Authentication authentication, DomainLocationInfo location)
         {
-            this.domain.SetUserLocation(authentication, location);
+            return this.domain.SetUserLocationAsync(authentication, location);
         }
 
-        public void Kick(Authentication authentication, string comment)
+        public Task KickAsync(Authentication authentication, string comment)
         {
-            this.domain.Kick(authentication, base.DomainUserInfo.UserID, comment);
+            return this.domain.KickAsync(authentication, base.DomainUserInfo.UserID, comment);
         }
 
-        public void SetOwner(Authentication authentication)
+        public Task SetOwnerAsync(Authentication authentication)
         {
-            this.domain.SetOwner(authentication, base.DomainUserInfo.UserID);
+            return this.domain.SetOwnerAsync(authentication, base.DomainUserInfo.UserID);
         }
 
         public DomainUserMetaData GetMetaData(Authentication authentication)
         {
             this.Dispatcher.VerifyAccess();
-
+            if (base.DomainUserState.HasFlag(DomainUserState.Detached) == true)
+            {
+                int qwer = 0;
+            }
             var metaData = new DomainUserMetaData()
             {
                 DomainUserInfo = base.DomainUserInfo,
                 DomainUserState = base.DomainUserState,
             };
-
             return metaData;
         }
 
-        public new DomainUserInfo DomainUserInfo
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.DomainUserInfo;
-            }
-        }
-
-        public new DomainUserState DomainUserState
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.DomainUserState;
-            }
-        }
-
-        public string ID
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.DomainUserInfo.UserID;
-            }
-        }
+        public string ID => base.DomainUserInfo.UserID;
 
         public DomainLocationInfo Location
         {
-            get { return base.DomainUserInfo.Location; }
-            set
-            {
-                base.UpdateLocation(value);
-            }
+            get => base.DomainUserInfo.Location;
+            set => base.UpdateLocation(value);
         }
-
-        
 
         public Authentication Authentication
         {
-            get { return this.authentication; }
+            get => this.authentication;
             set
             {
                 if (this.authentication != null && value != null)

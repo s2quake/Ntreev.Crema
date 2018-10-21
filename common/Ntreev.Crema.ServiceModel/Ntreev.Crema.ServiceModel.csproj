@@ -52,7 +52,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccessChangeType.cs" />
@@ -60,6 +59,11 @@
     <Compile Include="AuthenticationInfo.cs" />
     <Compile Include="AuthenticationType.cs" />
     <Compile Include="Authority.cs" />
+    <Compile Include="CremaFaultException.cs" />
+    <Compile Include="DataSetType.cs" />
+    <Compile Include="DispatcherExpiredException.cs" />
+    <Compile Include="DispatcherScopeAttribute.cs" />
+    <Compile Include="DomainFieldInfo.cs" />
     <Compile Include="DomainUserBase.cs" />
     <Compile Include="DataBaseNotFoundException.cs" />
     <Compile Include="CloseReason.cs" />
@@ -68,6 +72,7 @@
     <Compile Include="BanChangeType.cs" />
     <Compile Include="DomainAccessType.cs" />
     <Compile Include="DomainUserMetaData.cs" />
+    <Compile Include="ItemAlreadyExistsException.cs" />
     <Compile Include="LockChangeType.cs" />
     <Compile Include="MessageType.cs" />
     <Compile Include="Properties\EventResources.Designer.cs">
@@ -160,7 +165,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj">
+    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library.Net45\Ntreev.Library.csproj">
       <Project>{1918437f-4fbf-4731-ac5b-981a4a4cb1f1}</Project>
       <Name>Ntreev.Library</Name>
     </ProjectReference>

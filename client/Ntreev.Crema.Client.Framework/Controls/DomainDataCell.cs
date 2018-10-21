@@ -68,16 +68,16 @@ namespace Ntreev.Crema.Client.Framework.Controls
             this.users.CollectionChanged += Users_CollectionChanged;
         }
 
-        public void Reset()
+        public Task ResetAsync()
         {
             var domain = this.GridControl.Domain;
             var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
             var item = this.DataContext;
             var fieldName = this.FieldName;
-            domain.Dispatcher.Invoke(() => domain.SetRow(authenticator, item, fieldName, DBNull.Value));
+            return domain.SetRowAsync(authenticator, item, fieldName, DBNull.Value);
         }
 
-        public void PasteFromClipboard()
+        public async void PasteFromClipboard()
         {
             if (Clipboard.ContainsText() == false)
                 return;
@@ -90,7 +90,7 @@ namespace Ntreev.Crema.Client.Framework.Controls
             var rowInfos = parser.DomainRows;
             var domain = gridControl.Domain;
             var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
-            domain.Dispatcher.Invoke(() => domain.SetRow(authenticator, rowInfos));
+            await domain.SetRowAsync(authenticator, rowInfos);
             parser.SelectRange();
         }
 
@@ -162,40 +162,40 @@ namespace Ntreev.Crema.Client.Framework.Controls
             base.OnPreviewKeyDown(e);
         }
 
-        protected override void OnEditBegun()
+        protected override async void OnEditBegun()
         {
             base.OnEditBegun();
-            this.RequestBeginEdit();
+            await this.RequestBeginEditAsync();
         }
 
-        protected override void OnEditEnded()
+        protected override async void OnEditEnded()
         {
             base.OnEditEnded();
             var parentRow = this.ParentRow as DomainDataRow;
             if (parentRow.IsBeginEnding == false)
                 parentRow.EndEdit();
-            this.RequestEditEnd();
+            await this.RequestEditEndAsync();
         }
 
-        protected override void OnEditEnding(CancelRoutedEventArgs e)
+        protected override async void OnEditEnding(CancelRoutedEventArgs e)
         {
             var editingContent = this.EditingContent;
             var content = this.Content;
             base.OnEditEnding(e);
             if (editingContent != content)
             {
-                this.RequestSetRow(editingContent);
+                await this.RequestSetRowAsync(editingContent);
             }
         }
 
-        protected override void OnEditCanceled()
+        protected override async void OnEditCanceled()
         {
             base.OnEditCanceled();
             var parentRow = this.ParentRow as DomainDataRow;
             if (parentRow.IsBeginEnding == false)
                 this.ParentRow.CancelEdit();
             this.Focus();
-            this.RequestEditEnd();
+            await this.RequestEditEndAsync();
         }
 
         protected override void OnContentChanged(object oldContent, object newContent)
@@ -323,7 +323,7 @@ namespace Ntreev.Crema.Client.Framework.Controls
             this.RequestReset();
         }
 
-        private void RequestBeginEdit()
+        private async Task RequestBeginEditAsync()
         {
             try
             {
@@ -333,7 +333,7 @@ namespace Ntreev.Crema.Client.Framework.Controls
                     var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
                     var item = this.DataContext;
                     var fieldName = this.FieldName;
-                    domain.Dispatcher.Invoke(() => domain.BeginEdit(authenticator, item, fieldName));
+                    await domain.BeginEditAsync(authenticator, item, fieldName);
                 }
             }
             catch (Exception e)
@@ -342,7 +342,7 @@ namespace Ntreev.Crema.Client.Framework.Controls
             }
         }
 
-        private void RequestEditEnd()
+        private async Task RequestEditEndAsync()
         {
             try
             {
@@ -352,7 +352,7 @@ namespace Ntreev.Crema.Client.Framework.Controls
 
                 var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
                 if (domain != null)
-                    domain.Dispatcher.Invoke(() => domain.EndUserEdit(authenticator));
+                    await domain.EndUserEditAsync(authenticator);
             }
             catch (Exception e)
             {
@@ -360,11 +360,11 @@ namespace Ntreev.Crema.Client.Framework.Controls
             }
         }
 
-        private void RequestReset()
+        private async void RequestReset()
         {
             try
             {
-                this.Reset();
+                await this.ResetAsync();
             }
             catch (Exception ex)
             {
@@ -384,7 +384,7 @@ namespace Ntreev.Crema.Client.Framework.Controls
             }
         }
 
-        private void RequestSetRow(object value)
+        private async Task RequestSetRowAsync(object value)
         {
             try
             {
@@ -393,7 +393,7 @@ namespace Ntreev.Crema.Client.Framework.Controls
                 var fieldName = this.FieldName;
                 var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
 
-                domain.Dispatcher.Invoke(() => domain.SetRow(authenticator, item, fieldName, value));
+                await domain.SetRowAsync(authenticator, item, fieldName, value);
             }
             catch (Exception e)
             {

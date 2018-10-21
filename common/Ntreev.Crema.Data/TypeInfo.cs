@@ -15,18 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Runtime.Serialization;
-using System;
-using System.Linq;
-using Ntreev.Crema.Data;
-using System.IO;
-using Ntreev.Library.IO;
-using Ntreev.Crema.Data.Xml;
-using Ntreev.Library;
-using System.Xml.Serialization;
-using Ntreev.Library.ObjectModel;
-using System.Collections.Generic;
 using Ntreev.Crema.Data.Xml.Schema;
+using Ntreev.Library;
+using Ntreev.Library.IO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Ntreev.Crema.Data
 {
@@ -70,6 +65,8 @@ namespace Ntreev.Crema.Data
             get; set;
         }
 
+        public string Path => this.CategoryPath + this.Name;
+
         public override bool Equals(object obj)
         {
             if (obj is TypeInfo == false)
@@ -105,20 +102,19 @@ namespace Ntreev.Crema.Data
         public IDictionary<string, object> ToDictionary()
         {
             var props = new Dictionary<string, object>
-                {
-                    { nameof(this.ID), this.ID },
-                    { nameof(this.Name), this.Name },
-                    { nameof(this.Comment), this.Comment },
-                    { nameof(this.Tags), $"{this.Tags}" },
-                    { nameof(this.IsFlag), this.IsFlag },
-                    { nameof(this.CategoryPath), this.CategoryPath },
-                    { CremaSchema.Creator, this.CreationInfo.ID },
-                    { CremaSchema.CreatedDateTime, this.CreationInfo.DateTime },
-                    { CremaSchema.Modifier, this.ModificationInfo.ID },
-                    { CremaSchema.ModifiedDateTime, this.ModificationInfo.DateTime },
-                    { nameof(this.Members), this.GetMembersInfo(this.Members) }
-                };
-
+            {
+                { nameof(this.ID), this.ID },
+                { nameof(this.Name), this.Name },
+                { nameof(this.Comment), this.Comment },
+                { nameof(this.Tags), $"{this.Tags}" },
+                { nameof(this.IsFlag), this.IsFlag },
+                { nameof(this.CategoryPath), this.CategoryPath },
+                { CremaSchema.Creator, this.CreationInfo.ID },
+                { CremaSchema.CreatedDateTime, this.CreationInfo.DateTime },
+                { CremaSchema.Modifier, this.ModificationInfo.ID },
+                { CremaSchema.ModifiedDateTime, this.ModificationInfo.DateTime },
+                { nameof(this.Members), this.GetMembersInfo(this.Members) }
+            };
             return props;
         }
 

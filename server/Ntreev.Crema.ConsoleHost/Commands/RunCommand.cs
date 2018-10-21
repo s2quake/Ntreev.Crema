@@ -31,13 +31,15 @@ using Ntreev.Crema.Commands.Consoles;
 using Ntreev.Crema.ConsoleHost.Commands.Consoles;
 using System.Collections.Generic;
 using Ntreev.Crema.Javascript;
+using Ntreev.Library.IO;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ConsoleHost.Commands
 {
     [Export(typeof(ICommand))]
     [Export]
     [ResourceDescription]
-    class RunCommand : CommandBase
+    class RunCommand : CommandAsyncBase
     {
         private readonly CremaApplication application;
         private string repositoryModule;
@@ -72,21 +74,18 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             set;
         }
 
-        [CommandProperty("repo-name")]
-        public string RepositoryName
-        {
-            get;
-            set;
-        }
-
         [CommandProperty("repo-module")]
         public string RepositoryModule
         {
-            get { return this.repositoryModule ?? CremaBootstrapper.DefaultRepositoryModule; }
-            set
-            {
-                this.repositoryModule = value;
-            }
+            get => this.repositoryModule;
+            set => this.repositoryModule = value;
+        }
+
+        [CommandProperty("file-type")]
+        public string FileType
+        {
+            get;
+            set;
         }
 
         [CommandProperty("prompt", 'p')]
@@ -162,12 +161,10 @@ namespace Ntreev.Crema.ConsoleHost.Commands
         }
 #endif
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             CremaLog.Verbose = this.Verbose ? LogVerbose.Debug : LogVerbose.Info;
             this.application.BasePath = this.Path;
-            this.application.RepositoryName = this.RepositoryName;
-            this.application.RepositoryModule = this.RepositoryModule;
             this.application.Verbose = this.Verbose ? LogVerbose.Debug : LogVerbose.Info;
             this.application.NoCache = this.NoCache;
             this.application.Culture = this.Culture;
@@ -176,17 +173,20 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             this.application.ValidationMode = this.ValidationMode;
 #endif
             this.application.Port = this.Port;
-            this.application.Open();
-
+            await this.application.OpenAsync();
+            this.application.Closed += Application_Closed;
+            Console.Title = $"{this.application.BasePath} --port {this.application.Port}";
             var cremaHost = this.application.GetService(typeof(ICremaHost)) as ICremaHost;
-            cremaHost.Closed += CremaHost_Closed;
-            this.Wait();
-            Console.WriteLine(Resources.StoppingServer);
-            this.application.Close();
+            await this.WaitAsync(cremaHost);
+            if (this.application.ServiceState == ServiceState.Opened)
+            {
+                Console.WriteLine(Resources.StoppingServer);
+                await this.application.CloseAsync();
+            }
             Console.WriteLine(Resources.ServerHasBeenStopped);
         }
 
-        private void CremaHost_Closed(object sender, ClosedEventArgs e)
+        private void Application_Closed(object sender, ClosedEventArgs e)
         {
             if (e.Reason == CloseReason.Shutdown)
             {
@@ -194,13 +194,13 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             }
         }
 
-        private void Wait()
+        private async Task WaitAsync(ICremaHost cremaHost)
         {
             if (this.IsPromptMode == true)
             {
                 var terminal = this.application.GetService(typeof(ConsoleTerminal)) as ConsoleTerminal;
 #if DEBUG
-                terminal.Start(this.LoginAuthentication);
+                await terminal.StartAsync(this.LoginAuthentication);
 #else
                 terminal.Start();
 #endif
@@ -208,7 +208,18 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             else if (this.ScriptPath != string.Empty)
             {
                 var script = File.ReadAllText(this.ScriptPath);
-                this.ScriptContext.RunInternal(script, null);
+                var basePath = cremaHost.GetPath(CremaPath.Documents);
+                var oldPath = Directory.GetCurrentDirectory();
+                try
+                {
+                    DirectoryUtility.Prepare(basePath);
+                    Directory.SetCurrentDirectory(basePath);
+                    this.ScriptContext.RunInternal(script, null);
+                }
+                finally
+                {
+                    Directory.SetCurrentDirectory(oldPath);
+                }
             }
             else
             {

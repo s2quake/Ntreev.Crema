@@ -17,10 +17,6 @@
 
 using Ntreev.Crema.ServiceModel;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
@@ -35,7 +31,7 @@ namespace Ntreev.Crema.Services
         public static void Validate(this ResultBase result)
         {
             if (result.Fault != null)
-                throw new Exception(result.Fault.Message);
+                throw new CremaFaultException(result.Fault.Message);
         }
 
         public static void Validate<T>(this ResultBase<T> result, Authentication authentication)
@@ -47,7 +43,7 @@ namespace Ntreev.Crema.Services
         public static void Validate<T>(this ResultBase<T> result)
         {
             if (result.Fault != null)
-                throw new Exception(result.Fault.Message);
+                throw new CremaFaultException(result.Fault.Message);
         }
     }
 }

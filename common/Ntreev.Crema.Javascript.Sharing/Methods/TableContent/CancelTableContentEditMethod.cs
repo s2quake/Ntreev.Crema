@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Text;
 
 namespace Ntreev.Crema.Javascript.Methods.TableContent
@@ -44,9 +45,11 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
 
         private void CancelTableContentEdit(string domainID)
         {
-            var content = this.GetDomainHost<ITableContent>(domainID);
+            var contents = this.GetDomainHost<IEnumerable<ITableContent>>(domainID);
             var authentication = this.Context.GetAuthentication(this);
-            content.Dispatcher.Invoke(() => content.CancelEdit(authentication));
+            var content = contents.First();
+            var task = content.CancelEditAsync(authentication);
+            task.Wait();
         }
     }
 }

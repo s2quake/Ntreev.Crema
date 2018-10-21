@@ -59,7 +59,7 @@ namespace Ntreev.Crema.Client.Framework.MenuItems.Domains
 
                 try
                 {
-                    await domain.Dispatcher.InvokeAsync(() => domain.Delete(this.authenticator, false));
+                    await domain.DeleteAsync(this.authenticator, false);
                 }
                 catch (Exception e)
                 {

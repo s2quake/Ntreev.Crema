@@ -15,19 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services.DataBaseService;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.DataBaseService;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.ServiceModel.Channels;
-using System.ServiceModel.Description;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
-using System.ServiceModel.Dispatcher;
-using System.Xml;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -39,8 +31,8 @@ namespace Ntreev.Crema.Services.Data
 
             var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/DataBaseService");
             var instanceContext = new InstanceContext(dataServiceCallback);
-            if (Environment.OSVersion.Platform != PlatformID.Unix)
-                instanceContext.SynchronizationContext = SynchronizationContext.Current;
+            //if (Environment.OSVersion.Platform != PlatformID.Unix)
+            //    instanceContext.SynchronizationContext = SynchronizationContext.Current;
 
             var serviceClient = new DataBaseServiceClient(instanceContext, binding, endPointAddress);
             return serviceClient;

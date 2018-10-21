@@ -36,39 +36,32 @@ namespace Ntreev.Crema.Services.Domains
     {
         private readonly Dictionary<string, DataView> views = new Dictionary<string, DataView>();
         private readonly Dictionary<DataView, CremaDataTable> tables = new Dictionary<DataView, CremaDataTable>();
-        private CremaDataSet dataSet;
 
-        public TableContentDomain(DomainInfo domainInfo, CremaDispatcher dispatcher)
-            : base(domainInfo, dispatcher)
+        public TableContentDomain(DomainInfo domainInfo)
+            : base(domainInfo)
         {
-            
+
         }
 
-        public override object Source
-        {
-            get { return this.dataSet; }
-        }
+        public override object Source => this.DataSet;
 
-        public CremaDataSet DataSet
-        {
-            get { return this.dataSet; }
-        }
+        public CremaDataSet DataSet { get; private set; }
 
         protected override byte[] SerializeSource()
         {
-            var xml = XmlSerializerUtility.GetString(this.dataSet);
+            var xml = XmlSerializerUtility.GetString(this.DataSet);
             return Encoding.UTF8.GetBytes(xml.Compress());
         }
 
         protected override void DerializeSource(byte[] data)
         {
             var xml = Encoding.UTF8.GetString(data).Decompress();
-            this.dataSet = XmlSerializerUtility.ReadString<CremaDataSet>(xml);
+            this.DataSet = XmlSerializerUtility.ReadString<CremaDataSet>(xml);
 
-            foreach (var item in this.dataSet.Tables)
+            foreach (var item in this.DataSet.Tables)
             {
                 var view = item.AsDataView();
-                this.views.Add(item.TableName, view);
+                this.views.Add(item.Name, view);
                 this.tables.Add(view, item);
             }
         }
@@ -78,16 +71,20 @@ namespace Ntreev.Crema.Services.Domains
             base.OnInitialize(metaData);
 
             var xml = Encoding.UTF8.GetString(metaData.Data).Decompress();
-            this.dataSet = XmlSerializerUtility.ReadString<CremaDataSet>(xml);
-            this.dataSet.AcceptChanges();
+            if (this.DataSet != null)
+            {
+                int qwer = 0;
+            }
+            this.DataSet = XmlSerializerUtility.ReadString<CremaDataSet>(xml);
+            this.DataSet.AcceptChanges();
             this.views.Clear();
-            foreach (var item in this.dataSet.Tables)
+            foreach (var item in this.DataSet.Tables)
             {
                 var view = item.AsDataView();
                 //view.AllowDelete = false;
                 //view.AllowEdit = false;
                 //view.AllowNew = false;
-                this.views.Add(item.TableName, view);
+                this.views.Add(item.Name, view);
                 this.tables.Add(view, item);
             }
         }
@@ -95,74 +92,89 @@ namespace Ntreev.Crema.Services.Domains
         protected override void OnRelease()
         {
             base.OnRelease();
-            this.dataSet = null;
+            this.DataSet = null;
             this.views.Clear();
         }
 
         protected override void OnDeleted(EventArgs e)
         {
             base.OnDeleted(e);
-            if (this.dataSet != null)
+            if (this.DataSet != null)
             {
-                this.dataSet.Dispose();
-                this.dataSet = null;
+                this.DataSet.Dispose();
+                this.DataSet = null;
             }
         }
 
-        protected override void OnNewRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
+        protected override async Task OnNewRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
         {
-            this.dataSet.BeginLoad();
-            try
+            await this.DataDispatcher.InvokeAsync(() =>
             {
-                foreach (var item in rows)
+                this.DataSet.BeginLoad();
+                try
+                {
+                    foreach (var item in rows)
+                    {
+                        var view = this.views[item.TableName];
+                        var table = view.Table;
+                        var count = table.Rows.Count;
+                        CremaDomainUtility.AddNew(view, item.Fields);
+                        if (table.Rows.Count == count)
+                        {
+                            int qwer = 0;
+                        }
+                        this.tables[view].ContentsInfo = signatureDate;
+                    }
+                }
+                finally
+                {
+                    this.DataSet.EndLoad();
+                }
+                this.DataSet.AcceptChanges();
+            });
+        }
+
+        protected override async Task OnRemoveRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
+        {
+            await this.DataDispatcher.InvokeAsync(() =>
+            {
+                foreach (var item in rows.Reverse())
                 {
                     var view = this.views[item.TableName];
-                    CremaDomainUtility.AddNew(view, item.Fields);
+                    if (DomainRowInfo.ClearKey.SequenceEqual(item.Keys) == true)
+                    {
+                        view.Table.Clear();
+                    }
+                    else
+                    {
+                        CremaDomainUtility.Delete(view, item.Keys);
+                    }
                     this.tables[view].ContentsInfo = signatureDate;
                 }
-            }
-            finally
-            {
-                this.dataSet.EndLoad();
-            }
-            this.dataSet.AcceptChanges();
+                this.DataSet.AcceptChanges();
+            });
         }
 
-        protected override void OnRemoveRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
+        protected override async Task OnSetRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
         {
-            foreach (var item in rows.Reverse())
+            await this.DataDispatcher.InvokeAsync(() =>
             {
-                var view = this.views[item.TableName];
-                if (DomainRowInfo.ClearKey.SequenceEqual(item.Keys) == true)
+                this.DataSet.BeginLoad();
+                try
                 {
-                    view.Table.Clear();
+                    foreach (var item in rows)
+                    {
+                        var view = this.views[item.TableName];
+                        CremaDomainUtility.SetFieldsForce(view, item.Keys, item.Fields);
+                        this.tables[view].ContentsInfo = signatureDate;
+                    }
                 }
-                else
+                finally
                 {
-                    CremaDomainUtility.Delete(view, item.Keys);
+                    this.DataSet.EndLoad();
                 }
-                this.tables[view].ContentsInfo = signatureDate;
-            }
-            this.dataSet.AcceptChanges();
-        }
-
-        protected override void OnSetRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
-        {
-            this.dataSet.BeginLoad();
-            try
-            {
-                foreach (var item in rows)
-                {
-                    var view = this.views[item.TableName];
-                    CremaDomainUtility.SetFieldsForce(view, item.Keys, item.Fields);
-                    this.tables[view].ContentsInfo = signatureDate;
-                }
-            }
-            finally
-            {
-                this.dataSet.EndLoad();
-            }
-            this.dataSet.AcceptChanges();
+                this.DataSet.AcceptChanges();
+            });
         }
     }
 }

@@ -84,16 +84,9 @@ namespace Ntreev.Crema.Services.Test.DispatcherTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void SetProperty()
-        {
-            typeItem.SetProperty(authentication, "Tags", "All");
-        }
-
-        [TestMethod]
         public void GetLog()
         {
-            typeItem.GetLog(authentication);
+            typeItem.GetLog(authentication, null);
         }
 
         [TestMethod]

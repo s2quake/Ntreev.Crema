@@ -15,16 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services.Domains;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data;
-using Ntreev.Library;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.DataBaseService;
+using Ntreev.Crema.Services.Domains;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -35,74 +32,73 @@ namespace Ntreev.Crema.Services.Data
 
         public NewTypeTemplate(TypeCategory category)
         {
-            this.category = category;
+            this.category = category ?? throw new ArgumentNullException(nameof(category));
+            this.DispatcherObject = category;
             this.IsNew = true;
         }
 
-        public override IType Type
+        public override AccessType GetAccessType(Authentication authentication)
         {
-            get { return this.type; }
+            return this.category.GetAccessType(authentication);
         }
 
-        public override DomainContext DomainContext
+        public override IType Type => this.type;
+
+        public override DomainContext DomainContext => this.category.GetService(typeof(DomainContext)) as DomainContext;
+
+        public override string Path => this.category.Path;
+
+        public override CremaHost CremaHost => this.category.CremaHost;
+
+        public override DataBase DataBase => this.category.DataBase;
+
+        public override IPermission Permission => this.category;
+
+        public override IDispatcherObject DispatcherObject { get; }
+
+        public TypeCollection Types => this.category.Context.Types;
+
+        protected override async Task OnBeginEditAsync(Authentication authentication)
         {
-            get { return this.category.GetService(typeof(DomainContext)) as DomainContext; }
+            await base.OnBeginEditAsync(authentication);
         }
 
-        public override CremaDispatcher Dispatcher
+        protected override async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
-            get { return this.category.Dispatcher; }
+            var typeInfos = await base.OnEndEditAsync(authentication, args);
+            var typeInfo = typeInfos.First();
+            if (args is Guid)
+            {
+                this.type = this.Types.AddNew(authentication, typeInfo);
+            }
+            return typeInfos;
         }
 
-        public override CremaHost CremaHost
+        protected override async Task OnCancelEditAsync(Authentication authentication)
         {
-            get { return this.category.CremaHost; }
+            await base.OnCancelEditAsync(authentication);
         }
 
-        public override DataBase DataBase
+        protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
         {
-            get { return this.category.DataBase; }
+            return Task.Run(() => this.Service.BeginNewType(this.category.Path));
         }
 
-        public override IPermission Permission
+        protected override async Task<TypeInfo[]> EndDomainAsync(Authentication authentication, object args)
         {
-            get { return this.category; }
+            if (args is Guid domainID)
+            {
+                var result = await Task.Run(() => this.Service.EndTypeTemplateEdit(domainID));
+                return result.GetValue();
+            }
+            return args as TypeInfo[];
         }
 
-        public TypeCollection Types
+        protected override Task<ResultBase> CancelDomainAsync(Authentication authentication, Guid domainID)
         {
-            get { return this.category.Context.Types; }
+            return Task.Run(() => this.Service.CancelTypeTemplateEdit(domainID));
         }
 
-        protected override void OnBeginEdit(Authentication authentication, DomainMetaData metaData)
-        {
-            base.OnBeginEdit(authentication, metaData);
-        }
-
-        protected override void OnEndEdit(Authentication authentication, TypeInfo typeInfo)
-        {
-            base.OnEndEdit(authentication, typeInfo);
-            this.type = this.Types.AddNew(authentication, typeInfo);
-        }
-
-        protected override void OnCancelEdit(Authentication authentication)
-        {
-            base.OnCancelEdit(authentication);
-        }
-
-        protected override ResultBase<DomainMetaData> BeginDomain(Authentication authentication)
-        {
-            return this.category.Service.BeginNewType(this.category.Path);
-        }
-
-        protected override ResultBase<TypeInfo> EndDomain(Authentication authentication, Guid domainID)
-        {
-            return this.category.Service.EndTypeTemplateEdit(domainID);
-        }
-
-        protected override ResultBase CancelDomain(Authentication authentication, Guid domainID)
-        {
-            return this.category.Service.CancelTypeTemplateEdit(domainID);
-        }
+        public IDataBaseService Service => this.category.Service;
     }
 }

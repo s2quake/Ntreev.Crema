@@ -109,7 +109,7 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
             this.compositionService = compositionService;
             this.theme = Themes.Keys.FirstOrDefault();
             this.themeColor = FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor;
-            this.loginCommand = new DelegateCommand((p) => this.Login(), (p) => this.CanLogin);
+            this.loginCommand = new DelegateCommand((p) => this.LoginAsync(), (p) => this.CanLogin);
             this.connectionItems = ConnectionItemCollection.Read(AppUtility.GetDocumentFilename("ConnectionList.xml"));
             this.compositionService.SatisfyImportsOnce(this.connectionItems);
             this.ConnectionItem = this.connectionItems.FirstOrDefault(item => item.IsDefault);
@@ -143,12 +143,12 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
             Process.Start("https://github.com/NtreevSoft/Crema/wiki");
         }
 
-        public void Login()
+        public Task LoginAsync()
         {
-            this.Login(this.ConnectionItem.Address, this.ConnectionItem.ID, this.securePassword, this.ConnectionItem.DataBaseName);
+            return this.LoginAsync(this.ConnectionItem.Address, this.ConnectionItem.ID, this.securePassword, this.ConnectionItem.DataBaseName);
         }
 
-        public async void Login(string address, string userID, SecureString password, string dataBaseName)
+        public async Task LoginAsync(string address, string userID, SecureString password, string dataBaseName)
         {
             this.HasError = false;
             this.BeginProgress();
@@ -156,7 +156,7 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
             try
             {
                 this.ProgressMessage = Resources.Message_ConnectingToServer;
-                if (await this.cremaHost.Dispatcher.InvokeAsync(() => CremaBootstrapper.IsOnline(address, userID, password)) == true)
+                if (await CremaBootstrapper.IsOnlineAsync(address, userID, password) == true)
                 {
                     if (AppMessageBox.ShowQuestion(Resources.Message_SameIDConnected) == false)
                     {
@@ -204,8 +204,12 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
             }
         }
 
-        public async void Logout()
+        public async Task LogoutAsync()
         {
+            var closer = new InternalCloseRequestedEventArgs();
+            this.OnCloseRequested(closer);
+            await closer.WhenAll();
+
             this.ErrorMessage = string.Empty;
             if (this.DataBaseName != string.Empty)
                 await this.UnloadAsync();
@@ -270,19 +274,26 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
             else
             {
                 this.securePassword = new SecureString();
-                if (isEncrypted == true)
+                try
                 {
-                    foreach (var item in StringUtility.Decrypt(password, this.ConnectionItem.ID))
+                    if (isEncrypted == true)
                     {
-                        this.securePassword.AppendChar(item);
+                        foreach (var item in StringUtility.Decrypt(password, this.ConnectionItem.ID))
+                        {
+                            this.securePassword.AppendChar(item);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var item in password)
+                        {
+                            this.securePassword.AppendChar(item);
+                        }
                     }
                 }
-                else
+                catch
                 {
-                    foreach (var item in password)
-                    {
-                        this.securePassword.AppendChar(item);
-                    }
+                    return;
                 }
             }
             this.isEncrypted = isEncrypted;
@@ -603,6 +614,8 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
 
         public event EventHandler Opened;
 
+        public event CloseRequestedEventHandler CloseRequested;
+
         public event EventHandler Closed;
 
         protected virtual void OnLoading(EventArgs e)
@@ -638,6 +651,11 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
         protected virtual void OnOpened(EventArgs e)
         {
             this.Opened?.Invoke(this, e);
+        }
+
+        protected virtual void OnCloseRequested(CloseRequestedEventArgs e)
+        {
+            this.CloseRequested?.Invoke(this, e);
         }
 
         protected virtual void OnClosed(EventArgs e)
@@ -739,10 +757,7 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
 
         private async Task OpenAsync(string address, string userID, SecureString password)
         {
-            await this.cremaHost.Dispatcher.InvokeAsync(() =>
-            {
-                this.token = this.cremaHost.Open(address, userID, password);
-            });
+            this.token = await this.cremaHost.OpenAsync(address, userID, password);
             this.address = address;
             this.IsOpened = true;
             this.connectionItem.LastConnectedDateTime = DateTime.Now;
@@ -753,11 +768,8 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
         private async Task CloseAsync()
         {
             this.cremaHost.Closed -= CremaHost_Closed;
-            await this.cremaHost.Dispatcher.InvokeAsync(() =>
-            {
-                this.cremaHost.Close(this.token);
-                this.token = Guid.Empty;
-            });
+            await this.cremaHost.CloseAsync(this.token);
+            this.token = Guid.Empty;
             this.address = null;
             this.IsOpened = false;
             this.Refresh();
@@ -765,36 +777,37 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
             this.cremaHost.SaveConfigs();
         }
 
-        private Task EnterDataBaseAsync(string dataBaseName)
+        private async Task EnterDataBaseAsync(string dataBaseName)
         {
+            var dataBases = this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
             var autoLoad = this.authenticator.Authority == Authority.Admin && Keyboard.Modifiers == ModifierKeys.Shift;
-            return this.cremaHost.Dispatcher.InvokeAsync(() =>
+            var dataBase = await dataBases.Dispatcher.InvokeAsync(() => dataBases[dataBaseName]);
+            if (dataBase == null)
+                throw new ArgumentException(string.Format(Resources.Exception_NonExistentDataBase, dataBaseName), nameof(dataBaseName));
+            if (dataBase.IsLoaded == false && autoLoad == true)
             {
-                var dataBase = this.cremaHost.DataBases[dataBaseName];
-                if (dataBase == null)
-                    throw new ArgumentException(string.Format(Resources.Exception_NonExistentDataBase, dataBaseName), nameof(dataBaseName));
-                if (dataBase.IsLoaded == false && autoLoad == true)
-                {
-                    dataBase.Load(this.authenticator);
-                }
-                dataBase.Enter(this.authenticator);
+                await dataBase.LoadAsync(this.authenticator);
+            }
+            await dataBase.EnterAsync(this.authenticator);
+            await dataBase.Dispatcher.InvokeAsync(()=>
+            {
                 dataBase.Unloaded += DataBase_Unloaded;
                 dataBase.Resetting += DataBase_Resetting;
                 dataBase.Reset += DataBase_Reset;
-                this.dataBase = dataBase;
             });
+            this.dataBase = dataBase;
         }
 
-        private Task LeaveDataBaseAsync()
+        private async Task LeaveDataBaseAsync()
         {
-            return this.cremaHost.Dispatcher.InvokeAsync(() =>
+            await this.dataBase.Dispatcher.InvokeAsync(() =>
             {
                 this.dataBase.Unloaded -= DataBase_Unloaded;
                 this.dataBase.Resetting -= DataBase_Resetting;
                 this.dataBase.Reset -= DataBase_Reset;
-                this.dataBase.Leave(this.authenticator);
-                this.dataBase = null;
             });
+            await this.dataBase.LeaveAsync(this.authenticator);
+            this.dataBase = null;
         }
 
         private async Task CloseDocumentsAsync(bool save)
@@ -883,7 +896,7 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
 
         #region ICremaAppHost
 
-        void ICremaAppHost.Login(string address, string userID, string password, string dataBaseName)
+        async Task ICremaAppHost.LoginAsync(string address, string userID, string password, string dataBaseName)
         {
             var connectionItem = new ConnectionItemViewModel()
             {
@@ -899,7 +912,7 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
 
             this.ConnectionItems.Add(connectionItem);
             this.ConnectionItem = connectionItem;
-            this.Login();
+            await this.LoginAsync();
         }
 
         IEnumerable<IConnectionItem> ICremaAppHost.ConnectionItems

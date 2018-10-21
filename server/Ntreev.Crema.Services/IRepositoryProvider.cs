@@ -19,18 +19,43 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Users;
 
 namespace Ntreev.Crema.Services
 {
     public interface IRepositoryProvider
     {
-        void CreateRepository(string basePath, string repositoryPath);
+        void InitializeRepository(string basePath, string initPath);
 
-        void ValidateRepository(string basePath, string repositoryPath);
+        void CreateRepository(string author, string basePath, string initPath, string comment, params LogPropertyInfo[] properties);
+
+        void CopyRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, params LogPropertyInfo[] properties);
+
+        void RenameRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, params LogPropertyInfo[] properties);
+
+        void DeleteRepository(string author, string basePath, string repositoryName, string comment, params LogPropertyInfo[] properties);
+
+        void RevertRepository(string author, string basePath, string repositoryName, string revision, string comment);
+
+        IRepository CreateInstance(RepositorySettings settings);
+
+        string[] GetRepositories(string basePath);
+
+        string GetRevision(string basePath, string repositoryName);
+
+        RepositoryInfo GetRepositoryInfo(string basePath, string repositoryName);
+
+        string[] GetRepositoryItemList(string basePath, string repositoryName);
+
+        /// <summary>
+        /// 해당 저장소의 로그 목록을 가져옵니다. 지정된 revision 부터 과거 순입니다.
+        /// revision 이 null 값일때는 최신 로그를 가져옵니다. 
+        /// 만약 로그 갯수가 많아서 개수가 제한될때는 마지막에 LogInfo.Empty 의 유무를 확인해 로그 기록이 더 있음을 확인할 수 있습니다.
+        /// </summary>
+        LogInfo[] GetLog(string basePath, string repositoryName, string revision);
 
         string Name { get; }
-
-        IRepository CreateInstance(string repositoryPath, string workingPath);
     }
 }

@@ -15,14 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data;
+using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Crema.Services.Properties;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Data;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
@@ -30,110 +28,118 @@ namespace Ntreev.Crema.Services.Data
     class TypeTemplate : TypeTemplateBase
     {
         private readonly Type type;
+        private readonly Type[] types;
+        private string[] itemPaths;
 
         public TypeTemplate(Type type)
         {
             this.type = type;
+            this.types = new Type[] { type };
         }
 
-        public override DomainContext DomainContext
+        public override AccessType GetAccessType(Authentication authentication)
         {
-            get { return this.type.GetService(typeof(DomainContext)) as DomainContext; }
+            return this.type.GetAccessType(authentication);
         }
 
-        public override string ItemPath
+        public override DomainContext DomainContext => this.type.GetService(typeof(DomainContext)) as DomainContext;
+
+        public override string Path => this.type.Path;
+
+        public override CremaHost CremaHost => this.type.CremaHost;
+
+        public override IType Type => this.type;
+
+        public override DataBase DataBase => this.type.DataBase;
+
+        public override IDispatcherObject DispatcherObject => this.type;
+
+        public override IPermission Permission => this.type;
+
+        protected override async Task OnBeginEditAsync(Authentication authentication)
         {
-            get { return this.type.Path; }
+            await base.OnBeginEditAsync(authentication);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.type.IsBeingEdited = true;
+                this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
+            });
         }
 
-        public override CremaDispatcher Dispatcher
+        protected override async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, TypeInfo[] typeInfos)
         {
-            get { return this.type.Dispatcher; }
+            var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, this.TypeSource.DataSet, false, false);
+            var typeInfo = this.TypeSource.TypeInfo;
+            typeInfos = new TypeInfo[] { typeInfo };
+            await this.Container.InvokeTypeEndTemplateEditAsync(authentication, this.type.Name, dataBaseSet);
+            await base.OnEndEditAsync(authentication, typeInfos);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.type.UpdateTypeInfo(typeInfo);
+                this.type.IsBeingEdited = false;
+                this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
+                this.Container.InvokeTypesChangedEvent(authentication, this.types, dataBaseSet.DataSet);
+            });
+            return typeInfos;
         }
 
-        public override CremaHost CremaHost
+        protected override async Task OnCancelEditAsync(Authentication authentication)
         {
-            get { return this.type.CremaHost; }
+            await base.OnCancelEditAsync(authentication);
+            await this.Repository.UnlockAsync(this.itemPaths);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.type.IsBeingEdited = false;
+                this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
+            });
         }
 
-        public override IType Type
+        protected override void OnAttach(Domain domain)
         {
-            get { return this.type; }
+            this.type.IsBeingEdited = true;
+            base.OnAttach(domain);
         }
 
-        public override DataBase DataBase
+        protected override async Task<CremaDataType> CreateSourceAsync(Authentication authentication)
         {
-            get { return this.type.DataBase; }
+            var typePath = this.type.Path;
+            var dataSet = await this.type.ReadDataForTypeTemplateAsync(authentication);
+            var dataType = dataSet.Types[this.type.Name, this.type.Category.Path];
+            if (dataType == null)
+                throw new TypeNotFoundException(typePath);
+            this.itemPaths = dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] as string[] ?? new string[] { };
+            return dataType;
         }
 
-        public override IPermission Permission
-        {
-            get { return this.type; }
-        }
+        private TypeCollection Container => this.type.Container;
 
+        private DataBaseRepositoryHost Repository => this.type.Repository;
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public override void OnValidateBeginEdit(Authentication authentication, object target)
         {
             base.OnValidateBeginEdit(authentication, target);
-
-            this.type.ValidateNotBeingEdited();
+            this.type.ValidateIsNotBeingEdited();
             this.type.ValidateAccessType(authentication, AccessType.Master);
             this.type.ValidateUsingTables(authentication);
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public override void OnValidateEndEdit(Authentication authentication, object target)
         {
             base.OnValidateEndEdit(authentication, target);
-
+            this.type.ValidateIsBeingEdited();
             if (this.TypeSource == null)
                 throw new InvalidOperationException(Resources.Exception_CannotEndEdit);
             this.type.ValidateUsingTables(authentication);
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public override void OnValidateCancelEdit(Authentication authentication, object target)
         {
             base.OnValidateCancelEdit(authentication, target);
+            this.type.ValidateIsBeingEdited();
             this.type.ValidateAccessType(authentication, AccessType.Master);
-        }
-
-        protected override void OnBeginEdit(Authentication authentication)
-        {
-            this.Container.InvokeTypeBeginTemplateEdit(authentication, this.type);
-            base.OnBeginEdit(authentication);
-            this.type.IsBeingEdited = true;
-            this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
-        }
-
-        protected override void OnEndEdit(Authentication authentication)
-        {
-            this.Container.InvokeTypeEndTemplateEdit(authentication, this.type, this.TypeSource);
-            base.OnEndEdit(authentication);
-            this.type.UpdateTypeInfo(this.TypeSource.TypeInfo);
-            this.type.IsBeingEdited = false;
-            this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
-            this.Container.InvokeTypesChangedEvent(authentication, new Type[] { this.type }, this.TypeSource.DataSet);
-        }
-
-        protected override void OnCancelEdit(Authentication authentication)
-        {
-            base.OnCancelEdit(authentication);
-            this.type.IsBeingEdited = false;
-            this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
-        }
-
-        protected override void OnRestore(Domain domain)
-        {
-            this.type.IsBeingEdited = true;
-            base.OnRestore(domain);
-        }
-
-        protected override CremaDataType CreateSource(Authentication authentication)
-        {
-            return this.type.ReadAllData(authentication);
-        }
-
-        private TypeCollection Container
-        {
-            get { return this.type.Container; }
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
     [Export(typeof(ICommand))]
     [Export]
     [ResourceDescription]
-    class ConnectCommand : CommandBase
+    class ConnectCommand : CommandAsyncBase
     {
         private readonly CremaBootstrapper application;
         private readonly ICremaHost cremaHost;
@@ -85,11 +85,11 @@ namespace Ntreev.Crema.ConsoleHost.Commands
         }
 #endif
 
-        protected override void OnExecute()
+        protected override Task OnExecuteAsync()
         {
             this.application.Culture = this.Culture;
             this.cremaHost.Closed += CremaHost_Closed;
-            this.Wait();
+            return this.WaitAsync();
         }
 
         private void CremaHost_Closed(object sender, ClosedEventArgs e)
@@ -100,12 +100,12 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             }
         }
 
-        private void Wait()
+        private Task WaitAsync()
         {
             this.CommandContext.SetAddress(this.Address);
 
 #if DEBUG
-            this.Terminal.Start(this.LoginAuthentication);
+            return this.Terminal.StartAsync(this.LoginAuthentication);
 #else
             this.Terminal.Start();
 #endif

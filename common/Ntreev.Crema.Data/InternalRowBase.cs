@@ -15,21 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Data
 {
     abstract class InternalRowBase : DataRow
     {
         private readonly InternalTableBase table;
-        private object target;
 
         protected InternalRowBase(InternalTableBase table, DataRowBuilder builder)
             : base(builder)
@@ -37,16 +31,12 @@ namespace Ntreev.Crema.Data
             this.table = table;
             this.table.RowChanged += Table_RowChanged;
             this.table.RowDeleted += Table_RowDeleted;
-            if (this.table.ColumnRelation != null)
-                this[this.table.ColumnRelation] = this.table.GenerateRelationID(this);
+            this[this.table.ColumnRelation] = this.table.GenerateRelationID(this);
         }
 
         public SignatureDate CreationInfo
         {
-            get
-            {
-                return new SignatureDate(this.Field<string>(this.table.attributeCreator) ?? string.Empty, this.Field<DateTime>(this.table.attributeCreatedDateTime));
-            }
+            get => new SignatureDate(this.Field<string>(this.table.attributeCreator) ?? string.Empty, this.Field<DateTime>(this.table.attributeCreatedDateTime));
             internal set
             {
                 if (this.table.attributeCreator.ReadOnly == false)
@@ -71,10 +61,7 @@ namespace Ntreev.Crema.Data
 
         public SignatureDate ModificationInfo
         {
-            get
-            {
-                return new SignatureDate(this.Field<string>(this.table.attributeModifier) ?? string.Empty, this.Field<DateTime>(this.table.attributeModifiedDateTime));
-            }
+            get => new SignatureDate(this.Field<string>(this.table.attributeModifier) ?? string.Empty, this.Field<DateTime>(this.table.attributeModifiedDateTime));
             internal set
             {
                 if (this.table.attributeModifier.ReadOnly == false)
@@ -97,11 +84,7 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        public object Target
-        {
-            get { return this.target; }
-            set { this.target = value; }
-        }
+        public object Target { get; set; }
 
         public string RelationID
         {
@@ -148,30 +131,27 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        public abstract int Index
-        {
-            get; set;
-        }
+        public abstract int Index { get; set; }
 
         private void Table_RowDeleted(object sender, DataRowChangeEventArgs e)
         {
-            this.Index = this.table.Rows.Count;
+            //this.Index = this.table.Rows.Count;
         }
 
         private void Table_RowChanged(object sender, DataRowChangeEventArgs e)
         {
-            if (e.Action == DataRowAction.Add)
-            {
-                if (e.Row == this)
-                {
-                    this.table.RowChanged -= Table_RowChanged;
-                    this.table.RowDeleted -= Table_RowDeleted;
-                }
-                else
-                {
-                    this.Index = this.table.Rows.Count;
-                }
-            }
+            //if (e.Action == DataRowAction.Add)
+            //{
+            //    if (e.Row == this)
+            //    {
+            //        this.table.RowChanged -= Table_RowChanged;
+            //        this.table.RowDeleted -= Table_RowDeleted;
+            //    }
+            //    else
+            //    {
+            //        this.Index = this.table.Rows.Count;
+            //    }
+            //}
         }
     }
 
@@ -188,8 +168,8 @@ namespace Ntreev.Crema.Data
 
         public override int Index
         {
-            get { return this.InternalIndex; }
-            set { this.InternalIndex = value; }
+            get => this.InternalIndex;
+            set => this.InternalIndex = value;
         }
 
         public int InternalIndex
@@ -197,6 +177,8 @@ namespace Ntreev.Crema.Data
             get
             {
                 if (this.RowState == DataRowState.Deleted || this.RowState == DataRowState.Detached)
+                    return -1;
+                if (this.Field<object>(this.table.attributeIndex) is DBNull value)
                     return -1;
                 return this.Field<int>(this.table.attributeIndex);
             }
@@ -209,7 +191,7 @@ namespace Ntreev.Crema.Data
             {
                 if (this.table.Parent == null)
                     return null;
-                var relationName = InternalSetBase.GenerateRelationName(this.table.Parent, this.table);
+                var relationName = InternalSetBase.GenerateRelationName(this.table);
                 return this.GetParentRow(relationName) as RowBase;
             }
         }

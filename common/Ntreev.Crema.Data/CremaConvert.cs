@@ -17,10 +17,6 @@
 
 using Ntreev.Crema.Data.Properties;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Data
 {
@@ -47,11 +43,17 @@ namespace Ntreev.Crema.Data
                 textValue = ((TimeSpan)value).TotalSeconds.ToString();
             }
             else if (value is float)
+            {
                 textValue = ((float)value).ToString("R");
+            }
             else if (value is double)
+            {
                 textValue = ((double)value).ToString("R");
+            }
             else
+            {
                 textValue = value.ToString();
+            }
 
             try
             {
@@ -93,11 +95,33 @@ namespace Ntreev.Crema.Data
                 }
                 else if (dataType == typeof(long))
                 {
-                    return long.Parse(textValue);
+                    if (long.TryParse(textValue, out var l) == true)
+                    {
+                        return l;
+                    }
+                    else if (double.TryParse(textValue, out var d) == true)
+                    {
+                        return (long)d;
+                    }
+                    else
+                    {
+                        return long.Parse(textValue);
+                    }
                 }
                 else if (dataType == typeof(ulong))
                 {
-                    return ulong.Parse(textValue);
+                    if (ulong.TryParse(textValue, out var u) == true)
+                    {
+                        return u;
+                    }
+                    else if (double.TryParse(textValue, out var d) == true)
+                    {
+                        return (ulong)d;
+                    }
+                    else
+                    {
+                        return ulong.Parse(textValue);
+                    }
                 }
                 else if (dataType == typeof(DateTime))
                 {

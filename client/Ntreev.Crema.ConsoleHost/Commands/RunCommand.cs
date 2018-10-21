@@ -99,9 +99,8 @@ namespace Ntreev.Crema.ConsoleHost.Commands
 
         protected override void OnExecute()
         {
-            CremaLog.Verbose = LogVerbose.Fatal;
-            this.cremaHost.Verbose = LogVerbose.Fatal;
             this.application.Culture = this.Culture;
+            this.application.Verbose = LogVerbose.None;
 
             if (this.List == true)
             {

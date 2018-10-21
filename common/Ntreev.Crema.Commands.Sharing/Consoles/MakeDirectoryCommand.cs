@@ -62,12 +62,12 @@ namespace Ntreev.Crema.Commands.Consoles
             if (NameValidator.VerifyCategoryPath(absolutePath))
             {
                 var categoryName = new CategoryName(absolutePath);
-                drive.Create(authentication, categoryName.ParentPath, categoryName.Name);
+                drive.CreateAsync(authentication, categoryName.ParentPath, categoryName.Name).Wait();
             }
             else
             {
                 var itemName = new ItemName(absolutePath);
-                drive.Create(authentication, itemName.CategoryPath, itemName.Name);
+                drive.CreateAsync(authentication, itemName.CategoryPath, itemName.Name).Wait();
             }
         }
     }

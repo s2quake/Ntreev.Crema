@@ -25,7 +25,7 @@ using System.Collections.Specialized;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ITypeCollection : IReadOnlyCollection<IType>, IEnumerable<IType>, INotifyCollectionChanged, IServiceProvider
+    public interface ITypeCollection : IReadOnlyCollection<IType>, IEnumerable<IType>, IServiceProvider, IDispatcherObject
     {
         bool Contains(string typeName);
 

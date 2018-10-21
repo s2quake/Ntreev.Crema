@@ -15,74 +15,116 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.UserService;
+using Ntreev.Library.Linq;
+using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library.ObjectModel;
-using System.Threading.Tasks;
-using System.Windows.Threading;
-using Ntreev.Crema.Services.UserService;
-using Ntreev.Library.Linq;
 using System.Security;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users
 {
     class UserCategory : UserCategoryBase<User, UserCategory, UserCollection, UserCategoryCollection, UserContext>,
         IUserCategory, IUserItem
     {
-        public void Rename(Authentication authentication, string name)
+        public async Task RenameAsync(Authentication authentication, string name)
         {
-            this.Dispatcher.VerifyAccess();
-            this.CremaHost.DebugMethod(authentication, this, nameof(Rename), this, name);
-
-            var items = EnumerableUtility.One(this).ToArray();
-            var oldNames = items.Select(item => item.Name).ToArray();
-            var oldPaths = items.Select(item => item.Path).ToArray();
-            var result = this.Service.RenameUserItem(this.Path, name);
-            result.Validate(authentication);
-            base.Name = name;
-            this.Container.InvokeCategoriesRenamedEvent(authentication, items, oldNames, oldPaths);
+            try
+            {
+                this.ValidateExpired();
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var oldNames = items.Select(item => item.Name).ToArray();
+                    var oldPaths = items.Select(item => item.Path).ToArray();
+                    var path = base.Path;
+                    return (items, oldNames, oldPaths, path);
+                });
+                var result = await Task.Run(() => this.Service.RenameUserItem(tuple.path, name));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    base.Name = name;
+                    this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void Move(Authentication authentication, string parentPath)
+        public async Task MoveAsync(Authentication authentication, string parentPath)
         {
-            this.Dispatcher.VerifyAccess();
-            this.CremaHost.DebugMethod(authentication, this, nameof(Move), this, parentPath);
-
-            var items = EnumerableUtility.One(this).ToArray();
-            var oldPaths = items.Select(item => item.Path).ToArray();
-            var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
-            var result = this.Service.MoveUserItem(this.Path, parentPath);
-            result.Validate(authentication);
-            this.Parent = this.Container[parentPath];
-            this.Container.InvokeCategoriesMovedEvent(authentication, items, oldPaths, oldParentPaths);
+            try
+            {
+                this.ValidateExpired();
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, parentPath);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var oldPaths = items.Select(item => item.Path).ToArray();
+                    var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
+                    var path = base.Path;
+                    return (items, oldPaths, oldParentPaths, path);
+                });
+                var result = await Task.Run(() => this.Service.MoveUserItem(tuple.path, parentPath));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    this.Parent = this.Container[parentPath];
+                    this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void Delete(Authentication authentication)
+        public async Task DeleteAsync(Authentication authentication)
         {
-            this.Dispatcher.VerifyAccess();
-            this.CremaHost.DebugMethod(authentication, this, nameof(Delete), this);
-
-            var items = EnumerableUtility.One(this).ToArray();
-            var oldPaths = items.Select(item => item.Path).ToArray();
-            var container = this.Container;
-            var result = this.Service.DeleteUserItem(this.Path);
-            result.Validate(authentication);
-            this.Dispose();
-            container.InvokeCategoriesDeletedEvent(authentication, items, oldPaths);
+            try
+            {
+                this.ValidateExpired();
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var oldPaths = items.Select(item => item.Path).ToArray();
+                    var path = base.Path;
+                    return (items, oldPaths, path);
+                });
+                var result = await Task.Run(() => this.Service.DeleteUserItem(tuple.path));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var container = this.Container;
+                    this.CremaHost.Sign(authentication, result);
+                    this.Dispose();
+                    container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public UserCategory AddNewCategory(Authentication authentication, string name)
+        public Task<UserCategory> AddNewCategoryAsync(Authentication authentication, string name)
         {
-            return this.Container.AddNew(authentication, name, this.Path);
+            return this.Container.AddNewAsync(authentication, name, base.Path);
         }
 
-        public User AddNewUser(Authentication authentication, string userID, SecureString password, string userName, Authority authority)
+        public Task<User> AddNewUserAsync(Authentication authentication, string userID, SecureString password, string userName, Authority authority)
         {
-            return this.Context.Users.AddNew(authentication, userID, this.Path, password, userName, authority);
+            return this.Context.Users.AddNewAsync(authentication, userID, base.Path, password, userName, authority);
         }
 
         public void InternalSetName(string name)
@@ -90,49 +132,26 @@ namespace Ntreev.Crema.Services.Users
             base.Name = name;
         }
 
-        public IUserService Service
-        {
-            get { return this.Context.Service; }
-        }
+        public IUserService Service => this.Context.Service;
 
-        public CremaHost CremaHost
-        {
-            get { return this.Context.CremaHost; }
-        }
+        public CremaHost CremaHost => this.Context.CremaHost;
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.Context.Dispatcher; }
-        }
-        
-        public new string Name
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.Name;
-            }
-        }
+        public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
 
-        public new string Path
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.Path;
-            }
-        }
+        public new string Name => base.Name;
+
+        public new string Path => base.Path;
 
         public new event EventHandler Renamed
         {
             add
             {
-                this.Dispatcher.VerifyAccess();
+                this.Dispatcher?.VerifyAccess();
                 base.Renamed += value;
             }
             remove
             {
-                this.Dispatcher.VerifyAccess();
+                this.Dispatcher?.VerifyAccess();
                 base.Renamed -= value;
             }
         }
@@ -141,12 +160,12 @@ namespace Ntreev.Crema.Services.Users
         {
             add
             {
-                this.Dispatcher.VerifyAccess();
+                this.Dispatcher?.VerifyAccess();
                 base.Moved += value;
             }
             remove
             {
-                this.Dispatcher.VerifyAccess();
+                this.Dispatcher?.VerifyAccess();
                 base.Moved -= value;
             }
         }
@@ -155,78 +174,48 @@ namespace Ntreev.Crema.Services.Users
         {
             add
             {
-                this.Dispatcher.VerifyAccess();
+                this.Dispatcher?.VerifyAccess();
                 base.Deleted += value;
             }
             remove
             {
-                this.Dispatcher.VerifyAccess();
+                this.Dispatcher?.VerifyAccess();
                 base.Deleted -= value;
             }
         }
 
         #region IUserCategory
 
-        IUserCategory IUserCategory.AddNewCategory(Authentication authentication, string name)
+        async Task<IUserCategory> IUserCategory.AddNewCategoryAsync(Authentication authentication, string name)
         {
-            return this.AddNewCategory(authentication, name);
+            return await this.AddNewCategoryAsync(authentication, name);
         }
 
-        IUser IUserCategory.AddNewUser(Authentication authentication, string userID, SecureString password, string userName, Authority authority)
+        async Task<IUser> IUserCategory.AddNewUserAsync(Authentication authentication, string userID, SecureString password, string userName, Authority authority)
         {
-            return this.AddNewUser(authentication, userID, password, userName, authority);
+            return await this.AddNewUserAsync(authentication, userID, password, userName, authority);
         }
 
-        IUserCategory IUserCategory.Parent
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        IUserCategory IUserCategory.Parent => this.Parent;
 
-        IContainer<IUser> IUserCategory.Users
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Items;
-            }
-        }
+        IContainer<IUser> IUserCategory.Users => this.Items;
 
-        IContainer<IUserCategory> IUserCategory.Categories
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        IContainer<IUserCategory> IUserCategory.Categories => this.Categories;
 
         #endregion
 
         #region IUserItem
 
-        IUserItem IUserItem.Parent
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        IUserItem IUserItem.Parent => this.Parent;
 
         IEnumerable<IUserItem> IUserItem.Childs
         {
             get
             {
-                this.Dispatcher.VerifyAccess();
                 foreach (var item in this.Categories)
                 {
                     yield return item;
                 }
-
                 foreach (var item in this.Items)
                 {
                     yield return item;

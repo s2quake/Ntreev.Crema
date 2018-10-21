@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles.TableContent
 {
-    abstract class ContentCommandBase : ConsoleCommandBase
+    abstract class ContentCommandBase : ConsoleCommandAsyncBase
     {
         protected ContentCommandBase(string name)
             : base(name)

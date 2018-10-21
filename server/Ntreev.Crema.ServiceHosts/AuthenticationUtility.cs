@@ -15,6 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using System;
 using System.Collections.Generic;
@@ -29,10 +30,11 @@ namespace Ntreev.Crema.ServiceHosts
     {
         private readonly static TimeSpan pingTimeout = new TimeSpan(0, 1, 0);
         private static Dictionary<Authentication, Description> authentications = new Dictionary<Authentication, Description>();
+        private static CremaDispatcher dispatcher;
 
         private static Timer timer;
 
-        private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        private static async void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             var descriptionList = new List<Description>();
             lock (authentications)
@@ -50,15 +52,13 @@ namespace Ntreev.Crema.ServiceHosts
                 }
             }
 
-            foreach (var item in descriptionList)
-            {
-                item.Dispose();
-            }
+            var tasks = descriptionList.Select(item => item.DisposeAsync()).ToArray();
+            await Task.WhenAll(tasks);
         }
 
-        public static int AddRef(this Authentication authentication, ICremaServiceItem obj)
+        public static Task<int> AddRefAsync(this Authentication authentication, ICremaServiceItem obj)
         {
-            lock (authentications)
+            return Dispatcher.InvokeAsync(() =>
             {
                 if (authentications.ContainsKey(authentication) == false)
                 {
@@ -69,12 +69,12 @@ namespace Ntreev.Crema.ServiceHosts
                 description.ServiceItems.Add(obj);
 
                 return description.ServiceItems.Count;
-            }
+            });
         }
 
-        public static int AddRef(this Authentication authentication, ICremaServiceItem obj, Action<Authentication> action)
+        public static Task<int> AddRefAsync(this Authentication authentication, ICremaServiceItem obj, Action<Authentication> action)
         {
-            lock (authentications)
+            return Dispatcher.InvokeAsync(() =>
             {
                 if (authentications.Any() == false && timer == null)
                 {
@@ -93,12 +93,12 @@ namespace Ntreev.Crema.ServiceHosts
                 var description = authentications[authentication];
                 description.ServiceItems.Add(obj);
                 return description.ServiceItems.Count;
-            }
+            });
         }
 
-        public static int RemoveRef(this Authentication authentication, ICremaServiceItem obj)
+        public static async Task<int> RemoveRefAsync(this Authentication authentication, ICremaServiceItem obj)
         {
-            lock (authentications)
+            return await await dispatcher.InvokeAsync(async () =>
             {
                 var description = authentications[authentication];
                 description.ServiceItems.Remove(obj);
@@ -108,7 +108,7 @@ namespace Ntreev.Crema.ServiceHosts
                     if (description.ServiceItems.Any() == false)
                     {
                         authentications.Remove(authentication);
-                        description.Dispose();
+                        await description.DisposeAsync();
                     }
 
                     return description.ServiceItems.Count;
@@ -122,44 +122,58 @@ namespace Ntreev.Crema.ServiceHosts
                         timer = null;
                     }
                 }
-            }
+            });
         }
 
-        public static void Ping(this Authentication authentication)
+        public static Task PingAsync(this Authentication authentication)
         {
-            lock (authentications)
+            return Dispatcher.InvokeAsync(() =>
             {
                 if (authentications.ContainsKey(authentication) == true)
                 {
                     authentications[authentication].Ping();
                 }
+            });
+        }
+
+        public static void Dispose()
+        {
+            dispatcher?.Dispose();
+            dispatcher = null;
+        }
+
+        private static CremaDispatcher Dispatcher
+        {
+            get
+            {
+                if (dispatcher == null)
+                    dispatcher = new CremaDispatcher(typeof(AuthenticationUtility));
+                return dispatcher;
             }
         }
 
-#region classes
+        #region classes
 
         class Description
         {
-            private readonly List<ICremaServiceItem> serviceItems = new List<ICremaServiceItem>();
-            private readonly Authentication authentication;
             private readonly Action<Authentication> action;
 
             public Description(Authentication authentication, Action<Authentication> action)
             {
-                this.authentication = authentication;
-                this.authentication.Expired += Authentication_Expired;
+                this.Authentication = authentication;
+                this.Authentication.Expired += Authentication_Expired;
                 this.action = action;
                 this.DateTime = DateTime.Now;
             }
 
-            private void Authentication_Expired(object sender, EventArgs e)
+            private async void Authentication_Expired(object sender, EventArgs e)
             {
-                this.authentication.Expired -= Authentication_Expired;
-                lock (authentications)
+                this.Authentication.Expired -= Authentication_Expired;
+                await Dispatcher.InvokeAsync(() =>
                 {
-                    authentications.Remove(authentication);
-                }
-                this.AbortServieItems(false);
+                    authentications.Remove(Authentication);
+                });
+                //await this.AbortServieItemsAsync(false);
             }
 
             public void Ping()
@@ -167,39 +181,28 @@ namespace Ntreev.Crema.ServiceHosts
                 this.DateTime = DateTime.Now;
             }
 
-            public void Dispose()
+            public async Task DisposeAsync()
             {
-                this.authentication.Expired -= Authentication_Expired;
-                this.AbortServieItems(true);
-                if (this.serviceItems.Any() == true)
-                    this.action(this.authentication);
+                this.Authentication.Expired -= Authentication_Expired;
+                //await this.AbortServieItemsAsync(true);
+                if (this.ServiceItems.Any() == true)
+                    this.action(this.Authentication);
             }
 
-            public Authentication Authentication
-            {
-                get { return this.authentication; }
-            }
+            public Authentication Authentication { get; }
 
-            public List<ICremaServiceItem> ServiceItems
-            {
-                get { return this.serviceItems; }
-            }
+            public List<ICremaServiceItem> ServiceItems { get; } = new List<ICremaServiceItem>();
 
-            public DateTime DateTime
-            {
-                get; private set;
-            }
+            public DateTime DateTime { get; private set; }
 
-            private void AbortServieItems(bool disconnect)
+            private async Task AbortServieItemsAsync(bool disconnect)
             {
-                var items = this.serviceItems.ToArray().Reverse();
-                foreach (var item in items)
-                {
-                    Task.Run(() => item.Abort(disconnect));
-                }
+                var items = this.ServiceItems.ToArray().Reverse();
+                var tasks = items.Select(item => item.CloseAsync(disconnect)).ToArray();
+                await Task.WhenAll(tasks);
             }
         }
 
-#endregion
+        #endregion
     }
 }

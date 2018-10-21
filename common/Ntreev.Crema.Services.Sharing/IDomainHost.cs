@@ -26,14 +26,10 @@ namespace Ntreev.Crema.Services
 {
     interface IDomainHost
     {
-        void Restore(Domain domain);
+        void Attach(Domain domain);
 
         void Detach();
 
-#if SERVER
-        void ValidateDelete(Authentication authentication, bool isCanceled);
-#endif
-
-        Domain Domain { get; }
+        Task<object> DeleteAsync(Authentication authentication, bool isCanceled, object result);
     }
 }

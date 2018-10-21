@@ -23,12 +23,13 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using Ntreev.Library.ObjectModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Random
 {
     public static class TableRowExtensions
     {
-        public static bool InitializeRandom(this ITableRow tableRow, Authentication authentication)
+        public static async Task<bool> InitializeRandomAsync(this ITableRow tableRow, Authentication authentication)
         {
             var content = tableRow.Content;
             var table = content.Table;
@@ -36,32 +37,32 @@ namespace Ntreev.Crema.Services.Random
             {
                 if (tableRow[item.Name] != null && item.IsUnique == false)
                     continue;
-                if (SetRandomValue(tableRow, authentication, item.Name) == false)
+                if (await SetRandomValueAsync(tableRow, authentication, item.Name) == false)
                     return false;
             }
             return true;
         }
 
-        public static bool SetRandomValue(this ITableRow tableRow, Authentication authentication)
+        public static async Task<bool> SetRandomValueAsync(this ITableRow tableRow, Authentication authentication)
         {
             var content = tableRow.Content;
             var table = content.Table;
             var columnInfo = table.TableInfo.Columns.Random();
-            var value = GetRandomValue(tableRow, columnInfo.Name);
+            var value = await GetRandomValueAsync(tableRow, columnInfo.Name);
             if (value == null)
                 return false;
-            tableRow.SetField(authentication, columnInfo.Name, value);
+            await tableRow.SetFieldAsync(authentication, columnInfo.Name, value);
             return true;
         }
 
-        public static bool SetRandomValue(this ITableRow tableRow, Authentication authentication, int tryCount)
+        public static async Task<bool> SetRandomValueAsync(this ITableRow tableRow, Authentication authentication, int tryCount)
         {
             var count = 0;
             for (var i = 0; i < tryCount; i++)
             {
                 try
                 {
-                    if (SetRandomValue(tableRow, authentication) == true)
+                    if (await SetRandomValueAsync(tableRow, authentication) == true)
                         count++;
                 }
                 catch
@@ -72,9 +73,9 @@ namespace Ntreev.Crema.Services.Random
             return count > 0;
         }
 
-        public static bool SetRandomValue(this ITableRow tableRow, Authentication authentication, string columnName)
+        public static async Task<bool> SetRandomValueAsync(this ITableRow tableRow, Authentication authentication, string columnName)
         {
-            var value = GetRandomValue(tableRow, columnName);
+            var value = await GetRandomValueAsync(tableRow, columnName);
             if (value == null)
                 return false;
 
@@ -83,25 +84,24 @@ namespace Ntreev.Crema.Services.Random
             var dataSet = domain.Source as CremaDataSet;
             var dataTable = dataSet.Tables[table.Name, table.Category.Path];
 
-            if (dataTable.Columns[columnName].Unique == true && value is TimeSpan == false)
+            if (dataTable.Columns[columnName].Unique == true)
             {
-                var text = $"{value}";
-                if (value is string || value is DateTime)
-                    text = $"'{value}'";
-                var items = dataTable.Select($"{columnName}={text}");
+                var expression = CremaDataExtensions.GenerateFieldExpression(columnName, value);
+                var items = dataTable.Select(expression);
                 if (items.Any() == true)
                     return false;
             }
 
-            tableRow.SetField(authentication, columnName, value);
+            await tableRow.SetFieldAsync(authentication, columnName, value);
             return true;
         }
 
-        private static object GetRandomValue(this ITableRow tableRow, string columnName)
+        private static async Task<object> GetRandomValueAsync(this ITableRow tableRow, string columnName)
         {
             var content = tableRow.Content;
             var table = content.Table;
-            var columnInfo = table.TableInfo.Columns.Where(item => item.Name == columnName).First();
+            var tableInfo = await table.Dispatcher.InvokeAsync(() => table.TableInfo);
+            var columnInfo = tableInfo.Columns.Where(item => item.Name == columnName).First();
 
             if (CremaDataTypeUtility.IsBaseType(columnInfo.DataType) == true)
             {
@@ -111,8 +111,8 @@ namespace Ntreev.Crema.Services.Random
             else
             {
                 var typeContext = table.GetService(typeof(ITypeContext)) as ITypeContext;
-                var type = typeContext[columnInfo.DataType] as IType;
-                return type.GetRandomValue();
+                var type = await typeContext.Dispatcher.InvokeAsync(()=> typeContext[columnInfo.DataType] as IType);
+                return await type.GetRandomValueAsync();
             }
         }
     }

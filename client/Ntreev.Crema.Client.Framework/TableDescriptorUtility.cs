@@ -86,11 +86,11 @@ namespace Ntreev.Crema.Client.Framework
             return descriptor.TableAttribute.HasFlag(TableAttribute.BaseTable);
         }
 
-        public static async Task<LogInfo[]> GetLogAsync(Authentication authentication, ITableDescriptor descriptor)
+        public static async Task<LogInfo[]> GetLogAsync(Authentication authentication, ITableDescriptor descriptor, string revision)
         {
             if (descriptor.Target is ITable table)
             {
-                return await table.Dispatcher.InvokeAsync(() => table.GetLog(authentication));
+                return await table.GetLogAsync(authentication, revision);
             }
             else
             {
@@ -102,7 +102,7 @@ namespace Ntreev.Crema.Client.Framework
         {
             if (descriptor.Target is ITable table)
             {
-                return await table.Dispatcher.InvokeAsync(() => table.Find(authentication, text, options));
+                return await table.FindAsync(authentication, text, options);
             }
             else
             {
@@ -110,11 +110,11 @@ namespace Ntreev.Crema.Client.Framework
             }
         }
 
-        public static async Task<CremaDataSet> GetDataAsync(Authentication authentication, ITableDescriptor descriptor, long revision)
+        public static async Task<CremaDataSet> GetDataAsync(Authentication authentication, ITableDescriptor descriptor, string revision)
         {
             if (descriptor.Target is ITable table)
             {
-                return await table.Dispatcher.InvokeAsync(() => table.GetDataSet(authentication, revision));
+                return await table.GetDataSetAsync(authentication, revision);
             }
             else
             {

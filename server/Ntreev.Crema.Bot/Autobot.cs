@@ -45,21 +45,21 @@ namespace Ntreev.Crema.Bot
             this.password = password;
         }
 
-        public override ICremaHost CremaHost => this.cremaHost;
+        public override object GetService(Type serviceType)
+        {
+            return this.cremaHost.GetService(serviceType);
+        }
 
         public override AutobotServiceBase Service => this.service;
 
-        protected override Authentication OnLogin()
+        protected override Task<Authentication> OnLoginAsync()
         {
-            return this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.Login(this.AutobotID, this.password));
+            return this.cremaHost.LoginAsync(this.AutobotID, this.password);
         }
 
-        protected override void OnLogout(Authentication authentication)
+        protected override Task OnLogoutAsync(Authentication authentication)
         {
-            this.cremaHost.Dispatcher.Invoke(() =>
-            {
-                this.cremaHost.Logout(authentication);
-            });
+            return this.cremaHost.LogoutAsync(authentication);
         }
     }
 }

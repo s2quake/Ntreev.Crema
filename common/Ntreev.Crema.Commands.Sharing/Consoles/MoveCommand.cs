@@ -25,12 +25,13 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceDescription("Resources", IsShared = true)]
-    class MoveCommand : ConsoleCommandBase
+    class MoveCommand : ConsoleCommandAsyncBase
     {
         public MoveCommand()
             : base("mv")
@@ -61,12 +62,12 @@ namespace Ntreev.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.IsOnline;
 
-        protected override void OnExecute()
+        protected override Task OnExecuteAsync()
         {
             var sourcePath = this.CommandContext.GetAbsolutePath(this.SourcePath);
             var destPath = this.CommandContext.GetAbsolutePath(this.DestPath);
             this.ValidateMove(sourcePath, destPath);
-            this.Move(sourcePath, destPath);
+            return this.MoveAsync(sourcePath, destPath);
         }
 
         private void ValidateMove(string sourcePath, string destPath)
@@ -77,13 +78,13 @@ namespace Ntreev.Crema.Commands.Consoles
                 throw new ArgumentException($"cannot move '{sourceRoot}' to '{destPath}'");
         }
 
-        private void Move(string sourcePath, string destPath)
+        private Task MoveAsync(string sourcePath, string destPath)
         {
             var root = this.CommandContext.GetDrive(sourcePath);
             var sourceLocalPath = this.CommandContext.GetAbsolutePath(sourcePath);
             var destLocalPath = this.CommandContext.GetAbsolutePath(destPath);
             var authentication = this.CommandContext.GetAuthentication(this);
-            root.Move(authentication, sourceLocalPath, destLocalPath);
+            return root.MoveAsync(authentication, sourceLocalPath, destLocalPath);
         }
     }
 }

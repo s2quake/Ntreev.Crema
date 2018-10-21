@@ -39,7 +39,6 @@ namespace Ntreev.Crema.Commands.Consoles
     {
         [ImportingConstructor]
         public LockCommand()
-            : base("lock")
         {
 
         }
@@ -60,16 +59,16 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty('m')]
+        [CommandProperty('m', true, IsRequired = true, IsExplicit = true)]
         [CommandPropertyTrigger(nameof(Information), false)]
         [DefaultValue("")]
-        public string Comment
+        public string Message
         {
             get; set;
         }
 
         [CommandProperty('i')]
-        [CommandPropertyTrigger(nameof(Comment), "")]
+        [CommandPropertyTrigger(nameof(Message), "")]
         public bool Information
         {
             get; set;
@@ -83,25 +82,24 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var lockable = this.GetObject(authentication, this.GetAbsolutePath(this.Path));
+            var lockable = await this.GetObjectAsync(authentication, this.GetAbsolutePath(this.Path));
 
             if (this.Information == true)
             {
                 var lockInfo = this.Invoke(authentication, lockable, () => lockable.LockInfo);
                 var prop = lockInfo.ToDictionary();
-                var text = TextSerializer.Serialize(prop, this.FormatType);
-                this.Out.WriteLine(text);
+                this.CommandContext.WriteObject(prop, this.FormatType);
             }
             else
             {
-                if (this.Comment == string.Empty)
+                if (this.Message == string.Empty)
                 {
-                    throw new ArgumentException($"'{this.GetDescriptor(nameof(this.Comment)).DisplayPattern}' 가 필요합니다.");
+                    throw new ArgumentException($"'{this.GetDescriptor(nameof(this.Message)).DisplayPattern}' 가 필요합니다.");
                 }
-                this.Invoke(authentication, lockable, () => lockable.Lock(authentication, this.Comment));
+                await lockable.LockAsync(authentication, this.Message);
             }
         }
     }

@@ -41,11 +41,17 @@ namespace Ntreev.Crema.Client.Base.Dialogs.Views
         private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             this.configs.Update(this);
+            this.gridControl.Visibility = System.Windows.Visibility.Visible;
         }
 
         private void UserControl_Unloaded(object sender, System.Windows.RoutedEventArgs e)
         {
             this.configs.Commit(this);
+        }
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            base.OnPreviewKeyDown(e);
         }
     }
 }

@@ -18,27 +18,23 @@
 //#if !DEBUG
 #define USE_PARALLEL
 //#endif
+using Ntreev.Crema.Data.Properties;
+using Ntreev.Crema.Data.Xml;
+using Ntreev.Crema.Data.Xml.Schema;
+using Ntreev.Library;
+using Ntreev.Library.IO;
+using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
-using Ntreev.Crema.Data.Xml;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml.Schema;
-using System.ComponentModel;
-using Ntreev.Library.IO;
 using System.Threading.Tasks;
-using Ntreev.Library;
-using System.Collections.Concurrent;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Data.Properties;
-using System.CodeDom.Compiler;
+using System.Xml;
 using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace Ntreev.Crema.Data
 {
@@ -46,9 +42,6 @@ namespace Ntreev.Crema.Data
     public class CremaDataSet : IListSource, IDisposable, IXmlSerializable, ISerializable
     {
         public const string DefaultDataSetName = "Content";
-        private readonly InternalDataSet dataSet;
-        private readonly CremaDataTableCollection tables;
-        private readonly CremaDataTypeCollection types;
 
         static CremaDataSet()
         {
@@ -57,9 +50,9 @@ namespace Ntreev.Crema.Data
 
         public CremaDataSet()
         {
-            this.dataSet = new InternalDataSet(this, CremaDataSet.DefaultDataSetName);
-            this.tables = new CremaDataTableCollection(this.dataSet);
-            this.types = new CremaDataTypeCollection(this.dataSet);
+            this.InternalObject = new InternalDataSet(this, CremaDataSet.DefaultDataSetName);
+            this.Tables = new CremaDataTableCollection(this.InternalObject);
+            this.Types = new CremaDataTypeCollection(this.InternalObject);
         }
 
         private CremaDataSet(SerializationInfo info, StreamingContext context)
@@ -130,13 +123,12 @@ namespace Ntreev.Crema.Data
                 this.ReadXmlString(xml, new ItemName(categoryPath, tableName));
             });
             this.EndLoad();
-            //this.AcceptChanges();
         }
 
         private CremaDataSet(SignatureDateProvider modificationProvider)
             : this()
         {
-            this.dataSet.SignatureDateProvider = modificationProvider;
+            this.InternalObject.SignatureDateProvider = modificationProvider;
         }
 
         public static string GenerateHashValue(params TypeInfo[] types)
@@ -156,13 +148,13 @@ namespace Ntreev.Crema.Data
 
         public override string ToString()
         {
-            return this.dataSet.ToString();
+            return this.InternalObject.ToString();
         }
 
         public event EventHandler Disposed
         {
-            add { this.dataSet.Disposed += value; }
-            remove { this.dataSet.Disposed -= value; }
+            add { this.InternalObject.Disposed += value; }
+            remove { this.InternalObject.Disposed -= value; }
         }
 
         public static CremaDataSet ReadSchema(string filename)
@@ -219,14 +211,29 @@ namespace Ntreev.Crema.Data
             return ReadFromDirectory(path, null);
         }
 
-        public static CremaDataSet ReadFromDirectory(string path, string readPattern)
+        public static CremaDataSet ReadFromDirectory(string path, string filterExpression)
+        {
+            return ReadFromDirectory(path, filterExpression, ReadTypes.All);
+        }
+
+        /// <summary>
+        /// 경로내에 타입과 테이블을 읽어들입니다.
+        /// </summary>
+        /// <param name="path">데이터를 읽어들일 경로입니다.</param>
+        /// <param name="filterExpression">필터 표현식입니다. glob 형태를 사용하며 여러개일 경우 구분자 ; 를 사용합니다.
+        /// options 값이 TypeOnly 일경우에는 필터가 타입에 영향을 미칩니다.
+        /// </param>
+        /// <param name="readType"></param>
+        /// <returns></returns>
+        public static CremaDataSet ReadFromDirectory(string path, string filterExpression, ReadTypes readType)
         {
             ValidateReadFromDirectory(path);
 
             var dataSet = new CremaDataSet();
 
-            var tablePath = Path.Combine(path, CremaSchemaObsolete.TableDirectoryObsolete);
-            var typePath = Path.Combine(path, CremaSchemaObsolete.TypeDirectoryObsolete);
+            var fullPath = new DirectoryInfo(path).FullName;
+            var tablePath = Path.Combine(fullPath, CremaSchemaObsolete.TableDirectoryObsolete);
+            var typePath = Path.Combine(fullPath, CremaSchemaObsolete.TypeDirectoryObsolete);
 
             if (Directory.Exists(tablePath) == true || Directory.Exists(typePath) == true)
             {
@@ -234,31 +241,50 @@ namespace Ntreev.Crema.Data
             }
             else
             {
-                tablePath = Path.Combine(path, CremaSchema.TableDirectory);
-                typePath = Path.Combine(path, CremaSchema.TypeDirectory);
+                tablePath = Path.Combine(fullPath, CremaSchema.TableDirectory);
+                typePath = Path.Combine(fullPath, CremaSchema.TypeDirectory);
             }
 
-            if (readPattern == null)
+            var typeFiles = DirectoryUtility.Exists(typePath) ? DirectoryUtility.GetAllFiles(typePath, "*" + CremaSchema.SchemaExtension) : new string[] { };
+            var tableFiles = DirectoryUtility.Exists(tablePath) ? DirectoryUtility.GetAllFiles(tablePath, "*" + CremaSchema.XmlExtension) : new string[] { };
+
+            switch (readType)
             {
-                var typeFiles = DirectoryUtility.Exists(typePath) ? DirectoryUtility.GetAllFiles(typePath, "*" + CremaSchema.SchemaExtension) : new string[] { };
-                var tableFiles = DirectoryUtility.Exists(tablePath) ? DirectoryUtility.GetAllFiles(tablePath, "*" + CremaSchema.XmlExtension) : new string[] { };
-                dataSet.ReadMany(typeFiles, tableFiles);
-            }
-            else
-            {
-                var query1 = from item in DirectoryUtility.Exists(tablePath) ? DirectoryUtility.GetAllFiles(tablePath, "*" + CremaSchema.XmlExtension) : new string[] { }
-                             where StringUtility.GlobMany(Path.GetFileNameWithoutExtension(item), readPattern)
-                             select item;
+                case ReadTypes.All:
+                case ReadTypes.OmitContent:
+                    {
+                        if (filterExpression != null)
+                        {
+                            var query1 = from item in tableFiles
+                                         where Filter(filterExpression, tablePath, item)
+                                         select item;
 
-                var query2 = from item in query1
-                             let readInfo = new CremaXmlReadInfo(item)
-                             from item2 in readInfo.GetTypePaths()
-                             select item2;
-
-                var tableFiles = query1.ToArray();
-                var typeFiles = query2.Distinct().ToArray();
-                dataSet.ReadMany(typeFiles, tableFiles);
+                            var query2 = from item in query1
+                                         let readInfo = new CremaXmlReadInfo(item)
+                                         from item2 in readInfo.GetTypePaths()
+                                         select item2;
+                            tableFiles = query1.ToArray();
+                            typeFiles = query2.Distinct().ToArray();
+                        }
+                    }
+                    break;
+                case ReadTypes.TypeOnly:
+                    {
+                        if (filterExpression != null)
+                        {
+                            var query1 = from item in typeFiles
+                                         where Filter(filterExpression, typePath, item)
+                                         select item;
+                        }
+                        else
+                        {
+                            tableFiles = new string[] { };
+                        }
+                    }
+                    break;
             }
+
+            dataSet.ReadMany(typeFiles, tableFiles, readType == ReadTypes.OmitContent);
 
             if (dataSet.Namespace == CremaSchemaObsolete.BaseNamespaceObsolete)
             {
@@ -280,17 +306,17 @@ namespace Ntreev.Crema.Data
 
         public void Dispose()
         {
-            this.dataSet.Dispose();
+            this.InternalObject.Dispose();
         }
 
         public void AcceptChanges()
         {
-            Parallel.ForEach(this.tables, item =>
+            Parallel.ForEach(this.Tables, item =>
             {
                 item.AcceptChanges();
             });
 
-            Parallel.ForEach(this.types, item =>
+            Parallel.ForEach(this.Types, item =>
             {
                 item.AcceptChanges();
             });
@@ -298,7 +324,7 @@ namespace Ntreev.Crema.Data
 
         public void Clear()
         {
-            this.dataSet.Clear();
+            this.InternalObject.Clear();
         }
 
         /// <summary>
@@ -335,8 +361,8 @@ namespace Ntreev.Crema.Data
 
         public void RejectChanges()
         {
-            this.dataSet.RejectChanges();
-            foreach (var item in this.types)
+            this.InternalObject.RejectChanges();
+            foreach (var item in this.Types)
             {
                 item.RejectChanges();
             }
@@ -344,12 +370,12 @@ namespace Ntreev.Crema.Data
 
         public bool HasChanges()
         {
-            return this.dataSet.HasChanges();
+            return this.InternalObject.HasChanges();
         }
 
         public bool HasChanges(DataRowState rowStates)
         {
-            return this.dataSet.HasChanges(rowStates);
+            return this.InternalObject.HasChanges(rowStates);
         }
 
         public void ReadXmlString(string xml)
@@ -404,9 +430,14 @@ namespace Ntreev.Crema.Data
 
         public void ReadTypeString(string schema)
         {
+            this.ReadTypeString(schema, null);
+        }
+
+        public void ReadTypeString(string schema, ItemName itemName)
+        {
             using (var sr = new StringReader(schema))
             {
-                this.ReadType(sr);
+                this.ReadType(sr, itemName);
             }
         }
 
@@ -494,6 +525,11 @@ namespace Ntreev.Crema.Data
 
         public void ReadMany(string[] typeFiles, string[] tableFiles)
         {
+            this.ReadMany(typeFiles, tableFiles, false);
+        }
+
+        public void ReadMany(string[] typeFiles, string[] tableFiles, bool schemaOnly)
+        {
 #if USE_PARALLEL
             Parallel.ForEach(typeFiles, item =>
             {
@@ -536,77 +572,109 @@ namespace Ntreev.Crema.Data
             }
 #endif
 
-            this.BeginLoad();
+            //if (schemaOnly == false)
+            //{
+                this.BeginLoad();
 
 #if USE_PARALLEL
-            readInfos.Sort((x, y) => y.XmlSize.CompareTo(x.XmlSize));
+                readInfos.Sort((x, y) => y.XmlSize.CompareTo(x.XmlSize));
 
-            var threadcount = 8;
-            var query = from item in readInfos
-                        let key = readInfos.IndexOf(item) % threadcount
-                        group item by key into g
-                        select g;
+                var threadcount = 8;
+                var query = from item in readInfos
+                            let key = readInfos.IndexOf(item) % threadcount
+                            group item by key into g
+                            select g;
 
-            var parallellist = new List<CremaXmlReadInfo>(readInfos.Count);
+                var parallellist = new List<CremaXmlReadInfo>(readInfos.Count);
 
-            foreach (var item in query)
-            {
-                parallellist.AddRange(item);
-            }
-
-            try
-            {
-                Parallel.ForEach(parallellist, new ParallelOptions { MaxDegreeOfParallelism = threadcount }, item =>
+                foreach (var item in query)
                 {
-                    this.ReadXml(item.XmlPath, item.ItemName);
-                });
-            }
-            catch (AggregateException e)
-            {
-                throw e.InnerException;
-            }
+                    parallellist.AddRange(item);
+                }
+
+                try
+                {
+                    Parallel.ForEach(parallellist, new ParallelOptions { MaxDegreeOfParallelism = threadcount }, item =>
+                    {
+                        var xmlReader = new CremaXmlReader(this, item.ItemName)
+                        {
+                            OmitContent = schemaOnly == true
+                        };
+                        xmlReader.Read(item.XmlPath);
+                    });
+                }
+                catch (AggregateException e)
+                {
+                    throw e.InnerException;
+                }
 #else
             foreach (var item in readInfos)
             {
-                this.ReadXml(item.XmlPath, item.ItemName);
+                var xmlReader = new CremaXmlReader(this, item.ItemName)
+                {
+                    OmitContent = schemaOnly == true
+                };
+                xmlReader.Read(item.XmlPath);
             }
 #endif
-            this.EndLoad();
+                this.EndLoad();
+            //}
+            this.Tables.Sort();
         }
 
         public void ReadType(string filename)
         {
+            this.ReadType(filename, null);
+        }
+
+        public void ReadType(string filename, ItemName itemName)
+        {
             var dataType = new CremaDataType();
-            var schemaReader = new CremaSchemaReader(dataType);
+            var schemaReader = new CremaSchemaReader(dataType, itemName);
             schemaReader.Read(filename);
             lock (this)
             {
-                this.types.Add(dataType);
+                this.Types.Add(dataType);
             }
         }
 
         public void ReadType(TextReader reader)
         {
-            var type = new CremaDataType();
-            var schemaReader = new CremaSchemaReader(type);
-            schemaReader.Read(reader);
-            this.types.Add(type);
+            this.ReadType(reader, null);
         }
 
-        public void ReadType(Stream stream)
+        public void ReadType(TextReader reader, ItemName itemName)
         {
-            var type = new CremaDataType();
-            var schemaReader = new CremaSchemaReader(type);
+            var dataType = new CremaDataType();
+            var schemaReader = new CremaSchemaReader(dataType, itemName);
+            schemaReader.Read(reader);
+            this.Types.Add(dataType);
+        }
+
+        public void ReadType(Stream reader)
+        {
+            this.ReadType(reader, null);
+        }
+
+        public void ReadType(Stream stream, ItemName itemName)
+        {
+            var dataType = new CremaDataType();
+            var schemaReader = new CremaSchemaReader(dataType, itemName);
             schemaReader.Read(stream);
-            this.types.Add(type);
+            this.Types.Add(dataType);
         }
 
         public void ReadType(XmlReader reader)
         {
-            var type = new CremaDataType();
-            var schemaReader = new CremaSchemaReader(type);
+            this.ReadType(reader, null);
+        }
+
+        public void ReadType(XmlReader reader, ItemName itemName)
+        {
+            var dataType = new CremaDataType();
+            var schemaReader = new CremaSchemaReader(dataType, itemName);
             schemaReader.Read(reader);
-            this.types.Add(type);
+            this.Types.Add(dataType);
         }
 
         public void ReadXmlSchema(string filename)
@@ -740,33 +808,44 @@ namespace Ntreev.Crema.Data
         /// <param name="path"></param>
         public void WriteToDirectory(string path)
         {
+            path = PathUtility.GetFullPath(path);
             DirectoryUtility.Prepare(path);
             DirectoryUtility.Prepare(path, CremaSchema.TypeDirectory);
             DirectoryUtility.Prepare(path, CremaSchema.TableDirectory);
 
             foreach (var item in this.Types)
             {
-                var relativePath = UriUtility.MakeRelativeOfDirectory(this.dataSet.Namespace, item.Namespace);
-                string filename = Path.Combine(path, relativePath + CremaSchema.SchemaExtension);
+                var relativePath = UriUtility.MakeRelativeOfDirectory(this.InternalObject.Namespace, item.Namespace);
+                var filename = Path.Combine(path, relativePath + CremaSchema.SchemaExtension);
                 FileUtility.Prepare(filename);
                 item.Write(filename);
             }
 
-            foreach (var item in this.Tables.Where(item => item.Parent == null))
+            foreach (var item in this.Tables)
             {
                 if (item.TemplateNamespace != string.Empty)
-                    continue;
-
-                var relativePath = UriUtility.MakeRelativeOfDirectory(this.dataSet.Namespace, item.Namespace);
-                string filename = Path.Combine(path, relativePath + CremaSchema.SchemaExtension);
-                FileUtility.Prepare(filename);
-                item.WriteXmlSchema(filename);
+                {
+                    if (item.TemplatedParent == null)
+                    {
+                        var relativePath = UriUtility.MakeRelativeOfDirectory(this.InternalObject.Namespace, item.TemplateNamespace);
+                        var filename = Path.Combine(path, relativePath + CremaSchema.SchemaExtension);
+                        FileUtility.Prepare(filename);
+                        item.WriteXmlSchema(filename);
+                    }
+                }
+                else
+                {
+                    var relativePath = UriUtility.MakeRelativeOfDirectory(this.InternalObject.Namespace, item.Namespace);
+                    var filename = Path.Combine(path, relativePath + CremaSchema.SchemaExtension);
+                    FileUtility.Prepare(filename);
+                    item.WriteXmlSchema(filename);
+                }
             }
 
-            foreach (var item in this.Tables.Where(item => item.Parent == null))
+            foreach (var item in this.Tables)
             {
-                var relativePath = UriUtility.MakeRelativeOfDirectory(this.dataSet.Namespace, item.Namespace);
-                string filename = Path.Combine(path, relativePath + CremaSchema.XmlExtension);
+                var relativePath = UriUtility.MakeRelativeOfDirectory(this.InternalObject.Namespace, item.Namespace);
+                var filename = Path.Combine(path, relativePath + CremaSchema.XmlExtension);
                 FileUtility.Prepare(filename);
                 item.WriteXml(filename);
             }
@@ -790,37 +869,60 @@ namespace Ntreev.Crema.Data
             }
         }
 
+        public IDictionary<string, object> ToDictionary()
+        {
+            return this.ToDictionary(false, false);
+        }
+
+        public IDictionary<string, object> ToDictionary(bool omitType, bool omitTable)
+        {
+            var props = new Dictionary<string, object>();
+
+            if (omitType == false)
+            {
+                var types = new Dictionary<string, object>(this.Types.Count);
+                foreach (var item in this.Types.OrderBy(item => item.Name))
+                {
+                    types.Add(item.Name, item.ToDictionary());
+                }
+                props.Add(CremaSchema.TypeDirectory, types);
+            }
+
+            if (omitTable == false)
+            {
+                var tables = new Dictionary<string, object>(this.Tables.Count);
+                foreach (var item in this.Tables.OrderBy(item => item.Name))
+                {
+                    tables.Add(item.Name, item.ToDictionary());
+                }
+                props.Add(CremaSchema.TableDirectory, tables);
+            }
+
+            return props;
+        }
+
         [DefaultValue(false)]
         public bool CaseSensitive
         {
-            get { return this.dataSet.CaseSensitive; }
-            set { this.dataSet.CaseSensitive = value; }
+            get => this.InternalObject.CaseSensitive;
+            set => this.InternalObject.CaseSensitive = value;
         }
 
         [DefaultValue("")]
-        public string DataSetName
-        {
-            get { return this.dataSet.DataSetName; }
-        }
+        public string DataSetName => this.InternalObject.DataSetName;
 
         [Browsable(false)]
-        public DataViewManager DefaultViewManager
-        {
-            get { return this.dataSet.DefaultViewManager; }
-        }
+        public DataViewManager DefaultViewManager => this.InternalObject.DefaultViewManager;
 
         [Browsable(false)]
-        public PropertyCollection ExtendedProperties
-        {
-            get { return this.dataSet.ExtendedProperties; }
-        }
+        public PropertyCollection ExtendedProperties => this.InternalObject.ExtendedProperties;
 
         [Browsable(false)]
         public bool HasErrors
         {
             get
             {
-                if (this.dataSet.HasErrors == true)
+                if (this.InternalObject.HasErrors == true)
                     return true;
 
                 var query = from item in this.Tables
@@ -834,43 +936,24 @@ namespace Ntreev.Crema.Data
         [DefaultValue("")]
         public string Namespace
         {
-            get { return this.dataSet.Namespace; }
-            set { this.dataSet.Namespace = value; }
+            get => this.InternalObject.Namespace;
+            set => this.InternalObject.Namespace = value;
         }
 
-        public string TableNamespace
-        {
-            get { return this.dataSet.TableNamespace; }
-        }
+        public string TableNamespace => this.InternalObject.TableNamespace;
 
-        public string TypeNamespace
-        {
-            get { return this.dataSet.TypeNamespace; }
-        }
+        public string TypeNamespace => this.InternalObject.TypeNamespace;
 
         public SignatureDateProvider SignatureDateProvider
         {
-            get { return this.dataSet.SignatureDateProvider; }
-            set { this.dataSet.SignatureDateProvider = value; }
+            get => this.InternalObject.SignatureDateProvider;
+            set => this.InternalObject.SignatureDateProvider = value;
         }
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public CremaDataTableCollection Tables
-        {
-            get { return this.tables; }
-        }
+        public CremaDataTableCollection Tables { get; }
 
-        public CremaDataTypeCollection Types
-        {
-            get { return this.types; }
-        }
-
-        //[Obsolete]
-        //public static Func<string, bool> NameVerifier
-        //{
-        //    get { return nameVerifier ?? defaultNameVerifier; }
-        //    set { nameVerifier = value; }
-        //}
+        public CremaDataTypeCollection Types { get; }
 
         public static void ValidateName(string name)
         {
@@ -938,7 +1021,7 @@ namespace Ntreev.Crema.Data
 
         public static void ValidateDirectory(string path, string pattern)
         {
-            ValidateDirectory(path, pattern, null);
+            ValidateDirectory(path, pattern, DefaultValidationEventHandler);
         }
 
         public static void ValidateDirectory(string path, ValidationEventHandler validationEventHandler)
@@ -948,6 +1031,8 @@ namespace Ntreev.Crema.Data
 
         public static void ValidateDirectory(string path, string pattern, ValidationEventHandler validationEventHandler)
         {
+            if (validationEventHandler == null)
+                throw new ArgumentNullException(nameof(validationEventHandler));
             ValidateReadFromDirectory(path);
 
             var tablePath = Path.Combine(path, CremaSchemaObsolete.TableDirectoryObsolete);
@@ -968,7 +1053,8 @@ namespace Ntreev.Crema.Data
                         select item;
 
             var errorList = new List<ValidationEventArgs>();
-            Parallel.ForEach(query, item =>
+            foreach (var item in query)
+            //Parallel.ForEach(query, item =>
             {
                 Validate(item, (s, e) =>
                 {
@@ -977,37 +1063,62 @@ namespace Ntreev.Crema.Data
                         errorList.Add(e);
                     }
                 });
-            });
+            }
+            //});
 
-            var sourceUri = string.Empty;
             foreach (var item in errorList.OrderBy(i => i.Exception.SourceUri))
             {
-                if (sourceUri != item.Exception.SourceUri)
-                {
-                    if (sourceUri != string.Empty)
-                        Console.WriteLine();
-                    sourceUri = item.Exception.SourceUri;
-                    Console.WriteLine(sourceUri);
-                }
-
-                if (item.Severity == XmlSeverityType.Error)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write("error: ");
-                    Console.WriteLine(new XmlException(item.Message, item.Exception, item.Exception.LineNumber, item.Exception.LinePosition).Message);
-                    Console.ResetColor();
-                }
-                else
-                {
-                    Console.Write("warning: ");
-                    Console.WriteLine(item.Message);
-                }
+                validationEventHandler(null, item);
             }
+        }
+
+        private static void DefaultValidationEventHandler(object sender, ValidationEventArgs item)
+        {
+            Console.WriteLine(item.Exception.SourceUri);
+
+            if (item.Severity == XmlSeverityType.Error)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("error: ");
+                Console.WriteLine(new XmlException(item.Message, item.Exception, item.Exception.LineNumber, item.Exception.LinePosition).Message);
+                Console.ResetColor();
+            }
+            else
+            {
+                Console.Write("warning: ");
+                Console.WriteLine(item.Message);
+            }
+        }
+
+        private static bool Filter(string filterExpression, string basePath, string itemPath)
+        {
+            if (filterExpression == null)
+                return true;
+
+            var patterns = StringUtility.Split(filterExpression, ';');
+            var namePattern = string.Join(";", patterns.Where(item => item.IndexOf(PathUtility.SeparatorChar) < 0));
+            var pathPattern = string.Join(";", patterns.Where(item => item.IndexOf(PathUtility.SeparatorChar) >= 0));
+            var path = FileUtility.RemoveExtension(itemPath);
+            var relativePath = UriUtility.MakeRelativeOfDirectory(basePath, path);
+            var items = StringUtility.SplitPath(relativePath);
+            var itemName = ItemName.Create(items);
+
+            if (namePattern != string.Empty && StringUtility.GlobMany(itemName.Name, namePattern) == true)
+            {
+                return true;
+            }
+
+            if (pathPattern != string.Empty && StringUtility.GlobMany(itemName.CategoryPath, pathPattern) == true)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private void GetSerializableData(IDictionary<string, string> items)
         {
-            var relativeType = UriUtility.MakeRelativeOfDirectory(this.dataSet.Namespace, this.TypeNamespace);
+            var relativeType = UriUtility.MakeRelativeOfDirectory(this.InternalObject.Namespace, this.TypeNamespace);
             var lockobj = new object();
 
             Parallel.ForEach(this.Types, item =>
@@ -1019,7 +1130,7 @@ namespace Ntreev.Crema.Data
                 }
             });
 
-            Parallel.ForEach(this.Tables.Where(item => item.Parent == null), item =>
+            Parallel.ForEach(this.Tables, item =>
             {
                 var schema = string.Empty;
                 if (item.TemplateNamespace == string.Empty)
@@ -1032,7 +1143,7 @@ namespace Ntreev.Crema.Data
                 }
             });
 
-            Parallel.ForEach(this.Tables.Where(item => item.Parent == null), item =>
+            Parallel.ForEach(this.Tables, item =>
             {
                 var xml = item.GetXml().Compress();
                 lock (lockobj)
@@ -1100,7 +1211,7 @@ namespace Ntreev.Crema.Data
 
         internal string GetTableCategoryPath(string tableNamespace)
         {
-            return this.dataSet.GetTableCategoryPath(tableNamespace);
+            return this.InternalObject.GetTableCategoryPath(tableNamespace);
         }
 
         internal static string GetTableCategoryPath(CremaDataSet dataSet, string tableNamespace)
@@ -1115,7 +1226,7 @@ namespace Ntreev.Crema.Data
 
         internal string GetTableName(string tableNamespace)
         {
-            return this.dataSet.GetTableName(tableNamespace);
+            return this.InternalObject.GetTableName(tableNamespace);
         }
 
         internal static string GetTableName(CremaDataSet dataSet, string tableNamespace)
@@ -1130,7 +1241,7 @@ namespace Ntreev.Crema.Data
 
         internal string GetTypeCategoryPath(string typeNamespace)
         {
-            return this.dataSet.GetTypeCategoryPath(typeNamespace);
+            return this.InternalObject.GetTypeCategoryPath(typeNamespace);
         }
 
         internal static string GetTypeCategoryPath(CremaDataSet dataSet, string typeNamespace)
@@ -1145,7 +1256,7 @@ namespace Ntreev.Crema.Data
 
         internal string GetTypeName(string typeNamespace)
         {
-            return this.dataSet.GetTypeName(typeNamespace);
+            return this.InternalObject.GetTypeName(typeNamespace);
         }
 
         internal static string GetTypeName(CremaDataSet dataSet, string typeNamespace)
@@ -1158,21 +1269,15 @@ namespace Ntreev.Crema.Data
             return InternalDataSet.GetTypeName(baseNamespace, typeNamespace);
         }
 
-        internal InternalDataSet InternalObject
-        {
-            get { return this.dataSet; }
-        }
+        internal InternalDataSet InternalObject { get; }
 
         #region IListSource
 
-        bool IListSource.ContainsListCollection
-        {
-            get { return (this.dataSet as IListSource).ContainsListCollection; }
-        }
+        bool IListSource.ContainsListCollection => (this.InternalObject as IListSource).ContainsListCollection;
 
         System.Collections.IList IListSource.GetList()
         {
-            return (this.dataSet as IListSource).GetList();
+            return (this.InternalObject as IListSource).GetList();
         }
 
         #endregion

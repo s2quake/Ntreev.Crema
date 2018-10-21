@@ -27,6 +27,7 @@ using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Crema.Client.Framework;
 using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 {
@@ -66,7 +67,7 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 
         protected async override void VerifyRename(string newName, Action<bool> isVerify)
         {
-            var result = await this.table.Dispatcher.InvokeAsync(() =>
+            var result = await await this.table.Dispatcher.InvokeAsync(async () =>
             {
                 var tableContext = this.table.GetService(typeof(ITableContext)) as ITableContext;
                 var categoryNames = tableContext.Categories.Select(item => item.Path).ToArray();
@@ -83,7 +84,7 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
                     return true;
                 }
 
-                return tableContext.Tables.Contains(newName) == false;
+                return await tableContext.Tables.ContainsAsync(newName) == false;
             });
 
             isVerify(result);
@@ -91,7 +92,7 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 
         protected override Task RenameAsync(string newName)
         {
-            return this.table.Dispatcher.InvokeAsync(() => this.table.Rename(this.authentication, newName));
+            return this.table.RenameAsync(this.authentication, newName);
         }
     }
 }

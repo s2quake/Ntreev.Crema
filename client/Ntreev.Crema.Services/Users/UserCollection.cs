@@ -15,19 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library.ObjectModel;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.UserService;
+using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Threading;
-using Ntreev.Library;
-using Ntreev.Crema.Services.UserService;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Security;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users
 {
@@ -55,80 +52,54 @@ namespace Ntreev.Crema.Services.Users
             return base.BaseAddNew(name, categoryPath, null);
         }
 
-        public User AddNew(Authentication authentication, string userID, string categoryPath, SecureString password, string userName, Authority authority)
+        public async Task<User> AddNewAsync(Authentication authentication, string userID, string categoryPath, SecureString password, string userName, Authority authority)
         {
-            this.Dispatcher.VerifyAccess();
-            var result = this.Service.NewUser(userID, categoryPath, UserContext.Encrypt(userID, password), userName, authority);
-            this.Sign(authentication, result);
-            this.InvokeUserCreate(authentication, userID, authority, categoryPath);
-            var user = this.BaseAddNew(userID, categoryPath);
-            user.Initialize(result.Value, BanInfo.Empty);
-            this.InvokeUsersCreatedEvent(authentication, new User[] { user });
-            return user;
-        }
-
-        public void InvokeUserCreate(Authentication authentication, string userID, Authority authority, string categoryPath)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeUserCreate), userID, authority, categoryPath);
-        }
-
-        public void InvokeUserRename(Authentication authentication, User user, string newName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void InvokeUserMove(Authentication authentication, User user, string categoryPath)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeUserMove), user, categoryPath);
-        }
-
-        public void InvokeUserDelete(Authentication authentication, User user)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeUserDelete), user);
-        }
-
-        public void InvokeUserChange(Authentication authentication, User user)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeUserChange), user);
-        }
-
-        public void InvokeUserBan(Authentication authentication, User user, BanInfo banInfo)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeUserBan), user, banInfo.Comment);
-        }
-
-        public void InvokeUserUnban(Authentication authentication, User user)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeUserUnban), user);
-        }
-
-        public void InvokeUserKick(Authentication authentication, User user, string comment)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeUserKick), user, comment);
+            try
+            {
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
+                });
+                var result = await Task.Run(() => this.Service.NewUser(userID, categoryPath, UserContext.Encrypt(userID, password), userName, authority));
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    var user = this.BaseAddNew(userID, categoryPath);
+                    user.Initialize(result.GetValue(), BanInfo.Empty);
+                    this.InvokeUsersCreatedEvent(authentication, new User[] { user });
+                    return user;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public void InvokeUsersCreatedEvent(Authentication authentication, User[] users)
         {
             var args = users.Select(item => (object)item.UserInfo).ToArray();
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersCreatedEvent), users);
-            var comment = EventMessageBuilder.CreateUser(authentication, users);
+            var message = EventMessageBuilder.CreateUser(authentication, users);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnUsersCreated(new ItemsCreatedEventArgs<IUser>(authentication, users, args));
             this.Context.InvokeItemsCreatedEvent(authentication, users, args);
         }
 
         public void InvokeUsersRenamedEvent(Authentication authentication, User[] users, string[] oldNames, string[] oldPaths)
         {
-            
+
         }
 
         public void InvokeUsersMovedEvent(Authentication authentication, User[] users, string[] oldPaths, string[] oldCategoryPaths)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersMovedEvent), users, oldPaths, oldCategoryPaths);
-            var comment = EventMessageBuilder.MoveUser(authentication, users, oldCategoryPaths);
+            var message = EventMessageBuilder.MoveUser(authentication, users, oldCategoryPaths);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnUsersMoved(new ItemsMovedEventArgs<IUser>(authentication, users, oldPaths, oldCategoryPaths));
             this.Context.InvokeItemsMovedEvent(authentication, users, oldPaths, oldCategoryPaths);
         }
@@ -136,9 +107,9 @@ namespace Ntreev.Crema.Services.Users
         public void InvokeUsersDeletedEvent(Authentication authentication, User[] users, string[] itemPaths)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersDeletedEvent), itemPaths);
-            var comment = EventMessageBuilder.DeleteUser(authentication, users);
+            var message = EventMessageBuilder.DeleteUser(authentication, users);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnUsersDeleted(new ItemsDeletedEventArgs<IUser>(authentication, users, itemPaths));
             this.Context.InvokeItemsDeleteEvent(authentication, users, itemPaths);
         }
@@ -146,9 +117,9 @@ namespace Ntreev.Crema.Services.Users
         public void InvokeUsersChangedEvent(Authentication authentication, User[] users)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersChangedEvent), users);
-            var comment = EventMessageBuilder.ChangeUserInfo(authentication, users);
+            var message = EventMessageBuilder.ChangeUserInfo(authentication, users);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnUsersChanged(new ItemsEventArgs<IUser>(authentication, users));
         }
 
@@ -168,28 +139,28 @@ namespace Ntreev.Crema.Services.Users
         public void InvokeUsersLoggedOutEvent(Authentication authentication, User[] users, CloseInfo closeInfo)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersLoggedOutEvent), users, closeInfo.Reason, closeInfo.Message);
-            var comment = EventMessageBuilder.LogoutUser(authentication, users);
+            var message = EventMessageBuilder.LogoutUser(authentication, users);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnUsersLoggedOut(new ItemsEventArgs<IUser>(authentication, users));
         }
 
         public void InvokeUsersKickedEvent(Authentication authentication, User[] users, string[] comments)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersKickedEvent), users, comments);
-            var comment = EventMessageBuilder.KickUser(authentication, users, comments);
+            var message = EventMessageBuilder.KickUser(authentication, users, comments);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnUsersKicked(new ItemsEventArgs<IUser>(authentication, users, comments));
         }
 
         public void InvokeUsersBannedEvent(Authentication authentication, User[] users, string[] comments)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersBannedEvent), users, comments);
-            var comment = EventMessageBuilder.BanUser(authentication, users, comments);
+            var message = EventMessageBuilder.BanUser(authentication, users, comments);
             var metaData = EventMetaDataBuilder.Build(users, BanChangeType.Ban, comments);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnUsersBanChanged(new ItemsEventArgs<IUser>(authentication, users, metaData));
             this.Context.InvokeItemsChangedEvent(authentication, users);
         }
@@ -197,10 +168,10 @@ namespace Ntreev.Crema.Services.Users
         public void InvokeUsersUnbannedEvent(Authentication authentication, User[] users)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersUnbannedEvent), users);
-            var comment = EventMessageBuilder.UnbanUser(authentication, users);
+            var message = EventMessageBuilder.UnbanUser(authentication, users);
             var metaData = EventMetaDataBuilder.Build(users, BanChangeType.Unban);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnUsersBanChanged(new ItemsEventArgs<IUser>(authentication, users, metaData));
             this.Context.InvokeItemsChangedEvent(authentication, users);
         }
@@ -224,20 +195,11 @@ namespace Ntreev.Crema.Services.Users
             this.OnMessageReceived(new MessageEventArgs(authentication, users, message, MessageType.Notification));
         }
 
-        public CremaHost CremaHost
-        {
-            get { return this.Context.CremaHost; }
-        }
+        public CremaHost CremaHost => this.Context.CremaHost;
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.CremaHost.Dispatcher; }
-        }
+        public CremaDispatcher Dispatcher => this.Context.Dispatcher;
 
-        public IUserService Service
-        {
-            get { return this.Context.Service; }
-        }
+        public IUserService Service => this.Context.Service;
 
         public new int Count
         {
@@ -471,32 +433,14 @@ namespace Ntreev.Crema.Services.Users
             this.messageReceived?.Invoke(this, e);
         }
 
-        private void Sign(Authentication authentication, ResultBase result)
-        {
-            result.Validate(authentication);
-        }
-
-        private void Sign<T>(Authentication authentication, ResultBase<T> result)
-        {
-            result.Validate(authentication);
-        }
-
         #region IUserCollection
 
         bool IUserCollection.Contains(string userID)
         {
-            this.Dispatcher.VerifyAccess();
             return base.Contains(userID);
         }
 
-        IUser IUserCollection.this[string userID]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[userID];
-            }
-        }
+        IUser IUserCollection.this[string userID] => this[userID];
 
         #endregion
 
@@ -504,13 +448,11 @@ namespace Ntreev.Crema.Services.Users
 
         IEnumerator<IUser> IEnumerable<IUser>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 

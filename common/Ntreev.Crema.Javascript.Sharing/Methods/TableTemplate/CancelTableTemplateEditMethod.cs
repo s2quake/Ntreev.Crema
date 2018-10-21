@@ -46,7 +46,8 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
         {
             var template = this.GetDomainHost<ITableTemplate>(domainID);
             var authentication = this.Context.GetAuthentication(this);
-            template.Dispatcher.Invoke(() => template.CancelEdit(authentication));
+            var task = template.CancelEditAsync(authentication);
+            task.Wait();
         }
     }
 }

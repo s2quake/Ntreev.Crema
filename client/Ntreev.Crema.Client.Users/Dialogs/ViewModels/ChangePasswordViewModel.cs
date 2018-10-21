@@ -97,12 +97,12 @@ namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
             }
         }
 
-        public async void Change()
+        public async Task ChangeAsync()
         {
             try
             {
                 this.BeginProgress(Resources.Message_Change);
-                await this.user.Dispatcher.InvokeAsync(() => this.user.ChangeUserInfo(this.authentication, this.Password, this.NewPassword, null, null));
+                await this.user.ChangeUserInfoAsync(this.authentication, this.Password, this.NewPassword, null, null);
                 this.EndProgress();
                 this.TryClose(true);
                 AppMessageBox.ShowInfo(Resources.Message_ChangeComplete);

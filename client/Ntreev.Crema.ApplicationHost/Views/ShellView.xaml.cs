@@ -125,14 +125,21 @@ namespace Ntreev.Crema.ApplicationHost.Views
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(e.Property.Name));
         }
 
-        private void CremaHost_Opened(object sender, EventArgs e)
+        private async void CremaHost_Opened(object sender, EventArgs e)
         {
-            var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            userContext.UsersKicked += UserContext_UsersKicked;
-            userContext.UsersBanChanged += UserContext_UsersBanChanged;
+            if (this.cremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
+            {
+                await userContext.Dispatcher.InvokeAsync(() =>
+                {
+                    userContext.Users.UsersKicked += Users_UsersKicked;
+                    userContext.Users.UsersBanChanged += Users_UsersBanChanged;
+                });
+            }
 
-            var logService = this.cremaHost.GetService(typeof(ILogService)) as ILogService;
-            logService.RedirectionWriter = new LogWriter() { TextBox = this.logView, };
+            if (this.cremaHost.GetService(typeof(ILogService)) is ILogService logService)
+            {
+                logService.RedirectionWriter = new LogWriter() { TextBox = this.logView, };
+            }
         }
 
         private void CremaHost_Closing(object sender, EventArgs e)
@@ -161,7 +168,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
             var i = Application.Current.Windows.Count;
         }
 
-        private void UserContext_UsersKicked(object sender, ItemsEventArgs<IUser> e)
+        private void Users_UsersKicked(object sender, ItemsEventArgs<IUser> e)
         {
             var userID = this.cremaHost.UserID;
             var userIDs = e.Items.Select(item => item.ID).ToArray();
@@ -184,7 +191,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
             });
         }
 
-        private async void UserContext_UsersBanChanged(object sender, ItemsEventArgs<IUser> e)
+        private async void Users_UsersBanChanged(object sender, ItemsEventArgs<IUser> e)
         {
             foreach (var item in e.Items)
             {
@@ -246,7 +253,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
 
         private void ModernWindow_Initialized(object sender, EventArgs e)
         {
-            
+
         }
 
         private void ModernWindow_Loaded(object sender, RoutedEventArgs e)
@@ -288,7 +295,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
             }
         }
 
-        private void ConnectWithSettings()
+        private async void ConnectWithSettings()
         {
             if (this.FindResource("bootstrapper") is AppBootstrapper bootstrapper && Uri.TryCreate(bootstrapper.Settings.Address, UriKind.Absolute, out var uri))
             {
@@ -296,7 +303,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
                 {
                     var ss = uri.UserInfo.Split(':');
                     var dataBaseName = uri.LocalPath.TrimStart(PathUtility.SeparatorChar);
-                    this.cremaAppHost.Login(uri.Authority, ss[0], ss[1], dataBaseName);
+                    await this.cremaAppHost.LoginAsync(uri.Authority, ss[0], ss[1], dataBaseName);
                 }
                 catch (Exception e)
                 {

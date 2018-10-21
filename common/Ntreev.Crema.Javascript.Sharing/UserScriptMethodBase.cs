@@ -26,17 +26,15 @@ namespace Ntreev.Crema.Javascript
 {
     public abstract class UserScriptMethodBase : ScriptMethodBase
     {
-        private readonly ICremaHost cremaHost;
-
         protected UserScriptMethodBase(ICremaHost cremaHost)
         {
-            this.cremaHost = cremaHost;
+            this.CremaHost = cremaHost;
         }
 
         protected UserScriptMethodBase(ICremaHost cremaHost, string name)
             : base(name)
         {
-            this.cremaHost = cremaHost;
+            this.CremaHost = cremaHost;
         }
 
         protected IUser GetUser(string userID)
@@ -69,6 +67,23 @@ namespace Ntreev.Crema.Javascript
             throw new NotImplementedException();
         }
 
-        protected ICremaHost CremaHost => this.cremaHost;
+        protected IUserCategory GetUserCategory(string categoryPath)
+        {
+            if (categoryPath == null)
+                throw new ArgumentNullException(nameof(categoryPath));
+
+            if (this.CremaHost.GetService(typeof(IUserContext)) is IUserContext userContext)
+            {
+                var category = userContext.Dispatcher.Invoke(() => userContext.Categories[categoryPath]);
+                if (category == null)
+                    throw new CategoryNotFoundException(categoryPath);
+                return category;
+            }
+            throw new NotImplementedException();
+        }
+
+        protected ICremaHost CremaHost { get; }
+
+        protected IUserContext UserContext => this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
     }
 }

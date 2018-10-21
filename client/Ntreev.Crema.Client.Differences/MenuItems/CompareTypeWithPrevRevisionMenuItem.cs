@@ -33,7 +33,7 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.Client.Differences.MenuItems
 {
     [Export(typeof(IMenuItem))]
-    [ParentType("Ntreev.Crema.Client.Types.BrowserItems.ViewModels.TypeTreeViewItemViewModel, Ntreev.Crema.Client.Types, Version=3.6.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Client.Types.BrowserItems.ViewModels.TypeTreeViewItemViewModel, Ntreev.Crema.Client.Types, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class CompareTypeWithPrevRevisionMenuItem : MenuItemBase
     {
         [Import]
@@ -56,22 +56,19 @@ namespace Ntreev.Crema.Client.Differences.MenuItems
             dialog.ShowDialog();
         }
 
-        private Task<DiffDataType> Initialize(IType type)
+        private async Task<DiffDataType> Initialize(IType type)
         {
-            return type.Dispatcher.InvokeAsync(() =>
+            var logs = await type.GetLogAsync(this.authenticator, null);
+            var hasRevision = logs.Length >= 2;
+            var dataSet1 = hasRevision ? await type.GetDataSetAsync(this.authenticator, logs[1].Revision) : new CremaDataSet();
+            var dataSet2 = await type.GetDataSetAsync(this.authenticator, null);
+            var header1 = hasRevision ? $"[{logs[1].DateTime}] {logs[1].Revision}" : string.Empty;
+            var dataSet = new DiffDataSet(dataSet1, dataSet2)
             {
-                var logs = type.GetLog(this.authenticator);
-                var hasRevision = logs.Length >= 2;
-                var dataSet1 = hasRevision ? type.GetDataSet(this.authenticator, logs[1].Revision) : new CremaDataSet();
-                var dataSet2 = type.GetDataSet(this.authenticator, -1);
-                var header1 = hasRevision ? $"[{logs[1].DateTime}] {logs[1].Revision}" : string.Empty;
-                var dataSet = new DiffDataSet(dataSet1, dataSet2)
-                {
-                    Header1 = header1,
-                    Header2 = Resources.Text_Current,
-                };
-                return dataSet.Types.First();
-            });
+                Header1 = header1,
+                Header2 = Resources.Text_Current,
+            };
+            return dataSet.Types.First();
         }
     }
 }

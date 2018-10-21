@@ -32,10 +32,10 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
     {
         private readonly Authentication authentication;
         private readonly ITable table;
-        private readonly long revision;
+        private readonly string revision;
         private CremaDataTable source;
 
-        public PreviewTableViewModel(Authentication authentication, ITable table, long revision)
+        public PreviewTableViewModel(Authentication authentication, ITable table, string revision)
         {
             this.authentication = authentication;
             this.table = table;
@@ -59,11 +59,8 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
             {
                 this.DisplayName = await this.table.Dispatcher.InvokeAsync(() => $"{this.table.Name} - {revision}");
                 this.BeginProgress(Resources.Message_ReceivingInfo);
-                this.Source = await Task.Run(() =>
-                {
-                    var dataSet = this.table.GetDataSet(this.authentication, this.revision);
-                    return dataSet.Tables.FirstOrDefault();
-                });
+                var dataSet = await this.table.GetDataSetAsync(this.authentication, this.revision);
+                this.Source = dataSet.Tables.FirstOrDefault();
             }
             catch (Exception e)
             {

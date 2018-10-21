@@ -20,10 +20,11 @@ using Ntreev.Library.ObjectModel;
 using Ntreev.Crema.ServiceModel;
 using System.Collections.Specialized;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
-    public interface IUserCategoryCollection : IReadOnlyCollection<IUserCategory>, IEnumerable<IUserCategory>, INotifyCollectionChanged, IServiceProvider, IDispatcherObject
+    public interface IUserCategoryCollection : IReadOnlyCollection<IUserCategory>, IEnumerable<IUserCategory>, IServiceProvider, IDispatcherObject
     {
         bool Contains(string categoryPath);
 

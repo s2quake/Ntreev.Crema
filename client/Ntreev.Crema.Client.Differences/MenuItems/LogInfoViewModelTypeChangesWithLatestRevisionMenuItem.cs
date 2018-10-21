@@ -63,24 +63,21 @@ namespace Ntreev.Crema.Client.Differences.MenuItems
             dialog.ShowDialog();
         }
 
-        private Task<DiffDataType> Initialize(LogInfoViewModel viewModel, IType type)
+        private async Task<DiffDataType> Initialize(LogInfoViewModel viewModel, IType type)
         {
-            return type.Dispatcher.InvokeAsync(() =>
-            {
-                var logs = type.GetLog(this.authenticator);
-                var revision = logs.First().Revision;
+            var logs = await type.GetLogAsync(this.authenticator, null);
+            var revision = logs.First().Revision;
 
-                var dataSet1 = type.GetDataSet(this.authenticator, viewModel.Revision);
-                var dataSet2 = type.GetDataSet(this.authenticator, revision);
-                var header1 = $"{type.Name} - {viewModel.Revision}";
-                var header2 = $"{type.Name} - {revision}";
-                var dataSet = new DiffDataSet(dataSet1, dataSet2)
-                {
-                    Header1 = header1,
-                    Header2 = header2,
-                };
-                return dataSet.Types.First();
-            });
+            var dataSet1 = await type.GetDataSetAsync(this.authenticator, viewModel.Revision);
+            var dataSet2 = await type.GetDataSetAsync(this.authenticator, revision);
+            var header1 = $"{type.Name} - {viewModel.Revision}";
+            var header2 = $"{type.Name} - {revision}";
+            var dataSet = new DiffDataSet(dataSet1, dataSet2)
+            {
+                Header1 = header1,
+                Header2 = header2,
+            };
+            return dataSet.Types.First();
         }
     }
 }

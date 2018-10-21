@@ -19,6 +19,7 @@ using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -36,13 +37,17 @@ using Xceed.Wpf.DataGrid.Views;
 namespace Ntreev.Crema.Presentation.Controls
 {
     [TemplatePart(Name = "PART_DataGridControl", Type = typeof(ModernDataGridControl))]
-    public class CremaDataTypeControl : Control
+    public class CremaDataTypeControl : UserControl
     {
         public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register(nameof(Source), typeof(CremaDataType), typeof(CremaDataTypeControl));
+            DependencyProperty.Register(nameof(Source), typeof(CremaDataType), typeof(CremaDataTypeControl),
+                new PropertyMetadata(null, SourcePropertyChangedCallback));
 
         public static readonly DependencyProperty ReadOnlyProperty =
             DependencyProperty.Register(nameof(ReadOnly), typeof(bool), typeof(CremaDataTypeControl));
+
+        public static readonly DependencyProperty ItemsSourceProperty =
+            DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(CremaDataTypeControl));
 
         public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register(nameof(SelectedItem), typeof(object), typeof(CremaDataTypeControl),
@@ -71,7 +76,7 @@ namespace Ntreev.Crema.Presentation.Controls
             if (this.dataGridControl == null)
                 return;
 
-            //if (this.dataGridControl.Columns.Count == 0)
+            if (this.dataGridControl.Columns.Count == 0)
             {
                 try
                 {
@@ -86,29 +91,28 @@ namespace Ntreev.Crema.Presentation.Controls
                 }
             }
 
-            if (this.dataGridControl.AutoCreateColumns == false)
-            {
-                try
-                {
-                    var columnNames = new string[] { "tagColumn", "enableColumn", "modifierColumn", "modifiedDateTimeColumn", "creatorColumn", "createdDateTimeColumn" };
-                    foreach (var item in columnNames)
-                    {
-                        if (this.TryFindResource(item) is ColumnBase column)
-                            this.dataGridControl.Columns.Add(column);
-                    }
-                }
-                catch
-                {
+            //if (this.dataGridControl.AutoCreateColumns == false)
+            //{
+            //    try
+            //    {
+            //        var columnNames = new string[] { "tagColumn", "enableColumn", "modifierColumn", "modifiedDateTimeColumn", "creatorColumn", "createdDateTimeColumn" };
+            //        foreach (var item in columnNames)
+            //        {
+            //            if (this.TryFindResource(item) is ColumnBase column)
+            //                this.dataGridControl.Columns.Add(column);
+            //        }
+            //    }
+            //    catch
+            //    {
 
-                }
-            }
+            //    }
+            //}
 
             this.dataGridControl.RowDrag += DataGridControl_RowDrag;
             this.dataGridControl.RowDrop += DataGridControl_RowDrop;
             this.dataGridControl.ItemsSourceChangeCompleted += DataGridControl_ItemsSourceChangeCompleted;
-            BindingOperations.SetBinding(this.viewSource, DataGridCollectionViewSource.SourceProperty, new Binding($"{nameof(Source)}.{nameof(CremaDataType.View)}") { Source = this, });
+            BindingOperations.SetBinding(this.viewSource, DataGridCollectionViewSource.SourceProperty, new Binding("ItemsSource") { Source = this, });
             BindingOperations.SetBinding(this.dataGridControl, ModernDataGridControl.ItemsSourceProperty, new Binding() { Source = this.viewSource, });
-            BindingOperations.SetBinding(this.dataGridControl, ModernDataGridControl.IsVerticalScrollBarOnLeftSideProperty, new Binding(nameof(IsVerticalScrollBarOnLeftSide)) { Source = this, });
             this.dataGridControl.IsDeleteCommandEnabled = true;
         }
 
@@ -140,6 +144,12 @@ namespace Ntreev.Crema.Presentation.Controls
         {
             get { return (bool)this.GetValue(IsVerticalScrollBarOnLeftSideProperty); }
             set { this.SetValue(IsVerticalScrollBarOnLeftSideProperty, value); }
+        }
+
+        public IEnumerable ItemsSource
+        {
+            get { return (IEnumerable)this.GetValue(ItemsSourceProperty); }
+            set { this.SetValue(ItemsSourceProperty, value); }
         }
 
         public new bool Focus()
@@ -208,42 +218,47 @@ namespace Ntreev.Crema.Presentation.Controls
 
         private void DataGridControl_ItemsSourceChangeCompleted(object sender, EventArgs e)
         {
-            if (this.dataGridControl.AutoCreateColumns == true)
+            this.Dispatcher.InvokeAsync(() =>
             {
-                var index = 0;
+                var index = 10000;
 
-                this.dataGridControl.Columns[CremaSchema.Tags].MaxWidth = 40;
-                this.dataGridControl.Columns[CremaSchema.Tags].MinWidth = 40;
-                this.dataGridControl.Columns[CremaSchema.Tags].TitleTemplate = this.TryFindResource("EmptyTitle_DataTemplate") as DataTemplate;
-                this.dataGridControl.Columns[CremaSchema.Tags].CellHorizontalContentAlignment = HorizontalAlignment.Center;
-                this.dataGridControl.Columns[CremaSchema.Tags].CellEditor = this.TryFindResource("TagSelector") as CellEditor;
-                this.dataGridControl.Columns[CremaSchema.Tags].CellContentTemplate = this.TryFindResource("TagSelector_ContentTemplate") as DataTemplate;
-                this.dataGridControl.Columns[CremaSchema.Tags].VisiblePosition = index++;
-                this.dataGridControl.Columns[CremaSchema.Tags].Visible = false;
-                this.dataGridControl.Columns[CremaSchema.Enable].MaxWidth = 28;
-                this.dataGridControl.Columns[CremaSchema.Enable].MinWidth = 28;
-                this.dataGridControl.Columns[CremaSchema.Enable].TitleTemplate = this.TryFindResource("EmptyTitle_DataTemplate") as DataTemplate;
-                this.dataGridControl.Columns[CremaSchema.Enable].VisiblePosition = index++;
-                this.dataGridControl.Columns[CremaSchema.Enable].CellEditor = this.TryFindResource("EnableEditor") as CellEditor;
-                this.dataGridControl.Columns[CremaSchema.Enable].CellContentTemplate = this.TryFindResource("EnableContentTemplate") as DataTemplate;
-                this.dataGridControl.Columns[CremaSchema.Enable].Visible = false;
-                this.dataGridControl.Columns[CremaSchema.ID].VisiblePosition = index++;
-                this.dataGridControl.Columns[CremaSchema.Name].VisiblePosition = index++;
-                this.dataGridControl.Columns[CremaSchema.Value].VisiblePosition = index++;
-                this.dataGridControl.Columns[CremaSchema.Comment].VisiblePosition = index++;
-                this.dataGridControl.Columns[CremaSchema.Creator].VisiblePosition = index++;
-                this.dataGridControl.Columns[CremaSchema.CreatedDateTime].VisiblePosition = index++;
+                //this.dataGridControl.Columns[CremaSchema.Tags].MaxWidth = 40;
+                //this.dataGridControl.Columns[CremaSchema.Tags].MinWidth = 40;
+                //this.dataGridControl.Columns[CremaSchema.Tags].TitleTemplate = this.TryFindResource("EmptyTitle_DataTemplate") as DataTemplate;
+                //this.dataGridControl.Columns[CremaSchema.Tags].CellHorizontalContentAlignment = HorizontalAlignment.Center;
+                //this.dataGridControl.Columns[CremaSchema.Tags].CellEditor = this.TryFindResource("TagSelector") as CellEditor;
+                //this.dataGridControl.Columns[CremaSchema.Tags].CellContentTemplate = this.TryFindResource("TagSelector_ContentTemplate") as DataTemplate;
+                //this.dataGridControl.Columns[CremaSchema.Tags].VisiblePosition = index++;
+                //this.dataGridControl.Columns[CremaSchema.Tags].Visible = false;
+                //this.dataGridControl.Columns[CremaSchema.Enable].MaxWidth = 28;
+                //this.dataGridControl.Columns[CremaSchema.Enable].MinWidth = 28;
+                //this.dataGridControl.Columns[CremaSchema.Enable].TitleTemplate = this.TryFindResource("EmptyTitle_DataTemplate") as DataTemplate;
+                //this.dataGridControl.Columns[CremaSchema.Enable].VisiblePosition = index++;
+                //this.dataGridControl.Columns[CremaSchema.Enable].CellEditor = this.TryFindResource("EnableEditor") as CellEditor;
+                //this.dataGridControl.Columns[CremaSchema.Enable].CellContentTemplate = this.TryFindResource("EnableContentTemplate") as DataTemplate;
+                //this.dataGridControl.Columns[CremaSchema.Enable].Visible = false;
+                //this.dataGridControl.Columns[CremaSchema.ID].VisiblePosition = index++;
+                //this.dataGridControl.Columns[CremaSchema.Name].VisiblePosition = index++;
+                //this.dataGridControl.Columns[CremaSchema.Value].VisiblePosition = index++;
+                //this.dataGridControl.Columns[CremaSchema.Comment].VisiblePosition = index++;
+                //this.dataGridControl.Columns[CremaSchema.Creator].VisiblePosition = index++;
+                //this.dataGridControl.Columns[CremaSchema.CreatedDateTime].VisiblePosition = index++;
+                //this.dataGridControl.Columns[CremaSchema.Modifier].VisiblePosition = index++;
+                //this.dataGridControl.Columns[CremaSchema.ModifiedDateTime].VisiblePosition = index++;
+
                 this.dataGridControl.Columns[CremaSchema.Modifier].VisiblePosition = index++;
                 this.dataGridControl.Columns[CremaSchema.ModifiedDateTime].VisiblePosition = index++;
+                this.dataGridControl.Columns[CremaSchema.Creator].VisiblePosition = index++;
+                this.dataGridControl.Columns[CremaSchema.CreatedDateTime].VisiblePosition = index++;
 
                 foreach (var item in this.dataGridControl.Columns)
                 {
                     item.AllowSort = false;
                 }
-            }
-            this.dataGridControl.PropertyChanged -= DataGridControl_PropertyChanged;
-            this.dataGridControl.PropertyChanged += DataGridControl_PropertyChanged;
-            this.dataGridControl.LayoutUpdated += DataGridControl_LayoutUpdated;
+            }, DispatcherPriority.Send);
+            //this.dataGridControl.PropertyChanged -= DataGridControl_PropertyChanged;
+            //this.dataGridControl.PropertyChanged += DataGridControl_PropertyChanged;
+            //this.dataGridControl.LayoutUpdated += DataGridControl_LayoutUpdated;
         }
 
         private void DataGridControl_LayoutUpdated(object sender, EventArgs e)
@@ -256,7 +271,6 @@ namespace Ntreev.Crema.Presentation.Controls
             if (this.dataGridControl.CurrentItem != selectedItem && this.dataGridControl.Items.Contains(selectedItem) == true)
             {
                 this.dataGridControl.CurrentItem = selectedItem;
-
             }
 
             if (selectedColumn != null)
@@ -288,7 +302,6 @@ namespace Ntreev.Crema.Presentation.Controls
             var self = d as CremaDataTypeControl;
             var gridControl = self.dataGridControl;
             var columnName = (string)e.NewValue;
-
             var column = gridControl.VisibleColumns.FirstOrDefault(item => item.FieldName == columnName);
 
             if (column == null)
@@ -297,6 +310,18 @@ namespace Ntreev.Crema.Presentation.Controls
             if (gridControl.CurrentColumn != column)
             {
                 gridControl.CurrentColumn = column;
+            }
+        }
+
+        private static void SourcePropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is CremaDataType dataType)
+            {
+                d.SetValue(ItemsSourceProperty, dataType.View);
+            }
+            else
+            {
+                d.SetValue(ItemsSourceProperty, null);
             }
         }
     }

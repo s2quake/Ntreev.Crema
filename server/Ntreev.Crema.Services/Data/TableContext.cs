@@ -15,28 +15,20 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Data.Xml;
+using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Services;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Data.Serializations;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Crema.Services.Users;
-using Ntreev.Crema.Data;
-using System.Xml.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using Ntreev.Library.Serialization;
 using Ntreev.Library;
+using Ntreev.Library.IO;
+using Ntreev.Library.ObjectModel;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -45,7 +37,6 @@ namespace Ntreev.Crema.Services.Data
     {
         private DataBase dataBase;
         private readonly DataBaseRepositoryHost repository;
-        private readonly string basePath;
 
         private ItemsCreatedEventHandler<ITableItem> itemsCreated;
         private ItemsRenamedEventHandler<ITableItem> itemsRenamed;
@@ -60,303 +51,197 @@ namespace Ntreev.Crema.Services.Data
             this.dataBase = dataBase;
             this.repository = dataBase.Repository;
             this.CremaHost.Debug(Resources.Message_TableContextInitialize);
-            this.basePath = Path.Combine(dataBase.BasePath, CremaSchema.TableDirectory);
+            this.BasePath = Path.Combine(dataBase.BasePath, CremaSchema.TableDirectory);
             this.Initialize(tableInfos);
-            this.CremaHost.UserContext.Dispatcher.Invoke(() => this.CremaHost.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
+            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut);
             this.CremaHost.Debug(Resources.Message_TableContextIsCreated);
-        }
-
-        public void InvokeTableItemLock(Authentication authentication, ITableItem tableItem, string comment)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemLock), tableItem, comment);
-        }
-
-        public void InvokeTableItemUnlock(Authentication authentication, ITableItem tableItem)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemUnlock), tableItem);
-        }
-
-        public void InvokeTableItemSetPrivate(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemSetPrivate), tableItem);
-            var accessInfoPath = tableItem.GetAccessInfoPath();
-            try
-            {
-                accessInfo.SetPrivate(tableItem.GetType().Name, authentication.SignatureDate);
-                tableItem.WriteAccessInfo(accessInfoPath, accessInfo);
-                this.repository.Add(accessInfoPath);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.repository.Revert();
-                throw e;
-            }
-        }
-
-        public void InvokeTableItemSetPublic(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemSetPrivate), tableItem);
-            var accessInfoPath = tableItem.GetAccessInfoPath();
-            try
-            {
-                accessInfo.SetPublic();
-                this.repository.Delete(accessInfoPath);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.repository.Revert();
-                throw e;
-            }
-        }
-
-        public void InvokeTableItemAddAccessMember(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID, AccessType accessType)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemAddAccessMember), tableItem, memberID, accessType);
-            var accessInfoPath = tableItem.GetAccessInfoPath();
-            try
-            {
-                accessInfo.Add(authentication.SignatureDate, memberID, accessType);
-                tableItem.WriteAccessInfo(accessInfoPath, accessInfo);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.repository.Revert();
-                throw e;
-            }
-        }
-
-        public void InvokeTableItemSetAccessMember(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID, AccessType accessType)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemSetAccessMember), tableItem, memberID, accessType);
-            var accessInfoPath = tableItem.GetAccessInfoPath();
-            try
-            {
-                accessInfo.Set(authentication.SignatureDate, memberID, accessType);
-                tableItem.WriteAccessInfo(accessInfoPath, accessInfo);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.repository.Revert();
-                throw e;
-            }
-        }
-
-        public void InvokeTableItemRemoveAccessMember(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemRemoveAccessMember), tableItem, memberID);
-            var accessInfoPath = tableItem.GetAccessInfoPath();
-            try
-            {
-                accessInfo.Remove(authentication.SignatureDate, memberID);
-                tableItem.WriteAccessInfo(accessInfoPath, accessInfo);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.repository.Revert();
-                throw e;
-            }
-        }
-
-        public void InvokeTableItemCreate(Authentication authentication, string path)
-        {
-
-        }
-
-        public void InvokeTableItemRename(Authentication authentication, ITableItem tableItem, string newName)
-        {
-            if (tableItem.AccessInfo.Path == tableItem.Path)
-            {
-                var accessInfoPath1 = tableItem.GetAccessInfoPath();
-                var directoryName = Path.GetDirectoryName(accessInfoPath1);
-                var extension = Path.GetExtension(accessInfoPath1);
-                var accessInfoPath2 = Path.Combine(directoryName, newName + extension);
-                if (File.Exists(accessInfoPath1) == true && accessInfoPath1 != accessInfoPath2)
-                {
-                    this.repository.Move(accessInfoPath1, accessInfoPath2);
-                }
-            }
-        }
-
-        public void InvokeTableItemMove(Authentication authentication, ITableItem tableItem, string newCategoryPath)
-        {
-            if (tableItem.AccessInfo.Path == tableItem.Path)
-            {
-                var accessInfoPath1 = tableItem.GetAccessInfoPath();
-                var accessInfoPath2 = tableItem.GetAccessInfoPath(newCategoryPath);
-                if (File.Exists(accessInfoPath1) == true)
-                {
-                    this.repository.Move(accessInfoPath1, accessInfoPath2);
-                }
-            }
-        }
-
-        public void InvokeTableItemDelete(Authentication authentication, ITableItem tableItem)
-        {
-            if (tableItem.AccessInfo.Path == tableItem.Path)
-            {
-                var accessInfoPath = tableItem.GetAccessInfoPath();
-                if (File.Exists(accessInfoPath) == true)
-                {
-                    this.repository.Delete(accessInfoPath);
-                }
-            }
-        }
-
-        public void InvokeTableItemChange(Authentication authentication, ITableItem tableItem)
-        {
-
-        }
-
-        public void Import(Authentication authentication, CremaDataSet dataSet, string comment)
-        {
-            this.Dispatcher?.VerifyAccess();
-            this.CremaHost.DebugMethod(authentication, this, nameof(Import), comment);
-            this.ValidateImport(authentication, dataSet, comment);
-            var query = from item in dataSet.Tables
-                        let table = this.Tables[item.Name]
-                        where table.LockInfo.Path != table.Path
-                        select table;
-
-            var items = query.ToArray();
-            var comments = Enumerable.Repeat(comment, items.Length).ToArray();
-            foreach (var item in items)
-            {
-                item.LockInternal(Authentication.System, comment);
-            }
-            this.InvokeItemsLockedEvent(authentication, items, comments);
-
-            try
-            {
-                var targetSet = new CremaDataSet();
-                foreach (var item in items.Where(i => i.Parent == null))
-                {
-                    var targetTable = item.ReadSchema(authentication, targetSet);
-
-                    var dataTable = dataSet.Tables[targetTable.TableName];
-                    if (dataTable == null)
-                        continue;
-
-                    foreach (var row in dataTable.Rows)
-                    {
-                        targetTable.ImportRow(row);
-                    }
-                    targetTable.ContentsInfo = dataTable.ContentsInfo;
-                }
-
-                var dataTables = new DataTableCollection(targetSet, this.DataBase);
-                try
-                {
-                    dataTables.Modify(this.Repository);
-                }
-                catch
-                {
-
-                }
-
-                foreach (var item in items)
-                {
-                    var dataTable = targetSet.Tables[item.Name, item.Category.Path];
-                    item.UpdateContent(dataTable.TableInfo);
-                }
-
-                var eventLog = EventLogBuilder.Build(authentication, this, nameof(Import), comment);
-                this.Repository.Commit(authentication, comment, eventLog);
-                this.OnItemsChanged(new ItemsEventArgs<ITableItem>(Authentication.System, items, targetSet));
-            }
-            finally
-            {
-                foreach (var item in items)
-                {
-                    item.UnlockInternal(Authentication.System);
-                }
-                this.InvokeItemsUnlockedEvent(authentication, items);
-            }
         }
 
         public void Dispose()
         {
-            var userContext = this.CremaHost.UserContext;
+            this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
             this.dataBase = null;
-            userContext.Dispatcher.Invoke(() => userContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
+        }
+
+        public Task<SignatureDate> InvokeTableItemSetPublicAsync(Authentication authentication, string tableItemPath)
+        {
+            var message = EventMessageBuilder.SetPublicTableItem(authentication, tableItemPath);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    var itemPath = this.GeneratePath(tableItemPath);
+                    var signatureDate = authentication.Sign();
+                    var itemPaths = this.Serializer.GetPath(itemPath, typeof(AccessSerializationInfo), AccessSerializationInfo.Settings);
+                    this.Repository.DeleteRange(itemPaths);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
+        }
+
+        public Task<AccessInfo> InvokeTableItemSetPrivateAsync(Authentication authentication, string tableItemPath)
+        {
+            var message = EventMessageBuilder.SetPrivateTableItem(authentication, tableItemPath);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    var accessInfo = AccessInfo.Empty;
+                    var itemPath = this.GeneratePath(tableItemPath);
+                    var signatureDate = authentication.Sign();
+                    accessInfo.SetPrivate(typeof(ITableItem).Name, signatureDate);
+                    var itemPaths = this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
+                    this.Repository.AddRange(itemPaths);
+                    this.Repository.Commit(authentication, message);
+                    return accessInfo;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
+        }
+
+        public Task<AccessInfo> InvokeTableItemAddAccessMemberAsync(Authentication authentication, string tableItemPath, AccessInfo accessInfo, string memberID, AccessType accessType)
+        {
+            var message = EventMessageBuilder.AddAccessMemberToTableItem(authentication, tableItemPath, memberID, accessType);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    var itemPath = this.GeneratePath(tableItemPath);
+                    var signatureDate = authentication.Sign();
+                    accessInfo.Add(signatureDate, memberID, accessType);
+                    this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
+                    this.Repository.Commit(authentication, message);
+                    return accessInfo;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
+        }
+
+        public Task<AccessInfo> InvokeTableItemSetAccessMemberAsync(Authentication authentication, string tableItemPath, AccessInfo accessInfo, string memberID, AccessType accessType)
+        {
+            var message = EventMessageBuilder.SetAccessMemberOfTableItem(authentication, tableItemPath, memberID, accessType);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    var itemPath = this.GeneratePath(tableItemPath);
+                    var signatureDate = authentication.Sign();
+                    accessInfo.Set(signatureDate, memberID, accessType);
+                    this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
+                    this.Repository.Commit(authentication, message);
+                    return accessInfo;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
+        }
+
+        public Task<AccessInfo> InvokeTableItemRemoveAccessMemberAsync(Authentication authentication, string tableItemPath, AccessInfo accessInfo, string memberID)
+        {
+            var message = EventMessageBuilder.RemoveAccessMemberFromTableItem(authentication, tableItemPath, memberID);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    var itemPath = this.GeneratePath(tableItemPath);
+                    var signatureDate = authentication.Sign();
+                    accessInfo.Remove(signatureDate, memberID);
+                    this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
+                    this.Repository.Commit(authentication, message);
+                    return accessInfo;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public void InvokeItemsSetPublicEvent(Authentication authentication, ITableItem[] items)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetPublicEvent), items);
-            var comment = EventMessageBuilder.SetPublicTableItem(authentication, items);
+            var message = EventMessageBuilder.SetPublicTableItem(authentication, items);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Public);
             this.CremaHost.Debug(eventLog);
-            this.repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnItemsAccessChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
         public void InvokeItemsSetPrivateEvent(Authentication authentication, ITableItem[] items)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetPrivateEvent), items);
-            var comment = EventMessageBuilder.SetPrivateTableItem(authentication, items);
+            var message = EventMessageBuilder.SetPrivateTableItem(authentication, items);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Private);
             this.CremaHost.Debug(eventLog);
-            this.repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnItemsAccessChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
         public void InvokeItemsAddAccessMemberEvent(Authentication authentication, ITableItem[] items, string[] memberIDs, AccessType[] accessTypes)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsAddAccessMemberEvent), items, memberIDs, accessTypes);
-            var comment = EventMessageBuilder.AddAccessMemberToTableItem(authentication, items, memberIDs, accessTypes);
+            var message = EventMessageBuilder.AddAccessMemberToTableItem(authentication, items, memberIDs, accessTypes);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Add, memberIDs, accessTypes);
             this.CremaHost.Debug(eventLog);
-            this.repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnItemsAccessChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
         public void InvokeItemsSetAccessMemberEvent(Authentication authentication, ITableItem[] items, string[] memberIDs, AccessType[] accessTypes)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetAccessMemberEvent), items, memberIDs, accessTypes);
-            var comment = EventMessageBuilder.SetAccessMemberOfTableItem(authentication, items, memberIDs, accessTypes);
+            var message = EventMessageBuilder.SetAccessMemberOfTableItem(authentication, items, memberIDs, accessTypes);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Set, memberIDs, accessTypes);
             this.CremaHost.Debug(eventLog);
-            this.repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnItemsAccessChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
         public void InvokeItemsRemoveAccessMemberEvent(Authentication authentication, ITableItem[] items, string[] memberIDs)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsRemoveAccessMemberEvent), items, memberIDs);
-            var comment = EventMessageBuilder.RemoveAccessMemberFromTableItem(authentication, items, memberIDs);
+            var message = EventMessageBuilder.RemoveAccessMemberFromTableItem(authentication, items, memberIDs);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Remove, memberIDs);
             this.CremaHost.Debug(eventLog);
-            this.repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnItemsAccessChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
         public void InvokeItemsLockedEvent(Authentication authentication, ITableItem[] items, string[] comments)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsLockedEvent), items, comments);
-            var comment = EventMessageBuilder.LockTableItem(authentication, items, comments);
+            var message = EventMessageBuilder.LockTableItem(authentication, items, comments);
             var metaData = EventMetaDataBuilder.Build(items, LockChangeType.Lock, comments);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnItemsLockChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
         public void InvokeItemsUnlockedEvent(Authentication authentication, ITableItem[] items)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsUnlockedEvent), items);
-            var comment = EventMessageBuilder.UnlockTableItem(authentication, items);
+            var message = EventMessageBuilder.UnlockTableItem(authentication, items);
             var metaData = EventMetaDataBuilder.Build(items, LockChangeType.Unlock);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnItemsLockChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
@@ -367,19 +252,16 @@ namespace Ntreev.Crema.Services.Data
 
         public void InvokeItemsRenamedEvent(Authentication authentication, ITableItem[] items, string[] oldNames, string[] oldPaths, object metaData)
         {
-            //this.WriteAccessInfos();
             this.OnItemsRenamed(new ItemsRenamedEventArgs<ITableItem>(authentication, items, oldNames, oldPaths, metaData));
         }
 
         public void InvokeItemsMovedEvent(Authentication authentication, ITableItem[] items, string[] oldPaths, string[] oldParentPaths, object metaData)
         {
-            //this.WriteAccessInfos();
             this.OnItemsMoved(new ItemsMovedEventArgs<ITableItem>(authentication, items, oldPaths, oldParentPaths, metaData));
         }
 
         public void InvokeItemsDeletedEvent(Authentication authentication, ITableItem[] items, string[] itemPaths, object metaData)
         {
-            //this.WriteAccessInfos();
             this.OnItemsDeleted(new ItemsDeletedEventArgs<ITableItem>(authentication, items, itemPaths, metaData));
         }
 
@@ -388,27 +270,33 @@ namespace Ntreev.Crema.Services.Data
             this.OnItemsChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
-        public LogInfo[] GetLog(string xmlPath, string schemaPath)
+        public LogInfo[] GetTableLog(string itemPath, string revision)
         {
-            var revision = this.Repository.GetRevision(xmlPath);
-            var schemaLogs = this.Repository.GetLog(schemaPath, revision, 100);
-            var xmlLogs = this.Repository.GetLog(xmlPath, revision, 100);
-
-            var logs = xmlLogs.ToList();
-            foreach (var item in schemaLogs)
-            {
-                if (logs.Any(i => i.Revision == item.Revision))
-                    continue;
-                logs.Add(item);
-            }
-
-            return logs.OrderByDescending(item => item.Revision).Take(100).ToArray();
+            var files = this.GetFiles(itemPath);
+            return this.Repository.GetLog(files, revision);
         }
 
-        public LogInfo[] GetCategoryLog(string localPath)
+        public LogInfo[] GetCategoryLog(string localPath, string revision)
         {
-            var revision = this.Repository.GetRevision(localPath);
-            return this.Repository.GetLog(localPath, revision, 100);
+            return this.Repository.GetLog(new string[] { localPath }, revision);
+        }
+
+        public CategoryMetaData[] GetCategoryMetaDatas()
+        {
+            var query = from TableCategory item in this.Categories
+                        orderby item.Path
+                        select item.MetaData;
+
+            return query.ToArray();
+        }
+
+        public TableMetaData[] GetTableMetaDatas()
+        {
+            var query = from Table item in this.Tables
+                        orderby item.Path
+                        select item.MetaData;
+
+            return query.ToArray();
         }
 
         public string GenerateCategoryPath(string parentPath, string name)
@@ -420,34 +308,41 @@ namespace Ntreev.Crema.Services.Data
         public string GenerateCategoryPath(string categoryPath)
         {
             NameValidator.ValidateCategoryPath(categoryPath);
-            var baseUri = new Uri(this.basePath);
-            var uri = new Uri(baseUri + categoryPath.TrimEnd(PathUtility.SeparatorChar));
+            var baseUri = new Uri(this.BasePath);
+            var uri = new Uri(baseUri + categoryPath);
             return uri.LocalPath;
         }
 
-        public string GenerateTableXmlPath(string categoryPath, string name)
+        public string GenerateTablePath(string categoryPath, string name)
         {
-            return Path.Combine(this.GenerateCategoryPath(categoryPath), name + CremaSchema.XmlExtension);
+            return Path.Combine(this.GenerateCategoryPath(categoryPath), name);
         }
 
-        public string GenerateTableSchemaPath(string categoryPath, string name)
+        public string GeneratePath(string path)
         {
-            return Path.Combine(this.GenerateCategoryPath(categoryPath), name + CremaSchema.SchemaExtension);
+            if (NameValidator.VerifyCategoryPath(path) == true)
+                return this.GenerateCategoryPath(path);
+            var itemName = new ItemName(path);
+            return this.GenerateTablePath(itemName.CategoryPath, itemName.Name);
         }
 
-        public string GeneratePath(string parentPath, string name, string extension)
+        public string[] GetFiles(string itemPath)
         {
-            return Path.Combine(this.basePath, parentPath.Replace('/', '\\'), name + extension);
+            var directoryName = Path.GetDirectoryName(itemPath);
+            var name = Path.GetFileName(itemPath);
+            var files = Directory.GetFiles(directoryName, $"{name}.*").Where(item => Path.GetFileNameWithoutExtension(item) == name).ToArray();
+            return files;
         }
 
-        public void ValidateTableXmlPath(string categoryPath, string name)
+        public void ValidateTablePath(string categoryPath, string name, Table templatedParent)
         {
-            this.DataBase.ValidateFileInfo(this.GenerateTableXmlPath(categoryPath, name));
-        }
-
-        public void ValidateTableSchemaPath(string categoryPath, string name)
-        {
-            this.DataBase.ValidateFileInfo(this.GenerateTableSchemaPath(categoryPath, name));
+            var itemPath = this.GenerateTablePath(categoryPath, name);
+            var settings = new CremaDataTableSerializerSettings(itemPath, templatedParent?.ItemPath);
+            var itemPaths = this.Serializer.GetPath(itemPath, typeof(CremaDataTable), settings);
+            foreach (var item in itemPaths)
+            {
+                this.DataBase.ValidateFileInfo(item);
+            }
         }
 
         public void ValidateCategoryPath(string categoryPath)
@@ -463,7 +358,10 @@ namespace Ntreev.Crema.Services.Data
 
             foreach (var item in items)
             {
-                item.Lock(authentication, comment);
+                if (item is Table table)
+                    table.LockInternal(authentication, comment);
+                else if (item is TableCategory category)
+                    category.LockInternal(authentication, comment);
             }
 
             authentication.Sign();
@@ -474,7 +372,7 @@ namespace Ntreev.Crema.Services.Data
         {
             this.Dispatcher?.VerifyAccess();
             this.ValidateUnlockItems(authentication, userID);
-            this.Sign(authentication);
+            this.CremaHost.Sign(authentication);
             var query = from ITableItem item in this
                         let lockInfo = item.LockInfo
                         where lockInfo.IsLocked == true && lockInfo.IsInherited == false && lockInfo.IsOwner(userID)
@@ -486,7 +384,10 @@ namespace Ntreev.Crema.Services.Data
 
             foreach (var item in items)
             {
-                item.Unlock(authentication);
+                if (item is Table table)
+                    table.UnlockInternal(authentication);
+                else if (item is TableCategory category)
+                    category.UnlockInternal(authentication);
             }
 
             var metaData = EventMetaDataBuilder.Build(items, LockChangeType.Unlock);
@@ -498,10 +399,7 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public TableCollection Tables
-        {
-            get { return this.Items; }
-        }
+        public TableCollection Tables => this.Items;
 
         public DataBase DataBase
         {
@@ -513,20 +411,15 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public CremaHost CremaHost
-        {
-            get { return this.DataBase.CremaHost; }
-        }
+        public CremaHost CremaHost => this.DataBase.CremaHost;
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.dataBase?.Dispatcher; }
-        }
+        public UserContext UserContext => this.CremaHost.UserContext;
 
-        public string BasePath
-        {
-            get { return this.basePath; }
-        }
+        public CremaDispatcher Dispatcher => this.dataBase?.Dispatcher;
+
+        public IObjectSerializer Serializer => this.DataBase.Serializer;
+
+        public string BasePath { get; }
 
         public event ItemsCreatedEventHandler<ITableItem> ItemsCreated
         {
@@ -586,7 +479,6 @@ namespace Ntreev.Crema.Services.Data
         }
 
         public event ItemsEventHandler<ITableItem> ItemsChanged
-
         {
             add
             {
@@ -709,47 +601,16 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        private void ValidateImport(Authentication authentication, CremaDataSet dataSet, string comment)
-        {
-            if (dataSet == null)
-                throw new ArgumentNullException(nameof(dataSet));
-            if (dataSet.Tables.Any() == false)
-                throw new ArgumentException(Resources.Exception_EmptyDataSetCannotImport, nameof(dataSet));
-            if (comment == null)
-                throw new ArgumentNullException(nameof(comment));
-            if (comment == string.Empty)
-                throw new ArgumentException(Resources.Exception_EmptyStringIsNotAllowed);
-            var tableList = new List<Table>(dataSet.Tables.Count);
-            foreach (var item in dataSet.Tables)
-            {
-                var table = this.Tables[item.Name];
-                if (table == null)
-                    throw new TableNotFoundException(item.Name);
-                tableList.Add(table);
-                table.ValidateAccessType(authentication, AccessType.Editor);
-                table.ValidateHasNotBeingEditedType();
-                table.ValidateNotBeingEdited();
-            }
-
-            var query = from item in tableList
-                        where item.LockInfo.Path != item.Path
-                        select item;
-
-            foreach (var item in query)
-            {
-                item.ValidateLockInternal(authentication);
-            }
-        }
-
         private void Initialize(IEnumerable<TableInfo> tableInfos)
         {
             this.CremaHost.Debug(Resources.Message_LoadTables);
-            var directories = DirectoryUtility.GetAllDirectories(this.basePath);
+            var directories = DirectoryUtility.GetAllDirectories(this.BasePath);
             foreach (var item in directories)
             {
-                var categoryName = CategoryName.Create(UriUtility.MakeRelativeOfDirectory(this.basePath, item));
+                var categoryName = CategoryName.Create(UriUtility.MakeRelativeOfDirectory(this.BasePath, item));
                 this.Categories.Prepare(categoryName.Path);
             }
+
             foreach (var item in tableInfos.OrderBy(i => i.Name))
             {
                 var table = this.Tables.AddNew(Authentication.System, item.Name, item.CategoryPath);
@@ -765,74 +626,50 @@ namespace Ntreev.Crema.Services.Data
                     throw new Exception();
                 }
             }
-            foreach (ITableItem item in this)
+
+            var itemPaths = this.Serializer.GetItemPaths(this.BasePath, typeof(AccessSerializationInfo), AccessSerializationInfo.Settings);
+            foreach (var item in itemPaths)
             {
-                var accessInfoPath = item.GetAccessInfoPath();
-                try
+                var accessInfo = (AccessSerializationInfo)this.Serializer.Deserialize(item, typeof(AccessSerializationInfo), AccessSerializationInfo.Settings);
+                var tableItem = this.GetTableItemByItemPath(item);
+                if (tableItem is Table table)
                 {
-                    item.ReadAccessInfo(accessInfoPath);
+                    table.SetAccessInfo((AccessInfo)accessInfo);
                 }
-                catch (Exception e)
+                else if (tableItem is TableCategory category)
                 {
-                    this.CremaHost.Error(e);
+                    category.SetAccessInfo((AccessInfo)accessInfo);
                 }
             }
             this.CremaHost.Debug(Resources.Message_TableLoadingIsCompleted);
         }
 
-        private void Sign(Authentication authentication)
+        private ITableItem GetTableItemByItemPath(string itemPath)
         {
-            authentication.Sign();
+            var isCategory = itemPath.EndsWith($"{Path.DirectorySeparatorChar}");
+            var directory = Path.GetDirectoryName(itemPath);
+            var relativeUri = UriUtility.MakeRelativeOfDirectory(this.BasePath, itemPath);
+            var segments = StringUtility.Split(relativeUri, PathUtility.SeparatorChar, true);
+            var path = isCategory == true ? (string)CategoryName.Create(segments) : ItemName.Create(segments);
+            return this[path] as ITableItem;
         }
 
-        private DataBaseRepositoryHost Repository
-        {
-            get { return this.DataBase.Repository; }
-        }
+        private DataBaseRepositoryHost Repository => this.DataBase.Repository;
 
         #region ITableContext
 
         bool ITableContext.Contains(string itemPath)
         {
-            this.Dispatcher?.VerifyAccess();
             return this.Contains(itemPath);
         }
 
-        ITableCollection ITableContext.Tables
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Tables;
-            }
-        }
+        ITableCollection ITableContext.Tables => this.Tables;
 
-        ITableCategoryCollection ITableContext.Categories
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        ITableCategoryCollection ITableContext.Categories => this.Categories;
 
-        ITableCategory ITableContext.Root
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Root;
-            }
-        }
+        ITableCategory ITableContext.Root => this.Root;
 
-        ITableItem ITableContext.this[string itemPath]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this[itemPath] as ITableItem;
-            }
-        }
+        ITableItem ITableContext.this[string itemPath] => this[itemPath] as ITableItem;
 
         #endregion
 
@@ -840,7 +677,6 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITableItem> IEnumerable<ITableItem>.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as ITableItem;
@@ -849,7 +685,6 @@ namespace Ntreev.Crema.Services.Data
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as ITableItem;

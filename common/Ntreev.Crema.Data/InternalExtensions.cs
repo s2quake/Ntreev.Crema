@@ -16,11 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Data
 {
@@ -53,14 +49,18 @@ namespace Ntreev.Crema.Data
         {
             if (column.Editor != null)
                 throw new ArgumentException();
-
+            var readOnly = column.ReadOnly;
             try
             {
                 column.Editor = editor;
+                if (readOnly == true)
+                    column.ReadOnly = false;
                 row.SetField(column, value);
             }
             finally
             {
+                if (readOnly == true)
+                    column.ReadOnly = true;
                 column.Editor = null;
             }
         }

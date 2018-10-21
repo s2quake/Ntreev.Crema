@@ -18,6 +18,7 @@
 using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.DataBaseService;
+using Ntreev.Library;
 using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 using System;
@@ -25,6 +26,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -38,171 +40,362 @@ namespace Ntreev.Crema.Services.Data
 
         public AccessType GetAccessType(Authentication authentication)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
+            this.ValidateExpired();
             return base.GetAccessType(authentication);
         }
 
-        public void SetPublic(Authentication authentication)
+        public async Task SetPublicAsync(Authentication authentication)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(SetPublic), this);
-            var result = this.Service.SetPublicTableItem(base.Path);
-            this.Sign(authentication, result);
-            this.Context.InvokeTableItemSetPublic(authentication, this, this.AccessInfo);
-            base.SetPublic(authentication);
-            this.Context.InvokeItemsSetPublicEvent(authentication, new ITableItem[] { this, });
+            try
+            {
+                this.ValidateExpired();
+                var path = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
+                    return base.Path;
+                });
+                var result = await Task.Run(() => this.Service.SetPublicTableItem(path));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    base.SetPublic(authentication);
+                    this.Context.InvokeItemsSetPublicEvent(authentication, new ITableItem[] { this, });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void SetPrivate(Authentication authentication)
+        public async Task SetPrivateAsync(Authentication authentication)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivate), this);
-            var result = this.Service.SetPrivateTableItem(base.Path);
-            this.Sign(authentication, result);
-            this.Context.InvokeTableItemSetPrivate(authentication, this, AccessInfo.Empty);
-            base.SetPrivate(authentication);
-            this.Context.InvokeItemsSetPrivateEvent(authentication, new ITableItem[] { this, });
+            try
+            {
+                this.ValidateExpired();
+                var path = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
+                    return base.Path;
+                });
+                var result = await Task.Run(() => this.Service.SetPrivateTableItem(path));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    base.SetPrivate(authentication);
+                    this.Context.InvokeItemsSetPrivateEvent(authentication, new ITableItem[] { this, });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void AddAccessMember(Authentication authentication, string memberID, AccessType accessType)
+        public async Task AddAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMember), this, memberID, accessType);
-            var result = this.Service.AddAccessMemberTableItem(base.Path, memberID, accessType);
-            this.Sign(authentication, result);
-            this.Context.InvokeTableItemAddAccessMember(authentication, this, this.AccessInfo, memberID, accessType);
-            base.AddAccessMember(authentication, memberID, accessType);
-            this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITableItem[] { this, }, new string[] { memberID, }, new AccessType[] { accessType, });
+            try
+            {
+                this.ValidateExpired();
+                var path = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMemberAsync), this, memberID, accessType);
+                    return base.Path;
+                });
+                var result = await Task.Run(() => this.Service.AddAccessMemberTableItem(path, memberID, accessType));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    base.AddAccessMember(authentication, memberID, accessType);
+                    this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITableItem[] { this, }, new string[] { memberID, }, new AccessType[] { accessType, });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void SetAccessMember(Authentication authentication, string memberID, AccessType accessType)
+        public async Task SetAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMember), this, memberID, accessType);
-            var result = this.Service.SetAccessMemberTableItem(base.Path, memberID, accessType);
-            this.Sign(authentication, result);
-            this.Context.InvokeTableItemSetAccessMember(authentication, this, this.AccessInfo, memberID, accessType);
-            base.SetAccessMember(authentication, memberID, accessType);
-            this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITableItem[] { this, }, new string[] { memberID, }, new AccessType[] { accessType, });
+            try
+            {
+                this.ValidateExpired();
+                var path = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
+                    return base.Path;
+                });
+                var result = await Task.Run(() => this.Service.SetAccessMemberTableItem(path, memberID, accessType));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    base.SetAccessMember(authentication, memberID, accessType);
+                    this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITableItem[] { this, }, new string[] { memberID, }, new AccessType[] { accessType, });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void RemoveAccessMember(Authentication authentication, string memberID)
+        public async Task RemoveAccessMemberAsync(Authentication authentication, string memberID)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMember), this, memberID);
-            var result = this.Service.RemoveAccessMemberTableItem(base.Path, memberID);
-            this.Sign(authentication, result);
-            this.Context.InvokeTableItemRemoveAccessMember(authentication, this, this.AccessInfo, memberID);
-            base.RemoveAccessMember(authentication, memberID);
-            this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITableItem[] { this, }, new string[] { memberID, });
+            try
+            {
+                this.ValidateExpired();
+                var path = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
+                    return base.Path;
+                });
+                var result = await Task.Run(() => this.Service.RemoveAccessMemberTableItem(path, memberID));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    base.RemoveAccessMember(authentication, memberID);
+                    this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITableItem[] { this, }, new string[] { memberID, });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void Lock(Authentication authentication, string comment)
+        public async Task LockAsync(Authentication authentication, string comment)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(Lock), this, comment);
-            var result = this.Service.LockTableItem(base.Path, comment);
-            this.Sign(authentication, result);
-            this.Context.InvokeTableItemLock(authentication, this, comment);
-            base.Lock(authentication, comment);
-            this.Context.InvokeItemsLockedEvent(authentication, new ITableItem[] { this, }, new string[] { comment });
+            try
+            {
+                this.ValidateExpired();
+                var path = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(LockAsync), this, comment);
+                    return base.Path;
+                });
+                var result = await Task.Run(() => this.Service.LockTableItem(path, comment));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    base.Lock(authentication, comment);
+                    this.Context.InvokeItemsLockedEvent(authentication, new ITableItem[] { this, }, new string[] { comment });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void Unlock(Authentication authentication)
+        public async Task UnlockAsync(Authentication authentication)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(Unlock), this);
-            var result = this.Service.UnlockTableItem(base.Path);
-            this.Sign(authentication, result);
-            this.Context.InvokeTableItemUnlock(authentication, this);
-            base.Unlock(authentication);
-            this.Context.InvokeItemsUnlockedEvent(authentication, new ITableItem[] { this, });
+            try
+            {
+                this.ValidateExpired();
+                var path = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(UnlockAsync), this);
+                    return base.Path;
+                });
+                var result = await Task.Run(() => this.Service.UnlockTableItem(path));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    base.Unlock(authentication);
+                    this.Context.InvokeItemsUnlockedEvent(authentication, new ITableItem[] { this, });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void Rename(Authentication authentication, string name)
+        public async Task RenameAsync(Authentication authentication, string name)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(Rename), this, name);
-            var result = this.Service.RenameTableItem(base.Path, name);
-            this.Sign(authentication, result);
-            var items = EnumerableUtility.One(this).ToArray();
-            var oldNames = items.Select(item => item.Name).ToArray();
-            var oldPaths = items.Select(item => item.Path).ToArray();
-            this.Container.InvokeCategoryRename(authentication, this, name);
-            base.Rename(authentication, name);
-            this.Container.InvokeCategoriesRenamedEvent(authentication, items, oldNames, oldPaths);
+            try
+            {
+                this.ValidateExpired();
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(RenameAsync), this, name);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var oldNames = items.Select(item => item.Name).ToArray();
+                    var oldPaths = items.Select(item => item.Path).ToArray();
+                    var path = base.Path;
+                    return (items, oldNames, oldPaths, path);
+                });
+                var result = await Task.Run(() => this.Service.RenameTableItem(tuple.path, name));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    base.Rename(authentication, name);
+                    this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void Move(Authentication authentication, string parentPath)
+        public async Task MoveAsync(Authentication authentication, string parentPath)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(Move), this, parentPath);
-            var result = this.Service.MoveTableItem(base.Path, parentPath);
-            this.Sign(authentication, result);
-            var items = EnumerableUtility.One(this).ToArray();
-            var oldPaths = items.Select(item => item.Path).ToArray();
-            var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
-            this.Container.InvokeCategoryMove(authentication, this, parentPath);
-            base.Move(authentication, parentPath);
-            this.Container.InvokeCategoriesMovedEvent(authentication, items, oldPaths, oldParentPaths);
+            try
+            {
+                this.ValidateExpired();
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(MoveAsync), this, parentPath);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var oldPaths = items.Select(item => item.Path).ToArray();
+                    var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
+                    var path = base.Path;
+                    return (items, oldPaths, oldParentPaths, path);
+                });
+                var result = await Task.Run(() => this.Service.MoveTableItem(tuple.path, parentPath));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    base.Move(authentication, parentPath);
+                    this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void Delete(Authentication authentication)
+        public async Task DeleteAsync(Authentication authentication)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(Delete), this);
-            var result = this.Service.DeleteTableItem(base.Path);
-            this.Sign(authentication, result);
-            var items = EnumerableUtility.One(this).ToArray();
-            var oldPaths = items.Select(item => item.Path).ToArray();
-            var container = this.Container;
-            container.InvokeCategoryDelete(authentication, this);
-            base.Delete(authentication);
-            container.InvokeCategoriesDeletedEvent(authentication, items, oldPaths);
+            try
+            {
+                this.ValidateExpired();
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
+                    var items = EnumerableUtility.One(this).ToArray();
+                    var oldPaths = items.Select(item => item.Path).ToArray();
+                    var path = base.Path;
+                    return (items, oldPaths, path);
+                });
+                var result = await Task.Run(() => this.Service.DeleteTableItem(tuple.path));
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var container = this.Container;
+                    this.CremaHost.Sign(authentication, result);
+                    base.Delete(authentication);
+                    container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void SetProperty(Authentication authentication, string propertyName, string value)
+        public async Task<NewTableTemplate> NewTableAsync(Authentication authentication)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(SetProperty), this, propertyName, value);
-            var result = this.Service.SetTableItemProperty(base.Path, propertyName, value);
-            this.Sign(authentication, result);
-        }
-        
-        public NewTableTemplate NewTable(Authentication authentication)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(NewTable), this);
-            var template = new NewTableTemplate(this);
-            template.BeginEdit(authentication);
-            return template;
-        }
-
-        public CremaDataSet GetDataSet(Authentication authentication, long revision)
-        {
-            this.DataBase.ValidateAsyncBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSet), this, revision);
-            var result = this.Service.GetTableItemDataSet(base.Path, revision);
-            this.Sign(authentication, result); 
-            return result.Value;
+            try
+            {
+                this.ValidateExpired();
+                var template = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(NewTableAsync), this);
+                    return new NewTableTemplate(this);
+                });
+                await template.BeginEditAsync(authentication);
+                return template;
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public LogInfo[] GetLog(Authentication authentication)
+        public async Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision)
         {
-            this.DataBase.ValidateAsyncBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(GetLog), this);
-            var result = this.Service.GetTableItemLog(base.Path);
-            this.Sign(authentication, result);
-            return result.Value ?? new LogInfo[] { };
+            try
+            {
+                this.ValidateExpired();
+                var path = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, revision);
+                    return base.Path;
+                });
+                var result = await Task.Run(() => this.Service.GetTableItemDataSet(path, revision));
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    return result.GetValue();
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public FindResultInfo[] Find(Authentication authentication, string text, FindOptions options)
+        public async Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision)
         {
-            this.DataBase.ValidateAsyncBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(Find), this, text, options);
-            var result = this.Context.Service.FindTableItem(base.Path, text, options);
-            this.Sign(authentication, result);
-            return result.Value ?? new FindResultInfo[] { };
+            try
+            {
+                this.ValidateExpired();
+                var path = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(GetLogAsync), this);
+                    return base.Path;
+                });
+                var result = await Task.Run(() => this.Service.GetTableItemLog(path, revision));
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    return result.GetValue();
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public async Task<FindResultInfo[]> FindAsync(Authentication authentication, string text, FindOptions options)
+        {
+            try
+            {
+                this.ValidateExpired();
+                var path = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(FindAsync), this, text, options);
+                    return base.Path;
+                });
+                var result = await Task.Run(() => this.Service.FindTableItem(path, text, options));
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result);
+                    return result.GetValue() ?? new FindResultInfo[] { };
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public object GetService(System.Type serviceType)
@@ -252,79 +445,25 @@ namespace Ntreev.Crema.Services.Data
             base.LockInfo = lockInfo;
         }
 
-        public CremaHost CremaHost
-        {
-            get { return this.Context.DataBase.CremaHost; }
-        }
+        public CremaHost CremaHost => this.Context.DataBase.CremaHost;
 
-        public DataBase DataBase
-        {
-            get { return this.Context.DataBase; }
-        }
+        public DataBase DataBase => this.Context.DataBase;
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.Context?.Dispatcher; }
-        }
+        public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
 
-        public IDataBaseService Service
-        {
-            get { return this.Context.Service; }
-        }
+        public IDataBaseService Service => this.Context.Service;
 
-        public new string Name
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Name;
-            }
-        }
+        public new string Name => base.Name;
 
-        public new string Path
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Path;
-            }
-        }
+        public new string Path => base.Path;
 
-        public new bool IsLocked
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.IsLocked;
-            }
-        }
+        public new bool IsLocked => base.IsLocked;
 
-        public new bool IsPrivate
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.IsPrivate;
-            }
-        }
+        public new bool IsPrivate => base.IsPrivate;
 
-        public new AccessInfo AccessInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.AccessInfo;
-            }
-        }
+        public new AccessInfo AccessInfo => base.AccessInfo;
 
-        public new LockInfo LockInfo
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.LockInfo;
-            }
-        }
+        public new LockInfo LockInfo => base.LockInfo;
 
         public new event EventHandler Renamed
         {
@@ -396,73 +535,34 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        private void Sign(Authentication authentication, ResultBase result)
-        {
-            result.Validate(authentication);
-        }
-
-        private void Sign<T>(Authentication authentication, ResultBase<T> result)
-        {
-            result.Validate(authentication);
-        }
-
         #region ITableCategory
 
-        ITableCategory ITableCategory.AddNewCategory(Authentication authentication, string name)
+        async Task<ITableCategory> ITableCategory.AddNewCategoryAsync(Authentication authentication, string name)
         {
-            return this.Container.AddNew(authentication, name, base.Path);
+            return await this.Container.AddNewAsync(authentication, name, base.Path);
         }
 
-        ITableTemplate ITableCategory.NewTable(Authentication authentication)
+        async Task<ITableTemplate> ITableCategory.NewTableAsync(Authentication authentication)
         {
-            return this.NewTable(authentication);
+            return await this.NewTableAsync(authentication);
         }
 
-        ITableCategory ITableCategory.Parent
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        ITableCategory ITableCategory.Parent => this.Parent;
 
-        IContainer<ITableCategory> ITableCategory.Categories
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        IContainer<ITableCategory> ITableCategory.Categories => this.Categories;
 
-        IContainer<ITable> ITableCategory.Tables
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Tables;
-            }
-        }
+        IContainer<ITable> ITableCategory.Tables => this.Tables;
 
         #endregion
 
         #region ITableItem
 
-        ITableItem ITableItem.Parent
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        ITableItem ITableItem.Parent => this.Parent;
 
         IEnumerable<ITableItem> ITableItem.Childs
         {
             get
             {
-                this.Dispatcher?.VerifyAccess();
                 foreach (var item in this.Categories)
                 {
                     yield return item;

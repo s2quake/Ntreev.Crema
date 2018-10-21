@@ -55,9 +55,9 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
             {
                 try
                 {
+                    var template = await table.NewTableAsync(authentication);
                     return await table.Dispatcher.InvokeAsync(() =>
                     {
-                        var template = table.NewTable(authentication);
                         return new NewChildTableViewModel(authentication, table, template);
                     });
                 }

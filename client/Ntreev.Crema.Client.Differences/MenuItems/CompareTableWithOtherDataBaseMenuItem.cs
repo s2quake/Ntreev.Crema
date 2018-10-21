@@ -35,7 +35,7 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.Client.Differences.MenuItems
 {
     [Export(typeof(IMenuItem))]
-    [ParentType("Ntreev.Crema.Client.Tables.BrowserItems.ViewModels.TableTreeViewItemViewModel, Ntreev.Crema.Client.Tables, Version=3.6.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Client.Tables.BrowserItems.ViewModels.TableTreeViewItemViewModel, Ntreev.Crema.Client.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class CompareTableWithOtherDataBaseMenuItem : MenuItemBase
     {
         [Import]
@@ -50,7 +50,7 @@ namespace Ntreev.Crema.Client.Differences.MenuItems
             this.DisplayName = Resources.MenuItem_CompareWithOtherDataBase;
         }
 
-        protected override void OnExecute(object parameter)
+        protected override async void OnExecute(object parameter)
         {
             var tableDescriptor = parameter as ITableDescriptor;
             var table = tableDescriptor.Target;
@@ -60,10 +60,10 @@ namespace Ntreev.Crema.Client.Differences.MenuItems
             if (dataBaseName == null)
                 return;
 
-            var dataSet1 = this.PreviewOtherTable(dataBaseName, tableName);
+            var dataSet1 = await this.PreviewOtherTableAsync(dataBaseName, tableName);
             if (dataSet1 != null)
             {
-                var dataSet2 = table.Dispatcher.Invoke(() => table.GetDataSet(this.authenticator, -1));
+                var dataSet2 = await table.GetDataSetAsync(this.authenticator, null);
                 var dataSet = new DiffDataSet(dataSet1, dataSet2)
                 {
                     Header1 = $"{dataBaseName}: {tableName}",
@@ -92,29 +92,39 @@ namespace Ntreev.Crema.Client.Differences.MenuItems
             return null;
         }
 
-        private CremaDataSet PreviewOtherTable(string dataBaseName, string tableName)
+        private async Task<CremaDataSet> PreviewOtherTableAsync(string dataBaseName, string tableName)
         {
-            try
-            {
-                return this.cremaHost.Dispatcher.Invoke(() =>
-                {
-                    using (var item = UsingDataBase.Set(this.cremaHost, dataBaseName, this.authenticator))
-                    {
-                        var dataBase = item.DataBase;
-                        if (dataBase.TableContext.Tables.Contains(tableName) == true)
-                        {
-                            var table2 = dataBase.TableContext.Tables[tableName];
-                            return table2.GetDataSet(this.authenticator, -1);
-                        }
-                        return null;
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                AppMessageBox.ShowError(e);
-                return null;
-            }
+            throw new NotImplementedException();
+            //try
+            //{
+                
+            //    //var dataBase = this.cremaHost item.DataBase;
+            //    //if (dataBase.TableContext.Tables.Contains(tableName) == true)
+            //    //{
+            //    //    var table2 = dataBase.TableContext.Tables[tableName];
+            //    //    return table2.GetDataSet(this.authenticator, null);
+            //    //}
+            //    //return null;
+
+            //    //return this.cremaHost.Dispatcher.Invoke(() =>
+            //    //{
+            //    //    using (var item = UsingDataBase.Set(this.cremaHost, dataBaseName, this.authenticator))
+            //    //    {
+            //    //        var dataBase = item.DataBase;
+            //    //        if (dataBase.TableContext.Tables.Contains(tableName) == true)
+            //    //        {
+            //    //            var table2 = dataBase.TableContext.Tables[tableName];
+            //    //            return table2.GetDataSet(this.authenticator, null);
+            //    //        }
+            //    //        return null;
+            //    //    }
+            //    //});
+            //}
+            //catch (Exception e)
+            //{
+            //    AppMessageBox.ShowError(e);
+            //    return null;
+            //}
         }
     }
 }

@@ -132,9 +132,13 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
 
         private async void CremaHost_Opened(object sender, EventArgs e)
         {
-            var dataBases = this.cremaHost.DataBases.Select(item => new DataBaseItemViewModel(this.authenticator, item, this)).ToArray();
-            this.cremaHost.DataBases.ItemsCreated += DataBases_ItemsCreated;
-            this.cremaHost.DataBases.ItemsDeleted += DataBases_ItemsDeleted;
+            var dataBases = await this.DataBases.Dispatcher.InvokeAsync(() =>
+            {
+                this.DataBases.ItemsCreated += DataBases_ItemsCreated;
+                this.DataBases.ItemsDeleted += DataBases_ItemsDeleted;
+                return this.DataBases.Select(item => new DataBaseItemViewModel(this.authenticator, item, this)).ToArray();
+            });
+            
             await this.Dispatcher.InvokeAsync(() =>
             {
                 var query = from connectionItem in this.CremaAppHost.ConnectionItems
@@ -206,5 +210,7 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
         {
             get { return this.cremaAppHost.Value; }
         }
+
+        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
     }
 }

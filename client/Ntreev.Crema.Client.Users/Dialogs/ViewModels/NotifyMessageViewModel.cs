@@ -93,12 +93,12 @@ namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
             }
         }
 
-        public async void Notify()
+        public async Task NotifyAsync()
         {
             try
             {
                 this.BeginProgress(Resources.Message_SendMessage);
-                await this.userContext.Dispatcher.InvokeAsync(() => this.userContext.NotifyMessage(this.authentication, this.userIDs, this.Message));
+                await this.userContext.NotifyMessageAsync(this.authentication, this.userIDs, this.Message);
                 this.EndProgress();
                 this.TryClose(true);
             }

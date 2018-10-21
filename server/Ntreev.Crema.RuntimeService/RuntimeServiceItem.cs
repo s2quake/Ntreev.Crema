@@ -42,7 +42,7 @@ namespace Ntreev.Crema.RuntimeService
         private readonly Dictionary<string, SerializationSet> caches = new Dictionary<string, SerializationSet>();
         private readonly CremaDispatcher dispatcher;
         private readonly Authentication authentication;
-        private readonly BinaryFormatter formatter = new BinaryFormatter();
+        //private readonly BinaryFormatter formatter = new BinaryFormatter();
         private ILogService logService;
 
         private readonly Dictionary<long, CremaDataSet> cachesByRevison = new Dictionary<long, CremaDataSet>();
@@ -55,100 +55,105 @@ namespace Ntreev.Crema.RuntimeService
             this.logService = dataBase.GetService(typeof(ILogService)) as ILogService;
         }
 
-        public GenerationSet Gerneration(TagInfo tags, string filterExpression, bool isDevmode, long revision)
+        public Task<GenerationSet> GernerationAsync(TagInfo tags, string filterExpression, bool isDevmode, string revision)
         {
-            this.Dispatcher.VerifyAccess();
-
-            if (filterExpression == null)
-                throw new ArgumentNullException(nameof(filterExpression));
-
-            if (revision == -1)
+            return this.dispatcher.Invoke(async () =>
             {
-                var tables = this.GetTables().Select(item => this.GetTableInfo(item))
-                                             .ToArray();
-                var types = this.GetTypes().Select(item => this.GetTypeInfo(item))
-                                           .ToArray();
+                if (filterExpression == null)
+                    throw new ArgumentNullException(nameof(filterExpression));
 
-                var codeSet = new GenerationSet(types, tables)
+                if (revision == null)
                 {
-                    Name = this.DataBaseName,
-                    Revision = this.Revision,
-                };
+                    var tables = this.GetTables().Select(item => this.GetTableInfo(item))
+                                                 .ToArray();
+                    var types = this.GetTypes().Select(item => this.GetTypeInfo(item))
+                                               .ToArray();
 
-                codeSet = codeSet.Filter(tags);
-                if (filterExpression != string.Empty)
-                    codeSet = codeSet.Filter(filterExpression);
-                return codeSet;
-            }
-            else
-            {
-                var dataSet = this.DataBase.GetDataSet(this.authentication, revision);
-                var tables = dataSet.Tables.Select(item => item.TableInfo).ToArray();
-                var types = dataSet.Types.Select(item => item.TypeInfo).ToArray();
-                var codeSet = new GenerationSet(types, tables)
+                    var codeSet = new GenerationSet(types, tables)
+                    {
+                        Name = this.DataBaseName,
+                        Revision = this.Revision,
+                    };
+
+                    codeSet = codeSet.Filter(tags);
+                    if (filterExpression != string.Empty)
+                        codeSet = codeSet.Filter(filterExpression);
+                    return codeSet;
+                }
+                else
                 {
-                    Name = this.DataBaseName,
-                    Revision = this.Revision,
-                };
-                codeSet = codeSet.Filter(tags);
-                if (filterExpression != string.Empty)
-                    codeSet = codeSet.Filter(filterExpression);
-                return codeSet;
-            }
+                    var dataSet = await this.DataBase.GetDataSetAsync(this.authentication, DataSetType.All, filterExpression, revision);
+                    var tables = dataSet.Tables.Select(item => item.TableInfo).ToArray();
+                    var types = dataSet.Types.Select(item => item.TypeInfo).ToArray();
+                    var codeSet = new GenerationSet(types, tables)
+                    {
+                        Name = this.DataBaseName,
+                        Revision = this.Revision,
+                    };
+                    codeSet = codeSet.Filter(tags);
+                    if (filterExpression != string.Empty)
+                        codeSet = codeSet.Filter(filterExpression);
+                    return codeSet;
+                }
+            });
         }
 
-        public SerializationSet Serialize(TagInfo tags, string filterExpression, bool isDevmode, long revision)
+        public Task<SerializationSet> SerializeAsync(TagInfo tags, string filterExpression, bool isDevmode, string revision)
         {
-            this.Dispatcher.VerifyAccess();
-
-            if (filterExpression == null)
-                throw new ArgumentNullException(nameof(filterExpression));
-
-            if (revision == -1)
+            return this.dispatcher.Invoke(async () =>
             {
-                var cacheKey = tags.ToString() + filterExpression;
 
-                if (isDevmode == false && this.caches.ContainsKey(cacheKey) == true)
+
+
+                if (filterExpression == null)
+                    throw new ArgumentNullException(nameof(filterExpression));
+
+                if (revision == null)
                 {
-                    return this.caches[cacheKey];
+                    var cacheKey = tags.ToString() + filterExpression;
+
+                    if (isDevmode == false && this.caches.ContainsKey(cacheKey) == true)
+                    {
+                        return this.caches[cacheKey];
+                    }
+
+                    var dataSet = new SerializationSet()
+                    {
+                        Name = this.DataBaseName,
+                        Revision = this.Revision,
+                    };
+
+                    var tableItems = this.ReadTables(isDevmode);
+                    dataSet.Tables = tableItems.Cast<SerializationTable>().ToArray();
+
+                    var typeItems = this.ReadTypes(isDevmode);
+                    dataSet.Types = typeItems.Cast<SerializationType>().ToArray();
+
+                    dataSet = dataSet.Filter(tags);
+                    if (filterExpression != string.Empty)
+                        dataSet = dataSet.Filter(filterExpression);
+
+                    if (isDevmode == false)
+                    {
+                        this.caches[cacheKey] = dataSet;
+                    }
+
+                    return dataSet;
                 }
-
-                var dataSet = new SerializationSet()
+                else
                 {
-                    Name = this.DataBaseName,
-                    Revision = this.Revision,
-                };
-
-                var tableItems = this.ReadTables(isDevmode);
-                dataSet.Tables = tableItems.Cast<SerializationTable>().ToArray();
-
-                var typeItems = this.ReadTypes(isDevmode);
-                dataSet.Types = typeItems.Cast<SerializationType>().ToArray();
-
-                dataSet = dataSet.Filter(tags);
-                if (filterExpression != string.Empty)
-                    dataSet = dataSet.Filter(filterExpression);
-
-                if (isDevmode == false)
-                {
-                    this.caches[cacheKey] = dataSet;
+                    var dataSet = await this.DataBase.GetDataSetAsync(this.authentication, DataSetType.All, filterExpression, revision);
+                    var serializedSet = new SerializationSet(dataSet)
+                    {
+                        Name = this.DataBaseName,
+                        Revision = this.Revision,
+                    };
+                    serializedSet = serializedSet.Filter(tags);
+                    if (filterExpression != string.Empty)
+                        serializedSet = serializedSet.Filter(filterExpression);
+                    return serializedSet;
                 }
-
-                return dataSet;
-            }
-            else
-            {
-                var dataSet = this.DataBase.GetDataSet(this.authentication, revision);
-                var serializedSet = new SerializationSet(dataSet)
-                {
-                    Name = this.DataBaseName,
-                    Revision = this.Revision,
-                };
-                serializedSet = serializedSet.Filter(tags);
-                if (filterExpression != string.Empty)
-                    serializedSet = serializedSet.Filter(filterExpression);
-                return serializedSet;
-            }
+            });
         }
 
         public override CremaDispatcher Dispatcher
@@ -176,31 +181,35 @@ namespace Ntreev.Crema.RuntimeService
             return new SerializationType(dataType);
         }
 
-        protected override void OnSerializeTable(Stream stream, object tableData)
-        {
-            this.formatter.Serialize(stream, tableData);
-        }
+        //protected override void OnSerializeTable(Stream stream, object tableData)
+        //{
+        //    this.formatter.Serialize(stream, tableData);
+        //}
 
-        protected override void OnSerializeType(Stream stream, object typeData)
-        {
-            this.formatter.Serialize(stream, typeData);
-        }
+        //protected override void OnSerializeType(Stream stream, object typeData)
+        //{
+        //    this.formatter.Serialize(stream, typeData);
+        //}
 
-        protected override object OnDeserializeTable(Stream stream)
-        {
-            return this.formatter.Deserialize(stream);
-        }
+        //protected override object OnDeserializeTable(Stream stream)
+        //{
+        //    return this.formatter.Deserialize(stream);
+        //}
 
-        protected override object OnDeserializeType(Stream stream)
-        {
-            return this.formatter.Deserialize(stream);
-        }
+        //protected override object OnDeserializeType(Stream stream)
+        //{
+        //    return this.formatter.Deserialize(stream);
+        //}
 
         protected override void OnChanged(EventArgs e)
         {
             base.OnChanged(e);
             this.caches.Clear();
         }
+
+        protected override Type TableDataType => typeof(SerializationTable);
+
+        protected override Type TypeDataType => typeof(SerializationType);
 
         protected override Authentication Authentication
         {

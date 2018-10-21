@@ -33,7 +33,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceDescription("Resources", IsShared = true)]
-    class LoginCommand : ConsoleCommandBase
+    class LoginCommand : ConsoleCommandAsyncBase
     {
         [Import]
         private Lazy<ConsoleCommandContext> commandContext = null;
@@ -55,13 +55,13 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
 
         public new ConsoleCommandContext CommandContext => this.commandContext.Value;
 
-        protected override void OnExecute()
+        protected override Task OnExecuteAsync()
         {
             var terminal = new Terminal();
             var userID = terminal.ReadString("UserID:");
             var password = terminal.ReadSecureString("Password:");
             var address = this.Address == string.Empty ? this.CommandContext.Address : this.Address;
-            this.CommandContext.Login(address, userID, password);
+            return this.CommandContext.LoginAsync(address, userID, password);
         }
     }
 }

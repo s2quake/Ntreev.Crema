@@ -15,30 +15,34 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data;
+using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Crema.Services.Properties;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Data;
 using Ntreev.Library;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
     class NewTypeTemplate : TypeTemplateBase
     {
-        private TypeCategory category;
+        private readonly TypeCategory category;
         private Type type;
 
         public NewTypeTemplate(TypeCategory category)
         {
             this.category = category ?? throw new ArgumentNullException(nameof(category));
+            this.DispatcherObject = category;
             this.category.Attach(this);
             this.IsNew = true;
+        }
+
+        public override AccessType GetAccessType(Authentication authentication)
+        {
+            return this.category.GetAccessType(authentication);
         }
 
         public override void OnValidateBeginEdit(Authentication authentication, object target)
@@ -48,92 +52,70 @@ namespace Ntreev.Crema.Services.Data
                 throw new InvalidOperationException(Resources.Exception_Expired);
             if (this.Domain != null)
                 throw new InvalidOperationException(Resources.Exception_ItIsAlreadyBeingEdited);
-            this.category.ValidateAccessType(authentication, AccessType.Master);
         }
 
         public override void OnValidateEndEdit(Authentication authentication, object target)
         {
             base.OnValidateEndEdit(authentication, target);
-            this.category.ValidateAccessType(authentication, AccessType.Master);
         }
 
         public override void OnValidateCancelEdit(Authentication authentication, object target)
         {
             base.OnValidateCancelEdit(authentication, target);
-            this.category.ValidateAccessType(authentication, AccessType.Master);
         }
 
-        public override IType Type
+        public override IType Type => this.type;
+
+        public override DomainContext DomainContext => this.category.GetService(typeof(DomainContext)) as DomainContext;
+
+        public override string Path => this.category.Path;
+
+        public override CremaHost CremaHost => this.category.CremaHost;
+
+        public override DataBase DataBase => this.category.DataBase;
+
+        public override IPermission Permission => this.category;
+
+        public override IDispatcherObject DispatcherObject { get; }
+
+        public TypeCollection Types => this.category.Context.Types;
+
+        public TypeContext Context => this.category.Context;
+
+        protected override async Task OnBeginEditAsync(Authentication authentication)
         {
-            get { return this.type; }
+            await base.OnBeginEditAsync(authentication);
         }
 
-        public override DomainContext DomainContext
+        protected override async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, TypeInfo[] typeInfos)
         {
-            get { return this.category.GetService(typeof(DomainContext)) as DomainContext; }
+            var dataType = this.TypeSource;
+            var dataSet = dataType.DataSet;
+            var itemPath = this.Context.GeneratePath(dataType.Path);
+            await this.Repository.LockAsync(itemPath);
+            dataSet.AddItemPaths(itemPath);
+            this.type = await this.Types.AddNewAsync(authentication, dataType);
+            typeInfos = new TypeInfo[] { dataType.TypeInfo };
+            await base.OnEndEditAsync(authentication, typeInfos);
+            return typeInfos;
         }
 
-        public override string ItemPath
+        protected override async Task OnCancelEditAsync(Authentication authentication)
         {
-            get { return this.category.Path; }
+            await this.Repository.UnlockAsync(this.ItemPaths);
+            await base.OnCancelEditAsync(authentication);
         }
 
-        public override CremaDispatcher Dispatcher
+        protected override async Task<CremaDataType> CreateSourceAsync(Authentication authentication)
         {
-            get
-            {
-                if (this.category == null)
-                    return null;
-                return this.category.Dispatcher;
-            }
-        }
-
-        public override CremaHost CremaHost
-        {
-            get { return this.category.CremaHost; }
-        }
-
-        public override DataBase DataBase
-        {
-            get { return this.category.DataBase; }
-        }
-
-        public override IPermission Permission
-        {
-            get { return this.category; }
-        }
-
-        public TypeCollection Types
-        {
-            get { return this.category.Context.Types; }
-        }
-
-        protected override void OnBeginEdit(Authentication authentication)
-        {
-            base.OnBeginEdit(authentication);
-        }
-
-        protected override void OnEndEdit(Authentication authentication)
-        {
-            base.OnEndEdit(authentication);
-            this.type = this.Types.AddNew(authentication, this.TypeSource);
-            this.category = null;
-        }
-
-        protected override void OnCancelEdit(Authentication authentication)
-        {
-            base.OnCancelEdit(authentication);
-            this.category = null;
-        }
-
-        protected override CremaDataType CreateSource(Authentication authentication)
-        {
-            var newName = NameUtility.GenerateNewName("Type", this.Types.Select((Type item) => item.Name).ToArray());
-            var dataSet = CremaDataSet.Create(new SignatureDateProvider(authentication.ID));
+            var dataSet = await this.category.ReadDataForNewTemplateAsync(authentication);
+            var typeName = NameUtility.GenerateNewName(nameof(Type), this.Types.Select((Type item) => item.Name).ToArray());
             var dataType = dataSet.Types.Add();
-            dataType.TypeName = newName;
+            dataType.TypeName = typeName;
             dataType.CategoryPath = this.category.Path;
             return dataType;
         }
+
+        private DataBaseRepositoryHost Repository => this.DataBase.Repository;
     }
 }

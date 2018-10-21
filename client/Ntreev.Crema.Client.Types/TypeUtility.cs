@@ -117,7 +117,7 @@ namespace Ntreev.Crema.Client.Types
 
         public static async Task<bool> RenameAsync(Authentication authentication, ITypeDescriptor descriptor)
         {
-            var comment = await LockAsync(authentication, descriptor, nameof(IType.Rename));
+            var comment = await LockAsync(authentication, descriptor, nameof(IType.RenameAsync));
             if (comment == null)
                 return false;
 
@@ -130,7 +130,7 @@ namespace Ntreev.Crema.Client.Types
 
         public static async Task<bool> MoveAsync(Authentication authentication, ITypeDescriptor descriptor)
         {
-            var comment = await LockAsync(authentication, descriptor, nameof(IType.Move));
+            var comment = await LockAsync(authentication, descriptor, nameof(IType.MoveAsync));
             if (comment == null)
                 return false;
 
@@ -202,16 +202,14 @@ namespace Ntreev.Crema.Client.Types
             {
                 try
                 {
-                    return await type.Dispatcher.InvokeAsync(() =>
+                    var lockInfo = await type.Dispatcher.InvokeAsync(() => type.LockInfo);
+                    if (lockInfo.IsLocked == false || lockInfo.IsInherited == true)
                     {
-                        if (type.IsLocked == false || type.LockInfo.IsInherited == true)
-                        {
-                            var lockComment = comment + ":" + Guid.NewGuid();
-                            type.Lock(authentication, lockComment);
-                            return lockComment;
-                        }
-                        return string.Empty;
-                    });
+                        var lockComment = comment + ":" + Guid.NewGuid();
+                        await type.LockAsync(authentication, lockComment);
+                        return lockComment;
+                    }
+                    return string.Empty;
                 }
                 catch (Exception e)
                 {
@@ -234,14 +232,11 @@ namespace Ntreev.Crema.Client.Types
 
                 try
                 {
-                    await type.Dispatcher.InvokeAsync(() =>
+                    var lockInfo = await type.Dispatcher.InvokeAsync(() => type.LockInfo);
+                    if (lockInfo.IsLocked == true && lockInfo.IsInherited == false && lockInfo.Comment == comment)
                     {
-                        var lockInfo = type.LockInfo;
-                        if (lockInfo.IsLocked == true && lockInfo.IsInherited == false && lockInfo.Comment == comment)
-                        {
-                            type.Unlock(authentication);
-                        }
-                    });
+                        await type.UnlockAsync(authentication);
+                    }
                 }
                 catch (Exception e)
                 {

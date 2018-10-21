@@ -28,7 +28,7 @@ namespace Ntreev.Crema.ServiceHosts
     [ServiceContract(Namespace = CremaService.Namespace)]
     public interface IDescriptorService
     {
-        [OperationContract(IsInitiating = true)]
+        [OperationContract]
         string GetVersion();
 
         [OperationContract]

@@ -18,10 +18,11 @@
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library.ObjectModel;
 using System;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains
 {
@@ -162,10 +163,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.Context.Dispatcher; }
-        }
+        public CremaDispatcher Dispatcher => this.Context.Dispatcher;
 
         protected virtual void OnCategoriesCreated(ItemsCreatedEventArgs<IDomainCategory> e)
         {
@@ -191,27 +189,12 @@ namespace Ntreev.Crema.Services.Domains
 
         bool IDomainCategoryCollection.Contains(string categoryPath)
         {
-            this.Dispatcher.VerifyAccess();
             return this.Contains(categoryPath);
         }
 
-        IDomainCategory IDomainCategoryCollection.Root
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Root;
-            }
-        }
+        IDomainCategory IDomainCategoryCollection.Root => this.Root;
 
-        IDomainCategory IDomainCategoryCollection.this[string categoryPath]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[categoryPath];
-            }
-        }
+        IDomainCategory IDomainCategoryCollection.this[string categoryPath] => this[categoryPath];
 
         #endregion
 
@@ -219,13 +202,11 @@ namespace Ntreev.Crema.Services.Domains
 
         IEnumerator<IDomainCategory> IEnumerable<IDomainCategory>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 

@@ -22,6 +22,7 @@ using System.Xml.Serialization;
 using Ntreev.Crema.Data.Xml;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 using Ntreev.Library;
 using System.Xml.Schema;
 using Ntreev.Library.Serialization;
@@ -37,17 +38,24 @@ namespace Ntreev.Crema.ServiceModel
     {
         private object[] keys;
 
-        [XmlElement]
+        [DataMember]
         public string TableName { get; set; }
 
-        [XmlElement]
+        [DataMember]
         public string ColumnName { get; set; }
 
-        [XmlIgnore]
+        [IgnoreDataMember]
         public object[] Keys
         {
             get { return this.keys; }
             set { this.keys = value; }
+        }
+
+        [DataMember]
+        public DomainFieldInfo[] KeyInfos
+        {
+            get { return this.keys != null ? this.keys.Select(item => new DomainFieldInfo(item)).ToArray() : new DomainFieldInfo[] { }; }
+            set { this.keys = value?.Select(item => item.ToValue()).ToArray(); }
         }
 
         public static readonly DomainLocationInfo Empty = new DomainLocationInfo() { Keys = new object[] { } };
@@ -78,54 +86,5 @@ namespace Ntreev.Crema.ServiceModel
         {
             return HashUtility.GetHashCode(this.Keys, this.ColumnName, this.TableName);
         }
-
-        #region DataMember
-
-        [XmlElement]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public string ItemXml
-        {
-            get
-            {
-                var settings = new XmlWriterSettings()
-                {
-                    ConformanceLevel = ConformanceLevel.Fragment,
-                    Encoding = Encoding.UTF8,
-                    Indent = true,
-                };
-
-                using (var sw = new Ntreev.Library.IO.Utf8StringWriter())
-                using (var writer = XmlWriter.Create(sw, settings))
-                {
-                    DomainRowInfo.WriteFields(writer, nameof(Keys), this.keys);
-
-                    writer.Close();
-                    return sw.ToString();
-                }
-            }
-            set
-            {
-                var settings = new XmlReaderSettings()
-                {
-                    ConformanceLevel = ConformanceLevel.Fragment,
-                };
-
-                using (var sr = new StringReader(value))
-                using (var reader = XmlReader.Create(sr, settings))
-                {
-                    this.keys = DomainRowInfo.ReadFields(reader, nameof(Keys));
-                }
-            }
-        }
-
-        [DataMember]
-        [XmlIgnore]
-        private string Xml
-        {
-            get { return XmlSerializerUtility.GetString(this); }
-            set { this = XmlSerializerUtility.ReadString(this, value); }
-        }
-
-        #endregion
     }
 }

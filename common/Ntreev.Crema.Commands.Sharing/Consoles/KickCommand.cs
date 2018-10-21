@@ -38,37 +38,33 @@ namespace Ntreev.Crema.Commands.Consoles
     class KickCommand : UserCommandBase, IConsoleCommand
     {
         public KickCommand()
-            : base("kick")
         {
 
         }
 
         public override string[] GetCompletions(CommandCompletionContext completionContext)
         {
-            if (completionContext.MemberDescriptor != null && completionContext.MemberDescriptor.DescriptorName == nameof(this.UserID))
-            {
-                return this.GetUserList();
-            }
             return base.GetCompletions(completionContext);
         }
 
         [CommandProperty(IsRequired = true)]
+        [CommandCompletion(nameof(GetUserList))]
         public string UserID
         {
             get; set;
         }
 
-        [CommandProperty('m', IsRequired = true, IsExplicit = true)]
-        public string Comment
+        [CommandProperty('m', true, IsRequired = true, IsExplicit = true)]
+        public string Message
         {
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var user = this.GetUser(authentication, this.UserID);
-            user.Dispatcher.Invoke(() => user.Kick(authentication, this.Comment));
+            var user = await this.GetUserAsync(authentication, this.UserID);
+            await user.KickAsync(authentication, this.Message);
         }
     }
 }

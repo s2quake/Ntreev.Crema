@@ -23,107 +23,92 @@ using Ntreev.Library.Linq;
 using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
     class TableTemplate : TableTemplateBase
     {
         private readonly Table table;
+        private readonly Table[] tables;
 
         public TableTemplate(Table table)
         {
             this.table = table;
+            this.tables = new Table[] { table };
         }
 
-        public override Type GetType(string typeName)
+        public override AccessType GetAccessType(Authentication authentication)
         {
-            var typeContext = this.table.GetService(typeof(TypeContext)) as TypeContext;
-            return typeContext[typeName] as Type;
+            return this.table.GetAccessType(authentication);
         }
 
-        public override ITable Table
+        public override object Target => this.table;
+
+        public override DomainContext DomainContext => this.table.GetService(typeof(DomainContext)) as DomainContext;
+
+        public override string ItemPath => this.table.Path;
+
+        public override CremaHost CremaHost => this.table.CremaHost;
+
+        public override DataBase DataBase => this.table.DataBase;
+
+        public override IDispatcherObject DispatcherObject => this.table;
+
+        public override IPermission Permission => this.table;
+
+        protected override async Task OnBeginEditAsync(Authentication authentication)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.table;
-            }
+            await base.OnBeginEditAsync(authentication);
+            this.table.IsBeingSetup = true;
+            this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
         }
 
-        public override DomainContext DomainContext
+        protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, TableInfo[] tableInfos)
         {
-            get { return this.table.GetService(typeof(DomainContext)) as DomainContext; }
-        }
-
-        public override string ItemPath
-        {
-            get { return this.table.Path; }
-        }
-
-        public override CremaHost CremaHost
-        {
-            get { return this.table.CremaHost; }
-        }
-
-        public override CremaDispatcher Dispatcher
-        {
-            get { return this.table.Dispatcher; }
-        }
-
-        public override DataBase DataBase
-        {
-            get { return this.table.DataBase; }
-        }
-
-        public override IPermission Permission
-        {
-            get { return this.table; }
-        }
-
-        protected override void OnBeginEdit(Authentication authentication)
-        {
-            base.OnBeginEdit(authentication);
-            this.table.SetTableState(TableState.IsBeingSetup);
-            this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table, });
-        }
-
-        protected override void OnEndEdit(Authentication authentication, CremaTemplate template)
-        {
-            this.Container.InvokeTableEndTemplateEdit(authentication, this.table, this.TemplateSource);
-            base.OnEndEdit(authentication, template);
+            var template = this.TemplateSource;
+            var dataSet = template.TargetTable.DataSet;
+            var dataBaseSet = await DataBaseSet.CreateAsync(this.table.DataBase, dataSet, false, false);
+            var tableInfo = template.TableInfo;
+            tableInfos = new TableInfo[] { tableInfo };
+            await this.Container.InvokeTableEndTemplateEditAsync(authentication, tableInfo, dataBaseSet);
+            await base.OnEndEditAsync(authentication, tableInfos);
             this.table.UpdateTemplate(template.TableInfo);
             this.table.UpdateTags(template.Tags);
             this.table.UpdateComment(template.Comment);
-            this.table.SetTableState(TableState.None);
-
-            var items = EnumerableUtility.One(this.table).ToArray();
-            this.Container.InvokeTablesStateChangedEvent(authentication, items);
-            this.Container.InvokeTablesTemplateChangedEvent(authentication, items, this.TemplateSource.TargetTable.DataSet);
+            this.table.IsBeingSetup = true;
+            this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
+            this.Container.InvokeTablesTemplateChangedEvent(authentication, this.tables, dataSet);
+            return tableInfos;
         }
 
-        protected override void OnCancelEdit(Authentication authentication)
+        protected override async Task OnCancelEditAsync(Authentication authentication)
         {
-            base.OnCancelEdit(authentication);
-            this.table.SetTableState(TableState.None);
-            this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table });
+            await base.OnCancelEditAsync(authentication);
+            await this.Repository.UnlockAsync(this.ItemPaths);
+            this.table.IsBeingSetup = false;
+            this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
         }
 
-        protected override void OnRestore(Domain domain)
+        protected override void OnAttach(Domain domain)
         {
-            this.table.SetTableState(TableState.IsBeingSetup);
-            base.OnRestore(domain);
+            this.table.IsBeingSetup = true;
+            base.OnAttach(domain);
         }
 
-        protected override CremaTemplate CreateSource(Authentication authentication)
+        protected override async Task<CremaTemplate> CreateSourceAsync(Authentication authentication)
         {
-            var dataSet = this.table.ReadAll(authentication);
-            return new CremaTemplate(dataSet.Tables[this.table.Name, this.table.Category.Path]);
+            var tablePath = this.table.Path;
+            var dataSet = await this.table.ReadDataForTemplateAsync(authentication, true);
+            var dataTable = dataSet.Tables[this.table.Name, this.table.Category.Path];
+            if (dataTable == null)
+                throw new TableNotFoundException(tablePath);
+            return new CremaTemplate(dataTable);
         }
 
-        private TableCollection Container
-        {
-            get { return this.table.Container; }
-        }
+        private TableCollection Container => this.table.Container;
+
+        private DataBaseRepositoryHost Repository => this.table.Repository;
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override void OnValidateBeginEdit(Authentication authentication, object target)
@@ -134,7 +119,7 @@ namespace Ntreev.Crema.Services.Data
                 throw new InvalidOperationException(Resources.Exception_InheritedTableCannotEditTemplate);
 
             this.table.ValidateAccessType(authentication, AccessType.Master);
-            this.table.ValidateNotBeingEdited();
+            this.table.ValidateIsNotBeingEdited();
             this.table.ValidateHasNotBeingEditedType();
 
             var templates = this.table.Childs.Select(item => item.Template);
@@ -151,17 +136,18 @@ namespace Ntreev.Crema.Services.Data
 
             if (target == this)
             {
-                if (this.IsBeingEdited == false)
-                    throw new InvalidOperationException(Resources.Exception_TableTemplateIsNotBeingEdited);
+                if (this.table.TemplatedParent != null)
+                    throw new InvalidOperationException(Resources.Exception_InheritedTableTemplateCannotEdit);
                 this.TemplateSource.Validate();
             }
 
             this.table.ValidateAccessType(authentication, AccessType.Master);
 
-            var templates = this.table.Childs.Select(item => item.Template);
+            var templates = this.table.GetRelations().Select(item => item.Template).ToArray();
             foreach (var item in templates)
             {
-                item.OnValidateEndEdit(authentication, target);
+                if (target != this)
+                    item.OnValidateEndEdit(authentication, target);
             }
         }
 
@@ -169,19 +155,13 @@ namespace Ntreev.Crema.Services.Data
         public override void OnValidateCancelEdit(Authentication authentication, object target)
         {
             base.OnValidateCancelEdit(authentication, target);
-
-            if (target == this)
-            {
-                if (this.IsBeingEdited == false)
-                    throw new InvalidOperationException(Resources.Exception_TableTemplateIsNotBeingEdited);
-            }
-
             this.table.ValidateAccessType(authentication, AccessType.Master);
 
-            var templates = this.table.Childs.Select(item => item.Template);
+            var templates = this.table.GetRelations().Select(item => item.Template).ToArray();
             foreach (var item in templates)
             {
-                item.OnValidateCancelEdit(authentication, target);
+                if (target != this)
+                    item.OnValidateCancelEdit(authentication, target);
             }
         }
     }

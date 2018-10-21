@@ -23,7 +23,7 @@ using System.Collections.Generic;
 
 namespace Ntreev.Crema.Services
 {
-    public interface IDomainContext : IEnumerable<IDomainItem>, IServiceProvider
+    public interface IDomainContext : IEnumerable<IDomainItem>, IServiceProvider, IDispatcherObject
     {
         bool Contains(string itemPath);
 
@@ -34,8 +34,6 @@ namespace Ntreev.Crema.Services
         IDomainCategory Root { get; }
 
         IDomainItem this[string itemPath] { get; }
-
-        CremaDispatcher Dispatcher { get; }
 
         event ItemsCreatedEventHandler<IDomainItem> ItemsCreated;
 

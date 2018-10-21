@@ -16,8 +16,6 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml;
-using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
@@ -28,7 +26,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 #pragma warning disable 0612
 
@@ -56,69 +57,111 @@ namespace Ntreev.Crema.Services.Data
             return this.BaseAddNew(name, categoryPath, authentication);
         }
 
-        public Table AddNew(Authentication authentication, CremaTemplate template)
+        public async Task<Table[]> AddNewAsync(Authentication authentication, CremaDataSet dataSet, CremaDataTable[] dataTables)
         {
-            var dataSet = template.TargetTable.DataSet.Copy();
-            var dataTable = dataSet.Tables[template.TableName, template.CategoryPath];
-            var categoryPath = dataTable.CategoryPath;
-
-            this.ValidateAddNew(dataTable.TableName, categoryPath, authentication);
-            this.Sign(authentication);
-            this.InvokeTableCreate(authentication, dataTable.TableName, categoryPath, dataTable, null);
-            var table = this.AddNew(authentication, dataTable.TableName, categoryPath);
-            table.Initialize(dataTable.TableInfo);
-            this.InvokeTablesCreatedEvent(authentication, new Table[] { table }, dataSet);
-            return table;
+            foreach (var item in dataTables)
+            {
+                this.ValidateAddNew(item.Name, item.CategoryPath, authentication);
+            }
+            var tableList = new List<Table>(dataTables.Length);
+            var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, true);
+            var tablePaths = dataTables.Select(item => item.Path).ToArray();
+            await this.InvokeTableCreateAsync(authentication, tablePaths, dataBaseSet);
+            foreach (var item in dataTables)
+            {
+                var table = this.AddNew(authentication, item.Name, item.CategoryPath);
+                if (item.TemplatedParentName != string.Empty)
+                    table.TemplatedParent = this[item.TemplatedParentName];
+                table.Initialize(item.TableInfo);
+                tableList.Add(table);
+            }
+            this.InvokeTablesCreatedEvent(authentication, tableList.ToArray(), dataSet);
+            return tableList.ToArray();
         }
 
-        public Table Inherit(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
+        public async Task<Table> InheritAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
         {
-            this.ValidateInherit(authentication, table, newTableName, categoryPath, copyContent);
-            this.Sign(authentication);
-            var dataTable = table.ReadData(authentication);
-            var itemName = new ItemName(categoryPath, newTableName);
-            var newDataTable = dataTable.Inherit(itemName, copyContent);
-            if (copyContent == false)
-                newDataTable.Clear();
-            newDataTable.CategoryPath = categoryPath;
-
-            this.InvokeTableCreate(authentication, newTableName, categoryPath, newDataTable, table);
-            var newTable = this.AddNew(authentication, newTableName, categoryPath);
-            newTable.TemplatedParent = table;
-            newTable.Initialize(newDataTable.TableInfo);
-            foreach (var item in newDataTable.Childs)
+            try
             {
-                var childTable = this.AddNew(authentication, item.Name, categoryPath);
-                childTable.TemplatedParent = table.Childs[item.TableName];
-                childTable.Initialize(item.TableInfo);
+                this.ValidateExpired();
+                var path = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(InheritAsync), this, table, newTableName, categoryPath, copyContent);
+                    this.ValidateInherit(authentication, table, newTableName, categoryPath, copyContent);
+                    return table.Path;
+                });
+                var itemName = new ItemName(path);
+                var targetName = new ItemName(categoryPath, newTableName);
+                var dataSet = await table.ReadDataForCopyAsync(authentication, targetName);
+                var dataTable = dataSet.Tables[itemName.Name, itemName.CategoryPath];
+                var dataTables = dataSet.Tables.ToArray();
+                var newDataTable = dataTable.Inherit(targetName, copyContent);
+                newDataTable.CategoryPath = categoryPath;
+                var query = from item in dataSet.Tables.Except(dataTables)
+                            orderby item.Name
+                            orderby item.TemplatedParentName != string.Empty
+                            select item;
+                var tables = await this.AddNewAsync(authentication, dataSet, query.ToArray());
+                return await this.Dispatcher.InvokeAsync(() => this[newTableName]);
             }
-            var items = EnumerableUtility.Friends(newTable, newTable.Childs).ToArray();
-            this.InvokeTablesCreatedEvent(authentication, items, dataTable.DataSet);
-            return newTable;
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public Table Copy(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
+        // TODO: 상속된 테이블 복사시 에러가 발생
+        public async Task<Table> CopyAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
         {
-            this.ValidateCopy(authentication, table, newTableName, categoryPath, copyContent);
-            this.Sign(authentication);
-            var dataTable = table.ReadData(authentication);
-            var itemName = new ItemName(categoryPath, newTableName);
-            var newDataTable = dataTable.Copy(itemName, copyContent);
-            if (copyContent == false)
-                newDataTable.Clear();
-            newDataTable.CategoryPath = categoryPath;
-
-            this.InvokeTableCreate(authentication, newTableName, categoryPath, newDataTable, null);
-            var newTable = this.AddNew(authentication, newTableName, categoryPath);
-            newTable.Initialize(newDataTable.TableInfo);
-            foreach (var item in newDataTable.Childs)
+            try
             {
-                var childTable = this.AddNew(authentication, item.Name, categoryPath);
-                childTable.Initialize(item.TableInfo);
+                this.ValidateExpired();
+                var path = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), this, table, newTableName, categoryPath, copyContent);
+                    this.ValidateCopy(authentication, table, newTableName, categoryPath, copyContent);
+                    return table.Path;
+                });
+                var itemName = new ItemName(path);
+                var targetName = new ItemName(categoryPath, newTableName);
+                var dataSet = await table.ReadDataForCopyAsync(authentication, targetName);
+                var dataTable = dataSet.Tables[itemName.Name, itemName.CategoryPath];
+                var dataTables = dataSet.Tables.ToArray();
+                var newDataTable = dataTable.Copy(targetName, copyContent);
+                newDataTable.CategoryPath = categoryPath;
+                var query = from item in dataSet.Tables.Except(dataTables)
+                            orderby item.Name
+                            orderby item.TemplatedParentName != string.Empty
+                            select item;
+                await this.AddNewAsync(authentication, dataSet, query.ToArray());
+                return await this.Dispatcher.InvokeAsync(() => this[newTableName]);
             }
-            var items = EnumerableUtility.Friends(newTable, newTable.Childs).ToArray();
-            this.InvokeTablesCreatedEvent(authentication, items, dataTable.DataSet);
-            return newTable;
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public async Task<CremaDataSet> ReadDataForContentAsync(Authentication authentication, Table[] tables)
+        {
+            var tuple = await this.Dispatcher.InvokeAsync(() =>
+            {
+                var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
+                var typePaths = types.Select(item => item.ItemPath).ToArray();
+                var tablePaths = tables.Select(item => item.ItemPath).ToArray();
+                var itemPaths = typePaths.Concat(tablePaths).ToArray();
+                var props = new CremaDataSetSerializerSettings(authentication, typePaths, tablePaths);
+                return (itemPaths, props);
+            });
+            return await this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                this.Repository.Lock(tuple.itemPaths);
+                var dataSet = this.Serializer.Deserialize(this.DataBase.BasePath, typeof(CremaDataSet), tuple.props) as CremaDataSet;
+                dataSet.SetItemPaths(tuple.itemPaths);
+                return dataSet;
+            });
         }
 
         public object GetService(System.Type serviceType)
@@ -126,235 +169,158 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public void InvokeTableCreate(Authentication authentication, string tableName, string categoryPath, CremaDataTable dataTable, Table sourceTable)
+        public Task<SignatureDate> InvokeTableCreateAsync(Authentication authentication, string[] tablePaths, DataBaseSet dataBaseSet)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableCreate), tableName, categoryPath, sourceTable);
-            this.ValidateCreate(authentication, categoryPath);
-
-            var category = this.GetCategory(categoryPath);
-            var schemaPath = this.Context.GenerateTableSchemaPath(categoryPath, tableName);
-            var xmlPath = this.Context.GenerateTableXmlPath(categoryPath, tableName);
-
-            try
+            var message = EventMessageBuilder.CreateTable(authentication, tablePaths);
+            var itemPaths = tablePaths.Select(item => this.Context.GeneratePath(item)).ToArray();
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                if (sourceTable != null)
+                try
                 {
-                    if (dataTable.TemplateNamespace == string.Empty)
-                    {
-                        this.Repository.Copy(sourceTable.SchemaPath, schemaPath);
-                        this.Repository.Modify(schemaPath, dataTable.GetXmlSchema());
-                        this.Repository.Copy(sourceTable.XmlPath, xmlPath);
-                        this.Repository.Modify(xmlPath, dataTable.GetXml());
-                    }
-                    else
-                    {
-                        this.Repository.Copy(sourceTable.XmlPath, xmlPath);
-                        this.Repository.Modify(xmlPath, dataTable.GetXml());
-                    }
+                    var signatureDate = authentication.Sign();
+                    this.Repository.CreateTable(dataBaseSet, tablePaths);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
                 }
-                else
+                catch
                 {
-                    this.Repository.Add(schemaPath, dataTable.GetXmlSchema());
-                    this.Repository.Add(xmlPath, dataTable.GetXml());
+                    this.Repository.Revert();
+                    throw;
                 }
-                this.Context.InvokeTableItemCreate(authentication, categoryPath + tableName);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
-        }
-
-        public void InvokeTableRename(Authentication authentication, Table table, string newName, CremaDataSet dataSet)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableRename), table, newName);
-
-            var dataTables = new DataTableCollection(dataSet, this.DataBase);
-            var dataTable = dataSet.Tables[table.Name, table.Category.Path];
-            dataTable.TableName = newName;
-
-            try
-            {
-                dataTables.Modify(this.Repository);
-                dataTables.Move(this.Repository);
-                this.Context.InvokeTableItemRename(authentication, table, newName);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
-        }
-
-        public void InvokeTableMove(Authentication authentication, Table table, string newCategoryPath, CremaDataSet dataSet)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableMove), table, newCategoryPath);
-
-            var dataTables = new DataTableCollection(dataSet, this.DataBase);
-            var dataTable = dataSet.Tables[table.Name, table.Category.Path];
-            dataTable.CategoryPath = newCategoryPath;
-
-            try
-            {
-                dataTables.Modify(this.Repository);
-                dataTables.Move(this.Repository);
-                this.Context.InvokeTableItemMove(authentication, table, newCategoryPath);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
-        }
-
-        public void InvokeTableDelete(Authentication authentication, Table table, CremaDataSet dataSet)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableDelete), table);
-
-            try
-            {
-                if (dataSet != null)
+                finally
                 {
-                    var dataTables = dataSet != null ? new DataTableCollection(dataSet, this.DataBase) : null;
-                    var dataTable = dataSet.Tables[table.Name, table.Category.Path];
-                    var parentTable = dataTable.Parent;
-                    if (parentTable != null)
-                        parentTable.Childs.Remove(dataTable);
-                    else
-                        dataSet.Tables.Remove(dataTable);
-                    dataTables.Modify(this.Repository);
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
                 }
-                else
+            });
+        }
+
+        public Task<SignatureDate> InvokeTableRenameAsync(Authentication authentication, TableInfo tableInfo, string newName, DataBaseSet dataBaseSet)
+        {
+            var message = EventMessageBuilder.RenameTable(authentication, tableInfo.Name, newName);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
                 {
-                    if (table.TemplatedParent == null)
-                        this.Repository.Delete(table.SchemaPath);
-
-                    this.Repository.Delete(table.XmlPath);
+                    var signatureDate = authentication.Sign();
+                    this.Repository.RenameTable(dataBaseSet, tableInfo.Path, newName);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
                 }
-                this.Context.InvokeTableItemDelete(authentication, table);
-            }
-            catch
-            {
-                this.Repository.Revert();
-                throw;
-            }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
+            });
         }
 
-        public void InvokeEndContentEdit(Authentication authentication, Table table, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTableMoveAsync(Authentication authentication, TableInfo tableInfo, string newCategoryPath, DataBaseSet dataBaseSet)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeEndContentEdit), table);
-
-            var dataTables = new DataTableCollection(dataSet, this.DataBase);
-            try
+            var message = EventMessageBuilder.MoveTable(authentication, tableInfo.Name, newCategoryPath, tableInfo.CategoryPath);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                dataTables.Modify(this.Repository);
-                this.Context.InvokeTableItemChange(authentication, table);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.MoveTable(dataBaseSet, tableInfo.Path, newCategoryPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
+            });
         }
 
-        public void InvokeTableEndTemplateEdit(Authentication authentication, Table table, CremaTemplate template)
+        public Task<SignatureDate> InvokeTableDeleteAsync(Authentication authentication, TableInfo tableInfo, DataBaseSet dataBaseSet)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableEndTemplateEdit), table);
-            if (table.TemplatedParent != null)
-                throw new InvalidOperationException(Resources.Exception_InheritedTableTemplateCannotEdit);
-
-            var dataTable = template.TargetTable;
-            var dataSet = dataTable.DataSet;
-            var dataTables = new DataTableCollection(dataSet, this.DataBase);
-
-            try
+            var message = EventMessageBuilder.DeleteTable(authentication, tableInfo.Name);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                dataTables.Modify(this.Repository);
-                this.Context.InvokeTableItemChange(authentication, table);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.DeleteTable(dataBaseSet, tableInfo.Path);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
+            });
         }
 
-        public void InvokeTableSetTags(Authentication authentication, Table table, TagInfo tags, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTableEndContentEditAsync(Authentication authentication, Table[] tables, DataBaseSet dataBaseSet)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableSetTags), table, tags);
-
-            var dataTables = new DataTableCollection(dataSet, this.DataBase);
-            var dataTable = dataSet.Tables[table.Name, table.Category.Path];
-            dataTable.Tags = tags;
-
-            try
+            var message = EventMessageBuilder.ChangeTableContent(authentication, tables);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                dataTables.Modify(this.Repository);
-                dataTables.Move(this.Repository);
-                this.Context.InvokeTableItemChange(authentication, table);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.ModifyTable(dataBaseSet);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
+            });
         }
 
-        public void InvokeTableSetComment(Authentication authentication, Table table, string comment, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTableEndTemplateEditAsync(Authentication authentication, TableInfo tableInfo, DataBaseSet dataBaseSet)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableSetComment), table, comment);
-
-            var dataTables = new DataTableCollection(dataSet, this.DataBase);
-            var dataTable = dataSet.Tables[table.Name, table.Category.Path];
-            dataTable.Comment = comment;
-
-            try
+            var message = EventMessageBuilder.ChangeTableTemplate(authentication, tableInfo.Name);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                dataTables.Modify(this.Repository);
-                dataTables.Move(this.Repository);
-                this.Context.InvokeTableItemChange(authentication, table);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
-        }
-
-        public void InvokeChildTableCreate(Authentication authentication, Table table, CremaDataSet dataSet)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeChildTableCreate), table);
-
-            var dataTables = new DataTableCollection(dataSet, this.DataBase);
-
-            try
-            {
-                dataTables.Modify(this.Repository);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.ModifyTable(dataBaseSet);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
+            });
         }
 
         public void InvokeTablesCreatedEvent(Authentication authentication, Table[] tables, CremaDataSet dataSet)
         {
             var args = tables.Select(item => (object)item.TableInfo).ToArray();
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTablesCreatedEvent), tables);
-            var comment = EventMessageBuilder.CreateTable(authentication, tables);
+            var message = EventMessageBuilder.CreateTable(authentication, tables);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTablesCreated(new ItemsCreatedEventArgs<ITable>(authentication, tables, args, dataSet));
             this.Context.InvokeItemsCreatedEvent(authentication, tables, args, dataSet);
         }
@@ -362,10 +328,9 @@ namespace Ntreev.Crema.Services.Data
         public void InvokeTablesRenamedEvent(Authentication authentication, Table[] tables, string[] oldNames, string[] oldPaths, CremaDataSet dataSet)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTablesRenamedEvent), tables, oldNames, oldPaths);
-            var comment = EventMessageBuilder.RenameTable(authentication, tables, oldNames);
+            var message = EventMessageBuilder.RenameTable(authentication, tables, oldNames);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTablesRenamed(new ItemsRenamedEventArgs<ITable>(authentication, tables, oldNames, oldPaths, dataSet));
             this.Context.InvokeItemsRenamedEvent(authentication, tables, oldNames, oldPaths, dataSet);
         }
@@ -373,10 +338,9 @@ namespace Ntreev.Crema.Services.Data
         public void InvokeTablesMovedEvent(Authentication authentication, Table[] tables, string[] oldPaths, string[] oldCategoryPaths, CremaDataSet dataSet)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTablesMovedEvent), tables, oldPaths, oldCategoryPaths);
-            var comment = EventMessageBuilder.MoveTable(authentication, tables, oldCategoryPaths);
+            var message = EventMessageBuilder.MoveTable(authentication, tables, oldCategoryPaths);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTablesMoved(new ItemsMovedEventArgs<ITable>(authentication, tables, oldPaths, oldCategoryPaths, dataSet));
             this.Context.InvokeItemsMovedEvent(authentication, tables, oldPaths, oldCategoryPaths, dataSet);
         }
@@ -385,10 +349,9 @@ namespace Ntreev.Crema.Services.Data
         {
             var dataSet = CremaDataSet.Create(new SignatureDateProvider(authentication.ID));
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTablesDeletedEvent), oldPaths);
-            var comment = EventMessageBuilder.DeleteTable(authentication, tables);
+            var message = EventMessageBuilder.DeleteTable(authentication, tables);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTablesDeleted(new ItemsDeletedEventArgs<ITable>(authentication, tables, oldPaths, dataSet));
             this.Context.InvokeItemsDeletedEvent(authentication, tables, oldPaths, dataSet);
         }
@@ -402,53 +365,34 @@ namespace Ntreev.Crema.Services.Data
         public void InvokeTablesTemplateChangedEvent(Authentication authentication, Table[] tables, CremaDataSet dataSet)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTablesTemplateChangedEvent), tables);
-            var comment = EventMessageBuilder.ChangeTableTemplate(authentication, tables);
+            var message = EventMessageBuilder.ChangeTableTemplate(authentication, tables);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTablesChanged(new ItemsEventArgs<ITable>(authentication, tables, dataSet));
             this.Context.InvokeItemsChangedEvent(authentication, tables, dataSet);
         }
 
-        public void InvokeTablesContentChangedEvent(Authentication authentication, TableContent content, Table[] tables, CremaDataSet dataSet)
+        public void InvokeTablesContentChangedEvent(Authentication authentication, Table[] tables, CremaDataSet dataSet)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTablesContentChangedEvent), tables);
-            var comment = EventMessageBuilder.ChangeTableContent(authentication, tables);
+            var message = EventMessageBuilder.ChangeTableContent(authentication, tables);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTablesChanged(new ItemsEventArgs<ITable>(authentication, tables));
             this.Context.InvokeItemsChangedEvent(authentication, tables, dataSet);
         }
 
-        public DataBaseRepositoryHost Repository
-        {
-            get { return this.DataBase.Repository; }
-        }
+        public DataBaseRepositoryHost Repository => this.DataBase.Repository;
 
-        public CremaHost CremaHost
-        {
-            get { return this.Context.CremaHost; }
-        }
+        public CremaHost CremaHost => this.Context.CremaHost;
 
-        public DataBase DataBase
-        {
-            get { return this.Context.DataBase; }
-        }
+        public DataBase DataBase => this.Context.DataBase;
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.Context?.Dispatcher; }
-        }
+        public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public IObjectSerializer Serializer => this.DataBase.Serializer;
+
+        public new int Count => base.Count;
 
         public event ItemsCreatedEventHandler<ITable> TablesCreated
         {
@@ -558,6 +502,8 @@ namespace Ntreev.Crema.Services.Data
             if (validation is Authentication authentication)
             {
                 var category = this.GetCategory(categoryPath);
+                if (category == null)
+                    throw new CategoryNotFoundException(categoryPath);
                 category.ValidateAccessType(authentication, AccessType.Master);
             }
         }
@@ -597,21 +543,6 @@ namespace Ntreev.Crema.Services.Data
             return new Table();
         }
 
-        private void Sign(Authentication authentication)
-        {
-            authentication.Sign();
-        }
-
-        private void ValidateCreate(Authentication authentication, string categoryPath)
-        {
-            var category = this.GetCategory(categoryPath);
-
-            if (category == null)
-                throw new CategoryNotFoundException(categoryPath);
-
-            category.ValidateAccessType(authentication, AccessType.Master);
-        }
-
         private void ValidateInherit(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyXml)
         {
             table.ValidateAccessType(authentication, AccessType.Master);
@@ -627,6 +558,9 @@ namespace Ntreev.Crema.Services.Data
 
             if (this.Context.Categories.Contains(categoryPath) == false)
                 throw new CategoryNotFoundException(categoryPath);
+
+            var category = this.Context.Categories[categoryPath];
+            category.ValidateAccessType(authentication, AccessType.Master);
 
             if (copyXml == true)
             {
@@ -651,6 +585,9 @@ namespace Ntreev.Crema.Services.Data
             if (this.Context.Categories.Contains(categoryPath) == false)
                 throw new CategoryNotFoundException(categoryPath);
 
+            var category = this.Context.Categories[categoryPath];
+            category.ValidateAccessType(authentication, AccessType.Master);
+
             if (copyXml == true)
             {
                 foreach (var item in EnumerableUtility.Friends(table, table.Childs))
@@ -664,18 +601,10 @@ namespace Ntreev.Crema.Services.Data
 
         bool ITableCollection.Contains(string tableName)
         {
-            this.Dispatcher?.VerifyAccess();
             return this.Contains(tableName);
         }
 
-        ITable ITableCollection.this[string tableName]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this[tableName];
-            }
-        }
+        ITable ITableCollection.this[string tableName] => this[tableName];
 
         #endregion
 
@@ -683,13 +612,11 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITable> IEnumerable<ITable>.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.GetEnumerator();
         }
 

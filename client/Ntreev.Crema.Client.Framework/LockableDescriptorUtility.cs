@@ -72,10 +72,9 @@ namespace Ntreev.Crema.Client.Framework
         {
             if (descriptor.Target is ILockable lockable)
             {
-                var dispatcher = lockable is IDispatcherObject dispatcherObject ? dispatcherObject.Dispatcher : Application.Current.Dispatcher;
                 try
                 {
-                    await dispatcher.InvokeAsync(() => lockable.Unlock(authentication));
+                    await lockable.UnlockAsync(authentication);
                     return true;
                 }
                 catch (Exception e)

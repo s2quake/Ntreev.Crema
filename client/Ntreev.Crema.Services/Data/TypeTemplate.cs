@@ -15,16 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services.Domains;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.DataBaseService;
+using Ntreev.Crema.Services.Domains;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Threading;
-using Ntreev.Library;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -37,78 +34,74 @@ namespace Ntreev.Crema.Services.Data
             this.type = type;
         }
 
-        public override DomainContext DomainContext
+        public override AccessType GetAccessType(Authentication authentication)
         {
-            get { return this.type.GetService(typeof(DomainContext)) as DomainContext; }
+            return this.type.GetAccessType(authentication);
         }
 
-        public override CremaDispatcher Dispatcher
-        {
-            get { return this.type.Dispatcher; }
-        }
+        public override DomainContext DomainContext => this.type.GetService(typeof(DomainContext)) as DomainContext;
 
-        public override CremaHost CremaHost
-        {
-            get { return this.type.CremaHost; }
-        }
+        public override string Path => this.type.Path;
 
-        public override IType Type
-        {
-            get { return this.type; }
-        }
+        public override CremaHost CremaHost => this.type.CremaHost;
 
-        public override DataBase DataBase
-        {
-            get { return this.type.DataBase; }
-        }
+        public override IType Type => this.type;
 
-        public override IPermission Permission
-        {
-            get { return this.type; }
-        }
+        public override DataBase DataBase => this.type.DataBase;
 
-        protected override void OnBeginEdit(Authentication authentication, DomainMetaData metaData)
+        public override IDispatcherObject DispatcherObject => this.type;
+
+        public override IPermission Permission => this.type;
+
+        protected override async Task OnBeginEditAsync(Authentication authentication)
         {
-            this.Container.InvokeTypeBeginTemplateEdit(authentication, this.type);
-            base.OnBeginEdit(authentication, metaData);
+            await base.OnBeginEditAsync(authentication);
             this.type.IsBeingEdited = true;
             this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
         }
 
-        protected override void OnEndEdit(Authentication authentication, TypeInfo typeInfo)
+        protected override async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
-            this.Container.InvokeTypeEndTemplateEdit(authentication, this.type, typeInfo);
-            base.OnEndEdit(authentication, typeInfo);
-            this.type.UpdateTypeInfo(typeInfo);
+            var typeInfos = await base.OnEndEditAsync(authentication, args);
+            if (args is Guid)
+            {
+                var typeInfo = typeInfos.First();
+                this.type.UpdateTypeInfo(typeInfo);
+                this.type.IsBeingEdited = false;
+                this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
+            }
+            return typeInfos;
+        }
+
+        protected override async Task OnCancelEditAsync(Authentication authentication)
+        {
+            await base.OnCancelEditAsync(authentication);
             this.type.IsBeingEdited = false;
             this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
         }
 
-        protected override void OnCancelEdit(Authentication authentication)
+        protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
         {
-            base.OnCancelEdit(authentication);
-            this.type.IsBeingEdited = false;
-            this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
+            return Task.Run(() => this.Service.BeginTypeTemplateEdit(this.type.Name));
         }
 
-        protected override ResultBase<DomainMetaData> BeginDomain(Authentication authentication)
+        protected override async Task<TypeInfo[]> EndDomainAsync(Authentication authentication, object args)
         {
-            return this.type.Service.BeginTypeTemplateEdit(this.type.Name);
+            if (args is Guid domainID)
+            {
+                var result = await Task.Run(() => this.Service.EndTypeTemplateEdit(domainID));
+                return result.GetValue();
+            }
+            return args as TypeInfo[];
         }
 
-        protected override ResultBase<TypeInfo> EndDomain(Authentication authentication, Guid domainID)
+        protected override Task<ResultBase> CancelDomainAsync(Authentication authentication, Guid domainID)
         {
-            return this.type.Service.EndTypeTemplateEdit(domainID);
+            return Task.Run(() => this.Service.CancelTypeTemplateEdit(domainID));
         }
 
-        protected override ResultBase CancelDomain(Authentication authentication, Guid domainID)
-        {
-            return this.type.Service.CancelTypeTemplateEdit(domainID);
-        }
+        private TypeCollection Container => this.type.Container;
 
-        private TypeCollection Container
-        {
-            get { return this.type.Container; }
-        }
+        private IDataBaseService Service => this.type.Service;
     }
 }

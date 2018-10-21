@@ -55,75 +55,6 @@ namespace Ntreev.Crema.Services.Data
             this.Initialize(metaData);
         }
 
-        public void InvokeTableItemLock(Authentication authentication, ITableItem tableItem, string comment)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemLock), tableItem, comment);
-        }
-
-        public void InvokeTableItemUnlock(Authentication authentication, ITableItem tableItem)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemUnlock), tableItem);
-        }
-
-        public void InvokeTableItemSetPrivate(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemSetPrivate), tableItem);
-        }
-
-        public void InvokeTableItemSetPublic(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemSetPrivate), tableItem);
-        }
-
-        public void InvokeTableItemAddAccessMember(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID, AccessType accessType)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemAddAccessMember), tableItem, memberID, accessType);
-        }
-
-        public void InvokeTableItemSetAccessMember(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID, AccessType accessType)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemSetAccessMember), tableItem, memberID, accessType);
-        }
-
-        public void InvokeTableItemRemoveAccessMember(Authentication authentication, ITableItem tableItem, AccessInfo accessInfo, string memberID)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTableItemRemoveAccessMember), tableItem, memberID);
-        }
-
-        public void InvokeTableItemCreate(Authentication authentication, string path)
-        {
-
-        }
-
-        public void InvokeTableItemRename(Authentication authentication, ITableItem tableItem, string newName)
-        {
-
-        }
-
-        public void InvokeTableItemMove(Authentication authentication, ITableItem tableItem, string newCategoryPath)
-        {
-
-        }
-
-        public void InvokeTableItemDelete(Authentication authentication, ITableItem tableItem)
-        {
-
-        }
-
-        public void InvokeTableItemChange(Authentication authentication, ITableItem tableItem)
-        {
-
-        }
-
-        public void Import(Authentication authentication, CremaDataSet dataSet, string comment)
-        {
-            this.Dispatcher?.VerifyAccess();
-            this.CremaHost.DebugMethod(authentication, this, nameof(Import), comment);
-
-            var result = this.Service.ImportTables(dataSet, comment);
-            result.Validate(authentication);
-        }
-
         public void Dispose()
         {
             this.dataBase = null;
@@ -132,75 +63,70 @@ namespace Ntreev.Crema.Services.Data
         public void InvokeItemsSetPublicEvent(Authentication authentication, ITableItem[] items)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetPublicEvent), items);
-            var comment = EventMessageBuilder.SetPublicTableItem(authentication, items);
+            var message = EventMessageBuilder.SetPublicTableItem(authentication, items);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Public);
             this.CremaHost.Debug(eventLog);
-            //this.repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnItemsAccessChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
         public void InvokeItemsSetPrivateEvent(Authentication authentication, ITableItem[] items)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetPrivateEvent), items);
-            var comment = EventMessageBuilder.SetPrivateTableItem(authentication, items);
+            var message = EventMessageBuilder.SetPrivateTableItem(authentication, items);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Private);
             this.CremaHost.Debug(eventLog);
-            //this.repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnItemsAccessChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
         public void InvokeItemsAddAccessMemberEvent(Authentication authentication, ITableItem[] items, string[] memberIDs, AccessType[] accessTypes)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsAddAccessMemberEvent), items, memberIDs, accessTypes);
-            var comment = EventMessageBuilder.AddAccessMemberToTableItem(authentication, items, memberIDs, accessTypes);
+            var message = EventMessageBuilder.AddAccessMemberToTableItem(authentication, items, memberIDs, accessTypes);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Add, memberIDs, accessTypes);
             this.CremaHost.Debug(eventLog);
-            //this.repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnItemsAccessChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
         public void InvokeItemsSetAccessMemberEvent(Authentication authentication, ITableItem[] items, string[] memberIDs, AccessType[] accessTypes)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetAccessMemberEvent), items, memberIDs, accessTypes);
-            var comment = EventMessageBuilder.SetAccessMemberOfTableItem(authentication, items, memberIDs, accessTypes);
+            var message = EventMessageBuilder.SetAccessMemberOfTableItem(authentication, items, memberIDs, accessTypes);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Set, memberIDs, accessTypes);
             this.CremaHost.Debug(eventLog);
-            //this.repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnItemsAccessChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
         public void InvokeItemsRemoveAccessMemberEvent(Authentication authentication, ITableItem[] items, string[] memberIDs)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsRemoveAccessMemberEvent), items, memberIDs);
-            var comment = EventMessageBuilder.RemoveAccessMemberFromTableItem(authentication, items, memberIDs);
+            var message = EventMessageBuilder.RemoveAccessMemberFromTableItem(authentication, items, memberIDs);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Remove, memberIDs);
             this.CremaHost.Debug(eventLog);
-            //this.repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnItemsAccessChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
         public void InvokeItemsLockedEvent(Authentication authentication, ITableItem[] items, string[] comments)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsLockedEvent), items, comments);
-            var comment = EventMessageBuilder.LockTableItem(authentication, items, comments);
+            var message = EventMessageBuilder.LockTableItem(authentication, items, comments);
             var metaData = EventMetaDataBuilder.Build(items, LockChangeType.Lock, comments);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnItemsLockChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
         public void InvokeItemsUnlockedEvent(Authentication authentication, ITableItem[] items)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsUnlockedEvent), items);
-            var comment = EventMessageBuilder.UnlockTableItem(authentication, items);
+            var message = EventMessageBuilder.UnlockTableItem(authentication, items);
             var metaData = EventMetaDataBuilder.Build(items, LockChangeType.Unlock);
             this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnItemsLockChanged(new ItemsEventArgs<ITableItem>(authentication, items, metaData));
         }
 
@@ -229,10 +155,7 @@ namespace Ntreev.Crema.Services.Data
             this.OnItemsChanged(new ItemsEventArgs<ITableItem>(authentication, items));
         }
 
-        public TableCollection Tables
-        {
-            get { return this.Items; }
-        }
+        public TableCollection Tables => this.Items;
 
         public DataBase DataBase
         {
@@ -244,20 +167,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public CremaHost CremaHost
-        {
-            get { return this.DataBase.CremaHost; }
-        }
+        public CremaHost CremaHost => this.DataBase.CremaHost;
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.dataBase?.Dispatcher; }
-        }
+        public CremaDispatcher Dispatcher => this.dataBase?.Dispatcher;
 
-        public IDataBaseService Service
-        {
-            get { return this.dataBase.Service; }
-        }
+        public IDataBaseService Service => this.dataBase.Service;
 
         public event ItemsCreatedEventHandler<ITableItem> ItemsCreated
         {
@@ -394,6 +308,16 @@ namespace Ntreev.Crema.Services.Data
             this.itemsLockChanged?.Invoke(this, e);
         }
 
+        private void Sign(Authentication authentication, ResultBase result)
+        {
+            result.Validate(authentication);
+        }
+
+        private void Sign<T>(Authentication authentication, ResultBase<T> result)
+        {
+            result.Validate(authentication);
+        }
+
         private void Initialize(DataBaseMetaData metaData)
         {
             foreach (var item in metaData.TableCategories)
@@ -461,45 +385,16 @@ namespace Ntreev.Crema.Services.Data
 
         bool ITableContext.Contains(string itemPath)
         {
-            this.Dispatcher?.VerifyAccess();
             return this.Contains(itemPath);
         }
 
-        ITableCollection ITableContext.Tables
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Tables;
-            }
-        }
+        ITableCollection ITableContext.Tables => this.Tables;
 
-        ITableCategoryCollection ITableContext.Categories
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        ITableCategoryCollection ITableContext.Categories => this.Categories;
 
-        ITableCategory ITableContext.Root
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Root;
-            }
-        }
+        ITableCategory ITableContext.Root => this.Root;
 
-        ITableItem ITableContext.this[string itemPath]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this[itemPath] as ITableItem;
-            }
-        }
+        ITableItem ITableContext.this[string itemPath] => this[itemPath] as ITableItem;
 
         #endregion
 
@@ -507,7 +402,6 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITableItem> IEnumerable<ITableItem>.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as ITableItem;
@@ -516,7 +410,6 @@ namespace Ntreev.Crema.Services.Data
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as ITableItem;

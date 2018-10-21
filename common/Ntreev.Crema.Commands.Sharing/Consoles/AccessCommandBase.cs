@@ -33,8 +33,13 @@ using YamlDotNet.Serialization;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
-    abstract class AccessCommandBase : ConsoleCommandBase
+    abstract class AccessCommandBase : ConsoleCommandAsyncBase
     {
+        protected AccessCommandBase()
+        {
+
+        }
+
         protected AccessCommandBase(string name)
             : base(name)
         {
@@ -58,11 +63,11 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        protected IAccessible GetObject(Authentication authentication, string path)
+        protected async Task<IAccessible> GetObjectAsync(Authentication authentication, string path)
         {
             var absolutePath = this.GetAbsolutePath(path);
             var drive = this.CommandContext.Drive as DataBasesConsoleDrive;
-            if (drive.GetObject(authentication, absolutePath) is IAccessible accessible)
+            if (await drive.GetObjectAsync(authentication, absolutePath) is IAccessible accessible)
             {
                 return accessible;
             }
@@ -71,7 +76,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
         protected void Invoke(Authentication authentication, IAccessible accessible, Action action)
         {
-            using (UsingDataBase.Set(accessible as IServiceProvider, authentication, true))
+            var task = UsingDataBase.SetAsync(accessible as IServiceProvider, authentication);
+            task.Wait();
+            using (task.Result)
             {
                 if (accessible is IDispatcherObject dispatcherObject)
                 {
@@ -86,7 +93,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
         protected T Invoke<T>(Authentication authentication, IAccessible accessible, Func<T> func)
         {
-            using (UsingDataBase.Set(accessible as IServiceProvider, authentication, true))
+            var task = UsingDataBase.SetAsync(accessible as IServiceProvider, authentication);
+            task.Wait();
+            using (task.Result)
             {
                 if (accessible is IDispatcherObject dispatcherObject)
                 {

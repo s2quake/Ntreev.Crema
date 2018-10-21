@@ -23,6 +23,7 @@ using Ntreev.Library.Random;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Random
 {
@@ -34,36 +35,36 @@ namespace Ntreev.Crema.Services.Random
             MaxRowCount = 20;
         }
 
-        public static ITableRow AddRandomRow(this ITableContent content, Authentication authentication)
+        public static async Task<ITableRow> AddRandomRowAsync(this ITableContent content, Authentication authentication)
         {
-            var row = content.AddNew(authentication, null);
-            row.InitializeRandom(authentication);
-            content.EndNew(authentication, row);
+            var row = await content.AddNewAsync(authentication, null);
+            await row.InitializeRandomAsync(authentication);
+            await content.EndNewAsync(authentication, row);
             return row;
         }
 
-        public static void RemoveRandomRow(this ITableContent content, Authentication authentication)
+        public static async Task RemoveRandomRowAsync(this ITableContent content, Authentication authentication)
         {
             var row = content.RandomOrDefault();
-            row?.Delete(authentication);
+            await row?.DeleteAsync(authentication);
         }
 
-        public static void ModifyRandomRow(this ITableContent content, Authentication authentication)
+        public static async Task ModifyRandomRowAsync(this ITableContent content, Authentication authentication)
         {
             var row = content.RandomOrDefault();
-            row?.SetRandomValue(authentication);
+            await row?.SetRandomValueAsync(authentication);
         }
 
-        public static void AddRandomRows(this ITableContent content, Authentication authentication)
+        public static Task AddRandomRowsAsync(this ITableContent content, Authentication authentication)
         {
-            AddRandomRows(content, authentication, RandomUtility.Next(MinRowCount, MaxRowCount));
+            return AddRandomRowsAsync(content, authentication, RandomUtility.Next(MinRowCount, MaxRowCount));
         }
 
-        public static void AddRandomRows(this ITableContent content, Authentication authentication, int tryCount)
+        public static async Task AddRandomRowsAsync(this ITableContent content, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                AddRandomRow(content, authentication);
+                await AddRandomRowAsync(content, authentication);
             }
         }
 

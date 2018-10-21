@@ -10,8 +10,26 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AuthenticationEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CloseRequestedEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CloseRequestedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClosedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClosedEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\DataBaseCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableCategoryCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\DataBaseExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeCategoryCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\UserCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\UserCategoryCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeCategoryExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableCategoryExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\DomainUserCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableTemplateExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\TableExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITableContentExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ServiceState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventMetaDataBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IStateProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IInfoProvider.cs" />
@@ -52,7 +70,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)ITableCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableColumn.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableContent.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ITableContentCollection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableRow.cs" />

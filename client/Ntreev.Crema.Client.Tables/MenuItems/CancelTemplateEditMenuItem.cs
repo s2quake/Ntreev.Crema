@@ -66,10 +66,7 @@ namespace Ntreev.Crema.Client.Tables.MenuItems
             {
                 if (parameter is ITableDescriptor descriptor && descriptor.Target is ITable table)
                 {
-                    await table.Dispatcher.InvokeAsync(() =>
-                    {
-                        table.Template.CancelEdit(this.authenticator);
-                    });
+                    await table.Template.CancelEditAsync(this.authenticator);
                 }
             }
             catch (Exception e)

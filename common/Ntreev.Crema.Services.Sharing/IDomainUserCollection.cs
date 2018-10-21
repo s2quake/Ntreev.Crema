@@ -19,9 +19,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Threading.Tasks;
+
 namespace Ntreev.Crema.Services
 {
-    public interface IDomainUserCollection : IEnumerable<IDomainUser>
+    public interface IDomainUserCollection : IEnumerable<IDomainUser>, IDispatcherObject
     {
         bool Contains(string userID);
 

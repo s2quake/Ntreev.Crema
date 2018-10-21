@@ -26,6 +26,8 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using Ntreev.Crema.Services.Random;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Bot.Tasks
 {
@@ -34,84 +36,108 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     class ITableContentTask : ITaskProvider
     {
-        public void InvokeTask(TaskContext context)
+        public async Task InvokeAsync(TaskContext context)
         {
+            var authentication = context.Authentication;
             var content = context.Target as ITableContent;
-            content.Dispatcher.Invoke(() =>
+            if (context.IsCompleted(content) == true)
             {
-                if (context.IsCompleted(content) == true)
+                var domain = content.Domain;
+                try
                 {
-                    var domain = content.Domain;
                     if (domain != null && RandomUtility.Within(50) == true)
                     {
-                        var isMember = domain.Dispatcher.Invoke(() =>
-                        {
-                            if (domain.Users.Contains(context.Authentication.ID) == false)
-                                return false;
-                            var user = domain.Users[context.Authentication.ID];
-                            return user.DomainUserState.HasFlag(DomainUserState.Online);
-                        });
+                        if (await domain.Users.ContainsAsync(authentication.ID) == false)
+                            return;
+                        var userState = await domain.Dispatcher.InvokeAsync(() => domain.Users[authentication.ID].DomainUserState);
+                        var isMember = userState.HasFlag(DomainUserState.Online);
                         if (isMember == true)
                         {
-                            content.LeaveEdit(context.Authentication);
+                            await content.LeaveEditAsync(authentication);
                         }
-                        var isEmpty = domain.Dispatcher.Invoke(() => domain.Users.Any() == false);
-                        if (isEmpty == true)
+                        if (await domain.Dispatcher.InvokeAsync(() => domain.Users.Any()) == false)
                         {
-                            content.EndEdit(context.Authentication);
+                            await content.EndEditAsync(authentication);
                         }
                     }
+                }
+                finally
+                {
                     context.Pop(content);
                     context.Complete(context.Target);
                 }
+            }
+            else
+            {
+                var table = content.Table;
+                var tableState = await table.Dispatcher.InvokeAsync(() => table.TableState);
+                if (tableState == TableState.None)
+                {
+                    await content.BeginEditAsync(authentication);
+                }
+                else if (tableState.HasFlag(TableState.IsBeingSetup) == true)
+                {
+                    context.Pop(content);
+                    context.Complete(context.Target);
+                    return;
+                }
+
+                var domain = content.Domain;
+
+                if (domain == null)
+                {
+                    context.Pop(content);
+                    context.Complete(context.Target);
+                    return;
+                }
+
+                if (await domain.Users.ContainsAsync(authentication.ID) == false)
+                {
+                    await content.EnterEditAsync(authentication);
+                }
                 else
                 {
-                    if (content.Domain == null)
-                        content.BeginEdit(context.Authentication);
-
-                    var domain = content.Domain;
-                    var isMember = domain.Dispatcher.Invoke(() =>
+                    var userState = await domain.Dispatcher.InvokeAsync(() => domain.Users[authentication.ID].DomainUserState);
+                    if (userState.HasFlag(DomainUserState.Online) == false)
                     {
-                        if (domain.Users.Contains(context.Authentication.ID) == false)
-                            return false;
-                        var user = domain.Users[context.Authentication.ID];
-                        return user.DomainUserState.HasFlag(DomainUserState.Online);
-                    });
-                    if (isMember == false)
-                    {
-                        content.EnterEdit(context.Authentication);
+                        await content.EndEditAsync(authentication);
+                        context.Pop(content);
+                        return;
                     }
+                }
 
-                    if (content.Any() == false || RandomUtility.Within(25) == true)
+                if (RandomUtility.Within(25) == true || await content.Dispatcher.InvokeAsync(() => content.Any()) == false)
+                {
+                    var row = await this.AddNewRowAsync(authentication, content);
+                    if (row != null)
                     {
-                        var row = this.AddNewRow(context.Authentication, content);
-                        if (row != null)
+                        if (await row.InitializeRandomAsync(authentication) == true)
                         {
-                            row.InitializeRandom(context.Authentication);
                             context.Push(row);
                             context.State = System.Data.DataRowState.Detached;
                         }
                     }
-                    else
-                    {
-                        var member = content.Random();
-                        context.Push(member);
-                    }
                 }
-            });
+                else
+                {
+                    var member = await content.Dispatcher.InvokeAsync(() => content.Random());
+                    context.Push(member);
+                }
+            }
         }
 
-        private ITableRow AddNewRow(Authentication authentication, ITableContent content)
+        private async Task<ITableRow> AddNewRowAsync(Authentication authentication, ITableContent content)
         {
-            var parent = content.Parent;
+            var table = content.Table;
+            var parent = table.Parent;
             if (parent != null)
             {
-                if (parent.Any() == false)
+                if (parent.Content.Any() == false)
                     return null;
-                var relationID = parent.Random().RelationID;
-                return content.AddNew(authentication, relationID);
+                var relationID = parent.Content.Random().RelationID;
+                return await content.AddNewAsync(authentication, relationID);
             }
-            return content.AddNew(authentication, null);
+            return await content.AddNewAsync(authentication, null);
         }
 
         public Type TargetType

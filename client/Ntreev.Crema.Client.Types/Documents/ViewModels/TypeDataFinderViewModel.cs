@@ -108,7 +108,7 @@ namespace Ntreev.Crema.Client.Types.Documents.ViewModels
             try
             {
                 var typeItem = await this.dataBase.Dispatcher.InvokeAsync(() => this.dataBase.TypeContext[this.findingTarget]);
-                var results = await Task.Run(() => typeItem.Find(this.authentication, this.findingText, FindOptions.None));
+                var results = await typeItem.FindAsync(this.authentication, this.findingText, FindOptions.None);
 
                 foreach (var item in results)
                 {

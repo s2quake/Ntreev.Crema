@@ -49,7 +49,7 @@ namespace Ntreev.Crema.Client.Base.MenuItems
 
         protected override bool OnCanExecute(object parameter)
         {
-            return this.cremaHost.IsOpened && this.authenticator.Authority == Authority.Admin;
+            return this.cremaHost.ServiceState == ServiceState.Opened && this.authenticator.Authority == Authority.Admin;
         }
 
         protected async override void OnExecute(object parameter)

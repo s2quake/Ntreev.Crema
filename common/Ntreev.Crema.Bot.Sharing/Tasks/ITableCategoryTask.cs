@@ -27,6 +27,8 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.Threading.Tasks;
 using Ntreev.Library.ObjectModel;
+using Ntreev.Library.Linq;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Bot.Tasks
 {
@@ -35,32 +37,30 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     public class ITableCategoryTask : ITaskProvider
     {
-        public void InvokeTask(TaskContext context)
+        public async Task InvokeAsync(TaskContext context)
         {
+            var authentication = context.Authentication;
             var category = context.Target as ITableCategory;
-            category.Dispatcher.Invoke(() =>
+            var tables = category.GetService(typeof(ITableCollection)) as ITableCollection;
+            var categories = category.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
+            if (context.IsCompleted(category) == true)
             {
-                var tables = category.GetService(typeof(ITableCollection)) as ITableCollection;
-                var categories = category.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
-                if (context.IsCompleted(category) == true)
-                {
-                    context.Pop(category);
-                }
-                else if (categories.Count < RandomUtility.Next(Math.Max(10, categories.Count + 1)))
-                {
-                    this.AddNewCategory(category, context);
-                    context.Complete(category);
-                }
-                else if (tables.Count < RandomUtility.Next(Math.Max(10, tables.Count + 1)))
-                {
-                    var template = category.NewTable(context.Authentication);
-                    context.Push(template);
-                }
-                else
-                {
-                    context.Complete(category);
-                }
-            });
+                context.Pop(category);
+            }
+            else if (categories.Count < RandomUtility.Next(Math.Max(10, categories.Count + 1)))
+            {
+                await this.AddNewCategoryAsync(category, context);
+                context.Complete(category);
+            }
+            else if (tables.Count < RandomUtility.Next(Math.Max(10, tables.Count + 1)))
+            {
+                var template = await category.NewTableAsync(authentication);
+                context.Push(template);
+            }
+            else
+            {
+                context.Complete(category);
+            }
         }
 
         public Type TargetType
@@ -74,264 +74,229 @@ namespace Ntreev.Crema.Bot.Tasks
         }
 
         [TaskMethod]
-        public void GetAccessType(ITableCategory category, TaskContext context)
+        public async Task GetAccessTypeAsync(ITableCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
-            {
-                category.GetAccessType(context.Authentication);
-            });
+            var authentication = context.Authentication;
+            await category.Dispatcher.InvokeAsync(() => category.GetAccessType(authentication));
         }
 
-        //[TaskMethod]
-        //public void VerifyRead(ITableCategory category, TaskContext context)
-        //{
-        //    category.Dispatcher.Invoke(() =>
-        //    {
-        //        category.VerifyRead(context.Authentication);
-        //    });
-        //}
-
-        //[TaskMethod]
-        //public void VerifyOwner(ITableCategory category, TaskContext context)
-        //{
-        //    category.Dispatcher.Invoke(() =>
-        //    {
-        //        category.VerifyOwner(context.Authentication);
-        //    });
-        //}
-
-        //[TaskMethod]
-        //public void VerifyMember(ITableCategory category, TaskContext context)
-        //{
-        //    category.Dispatcher.Invoke(() =>
-        //    {
-        //        category.VerifyMember(context.Authentication);
-        //    });
-        //}
-
-        [TaskMethod(Weight = 10)]
-        public void Lock(ITableCategory category, TaskContext context)
+        //[TaskMethod(Weight = 10)]
+        public async Task LockAsync(ITableCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            var comment = RandomUtility.NextString();
+            if (context.AllowException == false)
             {
                 if (category.Parent == null)
                     return;
-                var comment = RandomUtility.NextString();
-                if (Verify(comment) == false)
-                    return;
-                category.Lock(context.Authentication, comment);
-            });
-
-            bool Verify(string comment)
-            {
-                if (context.AllowException == true)
-                    return true;
                 if (comment == string.Empty)
-                    return false;
+                    return;
                 if (category.IsLocked == true)
-                    return false;
-                return true;
+                    return;
             }
+            await category.LockAsync(authentication, comment);
         }
 
-        [TaskMethod]
-        public void Unlock(ITableCategory category, TaskContext context)
+        //[TaskMethod]
+        public async Task UnlockAsync(ITableCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
             {
                 if (category.Parent == null)
                     return;
-                if (Verify() == false)
+                if (await category.Dispatcher.InvokeAsync(() => category.IsLocked) == false)
                     return;
-                category.Unlock(context.Authentication);
-            });
-
-            bool Verify()
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (category.IsLocked == false)
-                    return false;
-                return true;
             }
+            await category.UnlockAsync(authentication);
         }
 
-        [TaskMethod]
-        public void SetPublic(ITableCategory category, TaskContext context)
+        //[TaskMethod]
+        public async Task SetPublicAsync(ITableCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
             {
                 if (category.Parent == null)
                     return;
-                if (Verify() == false)
-                    return;
-                category.SetPublic(context.Authentication);
-            });
-
-            bool Verify()
-            {
-                if (context.AllowException == true)
-                    return true;
                 if (category.IsPrivate == false)
-                    return false;
-                return true;
+                    return;
+            }
+            await category.SetPublicAsync(authentication);
+        }
+
+        //[TaskMethod(Weight = 10)]
+        public async Task SetPrivateAsync(ITableCategory category, TaskContext context)
+        {
+            var authentication = context.Authentication;
+            if (category.Parent == null)
+                return;
+            await category.SetPrivateAsync(authentication);
+        }
+
+        //[TaskMethod(Weight = 10)]
+        public async Task AddAccessMemberAsync(ITableCategory category, TaskContext context)
+        {
+            var authentication = context.Authentication;
+            if (category.Parent == null)
+                return;
+            var userContext = category.GetService(typeof(IUserContext)) as IUserContext;
+            var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Select(item => item.Path).Random());
+            var accessType = RandomUtility.NextEnum<AccessType>();
+            if (NameValidator.VerifyItemPath(memberID) == true)
+            {
+                await category.AddAccessMemberAsync(authentication, new ItemName(memberID).Name, accessType);
+            }
+            else
+            {
+                await category.AddAccessMemberAsync(authentication, memberID, accessType);
             }
         }
 
-        [TaskMethod(Weight = 10)]
-        public void SetPrivate(ITableCategory category, TaskContext context)
+        //[TaskMethod(Weight = 10)]
+        public async Task RemoveAccessMemberAsync(ITableCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (category.Parent == null)
+                return;
+            var userContext = category.GetService(typeof(IUserContext)) as IUserContext;
+            var memberID = await userContext.Dispatcher.InvokeAsync(() => userContext.Select(item => item.Path).Random());
+            if (NameValidator.VerifyItemPath(memberID) == true)
             {
-                if (category.Parent == null)
-                    return;
-                category.SetPrivate(context.Authentication);
-            });
-        }
-
-        [TaskMethod(Weight = 10)]
-        public void AddAccessMember(ITableCategory category, TaskContext context)
-        {
-            category.Dispatcher.Invoke(() =>
+                await category.RemoveAccessMemberAsync(authentication, new ItemName(memberID).Name);
+            }
+            else
             {
-                if (category.Parent == null)
-                    return;
-                var userContext = category.GetService(typeof(IUserContext)) as IUserContext;
-                var memberID = userContext.Dispatcher.Invoke(() => userContext.Select(item => item.Path).Random());
-                var accessType = RandomUtility.NextEnum<AccessType>();
-                if (NameValidator.VerifyItemPath(memberID) == true)
-                {
-                    category.AddAccessMember(context.Authentication, new ItemName(memberID).Name, accessType);
-                }
-                else
-                {
-                    category.AddAccessMember(context.Authentication, memberID, accessType);
-                }
-            });
-        }
-
-        [TaskMethod(Weight = 10)]
-        public void RemoveAccessMember(ITableCategory category, TaskContext context)
-        {
-            category.Dispatcher.Invoke(() =>
-            {
-                if (category.Parent == null)
-                    return;
-                var userContext = category.GetService(typeof(IUserContext)) as IUserContext;
-                var memberID = userContext.Dispatcher.Invoke(() => userContext.Select(item => item.Path).Random());
-                if (NameValidator.VerifyItemPath(memberID) == true)
-                {
-                    category.RemoveAccessMember(context.Authentication, new ItemName(memberID).Name);
-                }
-                else
-                {
-                    category.RemoveAccessMember(context.Authentication, memberID);
-                }
-            });
-        }
-
-        [TaskMethod]
-        public void Rename(ITableCategory category, TaskContext context)
-        {
-            category.Dispatcher.Invoke(() =>
-            {
-                var categoryName = RandomUtility.NextIdentifier();
-                if (Verify() == false)
-                    return;
-                category.Rename(context.Authentication, categoryName);
-            });
-
-            bool Verify()
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (category.Parent == null)
-                    return false;
-                return true;
+                await category.RemoveAccessMemberAsync(authentication, memberID);
             }
         }
 
         [TaskMethod]
-        public void Move(ITableCategory category, TaskContext context)
+        public async Task RenameAsync(ITableCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            var categoryName = RandomUtility.NextIdentifier();
+            if (context.AllowException == false)
             {
-                if (category.Parent == null)
+                if (await VerifyAsync() == false)
                     return;
-                var categories = category.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
-                var categoryPath = categories.Random().Path;
-                if (Verify(categoryPath) == false)
-                    return;
-                category.Move(context.Authentication, categoryPath);
-            });
+            }
+            await category.RenameAsync(authentication, categoryName);
 
-            bool Verify(string categoryPath)
+            async Task<bool> VerifyAsync()
             {
-                if (context.AllowException == true)
+                if ((await category.GetAllRelationTablesAsync(item => item.TableState != TableState.None)).Any() == true)
+                    return false;
+                return await category.Dispatcher.InvokeAsync(() =>
+                {
+                    if (category.Parent == null)
+                        return false;
+                    if (category.Name == categoryName)
+                        return false;
                     return true;
-                if (categoryPath.StartsWith(category.Path) == true)
+                });
+            }
+        }
+
+        [TaskMethod]
+        public async Task MoveAsync(ITableCategory category, TaskContext context)
+        {
+            var authentication = context.Authentication;
+            var categories = category.GetService(typeof(ITableCategoryCollection)) as ITableCategoryCollection;
+            var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
+            if (context.AllowException == false)
+            {
+                if (await VerifyAsync() == false)
+                    return;
+            }
+            await category.MoveAsync(authentication, categoryPath);
+
+            async Task<bool> VerifyAsync()
+            {
+                if ((await category.GetAllTablesAsync(item => item.TableState != TableState.None)).Any() == true)
                     return false;
-                if (category.Parent.Path == categoryPath)
-                    return false;
-                return true;
+                return await category.Dispatcher.InvokeAsync(() =>
+                {
+                    if (category.Parent == null)
+                        return false;
+                    if (categoryPath.StartsWith(category.Path) == true)
+                        return false;
+                    if (category.Parent.Path == categoryPath)
+                        return false;
+                    if (categoryPath.StartsWith(category.Path) == true)
+                        return false;
+                    return true;
+                });
             }
         }
 
         [TaskMethod(Weight = 1)]
-        public void Delete(ITableCategory category, TaskContext context)
+        public async Task DeleteAsync(ITableCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
             {
-            });
+                if (await VerifyAsync() == true)
+                    return;
+            }
+            await category.DeleteAsync(authentication);
+            context.Pop(category);
+
+            async Task<bool> VerifyAsync()
+            {
+                if ((await category.GetAllTablesAsync(item => true)).Any() == true)
+                    return false;
+                return await category.Dispatcher.InvokeAsync(() =>
+                {
+                    if (category.Parent == null)
+                        return false;
+                    return true;
+                });
+            }
         }
 
         [TaskMethod(Weight = 10)]
-        public void AddNewCategory(ITableCategory category, TaskContext context)
+        public async Task AddNewCategoryAsync(ITableCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            var categoryNanme = RandomUtility.NextIdentifier();
+            if (context.AllowException == false)
             {
-                var categoryNanme = RandomUtility.NextIdentifier();
-                category.AddNewCategory(context.Authentication, categoryNanme);
-            });
+                if (category.GetAccessType(authentication) < AccessType.Master)
+                    return;
+            }
+            await category.AddNewCategoryAsync(authentication, categoryNanme);
         }
 
         [TaskMethod(Weight = 10)]
-        public void NewTable(ITableCategory category, TaskContext context)
+        public async Task NewTableAsync(ITableCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
-            {
-                var template = category.NewTable(context.Authentication);
-                context.Push(template);
-            });
+            var authentication = context.Authentication;
+            var template = await category.NewTableAsync(authentication);
+            context.Push(template);
         }
 
         [TaskMethod]
-        public void Preview(ITableCategory category, TaskContext context)
+        public async Task GetDataSetAsync(ITableCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
-            {
-                category.GetDataSet(context.Authentication, -1);
-            });
+            var authentication = context.Authentication;
+            await category.GetDataSetAsync(authentication, null);
         }
 
         [TaskMethod]
-        public void GetLog(ITableCategory category, TaskContext context)
+        public async Task GetLogAsync(ITableCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
-            {
-                category.GetLog(context.Authentication);
-            });
+            var authentication = context.Authentication;
+            await category.GetLogAsync(authentication, null);
         }
 
         [TaskMethod]
-        public void Find(ITableCategory category, TaskContext context)
+        public async Task FindAsync(ITableCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
-            {
-                var text = RandomUtility.NextWord();
-                var option = RandomUtility.NextEnum<FindOptions>();
-                category.Find(context.Authentication, text, option);
-            });
+            var authentication = context.Authentication;
+            var text = RandomUtility.NextWord();
+            var option = RandomUtility.NextEnum<FindOptions>();
+            await category.FindAsync(authentication, text, option);
         }
     }
 }

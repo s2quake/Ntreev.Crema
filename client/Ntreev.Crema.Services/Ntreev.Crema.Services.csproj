@@ -26,6 +26,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -48,6 +49,9 @@
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -61,18 +65,17 @@
     <Compile Include="CremaConfiguration.cs" />
     <Compile Include="CremaBootstrapper.cs" />
     <Compile Include="Authentication.cs" />
+    <Compile Include="CremaSettings.cs" />
     <Compile Include="Data\DataBaseCollectionServiceFactory.cs" />
     <Compile Include="Data\DataBaseCollection.cs" />
     <Compile Include="Data\DataBaseTransaction.cs" />
-    <Compile Include="Data\TableContentCollection.cs" />
     <Compile Include="Data\DataServiceFactory.cs" />
     <Compile Include="Data\DomainBasedRow.cs" />
-    <Compile Include="Data\NewChildTableTemplate.cs" />
     <Compile Include="Data\NewTypeTemplate.cs" />
     <Compile Include="Data\TableColumn.cs" />
     <Compile Include="Data\TableContent.cs" />
     <Compile Include="Data\NewTableTemplate.cs" />
-    <Compile Include="Data\TableContentBase.cs" />
+    <Compile Include="Data\TableContentDomainHost.cs" />
     <Compile Include="Data\TableRow.cs" />
     <Compile Include="Data\TableTemplate.cs" />
     <Compile Include="Data\TableTemplateBase.cs" />
@@ -150,6 +153,26 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\Ntreev.Crema.Data.CremaDataSet.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.Data.TableInfo.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.Data.TypeInfo.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.AccessInfo.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.AccessMemberInfo.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.BanInfo.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DataBaseCollectionMetaData.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DataBaseInfo.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DataBaseMetaData.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DomainContextMetaData.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DomainMetaData.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DomainRowInfo.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DomainUserInfo.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.FindResultInfo.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.LockInfo.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.LogInfo.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.ResultBase.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.ServiceInfo.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.UserContextMetaData.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.UserInfo.datasource" />
     <None Include="Service References\DataBaseCollectionService\Arrays.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -173,9 +196,6 @@
     <None Include="Service References\DataBaseService\Ntreev.Crema.ServiceModel.Data.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\DataBaseService\Ntreev.Crema.ServiceModel.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Service References\DataBaseService\schemas.ntreev.com.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -190,6 +210,9 @@
     <None Include="Service References\DataBaseService\www.ntreev.com.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\DescriptorService\Arrays.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\DescriptorService\schemas.ntreev.com.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -199,6 +222,9 @@
     </None>
     <None Include="Service References\DescriptorService\www.ntreev.com.wsdl" />
     <None Include="Service References\DescriptorService\www.ntreev.com.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\DomainService\Arrays.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\DomainService\schemas.ntreev.com.xsd">
@@ -261,7 +287,7 @@
       <Project>{6478450a-dfa5-445d-890f-bc5f57c9a148}</Project>
       <Name>Ntreev.Crema.ServiceModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj">
+    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library.Net45\Ntreev.Library.csproj">
       <Project>{1918437f-4fbf-4731-ac5b-981a4a4cb1f1}</Project>
       <Name>Ntreev.Library</Name>
     </ProjectReference>
@@ -322,6 +348,7 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="..\..\common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems" Label="Shared" />
   <Import Project="..\..\common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

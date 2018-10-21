@@ -85,7 +85,7 @@ namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
                 this.NotifyOfPropertyChange(nameof(this.CanChange));
             }
         }
-
+         
         public SecureString Password
         {
             get { return this.password; }
@@ -122,6 +122,11 @@ namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
             }
         }
 
+        public bool IsCurrentUser
+        {
+            get { return this.authentication.ID == this.userID; }
+        }
+
         public IEnumerable<Authority> Authorities
         {
             get
@@ -130,7 +135,7 @@ namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
             }
         }
 
-        public async void Change()
+        public async Task ChangeAsync()
         {
             try
             {
@@ -138,7 +143,7 @@ namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
                 var authority = this.oldAuthority == this.authority ? null : (Authority?)this.authority;
                 var userName = this.oldUserName == this.userName ? null : this.userName;
                 var password = this.Password;
-                await this.user.Dispatcher.InvokeAsync(() => this.user.ChangeUserInfo(this.authentication, password, password, userName, authority));
+                await this.user.ChangeUserInfoAsync(this.authentication, password, password, userName, authority);
                 this.EndProgress();
                 this.TryClose(true);
                 AppMessageBox.Show(Resources.Message_ChangeComplete);

@@ -23,6 +23,7 @@ using Ntreev.Library.Random;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Random
 {
@@ -34,47 +35,47 @@ namespace Ntreev.Crema.Services.Random
             MaxMemberCount = 50;
         }
 
-        public static void InitializeRandom(this ITypeTemplate template, Authentication authentication)
+        public static async Task InitializeRandomAsync(this ITypeTemplate template, Authentication authentication)
         {
             var typeName = RandomUtility.NextIdentifier();
-            template.SetTypeName(authentication, typeName);
+            await template.SetTypeNameAsync(authentication, typeName);
             if (RandomUtility.Within(50) == true)
-                template.SetIsFlag(authentication, RandomUtility.NextBoolean());
+                await template.SetIsFlagAsync(authentication, RandomUtility.NextBoolean());
             if (RandomUtility.Within(50) == true)
-                template.SetComment(authentication, RandomUtility.NextString());
-            template.AddRandomMembers(authentication);
+                await template.SetCommentAsync(authentication, RandomUtility.NextString());
+            await template.AddRandomMembersAsync(authentication);
         }
 
-        public static ITypeMember AddRandomMember(this ITypeTemplate template, Authentication authentication)
+        public static async Task<ITypeMember> AddRandomMemberAsync(this ITypeTemplate template, Authentication authentication)
         {
-            var member = template.AddNew(authentication);
-            member.InitializeRandom(authentication);
-            template.EndNew(authentication, member);
+            var member = await template.AddNewAsync(authentication);
+            await member.InitializeRandomAsync(authentication);
+            await template.EndNewAsync(authentication, member);
             return member;
         }
 
-        public static void RemoveRandomMember(this ITypeTemplate template, Authentication authentication)
+        public static async Task RemoveRandomMemberAsync(this ITypeTemplate template, Authentication authentication)
         {
             var member = template.RandomOrDefault();
-            member?.Delete(authentication);
+            await member?.DeleteAsync(authentication);
         }
 
-        public static void ModifyRandomMember(this ITypeTemplate template, Authentication authentication)
+        public static async Task ModifyRandomMemberAsync(this ITypeTemplate template, Authentication authentication)
         {
             var member = template.RandomOrDefault();
-            member?.ModifyRandomValue(authentication);
+            await member?.ModifyRandomValueAsync(authentication);
         }
 
-        public static void AddRandomMembers(this ITypeTemplate template, Authentication authentication)
+        public static Task AddRandomMembersAsync(this ITypeTemplate template, Authentication authentication)
         {
-            AddRandomMembers(template, authentication, RandomUtility.Next(MinMemberCount, MaxMemberCount));
+            return AddRandomMembersAsync(template, authentication, RandomUtility.Next(MinMemberCount, MaxMemberCount));
         }
 
-        public static void AddRandomMembers(this ITypeTemplate template, Authentication authentication, int tryCount)
+        public static async Task AddRandomMembersAsync(this ITypeTemplate template, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                AddRandomMember(template, authentication);
+                await AddRandomMemberAsync(template, authentication);
             }
         }
 

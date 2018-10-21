@@ -76,7 +76,7 @@ namespace Ntreev.Crema.Data.Test
         [TestMethod]
         public void CreateWithNameAndCategoryPath()
         {
-            var dataTable = new CremaDataTable(RandomUtility.NextName(), RandomUtility.NextCategoryPath(1));
+            var dataTable = new CremaDataTable(RandomUtility.NextIdentifier(), RandomUtility.NextCategoryPath(1));
 
             Assert.AreNotEqual(string.Empty, dataTable.Name);
             Assert.AreNotEqual(string.Empty, dataTable.TableName);
@@ -142,6 +142,7 @@ namespace Ntreev.Crema.Data.Test
         {
             var dataSet = CremaDataSetExtensions.CreateRandomSet();
             var row = dataSet.Tables.Random().Rows.RandomOrDefault();
+            Thread.Sleep(1);
 
             if (row == null || row.SetRandomValue() == false)
                 return;
@@ -172,13 +173,11 @@ namespace Ntreev.Crema.Data.Test
         {
             var testSet = new CremaDataSet();
             var dataSet = CremaDataSetExtensions.CreateRandomSet();
+
             foreach (var item in dataSet.Tables)
             {
-                if (item.Parent != null)
-                    continue;
-
-                string schemaPath = PathUtility.GetTempFileName();
-                string xmlPath = PathUtility.GetTempFileName();
+                var schemaPath = PathUtility.GetTempFileName();
+                var xmlPath = PathUtility.GetTempFileName();
 
                 try
                 {
@@ -215,8 +214,11 @@ namespace Ntreev.Crema.Data.Test
                     FileUtility.Delete(schemaPath);
                     FileUtility.Delete(xmlPath);
                 }
+            }
 
-                var newTable = testSet.Tables[item.TableName];
+            foreach (var item in dataSet.Tables)
+            {
+                var newTable = testSet.Tables[item.Name];
                 CremaComparer.CompareTable(item, newTable);
             }
         }
@@ -228,11 +230,11 @@ namespace Ntreev.Crema.Data.Test
             var testSet = new CremaDataSet();
             foreach (var item in dataSet.Tables)
             {
-                if (item.Parent != null || item.TemplateNamespace != string.Empty)
+                if (item.TemplateNamespace != string.Empty)
                     continue;
 
-                MemoryStream schemaStream = new MemoryStream();
-                MemoryStream xmlStream = new MemoryStream();
+                var schemaStream = new MemoryStream();
+                var xmlStream = new MemoryStream();
 
                 item.WriteXmlSchema(schemaStream);
                 item.WriteXml(xmlStream);
@@ -255,9 +257,13 @@ namespace Ntreev.Crema.Data.Test
 
                 xmlStream.Position = 0;
                 testSet.ReadXml(xmlStream);
+            }
 
-
-                var newTable = testSet.Tables[item.TableName];
+            foreach (var item in dataSet.Tables)
+            {
+                if (item.TemplateNamespace != string.Empty)
+                    continue;
+                var newTable = testSet.Tables[item.Name];
                 CremaComparer.CompareTable(item, newTable);
             }
         }
@@ -269,7 +275,7 @@ namespace Ntreev.Crema.Data.Test
             var testSet = new CremaDataSet();
             foreach (var item in dataSet.Tables)
             {
-                if (item.Parent != null || item.TemplateNamespace != string.Empty)
+                if (item.TemplateNamespace != string.Empty)
                     continue;
 
                 StringWriter schemaWriter = new StringWriter();
@@ -299,8 +305,13 @@ namespace Ntreev.Crema.Data.Test
                 {
                     testSet.ReadXml(sr);
                 }
+            }
 
-                var newTable = testSet.Tables[item.TableName];
+            foreach (var item in dataSet.Tables)
+            {
+                if (item.TemplateNamespace != string.Empty)
+                    continue;
+                var newTable = testSet.Tables[item.Name];
                 CremaComparer.CompareTable(item, newTable);
             }
         }
@@ -312,7 +323,7 @@ namespace Ntreev.Crema.Data.Test
             var testSet = new CremaDataSet();
             foreach (var item in dataSet.Tables)
             {
-                if (item.Parent != null || item.TemplateNamespace != string.Empty)
+                if (item.TemplateNamespace != string.Empty)
                     continue;
 
                 StringBuilder schemaBuilder = new StringBuilder();
@@ -350,8 +361,13 @@ namespace Ntreev.Crema.Data.Test
                 {
                     testSet.ReadXml(reader);
                 }
+            }
 
-                var newTable = testSet.Tables[item.TableName];
+            foreach (var item in dataSet.Tables)
+            {
+                if (item.TemplateNamespace != string.Empty)
+                    continue;
+                var newTable = testSet.Tables[item.Name];
                 CremaComparer.CompareTable(item, newTable);
             }
         }

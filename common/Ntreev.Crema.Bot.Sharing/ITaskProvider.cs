@@ -20,12 +20,13 @@ using Ntreev.Crema.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Bot
 {
     public interface ITaskProvider
     {
-        void InvokeTask(TaskContext context);
+        Task InvokeAsync(TaskContext context);
 
         Type TargetType { get; }
     }

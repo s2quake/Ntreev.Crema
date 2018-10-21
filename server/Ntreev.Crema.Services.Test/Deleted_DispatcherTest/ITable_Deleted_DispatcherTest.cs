@@ -86,13 +86,6 @@ namespace Ntreev.Crema.Services.Test.Deleted_DispatcherTest
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public void SetTags()
-        {
-            table.SetTags(authentication, TagInfo.All);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void Copy()
         {
             table.Copy(authentication, RandomUtility.NextIdentifier(), PathUtility.Separator, true);
@@ -116,14 +109,14 @@ namespace Ntreev.Crema.Services.Test.Deleted_DispatcherTest
         [ExpectedException(typeof(InvalidOperationException))]
         public void Preview()
         {
-            table.GetDataSet(authentication, -1);
+            table.GetDataSet(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void GetLog()
         {
-            table.GetLog(authentication);
+            table.GetLog(authentication, null);
         }
 
         [TestMethod]
@@ -227,12 +220,6 @@ namespace Ntreev.Crema.Services.Test.Deleted_DispatcherTest
         public void Content()
         {
             Console.Write(table.Content);
-        }
-
-        [TestMethod]
-        public void Tags()
-        {
-            Console.Write(table.Tags);
         }
 
         [TestMethod]

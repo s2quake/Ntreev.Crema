@@ -50,9 +50,9 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
             {
                 try
                 {
+                    await table.Template.BeginEditAsync(authentication);
                     return await table.Dispatcher.InvokeAsync(() =>
                     {
-                        table.Template.BeginEdit(authentication);
                         return new EditTemplateViewModel(authentication, table, table.Template);
                     });
                 }

@@ -33,8 +33,13 @@ using YamlDotNet.Serialization;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
-    abstract class LockCommandBase : ConsoleCommandBase
+    abstract class LockCommandBase : ConsoleCommandAsyncBase
     {
+        protected LockCommandBase()
+        {
+
+        }
+
         protected LockCommandBase(string name)
             : base(name)
         {
@@ -58,10 +63,10 @@ namespace Ntreev.Crema.Commands.Consoles
             return this.CommandContext.GetAbsolutePath(path);
         }
 
-        protected ILockable GetObject(Authentication authentication, string path)
+        protected async Task<ILockable> GetObjectAsync(Authentication authentication, string path)
         {
             var drive = this.CommandContext.Drive as DataBasesConsoleDrive;
-            if (drive.GetObject(authentication, path) is ILockable lockable)
+            if (await drive.GetObjectAsync(authentication, path) is ILockable lockable)
             {
                 return lockable;
             }

@@ -18,57 +18,51 @@
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Properties;
+using Ntreev.Crema.Services.Users.Serializations;
 using Ntreev.Library;
 using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Serialization;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users
 {
     class UserContext : ItemContext<User, UserCategory, UserCollection, UserCategoryCollection, UserContext>,
-        IUserContext, IServiceProvider, IDisposable
+        IUserContext, IServiceProvider
     {
-        public const string usersFileName = "users.xml";
-
-        private readonly CremaHost cremaHost;
-        private readonly CremaDispatcher dispatcher;
-        private readonly RepositoryHost repository;
-        private readonly string userFilePath;
+        private readonly string remotePath;
 
         private ItemsCreatedEventHandler<IUserItem> itemsCreated;
         private ItemsRenamedEventHandler<IUserItem> itemsRenamed;
         private ItemsMovedEventHandler<IUserItem> itemsMoved;
         private ItemsDeletedEventHandler<IUserItem> itemsDeleted;
         private ItemsEventHandler<IUserItem> itemsChanged;
-        private EventHandler<MessageEventArgs> messageReceived;
-        private ItemsEventHandler<IUser> usersLoggedIn;
-        private ItemsEventHandler<IUser> usersLoggedOut;
-        private ItemsEventHandler<IUser> usersKicked;
-        private ItemsEventHandler<IUser> usersBanChanged;
 
         public UserContext(CremaHost cremaHost)
         {
-            this.cremaHost = cremaHost;
-            this.cremaHost.Debug(Resources.Message_UserContextInitialize);
-            this.userFilePath = GenerateUsersFilePath(cremaHost.RepositoryPath);
-            this.repository = new RepositoryHost(cremaHost.Repository, cremaHost.RepositoryDispatcher, this.userFilePath);
-            this.dispatcher = new CremaDispatcher(this);
-            this.dispatcher.Invoke(() =>
+            this.CremaHost = cremaHost;
+            this.CremaHost.Debug(Resources.Message_UserContextInitialize);
+
+            this.remotePath = cremaHost.GetPath(CremaPath.RepositoryUsers);
+            this.BasePath = cremaHost.GetPath(CremaPath.Users);
+            this.Serializer = cremaHost.Serializer;
+
+            this.Repository = new UserRepositoryHost(this, this.CremaHost.RepositoryProvider.CreateInstance(new RepositorySettings()
             {
-                this.Items.MessageReceived += Users_MessageReceived;
-                this.Items.UsersLoggedIn += Users_UsersLoggedIn;
-                this.Items.UsersLoggedOut += Users_UsersLoggedOut;
-                this.Items.UsersKicked += Users_UsersKicked;
-                this.Items.UsersBanChanged += Users_UsersBanChanged;
-            });
-            this.cremaHost.Debug(Resources.Message_UserContextIsCreated);
+                BasePath = this.remotePath,
+                RepositoryName = string.Empty,
+                WorkingPath = this.BasePath,
+                LogService = this.CremaHost
+            }));
+
+            this.Dispatcher = new CremaDispatcher(this);
+            this.CremaHost.Debug(Resources.Message_UserContextIsCreated);
         }
 
         public void InvokeItemsCreatedEvent(Authentication authentication, IUserItem[] items, object[] args)
@@ -96,84 +90,134 @@ namespace Ntreev.Crema.Services.Users
             this.OnItemsChanged(new ItemsEventArgs<IUserItem>(authentication, items));
         }
 
-        public Authentication Login(string userID, SecureString password)
+        public async Task<Authentication> LoginAsync(string userID, SecureString password)
         {
-            this.Dispatcher.VerifyAccess();
-            this.ValidateLogin(userID, password);
-
-            var user = this.Users[userID];
-            return user.Login(password);
+            try
+            {
+                this.ValidateExpired();
+                var user = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ValidateLogin(userID, password);
+                    return this.Users[userID];
+                });
+                return await user.LoginAsync(password);
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void Logout(Authentication authentication)
+        public async Task LogoutAsync(Authentication authentication)
         {
-            this.Dispatcher.VerifyAccess();
-            this.ValidateLogout(authentication);
-            var user = this.Users[authentication.ID];
-            user.Logout(authentication);
+            try
+            {
+                this.ValidateExpired();
+                var user = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ValidateLogout(authentication);
+                    return this.Users[authentication.ID];
+
+                });
+                await user.LogoutAsync(authentication);
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void NotifyMessage(Authentication authentication, string[] userIDs, string message)
+        public async Task NotifyMessageAsync(Authentication authentication, string[] userIDs, string message)
         {
-            this.Dispatcher.VerifyAccess();
-            this.CremaHost.DebugMethod(authentication, this, nameof(NotifyMessage), this, userIDs, message);
-            this.ValidateSendMessage(authentication, userIDs, message);
-            var users = userIDs == null ? new User[] { } : userIDs.Select(item => this.Users[item]).ToArray();
-            authentication.Sign();
-            this.Users.InvokeNotifyMessageEvent(authentication, users, message);
+            try
+            {
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(NotifyMessageAsync), this, userIDs, message);
+                    this.ValidateSendMessage(authentication, userIDs, message);
+                    var users = userIDs == null ? new User[] { } : userIDs.Select(item => this.Users[item]).ToArray();
+                    authentication.Sign();
+                    this.Users.InvokeNotifyMessageEvent(authentication, users, message);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public Authentication Authenticate(Guid authenticationToken)
+        public async Task<Authentication> AuthenticateAsync(Guid authenticationToken)
         {
-            this.Dispatcher.VerifyAccess();
-            var query = from User item in this.Users
-                        let authentication = item.Authentication
-                        where authentication != null && authentication.Token == authenticationToken
-                        select item;
+            try
+            {
+                this.ValidateExpired();
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var query = from User item in this.Users
+                                let authentication = item.Authentication
+                                where authentication != null && authentication.Token == authenticationToken
+                                select item;
 
-            if (query.Any() == true)
-                return query.First().Authentication;
+                    if (query.Any() == true)
+                        return query.First().Authentication;
 
-            if (authenticationToken == Authentication.System.Token)
-                return Authentication.System;
+                    if (authenticationToken == Authentication.System.Token)
+                        return Authentication.System;
 
-            return null;
+                    return null;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public bool IsAuthenticated(string userID)
+        public async Task<bool> IsAuthenticatedAsync(string userID)
         {
-            this.Dispatcher.VerifyAccess();
+            this.ValidateExpired();
+            return await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.Users.Contains(userID) == false)
+                    return false;
 
-            if (this.Users.Contains(userID) == false)
-                return false;
+                var user = this.Users[userID];
 
-            var user = this.Users[userID];
+                if (user.IsOnline == false)
+                    return false;
 
-            if (user.IsOnline == false)
-                return false;
-
-            return user.Authentication != null;
+                return user.Authentication != null;
+            });
         }
 
-        public bool IsOnlineUser(string userID, SecureString password)
+        public Task<bool> IsOnlineUserAsync(string userID, SecureString password)
         {
-            this.Dispatcher.VerifyAccess();
-            if (this.Users.Contains(userID) == false)
-                return false;
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.Users.Contains(userID) == false)
+                    return false;
 
-            var user = this.Users[userID];
+                var user = this.Users[userID];
 
-            if (user.VerifyPassword(password) == false)
-                return false;
+                if (user.VerifyPassword(password) == false)
+                    return false;
 
-            return user.IsOnline;
+                return user.IsOnline;
+            });
         }
 
         public UserContextMetaData GetMetaData(Authentication authentication)
         {
             this.Dispatcher.VerifyAccess();
-            var metaData = new UserContextMetaData();
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
 
+            var metaData = new UserContextMetaData();
             {
                 var query = from UserCategory item in this.Categories
                             orderby item.Path
@@ -199,14 +243,41 @@ namespace Ntreev.Crema.Services.Users
             return metaData;
         }
 
-        public static string GenerateUsersFilePath(string basePath)
+        public async Task<UserContextMetaData> GetMetaDataAsync(Authentication authentication)
         {
-            return Path.Combine(basePath, usersFileName);
+            this.ValidateExpired();
+            return await this.Dispatcher.InvokeAsync(() =>
+            {
+                var metaData = new UserContextMetaData();
+
+                {
+                    var query = from UserCategory item in this.Categories
+                                orderby item.Path
+                                select item.Path;
+
+                    metaData.Categories = query.ToArray();
+                }
+
+                {
+                    var query = from User item in this.Users
+                                orderby item.Category.Path
+                                select new UserMetaData()
+                                {
+                                    Path = item.Path,
+                                    UserInfo = item.UserInfo,
+                                    UserState = item.UserState,
+                                    BanInfo = item.BanInfo,
+                                };
+                    metaData.Users = query.ToArray();
+                }
+
+                metaData.AuthenticationToken = authentication.Token;
+                return metaData;
+            });
         }
 
-        public static void GenerateDefaultUserInfos(string repositoryPath)
+        public static void GenerateDefaultUserInfos(string repositoryPath, IObjectSerializer serializer)
         {
-            var filename = UserContext.GenerateUsersFilePath(repositoryPath);
             var designedInfo = new SignatureDate(Authentication.SystemID, DateTime.UtcNow);
             var administrator = new UserSerializationInfo()
             {
@@ -225,7 +296,7 @@ namespace Ntreev.Crema.Services.Users
             {
                 administrator
             };
-            for (var i = 0; i < 0; i++)
+            for (var i = 0; i < 10; i++)
             {
                 var admin = new UserSerializationInfo()
                 {
@@ -268,10 +339,26 @@ namespace Ntreev.Crema.Services.Users
                 users.Add(guest);
             }
 
+            for (var i = 0; i < 1000; i++)
+            {
+                var autobot = new UserSerializationInfo()
+                {
+                    ID = "autobot" + i,
+                    Name = "Autobot" + i,
+                    CategoryName = "autobots",
+                    Authority = Authority.Admin,
+                    Password = "1111".Encrypt(),
+                    CreationInfo = designedInfo,
+                    ModificationInfo = designedInfo,
+                    BanInfo = (BanSerializationInfo)BanInfo.Empty,
+                };
+                users.Add(autobot);
+            }
+
             var serializationInfo = new UserContextSerializationInfo()
             {
                 Version = CremaSchema.VersionValue,
-                Categories = new string[] { "/Administrators/", "/Members/", "/Guests/" },
+                Categories = new string[] { "/Administrators/", "/Members/", "/Guests/", "autobots" },
                 Users = users.ToArray(),
             };
 #else
@@ -282,21 +369,7 @@ namespace Ntreev.Crema.Services.Users
                 Users = new UserSerializationInfo[] { administrator},
             };
 #endif
-            //foreach (var item in serializationInfo.Categories)
-            //{
-            //    var basePath = Path.Combine(Path.GetDirectoryName(filename), "users");
-            //    var localPath = PathUtility.ConvertFromUri(basePath + item);
-            //    DirectoryUtility.Prepare(localPath);
-            //}
-
-            //foreach (var item in serializationInfo.Users)
-            //{
-            //    var basePath = Path.Combine(Path.GetDirectoryName(filename), "users");
-            //    var localPath = PathUtility.ConvertFromUri(basePath + item.CategoryPath + item.ID + ".xml");
-            //    FileUtility.WriteAllText(DataContractSerializerUtility.GetString(item), localPath);
-            //}
-
-            DataContractSerializerUtility.Write(filename, serializationInfo, true);
+            serializationInfo.WriteToDirectory(repositoryPath, serializer);
         }
 
         public static string SecureStringToString(SecureString value)
@@ -323,87 +396,110 @@ namespace Ntreev.Crema.Services.Users
             return secureString;
         }
 
-        public void Initialize()
+        public string GenerateCategoryPath(string parentPath, string name)
         {
-            this.cremaHost.Debug("Load user data...");
+            var value = new CategoryName(parentPath, name);
+            return this.GenerateCategoryPath(value.Path);
+        }
 
-            if (File.Exists(this.userFilePath) == true)
+        public string GenerateCategoryPath(string categoryPath)
+        {
+            NameValidator.ValidateCategoryPath(categoryPath);
+            var baseUri = new Uri(this.BasePath);
+            var uri = new Uri(baseUri + categoryPath);
+            return uri.LocalPath;
+        }
+
+        public string GenerateUserPath(string categoryPath, string userID)
+        {
+            return Path.Combine(this.GenerateCategoryPath(categoryPath), userID);
+        }
+
+        public string GeneratePath(string path)
+        {
+            if (NameValidator.VerifyCategoryPath(path) == true)
+                return this.GenerateCategoryPath(path);
+            var itemName = new ItemName(path);
+            return this.GenerateUserPath(itemName.CategoryPath, itemName.Name);
+        }
+
+        public string[] GetFiles(string itemPath)
+        {
+            var directoryName = Path.GetDirectoryName(itemPath);
+            var name = Path.GetFileNameWithoutExtension(itemPath);
+            var files = Directory.GetFiles(directoryName, $"{name}.*").Where(item => Path.GetFileNameWithoutExtension(item) == name).ToArray();
+            return files;
+        }
+
+        public async Task InitializeAsync()
+        {
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                var serializationInfo = DataContractSerializerUtility.Read<UserContextSerializationInfo>(this.userFilePath);
+                this.CremaHost.Debug("Load user data...");
 
-                foreach (var item in serializationInfo.Categories)
+                var directories = DirectoryUtility.GetAllDirectories(this.BasePath, "*", true);
+                foreach (var item in directories)
                 {
-                    if (item == this.Root.Path)
-                        continue;
-                    this.Categories.Prepare(item);
+                    var relativeUri = UriUtility.MakeRelativeOfDirectory(this.BasePath, item);
+                    var segments = StringUtility.Split(relativeUri, PathUtility.SeparatorChar, true);
+                    var categoryName = CategoryName.Create(relativeUri);
+                    this.Categories.Prepare(categoryName);
                 }
 
-                for (var i = 0; i < serializationInfo.Users.Length; i++)
+                var settings = ObjectSerializerSettings.Empty;
+                var itemPaths = this.Serializer.GetItemPaths(this.BasePath, typeof(UserSerializationInfo), settings);
+                foreach (var item in itemPaths)
                 {
-                    var item = serializationInfo.Users[i];
-                    if (serializationInfo.Version == null)
-                        item.BanInfo = (BanSerializationInfo)BanInfo.Empty;
-                    var user = this.Users.AddNew(item.ID, item.CategoryPath);
-                    user.Initialize((UserInfo)item, (BanInfo)item.BanInfo);
-                    user.Password = UserContext.StringToSecureString(item.Password);
+                    var userInfo = (UserSerializationInfo)this.Serializer.Deserialize(item, typeof(UserSerializationInfo), settings);
+                    var directory = Path.GetDirectoryName(item);
+                    var relativeUri = UriUtility.MakeRelativeOfDirectory(this.BasePath, item);
+                    var segments = StringUtility.Split(relativeUri, PathUtility.SeparatorChar, true);
+                    var itemName = ItemName.Create(segments);
+                    var user = this.Users.AddNew(userInfo.ID, itemName.CategoryPath);
+                    user.Initialize((UserInfo)userInfo, (BanInfo)userInfo.BanInfo);
+                    user.Password = UserContext.StringToSecureString(userInfo.Password);
                 }
-            }
-            else
+
+                this.CremaHost.Debug("Loading complete!");
+            });
+        }
+
+        public async Task DisposeAsync()
+        {
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                var user = this.Users.AddNew(Authentication.AdminID, PathUtility.Separator);
-                var userInfo = new UserInfo()
+                var query = from User item in this.Users
+                            where item.IsOnline
+                            select item;
+                var users = query.ToArray();
+
+                foreach (var item in users)
                 {
-                    ID = Authentication.AdminID,
-                    Name = Authentication.AdminName,
-                    CategoryPath = PathUtility.Separator,
-                    Authority = Authority.Admin,
-                };
-                user.Initialize(userInfo, BanInfo.Empty);
-                user.Password = UserContext.StringToSecureString(Authentication.AdminID.Encrypt());
-            }
+                    item.Authentication.InvokeExpiredEvent(Authentication.System.ID, string.Empty);
+                    item.Authentication = null;
+                    item.IsOnline = false;
+                }
 
-            this.cremaHost.Debug("Loading complete!");
+                this.Users.InvokeUsersStateChangedEvent(Authentication.System, users);
+                this.Users.InvokeUsersLoggedOutEvent(Authentication.System, users, CloseInfo.Empty);
+
+                base.Clear();
+            });
+            this.Repository.Dispose();
+            this.Dispatcher.Dispose();
         }
 
-        public void Dispose()
-        {
-            this.dispatcher.Dispose();
-        }
+        public UserRepositoryHost Repository { get; }
 
-        public new void Clear()
-        {
-            foreach (var item in this.Users)
-            {
-                if (item.Authentication != null)
-                    item.Authentication.InvokeExpiredEvent(Authentication.System.ID);
-            }
-            base.Clear();
-        }
+        public string BasePath { get; }
 
-        public RepositoryHost Repository
-        {
-            get { return this.repository; }
-        }
+        public UserCollection Users => this.Items;
 
-        public string UserFilePath
-        {
-            get { return this.userFilePath; }
-        }
+        public CremaHost CremaHost { get; }
 
-        public UserCollection Users
-        {
-            get { return this.Items; }
-        }
+        public CremaDispatcher Dispatcher { get; }
 
-        public CremaHost CremaHost
-        {
-            get { return this.cremaHost; }
-        }
-
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.dispatcher; }
-        }
+        public IObjectSerializer Serializer { get; }
 
         public event ItemsCreatedEventHandler<IUserItem> ItemsCreated
         {
@@ -475,76 +571,6 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public event EventHandler<MessageEventArgs> MessageReceived
-        {
-            add
-            {
-                this.Dispatcher.VerifyAccess();
-                this.messageReceived += value;
-            }
-            remove
-            {
-                this.Dispatcher.VerifyAccess();
-                this.messageReceived -= value;
-            }
-        }
-
-        public event ItemsEventHandler<IUser> UsersLoggedIn
-        {
-            add
-            {
-                this.Dispatcher.VerifyAccess();
-                this.usersLoggedIn += value;
-            }
-            remove
-            {
-                this.Dispatcher.VerifyAccess();
-                this.usersLoggedIn -= value;
-            }
-        }
-
-        public event ItemsEventHandler<IUser> UsersLoggedOut
-        {
-            add
-            {
-                this.Dispatcher.VerifyAccess();
-                this.usersLoggedOut += value;
-            }
-            remove
-            {
-                this.Dispatcher.VerifyAccess();
-                this.usersLoggedOut -= value;
-            }
-        }
-
-        public event ItemsEventHandler<IUser> UsersKicked
-        {
-            add
-            {
-                this.Dispatcher.VerifyAccess();
-                this.usersKicked += value;
-            }
-            remove
-            {
-                this.Dispatcher.VerifyAccess();
-                this.usersKicked -= value;
-            }
-        }
-
-        public event ItemsEventHandler<IUser> UsersBanChanged
-        {
-            add
-            {
-                this.Dispatcher.VerifyAccess();
-                this.usersBanChanged += value;
-            }
-            remove
-            {
-                this.Dispatcher.VerifyAccess();
-                this.usersBanChanged -= value;
-            }
-        }
-
         protected virtual void OnItemsCreated(ItemsCreatedEventArgs<IUserItem> e)
         {
             this.itemsCreated?.Invoke(this, e);
@@ -610,77 +636,22 @@ namespace Ntreev.Crema.Services.Users
             };
 
             var xml = DataContractSerializerUtility.GetString(serializationInfo, true);
-
-        }
-
-        private void Users_MessageReceived(object sender, MessageEventArgs e)
-        {
-            this.messageReceived?.Invoke(this, e);
-        }
-
-        private void Users_UsersLoggedIn(object sender, ItemsEventArgs<IUser> e)
-        {
-            this.usersLoggedIn?.Invoke(this, e);
-        }
-
-        private void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
-        {
-            this.usersLoggedOut?.Invoke(this, e);
-        }
-
-        private void Users_UsersKicked(object sender, ItemsEventArgs<IUser> e)
-        {
-            this.usersKicked?.Invoke(this, e);
-        }
-
-        private void Users_UsersBanChanged(object sender, ItemsEventArgs<IUser> e)
-        {
-            this.usersBanChanged?.Invoke(this, e);
         }
 
         #region IUserContext
 
         bool IUserContext.Contains(string itemPath)
         {
-            this.Dispatcher.VerifyAccess();
             return this.Contains(itemPath);
         }
 
-        IUserCollection IUserContext.Users
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Users;
-            }
-        }
+        IUserCollection IUserContext.Users => this.Users;
 
-        IUserCategoryCollection IUserContext.Categories
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        IUserCategoryCollection IUserContext.Categories => this.Categories;
 
-        IUserItem IUserContext.this[string itemPath]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[itemPath] as IUserItem;
-            }
-        }
+        IUserItem IUserContext.this[string itemPath] => this[itemPath] as IUserItem;
 
-        IUserCategory IUserContext.Root
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Root;
-            }
-        }
+        IUserCategory IUserContext.Root => this.Root;
 
         #endregion
 
@@ -688,7 +659,6 @@ namespace Ntreev.Crema.Services.Users
 
         IEnumerator<IUserItem> IEnumerable<IUserItem>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IUserItem;
@@ -697,7 +667,6 @@ namespace Ntreev.Crema.Services.Users
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IUserItem;

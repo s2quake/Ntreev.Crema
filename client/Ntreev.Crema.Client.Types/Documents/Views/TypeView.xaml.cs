@@ -45,6 +45,10 @@ namespace Ntreev.Crema.Client.Types.Documents.Views
     /// </summary>
     public partial class TypeView : UserControl, IDisposable
     {
+        public static readonly DependencyProperty SearchTextProperty =
+            DependencyProperty.Register(nameof(SearchText), typeof(string), typeof(TypeView),
+                new UIPropertyMetadata(string.Empty, SearchTextPropertyChangedCallback, SearchTextCoerceValueCallback));
+
         [Import]
         private ICremaHost cremaHost = null;
         [Import]
@@ -52,27 +56,17 @@ namespace Ntreev.Crema.Client.Types.Documents.Views
 
         private ModernDataGridControl gridControl;
 
-        public static readonly DependencyProperty SearchTextProperty =
-            DependencyProperty.Register(nameof(SearchText), typeof(string), typeof(TypeView),
-                new UIPropertyMetadata(string.Empty, SearchTextPropertyChangedCallback, SearchTextCoerceValueCallback));
-
-        //public static RoutedCommand ShowFilterCommand = new RoutedCommand("ShowFilter", typeof(TypeView));
-
         public TypeView()
         {
             InitializeComponent();
 
-            //    this.CommandBindings.Add(new CommandBinding(ShowFilterCommand, ShowFilter_Execute, ShowFilter_CanExecute));
             this.CommandBindings.Add(new CommandBinding(SearchBox.ShowCommand, ShowCommand_Execute, ShowCommand_CanExecute));
             this.CommandBindings.Add(new CommandBinding(SearchBox.HideCommand, HideCommand_Execute, HideCommand_CanExecute));
         }
 
         public void Dispose()
         {
-            if (this.gridControl != null && this.dataTypeControl.Source != null)
-            {
-                var typeID = this.dataTypeControl.Source.TypeID;
-            }
+
         }
 
         public override void OnApplyTemplate()
@@ -162,38 +156,13 @@ namespace Ntreev.Crema.Client.Types.Documents.Views
 
         private void GridControl_ItemsSourceChangeCompleted(object sender, EventArgs e)
         {
-            var typeID = this.dataTypeControl.Source.TypeID;
+            
         }
 
         private ICremaConfiguration Configs
         {
             get { return this.cremaHost.Configs; }
         }
-
-        //private void CloseFilter_Click(object sender, RoutedEventArgs e)
-        //{
-        //    this.HideFilter();
-        //}
-
-        //private void ShowFilter()
-        //{
-        //    this.gridFilter.Visibility = Visibility.Visible;
-        //    this.PART_Filter.Focus();
-        //    BindingOperations.SetBinding(this.PART_Filter, TextBox.TextProperty, new Binding("Filter")
-        //    {
-        //        Mode = BindingMode.TwoWay,
-        //        Source = this.gridControl,
-        //        Delay = 300,
-        //        UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-        //    });
-        //}
-
-        //private void HideFilter()
-        //{
-        //    this.gridFilter.Visibility = Visibility.Collapsed;
-        //    this.gridControl.SearchText = string.Empty;
-        //    BindingOperations.ClearBinding(this.PART_Filter, TextBox.TextProperty);
-        //}
 
         private void SearchBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {

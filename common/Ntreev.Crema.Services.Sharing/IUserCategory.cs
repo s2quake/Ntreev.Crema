@@ -20,22 +20,21 @@ using Ntreev.Crema.ServiceModel;
 using System;
 using System.Threading.Tasks;
 using System.Data;
-using System.Windows.Threading;
 using System.Security;
 
 namespace Ntreev.Crema.Services
 {
     public interface IUserCategory : IServiceProvider, IDispatcherObject, IExtendedProperties
     {
-        void Rename(Authentication authentication, string newName);
+        Task RenameAsync(Authentication authentication, string newName);
 
-        void Move(Authentication authentication, string parentPath);
+        Task MoveAsync(Authentication authentication, string parentPath);
 
-        void Delete(Authentication authentication);
+        Task DeleteAsync(Authentication authentication);
 
-        IUserCategory AddNewCategory(Authentication authentication, string name);
+        Task<IUserCategory> AddNewCategoryAsync(Authentication authentication, string name);
 
-        IUser AddNewUser(Authentication authentication, string userID, SecureString password, string userName, Authority authority);
+        Task<IUser> AddNewUserAsync(Authentication authentication, string userID, SecureString password, string userName, Authority authority);
 
         string Name { get; }
 

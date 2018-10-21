@@ -45,11 +45,12 @@ namespace Ntreev.Crema.Services
 
         static CremaLog()
         {
-            
+
         }
 
         public static void Release()
         {
+            log?.Dispose();
             log4net.LogManager.Shutdown();
         }
 
@@ -95,8 +96,7 @@ namespace Ntreev.Crema.Services
 
         public static void Error(Exception e)
         {
-            LogService.Error(e.Message);
-            LogService.Debug(e);
+            LogService.Error(e.ToString());
         }
 
         public static void Warn(string format, params object[] args)
@@ -111,14 +111,14 @@ namespace Ntreev.Crema.Services
 
         public static TextWriter RedirectionWriter
         {
-            get { return LogService.RedirectionWriter; }
-            set { LogService.RedirectionWriter = value; }
+            get => LogService.RedirectionWriter;
+            set => LogService.RedirectionWriter = value;
         }
 
         public static LogVerbose Verbose
         {
-            get { return LogService.Verbose; }
-            set { LogService.Verbose = value; }
+            get => LogService.Verbose;
+            set => LogService.Verbose = value;
         }
 
         internal static LogService LogService

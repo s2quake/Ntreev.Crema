@@ -20,19 +20,21 @@ using Ntreev.Library.Random;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Random
 {
     public static class CremaHostExtensions
     {
-        public static IDataBase CreateRandom(this ICremaHost cremaHost, Authentication authentication)
+        public static Task<IDataBase> CreateRandomAsync(this ICremaHost cremaHost, Authentication authentication)
         {
-            return cremaHost.Dispatcher.Invoke(() =>
+            var dataBaseName = RandomUtility.NextIdentifier();
+            var comment = RandomUtility.NextString();
+            if (cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
             {
-                var dataBaseName = RandomUtility.NextIdentifier();
-                var comment = RandomUtility.NextString();
-                return cremaHost.DataBases.AddNewDataBase(authentication, dataBaseName, comment);
-            });
+                return dataBases.AddNewDataBaseAsync(authentication, dataBaseName, comment);
+            }
+            throw new NotImplementedException();
         }
     }
 }

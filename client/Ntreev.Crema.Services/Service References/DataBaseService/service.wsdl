@@ -61,6 +61,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="ImportDataSet">
+      <soap12:operation soapAction="http://www.ntreev.com/IDataBaseService/ImportDataSet" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="NewTableCategory">
       <soap12:operation soapAction="http://www.ntreev.com/IDataBaseService/NewTableCategory" style="document" />
       <wsdl:input>
@@ -72,15 +81,6 @@
     </wsdl:operation>
     <wsdl:operation name="GetTableItemDataSet">
       <soap12:operation soapAction="http://www.ntreev.com/IDataBaseService/GetTableItemDataSet" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="ImportTables">
-      <soap12:operation soapAction="http://www.ntreev.com/IDataBaseService/ImportTables" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -171,15 +171,6 @@
     </wsdl:operation>
     <wsdl:operation name="UnlockTableItem">
       <soap12:operation soapAction="http://www.ntreev.com/IDataBaseService/UnlockTableItem" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="SetTableItemProperty">
-      <soap12:operation soapAction="http://www.ntreev.com/IDataBaseService/SetTableItemProperty" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -322,15 +313,6 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="ImportTypes">
-      <soap12:operation soapAction="http://www.ntreev.com/IDataBaseService/ImportTypes" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="RenameTypeItem">
       <soap12:operation soapAction="http://www.ntreev.com/IDataBaseService/RenameTypeItem" style="document" />
       <wsdl:input>
@@ -459,15 +441,6 @@
     </wsdl:operation>
     <wsdl:operation name="UnlockTypeItem">
       <soap12:operation soapAction="http://www.ntreev.com/IDataBaseService/UnlockTypeItem" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="SetTypeItemProperty">
-      <soap12:operation soapAction="http://www.ntreev.com/IDataBaseService/SetTypeItemProperty" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

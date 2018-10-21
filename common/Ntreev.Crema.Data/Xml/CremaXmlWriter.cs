@@ -15,20 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library;
+using Ntreev.Library.Linq;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
-using System.Xml;
 using System.Linq;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library.IO;
 using System.Text;
-using System.Collections.Generic;
+using System.Xml;
 using System.Xml.Schema;
-using Ntreev.Library.Linq;
 
 namespace Ntreev.Crema.Data.Xml
 {
@@ -89,15 +87,16 @@ namespace Ntreev.Crema.Data.Xml
             if (this.dataSet != null)
             {
                 writer.WriteStartElement(this.dataSet.DataSetName, this.targetNamespace);
-                this.WriteTables(writer, this.dataSet.Tables.Where(item => item.Parent == null).OrderBy(item => item.TemplateNamespace));
+                this.WriteTables(writer, this.dataSet.Tables.OrderBy(item => item.Name).OrderBy(item => item.TemplateNamespace));
                 writer.WriteEndElement();
             }
             else if (this.dataTable != null)
             {
                 if (this.dataTable.TableName == string.Empty)
                     throw new CremaDataException("table without name cannot serialize");
+                var tables = this.IsRecursive == true ? EnumerableUtility.Friends(this.dataTable, this.dataTable.Childs) : Enumerable.Repeat(this.dataTable, 1);
                 writer.WriteStartElement(CremaDataSet.DefaultDataSetName, this.targetNamespace);
-                this.WriteTable(writer, this.dataTable);
+                this.WriteTables(writer, tables);
                 writer.WriteEndElement();
             }
             else
@@ -105,6 +104,8 @@ namespace Ntreev.Crema.Data.Xml
                 throw new CremaDataException("there is no table to write");
             }
         }
+
+        public bool IsRecursive { get; set; }
 
         private void WriteAttribute(XmlWriter writer, InternalDataRow dataRow, InternalAttribute dataColumn)
         {
@@ -128,7 +129,7 @@ namespace Ntreev.Crema.Data.Xml
             WriteField(writer, dataRow, dataColumn, false);
         }
 
-        internal static void WriteField(XmlWriter writer, CremaDataRow dataRow, CremaDataColumn dataColumn, bool ignoreDefaultValue)
+        private static void WriteField(XmlWriter writer, CremaDataRow dataRow, CremaDataColumn dataColumn, bool ignoreDefaultValue)
         {
             var dataType = dataColumn.DataType;
             var value = dataRow[dataColumn];
@@ -164,10 +165,17 @@ namespace Ntreev.Crema.Data.Xml
                 this.WriteAttribute(writer, dataRow.InternalObject, item.InternalAttribute);
             }
 
-            if (dataTable.Childs.Count > 0)
+            if (dataTable.ColumnRelation != null)
             {
                 writer.WriteStartAttribute(CremaSchema.RelationID);
-                writer.WriteValue(dataRow.Field<string>(dataTable.RelationColumn));
+                writer.WriteValue(dataRow.Field<string>(dataTable.ColumnRelation));
+                writer.WriteEndAttribute();
+            }
+
+            if (dataTable.ParentRelation != null)
+            {
+                writer.WriteStartAttribute(CremaSchema.ParentID);
+                writer.WriteValue(dataRow.Field<string>(dataTable.ParentRelation));
                 writer.WriteEndAttribute();
             }
 
@@ -176,50 +184,48 @@ namespace Ntreev.Crema.Data.Xml
                 WriteField(writer, dataRow, item);
             }
 
-            if (dataTable.Childs.Count > 0)
-            {
-                var relationID = dataRow.Field<string>(dataTable.RelationColumn);
-
-                foreach (var child in dataTable.Childs)
-                {
-                    var rows = child.Select(string.Format("{0} = '{1}'", "__ParentID__", relationID));
-
-                    foreach (var row in rows)
-                    {
-                        this.WriteDataRow(writer, row);
-                    }
-                }
-
-            }
-
             writer.WriteEndElement();
-        }
-
-        private void WriteTable(XmlWriter writer, CremaDataTable dataTable)
-        {
-            writer.WriteAttribute(CremaSchema.Version, CremaSchema.VersionValue);
-
-            if (dataTable.TemplateNamespace != string.Empty)
-            {
-                var relativeUri = UriUtility.MakeRelative(dataTable.Namespace, dataTable.TemplateNamespace) + CremaSchema.SchemaExtension;
-                var value = string.Format("{0} {1}", dataTable.Namespace, relativeUri);
-                writer.WriteAttributeString(CremaSchema.InstancePrefix, "schemaLocation", XmlSchema.InstanceNamespace, value);
-                writer.WriteAttribute(CremaSchema.Creator, CremaSchema.CreatedDateTime, dataTable.CreationInfo);
-            }
-            else
-            {
-                var value = string.Format("{0} {1}", dataTable.Namespace, dataTable.Name + CremaSchema.SchemaExtension);
-                writer.WriteAttributeString(CremaSchema.InstancePrefix, "schemaLocation", XmlSchema.InstanceNamespace, value);
-            }
-
-            this.WriteHeaderInfo(writer, dataTable);
-
-            this.WriteRows(writer, dataTable);
         }
 
         private void WriteTables(XmlWriter writer, IEnumerable<CremaDataTable> tables)
         {
             writer.WriteAttribute(CremaSchema.Version, CremaSchema.VersionValue);
+
+            if (this.dataTable != null)
+            {
+                if (this.dataTable.TemplateNamespace != string.Empty)
+                {
+                    var relativeUri = UriUtility.MakeRelative(this.dataTable.Namespace, this.dataTable.TemplateNamespace) + CremaSchema.SchemaExtension;
+                    var value = string.Format("{0} {1}", this.dataTable.Namespace, relativeUri);
+                    writer.WriteAttributeString(CremaSchema.InstancePrefix, "schemaLocation", XmlSchema.InstanceNamespace, value);
+                }
+                else
+                {
+                    var value = string.Format("{0} {1}", this.dataTable.Namespace, this.dataTable.Name + CremaSchema.SchemaExtension);
+                    writer.WriteAttributeString(CremaSchema.InstancePrefix, "schemaLocation", XmlSchema.InstanceNamespace, value);
+                }
+            }
+
+            foreach (var item in tables)
+            {
+                if (item.TemplateNamespace != string.Empty)
+                {
+                    if (this.dataSet != null)
+                    {
+                        var name = item.Name;
+                        var user = name + CremaSchema.CreatorExtension;
+                        var dateTime = name + CremaSchema.CreatedDateTimeExtension;
+                        writer.WriteAttribute(user, dateTime, item.CreationInfo);
+                    }
+                    else
+                    {
+                        var name = item.TemplatedParentName;
+                        var user = name + CremaSchema.CreatorExtension;
+                        var dateTime = name + CremaSchema.CreatedDateTimeExtension;
+                        writer.WriteAttribute(user, dateTime, item.CreationInfo);
+                    }
+                }
+            }
 
             foreach (var item in tables)
             {
@@ -232,24 +238,21 @@ namespace Ntreev.Crema.Data.Xml
             }
         }
 
-        private void WriteHeaderInfo(XmlWriter writer, CremaDataTable table)
+        private void WriteHeaderInfo(XmlWriter writer, CremaDataTable dataTable)
         {
-            foreach (var item in EnumerableUtility.Friends(table, table.Childs))
-            {
-                var name = item.GetXmlPath(this.targetNamespace);
-                var user = name + CremaSchema.ModifierExtension;
-                var dateTime = name + CremaSchema.ModifiedDateTimeExtension;
-                var count = name + CremaSchema.CountExtension;
-                var id = name + CremaSchema.IDExtension;
-                writer.WriteAttribute(user, dateTime, item.ContentsInfo);
-                writer.WriteAttribute(count, item.Rows.Count);
-                writer.WriteAttribute(id, item.TableID.ToString());
-            }
+            var name = dataTable.GetXmlPath(this.targetNamespace);
+            var user = name + CremaSchema.ModifierExtension;
+            var dateTime = name + CremaSchema.ModifiedDateTimeExtension;
+            var count = name + CremaSchema.CountExtension;
+            var id = name + CremaSchema.IDExtension;
+            writer.WriteAttribute(user, dateTime, dataTable.ContentsInfo);
+            writer.WriteAttribute(count, dataTable.Rows.Count);
+            writer.WriteAttribute(id, dataTable.TableID.ToString());
         }
 
-        private void WriteRows(XmlWriter writer, CremaDataTable table)
+        private void WriteRows(XmlWriter writer, CremaDataTable dataTable)
         {
-            foreach (var item in table.Rows)
+            foreach (var item in dataTable.Rows)
             {
                 if (item.RowState == DataRowState.Deleted)
                     continue;

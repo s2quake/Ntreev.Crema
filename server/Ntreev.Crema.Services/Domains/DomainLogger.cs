@@ -15,224 +15,249 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Xml.Serialization;
-using System.Xml;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.Data.Xml;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Domains.Actions;
+using Ntreev.Crema.Services.Domains.Serializations;
 using Ntreev.Library.IO;
 using Ntreev.Library.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization;
-using System.Collections.Specialized;
-using Ntreev.Crema.Services.Domains.Actions;
-using Ntreev.Library;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using System.Xml;
 
 namespace Ntreev.Crema.Services.Domains
 {
-    class DomainLogger
+    class DomainLogger : IDispatcherObject
     {
-        public const string HeaderFileName = "info.dat";
-        public const string PostedFileName = "posted.log";
-        public const string CompletedFileName = "completed.log";
-        public const string UsersFileName = "users.xml";
+        public const string HeaderItemPath = "header";
+        public const string SourceItemPath = "source";
+        public const string PostedItemPath = "posted";
+        public const string CompletedItemPath = "completed";
 
-        private static XmlWriterSettings writerSettings = new XmlWriterSettings() { OmitXmlDeclaration = true, Indent = true };
+        private static readonly XmlWriterSettings writerSettings = new XmlWriterSettings() { OmitXmlDeclaration = true, Indent = true };
 
-        private string workingPath;
+        private readonly string basePath;
 
-        private StreamWriter postedWriter;
-        private StreamWriter completedWriter;
-        private long id;
-        private DomainActionBase current;
-        private bool isEnabled = true;
+        private readonly string headerPath;
+        private readonly string sourcePath;
+        private readonly string postedPath;
+        private readonly string completedPath;
 
-        public DomainLogger(Domain domain)
+        private readonly IObjectSerializer serializer;
+        private readonly DomainSerializationInfo domainInfo;
+        private readonly object source;
+
+        private DomainPostItemSerializationInfo currentPost;
+        private readonly List<DomainPostItemSerializationInfo> postedList = new List<DomainPostItemSerializationInfo>();
+        private readonly List<DomainCompleteItemSerializationInfo> completedList = new List<DomainCompleteItemSerializationInfo>();
+
+        public DomainLogger(IObjectSerializer serializer, Domain domain)
         {
-            this.Initialize(domain);
+            this.serializer = serializer;
+            this.domainInfo = domain.GetSerializationInfo();
+            this.source = domain.Source;
+            this.basePath = DirectoryUtility.Prepare(domain.Context.BasePath, domain.DataBaseID.ToString(), domain.Name);
+            this.headerPath = Path.Combine(this.basePath, HeaderItemPath);
+            this.sourcePath = Path.Combine(this.basePath, SourceItemPath);
+            this.postedPath = Path.Combine(this.basePath, PostedItemPath);
+            this.completedPath = Path.Combine(this.basePath, CompletedItemPath);
+
+            this.serializer.Serialize(this.headerPath, this.domainInfo, ObjectSerializerSettings.Empty);
+            this.serializer.Serialize(this.sourcePath, this.source, ObjectSerializerSettings.Empty);
+            this.postedList = new List<DomainPostItemSerializationInfo>();
+            this.completedList = new List<DomainCompleteItemSerializationInfo>();
+            this.Dispatcher = new CremaDispatcher(this);
         }
 
-        public DomainLogger(string workingPath)
+        public DomainLogger(IObjectSerializer serializer, string basePath)
         {
-            this.workingPath = workingPath;
+            this.serializer = serializer;
+            this.basePath = basePath;
+            this.headerPath = Path.Combine(this.basePath, HeaderItemPath);
+            this.sourcePath = Path.Combine(this.basePath, SourceItemPath);
+            this.postedPath = Path.Combine(this.basePath, PostedItemPath);
+            this.completedPath = Path.Combine(this.basePath, CompletedItemPath);
 
-            this.postedWriter = new StreamWriter(Path.Combine(workingPath, DomainLogger.PostedFileName), true, Encoding.UTF8)
+            this.domainInfo = (DomainSerializationInfo)this.serializer.Deserialize(this.headerPath, typeof(DomainSerializationInfo), ObjectSerializerSettings.Empty);
+            this.source = this.serializer.Deserialize(this.sourcePath, Type.GetType(this.domainInfo.SourceType), ObjectSerializerSettings.Empty);
+
             {
-                AutoFlush = true,
-            };
-
-            this.completedWriter = new StreamWriter(Path.Combine(workingPath, DomainLogger.CompletedFileName), true, Encoding.UTF8)
-            {
-                AutoFlush = true,
-            };
-        }
-
-        public void Initialize(Domain domain)
-        {
-            this.workingPath = DirectoryUtility.Prepare(domain.Context.BasePath, domain.DataBaseID.ToString(), domain.Name);
-
-            domain.Write(Path.Combine(workingPath, DomainLogger.HeaderFileName));
-
-            this.postedWriter = new StreamWriter(Path.Combine(workingPath, DomainLogger.PostedFileName), true, Encoding.UTF8)
-            {
-                AutoFlush = true,
-            };
-
-            this.completedWriter = new StreamWriter(Path.Combine(workingPath, DomainLogger.CompletedFileName), true, Encoding.UTF8)
-            {
-                AutoFlush = true,
-            };
-        }
-
-        public void Dispose(bool delete)
-        {
-            this.postedWriter?.Close();
-            this.postedWriter = null;
-
-            this.completedWriter?.Close();
-            this.completedWriter = null;
-
-            if (delete == true)
-            {
-                DirectoryUtility.Delete(this.workingPath);
-            }
-        }
-
-        public void NewRow(Authentication authentication, DomainRowInfo[] rows)
-        {
-            if (this.isEnabled == false)
-                return;
-
-            var action = new NewRowAction() { UserID = authentication.ID, Rows = rows, AcceptTime = authentication.SignatureDate.DateTime };
-            this.Post(action);
-        }
-
-        public void SetRow(Authentication authentication, DomainRowInfo[] rows)
-        {
-            if (this.isEnabled == false)
-                return;
-
-            var action = new SetRowAction() { UserID = authentication.ID, Rows = rows, AcceptTime = authentication.SignatureDate.DateTime };
-            this.Post(action);
-        }
-
-        public void RemoveRow(Authentication authentication, DomainRowInfo[] rows)
-        {
-            if (this.isEnabled == false)
-                return;
-
-            var action = new RemoveRowAction() { UserID = authentication.ID, Rows = rows, AcceptTime = authentication.SignatureDate.DateTime };
-            this.Post(action);
-        }
-
-        public void SetProperty(Authentication authentication, string propertyName, object value)
-        {
-            if (this.isEnabled == false)
-                return;
-
-            var action = new SetPropertyAction() { UserID = authentication.ID, PropertyName = propertyName, Value = value, AcceptTime = authentication.SignatureDate.DateTime };
-            this.Post(action);
-        }
-
-        public void Join(Authentication authentication, DomainAccessType accessType)
-        {
-            var action = new JoinAction() { UserID = authentication.ID, AccessType = accessType, AcceptTime = authentication.SignatureDate.DateTime};
-            this.Post(action);
-        }
-
-        public void Disjoin(Authentication authentication, RemoveInfo removeInfo)
-        {
-            var action = new DisjoinAction() { UserID = authentication.ID, RemoveInfo = removeInfo, AcceptTime = authentication.SignatureDate.DateTime };
-            this.Post(action);
-        }
-
-        public void Kick(Authentication authentication, string userID, string comment)
-        {
-            var action = new KickAction() { UserID = authentication.ID, TargetID = userID, Comment = comment, AcceptTime = authentication.SignatureDate.DateTime };
-            this.Post(action);
-        }
-
-        public void SetOwner(Authentication authentication, string userID)
-        {
-            var action = new SetOwnerAction() { UserID = authentication.ID, TargetID = userID, AcceptTime = authentication.SignatureDate.DateTime };
-            this.Post(action);
-        }
-
-        public void Post(DomainActionBase action)
-        {
-            if (this.isEnabled == false)
-                return;
-
-            var message = string.Empty;
-
-            this.current = action;
-            action.ID = this.id++;
-
-            var s = XmlSerializerUtility.GetSerializer(action.GetType());
-
-            var ns = new XmlSerializerNamespaces();
-            ns.Add(string.Empty, string.Empty);
-            ns.Add("fn", action.GetType().AssemblyQualifiedName);
-
-            using (var sw = new Utf8StringWriter())
-            using (var writer = XmlWriter.Create(sw, writerSettings))
-            {
-                DataContractSerializerUtility.Write(writer, action);
-                writer.Close();
-                message = sw.ToString();
-            }
-
-            this.postedWriter.WriteLine(message);
-        }
-
-        public void Complete()
-        {
-            if (this.isEnabled == false)
-                return;
-
-            var message = string.Empty;
-            using (var sw = new Utf8StringWriter())
-            using (var writer = XmlWriter.Create(sw, writerSettings))
-            {
-                writer.WriteStartElement("Action");
+                var items = File.ReadAllLines(this.completedPath);
+                this.completedList = new List<DomainCompleteItemSerializationInfo>(items.Length);
+                foreach (var item in items)
                 {
-                    writer.WriteAttributeString("ID", this.current.ID.ToString());
-                    writer.WriteAttributeString("DateTime", DateTime.Now.ToString("o"));
+                    this.completedList.Add(DomainCompleteItemSerializationInfo.Parse(item));
                 }
-                writer.WriteEndElement();
-                writer.Close();
-                message = sw.ToString();
             }
 
-            this.completedWriter.WriteLine(message);
-            this.current = null;
-        }
-
-        public long ID
-        {
-            get { return this.id; }
-            set { this.id = value; }
-        }
-
-        public bool IsEnabled
-        {
-            get { return this.isEnabled; }
-            set { this.isEnabled = value; }
-        }
-
-        private void SerializeDomain(Domain domain)
-        {
-            var formatter = new BinaryFormatter();
-            using (var stream = new FileStream(Path.Combine(workingPath, DomainLogger.HeaderFileName), FileMode.Create))
             {
-                formatter.Serialize(stream, domain);
-                stream.Close();
+                var items = File.ReadAllLines(this.postedPath);
+                this.postedList = new List<DomainPostItemSerializationInfo>(items.Length);
+                foreach (var item in items)
+                {
+                    this.postedList.Add(DomainPostItemSerializationInfo.Parse(item));
+                }
             }
+            this.Dispatcher = new CremaDispatcher(this);
         }
+
+        public override string ToString()
+        {
+            return $"{this.domainInfo.DomainInfo.CategoryPath}{this.domainInfo.DomainInfo.DomainID}";
+        }
+
+
+        private bool d;
+        public Task DisposeAsync(bool delete)
+        {
+            if(this.d == true)
+            {
+                int qwer = 0;
+            }
+            this.d = true;
+            if (Directory.Exists(this.basePath) == false)
+            {
+                int qwer = 0;
+            }
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (delete == true)
+                {
+                    DirectoryUtility.Delete(this.basePath);
+                    if(Directory.Exists(this.basePath) == true)
+                    {
+                        int qwer = 0;
+                    }
+                }
+                this.Dispatcher.Dispose();
+                this.Dispatcher = null;
+            });
+        }
+
+        public Task<long> NewRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        {
+            return this.PostAsync(new NewRowAction()
+            {
+                UserID = authentication.ID,
+                Rows = rows,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public Task<long> SetRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        {
+            return this.PostAsync(new SetRowAction()
+            {
+                UserID = authentication.ID,
+                Rows = rows,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public Task<long> RemoveRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        {
+            return this.PostAsync(new RemoveRowAction()
+            {
+                UserID = authentication.ID,
+                Rows = rows,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public Task<long> SetPropertyAsync(Authentication authentication, string propertyName, object value)
+        {
+            return this.PostAsync(new SetPropertyAction()
+            {
+                UserID = authentication.ID,
+                PropertyName = propertyName,
+                Value = value,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public Task<long> JoinAsync(Authentication authentication, DomainAccessType accessType)
+        {
+            return this.PostAsync(new JoinAction()
+            {
+                UserID = authentication.ID,
+                AccessType = accessType,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public Task<long> DisjoinAsync(Authentication authentication, RemoveInfo removeInfo)
+        {
+            return this.PostAsync(new DisjoinAction()
+            {
+                UserID = authentication.ID,
+                RemoveInfo = removeInfo,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public Task<long> KickAsync(Authentication authentication, string userID, string comment)
+        {
+            return this.PostAsync(new KickAction()
+            {
+                UserID = authentication.ID,
+                TargetID = userID,
+                Comment = comment,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public Task<long> SetOwnerAsync(Authentication authentication, string userID)
+        {
+            return this.PostAsync(new SetOwnerAction()
+            {
+                UserID = authentication.ID,
+                TargetID = userID,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public Task<long> PostAsync(DomainActionBase action)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.IsEnabled == false)
+                    return this.ID;
+
+                var id = this.ID++;
+                var itemPath = Path.Combine(this.basePath, $"{id}");
+                this.currentPost = new DomainPostItemSerializationInfo(id, action.GetType());
+                this.postedList.Add(this.currentPost);
+                this.serializer.Serialize(itemPath, action, ObjectSerializerSettings.Empty);
+                File.AppendAllText(this.postedPath, $"{this.currentPost}{Environment.NewLine}");
+                return id;
+            });
+        }
+
+        public Task CompleteAsync(long id)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.IsEnabled == false)
+                    return;
+
+                this.completedList.Add(new DomainCompleteItemSerializationInfo(id));
+                File.AppendAllText(this.completedPath, $"{new DomainCompleteItemSerializationInfo(id)}{Environment.NewLine}");
+            });
+        }
+
+        public long ID { get; set; }
+
+        public bool IsEnabled { get; set; } = true;
+
+        public CremaDispatcher Dispatcher { get; private set; }
+
+        public IReadOnlyList<DomainPostItemSerializationInfo> PostedList => this.postedList;
+
+        public IReadOnlyList<DomainCompleteItemSerializationInfo> CompletedList => this.completedList;
+
+        public DomainSerializationInfo DomainInfo => this.domainInfo;
+
+        public object Source => this.source;
     }
 }

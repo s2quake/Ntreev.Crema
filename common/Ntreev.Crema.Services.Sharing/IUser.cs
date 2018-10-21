@@ -25,19 +25,19 @@ namespace Ntreev.Crema.Services
 {
     public interface IUser : IServiceProvider, IDispatcherObject, IExtendedProperties
     {
-        void Move(Authentication authentication, string categoryPath);
+        Task MoveAsync(Authentication authentication, string categoryPath);
 
-        void Delete(Authentication authentication);
+        Task DeleteAsync(Authentication authentication);
 
-        void ChangeUserInfo(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority);
+        Task ChangeUserInfoAsync(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority);
 
-        void SendMessage(Authentication authentication, string message);
+        Task SendMessageAsync(Authentication authentication, string message);
 
-        void Kick(Authentication authentication, string comment);
+        Task KickAsync(Authentication authentication, string comment);
 
-        void Ban(Authentication authentication, string comment);
+        Task BanAsync(Authentication authentication, string comment);
 
-        void Unban(Authentication authentication);
+        Task UnbanAsync(Authentication authentication);
 
         string ID { get; }
 

@@ -25,6 +25,7 @@ using System.ComponentModel;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
@@ -42,18 +43,22 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         protected override Delegate CreateDelegate()
         {
-            return new Func<string, IDictionary<string, object>[]>(GetDataBaseLogInfo);
+            return new Func<string, string, IDictionary<string, object>[]>(GetDataBaseLogInfo);
         }
 
-        private IDictionary<string, object>[] GetDataBaseLogInfo(string dataBaseName)
+        private IDictionary<string, object>[] GetDataBaseLogInfo(string dataBaseName, string revision = null)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.Context.GetAuthentication(this);
-            return dataBase.Dispatcher.Invoke(() =>
+            var task = InvokeAsync();
+            task.Wait();
+            return task.Result;
+
+            async Task<IDictionary<string, object>[]> InvokeAsync()
             {
-                var logInfos = dataBase.GetLog(authentication);
+                var logInfos = await dataBase.GetLogAsync(authentication, revision);
                 return this.GetLogInfo(logInfos);
-            });
+            };
         }
 
         private IDictionary<string, object>[] GetLogInfo(LogInfo[] logInfos)

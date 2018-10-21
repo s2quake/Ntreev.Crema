@@ -38,31 +38,22 @@ namespace Ntreev.Crema.Commands.Consoles
     class UnbanCommand : UserCommandBase, IConsoleCommand
     {
         public UnbanCommand()
-            : base("unban")
         {
 
-        }
-
-        public override string[] GetCompletions(CommandCompletionContext completionContext)
-        {
-            if (completionContext.MemberDescriptor != null && completionContext.MemberDescriptor.DescriptorName == nameof(this.UserID))
-            {
-                return this.GetUserList();
-            }
-            return base.GetCompletions(completionContext);
         }
 
         [CommandProperty(IsRequired = true)]
+        [CommandCompletion(nameof(GetUserList))]
         public string UserID
         {
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var user = this.GetUser(authentication, this.UserID);
-            user.Dispatcher.Invoke(() => user.Unban(authentication));
+            var user = await this.GetUserAsync(authentication, this.UserID);
+            await user.UnbanAsync(authentication);
         }
     }
 }

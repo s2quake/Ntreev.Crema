@@ -68,7 +68,7 @@
     <Compile Include="CremaDataTableClearEventArgs.cs" />
     <Compile Include="CremaDataTableClearEventHandler.cs" />
     <Compile Include="CremaDataTableCollection.cs" />
-    <Compile Include="CremaDataTableExtensions.cs" />
+    <Compile Include="CremaDataExtensions.cs" />
     <Compile Include="CremaDataTableNamespace.cs" />
     <Compile Include="CremaDataTableNewRowEventArgs.cs" />
     <Compile Include="CremaDataTableNewRowEventHandler.cs" />
@@ -137,6 +137,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ReadTypes.cs" />
     <Compile Include="TableInfo.cs" />
     <Compile Include="TagInfoUtility.cs" />
     <Compile Include="TypeInfo.cs" />
@@ -147,13 +148,12 @@
     <Compile Include="Xml\CremaXmlReader.cs" />
     <Compile Include="Xml\CremaXmlReadInfo.cs" />
     <Compile Include="Xml\CremaXmlResolver.cs" />
-    <Compile Include="Xml\CremaXmlString.cs" />
     <Compile Include="Xml\CremaXmlWriter.cs" />
     <Compile Include="Xml\Schema\CremaSchema.cs" />
-    <Compile Include="Xml\Schema\CremaSchemaExtension.cs" />
     <Compile Include="Xml\Schema\CremaSchemaObsolete.cs" />
     <Compile Include="Xml\Schema\CremaSchemaReader.cs" />
     <Compile Include="Xml\Schema\CremaSchemaReadInfo.cs" />
+    <Compile Include="Xml\Schema\CremaSchemaTypeUtility.cs" />
     <Compile Include="Xml\Schema\CremaSchemaWriter.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -164,7 +164,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj">
+    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library.Net45\Ntreev.Library.csproj">
       <Project>{1918437f-4fbf-4731-ac5b-981a4a4cb1f1}</Project>
       <Name>Ntreev.Library</Name>
     </ProjectReference>

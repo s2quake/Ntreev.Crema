@@ -130,9 +130,9 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
             try
             {
                 this.BeginProgress(Resources.Message_ReceivingInfo);
+                var logs = await this.tableItem.GetLogAsync(this.authentication, null);
                 this.itemsSource = await this.tableItem.Dispatcher.InvokeAsync(() =>
                 {
-                    var logs = this.tableItem.GetLog(this.authentication);
                     var logList = new List<LogInfoViewModel>(logs.Length);
                     foreach (var item in logs)
                     {

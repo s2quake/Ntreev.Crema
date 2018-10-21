@@ -191,7 +191,7 @@ namespace Ntreev.Crema.ServiceModel
         public override void OnValidateMove(IAuthentication authentication, object target, string oldPath, string newPath)
         {
             if (target == this && this.Parent != null)
-                throw new NotImplementedException();
+                throw new InvalidOperationException("자식 테이블은 이동할 수 없습니다.");
             base.OnValidateMove(authentication, target, oldPath, newPath);
 
             foreach (var item in this.Childs)
@@ -377,16 +377,6 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
-        public TagInfo Tags
-        {
-            get
-            {
-                if (this.templatedParent != null)
-                    return this.templatedParent.Tags;
-                return this.tableInfo.DerivedTags;
-            }
-        }
-
         public TableState TableState
         {
             get { return this.tableState; }
@@ -399,18 +389,54 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
+        public TagInfo Tags
+        {
+            get
+            {
+                if (this.templatedParent != null)
+                    return this.templatedParent.Tags;
+                return this.tableInfo.DerivedTags;
+            }
+        }
+
+        public bool IsBeingEdited
+        {
+            get { return this.tableState.HasFlag(TableState.IsBeingEdited); }
+            set
+            {
+                if (value == true)
+                    this.tableState |= TableState.IsBeingEdited;
+                else
+                    this.tableState &= ~TableState.IsBeingEdited;
+                this.OnTableStateChanged(EventArgs.Empty);
+            }
+        }
+
+        public bool IsBeingSetup
+        {
+            get { return this.tableState.HasFlag(TableState.IsBeingSetup); }
+            set
+            {
+                if (value == true)
+                    this.tableState |= TableState.IsBeingSetup;
+                else
+                    this.tableState &= ~TableState.IsBeingSetup;
+                this.OnTableStateChanged(EventArgs.Empty);
+            }
+        }
+
         public string TableName
         {
             get
             {
                 if (this.parent == null)
                     return this.Name;
-                return StringUtility.Split(this.Name, '.')[1];
+                return CremaDataTable.GetTableName(this.Name);
             }
             set
             {
                 if (this.parent != null)
-                    this.Name = this.parent.TableName + "." + value;
+                    this.Name = this.parent.Name + "." + value;
                 else
                     this.Name = value;
             }

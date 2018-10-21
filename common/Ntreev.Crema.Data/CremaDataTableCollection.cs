@@ -15,20 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library;
-using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Ntreev.Crema.Data
 {
@@ -37,6 +32,8 @@ namespace Ntreev.Crema.Data
         private readonly InternalDataSet dataSet;
         private readonly DataTableCollection tables;
         private readonly List<InternalDataTable> itemList = new List<InternalDataTable>();
+        private readonly Dictionary<string, InternalDataTable> itemsByName = new Dictionary<string, InternalDataTable>();
+        private readonly Dictionary<string, InternalDataTable> itemsByNamespace = new Dictionary<string, InternalDataTable>();
 
         internal CremaDataTableCollection(InternalDataSet dataSet)
         {
@@ -46,31 +43,15 @@ namespace Ntreev.Crema.Data
             this.dataSet.PropertyChanged += InternalDataSet_PropertyChanged;
         }
 
-        public CremaDataTable this[int index]
-        {
-            get { return this.itemList[index].Target; }
-        }
+        public CremaDataTable this[int index] => this.itemList[index].Target;
 
         public CremaDataTable this[string name]
         {
             get
             {
-                var index = -1;
-                for (var i = 0; i < this.itemList.Count; i++)
-                {
-                    var item = this.itemList[i];
-                    var itemPath = item.Namespace.Substring(this.dataSet.TableNamespace.Length);
-                    var itemName = new ItemName(itemPath);
-                    if (itemName.Name == name)
-                    {
-                        if (index != -1)
-                            return null;
-                        index = i;
-                    }
-                }
-                if (index >= 0)
-                    return this.itemList[index].Target;
-                return null;
+                if (this.itemsByName.ContainsKey(name) == false)
+                    return null;
+                return this.itemsByName[name].Target;
             }
         }
 
@@ -79,13 +60,9 @@ namespace Ntreev.Crema.Data
             get
             {
                 var itemNamespace = UriUtility.Combine(this.dataSet.TableNamespace + categoryPath, name);
-                for (var i = 0; i < this.itemList.Count; i++)
-                {
-                    var item = this.itemList[i];
-                    if (item.Name == name && item.Namespace == itemNamespace)
-                        return item.Target;
-                }
-                return null;
+                if (this.itemsByNamespace.ContainsKey(itemNamespace) == false)
+                    return null;
+                return this.itemsByNamespace[itemNamespace].Target;
             }
         }
 
@@ -138,12 +115,15 @@ namespace Ntreev.Crema.Data
 
         public bool Contains(string name)
         {
-            return this.IndexOf(name) >= 0;
+            return this.itemsByName.ContainsKey(name);
+            //return this.IndexOf(name) >= 0;
         }
 
         public bool Contains(string name, string categoryPath)
         {
-            return this.IndexOf(name, categoryPath) >= 0;
+            var itemNamespace = UriUtility.Combine(this.dataSet.TableNamespace + categoryPath, name);
+            return this.itemsByNamespace.ContainsKey(name);
+            //return this.IndexOf(name, categoryPath) >= 0;
         }
 
         public void CopyTo(CremaDataTable[] array, int index)
@@ -218,10 +198,7 @@ namespace Ntreev.Crema.Data
             this.dataSet.RemoveTable(item);
         }
 
-        public int Count
-        {
-            get { return this.itemList.Count; }
-        }
+        public int Count => this.itemList.Count;
 
         public event CollectionChangeEventHandler CollectionChanged;
 
@@ -239,9 +216,12 @@ namespace Ntreev.Crema.Data
                         if (e.Element is InternalDataTable dataTable)
                         {
                             this.itemList.Add(dataTable);
+                            this.itemsByName.Add(dataTable.Name, dataTable);
+                            this.itemsByNamespace.Add(dataTable.Namespace, dataTable);
                             dataTable.DefaultView.Sort = $"{CremaSchema.Index} ASC";
                             dataTable.BuildNamespace();
                             this.InvokeCollectionChanged(e);
+                            dataTable.PropertyChanged += DataTable_PropertyChanged;
                         }
                     }
                     break;
@@ -249,6 +229,9 @@ namespace Ntreev.Crema.Data
                     {
                         if (e.Element is InternalDataTable dataTable)
                         {
+                            dataTable.PropertyChanged -= DataTable_PropertyChanged;
+                            this.itemsByNamespace.Remove(dataTable.Namespace);
+                            this.itemsByName.Remove(dataTable.Name);
                             this.itemList.Remove(dataTable);
                             dataTable.DefaultView.Sort = $"{CremaSchema.Index} ASC";
                             dataTable.BuildNamespace();
@@ -264,6 +247,26 @@ namespace Ntreev.Crema.Data
             }
         }
 
+        private void DataTable_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender is InternalDataTable dataTable)
+            {
+                if (e.PropertyName == nameof(InternalDataTable.Name))
+                {
+                    var value = this.itemsByName.First(item => item.Value == dataTable);
+                    this.itemsByName.Remove(value.Key);
+                    this.itemsByName.Add(dataTable.Name, dataTable);
+                }
+                else if (e.PropertyName == nameof(InternalDataTable.Namespace))
+                {
+                    var value = this.itemsByNamespace.First(item => item.Value == dataTable);
+                    this.itemsByNamespace.Remove(value.Key);
+                    this.itemsByNamespace.Add(dataTable.Namespace, dataTable);
+
+                }
+            }
+        }
+
         private void InternalDataSet_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(InternalDataSet.Namespace))
@@ -274,6 +277,11 @@ namespace Ntreev.Crema.Data
                         dataTable.BuildNamespace();
                 }
             }
+        }
+
+        internal void Sort()
+        {
+            this.itemList.Sort((x, y) => string.Compare(x.Name, y.Name));
         }
 
         #region IEnumerable

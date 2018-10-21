@@ -61,12 +61,12 @@ namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
             }
         }
 
-        public async void Kick()
+        public async Task KickAsync()
         {
             try
             {
                 this.BeginProgress();
-                await this.user.Dispatcher.InvokeAsync(() => this.user.Kick(this.authentication, this.Comment));
+                await this.user.KickAsync(this.authentication, this.Comment);
                 this.EndProgress();
                 this.TryClose(true);
             }

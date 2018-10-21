@@ -33,7 +33,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceDescription("Resources", IsShared = true)]
-    class ShutdownCommand : ConsoleCommandBase
+    class ShutdownCommand : ConsoleCommandAsyncBase
     {
         [Import]
         private Lazy<ICremaHost> cremaHost = null;
@@ -78,16 +78,16 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.IsOnline;
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             if (this.IsCancelled == true)
             {
-                this.CremaHost.CancelShutdown(authentication);
+                await this.CremaHost.CancelShutdownAsync(authentication);
             }
             else
             {
-                this.CremaHost.Shutdown(authentication, this.Time.Milliseconds, this.ShutdownType, this.Message);
+                await this.CremaHost.ShutdownAsync(authentication, this.Time.Milliseconds, this.ShutdownType, this.Message);
             }
         }
 

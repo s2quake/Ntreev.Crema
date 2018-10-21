@@ -33,43 +33,39 @@ namespace Ntreev.Crema.ServiceModel
     [DataContract(Namespace = SchemaUtility.Namespace)]
     public struct DataBaseInfo
     {
-        [XmlElement]
+        public DataBaseInfo(DataBaseInfo dataBaseInfo)
+        {
+            this = dataBaseInfo;
+        }
+
+        [DataMember]
         public Guid ID { get; set; }
 
-        [XmlElement]
+        [DataMember]
         public string Name { get; set; }
 
-        [XmlElement]
+        [DataMember]
         public string Comment { get; set; }
 
-        [XmlElement]
-        public long Revision { get; set; }
+        [DataMember]
+        public string Revision { get; set; }
 
-        [XmlElement]
+        [DataMember]
         public TagInfo Tags { get; set; }
 
-        [XmlElement]
-        public long BranchRevision { get; set; }
-
-        [XmlElement]
-        public string BranchSource { get; set; }
-
-        [XmlElement]
-        public long BranchSourceRevision { get; set; }
-
-        [XmlElement]
+        [DataMember]
         public string TypesHashValue { get; set; }
 
-        [XmlElement]
+        [DataMember]
         public string TablesHashValue { get; set; }
 
-        [XmlArray]
+        [DataMember]
         public string[] Paths { get; set; }
 
-        [XmlElement]
+        [DataMember]
         public SignatureDate CreationInfo { get; set; }
 
-        [XmlElement]
+        [DataMember]
         public SignatureDate ModificationInfo { get; set; }
 
         public IDictionary<string, object> ToDictionary()
@@ -80,9 +76,9 @@ namespace Ntreev.Crema.ServiceModel
                 { nameof(this.Name), this.Name },
                 { nameof(this.Comment), this.Comment },
                 { nameof(this.Revision), this.Revision },
-                { nameof(this.BranchRevision), this.BranchRevision},
-                { nameof(this.BranchSource), this.BranchSource },
-                { nameof(this.BranchSourceRevision), this.BranchSourceRevision},
+                { nameof(this.Tags), $"{this.Tags}" },
+                { nameof(this.TypesHashValue), this.TypesHashValue },
+                { nameof(this.TablesHashValue), this.TablesHashValue },
                 { nameof(this.Paths), this.Paths },
                 { nameof(CremaSchema.Creator), this.CreationInfo.ID },
                 { nameof(CremaSchema.CreatedDateTime), this.CreationInfo.DateTime },
@@ -96,23 +92,9 @@ namespace Ntreev.Crema.ServiceModel
         {
             Name = string.Empty,
             Comment = string.Empty,
-            BranchSource = string.Empty,
             Paths = new string[] { },
             CreationInfo = SignatureDate.Empty,
             ModificationInfo = SignatureDate.Empty,
         };
-
-
-        #region DataMember
-
-        [DataMember]
-        [XmlIgnore]
-        private string Xml
-        {
-            get { return XmlSerializerUtility.GetString(this); }
-            set { this = XmlSerializerUtility.ReadString(this, value); }
-        }
-
-        #endregion
     }
 }

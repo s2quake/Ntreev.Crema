@@ -141,7 +141,7 @@ namespace Ntreev.Crema.Client.Users
             {
                 try
                 {
-                    await user.Dispatcher.InvokeAsync(() => user.Unban(authentication));
+                    await user.UnbanAsync(authentication);
                     return true;
                 }
                 catch (Exception e)

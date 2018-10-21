@@ -15,13 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Commands.Properties;
 using Ntreev.Crema.Services;
 using Ntreev.Library;
 using Ntreev.Library.Commands;
+using Ntreev.Library.IO;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,7 +41,6 @@ namespace Ntreev.Crema.Commands
         public InitializeCommand(CremaBootstrapper boot)
             : base("init")
         {
-            this.RepositoryModule = CremaBootstrapper.DefaultRepositoryModule;
             this.boot = boot;
         }
 
@@ -62,9 +64,8 @@ namespace Ntreev.Crema.Commands
             set;
         }
 
-        [CommandProperty("repo-name")]
-        [DefaultValue("crema")]
-        public string RepositoryName
+        [CommandProperty("file-type")]
+        public string FileType
         {
             get;
             set;
@@ -72,8 +73,16 @@ namespace Ntreev.Crema.Commands
 
         protected override void OnExecute()
         {
-            this.boot.RepositoryModule = this.RepositoryModule;
-            this.boot.CreateRepository(this.Path, this.RepositoryName, this.Force);
+            var directoryInfo = new DirectoryInfo(this.Path);
+            if (directoryInfo.Exists == false && this.Force == true)
+            {
+                DirectoryUtility.Create(directoryInfo.FullName);
+            }
+            if (DirectoryUtility.IsEmpty(directoryInfo.FullName) == false && this.Force == false)
+            {
+                throw new ArgumentException("Path is not an empty directory.", nameof(this.Path));
+            }
+            CremaBootstrapper.CreateRepository(this.boot, this.Path, this.RepositoryModule, this.FileType, this.Force);
         }
     }
 }

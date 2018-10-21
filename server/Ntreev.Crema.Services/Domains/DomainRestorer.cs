@@ -15,25 +15,19 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Services.Domains.Actions;
+using Ntreev.Crema.Services.Domains.Serializations;
+using Ntreev.Crema.Services.Users;
+using Ntreev.Library.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
-using Ntreev.Crema.Services;
-using System.ComponentModel;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Domains.Actions;
-using Ntreev.Crema.Services.Users;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library.IO;
-using Ntreev.Library.Serialization;
-using Ntreev.Library;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
 
 namespace Ntreev.Crema.Services.Domains
 {
@@ -45,214 +39,160 @@ namespace Ntreev.Crema.Services.Domains
             IgnoreWhitespace = true,
         };
 
-        private readonly Authentication authentication;
         private readonly DomainContext domainContext;
         private readonly string workingPath;
 
-        private readonly HashSet<long> completedActions = new HashSet<long>();
-        private readonly List<DomainActionBase> postedActions = new List<DomainActionBase>();
+        //private readonly List<DomainPostItemSerializationInfo> postedList = new List<DomainPostItemSerializationInfo>();
+        private readonly Dictionary<long, DomainCompleteItemSerializationInfo> completedList = new Dictionary<long, DomainCompleteItemSerializationInfo>();
+        private readonly List<DomainActionBase> actionList = new List<DomainActionBase>();
         private Dictionary<string, Authentication> authentications;
         private Domain domain;
         private DateTime dateTime;
 
-        private long lastID;
-
-        public DomainRestorer(Authentication authentication, DomainContext domainContext, string workingPath)
+        public DomainRestorer(DomainContext domainContext, string workingPath)
         {
-            this.authentication = authentication;
             this.domainContext = domainContext;
             this.workingPath = workingPath;
         }
 
-        public void Restore()
+        public async Task RestoreAsync()
         {
             try
             {
-                this.CollectCompletedActions();
-                this.CollectPostedActions();
-                this.DeserializeDomain();
-                this.CollectAuthentications();
-                this.RestoreDomain();
+                await Task.Run(async () =>
+                {
+                    await this.DeserializeDomainAsync();
+                    this.CollectCompletedActions();
+                    this.CollectPostedActions();
+                    await this.RestoreDomainAsync();
+                });
             }
             finally
             {
-                this.ExpireAuthetications();
+                this.Dispose();
             }
         }
 
         private void CollectCompletedActions()
         {
-            var completedPath = Path.Combine(this.workingPath, DomainLogger.CompletedFileName);
-
-            using (var reader = XmlReader.Create(completedPath, readerSettings))
+            var domainLogger = this.domain.Logger;
+            foreach (var item in domainLogger.CompletedList)
             {
-                while (reader.Read() == true)
-                {
-                    var id = long.Parse(reader.GetAttribute("ID"));
-                    this.completedActions.Add(id);
-                }
+                this.completedList.Add(item.ID, item);
             }
         }
 
         private void CollectPostedActions()
         {
-            var postedPath = Path.Combine(this.workingPath, DomainLogger.PostedFileName);
-
-            using (var reader = XmlReader.Create(postedPath, readerSettings))
+            var domainLogger = this.domain.Logger;
+            foreach (var item in domainLogger.PostedList)
             {
-                reader.Read();
-                while (reader.EOF != true)
+                if (this.completedList.ContainsKey(item.ID) == true)
                 {
-                    DomainActionBase actionObject = null;
-                    if (reader.Name == typeof(NewRowAction).Name)
-                    {
-                        actionObject = DataContractSerializerUtility.Read<NewRowAction>(reader);
-                    }
-                    else if (reader.Name == typeof(RemoveRowAction).Name)
-                    {
-                        actionObject = DataContractSerializerUtility.Read<RemoveRowAction>(reader);
-                    }
-                    else if (reader.Name == typeof(SetRowAction).Name)
-                    {
-                        actionObject = DataContractSerializerUtility.Read<SetRowAction>(reader);
-                    }
-                    else if (reader.Name == typeof(SetPropertyAction).Name)
-                    {
-                        actionObject = DataContractSerializerUtility.Read<SetPropertyAction>(reader);
-                    }
-                    else if (reader.Name == typeof(JoinAction).Name)
-                    {
-                        actionObject = DataContractSerializerUtility.Read<JoinAction>(reader);
-                    }
-                    else if (reader.Name == typeof(DisjoinAction).Name)
-                    {
-                        actionObject = DataContractSerializerUtility.Read<DisjoinAction>(reader);
-                    }
-                    else if (reader.Name == typeof(KickAction).Name)
-                    {
-                        actionObject = DataContractSerializerUtility.Read<KickAction>(reader);
-                    }
-                    else if (reader.Name == typeof(SetOwnerAction).Name)
-                    {
-                        actionObject = DataContractSerializerUtility.Read<SetOwnerAction>(reader);
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
-                    }
-
-                    this.lastID = actionObject.ID;
-
-                    if (this.completedActions.Contains(actionObject.ID) == false)
-                        continue;
-
-                    this.postedActions.Add(actionObject);
+                    var type = Type.GetType(item.Type);
+                    var path = Path.Combine(this.workingPath, $"{item.ID}");
+                    var action = (DomainActionBase)this.Serializer.Deserialize(path, type, ObjectSerializerSettings.Empty);
+                    this.actionList.Add(action);
                 }
             }
         }
 
-        private void DeserializeDomain()
+        private async Task DeserializeDomainAsync()
         {
-            var path = Path.Combine(this.workingPath, DomainLogger.HeaderFileName);
-            var formatter = new BinaryFormatter() { Context = new StreamingContext(StreamingContextStates.CrossAppDomain, this.domainContext.CremaHost) };
-            using (var stream = File.OpenRead(path))
-            {
-                this.domain = formatter.Deserialize(stream) as Domain;
-                this.domain.Logger = new DomainLogger(this.workingPath);
-                this.domainContext.Domains.Restore(this.authentication, this.domain);
-            }
-        }
-
-        private void CollectAuthentications()
-        {
-            var creatorID = this.domain.DomainInfo.CreationInfo.ID;
             var userContext = this.domainContext.CremaHost.UserContext;
-            var userIDs = this.postedActions.Select(item => item.UserID).Concat(Enumerable.Repeat(creatorID, 1)).Distinct();
-
-            var users = userContext.Dispatcher.Invoke(() =>
+            var domainLogger = new DomainLogger(this.domainContext.Serializer, this.workingPath);
+            var domainSerializationInfo = domainLogger.DomainInfo;
+            var domainType = Type.GetType(domainSerializationInfo.DomainType);
+            var domainInfo = domainSerializationInfo.DomainInfo;
+            var source = domainLogger.Source;
+            var users = await userContext.Dispatcher.InvokeAsync(() =>
             {
-                var query = from userID in userIDs
-                            join User user in userContext.Users on userID equals user.ID
+                var query = from User user in userContext.Users
                             select new Authentication(new UserAuthenticationProvider(user, true));
                 return query.ToArray();
             });
-
             this.authentications = users.ToDictionary(item => item.ID);
+            this.domain = (Domain)Activator.CreateInstance(domainType, domainSerializationInfo, source);
+            this.domain.Logger = domainLogger;
+            await this.domainContext.RestoreAsync(this.authentications[domainInfo.CreationInfo.ID], this.domain);
         }
 
-        private void RestoreDomain()
+        private async Task RestoreDomainAsync()
         {
             var dummyHost = new DummyDomainHost(this.domain);
             this.domain.Host = dummyHost;
-            this.domain.Dispatcher.Invoke(() =>
+            this.domain.Logger.IsEnabled = false;
+
+            foreach (var item in this.actionList)
             {
-                this.domain.Logger.IsEnabled = false;
-
-                foreach (var item in this.postedActions)
+                var authentication = this.authentications[item.UserID];
+                try
                 {
-                    var authentication = this.authentications[item.UserID];
-                    try
+                    if (!(item is DomainActionBase action))
+                        throw new Exception();
+
+                    this.domain.DateTimeProvider = this.GetTime;
+                    this.dateTime = action.AcceptTime;
+                    this.domain.Logger.ID = item.ID;
+
+                    if (item is NewRowAction newRowAction)
                     {
-                        var action = item as DomainActionBase;
-                        if (action == null)
-                            throw new Exception();
-
-                        this.domain.DateTimeProvider = this.GetTime;
-                        this.dateTime = action.AcceptTime;
-
-                        if (item is NewRowAction newRowAction)
-                        {
-                            this.domain.NewRow(authentication, newRowAction.Rows);
-                        }
-                        else if (item is RemoveRowAction removeRowAction)
-                        {
-                            this.domain.RemoveRow(authentication, removeRowAction.Rows);
-                        }
-                        else if (item is SetRowAction setRowAction)
-                        {
-                            this.domain.SetRow(authentication, setRowAction.Rows);
-                        }
-                        else if (item is SetPropertyAction setPropertyAction)
-                        {
-                            this.domain.SetProperty(authentication, setPropertyAction.PropertyName, setPropertyAction.Value);
-                        }
-                        else if (item is JoinAction joinAction)
-                        {
-                            dummyHost.AccessType = joinAction.AccessType;
-                            this.domain.AddUser(authentication, joinAction.AccessType);
-                        }
-                        else if (item is DisjoinAction disjoinAction)
-                        {
-                            this.domain.RemoveUser(authentication);
-                        }
-                        else if (item is KickAction kickAction)
-                        {
-                            this.domain.Kick(authentication, kickAction.TargetID, kickAction.Comment);
-                        }
-                        else if (item is SetOwnerAction setOwnerAction)
-                        {
-                            this.domain.SetOwner(authentication, setOwnerAction.TargetID);
-                        }
-                        else
-                        {
-                            throw new NotImplementedException(item.GetType().Name);
-                        }
+                        await this.domain.NewRowAsync(authentication, newRowAction.Rows);
                     }
-                    finally
+                    else if (item is RemoveRowAction removeRowAction)
                     {
-                        this.domain.DateTimeProvider = null;
-                        // 데이터 베이스 Reset에 의해서 복구가 되었을때 클라이언트에 이벤트 전달 순서가 꼬이는 경우가 생김
-                        Thread.Sleep(1);
+                        await this.domain.RemoveRowAsync(authentication, removeRowAction.Rows);
+                    }
+                    else if (item is SetRowAction setRowAction)
+                    {
+                        await this.domain.SetRowAsync(authentication, setRowAction.Rows);
+                    }
+                    else if (item is SetPropertyAction setPropertyAction)
+                    {
+                        await this.domain.SetPropertyAsync(authentication, setPropertyAction.PropertyName, setPropertyAction.Value);
+                    }
+                    else if (item is JoinAction joinAction)
+                    {
+                        await this.domain.AddUserAsync(authentication, joinAction.AccessType);
+                    }
+                    else if (item is DisjoinAction disjoinAction)
+                    {
+                        await this.domain.RemoveUserAsync(authentication);
+                    }
+                    else if (item is KickAction kickAction)
+                    {
+                        await this.domain.KickAsync(authentication, kickAction.TargetID, kickAction.Comment);
+                    }
+                    else if (item is SetOwnerAction setOwnerAction)
+                    {
+                        await this.domain.SetOwnerAsync(authentication, setOwnerAction.TargetID);
+                    }
+                    else
+                    {
+                        throw new NotImplementedException(item.GetType().Name);
                     }
                 }
+                finally
+                {
+                    this.domain.DateTimeProvider = null;
+                    // 데이터 베이스 Reset에 의해서 복구가 되었을때 클라이언트에 이벤트 전달 순서가 꼬이는 경우가 생김
+                    Thread.Sleep(1);
+                }
+            }
 
-                this.domain.Logger.ID = this.lastID + 1;
-                this.domain.Logger.IsEnabled = true;
-            });
+            this.domain.Logger.ID = this.domain.Logger.PostedList.Count;
+            this.domain.Logger.IsEnabled = true;
             this.domain.Host = null;
         }
 
-        private void ExpireAuthetications()
+        private DateTime GetTime()
+        {
+            return this.dateTime;
+        }
+
+        private IObjectSerializer Serializer => this.domainContext.Serializer;
+
+        private void Dispose()
         {
             if (this.authentications == null)
                 return;
@@ -262,9 +202,36 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        private DateTime GetTime()
+        #region DummyDomainHost
+
+        class DummyDomainHost : IDomainHost
         {
-            return this.dateTime;
+            public DummyDomainHost(Domain domain)
+            {
+
+            }
+
+            public void Attach(Domain domain)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Detach()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void ValidateDelete(Authentication authentication, bool isCanceled)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task<object> DeleteAsync(Authentication authentication, bool isCanceled, object result)
+            {
+                throw new NotImplementedException();
+            }
         }
+
+        #endregion
     }
 }

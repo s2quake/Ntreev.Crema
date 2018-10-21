@@ -54,9 +54,9 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override Task OnExecuteAsync()
         {
-            this.EditMember();
+            return this.EditMemberAsync();
         }
 
         public override string[] GetCompletions(string find)
@@ -64,7 +64,7 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
             return base.GetCompletions(find);
         }
 
-        private void EditMember()
+        private async Task EditMemberAsync()
         {
             var value = new JsonColumnInfo();
             var column = this.Template.Dispatcher.Invoke(() => this.Template[this.ColumnName]);
@@ -92,11 +92,8 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
                 if (editor.Execute() == true)
                 {
                     value = editor.Read<JsonColumnInfo>();
-                    column.Dispatcher.Invoke(() =>
-                    {
-                        if (column.Name != value.Name)
-                            column.SetName(this.Authentication, value.Name);
-                    });
+                    if (column.Name != value.Name)
+                        await column.SetNameAsync(this.Authentication, value.Name);
                 }
             }
         }

@@ -27,6 +27,11 @@ namespace Ntreev.Crema.Commands.Consoles
 {
     public abstract class ConsoleCommandBase : CommandBase, IConsoleCommand
     {
+        protected ConsoleCommandBase()
+        {
+
+        }
+
         protected ConsoleCommandBase(string name)
             : base(name)
         {
@@ -44,6 +49,44 @@ namespace Ntreev.Crema.Commands.Consoles
             internal set;
         }
 
+        [Obsolete]
+        public TextWriter Out
+        {
+            get { return this.CommandContext.Out; }
+        }
+
+        #region IConsoleCommand
+
+        ICommand IConsoleCommand.Command => this;
+
+        #endregion
+    }
+
+    public abstract class ConsoleCommandAsyncBase : CommandAsyncBase, IConsoleCommand
+    {
+        protected ConsoleCommandAsyncBase()
+        {
+
+        }
+
+        protected ConsoleCommandAsyncBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public virtual object Instance
+        {
+            get { return this; }
+        }
+
+        public ConsoleCommandContextBase CommandContext
+        {
+            get;
+            internal set;
+        }
+
+        [Obsolete]
         public TextWriter Out
         {
             get { return this.CommandContext.Out; }

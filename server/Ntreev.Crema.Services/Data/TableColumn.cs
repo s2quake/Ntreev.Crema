@@ -15,17 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services.Domains;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
@@ -40,203 +37,115 @@ namespace Ntreev.Crema.Services.Data
             this.template = template;
         }
 
-        public TableColumn(TableTemplateBase template, DataTable table)
+        private TableColumn(TableTemplateBase template, DataTable table)
             : base(template.Domain, table)
         {
             this.template = template;
-            var query = from DataRow item in table.Rows
-                        where (item.RowState == DataRowState.Deleted || item.RowState == DataRowState.Detached) == false
-                        select item.Field<string>("ColumnName");
-
-            var newName = NameUtility.GenerateNewName("Column", query);
-            this.SetField(null, "ColumnName", newName);
         }
 
-        public void SetIndex(Authentication authentication, int value)
+        public static async Task<TableColumn> CreateAsync(Authentication authentication, TableTemplateBase template, DataTable table)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, CremaSchema.Index, value);
-        }
-
-        public void SetIsKey(Authentication authentication, bool value)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, "IsKey", value);
-        }
-
-        public void SetIsUnique(Authentication authentication, bool value)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, "IsUnique", value);
-        }
-
-        public void SetName(Authentication authentication, string value)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, "ColumnName", value);
-        }
-
-        public void SetDataType(Authentication authentication, string value)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, "DataType", value);
-        }
-
-        public void SetDefaultValue(Authentication authentication, string value)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, "DefaultValue", value);
-        }
-
-        public void SetComment(Authentication authentication, string value)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, CremaSchema.Comment, value);
-        }
-
-        public void SetAutoIncrement(Authentication authentication, bool value)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, CremaSchema.AutoIncrement, value);
-        }
-
-        public void SetTags(Authentication authentication, TagInfo value)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, CremaSchema.Tags, value.ToString());
-        }
-
-        public void SetIsReadOnly(Authentication authentication, bool value)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, "ReadOnly", value);
-        }
-
-        public void SetAllowNull(Authentication authentication, bool value)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, "AllowNull", value);
-        }
-
-        public int Index
-        {
-            get
+            var domain = template.Domain;
+            var tuple = await domain.Dispatcher.InvokeAsync(() =>
             {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<int>(CremaSchema.Index);
-            }
+                var column = new TableColumn(template, table);
+                var query = from DataRow item in table.Rows
+                            where (item.RowState == DataRowState.Deleted || item.RowState == DataRowState.Detached) == false
+                            select item.Field<string>(CremaSchema.ColumnName);
+
+                var newName = NameUtility.GenerateNewName("Column", query);
+                return (column, newName);
+            });
+            await tuple.column.SetFieldAsync(authentication, CremaSchema.ColumnName, tuple.newName);
+            return tuple.column;
         }
 
-        public bool IsKey
+        public Task SetIndexAsync(Authentication authentication, int value)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<bool>("IsKey");
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Index, value);
         }
 
-        public bool IsUnique
+        public Task SetIsKeyAsync(Authentication authentication, bool value)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<bool>("IsUnique");
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.IsKey, value);
         }
 
-        public string Name
+        public Task SetIsUniqueAsync(Authentication authentication, bool value)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<string>("ColumnName");
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.IsUnique, value);
         }
 
-        public string DataType
+        public Task SetNameAsync(Authentication authentication, string value)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<string>("DataType");
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.ColumnName, value);
         }
 
-        public string DefaultValue
+        public Task SetDataTypeAsync(Authentication authentication, string value)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<string>("DefaultValue");
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.DataType, value);
         }
 
-        public string Comment
+        public Task SetDefaultValueAsync(Authentication authentication, string value)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<string>(CremaSchema.Comment);
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.DefaultValue, value);
         }
 
-        public bool AutoIncrement
+        public Task SetCommentAsync(Authentication authentication, string value)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<bool>(CremaSchema.AutoIncrement);
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Comment, value);
         }
 
-        public TagInfo Tags
+        public Task SetAutoIncrementAsync(Authentication authentication, bool value)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return (TagInfo)(this.GetField<string>(CremaSchema.Tags));
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.AutoIncrement, value);
         }
 
-        public bool IsReadOnly
+        public Task SetTagsAsync(Authentication authentication, TagInfo value)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<bool>("ReadOnly");
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Tags, value.ToString());
         }
 
-        public bool AllowNull
+        public Task SetIsReadOnlyAsync(Authentication authentication, bool value)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<bool>("AllowNull");
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.ReadOnly, value);
         }
 
-        public override CremaDispatcher Dispatcher
+        public Task SetAllowNullAsync(Authentication authentication, bool value)
         {
-            get { return this.template.Dispatcher; }
+            return this.SetFieldAsync(authentication, CremaSchema.AllowNull, value);
         }
 
-        public override DataBase DataBase
-        {
-            get { return this.template.DataBase; }
-        }
+        public int Index => this.GetField<int>(CremaSchema.Index);
+
+        public bool IsKey => this.GetField<bool>(CremaSchema.IsKey);
+
+        public bool IsUnique => this.GetField<bool>(CremaSchema.IsUnique);
+
+        public string Name => this.GetField<string>(CremaSchema.ColumnName);
+
+        public string DataType => this.GetField<string>(CremaSchema.DataType);
+
+        public string DefaultValue => this.GetField<string>(CremaSchema.DefaultValue);
+
+        public string Comment => this.GetField<string>(CremaSchema.Comment);
+
+        public bool AutoIncrement => this.GetField<bool>(CremaSchema.AutoIncrement);
+
+        public TagInfo Tags => (TagInfo)(this.GetField<string>(CremaSchema.Tags));
+
+        public bool IsReadOnly => this.GetField<bool>(CremaSchema.ReadOnly);
+
+        public bool AllowNull => this.GetField<bool>(CremaSchema.AllowNull);
+
+        public override CremaDispatcher Dispatcher => this.template.Dispatcher;
+
+        public override DataBase DataBase => this.template.DataBase;
+
+        public override CremaHost CremaHost => this.template.CremaHost;
 
         #region ITableTemplate
 
-        ITableTemplate ITableColumn.Template
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.template;
-            }
-        }
+        ITableTemplate ITableColumn.Template => this.template;
 
         #endregion
     }

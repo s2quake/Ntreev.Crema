@@ -64,11 +64,11 @@ namespace Ntreev.Crema.Client.Base.MenuItems
             return false;
         }
 
-        protected override void OnExecute(object parameter)
+        protected override async void OnExecute(object parameter)
         {
             if (parameter is ConnectionItemViewModel connectionItem && this.cremaAppHost.ConnectionItem == connectionItem)
             {
-                this.cremaAppHost.Login();
+                await this.cremaAppHost.LoginAsync();
             }
         }
     }

@@ -22,12 +22,13 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using Ntreev.Library.Commands;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles.TypeTemplate
 {
     static class TemplateEditor
     {
-        public static bool Edit(ITypeTemplate template, Authentication authentication)
+        public static async Task<bool> EditAsync(ITypeTemplate template, Authentication authentication)
         {
             var memberCount = template.Dispatcher.Invoke(() => template.Count);
             var memberList = new List<JsonTypeMemberInfos.ItemInfo>(memberCount);
@@ -64,56 +65,56 @@ namespace Ntreev.Crema.Commands.Consoles.TypeTemplate
             if (key != ConsoleKey.Y)
                 return false;
 
-            template.Dispatcher.Invoke(() =>
+            //template.Dispatcher.Invoke(() =>
+            //{
+            foreach (var item in idToMember.Keys.ToArray())
             {
-                foreach (var item in idToMember.Keys.ToArray())
+                if (members.Items.Any(i => i.ID == item) == false)
                 {
-                    if (members.Items.Any(i => i.ID == item) == false)
-                    {
-                        var member = idToMember[item];
-                        member.Delete(authentication);
-                        idToMember.Remove(item);
-                    }
+                    var member = idToMember[item];
+                    await member.DeleteAsync(authentication);
+                    idToMember.Remove(item);
                 }
+            }
 
-                for (var i = 0; i < members.Items.Length; i++)
+            for (var i = 0; i < members.Items.Length; i++)
+            {
+                var item = members.Items[i];
+                if (item.ID == Guid.Empty)
                 {
-                    var item = members.Items[i];
-                    if (item.ID == Guid.Empty)
-                    {
-                        var member = template.AddNew(authentication);
-                        member.SetName(authentication, item.Name);
-                        member.SetValue(authentication, item.Value);
-                        member.SetComment(authentication, item.Comment);
-                        template.EndNew(authentication, member);
-                        item.ID = Guid.NewGuid();
-                        idToMember.Add(item.ID, member);
-                        members.Items[i] = item;
-                    }
-                    else if (idToMember.ContainsKey(item.ID) == true)
-                    {
-                        var member = idToMember[item.ID];
-                        if (member.Name != item.Name)
-                            member.SetName(authentication, item.Name);
-                        if (member.Value != item.Value)
-                            member.SetValue(authentication, item.Value);
-                        if (member.Comment != item.Comment)
-                            member.SetComment(authentication, item.Comment);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"{item.ID} is not existed member.");
-                    }
+                    var member = await template.AddNewAsync(authentication);
+                    await member.SetNameAsync(authentication, item.Name);
+                    await member.SetValueAsync(authentication, item.Value);
+                    await member.SetCommentAsync(authentication, item.Comment);
+                    await template.EndNewAsync(authentication, member);
+                    item.ID = Guid.NewGuid();
+                    idToMember.Add(item.ID, member);
+                    members.Items[i] = item;
                 }
-
-                for (var i = 0; i < members.Items.Length; i++)
+                else if (idToMember.ContainsKey(item.ID) == true)
                 {
-                    var item = members.Items[i];
                     var member = idToMember[item.ID];
-                    member.SetIndex(authentication, i);
+                    if (member.Name != item.Name)
+                        await member.SetNameAsync(authentication, item.Name);
+                    if (member.Value != item.Value)
+                        await member.SetValueAsync(authentication, item.Value);
+                    if (member.Comment != item.Comment)
+                        await member.SetCommentAsync(authentication, item.Comment);
                 }
-                template.EndEdit(authentication);
-            });
+                else
+                {
+                    throw new InvalidOperationException($"{item.ID} is not existed member.");
+                }
+            }
+
+            for (var i = 0; i < members.Items.Length; i++)
+            {
+                var item = members.Items[i];
+                var member = idToMember[item.ID];
+                await member.SetIndexAsync(authentication, i);
+            }
+            await template.EndEditAsync(authentication);
+            //});
 
             return true;
         }

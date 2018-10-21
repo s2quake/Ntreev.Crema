@@ -28,13 +28,12 @@ namespace Ntreev.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceDescription("Resources", IsShared = true)]
-    class NotifyCommand : ConsoleCommandBase
+    class NotifyCommand : ConsoleCommandAsyncBase
     {
         [Import]
         private Lazy<ICremaHost> cremaHost = null;
 
         public NotifyCommand()
-            : base("notify")
         {
             this.Message = string.Empty;
         }
@@ -57,10 +56,10 @@ namespace Ntreev.Crema.Commands.Consoles
             });
         }
 
-        protected override void OnExecute()
+        protected override Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            this.UserContext.Dispatcher.Invoke(() => this.UserContext.NotifyMessage(authentication, this.Message));
+            return this.UserContext.NotifyMessageAsync(authentication, this.Message);
         }
 
         private ICremaHost CremaHost => this.cremaHost.Value;

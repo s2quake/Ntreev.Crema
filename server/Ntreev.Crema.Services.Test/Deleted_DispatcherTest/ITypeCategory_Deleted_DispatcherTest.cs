@@ -102,14 +102,14 @@ namespace Ntreev.Crema.Services.Test.Deleted_DispatcherTest
         [ExpectedException(typeof(InvalidOperationException))]
         public void Preview()
         {
-            category.GetDataSet(authentication, -1);
+            category.GetDataSet(authentication, null);
         }
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void GetLog()
         {
-            category.GetLog(authentication);
+            category.GetLog(authentication, null);
         }
 
         [TestMethod]

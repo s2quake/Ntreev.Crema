@@ -125,7 +125,7 @@ namespace Ntreev.Crema.Client.Tables
 
         public static async Task<bool> RenameAsync(Authentication authentication, ITableDescriptor descriptor)
         {
-            var comment = await LockAsync(authentication, descriptor, nameof(ITable.Rename));
+            var comment = await LockAsync(authentication, descriptor, nameof(ITable.RenameAsync));
             if (comment == null)
                 return false;
 
@@ -138,7 +138,7 @@ namespace Ntreev.Crema.Client.Tables
 
         public static async Task<bool> MoveAsync(Authentication authentication, ITableDescriptor descriptor)
         {
-            var comment = await LockAsync(authentication, descriptor, nameof(ITable.Move));
+            var comment = await LockAsync(authentication, descriptor, nameof(ITable.MoveAsync));
             if (comment == null)
                 return false;
 
@@ -194,7 +194,7 @@ namespace Ntreev.Crema.Client.Tables
 
                 try
                 {
-                    await table.Dispatcher.InvokeAsync(() => table.Content.CancelEdit(authentication));
+                    await table.Content.CancelEditAsync(authentication);
                     return true;
                 }
                 catch (Exception e)
@@ -218,7 +218,7 @@ namespace Ntreev.Crema.Client.Tables
 
                 try
                 {
-                    await table.Dispatcher.InvokeAsync(() => table.Content.EndEdit(authentication));
+                    await table.Content.EndEditAsync(authentication);
                     return true;
                 }
                 catch (Exception e)
@@ -266,7 +266,7 @@ namespace Ntreev.Crema.Client.Tables
 
         public static async Task<bool> NewTableAsync(Authentication authentication, ITableDescriptor descriptor)
         {
-            var comment = await LockAsync(authentication, descriptor, nameof(ITable.NewTable));
+            var comment = await LockAsync(authentication, descriptor, nameof(ITable.NewTableAsync));
             if (comment == null)
                 return false;
 
@@ -288,16 +288,14 @@ namespace Ntreev.Crema.Client.Tables
             {
                 try
                 {
-                    return await table.Dispatcher.InvokeAsync(() =>
+                    var lockInfo = await table.Dispatcher.InvokeAsync(() => table.LockInfo);
+                    if (lockInfo.IsLocked == false || lockInfo.IsInherited == true)
                     {
-                        if (table.IsLocked == false || table.LockInfo.IsInherited == true)
-                        {
-                            var lockComment = comment + ":" + Guid.NewGuid();
-                            table.Lock(authentication, lockComment);
-                            return lockComment;
-                        }
-                        return string.Empty;
-                    });
+                        var lockComment = comment + ":" + Guid.NewGuid();
+                        await table.LockAsync(authentication, lockComment);
+                        return lockComment;
+                    }
+                    return string.Empty;
                 }
                 catch (Exception e)
                 {
@@ -320,14 +318,11 @@ namespace Ntreev.Crema.Client.Tables
 
                 try
                 {
-                    await table.Dispatcher.InvokeAsync(() =>
+                    var lockInfo = await table.Dispatcher.InvokeAsync(() => table.LockInfo);
+                    if (lockInfo.IsLocked == true && lockInfo.IsInherited == false && lockInfo.Comment == comment)
                     {
-                        var lockInfo = table.LockInfo;
-                        if (lockInfo.IsLocked == true && lockInfo.IsInherited == false && lockInfo.Comment == comment)
-                        {
-                            table.Unlock(authentication);
-                        }
-                    });
+                        await table.UnlockAsync(authentication);
+                    }
                 }
                 catch (Exception e)
                 {

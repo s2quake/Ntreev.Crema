@@ -30,6 +30,7 @@ using Ntreev.ModernUI.Framework;
 using Ntreev.Crema.Client.Tables.Properties;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 {
@@ -47,7 +48,7 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
             this.DisplayName = Resources.Title_NewTable;
         }
 
-        public static Task<NewTableViewModel> CreateInstanceAsync(Authentication authentication, ITableCategoryDescriptor descriptor)
+        public static async Task<NewTableViewModel> CreateInstanceAsync(Authentication authentication, ITableCategoryDescriptor descriptor)
         {
             if (authentication == null)
                 throw new ArgumentNullException(nameof(authentication));
@@ -56,9 +57,9 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 
             if (descriptor.Target is ITableCategory category)
             {
-                return category.Dispatcher.InvokeAsync(() =>
+                var template = await category.NewTableAsync(authentication);
+                return await category.Dispatcher.InvokeAsync(() =>
                 {
-                    var template = category.NewTable(authentication);
                     return new NewTableViewModel(authentication, category, template);
                 });
             }
@@ -70,14 +71,11 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 
         protected async override void Verify(Action<bool> isVerify)
         {
-            var result = await this.category.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.TableName == string.Empty)
-                    return false;
-                if (NameValidator.VerifyName(this.TableName) == false)
-                    return false;
-                return this.category.Dispatcher.Invoke(() => this.tableContext.Tables.Contains(this.TableName) == false);
-            });
+            if (this.TableName == string.Empty)
+                return;
+            if (NameValidator.VerifyName(this.TableName) == false)
+                return;
+            var result = await this.tableContext.Tables.ContainsAsync(this.TableName) == false;
             isVerify(result);
         }
     }

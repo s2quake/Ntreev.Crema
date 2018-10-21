@@ -15,25 +15,19 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Services;
+using System;
+using System.Collections.Generic;
 
 namespace Ntreev.Crema.Services.Domains
 {
-    class DomainCategory : DomainCategoryBase<Domain, DomainCategory, DomainCollection, DomainCategoryCollection, DomainContext>, 
+    class DomainCategory : DomainCategoryBase<Domain, DomainCategory, DomainCollection, DomainCategoryCollection, DomainContext>,
         IDomainCategory, IDomainItem
     {
         private IDataBase dataBase;
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.Context.Dispatcher; }
-        }
+        public CremaDispatcher Dispatcher => this.Context.Dispatcher;
 
         public IDataBase DataBase
         {
@@ -53,51 +47,22 @@ namespace Ntreev.Crema.Services.Domains
 
         #region IDomainCategory
 
-        IDomainCategory IDomainCategory.Parent
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        IDomainCategory IDomainCategory.Parent => this.Parent;
 
-        IContainer<IDomain> IDomainCategory.Domains
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Items;
-            }
-        }
+        IContainer<IDomain> IDomainCategory.Domains => this.Items;
 
-        IContainer<IDomainCategory> IDomainCategory.Categories
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        IContainer<IDomainCategory> IDomainCategory.Categories => this.Categories;
 
         #endregion
 
         #region IDomainItem
 
-        IDomainItem IDomainItem.Parent
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Parent;
-            }
-        }
+        IDomainItem IDomainItem.Parent => this.Parent;
 
         IEnumerable<IDomainItem> IDomainItem.Childs
         {
             get
             {
-                this.Dispatcher.VerifyAccess();
                 foreach (var item in this.Categories)
                 {
                     yield return item;

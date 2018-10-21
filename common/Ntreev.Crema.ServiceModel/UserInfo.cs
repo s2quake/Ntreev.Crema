@@ -36,25 +36,25 @@ namespace Ntreev.Crema.ServiceModel
     [DataContract(Namespace = SchemaUtility.Namespace)]
     public struct UserInfo
     {
-        [XmlElement]
+        [DataMember]
         public string ID { get; set; }
 
-        [XmlElement]
+        [DataMember]
         public string Name { get; set; }
 
-        [XmlElement]
+        [DataMember]
         public string CategoryName { get; set; }
 
-        [XmlElement]
+        [DataMember]
         public Authority Authority { get; set; }
 
-        [XmlElement]
+        [DataMember]
         public SignatureDate CreationInfo { get; set; }
 
-        [XmlElement]
+        [DataMember]
         public SignatureDate ModificationInfo { get; set; }
 
-        [XmlIgnore]
+        [IgnoreDataMember]
         public string CategoryPath
         {
             get
@@ -73,6 +73,8 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
+        public string Path => this.CategoryPath + this.ID;
+
         public IDictionary<string, object> ToDictionary()
         {
             var props = new Dictionary<string, object>
@@ -89,16 +91,13 @@ namespace Ntreev.Crema.ServiceModel
             return props;
         }
 
-        #region DataMember
-
-        [DataMember]
-        [XmlIgnore]
-        private string Xml
+        public static readonly UserInfo Empty = new UserInfo()
         {
-            get { return XmlSerializerUtility.GetString(this); }
-            set { this = XmlSerializerUtility.ReadString(this, value); }
-        }
-
-        #endregion
+            ID = string.Empty,
+            Name = string.Empty,
+            CategoryName = string.Empty,
+            CreationInfo = SignatureDate.Empty,
+            ModificationInfo = SignatureDate.Empty
+        };
     }
 }

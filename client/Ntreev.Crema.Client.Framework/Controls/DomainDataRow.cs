@@ -51,12 +51,12 @@ namespace Ntreev.Crema.Client.Framework.Controls
             this.CommandBindings.Insert(0, new CommandBinding(ApplicationCommands.Delete, this.Delete_Execute, this.Delete_CanExecute));
         }
 
-        public void Delete()
+        public Task DeleteAsync()
         {
             var domain = this.GridControl.Domain;
             var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
             var item = this.DataContext;
-            domain.Dispatcher.Invoke(() => domain.RemoveRow(authenticator, item));
+            return domain.RemoveRowAsync(authenticator, item);
         }
 
         public new DomainDataGridControl GridControl
@@ -229,14 +229,14 @@ namespace Ntreev.Crema.Client.Framework.Controls
             e.CanExecute = this.CanDelete;
         }
 
-        private void Delete_Execute(object sender, ExecutedRoutedEventArgs e)
+        private async void Delete_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             if (AppMessageBox.ShowQuestion(Properties.Resources.Message_ConfirmToDeleteRow) == false)
                 return;
 
             try
             {
-                this.Delete();
+                await this.DeleteAsync();
             }
             catch (Exception ex)
             {

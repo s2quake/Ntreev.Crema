@@ -20,10 +20,11 @@ using Ntreev.Library.ObjectModel;
 using Ntreev.Crema.ServiceModel;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
-    public interface IUserCollection : IReadOnlyCollection<IUser>, IEnumerable<IUser>, INotifyCollectionChanged, IServiceProvider, IDispatcherObject
+    public interface IUserCollection : IReadOnlyCollection<IUser>, IEnumerable<IUser>, IServiceProvider, IDispatcherObject
     {
         bool Contains(string userID);
 

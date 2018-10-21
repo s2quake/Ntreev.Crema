@@ -58,6 +58,10 @@ namespace Ntreev.Crema.Commands.Consoles
                 {
                     command.CommandContext = this;
                 }
+                else if (item is ConsoleCommandAsyncBase asyncCommand)
+                {
+                    asyncCommand.CommandContext = this;
+                }
                 else if (item is ConsoleCommandMethodBase commandMethod)
                 {
                     commandMethod.CommandContext = this;
@@ -73,6 +77,8 @@ namespace Ntreev.Crema.Commands.Consoles
             }
             foreach (var item in driveItems)
             {
+                if (item.Name == Uri.UriSchemeFile)
+                    throw new Exception($"'{nameof(Uri.UriSchemeFile)}' can not use as name of {nameof(IConsoleDrive)}.");
                 if (item is ConsoleDriveBase driveBase)
                 {
                     driveBase.CommandContext = this;
@@ -101,11 +107,23 @@ namespace Ntreev.Crema.Commands.Consoles
         public IConsoleDrive GetDrive(string path)
         {
             var uri = new Uri(path, UriKind.RelativeOrAbsolute);
-            if (uri.IsAbsoluteUri == true)
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
             {
-                return this.driveItems.First(item => item.Name == uri.Scheme);
+                if (uri.Scheme != Uri.UriSchemeFile)
+                {
+                    return this.driveItems.First(item => item.Name == uri.Scheme);
+                }
+                return this.Drive;
             }
-            return this.Drive;
+            else
+            {
+                
+                if (uri.IsAbsoluteUri == true)
+                {
+                    return this.driveItems.First(item => item.Name == uri.Scheme);
+                }
+                return this.Drive;
+            }
         }
 
         public bool ConfirmToDelete()
@@ -113,7 +131,7 @@ namespace Ntreev.Crema.Commands.Consoles
             try
             {
                 this.Terminal.IsCommandMode = false;
-                return this.Terminal.ReadString("type 'delete' to delete:") == "delete";
+                return this.Terminal.ReadString("type 'delete': ") == "delete";
             }
             catch (OperationCanceledException)
             {
@@ -231,9 +249,18 @@ namespace Ntreev.Crema.Commands.Consoles
             return this.commission;
         }
 
-        internal Authentication GetAuthenticationInternal(IConsoleCommand command)
+        public Authentication GetAuthentication(IConsoleCommandProvider command)
         {
-            return this.authentication;
+            if (this.commission != null)
+                throw new Exception("임시 인증이 발급되어 있습니다.");
+            this.commission = this.authentication.BeginCommission();
+            return this.commission;
+        }
+
+        public void WriteObject(object value, TextSerializerType type)
+        {
+            var text = TextSerializer.Serialize(value, type);
+            this.WriteLine(text);
         }
 
         public bool IsOnline
@@ -441,7 +468,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private void Update(Authentication authentication, string[] segments, string path)
         {
-            this.drive.SetPath(authentication, path);
+            this.drive.SetPathAsync(authentication, path);
             this.path = path;
             this.drivePaths[this.drive] = path;
         }
@@ -450,6 +477,11 @@ namespace Ntreev.Crema.Commands.Consoles
         {
             if (SecureStringToString(value1) != SecureStringToString(value2))
                 throw new Exception("암호가 일치하지 않습니다.");
+        }
+
+        internal Authentication GetAuthenticationInternal(IConsoleCommand command)
+        {
+            return this.authentication;
         }
     }
 }

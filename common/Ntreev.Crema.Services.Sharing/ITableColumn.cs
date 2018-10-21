@@ -21,34 +21,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ITableColumn
+    public interface ITableColumn : IDispatcherObject
     {
-        void Delete(Authentication authentication);
+        Task DeleteAsync(Authentication authentication);
 
-        void SetIndex(Authentication authentication, int value);
+        Task SetIndexAsync(Authentication authentication, int value);
 
-        void SetIsKey(Authentication authentication, bool value);
+        Task SetIsKeyAsync(Authentication authentication, bool value);
 
-        void SetIsUnique(Authentication authentication, bool value);
+        Task SetIsUniqueAsync(Authentication authentication, bool value);
 
-        void SetName(Authentication authentication, string value);
+        Task SetNameAsync(Authentication authentication, string value);
 
-        void SetDataType(Authentication authentication, string value);
+        Task SetDataTypeAsync(Authentication authentication, string value);
 
-        void SetDefaultValue(Authentication authentication, string value);
+        Task SetDefaultValueAsync(Authentication authentication, string value);
 
-        void SetComment(Authentication authentication, string value);
+        Task SetCommentAsync(Authentication authentication, string value);
 
-        void SetAutoIncrement(Authentication authentication, bool value);
+        Task SetAutoIncrementAsync(Authentication authentication, bool value);
 
-        void SetTags(Authentication authentication, TagInfo value);
+        Task SetTagsAsync(Authentication authentication, TagInfo value);
 
-        void SetIsReadOnly(Authentication authentication, bool value);
+        Task SetIsReadOnlyAsync(Authentication authentication, bool value);
 
-        void SetAllowNull(Authentication authentication, bool value);
+        Task SetAllowNullAsync(Authentication authentication, bool value);
 
         int Index { get; }
 
@@ -73,7 +74,5 @@ namespace Ntreev.Crema.Services
         bool AllowNull { get; }
 
         ITableTemplate Template { get; }
-
-        CremaDispatcher Dispatcher { get; }
     }
 }

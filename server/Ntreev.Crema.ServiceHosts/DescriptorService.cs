@@ -46,7 +46,7 @@ namespace Ntreev.Crema.ServiceHosts
 
         public DataBaseInfo[] GetDataBaseInfos()
         {
-            return this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases.Select(item => item.DataBaseInfo).ToArray());
+            return this.DataBases.Dispatcher.Invoke(() => this.DataBases.Select(item => item.DataBaseInfo).ToArray());
         }
 
         public string GetVersion()
@@ -57,11 +57,12 @@ namespace Ntreev.Crema.ServiceHosts
         public bool IsOnline(string userID, byte[] password)
         {
             var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            return userContext.Dispatcher.Invoke(() =>
-            {
-                var text = Encoding.UTF8.GetString(password);
-                return userContext.IsOnlineUser(userID, StringUtility.ToSecureString(StringUtility.Decrypt(text, userID)));
-            });
+            var text = Encoding.UTF8.GetString(password);
+            var task = userContext.IsOnlineUserAsync(userID, StringUtility.ToSecureString(StringUtility.Decrypt(text, userID)));
+            task.Wait();
+            return task.Result;
         }
+
+        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
     }
 }

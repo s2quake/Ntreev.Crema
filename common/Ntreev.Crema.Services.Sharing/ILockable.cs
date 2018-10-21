@@ -26,9 +26,9 @@ namespace Ntreev.Crema.Services
 {
     public interface ILockable
     {
-        void Lock(Authentication authentication, string comment);
+        Task LockAsync(Authentication authentication, string comment);
 
-        void Unlock(Authentication authentication);
+        Task UnlockAsync(Authentication authentication);
 
         LockInfo LockInfo { get; }
     }

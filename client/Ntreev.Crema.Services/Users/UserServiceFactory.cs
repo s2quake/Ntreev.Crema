@@ -15,17 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services.UserService;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.UserService;
+using Ntreev.Library;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
-using System.ServiceModel.Description;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Library;
 using System.Threading;
 
 namespace Ntreev.Crema.Services.Users
@@ -41,8 +36,8 @@ namespace Ntreev.Crema.Services.Users
             this.binding = CremaHost.CreateBinding(serviceInfo);
             this.endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/UserService");
             this.instanceContext = new InstanceContext(userServiceCallback ?? (this));
-            if (Environment.OSVersion.Platform != PlatformID.Unix)
-                this.instanceContext.SynchronizationContext = SynchronizationContext.Current;
+            //if (Environment.OSVersion.Platform != PlatformID.Unix)
+            //    this.instanceContext.SynchronizationContext = SynchronizationContext.Current;
         }
 
         public static UserServiceClient CreateServiceClient(string address, ServiceInfo serviceInfo, IUserServiceCallback userServiceCallback)
@@ -93,7 +88,7 @@ namespace Ntreev.Crema.Services.Users
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUsersLoggedOut(SignatureDate signatureDate, string[] userIDs)
+        void IUserServiceCallback.OnUsersLoggedOut(SignatureDate signatureDate, string[] userIDs, CloseInfo closeInfo)
         {
             throw new NotImplementedException();
         }
@@ -109,11 +104,6 @@ namespace Ntreev.Crema.Services.Users
         }
 
         void IUserServiceCallback.OnMessageReceived(SignatureDate signatureDate, string[] userIDs, string message, MessageType messageType)
-        {
-            throw new NotImplementedException();
-        }
-
-        bool IUserServiceCallback.OnPing()
         {
             throw new NotImplementedException();
         }

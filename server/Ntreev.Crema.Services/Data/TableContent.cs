@@ -16,157 +16,306 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
+using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Crema.Services.Properties;
-using Ntreev.Library.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
-    class TableContent : TableContentBase, ITableContent, IDomainHost
+    partial class TableContent : ITableContent
     {
-        private readonly Table table;
-        private readonly TableContentCollection childs;
         private Domain domain;
-        private CremaDataSet dataSet;
         private CremaDataTable dataTable;
+        private DataTable internalTable;
+
+        private List<TableRow> items;
+        //private readonly Dictionary<DataRow, TableRow> rows = new Dictionary<DataRow, TableRow>();
+        //private readonly HashSet<DataRow> rowsToAdd = new HashSet<DataRow>();
 
         private EventHandler editBegun;
         private EventHandler editEnded;
         private EventHandler editCanceled;
         private EventHandler changed;
 
-        private bool isModified;
-
         public TableContent(Table table)
         {
-            this.table = table;
-            this.childs = new TableContentCollection(table);
+            this.Table = table;
         }
 
         public override string ToString()
         {
-            return this.table.ToString();
+            return this.Table.ToString();
         }
 
-        public void BeginEdit(Authentication authentication)
+        //protected Task AddAsync(TableRow row)
+        //{
+        //    return this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        this.items.Add(row);
+        //        this.dataTable.ExtendedProperties[row.Row] = row;
+        //    });
+        //}
+
+        protected void Clear()
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(BeginEdit), this.table);
-            this.ValidateBeginEdit(authentication);
-            this.Sign(authentication);
-            if (this.domain == null)
+            //this.rows.Clear();
+        }
+
+        public Task<TableRow> FindAsync(Authentication authentication, params object[] keys)
+        {
+            return this.Domain.Dispatcher.InvokeAsync(() =>
             {
-                this.dataTable = this.table.ReadData(authentication);
-                this.dataSet = this.dataTable.DataSet;
-                this.domain = new TableContentDomain(authentication, this.dataSet, this.table.DataBase, this.table.Path, this.GetType().Name);
-                this.domain.Host = this;
-                this.DomainContext.Domains.Add(authentication, this.domain);
-                this.BeginContent(authentication, this.domain);
-                this.domain.Dispatcher.Invoke(() =>
+                var row = this.internalTable.Rows.Find(keys);
+                if (row == null)
+                    return null;
+                return this.dataTable.ExtendedProperties[row] as TableRow;
+            });
+        }
+
+        public Task<TableRow[]> SelectAsync(Authentication authentication, string filterExpression)
+        {
+            return this.Domain.Dispatcher.InvokeAsync(() =>
+            {
+                var rows = this.internalTable.Select(filterExpression);
+                var rowList = new List<TableRow>(rows.Length);
+                foreach (var item in rows)
                 {
-                    this.AttachDomainEvent();
+                    rowList.Add(this.dataTable.ExtendedProperties[item] as TableRow);
+                }
+                return rowList.ToArray();
+            });
+        }
+
+        public async Task BeginEditAsync(Authentication authentication)
+        {
+            try
+            {
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync), this.Table);
+                    this.ValidateBeginEdit(authentication);
+                    this.domainHost = new TableContentDomainHost(this.Container, this.Table.GetRelations().ToArray());
+                    this.domainHost.SetServiceState(ServiceState.Opening);
+                });
+                try
+                {
+                    await this.domainHost.BeginContentAsync(authentication);
+                }
+                catch
+                {
+                    await this.Dispatcher.InvokeAsync(() => this.domainHost.SetServiceState(ServiceState.None));
+                    this.domainHost = null;
+                    throw;
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication);
+                    this.domainHost.SetServiceState(ServiceState.Opened);
+                    this.domainHost.InvokeEditBegunEvent(EventArgs.Empty);
                 });
             }
-            this.BeginContent(authentication, this.domain);
-            this.InvokeEditBegunEvent(EventArgs.Empty);
-        }
-
-        public void EndEdit(Authentication authentication)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(EndEdit), this.table);
-            this.ValidateEndEdit(authentication);
-            this.Sign(authentication);
-            var isModifeid = this.domain.Dispatcher.Invoke(() =>
+            catch (Exception e)
             {
-                this.DetachDomainEvent();
-                this.domain.Dispose(authentication, false);
-                return this.domain.IsModified;
-            });
-            this.EndContent(authentication, isModifeid);
-            this.InvokeEditEndedEvent(EventArgs.Empty);
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void CancelEdit(Authentication authentication)
+        public async Task EndEditAsync(Authentication authentication)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(CancelEdit), this.table);
-            this.ValidateCancelEdit(authentication);
-            this.Sign(authentication);
-            this.domain.Dispatcher.Invoke(() =>
+            try
             {
-                this.DetachDomainEvent();
-                this.domain.Dispose(authentication, true);
-            });
-            this.CancelContent(authentication);
-            this.InvokeEditCanceledEvent(EventArgs.Empty);
-        }
-
-        public void EnterEdit(Authentication authentication)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(EnterEdit), this.table);
-            this.ValidateEnter(authentication);
-            this.Sign(authentication);
-            var accessType = this.GetAccessType(authentication);
-            this.domain.Dispatcher.Invoke(() => this.domain.AddUser(authentication, accessType));
-            this.EnterContent(authentication);
-        }
-
-        public void LeaveEdit(Authentication authentication)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(LeaveEdit), this.table);
-            this.ValidateLeave(authentication);
-            this.Sign(authentication);
-            this.domain.Dispatcher.Invoke(() => this.domain.RemoveUser(authentication));
-            this.LeaveContent(authentication);
-        }
-
-        public void Clear(Authentication authentication)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.CremaHost.DebugMethod(authentication, this, nameof(Clear), this.table);
-            var rowInfo = new DomainRowInfo()
+                this.ValidateExpired();
+                var name = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync), this.Table);
+                    this.ValidateEndEdit(authentication);
+                    this.domainHost.SetServiceState(ServiceState.Closing);
+                    return this.Table.Name;
+                });
+                try
+                {
+                    await this.domainHost.EndContentAsync(authentication, null);
+                }
+                catch
+                {
+                    this.domainHost.SetServiceState(ServiceState.Opened);
+                    throw;
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication);
+                    this.domainHost.SetServiceState(ServiceState.Closed);
+                    this.domainHost.InvokeEditEndedEvent(EventArgs.Empty);
+                    this.domainHost = null;
+                });
+            }
+            catch (Exception e)
             {
-                TableName = this.table.Name,
-                Keys = DomainRowInfo.ClearKey,
-            };
-            this.domain.Dispatcher.Invoke(() => this.domain.RemoveRow(authentication, new DomainRowInfo[] { rowInfo }));
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public TableRow AddNew(Authentication authentication, string relationID)
+        public async Task CancelEditAsync(Authentication authentication)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            if (this.domain == null)
-                throw new InvalidOperationException(Resources.Exception_TableIsNotBeingEdited);
-            var view = this.dataTable.DefaultView;
-            return new TableRow(this, view.Table, relationID);
+            try
+            {
+                this.ValidateExpired();
+                var name = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync), this.Table);
+                    this.ValidateCancelEdit(authentication);
+                    this.domainHost.SetServiceState(ServiceState.Closing);
+                    return this.Table.Name;
+                });
+                try
+                {
+                    await this.domainHost.CancelContentAsync(authentication);
+                }
+                catch
+                {
+                    this.domainHost.SetServiceState(ServiceState.Opened);
+                    throw;
+                }
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication);
+                    this.domainHost.SetServiceState(ServiceState.Closed);
+                    this.domainHost.InvokeEditCanceledEvent(EventArgs.Empty);
+                    this.domainHost = null;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public void EndNew(Authentication authentication, TableRow row)
+        public async Task EnterEditAsync(Authentication authentication)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            if (this.domain == null)
-                throw new InvalidOperationException(Resources.Exception_TableIsNotBeingEdited);
-            row.EndNew(authentication);
-            this.Add(row);
+            try
+            {
+                this.ValidateExpired();
+                var accessType = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(EnterEditAsync), this.Table);
+                    this.ValidateEnter(authentication);
+                    return this.GetAccessType(authentication);
+                });
+                await this.domain.AddUserAsync(authentication, accessType);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication);
+                    this.domainHost.EnterContent(authentication);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public async Task LeaveEditAsync(Authentication authentication)
+        {
+            try
+            {
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(LeaveEditAsync), this.Table);
+                    this.ValidateLeave(authentication);
+                });
+                await this.domain.RemoveUserAsync(authentication);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication);
+                    this.domainHost.LeaveContent(authentication);
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public async Task ClearAsync(Authentication authentication)
+        {
+            try
+            {
+                this.ValidateExpired();
+                var name = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(ClearAsync), this.Table);
+                    return this.Table.Name;
+                });
+                var rowInfo = new DomainRowInfo()
+                {
+                    TableName = name,
+                    Keys = DomainRowInfo.ClearKey,
+                };
+                await this.domain.RemoveRowAsync(authentication, new DomainRowInfo[] { rowInfo });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public async Task<TableRow> AddNewAsync(Authentication authentication, string relationID)
+        {
+            try
+            {
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
+                });
+                var row = await this.domain.Dispatcher.InvokeAsync(() => new TableRow(this, this.dataTable.DefaultView.Table, relationID));
+                return row;
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
+        }
+
+        public async Task EndNewAsync(Authentication authentication, TableRow row)
+        {
+            try
+            {
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(EndNewAsync));
+                });
+                await row.EndNewAsync(authentication);
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void ValidateBeginEdit(Authentication authentication)
         {
-            if (this.table.Parent != null)
-                throw new InvalidOperationException(Resources.Exception_ChildTableCannotEdit);
             var isAdmin = authentication.Types.HasFlag(AuthenticationType.Administrator);
-            var items = EnumerableUtility.Friends(this, this.Childs);
-            foreach (var item in items)
+            foreach (var item in this.Relations)
             {
                 item.OnValidateBeginEdit(authentication, this);
             }
@@ -175,11 +324,11 @@ namespace Ntreev.Crema.Services.Data
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void ValidateEndEdit(Authentication authentication)
         {
-            if (this.table.Parent != null)
-                throw new NotImplementedException();
             var isAdmin = authentication.Types.HasFlag(AuthenticationType.Administrator);
-            if (this.domain == null)
-                throw new NotImplementedException();
+            foreach (var item in this.Relations)
+            {
+                item.OnValidateEndEdit(authentication, this);
+            }
             this.domain.Dispatcher?.Invoke(() =>
             {
                 var isOwner = this.domain.Users.OwnerUserID == authentication.ID;
@@ -191,11 +340,7 @@ namespace Ntreev.Crema.Services.Data
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void ValidateEnter(Authentication authentication)
         {
-            if (this.table.Parent != null)
-                throw new NotImplementedException();
-
-            var items = EnumerableUtility.Friends(this, this.Childs);
-            foreach (var item in items)
+            foreach (var item in this.Relations)
             {
                 item.OnValidateEnter(authentication, this);
             }
@@ -204,11 +349,7 @@ namespace Ntreev.Crema.Services.Data
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void ValidateLeave(Authentication authentication)
         {
-            if (this.table.Parent != null)
-                throw new NotImplementedException();
-
-            var items = EnumerableUtility.Friends(this, this.Childs);
-            foreach (var item in items)
+            foreach (var item in this.Relations)
             {
                 item.OnValidateLeave(authentication, this);
             }
@@ -217,140 +358,150 @@ namespace Ntreev.Crema.Services.Data
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void ValidateCancelEdit(Authentication authentication)
         {
-            if (this.table.Parent != null)
-                throw new NotImplementedException();
-
             var isAdmin = authentication.Types.HasFlag(AuthenticationType.Administrator);
-            if (this.domain == null)
-                throw new NotImplementedException();
+            foreach (var item in this.Relations)
+            {
+                item.OnValidateCancelEdit(authentication, this);
+            }
             this.domain.Dispatcher.Invoke(() =>
             {
                 if (isAdmin == false && this.domain.Users.Owner.ID != authentication.ID)
                     throw new NotImplementedException();
             });
-
-            var items = EnumerableUtility.Friends(this, this.Childs);
-            foreach (var item in items)
-            {
-                item.OnValidateCancelEdit(authentication, this);
-            }
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void OnValidateBeginEdit(Authentication authentication, object target)
         {
-            this.table.ValidateAccessType(authentication, AccessType.Guest);
+            this.Table.ValidateAccessType(authentication, AccessType.Guest);
+
+            if (this.Table.DataBase.Version.Major != CremaSchema.MajorVersion || this.DataBase.Version.Minor != CremaSchema.MinorVersion)
+                throw new InvalidOperationException("database version is low.");
 
             if (this.domain != null)
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
+            if (this.ServiceState != ServiceState.None)
+                throw new InvalidOperationException(Resources.Exception_ItIsAlreadyBeingEdited);
 
-            this.table.ValidateHasNotBeingEditedType();
+            this.Table.ValidateHasNotBeingEditedType();
 
-            if (this.table.Template.IsBeingEdited == true)
-                throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingEdited_Format, this.table.Name));
+            if (this.Table.IsBeingEdited == true)
+                throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingEdited_Format, this.Table.Name));
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public void OnValidateEnter(Authentication authentication, object target)
+        public void OnValidateEndEdit(Authentication authentication, object target)
         {
-            this.table.ValidateAccessType(authentication, AccessType.Guest);
-
             if (this.domain == null)
-                throw new NotImplementedException();
-
-            this.table.ValidateHasNotBeingEditedType();
-
-            if (this.table.Template.IsBeingEdited == true)
-                throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingEdited_Format, this.table.Name));
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void OnValidateLeave(Authentication authentication, object target)
-        {
-            this.table.ValidateAccessType(authentication, AccessType.Guest);
-
-            if (this.domain == null)
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
+            if (this.ServiceState != ServiceState.Opened)
+                throw new InvalidOperationException();
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void OnValidateCancelEdit(Authentication authentication, object target)
         {
             if (this.domain == null)
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
+            if (this.ServiceState != ServiceState.Opened)
+                throw new InvalidOperationException();
         }
 
-        public override Domain Domain
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void OnValidateEnter(Authentication authentication, object target)
         {
-            get
+            this.Table.ValidateAccessType(authentication, AccessType.Guest);
+
+            if (this.domain == null)
+                throw new InvalidOperationException();
+            if (this.ServiceState != ServiceState.Opened)
+                throw new InvalidOperationException();
+
+            this.Table.ValidateHasNotBeingEditedType();
+
+            //if (this.Table.IsBeingEdited == true)
+            //    throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingEdited_Format, this.Table.Name));
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void OnValidateLeave(Authentication authentication, object target)
+        {
+            this.Table.ValidateAccessType(authentication, AccessType.Guest);
+
+            if (this.domain == null)
+                throw new InvalidOperationException();
+            if (this.ServiceState != ServiceState.Opened)
+                throw new InvalidOperationException();
+        }
+
+        public Domain Domain => this.domain;
+
+        public IPermission Permission => this.Table;
+
+        public Table Table { get; }
+
+        public CremaHost CremaHost => this.Table.CremaHost;
+
+        public DataBase DataBase => this.Table.DataBase;
+
+        public IDispatcherObject DispatcherObject => this.Table;
+
+        public CremaDispatcher Dispatcher => this.DispatcherObject.Dispatcher;
+
+        public int Count => this.items.Count;
+
+        public CremaDataTable DataTable
+        {
+            get => this.dataTable;
+            set
             {
-                this.Dispatcher?.VerifyAccess();
-                return this.domain;
+                this.dataTable = value;
+                this.internalTable = this.dataTable.DefaultView.Table;
+                this.items = new List<TableRow>(this.internalTable.Rows.Count);
+                for (var i = 0; i < this.internalTable.Rows.Count; i++)
+                {
+                    var dataRow = this.internalTable.Rows[i];
+                    var row = new TableRow(this, dataRow);
+                    this.items.Add(row);
+                    this.internalTable.ExtendedProperties[dataRow] = row;
+                }
+                this.internalTable.RowDeleted += InternalTable_RowDeleted;
+                this.internalTable.RowChanged += InternalTable_RowChanged;
             }
         }
 
-        public IPermission Permission
+        private async void InternalTable_RowDeleted(object sender, DataRowChangeEventArgs e)
         {
-            get { return this.table; }
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                var row = this.internalTable.ExtendedProperties[e.Row] as TableRow;
+                this.items.Remove(row);
+                this.internalTable.ExtendedProperties.Remove(e.Row);
+            });
         }
 
-        public Table Table
+        private async void InternalTable_RowChanged(object sender, DataRowChangeEventArgs e)
         {
-            get
+            if (e.Action == DataRowAction.Add)
             {
-                this.Dispatcher?.VerifyAccess();
-                return this.table;
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var row = new TableRow(this, e.Row);
+                    this.items.Add(row);
+                    this.internalTable.ExtendedProperties[e.Row] = row;
+                });
             }
         }
 
-        public CremaHost CremaHost
-        {
-            get { return this.table.CremaHost; }
-        }
-
-        public override DataBase DataBase
-        {
-            get { return this.table.DataBase; }
-        }
-
-        public override CremaDispatcher Dispatcher
-        {
-            get { return this.table.Dispatcher; }
-        }
-
-        public int Count
-        {
-            get
-            {
-                if (this.Dispatcher == null)
-                    return 0;
-                this.Dispatcher?.VerifyAccess();
-                return this.dataTable.Rows.Count;
-            }
-        }
-
-        public CremaDataSet DataSet
-        {
-            get { return this.dataSet; }
-        }
-
-        public override CremaDataTable DataTable
-        {
-            get { return this.dataTable; }
-        }
-
-        public DomainContext DomainContext
-        {
-            get { return this.table.CremaHost.DomainContext; }
-        }
+        public DomainContext DomainContext => this.Table.CremaHost.DomainContext;
 
         public IEnumerable<TableContent> Childs
         {
             get
             {
-                if (this.table != null)
+                if (this.Table != null)
                 {
-                    foreach (var item in this.table.Childs)
+                    foreach (var item in this.Table.Childs)
                     {
                         yield return item.Content;
                     }
@@ -358,14 +509,9 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public bool IsModified
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.isModified;
-            }
-        }
+        public bool IsModified { get; private set; }
+
+        public ServiceState ServiceState { get; private set; }
 
         public event EventHandler EditBegun
         {
@@ -443,159 +589,12 @@ namespace Ntreev.Crema.Services.Data
             this.changed?.Invoke(this, e);
         }
 
-        private void Domain_Deleted(object sender, DomainDeletedEventArgs e)
-        {
-            var isCanceled = e.IsCanceled;
-            this.Dispatcher?.InvokeAsync(() =>
-            {
-                if (isCanceled == false)
-                {
-                    this.EndContent(e.Authentication, isModified);
-                    this.InvokeEditEndedEvent(e);
-                }
-                else
-                {
-                    this.CancelContent(e.Authentication);
-                    this.InvokeEditCanceledEvent(e);
-                }
-            });
-        }
-
-        private void Domain_RowAdded(object sender, DomainRowEventArgs e)
-        {
-            this.isModified = this.domain.IsModified;
-            this.Dispatcher.InvokeAsync(() => this.OnChanged(e));
-        }
-
-        private void Domain_RowChanged(object sender, DomainRowEventArgs e)
-        {
-            this.isModified = this.domain.IsModified;
-            this.Dispatcher.InvokeAsync(() => this.OnChanged(e));
-        }
-
-        private void Domain_RowRemoved(object sender, DomainRowEventArgs e)
-        {
-            this.isModified = this.domain.IsModified;
-            this.Dispatcher.InvokeAsync(() => this.OnChanged(e));
-        }
-
-        private void Domain_PropertyChanged(object sender, DomainPropertyEventArgs e)
-        {
-            this.isModified = this.domain.IsModified;
-            this.Dispatcher.InvokeAsync(() => this.OnChanged(e));
-        }
-
-        private void AttachDomainEvent()
-        {
-            this.domain.Deleted += Domain_Deleted;
-            this.domain.RowAdded += Domain_RowAdded;
-            this.domain.RowChanged += Domain_RowChanged;
-            this.domain.RowRemoved += Domain_RowRemoved;
-            this.domain.PropertyChanged += Domain_PropertyChanged;
-        }
-
-        private void DetachDomainEvent()
-        {
-            this.domain.Deleted -= Domain_Deleted;
-            this.domain.RowAdded -= Domain_RowAdded;
-            this.domain.RowChanged -= Domain_RowChanged;
-            this.domain.RowRemoved -= Domain_RowRemoved;
-            this.domain.PropertyChanged -= Domain_PropertyChanged;
-        }
-
-        private void InvokeEditBegunEvent(EventArgs e)
-        {
-            var items = EnumerableUtility.Friends(this, this.Childs);
-            foreach (var item in items)
-            {
-                item.OnEditBegun(e);
-            }
-        }
-
-        private void InvokeEditEndedEvent(EventArgs e)
-        {
-            var items = EnumerableUtility.Friends(this, this.Childs);
-            foreach (var item in items)
-            {
-                item.OnEditEnded(e);
-            }
-        }
-
-        private void InvokeEditCanceledEvent(EventArgs e)
-        {
-            var items = EnumerableUtility.Friends(this, this.Childs);
-            foreach (var item in items)
-            {
-                item.OnEditCanceled(e);
-            }
-        }
-
-        private void BeginContent(Authentication authentication, Domain domain)
-        {
-            var items = EnumerableUtility.Friends(this, this.Childs);
-            foreach (var item in items)
-            {
-                item.domain = domain;
-                item.dataSet = domain.Source as CremaDataSet;
-                item.dataTable = dataSet.Tables[item.table.Name, item.table.Category.Path];
-                item.table.SetTableState(TableState.IsBeingEdited);
-            }
-
-            this.Container.InvokeTablesStateChangedEvent(authentication, items.Select(i => i.table).ToArray());
-        }
-
-        private void EndContent(Authentication authentication, bool isUpdate)
-        {
-            if (isUpdate == true)
-                this.Container.InvokeEndContentEdit(authentication, this.table, this.dataSet);
-            var isModified = this.domain.IsModified;
-            var dataSet = this.dataSet;
-            var items = EnumerableUtility.Friends(this, this.Childs);
-            foreach (var item in items)
-            {
-                if (isUpdate == true)
-                    item.table.UpdateContent(item.dataTable.TableInfo);
-                item.domain = null;
-                item.isModified = false;
-                item.dataSet = null;
-                item.dataTable = null;
-                item.table.SetTableState(TableState.None);
-            }
-
-            if (isModified == true)
-                this.Container.InvokeTablesContentChangedEvent(authentication, this, items.Select(i => i.Table).ToArray(), dataSet);
-        }
-
-        private void CancelContent(Authentication authentication)
-        {
-            var items = EnumerableUtility.Friends(this.table, this.table.Childs);
-            foreach (var item in items.Select(i => i.Content))
-            {
-                item.domain = null;
-                item.isModified = false;
-                item.dataSet = null;
-                item.dataTable = null;
-                item.table.SetTableState(TableState.None);
-            }
-
-            this.Container.InvokeTablesStateChangedEvent(authentication, items.ToArray());
-        }
-
-        private void EnterContent(Authentication authentication)
-        {
-
-        }
-
-        private void LeaveContent(Authentication authentication)
-        {
-
-        }
-
         private DomainAccessType GetAccessType(Authentication authentication)
         {
-            if (this.table.VerifyAccessType(authentication, AccessType.Editor))
+            this.Dispatcher.VerifyAccess();
+            if (this.Table.VerifyAccessType(authentication, AccessType.Editor))
                 return DomainAccessType.ReadWrite;
-            else if (this.table.VerifyAccessType(authentication, AccessType.Guest))
+            else if (this.Table.VerifyAccessType(authentication, AccessType.Guest))
                 return DomainAccessType.Read;
             throw new PermissionDeniedException();
         }
@@ -605,106 +604,41 @@ namespace Ntreev.Crema.Services.Data
             authentication.Sign();
         }
 
-        private TableCollection Container
-        {
-            get { return this.table.Container; }
-        }
+        private TableCollection Container => this.Table.Container;
+
+        private IEnumerable<TableContent> Relations => this.Table.GetRelations().Select(item => item.Content);
 
         #region ITableContent
 
-        ITableRow ITableContent.AddNew(Authentication authentication, string relationID)
+        async Task<ITableRow> ITableContent.AddNewAsync(Authentication authentication, string relationID)
         {
-            return this.AddNew(authentication, relationID);
+            return await this.AddNewAsync(authentication, relationID);
         }
 
-        void ITableContent.EndNew(Authentication authentication, ITableRow row)
+        Task ITableContent.EndNewAsync(Authentication authentication, ITableRow row)
         {
             if (row == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(row));
             if (row is TableRow == false)
-                throw new ArgumentException(nameof(row));
-            this.EndNew(authentication, row as TableRow);
+                throw new ArgumentException(Resources.Exception_InvalidObject, nameof(row));
+            return this.EndNewAsync(authentication, row as TableRow);
         }
 
-        ITableRow ITableContent.Find(Authentication authentication, params object[] keys)
+        async Task<ITableRow> ITableContent.FindAsync(Authentication authentication, params object[] keys)
         {
-            return this.Find(authentication, keys);
+            return await this.FindAsync(authentication, keys);
         }
 
-        ITableRow[] ITableContent.Select(Authentication authentication, string filterExpression)
+        async Task<ITableRow[]> ITableContent.SelectAsync(Authentication authentication, string filterExpression)
         {
-            return this.Select(authentication, filterExpression);
+            return await this.SelectAsync(authentication, filterExpression);
         }
 
-        IDomain ITableContent.Domain
-        {
-            get { return this.Domain; }
-        }
+        IDomain ITableContent.Domain => this.Domain;
 
-        ITable ITableContent.Table
-        {
-            get { return this.Table; }
-        }
+        ITable ITableContent.Table => this.Table;
 
-        ITableContent ITableContent.Parent
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                if (this.table.Parent != null)
-                {
-                    return this.table.Parent.Content;
-                }
-                return null;
-            }
-        }
-
-        ITableContentCollection ITableContent.Childs
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.childs;
-            }
-        }
-
-        #endregion
-
-        #region IDomainHost
-
-        void IDomainHost.Restore(Domain domain)
-        {
-            this.domain = domain;
-            Authentication.System.Sign();
-            this.BeginContent(Authentication.System, this.domain);
-            this.InvokeEditBegunEvent(EventArgs.Empty);
-            this.domain.Dispatcher.Invoke(() =>
-            {
-                this.isModified = this.domain.IsModified;
-                this.AttachDomainEvent();
-            });
-        }
-
-        void IDomainHost.Detach()
-        {
-            this.domain.Dispatcher.Invoke(() =>
-            {
-                this.DetachDomainEvent();
-            });
-            this.domain = null;
-        }
-
-        void IDomainHost.ValidateDelete(Authentication authentication, bool isCanceled)
-        {
-            if (isCanceled == false)
-            {
-                this.Dispatcher.Invoke(() =>
-                {
-                    if (this.table.Parent != null)
-                        throw new NotImplementedException();
-                });
-            }
-        }
+        ITable[] ITableContent.Tables => this.domainHost != null ? this.domainHost.Tables : new ITable[] { };
 
         #endregion
 
@@ -712,14 +646,12 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITableRow> IEnumerable<ITableRow>.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
-            return this.GetEnumerator();
+            return (this.items ?? Enumerable.Empty<ITableRow>()).GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
-            return this.GetEnumerator();
+            return (this.items ?? Enumerable.Empty<ITableRow>()).GetEnumerator();
         }
 
         #endregion

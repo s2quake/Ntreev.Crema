@@ -19,6 +19,7 @@ using Ntreev.Crema.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
@@ -33,27 +34,27 @@ namespace Ntreev.Crema.Commands.Consoles
 
         public abstract string[] GetPaths();
 
-        public void Create(Authentication authentication, string path, string name)
+        public Task CreateAsync(Authentication authentication, string path, string name)
         {
-            this.OnCreate(authentication, path, name);
+            return this.OnCreateAsync(authentication, path, name);
         }
 
-        public void Move(Authentication authentication, string path, string newPath)
+        public Task MoveAsync(Authentication authentication, string path, string newPath)
         {
-            this.OnMove(authentication, path, newPath);
+            return this.OnMoveAsync(authentication, path, newPath);
         }
 
-        public void Delete(Authentication authentication, string path)
+        public Task DeleteAsync(Authentication authentication, string path)
         {
-            this.OnDelete(authentication, path);
+            return this.OnDeleteAsync(authentication, path);
         }
 
-        public void SetPath(Authentication authentication, string path)
+        public Task SetPathAsync(Authentication authentication, string path)
         {
-            this.OnSetPath(authentication, path);
+            return this.OnSetPathAsync(authentication, path);
         }
 
-        public abstract object GetObject(Authentication authentication, string path);
+        public abstract Task<object> GetObjectAsync(Authentication authentication, string path);
 
         public string Name => this.name;
 
@@ -63,12 +64,12 @@ namespace Ntreev.Crema.Commands.Consoles
             internal set;
         }
 
-        protected abstract void OnCreate(Authentication authentication, string path, string name);
+        protected abstract Task OnCreateAsync(Authentication authentication, string path, string name);
 
-        protected abstract void OnMove(Authentication authentication, string path, string newPath);
+        protected abstract Task OnMoveAsync(Authentication authentication, string path, string newPath);
 
-        protected abstract void OnDelete(Authentication authentication, string path);
+        protected abstract Task OnDeleteAsync(Authentication authentication, string path);
 
-        protected abstract void OnSetPath(Authentication authentication, string path);
+        protected abstract Task OnSetPathAsync(Authentication authentication, string path);
     }
 }

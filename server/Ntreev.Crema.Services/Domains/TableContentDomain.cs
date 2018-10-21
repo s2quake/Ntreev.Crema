@@ -15,159 +15,152 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Data;
+using Ntreev.Crema.Services.Domains.Serializations;
+using Ntreev.Crema.Services.Properties;
+using Ntreev.Library;
+using Ntreev.Library.Serialization;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Media;
-using System.Xml;
-using Ntreev.Crema.Services.Properties;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Data;
-using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Data.Xml;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Services.Users;
-using System.Windows.Threading;
-using Ntreev.Crema.Services.Data;
-using Ntreev.Library.Serialization;
 using System.Runtime.Serialization;
-using Ntreev.Library;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains
 {
-    [Serializable]
     class TableContentDomain : Domain
     {
-        public const string TypeName = "Table";
+        private readonly CremaDataSet dataSet;
+        private readonly List<FindResultInfo> findResults = new List<FindResultInfo>(100);
+        private readonly Dictionary<string, DataView> views = new Dictionary<string, DataView>();
 
-        private CremaDataSet dataSet;
-        private List<FindResultInfo> findResults = new List<FindResultInfo>(100);
-        private Dictionary<string, DataView> views = new Dictionary<string, DataView>();
-
-        private TableContentDomain(SerializationInfo info, StreamingContext context)
-            : base(info, context)
+        public TableContentDomain(DomainSerializationInfo serializationInfo, object source)
+            : base(serializationInfo, source)
         {
+            this.dataSet = source as CremaDataSet;
+            foreach (var item in this.dataSet.Tables)
+            {
+                var view = item.AsDataView();
+                this.views.Add(item.Name, view);
+            }
 
+            var itemPaths = (string)serializationInfo.GetProperty(nameof(ItemPaths));
+            this.dataSet.SetItemPaths(StringUtility.Split(itemPaths, ';'));
         }
 
-        public TableContentDomain(Authentication authentication, CremaDataSet dataSet, DataBase dataBase, string itemPath, string itemType)
-            : base(authentication.ID, dataBase.ID, itemPath, itemType)
+        public TableContentDomain(Authentication authentication, CremaDataSet dataSet, DataBase dataBase, string itemPath, string itemType, IDomainHost domainHost)
+            : base(authentication.ID, dataSet, dataBase.ID, itemPath, itemType)
         {
             if (dataSet.HasChanges() == true)
                 throw new ArgumentException(Resources.Exception_UnsavedDataCannotEdit, nameof(dataSet));
             this.dataSet = dataSet;
-
             foreach (var item in this.dataSet.Tables)
             {
                 var view = item.AsDataView();
-                this.views.Add(item.TableName, view);
+                this.views.Add(item.Name, view);
             }
+            this.Host = domainHost;
         }
 
-        public override object Source
-        {
-            get { return this.dataSet; }
-        }
+        public string[] ItemPaths => this.dataSet.GetItemPaths();
 
-        protected override byte[] SerializeSource()
+        protected override byte[] SerializeSource(object source)
         {
-            var xml = XmlSerializerUtility.GetString(this.dataSet);
+            var xml = XmlSerializerUtility.GetString(source);
             return Encoding.UTF8.GetBytes(xml.Compress());
         }
 
-        protected override void DerializeSource(byte[] data)
+        protected override object DerializeSource(byte[] data)
         {
             var xml = Encoding.UTF8.GetString(data).Decompress();
-            this.dataSet = XmlSerializerUtility.ReadString<CremaDataSet>(xml);
-
-            foreach (var item in this.dataSet.Tables)
-            {
-                var view = item.AsDataView();
-                this.views.Add(item.TableName, view);
-            }
+            return XmlSerializerUtility.ReadString<CremaDataSet>(xml);
         }
 
-        protected override DomainRowInfo[] OnNewRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected override void OnSerializaing(IDictionary<string, object> properties)
         {
-            this.dataSet.SignatureDateProvider = signatureProvider;
-
-            try
-            {
-                for (var i = 0; i < rows.Length; i++)
-                {
-                    var view = this.views[rows[i].TableName];
-                    var rowView = CremaDomainUtility.AddNew(view, rows[i].Fields);
-                    rows[i].Keys = CremaDomainUtility.GetKeys(rowView);
-                    rows[i].Fields = CremaDomainUtility.GetFields(rowView);
-                }
-
-                this.dataSet.AcceptChanges();
-
-                return rows;
-            }
-            catch (Exception e)
-            {
-                this.dataSet.RejectChanges();
-                throw e;
-            }
+            base.OnSerializaing(properties);
+            properties.Add(nameof(this.ItemPaths), string.Join(";", this.ItemPaths));
         }
 
-        protected override DomainRowInfo[] OnSetRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected override async Task<DomainRowInfo[]> OnNewRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            this.dataSet.SignatureDateProvider = signatureProvider;
-
-            try
+            return await this.DataDispatcher.InvokeAsync(() =>
             {
-                for (var i = 0; i < rows.Length; i++)
+                this.dataSet.SignatureDateProvider = signatureProvider;
+                try
                 {
-                    var view = this.views[rows[i].TableName];
-                    rows[i].Fields = CremaDomainUtility.SetFields(view, rows[i].Keys, rows[i].Fields);
-                }
-
-                this.dataSet.AcceptChanges();
-                return rows;
-            }
-            catch (Exception e)
-            {
-                this.dataSet.RejectChanges();
-                throw e;
-            }
-        }
-
-        protected override void OnRemoveRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
-        {
-            this.dataSet.SignatureDateProvider = signatureProvider;
-
-            try
-            {
-                foreach (var item in rows)
-                {
-                    var view = this.views[item.TableName];
-                    if (DomainRowInfo.ClearKey.SequenceEqual(item.Keys) == true)
+                    for (var i = 0; i < rows.Length; i++)
                     {
-                        view.Table.Clear();
+                        var view = this.views[rows[i].TableName];
+                        var rowView = CremaDomainUtility.AddNew(view, rows[i].Fields);
+                        rows[i].Keys = CremaDomainUtility.GetKeys(rowView);
+                        rows[i].Fields = CremaDomainUtility.GetFields(rowView);
                     }
-                    else
-                    {
-                        CremaDomainUtility.Delete(view, item.Keys);
-                    }
+                    this.dataSet.AcceptChanges();
+                    return rows;
                 }
-                this.dataSet.AcceptChanges();
-            }
-            catch (Exception e)
+                catch
+                {
+                    this.dataSet.RejectChanges();
+                    throw;
+                }
+            });
+        }
+
+        protected override async Task<DomainRowInfo[]> OnSetRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        {
+            return await this.DataDispatcher.InvokeAsync(() =>
             {
-                this.dataSet.RejectChanges();
-                throw e;
-            }
+                this.dataSet.SignatureDateProvider = signatureProvider;
+                try
+                {
+                    for (var i = 0; i < rows.Length; i++)
+                    {
+                        var view = this.views[rows[i].TableName];
+                        rows[i].Fields = CremaDomainUtility.SetFields(view, rows[i].Keys, rows[i].Fields);
+                    }
+                    this.dataSet.AcceptChanges();
+                    return rows;
+                }
+                catch
+                {
+                    this.dataSet.RejectChanges();
+                    throw;
+                }
+            });
+        }
+
+        protected override async Task OnRemoveRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        {
+            await this.DataDispatcher.InvokeAsync(() =>
+            {
+                this.dataSet.SignatureDateProvider = signatureProvider;
+                try
+                {
+                    foreach (var item in rows)
+                    {
+                        var view = this.views[item.TableName];
+                        if (DomainRowInfo.ClearKey.SequenceEqual(item.Keys) == true)
+                        {
+                            view.Table.Clear();
+                        }
+                        else
+                        {
+                            CremaDomainUtility.Delete(view, item.Keys);
+                        }
+                    }
+                    this.dataSet.AcceptChanges();
+                }
+                catch
+                {
+                    this.dataSet.RejectChanges();
+                    throw;
+                }
+            });
         }
     }
 }

@@ -35,26 +35,28 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     public class ITableColumnTask : ITaskProvider
     {
-        public void InvokeTask(TaskContext context)
+        public async Task InvokeAsync(TaskContext context)
         {
+            var authentication = context.Authentication;
             var column = context.Target as ITableColumn;
             if (context.IsCompleted(column) == true)
             {
-                column.Dispatcher.Invoke(() =>
+                var template = column.Template;
+                if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
                 {
-                    var template = column.Template;
-                    if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
+                    if (await template.Dispatcher.InvokeAsync(() => template.Any()) == false)
                     {
-                        try
-                        {
-                            template.EndNew(context.Authentication, column);
-                        }
-                        catch
-                        {
-
-                        }
+                        await column.SetIsKeyAsync(authentication, true);
                     }
-                });
+                    try
+                    {
+                        await template.EndNewAsync(authentication, column);
+                    }
+                    catch
+                    {
+
+                    }
+                }
                 context.State = null;
                 context.Pop(column);
             }
@@ -71,94 +73,81 @@ namespace Ntreev.Crema.Bot.Tasks
         }
 
         [TaskMethod(Weight = 1)]
-        public void Delete(ITableColumn column, TaskContext context)
+        public async Task DeleteAsync(ITableColumn column, TaskContext context)
         {
-            column.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (object.Equals(context.State, System.Data.DataRowState.Detached) == false)
             {
-                if (object.Equals(context.State, System.Data.DataRowState.Detached) == false)
-                {
-                    column.Delete(context.Authentication);
-                    context.State = System.Data.DataRowState.Deleted;
-                    context.Complete(column);
-                }
-            });
-        }
-
-        [TaskMethod]
-        public void SetIndex(ITableColumn column, TaskContext context)
-        {
-            column.Dispatcher.Invoke(() =>
-            {
-                var index = RandomUtility.Next(column.Template.Count);
-                column.SetIndex(context.Authentication, index);
-            });
-        }
-
-        [TaskMethod(Weight = 20)]
-        public void SetIsKey(ITableColumn column, TaskContext context)
-        {
-            column.Dispatcher.Invoke(() =>
-            {
-                var isKey = RandomUtility.NextBoolean();
-                column.SetIsKey(context.Authentication, isKey);
-            });
-        }
-
-        [TaskMethod]
-        public void SetIsUnique(ITableColumn column, TaskContext context)
-        {
-            column.Dispatcher.Invoke(() =>
-            {
-                var isUnique = RandomUtility.NextBoolean();
-                if (Verify(isUnique) == false)
-                    return;
-                column.SetIsUnique(context.Authentication, isUnique);
-            });
-
-            bool Verify(bool isUnique)
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (isUnique == true && column.DataType == typeof(bool).GetTypeName())
-                    return false;
-                var template = column.Template;
-                if (isUnique == false && column.IsKey == true && template.Count(item => item.IsKey) == 1)
-                    return false;
-                return true;
+                await column.DeleteAsync(authentication);
+                context.State = System.Data.DataRowState.Deleted;
+                context.Complete(column);
             }
         }
 
         [TaskMethod]
-        public void SetName(ITableColumn column, TaskContext context)
+        public async Task SetIndexAsync(ITableColumn column, TaskContext context)
         {
-            column.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
             {
-                var columnName = RandomUtility.NextIdentifier();
-                column.SetName(context.Authentication, columnName);
-            });
+                if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
+                    return;
+            }
+            var index = RandomUtility.Next(column.Template.Count);
+            await column.SetIndexAsync(authentication, index);
+        }
+
+        [TaskMethod(Weight = 20)]
+        public async Task SetIsKeyAsync(ITableColumn column, TaskContext context)
+        {
+            var authentication = context.Authentication;
+            var isKey = RandomUtility.NextBoolean();
+            await column.SetIsKeyAsync(authentication, isKey);
         }
 
         [TaskMethod]
-        public void SetDataType(ITableColumn column, TaskContext context)
+        public async Task SetIsUniqueAsync(ITableColumn column, TaskContext context)
         {
-            column.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            var isUnique = RandomUtility.NextBoolean();
+            if (context.AllowException == false)
             {
+                if (isUnique == true && column.DataType == typeof(bool).GetTypeName())
+                    return;
                 var template = column.Template;
-                if (RandomUtility.Within(75) == true)
-                {
-                    var dataType = CremaDataTypeUtility.GetBaseTypeNames().Random();
-                    if (Verify(dataType) == false)
-                        return;
-                    column.SetDataType(context.Authentication, dataType);
-                }
-                else
-                {
-                    var dataType = template.SelectableTypes.Random();
-                    if (Verify(dataType) == false)
-                        return;
-                    column.SetDataType(context.Authentication, dataType);
-                }
-            });
+                if (isUnique == false && column.IsKey == true && template.Count(item => item.IsKey) == 1)
+                    return;
+            }
+            await column.SetIsUniqueAsync(authentication, isUnique);
+        }
+
+        [TaskMethod]
+        public async Task SetNameAsync(ITableColumn column, TaskContext context)
+        {
+            var authentication = context.Authentication;
+            var columnName = RandomUtility.NextIdentifier();
+            await column.SetNameAsync(authentication, columnName);
+        }
+
+        [TaskMethod]
+        public async Task SetDataTypeAsync(ITableColumn column, TaskContext context)
+        {
+            var authentication = context.Authentication;
+            var template = column.Template;
+            if (RandomUtility.Within(75) == true)
+            {
+                var dataType = CremaDataTypeUtility.GetBaseTypeNames().Random();
+                if (Verify(dataType) == false)
+                    return;
+                await column.SetDataTypeAsync(authentication, dataType);
+            }
+            else
+            {
+                var dataType = template.SelectableTypes.Random();
+                if (Verify(dataType) == false)
+                    return;
+                await column.SetDataTypeAsync(authentication, dataType);
+            }
 
             bool Verify(string dataType)
             {
@@ -171,77 +160,64 @@ namespace Ntreev.Crema.Bot.Tasks
         }
 
         //[TaskMethod]
-        public void SetDefaultValue(ITableColumn column, TaskContext context)
+        public async Task SetDefaultValueAsync(ITableColumn column, TaskContext context)
         {
-            column.Dispatcher.Invoke(() =>
-            {
-                var defaultValue = column.GetRandomString();
-                column.SetDefaultValue(context.Authentication, defaultValue);
-            });
+            var authentication = context.Authentication;
+            var defaultValue = await column.GetRandomStringAsync();
+            await column.SetDefaultValueAsync(authentication, defaultValue);
         }
 
         [TaskMethod]
-        public void SetComment(ITableColumn column, TaskContext context)
+        public async Task SetCommentAsync(ITableColumn column, TaskContext context)
         {
-            column.Dispatcher.Invoke(() =>
-            {
-                var comment = RandomUtility.NextString();
-                column.SetComment(context.Authentication, comment);
-            });
+            var authentication = context.Authentication;
+            var comment = RandomUtility.NextString();
+            await column.SetCommentAsync(authentication, comment);
         }
 
         [TaskMethod]
-        public void SetAutoIncrement(ITableColumn column, TaskContext context)
+        public async Task SetAutoIncrementAsync(ITableColumn column, TaskContext context)
         {
-            column.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            var autoIncrement = RandomUtility.NextBoolean();
+            if (context.AllowException == false)
             {
-                var autoIncrement = RandomUtility.NextBoolean();
-                if (Verify(autoIncrement) == false)
-                    return;
-                column.SetAutoIncrement(context.Authentication, autoIncrement);
-            });
-
-            bool Verify(bool autoIncrement)
-            {
-                if (context.AllowException == true)
-                    return true;
                 if (autoIncrement == true && CremaDataTypeUtility.CanUseAutoIncrement(column.DataType) == false)
-                    return false;
-                return true;
+                    return;
+            }
+            await column.SetAutoIncrementAsync(authentication, autoIncrement);
+        }
+
+        [TaskMethod]
+        public async Task SetTagsAsync(ITableColumn column, TaskContext context)
+        {
+            var authentication = context.Authentication;
+            var tags = (TagInfo)TagInfoUtility.Names.Random();
+            await column.SetTagsAsync(authentication, tags);
+        }
+
+        [TaskMethod]
+        public async Task SetIsReadOnlyAsync(ITableColumn column, TaskContext context)
+        {
+            var authentication = context.Authentication;
+            if (column.IsKey == false || RandomUtility.Within(55) == true)
+            {
+                var isReadOnly = RandomUtility.NextBoolean();
+                await column.SetIsReadOnlyAsync(authentication, isReadOnly);
             }
         }
 
         [TaskMethod]
-        public void SetTags(ITableColumn column, TaskContext context)
+        public async Task SetAllowNullAsync(ITableColumn column, TaskContext context)
         {
-            column.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            var allowNull = RandomUtility.NextBoolean();
+            if (context.AllowException == false)
             {
-                var tags = (TagInfo)TagInfoUtility.Names.Random();
-                column.SetTags(context.Authentication, tags);
-            });
-        }
-
-        [TaskMethod]
-        public void SetIsReadOnly(ITableColumn column, TaskContext context)
-        {
-            column.Dispatcher.Invoke(() =>
-            {
-                if (column.IsKey == false || RandomUtility.Within(55) == true)
-                {
-                    var isReadOnly = RandomUtility.NextBoolean();
-                    column.SetIsReadOnly(context.Authentication, isReadOnly);
-                }
-            });
-        }
-
-        [TaskMethod]
-        public void SetAllowNull(ITableColumn column, TaskContext context)
-        {
-            column.Dispatcher.Invoke(() =>
-            {
-                var allowNull = RandomUtility.NextBoolean();
-                column.SetAllowNull(context.Authentication, allowNull);
-            });
+                if (await column.Dispatcher.InvokeAsync(() => column.IsKey == true && allowNull == true) == true)
+                    return;
+            }
+            await column.SetAllowNullAsync(authentication, allowNull);
         }
     }
 }

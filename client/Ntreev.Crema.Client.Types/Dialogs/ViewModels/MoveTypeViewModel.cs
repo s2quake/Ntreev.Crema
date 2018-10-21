@@ -81,7 +81,7 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
 
         protected override Task MoveAsync(string targetPath)
         {
-            return this.type.Dispatcher.InvokeAsync(() => this.type.Move(this.authentication, targetPath));
+            return this.type.MoveAsync(this.authentication, targetPath);
         }
     }
 }

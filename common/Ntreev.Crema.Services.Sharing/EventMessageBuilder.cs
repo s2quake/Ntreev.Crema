@@ -30,759 +30,965 @@ namespace Ntreev.Crema.Services
     {
         public static string LockDataBase(Authentication authentication, IDataBase[] items, string[] comments)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.LockDataBase, authentication.ID, authentication.Name, items[i].Name, comments[i]);
+                var message = string.Format(EventResources.LockDataBase, authentication.ID, authentication.Name, items[i].Name, comments[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
         public static string UnlockDataBase(Authentication authentication, IDataBase[] items)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.UnlockDataBase, authentication.ID, authentication.Name, items[i].Name);
+                var message = string.Format(EventResources.UnlockDataBase, authentication.ID, authentication.Name, items[i].Name);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string SetPrivateDataBase(Authentication authentication, string dataBaseName)
+        {
+            return string.Format(EventResources.SetPrivateDataBase, authentication.ID, authentication.Name, dataBaseName);
         }
 
         public static string SetPrivateDataBase(Authentication authentication, IDataBase[] items)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.SetPrivateDataBase, authentication.ID, authentication.Name, items[i].Name);
+                var message = SetPrivateDataBase(authentication, items[i].Name);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string SetPublicDataBase(Authentication authentication, string dataBaseName)
+        {
+            return string.Format(EventResources.SetPublicDataBase, authentication.ID, authentication.Name, dataBaseName);
         }
 
         public static string SetPublicDataBase(Authentication authentication, IDataBase[] items)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.SetPublicDataBase, authentication.ID, authentication.Name, items[i].Name);
+                var message = SetPublicDataBase(authentication, items[i].Name);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string AddAccessMemberToDataBase(Authentication authentication, string dataBaseName, string memberID, AccessType accessType)
+        {
+            return string.Format(EventResources.AddAccessMemberToDataBase, authentication.ID, authentication.Name, dataBaseName, memberID, accessType);
         }
 
         public static string AddAccessMemberToDataBase(Authentication authentication, IDataBase[] items, string[] memberIDs, AccessType[] accessTypes)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.AddAccessMemberToDataBase, authentication.ID, authentication.Name, items[i].Name, memberIDs[i], accessTypes[i]);
+                var message = AddAccessMemberToDataBase(authentication, items[i].Name, memberIDs[i], accessTypes[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string SetAccessMemberOfDataBase(Authentication authentication, string dataBaseName, string memberID, AccessType accessType)
+        {
+            return string.Format(EventResources.SetAccessMemberOfDataBase, authentication.ID, authentication.Name, dataBaseName, memberID, accessType);
         }
 
         public static string SetAccessMemberOfDataBase(Authentication authentication, IDataBase[] items, string[] memberIDs, AccessType[] accessTypes)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.SetAccessMemberOfDataBase, authentication.ID, authentication.Name, items[i].Name, memberIDs[i], accessTypes[i]);
+                var message = SetAccessMemberOfDataBase(authentication, items[i].Name, memberIDs[i], accessTypes[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string RemoveAccessMemberFromDataBase(Authentication authentication, string dataBaseName, string memberID)
+        {
+            return string.Format(EventResources.RemoveAccessMemberFromDataBase, authentication.ID, authentication.Name, dataBaseName, memberID);
         }
 
         public static string RemoveAccessMemberFromDataBase(Authentication authentication, IDataBase[] items, string[] memberIDs)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.RemoveAccessMemberFromDataBase, authentication.ID, authentication.Name, items[i].Name, memberIDs[i]);
+                var message = RemoveAccessMemberFromDataBase(authentication, items[i].Name, memberIDs[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string CreateDataBase(Authentication authentication, IDataBase[] dataBases)
+        public static string CreateDataBase(Authentication authentication, string dataBaseName)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < dataBases.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.CreateDataBase, authentication.ID, authentication.Name, dataBases[i]);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.CreateDataBase, authentication.ID, authentication.Name, dataBaseName);
         }
 
-        public static string RenameDataBase(Authentication authentication, IDataBase[] dataBases, string[] oldNames)
+        public static string CreateDataBase(Authentication authentication, IDataBase[] items)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < dataBases.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.RenameDataBase, authentication.ID, authentication.Name, oldNames[i], dataBases[i]);
+                var message = CreateDataBase(authentication, items[i].Name);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string DeleteDataBase(Authentication authentication, string[] dataBaseNames)
+        public static string RenameDataBase(Authentication authentication, string dataBaseName, string newDataBaseName)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < dataBaseNames.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.DeleteDataBase, authentication.ID, authentication.Name, dataBaseNames[i]);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.RenameDataBase, authentication.ID, authentication.Name, dataBaseName, newDataBaseName);
         }
 
-        public static string LoadDataBase(Authentication authentication, IDataBase[] dataBases)
+        public static string RenameDataBase(Authentication authentication, IDataBase[] items, string[] oldDataBaseNames)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < dataBases.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.LoadDataBase, authentication.ID, authentication.Name, dataBases[i]);
+                var message = RenameDataBase(authentication, oldDataBaseNames[i], items[i].Name);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string UnloadDataBase(Authentication authentication, IDataBase[] dataBases)
+        public static string DeleteDataBase(Authentication authentication, string dataBaseName)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < dataBases.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.UnloadDataBase, authentication.ID, authentication.Name, dataBases[i]);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.DeleteDataBase, authentication.ID, authentication.Name, dataBaseName);
         }
 
-        public static string ResettingDataBase(Authentication authentication, IDataBase[] dataBases)
+        public static string DeleteDataBase(Authentication authentication, IDataBase[] items)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < dataBases.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.ResettingDataBase, authentication.ID, authentication.Name, dataBases[i]);
+                var message = DeleteDataBase(authentication, items[i].Name);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string ResetDataBase(Authentication authentication, IDataBase[] dataBases)
+        public static string LoadDataBase(Authentication authentication, IDataBase[] items)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < dataBases.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.ResetDataBase, authentication.ID, authentication.Name, dataBases[i]);
+                var message = string.Format(EventResources.LoadDataBase, authentication.ID, authentication.Name, items[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string EnterDataBase(Authentication authentication, IDataBase[] dataBases)
+        public static string UnloadDataBase(Authentication authentication, IDataBase[] items)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < dataBases.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.EnterDataBase, authentication.ID, authentication.Name, dataBases[i]);
+                var message = string.Format(EventResources.UnloadDataBase, authentication.ID, authentication.Name, items[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string LeaveDataBase(Authentication authentication, IDataBase[] dataBases)
+        public static string ResettingDataBase(Authentication authentication, IDataBase[] items)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < dataBases.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.LeaveDataBase, authentication.ID, authentication.Name, dataBases[i]);
+                var message = string.Format(EventResources.ResettingDataBase, authentication.ID, authentication.Name, items[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string RevertDataBase(Authentication authentication, DataBase dataBase, long revision)
+        public static string ResetDataBase(Authentication authentication, IDataBase[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = string.Format(EventResources.ResetDataBase, authentication.ID, authentication.Name, items[i]);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string EnterDataBase(Authentication authentication, IDataBase[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = string.Format(EventResources.EnterDataBase, authentication.ID, authentication.Name, items[i]);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string LeaveDataBase(Authentication authentication, IDataBase[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = string.Format(EventResources.LeaveDataBase, authentication.ID, authentication.Name, items[i]);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string RevertDataBase(Authentication authentication, IDataBase dataBase, string revision)
         {
             return string.Format(EventResources.RevertDataBase, authentication.ID, authentication.Name, dataBase, revision);
         }
 
-        public static string LockTypeItem(Authentication authentication, ITypeItem[] items, string[] comments)
+        public static string RevertDataBase(Authentication authentication, IDataBase[] items, string[] revisions)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.LockTypeItem, authentication.ID, authentication.Name, items[i].Name, comments[i]);
+                var message = RevertDataBase(authentication, items[i], revisions[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string LockTypeItem(Authentication authentication, ITypeItem[] items, string[] comments)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = string.Format(EventResources.LockTypeItem, authentication.ID, authentication.Name, items[i].Name, comments[i]);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
         }
 
         public static string UnlockTypeItem(Authentication authentication, ITypeItem[] items)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.UnlockTypeItem, authentication.ID, authentication.Name, items[i].Name);
+                var message = string.Format(EventResources.UnlockTypeItem, authentication.ID, authentication.Name, items[i].Name);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string SetPrivateTypeItem(Authentication authentication, string typeItemPath)
+        {
+            return string.Format(EventResources.SetPrivateTypeItem, authentication.ID, authentication.Name, typeItemPath);
         }
 
         public static string SetPrivateTypeItem(Authentication authentication, ITypeItem[] items)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.SetPrivateTypeItem, authentication.ID, authentication.Name, items[i].Name);
+                var message = SetPrivateTypeItem(authentication, items[i].Path);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string SetPublicTypeItem(Authentication authentication, string typeItemPath)
+        {
+            return string.Format(EventResources.SetPublicTypeItem, authentication.ID, authentication.Name, typeItemPath);
         }
 
         public static string SetPublicTypeItem(Authentication authentication, ITypeItem[] items)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.SetPublicTypeItem, authentication.ID, authentication.Name, items[i].Name);
+                var message = SetPublicTypeItem(authentication, items[i].Path);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string AddAccessMemberToTypeItem(Authentication authentication, string typeItemPath, string memberID, AccessType accessType)
+        {
+            return string.Format(EventResources.AddAccessMemberToTypeItem, authentication.ID, authentication.Name, typeItemPath, memberID, accessType);
         }
 
         public static string AddAccessMemberToTypeItem(Authentication authentication, ITypeItem[] items, string[] memberIDs, AccessType[] accessTypes)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.AddAccessMemberToTypeItem, authentication.ID, authentication.Name, items[i].Name, memberIDs[i], accessTypes[i]);
+                var message = AddAccessMemberToTypeItem(authentication, items[i].Path, memberIDs[i], accessTypes[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string SetAccessMemberOfTypeItem(Authentication authentication, string typeItemPath, string memberID, AccessType accessType)
+        {
+            return string.Format(EventResources.SetAccessMemberOfTypeItem, authentication.ID, authentication.Name, typeItemPath, memberID, accessType);
         }
 
         public static string SetAccessMemberOfTypeItem(Authentication authentication, ITypeItem[] items, string[] memberIDs, AccessType[] accessTypes)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.SetAccessMemberOfTypeItem, authentication.ID, authentication.Name, items[i].Name, memberIDs[i], accessTypes[i]);
+                var message = SetAccessMemberOfTypeItem(authentication, items[i].Path, memberIDs[i], accessTypes[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string RemoveAccessMemberFromTypeItem(Authentication authentication, string typeItemPath, string memberID)
+        {
+            return string.Format(EventResources.RemoveAccessMemberFromTypeItem, authentication.ID, authentication.Name, typeItemPath, memberID);
         }
 
         public static string RemoveAccessMemberFromTypeItem(Authentication authentication, ITypeItem[] items, string[] memberIDs)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.RemoveAccessMemberFromTypeItem, authentication.ID, authentication.Name, items[i].Name, memberIDs[i]);
+                var message = RemoveAccessMemberFromTypeItem(authentication, items[i].Path, memberIDs[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string CreateTypeCategory(Authentication authentication, ITypeCategory[] categories)
+        public static string CreateTypeCategory(Authentication authentication, string categoryPath)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < categories.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.CreateTypeCategory, authentication.ID, authentication.Name, categories[i]);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.CreateTypeCategory, authentication.ID, authentication.Name, categoryPath);
         }
 
-        public static string RenameTypeCategory(Authentication authentication, ITypeCategory[] categories, string[] oldNames)
+        public static string CreateTypeCategory(Authentication authentication, ITypeCategory[] items)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < categories.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.RenameTypeCategory, authentication.ID, authentication.Name, oldNames[i], categories[i].Name);
+                var message = CreateTypeCategory(authentication, items[i].Path);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string MoveTypeCategory(Authentication authentication, ITypeCategory[] categories, string[] oldParentPaths)
+        public static string RenameTypeCategory(Authentication authentication, string categoryPath, string newCategoryName)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < categories.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.MoveTypeCategory, authentication.ID, authentication.Name, categories[i], oldParentPaths[i], categories[i].Parent);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.RenameTypeCategory, authentication.ID, authentication.Name, categoryPath, newCategoryName);
         }
 
-        public static string DeleteTypeCategory(Authentication authentication, ITypeCategory[] categories)
+        public static string RenameTypeCategory(Authentication authentication, ITypeCategory[] items, string[] oldCategoryPaths)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < categories.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.DeleteTypeCategory, authentication.ID, authentication.Name, categories[i]);
+                var message = RenameTypeCategory(authentication, oldCategoryPaths[i], items[i].Name);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string CreateType(Authentication authentication, IType[] types)
+        public static string MoveTypeCategory(Authentication authentication, string categoryPath, string parentPath, string newParentPath)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < types.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.CreateType, authentication.ID, authentication.Name, types[i]);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.MoveTypeCategory, authentication.ID, authentication.Name, categoryPath, parentPath, newParentPath);
         }
 
-        public static string RenameType(Authentication authentication, IType[] types, string[] oldNames)
+        public static string MoveTypeCategory(Authentication authentication, ITypeCategory[] items, string[] oldCategoryPaths, string[] oldParentPaths)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < types.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.RenameType, authentication.ID, authentication.Name, oldNames[i], types[i]);
+                var message = MoveTypeCategory(authentication, oldCategoryPaths[i], oldParentPaths[i], items[i].Parent.Path);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string MoveType(Authentication authentication, IType[] types, string[] oldCategoryPaths)
+        public static string DeleteTypeCategory(Authentication authentication, string categoryPath)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < types.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.MoveType, authentication.ID, authentication.Name, types[i], oldCategoryPaths[i], types[i].Category);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.DeleteTypeCategory, authentication.ID, authentication.Name, categoryPath);
         }
 
-        public static string DeleteType(Authentication authentication, IType[] types)
+        public static string DeleteTypeCategory(Authentication authentication, ITypeCategory[] items)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < types.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.DeleteType, authentication.ID, authentication.Name, types[i]);
+                var message = DeleteTypeCategory(authentication, items[i].Path);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string ChangeTypeTemplate(Authentication authentication, IType[] types)
+        public static string CreateType(Authentication authentication, string typeName)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < types.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.ChangeTypeTemplate, authentication.ID, authentication.Name, types[i]);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.CreateType, authentication.ID, authentication.Name, typeName);
         }
 
-        public static string CreateTableCategory(Authentication authentication, ITableCategory[] categories)
+        public static string CreateType(Authentication authentication, string[] typeNames)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < categories.Length; i++)
+            var messageList = new List<string>(typeNames.Length);
+            for (var i = 0; i < typeNames.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.CreateTableCategory, authentication.ID, authentication.Name, categories[i]);
+                var message = CreateType(authentication, typeNames[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string CreateType(Authentication authentication, IType[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = CreateType(authentication, items[i].Name);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string RenameType(Authentication authentication, string typeName, string newTypeName)
+        {
+            return string.Format(EventResources.RenameType, authentication.ID, authentication.Name, typeName, newTypeName);
+        }
+
+        public static string RenameType(Authentication authentication, IType[] items, string[] oldTypeNames)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = RenameType(authentication, oldTypeNames[i], items[i].Name);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string MoveType(Authentication authentication, string typeName, string categoryPath, string newCategoryPath)
+        {
+            return string.Format(EventResources.MoveType, authentication.ID, authentication.Name, typeName, categoryPath, newCategoryPath);
+        }
+
+        public static string MoveType(Authentication authentication, IType[] items, string[] oldCategoryPaths)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = MoveType(authentication, items[i].Name, oldCategoryPaths[i], items[i].Category.Path);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string DeleteType(Authentication authentication, string typeName)
+        {
+            return string.Format(EventResources.DeleteType, authentication.ID, authentication.Name, typeName);
+        }
+
+        public static string DeleteType(Authentication authentication, IType[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = DeleteType(authentication, items[i].Name);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string ChangeTypeTemplate(Authentication authentication, string typeName)
+        {
+            return string.Format(EventResources.ChangeTypeTemplate, authentication.ID, authentication.Name, typeName);
+        }
+
+        public static string ChangeTypeTemplate(Authentication authentication, IType[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = ChangeTypeTemplate(authentication, items[i].Name);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string CreateTableCategory(Authentication authentication, string categoryPath)
+        {
+            return string.Format(EventResources.CreateTableCategory, authentication.ID, authentication.Name, categoryPath);
+        }
+
+        public static string CreateTableCategory(Authentication authentication, ITableCategory[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = CreateTableCategory(authentication, items[i].Path);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
         }
 
         public static string LockTableItem(Authentication authentication, ITableItem[] items, string[] comments)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.LockTableItem, authentication.ID, authentication.Name, items[i].Name, comments[i]);
+                var message = string.Format(EventResources.LockTableItem, authentication.ID, authentication.Name, items[i].Name, comments[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
         public static string UnlockTableItem(Authentication authentication, ITableItem[] items)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.UnlockTableItem, authentication.ID, authentication.Name, items[i].Name);
+                var message = string.Format(EventResources.UnlockTableItem, authentication.ID, authentication.Name, items[i].Name);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string SetPrivateTableItem(Authentication authentication, string tableItemPath)
+        {
+            return string.Format(EventResources.SetPrivateTableItem, authentication.ID, authentication.Name, tableItemPath);
         }
 
         public static string SetPrivateTableItem(Authentication authentication, ITableItem[] items)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.SetPrivateTableItem, authentication.ID, authentication.Name, items[i].Name);
+                var message = SetPrivateTableItem(authentication, items[i].Path);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string SetPublicTableItem(Authentication authentication, string tableItemPath)
+        {
+            return string.Format(EventResources.SetPublicTableItem, authentication.ID, authentication.Name, tableItemPath);
         }
 
         public static string SetPublicTableItem(Authentication authentication, ITableItem[] items)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.SetPublicTableItem, authentication.ID, authentication.Name, items[i].Name);
+                var message = SetPublicTableItem(authentication, items[i].Path);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string AddAccessMemberToTableItem(Authentication authentication, string tableItemPath, string memberID, AccessType accessType)
+        {
+            return string.Format(EventResources.AddAccessMemberToTableItem, authentication.ID, authentication.Name, tableItemPath, memberID, accessType);
         }
 
         public static string AddAccessMemberToTableItem(Authentication authentication, ITableItem[] items, string[] memberIDs, AccessType[] accessTypes)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.AddAccessMemberToTableItem, authentication.ID, authentication.Name, items[i].Name, memberIDs[i], accessTypes[i]);
+                var message = AddAccessMemberToTableItem(authentication, items[i].Path, memberIDs[i], accessTypes[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string SetAccessMemberOfTableItem(Authentication authentication, string tableItemPath, string memberID, AccessType accessType)
+        {
+            return string.Format(EventResources.SetAccessMemberOfTableItem, authentication.ID, authentication.Name, tableItemPath, memberID, accessType);
         }
 
         public static string SetAccessMemberOfTableItem(Authentication authentication, ITableItem[] items, string[] memberIDs, AccessType[] accessTypes)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.SetAccessMemberOfTableItem, authentication.ID, authentication.Name, items[i].Name, memberIDs[i], accessTypes[i]);
+                var message = SetAccessMemberOfTableItem(authentication, items[i].Path, memberIDs[i], accessTypes[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string RemoveAccessMemberFromTableItem(Authentication authentication, string tableItemPath, string memberID)
+        {
+            return string.Format(EventResources.RemoveAccessMemberFromTableItem, authentication.ID, authentication.Name, tableItemPath, memberID);
         }
 
         public static string RemoveAccessMemberFromTableItem(Authentication authentication, ITableItem[] items, string[] memberIDs)
         {
-            var sb = new StringBuilder();
+            var messageList = new List<string>(items.Length);
             for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.RemoveAccessMemberFromTableItem, authentication.ID, authentication.Name, items[i].Name, memberIDs[i]);
+                var message = RemoveAccessMemberFromTableItem(authentication, items[i].Path, memberIDs[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string RenameTableCategory(Authentication authentication, ITableCategory[] categories, string[] oldNames)
+        public static string RenameTableCategory(Authentication authentication, string categoryPath, string newCategoryName)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < categories.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.RenameTableCategory, authentication.ID, authentication.Name, oldNames[i], categories[i].Name);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.RenameTableCategory, authentication.ID, authentication.Name, categoryPath, newCategoryName);
         }
 
-        public static string MoveTableCategory(Authentication authentication, ITableCategory[] categories, string[] oldParentPaths)
+        public static string RenameTableCategory(Authentication authentication, ITableCategory[] items, string[] oldCategoryPaths)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < categories.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.MoveTableCategory, authentication.ID, authentication.Name, categories[i], oldParentPaths[i], categories[i].Parent);
+                var message = RenameTableCategory(authentication, oldCategoryPaths[i], items[i].Name);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string DeleteTableCategory(Authentication authentication, ITableCategory[] categories)
+        public static string MoveTableCategory(Authentication authentication, string categoryPath, string parentPath, string newParentPath)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < categories.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.DeleteTableCategory, authentication.ID, authentication.Name, categories[i]);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.MoveTableCategory, authentication.ID, authentication.Name, categoryPath, parentPath, newParentPath);
         }
 
-        public static string CreateTable(Authentication authentication, ITable[] tables)
+        public static string MoveTableCategory(Authentication authentication, ITableCategory[] items, string[] oldCategoryPaths, string[] oldParentPaths)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < tables.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.CreateTable, authentication.ID, authentication.Name, tables[i]);
+                var message = MoveTableCategory(authentication, oldCategoryPaths[i], oldParentPaths[i], items[i].Parent.Path);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string RenameTable(Authentication authentication, ITable[] tables, string[] oldNames)
+        public static string DeleteTableCategory(Authentication authentication, string categoryPath)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < tables.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.RenameTable, authentication.ID, authentication.Name, oldNames[i], tables[i]);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.DeleteTableCategory, authentication.ID, authentication.Name, categoryPath);
         }
 
-        public static string MoveTable(Authentication authentication, ITable[] tables, string[] oldCategoryPaths)
+        public static string DeleteTableCategory(Authentication authentication, ITableCategory[] items)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < tables.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.MoveTable, authentication.ID, authentication.Name, tables[i], oldCategoryPaths[i], tables[i].Category);
+                var message = DeleteTableCategory(authentication, items[i].Path);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string DeleteTable(Authentication authentication, ITable[] tables)
+        public static string CreateTable(Authentication authentication, string tableName)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < tables.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.DeleteTable, authentication.ID, authentication.Name, tables[i]);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.CreateTable, authentication.ID, authentication.Name, tableName);
         }
 
-        public static string ChangeTableTemplate(Authentication authentication, ITable[] tables)
+        public static string CreateTable(Authentication authentication, string[] tableNames)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < tables.Length; i++)
+            var messageList = new List<string>(tableNames.Length);
+            for (var i = 0; i < tableNames.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.ChangeTableTemplate, authentication.ID, authentication.Name, tables[i]);
+                var message = CreateTable(authentication, tableNames[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string ChangeTableContent(Authentication authentication, ITable[] tables)
+        public static string CreateTable(Authentication authentication, ITable[] items)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < tables.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.ChangeTableContent, authentication.ID, authentication.Name, tables[i]);
+                var message = CreateTable(authentication, items[i].Name);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string CreateUserCategory(Authentication authentication, IUserCategory[] categories)
+        public static string RenameTable(Authentication authentication, string tableName, string newTableName)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < categories.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.CreateUserCategory, authentication.ID, authentication.Name, categories[i]);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.RenameTable, authentication.ID, authentication.Name, tableName, newTableName);
         }
 
-        public static string RenameUserCategory(Authentication authentication, IUserCategory[] categories, string[] oldNames)
+        public static string RenameTable(Authentication authentication, ITable[] items, string[] oldTableNames)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < categories.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.RenameUserCategory, authentication.ID, authentication.Name, oldNames[i], categories[i].Name);
+                var message = RenameTable(authentication, oldTableNames[i], items[i].Name);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string MoveUserCategory(Authentication authentication, IUserCategory[] categories, string[] oldParentPaths)
+        public static string MoveTable(Authentication authentication, string tableName, string categoryPath, string newCategoryPath)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < categories.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.MoveUserCategory, authentication.ID, authentication.Name, categories[i], oldParentPaths[i], categories[i].Parent);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.MoveTable, authentication.ID, authentication.Name, tableName, categoryPath, newCategoryPath);
         }
 
-        public static string DeleteUserCategory(Authentication authentication, IUserCategory[] categories)
+        public static string MoveTable(Authentication authentication, ITable[] items, string[] oldCategoryPaths)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < categories.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.DeleteUserCategory, authentication.ID, authentication.Name, categories[i]);
+                var message = MoveTable(authentication, items[i].Name, oldCategoryPaths[i], items[i].Category.Path);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string CreateUser(Authentication authentication, IUser[] users)
+        public static string DeleteTable(Authentication authentication, string tableName)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < users.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.CreateUser, authentication.ID, authentication.Name, users[i], users[i].UserName);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.DeleteTable, authentication.ID, authentication.Name, tableName);
         }
 
-        public static string ChangeUserInfo(Authentication authentication, IUser[] users)
+        public static string DeleteTable(Authentication authentication, ITable[] items)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < users.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.ChangeUserInfo, authentication.ID, authentication.Name, users[i], users[i].UserName);
+                var message = DeleteTable(authentication, items[i].Name);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string MoveUser(Authentication authentication, IUser[] users, string[] oldCategoryPaths)
+        public static string ChangeTableTemplate(Authentication authentication, string tableName)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < users.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.MoveUser, authentication.ID, authentication.Name, users[i], users[i].UserName, oldCategoryPaths[i], users[i].Category);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.ChangeTableTemplate, authentication.ID, authentication.Name, tableName);
         }
 
-        public static string DeleteUser(Authentication authentication, IUser[] users)
+        public static string ChangeTableTemplate(Authentication authentication, ITable[] items)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < users.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.DeleteUser, authentication.ID, authentication.Name, users[i]);
+                var message = ChangeTableTemplate(authentication, items[i].Name);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string KickUser(Authentication authentication, IUser[] users, string[] comments)
+        public static string ChangeTableContent(Authentication authentication, string tableName)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < users.Length; i++)
+            return string.Format(EventResources.ChangeTableContent, authentication.ID, authentication.Name, tableName);
+        }
+
+        public static string ChangeTableContent(Authentication authentication, ITable[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.KickUser, authentication.ID, authentication.Name, users[i], users[i].UserName);
+                var message = ChangeTableContent(authentication, items[i].Name);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string CreateUserCategory(Authentication authentication, string categoryPath)
+        {
+            return string.Format(EventResources.CreateUserCategory, authentication.ID, authentication.Name, categoryPath);
+        }
+
+        public static string CreateUserCategory(Authentication authentication, IUserCategory[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = CreateUserCategory(authentication, items[i].Path);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string RenameUserCategory(Authentication authentication, string categoryPath, string newCategoryName)
+        {
+            return string.Format(EventResources.RenameUserCategory, authentication.ID, authentication.Name, categoryPath, newCategoryName);
+        }
+
+        public static string RenameUserCategory(Authentication authentication, IUserCategory[] items, string[] oldCategoryPaths)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = RenameUserCategory(authentication, oldCategoryPaths[i], items[i].Name);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string MoveUserCategory(Authentication authentication, string categoryPath, string parentPath, string newParentPath)
+        {
+            return string.Format(EventResources.MoveUserCategory, authentication.ID, authentication.Name, categoryPath, parentPath, newParentPath);
+        }
+
+        public static string MoveUserCategory(Authentication authentication, IUserCategory[] items, string[] oldCategoryPaths, string[] oldParentPaths)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = MoveUserCategory(authentication, oldCategoryPaths[i], oldParentPaths[i], items[i].Parent.Path);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string DeleteUserCategory(Authentication authentication, string categoryPath)
+        {
+            return string.Format(EventResources.DeleteUserCategory, authentication.ID, authentication.Name, categoryPath);
+        }
+
+        public static string DeleteUserCategory(Authentication authentication, IUserCategory[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = DeleteUserCategory(authentication, items[i].Path);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string CreateUser(Authentication authentication, string userID, string userName)
+        {
+            return string.Format(EventResources.CreateUser, authentication.ID, authentication.Name, userID, userName);
+        }
+
+        public static string CreateUser(Authentication authentication, IUser[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = CreateUser(authentication, items[i].ID, items[i].UserName);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string MoveUser(Authentication authentication, string userID, string userName, string categoryPath, string newCategoryPath)
+        {
+            return string.Format(EventResources.MoveUser, authentication.ID, authentication.Name, userID, userName, categoryPath, newCategoryPath);
+        }
+
+        public static string MoveUser(Authentication authentication, IUser[] items, string[] oldCategoryPaths)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = MoveUser(authentication, items[i].ID, items[i].UserName, oldCategoryPaths[i], items[i].Category.Path);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string DeleteUser(Authentication authentication, string userID)
+        {
+            return string.Format(EventResources.DeleteUser, authentication.ID, authentication.Name, userID);
+        }
+
+        public static string DeleteUser(Authentication authentication, IUser[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = DeleteUser(authentication, items[i].ID);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string ChangeUserInfo(Authentication authentication, string userID, string userName)
+        {
+            return string.Format(EventResources.ChangeUserInfo, authentication.ID, authentication.Name, userID, userName);
+        }
+
+        public static string ChangeUserInfo(Authentication authentication, IUser[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = ChangeUserInfo(authentication, items[i].ID, items[i].UserName);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string KickUser(Authentication authentication, IUser[] items, string[] comments)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var sb = new StringBuilder();
+                sb.AppendFormat(EventResources.KickUser, authentication.ID, authentication.Name, items[i], items[i].UserName);
                 sb.AppendLine();
                 sb.Append($"{EventResources.Reason}: {comments[i]}");
+                var message = sb.ToString();
+                messageList.Add(message);
             }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string BanUser(Authentication authentication, string userID, string userName, string comment)
+        {
+            var sb = new StringBuilder();
+            sb.AppendFormat(EventResources.BanUser, authentication.ID, authentication.Name, userID, userName);
+            sb.AppendLine();
+            sb.Append($"{EventResources.Reason}: {comment}");
             return sb.ToString();
         }
 
-        public static string BanUser(Authentication authentication, IUser[] users, string[] comments)
+        public static string BanUser(Authentication authentication, IUser[] items, string[] comments)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < users.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.BanUser, authentication.ID, authentication.Name, users[i], users[i].UserName);
-                sb.AppendLine();
-                sb.Append($"{EventResources.Reason}: {comments[i]}");
+                var message = BanUser(authentication, items[i].ID, items[i].UserName, comments[i]);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string UnbanUser(Authentication authentication, IUser[] users)
+        public static string UnbanUser(Authentication authentication, string userID, string userName)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < users.Length; i++)
-            {
-                if (i > 0)
-                    sb.AppendLine();
-                sb.AppendFormat(EventResources.UnbanUser, authentication.ID, authentication.Name, users[i], users[i].UserName);
-            }
-            return sb.ToString();
+            return string.Format(EventResources.UnbanUser, authentication.ID, authentication.Name, userID, userName);
         }
 
-        public static string LoginUser(Authentication authentication, IUser[] users)
+        public static string UnbanUser(Authentication authentication, IUser[] items)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < users.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                var user = users[i];
-                var userInfo = user.UserInfo;
-                sb.AppendFormat(EventResources.LoginUser, userInfo.ID, userInfo.Name);
+                var message = UnbanUser(authentication, items[i].ID, items[i].UserName);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
         }
 
-        public static string LogoutUser(Authentication authentication, IUser[] users)
+        public static string LoginUser(Authentication authentication, IUser[] items)
         {
-            var sb = new StringBuilder();
-            for (var i = 0; i < users.Length; i++)
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
             {
-                if (i > 0)
-                    sb.AppendLine();
-                var user = users[i];
-                var userInfo = user.UserInfo;
-                sb.AppendFormat(EventResources.LogoutUser, userInfo.ID, userInfo.Name);
+                var message = string.Format(EventResources.LoginUser, items[i].ID, items[i].UserName);
+                messageList.Add(message);
             }
-            return sb.ToString();
+            return string.Join(Environment.NewLine, messageList);
+        }
+
+        public static string LogoutUser(Authentication authentication, IUser[] items)
+        {
+            var messageList = new List<string>(items.Length);
+            for (var i = 0; i < items.Length; i++)
+            {
+                var message = string.Format(EventResources.LogoutUser, items[i].ID, items[i].UserName);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
         }
 
         public static string BeginDomain(Authentication authentication, IDomain domain)
@@ -826,9 +1032,9 @@ namespace Ntreev.Crema.Services
             return string.Format(EventResources.SendMessage, authentication.ID, authentication.Name, user.ID, user.UserName, message);
         }
 
-        public static string NotifyMessage(Authentication authentication, IUser[] users, string message)
+        public static string NotifyMessage(Authentication authentication, IUser[] items, string message)
         {
-            var target = users.Any() == false ? "all users" : string.Join(",", users.Select(item => item.ID).ToArray());
+            var target = items.Any() == false ? "all users" : string.Join(",", items.Select(item => item.ID).ToArray());
             return string.Format(EventResources.NotifyMessage, authentication.ID, authentication.Name, target, message);
         }
     }

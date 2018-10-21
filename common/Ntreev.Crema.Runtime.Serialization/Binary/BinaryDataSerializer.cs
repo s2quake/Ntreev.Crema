@@ -72,10 +72,10 @@ namespace Ntreev.Crema.Runtime.Serialization.Binary
             writer.Seek(Marshal.SizeOf(typeof(BinaryTableIndex)) * tables.Length, SeekOrigin.Current);
             fileHeader.TypesHashValue = this.GetStringID(dataSet.TypesHashValue);
             fileHeader.TablesHashValue = this.GetStringID(dataSet.TablesHashValue);
-            fileHeader.Tags = this.GetStringID(dataSet.Tags);
+            fileHeader.Tags = this.GetStringID((string)dataSet.Tags);
             fileHeader.TablesOffset = stream.Position;
             fileHeader.TableCount = tables.Length;
-            fileHeader.Revision = (int)dataSet.Revision;
+            fileHeader.Revision = this.GetStringID(dataSet.Revision);
             fileHeader.Name = this.GetStringID(dataSet.Name);
 
             var t = new Dictionary<string, Stream>();

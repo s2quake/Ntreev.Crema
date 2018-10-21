@@ -46,7 +46,8 @@ namespace Ntreev.Crema.Javascript.Methods.Permission
         {
             var typeItem = this.GetTypeItem(dataBaseName, typeItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            typeItem.Dispatcher.Invoke(() => typeItem.SetPublic(authentication));
+            var task = typeItem.SetPublicAsync(authentication);
+            task.Wait();
         }
     }
 }

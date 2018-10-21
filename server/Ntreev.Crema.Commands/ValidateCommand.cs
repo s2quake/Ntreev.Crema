@@ -38,7 +38,6 @@ namespace Ntreev.Crema.Commands
         public ValidateCommand(CremaBootstrapper boot)
             : base("validate")
         {
-            this.RepositoryModule = CremaBootstrapper.DefaultRepositoryModule;
             this.boot = boot;
         }
 
@@ -49,25 +48,16 @@ namespace Ntreev.Crema.Commands
             set;
         }
 
-        [CommandProperty("repo-module")]
-        public string RepositoryModule
+        [CommandPropertyArray]
+        [Description("database list to migrate")]
+        public string[] DataBaseList
         {
-            get;
-            set;
-        }
-
-        [CommandProperty("repo-name")]
-        [DefaultValue("crema")]
-        public string RepositoryName
-        {
-            get;
-            set;
+            get; set;
         }
 
         protected override void OnExecute()
         {
-            this.boot.RepositoryModule = this.RepositoryModule;
-            this.boot.ValidateRepository(this.Path, this.RepositoryName);
+            CremaBootstrapper.ValidateRepository(this.boot, this.Path, this.DataBaseList);
         }
     }
 }

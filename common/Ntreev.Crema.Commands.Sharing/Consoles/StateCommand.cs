@@ -15,6 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Commands.Consoles.Properties;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Services;
 using Ntreev.Library;
@@ -36,7 +37,8 @@ namespace Ntreev.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceDescription("Resources", IsShared = true)]
-    class StateCommand : ConsoleCommandBase
+    [CommandStaticProperty(typeof(FormatProperties))]
+    class StateCommand : ConsoleCommandAsyncBase
     {
         [Import]
         private Lazy<ICremaHost> cremaHost = null;
@@ -61,13 +63,6 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty("format")]
-        [DefaultValue(TextSerializerType.Yaml)]
-        public TextSerializerType FormatType
-        {
-            get; set;
-        }
-
         public string AbsolutePath
         {
             get
@@ -85,20 +80,19 @@ namespace Ntreev.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.IsOnline;
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             var drive = this.CommandContext.Drive;
-            var provider = this.GetObject(authentication, this.AbsolutePath);
+            var provider = await this.GetObjectAsync(authentication, this.AbsolutePath);
             var info = this.Invoke(provider, () => provider.State);
-            var text = TextSerializer.Serialize(info, this.FormatType);
-            this.Out.WriteLine(text);
+            this.CommandContext.WriteObject(info, FormatProperties.Format);
         }
 
-        private IStateProvider GetObject(Authentication authentication, string path)
+        private async Task<IStateProvider> GetObjectAsync(Authentication authentication, string path)
         {
             var drive = this.CommandContext.Drive as DataBasesConsoleDrive;
-            if (drive.GetObject(authentication, path) is IStateProvider provider)
+            if (await drive.GetObjectAsync(authentication, path) is IStateProvider provider)
             {
                 return provider;
             }

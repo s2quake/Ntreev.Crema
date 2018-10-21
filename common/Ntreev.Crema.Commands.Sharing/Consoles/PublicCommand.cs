@@ -38,7 +38,6 @@ namespace Ntreev.Crema.Commands.Consoles
     class PublicCommand : AccessCommandBase, IConsoleCommand
     {
         public PublicCommand()
-            : base("public")
         {
 
         }
@@ -59,12 +58,11 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var accessible = this.GetObject(authentication, this.Path);
-
-            this.Invoke(authentication, accessible, () => accessible.SetPublic(authentication));
+            var accessible = await this.GetObjectAsync(authentication, this.Path);
+            await accessible.SetPublicAsync(authentication);
         }
     }
 }

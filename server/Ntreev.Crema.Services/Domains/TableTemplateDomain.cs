@@ -15,126 +15,135 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services.Data;
-using Ntreev.Crema.Services.Domains;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data;
+using Ntreev.Crema.Data.Xml.Schema;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Data;
+using Ntreev.Crema.Services.Domains.Serializations;
+using Ntreev.Crema.Services.Properties;
+using Ntreev.Library;
 using Ntreev.Library.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Library;
-using Ntreev.Crema.Services.Properties;
 
 namespace Ntreev.Crema.Services.Domains
 {
-    [Serializable]
     class TableTemplateDomain : Domain
     {
-        public const string TypeName = "TableTemplate";
+        public const string TypeName = nameof(TableTemplate);
 
-        private CremaTemplate template;
-        private DataView view;
+        private readonly CremaTemplate template;
+        private readonly DataView view;
 
-        public TableTemplateDomain(SerializationInfo info, StreamingContext context)
-            : base(info, context)
+        public TableTemplateDomain(DomainSerializationInfo serializationInfo, object source)
+            : base(serializationInfo, source)
         {
-            this.IsNew = info.GetBoolean("IsNew");
+            this.IsNew = (bool)serializationInfo.GetProperty(nameof(IsNew));
+            this.template = source as CremaTemplate;
             this.view = this.template.View;
+
+            var dataSet = this.template.TargetTable.DataSet;
+            var itemPaths = (string)serializationInfo.GetProperty(nameof(ItemPaths));
+            dataSet.SetItemPaths(StringUtility.Split(itemPaths, ';'));
         }
 
         public TableTemplateDomain(Authentication authentication, CremaTemplate templateSource, DataBase dataBase, string itemPath, string itemType)
-            : base(authentication.ID, dataBase.ID, itemPath, itemType)
+            : base(authentication.ID, templateSource, dataBase.ID, itemPath, itemType)
         {
             this.template = templateSource;
             this.view = this.template.View;
         }
 
-        public override object Source
-        {
-            get { return this.template; }
-        }
-
         public bool IsNew { get; set; }
 
-        protected override byte[] SerializeSource()
+        public string[] ItemPaths => this.template.TargetTable.DataSet.GetItemPaths();
+
+        protected override byte[] SerializeSource(object source)
         {
-            var xml = XmlSerializerUtility.GetString(this.template);
+            var xml = XmlSerializerUtility.GetString(source);
             return Encoding.UTF8.GetBytes(xml.Compress());
         }
 
-        protected override void DerializeSource(byte[] data)
+        protected override object DerializeSource(byte[] data)
         {
             var xml = Encoding.UTF8.GetString(data).Decompress();
-            this.template = XmlSerializerUtility.ReadString<CremaTemplate>(xml);
+            return XmlSerializerUtility.ReadString<CremaTemplate>(xml);
         }
 
-        protected override void OnSerializaing(SerializationInfo info, StreamingContext context)
+        protected override void OnSerializaing(IDictionary<string, object> properties)
         {
-            base.OnSerializaing(info, context);
-            info.AddValue("IsNew", this.IsNew);
+            base.OnSerializaing(properties);
+            properties.Add(nameof(IsNew), this.IsNew);
+            properties.Add(nameof(this.ItemPaths), string.Join(";", this.ItemPaths));
         }
 
-        protected override DomainRowInfo[] OnNewRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected override async Task<DomainRowInfo[]> OnNewRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            this.template.SignatureDateProvider = signatureProvider;
-
-            for (int i = 0; i < rows.Length; i++)
+            return await this.DataDispatcher.InvokeAsync(() =>
             {
-                var rowView = CremaDomainUtility.AddNew(this.view, rows[i].Fields);
-                rows[i].Keys = CremaDomainUtility.GetKeys(rowView);
-                rows[i].Fields = CremaDomainUtility.GetFields(rowView);
-            }
-
-            return rows;
+                this.template.SignatureDateProvider = signatureProvider;
+                for (var i = 0; i < rows.Length; i++)
+                {
+                    var rowView = CremaDomainUtility.AddNew(this.view, rows[i].Fields);
+                    rows[i].Keys = CremaDomainUtility.GetKeys(rowView);
+                    rows[i].Fields = CremaDomainUtility.GetFields(rowView);
+                }
+                return rows;
+            });
         }
 
-        protected override DomainRowInfo[] OnSetRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected override async Task<DomainRowInfo[]> OnSetRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            this.template.SignatureDateProvider = signatureProvider;
-
-            for (int i = 0; i < rows.Length; i++)
+            return await this.DataDispatcher.InvokeAsync(() =>
             {
-                rows[i].Fields = CremaDomainUtility.SetFields(this.view, rows[i].Keys, rows[i].Fields);
-            }
-
-            return rows;
+                this.template.SignatureDateProvider = signatureProvider;
+                for (var i = 0; i < rows.Length; i++)
+                {
+                    rows[i].Fields = CremaDomainUtility.SetFields(this.view, rows[i].Keys, rows[i].Fields);
+                }
+                return rows;
+            });
         }
 
-        protected override void OnRemoveRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected override async Task OnRemoveRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            this.template.SignatureDateProvider = signatureProvider;
-
-            foreach (var item in rows)
+            await this.DataDispatcher.InvokeAsync(() =>
             {
-                CremaDomainUtility.Delete(this.view, item.Keys);
-            }
+                this.template.SignatureDateProvider = signatureProvider;
+                foreach (var item in rows)
+                {
+                    CremaDomainUtility.Delete(this.view, item.Keys);
+                }
+            });
         }
 
-        protected override void OnSetProperty(DomainUser domainUser, string propertyName, object value, SignatureDateProvider signatureProvider)
+        protected override async Task OnSetPropertyAsync(DomainUser domainUser, string propertyName, object value, SignatureDateProvider signatureProvider)
         {
-            if (propertyName == "TableName")
+            await this.DataDispatcher.InvokeAsync(() =>
             {
-                if (this.IsNew == false)
-                    throw new InvalidOperationException(Resources.Exception_CannotRename);
-                this.template.TableName = (string)value;
-            }
-            else if (propertyName == "Comment")
-            {
-                this.template.Comment = (string)value;
-            }
-            else if (propertyName == "Tags")
-            {
-                this.template.Tags = (TagInfo)((string)value);
-            }
-            else
-            {
-                throw new NotSupportedException();
-            }
+                if (propertyName == CremaSchema.TableName)
+                {
+                    if (this.IsNew == false)
+                        throw new InvalidOperationException(Resources.Exception_CannotRename);
+                    this.template.TableName = (string)value;
+                }
+                else if (propertyName == CremaSchema.Comment)
+                {
+                    this.template.Comment = (string)value;
+                }
+                else if (propertyName == CremaSchema.Tags)
+                {
+                    this.template.Tags = (TagInfo)((string)value);
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
+            });
         }
     }
 }

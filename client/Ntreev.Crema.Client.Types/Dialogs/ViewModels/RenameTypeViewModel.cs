@@ -26,6 +26,7 @@ using System.Windows.Threading;
 using Ntreev.Library.ObjectModel;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
 {
@@ -65,17 +66,14 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
 
         protected async override void VerifyRename(string newName, Action<bool> isVerify)
         {
-            var result = await this.type.Dispatcher.InvokeAsync(() =>
-            {
-                var types = this.type.GetService(typeof(ITypeCollection)) as ITypeCollection;
-                return types.Contains(newName) == false;
-            });
+            var types = this.type.GetService(typeof(ITypeCollection)) as ITypeCollection;
+            var result = await types.ContainsAsync(newName) == false;
             isVerify(result);
         }
 
         protected override Task RenameAsync(string newName)
         {
-            return this.type.Dispatcher.InvokeAsync(() => this.type.Rename(this.authentication, newName));
+            return this.type.RenameAsync(this.authentication, newName);
         }
     }
 }

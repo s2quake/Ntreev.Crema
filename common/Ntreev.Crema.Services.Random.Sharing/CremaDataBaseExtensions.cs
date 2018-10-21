@@ -155,7 +155,7 @@ namespace Ntreev.Crema.Services.Random
                     var newID = string.Format("Admin_{0}", identifier);
                     var newName = string.Format("관리자_{0}", identifier);
 
-                    category.AddNewUser(authentication, newID, null, newName, Authority.Admin);
+                    category.AddNewUserAsync(authentication, newID, null, newName, Authority.Admin);
                 }
                 else if (authority == Authority.Member)
                 {
@@ -182,7 +182,7 @@ namespace Ntreev.Crema.Services.Random
             {
                 var typeContext = dataBase.TypeContext;
                 var category = typeContext.Categories.RandomOrDefault();
-                typeContext.AddRandomType(authentication);
+                typeContext.AddRandomTypeAsync(authentication);
             });
         }
 
@@ -364,7 +364,7 @@ namespace Ntreev.Crema.Services.Random
 
                 var comment = RandomUtility.NextString();
 
-                typeItem.Lock(authentication, comment);
+                typeItem.LockAsync(authentication, comment);
 
                 //Assert.IsTrue(typeItem.IsLocked);
                 //Assert.AreEqual(typeItem.Path, typeItem.LockInfo.Path);
@@ -570,7 +570,18 @@ namespace Ntreev.Crema.Services.Random
                 if (table == null || table.TemplatedParent != null || table.TableState != TableState.None)
                     return;
 
-                table.SetTags(authentication, CremaRandomUtility.RandomTags());
+                var template = table.Template;
+                template.BeginEdit(authentication);
+                try
+                {
+                    template.SetTags(authentication, CremaRandomUtility.RandomTags());
+                    template.EndEdit(authentication);
+                }
+                catch
+                {
+                    template.CancelEdit(authentication);
+                    throw;
+                }
             });
         }
 
@@ -591,7 +602,7 @@ namespace Ntreev.Crema.Services.Random
 
                 try
                 {
-                    template.EditRandom(authentication, RandomUtility.Next(5, 10));
+                    template.EditRandomAsync(authentication, RandomUtility.Next(5, 10));
                     template.EndEdit(authentication);
                 }
                 catch
@@ -616,11 +627,11 @@ namespace Ntreev.Crema.Services.Random
                 var content = table.Content;
                 content.EnterEdit(authentication);
 
-                var contents = EnumerableUtility.Friends(content, content.Childs);
+                var contents = EnumerableUtility.Friends(table, table.Childs).Select(item => item.Content);
 
                 try
                 {
-                    contents.Random().EditRandom(authentication, RandomUtility.Next(1000));
+                    contents.Random().EditRandomAsync(authentication, RandomUtility.Next(1000));
                     content.LeaveEdit(authentication);
                 }
                 catch
@@ -681,8 +692,8 @@ namespace Ntreev.Crema.Services.Random
                     return;
 
                 var content = table.Content;
-                var contents = EnumerableUtility.Friends(content, content.Childs);
-                contents.Random().EditRandom(authentication, 1);
+                var contents = EnumerableUtility.Friends(table, table.Childs).Select(item => item.Content);
+                contents.Random().EditRandomAsync(authentication, 1);
             });
         }
 
@@ -720,7 +731,7 @@ namespace Ntreev.Crema.Services.Random
             dataBase.Dispatcher.Invoke(() =>
             {
                 var tableContext = dataBase.TableContext;
-                tableContext.GenerateCategory(authentication);
+                tableContext.GenerateCategoryAsync(authentication);
             });
         }
 
@@ -848,7 +859,7 @@ namespace Ntreev.Crema.Services.Random
                     return;
 
                 var comment = RandomUtility.NextString();
-                tableItem.Lock(authentication, comment);
+                tableItem.LockAsync(authentication, comment);
             });
         }
 

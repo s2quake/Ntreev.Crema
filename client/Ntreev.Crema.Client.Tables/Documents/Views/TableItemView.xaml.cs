@@ -65,11 +65,7 @@ namespace Ntreev.Crema.Client.Tables.Documents.Views
 
         public void Dispose()
         {
-            if (this.gridControl != null && this.dataTableControl.Source != null)
-            {
-                var tableID = this.dataTableControl.Source.TableID;
-                this.Configs[this.GetType(), $"{nameof(this.columnsHashValue)}-{tableID}"] = this.columnsHashValue;
-            }
+            
         }
 
         public override void OnApplyTemplate()
@@ -108,15 +104,7 @@ namespace Ntreev.Crema.Client.Tables.Documents.Views
 
         private void GridControl_ItemsSourceChangeCompleted(object sender, EventArgs e)
         {
-            var tableID = this.dataTableControl.Source.TableID;
-            var columnsID = this.dataTableControl.Source.Columns.Select(item => (object)item.ColumnID).ToArray();
-            this.columnsHashValue = HashUtility.GetHashValue(columnsID);
 
-            if (this.Configs.TryParse<string>(this.GetType(), $"{nameof(this.columnsHashValue)}-{tableID}", out var columnsHashValue) == true)
-            {
-                if (this.columnsHashValue != columnsHashValue)
-                    return;
-            }
         }
 
         private ICremaConfiguration Configs

@@ -28,7 +28,7 @@ namespace Ntreev.Crema.Services
 {
     public interface IDataBaseCollection : IReadOnlyCollection<IDataBase>, IEnumerable<IDataBase>, IDispatcherObject
     {
-        IDataBase AddNewDataBase(Authentication authentication, string dataBaseName, string comment);
+        Task<IDataBase> AddNewDataBaseAsync(Authentication authentication, string dataBaseName, string comment);
 
         bool Contains(string dataBaseName);
 

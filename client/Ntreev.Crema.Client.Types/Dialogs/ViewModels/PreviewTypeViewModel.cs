@@ -32,10 +32,10 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
     {
         private readonly Authentication authentication;
         private readonly IType type;
-        private readonly long revision;
+        private readonly string revision;
         private CremaDataType source;
 
-        public PreviewTypeViewModel(Authentication authentication, IType type, long revision)
+        public PreviewTypeViewModel(Authentication authentication, IType type, string revision)
         {
             this.authentication = authentication;
             this.type = type;
@@ -59,11 +59,8 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
             {
                 this.DisplayName = await this.type.Dispatcher.InvokeAsync(() => $"{this.type.Name} - {revision}");
                 this.BeginProgress(Resources.Message_ReceivingInfo);
-                this.Source = await Task.Run(() =>
-                {
-                    var dataSet = this.type.GetDataSet(this.authentication, this.revision);
-                    return dataSet.Types.FirstOrDefault();
-                });
+                var dataSet = await this.type.GetDataSetAsync(this.authentication, this.revision);
+                this.Source = dataSet.Types.FirstOrDefault();
             }
             catch (Exception e)
             {

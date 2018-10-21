@@ -38,7 +38,6 @@ namespace Ntreev.Crema.Commands.Consoles
     class PrivateCommand : AccessCommandBase, IConsoleCommand
     {
         public PrivateCommand()
-            : base("private")
         {
 
         }
@@ -116,33 +115,31 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var accessible = this.GetObject(authentication, this.Path);
+            var accessible = await this.GetObjectAsync(authentication, this.Path);
 
             if (this.MemberIDToAdd != string.Empty)
             {
-                this.Invoke(authentication, accessible, () => accessible.AddAccessMember(authentication, this.MemberIDToAdd, this.AccessType));
+                await accessible.AddAccessMemberAsync(authentication, this.MemberIDToAdd, this.AccessType);
             }
             else if (this.MemberIDToSet != string.Empty)
             {
-                this.Invoke(authentication, accessible, () => accessible.SetAccessMember(authentication, this.MemberIDToSet, this.AccessType));
+                await accessible.SetAccessMemberAsync(authentication, this.MemberIDToSet, this.AccessType);
             }
             else if (this.MemberIDToRemove != string.Empty)
             {
-                this.Invoke(authentication, accessible, () => accessible.RemoveAccessMember(authentication, this.MemberIDToRemove));
+                await accessible.RemoveAccessMemberAsync(authentication, this.MemberIDToRemove);
             }
             else if (this.Information == true)
             {
                 var accessInfo = this.Invoke(authentication, accessible, () => accessible.AccessInfo);
-                var prop = accessInfo.ToDictionary();
-                var text = TextSerializer.Serialize(prop, this.FormatType);
-                this.Out.WriteLine(text);
+                this.CommandContext.WriteObject(accessInfo.ToDictionary(), this.FormatType);
             }
             else
             {
-                this.Invoke(authentication, accessible, () => accessible.SetPrivate(authentication));
+                await accessible.SetPrivateAsync(authentication);
             }
         }
     }

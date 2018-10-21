@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using Ntreev.Crema.Services.Random;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Bot.Tasks
 {
@@ -34,49 +35,55 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     class ITableRowTask : ITaskProvider
     {
-        public void InvokeTask(TaskContext context)
+        public async Task InvokeAsync(TaskContext context)
         {
+            var authentication = context.Authentication;
             var row = context.Target as ITableRow;
-            row.Dispatcher.Invoke(() =>
+            var content = row.Content;
+            if (context.IsCompleted(row) == true)
             {
-                var content = row.Content;
-                if (context.IsCompleted(row) == true)
+                try
                 {
-                    if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
+                    if (context.AllowException == false)
                     {
-                        try
+                        if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
                         {
-                            if (Verify() == true)
-                                content.EndNew(context.Authentication, row);
-                        }
-                        catch
-                        {
-                            
+                            var tableInfo = await content.Dispatcher.InvokeAsync(() => content.Table.TableInfo);
+                            var keys = tableInfo.Columns.Where(item => item.IsKey).Select(item => item.Name).ToArray();
+                            var keyFilterExpression = await row.GenerateFilterExpressionAsync(keys);
+                            if ((await content.SelectAsync(authentication, keyFilterExpression)).Any() == true)
+                                return;
+
+                            var uniques = tableInfo.Columns.Where(item => item.IsUnique && item.IsKey == false).Select(item => item.Name).ToArray();
+                            foreach (var item in uniques)
+                            {
+                                var itemExpression = await row.GenerateFilterExpressionAsync(item);
+                                if ((await content.SelectAsync(authentication, itemExpression)).Any() == true)
+                                    return;
+                            }
+
+                            var allowNulls = tableInfo.Columns.Where(item => item.AllowNull).Select(item => item.Name).ToArray();
+                            foreach (var item in allowNulls)
+                            {
+                                if (row[item] == null)
+                                    return;
+                            }
                         }
                     }
+                    if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
+                    {
+                        await content.EndNewAsync(authentication, row);
+                    }
+                }
+                catch
+                {
 
+                }
+                finally
+                {
                     context.State = null;
                     context.Pop(row);
                 }
-            });
-
-            bool Verify()
-            {
-                if (context.AllowException == true)
-                    return true;
-
-                var content = row.Content;
-                var domain = content.Domain;
-                var dataSet = domain.Source as CremaDataSet;
-                var dataTable = dataSet.Tables[content.Table.Name];
-
-                foreach(var item in dataTable.Columns)
-                {
-                    if (item.AllowDBNull == false && row[item.ColumnName] == null)
-                        return false;
-                }
-
-                return true;
             }
         }
 
@@ -91,55 +98,51 @@ namespace Ntreev.Crema.Bot.Tasks
         }
 
         [TaskMethod(Weight = 1)]
-        public void Delete(ITableRow row, TaskContext context)
+        public async Task DeleteAsync(ITableRow row, TaskContext context)
         {
-            row.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (object.Equals(context.State, System.Data.DataRowState.Detached) == false)
             {
-                if (object.Equals(context.State, System.Data.DataRowState.Detached) == false)
-                {
-                    row.Delete(context.Authentication);
-                    context.State = System.Data.DataRowState.Deleted;
-                    context.Complete(row);
-                }
-            });
+                await row.DeleteAsync(authentication);
+                context.State = System.Data.DataRowState.Deleted;
+                context.Pop(row);
+            }
         }
 
         [TaskMethod(Weight = 5)]
-        public void SetIsEnabled(ITableRow row, TaskContext context)
+        public async Task SetIsEnabledAsync(ITableRow row, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
                 return;
-            row.Dispatcher.Invoke(() =>
-            {
-                var isEnabled = RandomUtility.NextBoolean();
-                row.SetIsEnabled(context.Authentication, isEnabled);
-            });
+            var isEnabled = RandomUtility.NextBoolean();
+            await row.SetIsEnabledAsync(authentication, isEnabled);
         }
 
         [TaskMethod(Weight = 5)]
-        public void SetTags(ITableRow row, TaskContext context)
+        public async Task SetTagsAsync(ITableRow row, TaskContext context)
         {
+            var authentication = context.Authentication;
             if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
                 return;
-            row.Dispatcher.Invoke(() =>
-            {
-                var tags = TagInfoUtility.Names.Random();
-                row.SetTags(context.Authentication, (TagInfo)tags);
-            });
+            var tags = TagInfoUtility.Names.Random();
+            await row.SetTagsAsync(authentication, (TagInfo)tags);
         }
 
         [TaskMethod]
-        public void SetField(ITableRow row, TaskContext context)
+        public async Task SetFieldAsync(ITableRow row, TaskContext context)
         {
             if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
                 return;
+            await Task.Delay(0);
         }
 
         [TaskMethod]
-        public void MoveLeft(ITableRow row, TaskContext context)
+        public async Task MoveLeftAsync(ITableRow row, TaskContext context)
         {
             if (object.Equals(context.State, System.Data.DataRowState.Detached) == true)
                 return;
+            await Task.Delay(0);
         }
     }
 }

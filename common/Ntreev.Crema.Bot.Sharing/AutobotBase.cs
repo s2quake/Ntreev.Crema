@@ -31,19 +31,26 @@ using System.Security;
 
 namespace Ntreev.Crema.Bot
 {
-    public abstract class AutobotBase : IDisposable
+    public abstract class AutobotBase : IServiceProvider
     {
         private readonly static object error = new object();
         private readonly string autobotID;
         private readonly TaskContext taskContext = new TaskContext();
-        private CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
         private IEnumerable<ITaskProvider> taskProviders;
+        private CremaDispatcher dispatcher;
 
         public AutobotBase(string autobotID)
         {
             this.autobotID = autobotID;
+            this.dispatcher = new CremaDispatcher(this);
             this.MinSleepTime = 1;
             this.MaxSleepTime = 10;
+        }
+
+        public override string ToString()
+        {
+            return $"Autobot: {this.autobotID}";
         }
 
         public void Cancel()
@@ -51,19 +58,25 @@ namespace Ntreev.Crema.Bot
             this.cancelTokenSource.Cancel();
         }
 
-        public Authentication Login()
+        public async Task CancelAsync()
         {
-            this.taskContext.Authentication = this.OnLogin();
-            //this.taskContext.Authentication.Expired += (s, e) =>
-            //{
-            //    this.taskContext.Authentication = null;
-            //};
-            return this.taskContext.Authentication;
+            this.cancelTokenSource.Cancel();
+            while (this.dispatcher != null)
+            {
+                await Task.Delay(1);
+            }
         }
 
-        public void Logout()
+        public async Task LoginAsync()
         {
-            this.OnLogout(this.taskContext.Authentication);
+            var authentication = await this.OnLoginAsync();
+            authentication.Expired += Authentication_Expired;
+            this.taskContext.Authentication = authentication;
+        }
+
+        public async Task LogoutAsync()
+        {
+            await this.OnLogoutAsync(this.taskContext.Authentication);
             this.taskContext.Authentication = null;
         }
 
@@ -87,11 +100,6 @@ namespace Ntreev.Crema.Bot
             get { return this.autobotID; }
         }
 
-        public abstract ICremaHost CremaHost
-        {
-            get;
-        }
-
         public abstract AutobotServiceBase Service
         {
             get;
@@ -103,11 +111,13 @@ namespace Ntreev.Crema.Bot
             set { this.taskContext.AllowException = value; }
         }
 
+        public abstract object GetService(Type serviceType);
+
         public Task ExecuteAsync(IEnumerable<ITaskProvider> taskProviders)
         {
             this.taskProviders = taskProviders;
             this.taskContext.Push(this);
-            return Task.Run(() => this.Execute(taskProviders));
+            return this.dispatcher.InvokeAsync(async () => await this.ProcessAsync());
         }
 
         public event EventHandler Disposed;
@@ -117,17 +127,21 @@ namespace Ntreev.Crema.Bot
             this.Disposed?.Invoke(this, e);
         }
 
-        protected abstract Authentication OnLogin();
+        protected abstract Task<Authentication> OnLoginAsync();
 
-        protected abstract void OnLogout(Authentication authentication);
+        protected abstract Task OnLogoutAsync(Authentication authentication);
 
-        private void InvokeTask(MethodInfo method, ITaskProvider taskProvider, object target)
+        private async Task InvokeTaskAsync(MethodInfo method, ITaskProvider taskProvider, object target)
         {
             try
             {
                 if (method != null)
                 {
-                    method.Invoke(taskProvider, new object[] { target, this.taskContext });
+                    var result = method.Invoke(taskProvider, new object[] { target, this.taskContext });
+                    if (result is Task task)
+                    {
+                        await task;
+                    }
                 }
             }
             catch
@@ -140,36 +154,53 @@ namespace Ntreev.Crema.Bot
             }
         }
 
-        private void Execute(IEnumerable<ITaskProvider> taskProviders)
+        private async Task ProcessAsync()
         {
-            while (this.cancelTokenSource.IsCancellationRequested == false)
+            try
             {
-                if (this.taskContext.Target == null)
+                while (this.cancelTokenSource.IsCancellationRequested == false)
                 {
-                    this.taskContext.Push(this);
-                }
+                    var sleep = RandomUtility.Next(this.MinSleepTime, this.MaxSleepTime);
+                    Thread.Sleep(sleep);
 
-                var taskProvider = RandomTaskProvider(this.taskContext.Target);
+                    if (this.taskContext.Target == null)
+                    {
+                        this.taskContext.Push(this);
+                    }
 
-                try
-                {
-                    if (this.cancelTokenSource.IsCancellationRequested == true)
-                        break;
-                    taskProvider.InvokeTask(this.taskContext);
-                }
-                catch
-                {
-                    this.taskContext.Complete(this.taskContext.Target);
-                    continue;
-                }
+                    var taskProvider = RandomTaskProvider(this.taskContext.Target);
 
-                if (this.taskContext.Target != null && taskProvider.TargetType.IsAssignableFrom(this.taskContext.Target.GetType()) == true)
-                {
-                    var method = RandomMethod(taskProvider);
-                    if (this.cancelTokenSource.IsCancellationRequested == true)
-                        break;
-                    this.InvokeTask(method, taskProvider, this.taskContext.Target);
+                    try
+                    {
+                        if (this.cancelTokenSource.IsCancellationRequested == true)
+                            break;
+                        await taskProvider.InvokeAsync(this.taskContext);
+                    }
+                    catch
+                    {
+                        this.taskContext.Complete(this.taskContext.Target);
+                        continue;
+                    }
+
+                    if (this.taskContext.Target != null && taskProvider.TargetType.IsAssignableFrom(this.taskContext.Target.GetType()) == true)
+                    {
+                        var method = RandomMethod(taskProvider);
+                        if (this.cancelTokenSource.IsCancellationRequested == true)
+                            break;
+                        await this.InvokeTaskAsync(method, taskProvider, this.taskContext.Target);
+                    }
                 }
+                if (this.taskContext.Authentication != null)
+                {
+                    await this.OnLogoutAsync(this.taskContext.Authentication);
+                }
+                this.dispatcher.Dispose();
+                this.dispatcher = null;
+                this.OnDisposed(EventArgs.Empty);
+            }
+            catch (Exception e)
+            {
+                CremaLog.Fatal(e);
             }
         }
 
@@ -184,7 +215,7 @@ namespace Ntreev.Crema.Bot
                 if (methodInfo.IsStatic == true)
                     return false;
 
-                if (methodInfo.ReturnType != typeof(void))
+                if (methodInfo.ReturnType != typeof(void) && methodInfo.ReturnType != typeof(Task))
                     return false;
 
                 var attr = methodInfo.GetCustomAttribute<TaskMethodAttribute>();
@@ -222,13 +253,9 @@ namespace Ntreev.Crema.Bot
             }
         }
 
-        #region IDisposable
-
-        void IDisposable.Dispose()
+        private void Authentication_Expired(object sender, EventArgs e)
         {
-            this.OnDisposed(EventArgs.Empty);
+            this.taskContext.Authentication = null;
         }
-
-        #endregion
     }
 }

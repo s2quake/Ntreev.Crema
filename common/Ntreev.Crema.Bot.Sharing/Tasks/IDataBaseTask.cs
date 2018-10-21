@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Bot.Tasks
 {
@@ -35,34 +36,30 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass]
     public class IDataBaseTask : ITaskProvider, IConfigurationPropertyProvider
     {
-        public void InvokeTask(TaskContext context)
+        public async Task InvokeAsync(TaskContext context)
         {
+            var authentication = context.Authentication;
             var dataBase = context.Target as IDataBase;
-            dataBase.Dispatcher.Invoke(() =>
+            if (context.IsCompleted(dataBase) == true)
             {
-                if (context.IsCompleted(dataBase) == true)
+                context.Pop(dataBase);
+            }
+            else 
+            {
+                if (await dataBase.ContainsAsync(authentication) == true)
                 {
-                    context.Pop(dataBase);
-                }
-                else
-                {
-                    var item = SelectItem();
-                    if (item != null)
+                    if (RandomUtility.Within(35) == true)
                     {
-                        context.Push(item);
+                        var typeItem = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TypeContext.Random());
+                        context.Push(typeItem);
                     }
-                    object SelectItem()
+                    else
                     {
-                        if (dataBase.Contains(context.Authentication) == true)
-                        {
-                            if (RandomUtility.Within(35) == true)
-                                return dataBase.TypeContext.Random();
-                            return dataBase.TableContext.Random();
-                        }
-                        return null;
+                        var tableItem = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TableContext.Random());
+                        context.Push(tableItem);
                     }
                 }
-            });
+            }
         }
 
         public Type TargetType
@@ -71,62 +68,61 @@ namespace Ntreev.Crema.Bot.Tasks
         }
 
         [TaskMethod]
-        public void Enter(IDataBase dataBase, TaskContext context)
+        public async Task EnterAsync(IDataBase dataBase, TaskContext context)
         {
-            dataBase.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
             {
-                if (dataBase.Contains(context.Authentication) == false)
-                {
-                    if (dataBase.IsLoaded == false)
-                        dataBase.Load(context.Authentication);
-                    dataBase.Enter(context.Authentication);
-                }
-            });
+                if (await dataBase.Dispatcher.InvokeAsync(() => dataBase.IsLoaded) == false)
+                    return;
+                if (await dataBase.ContainsAsync(authentication) == true)
+                    return;
+            }
+            await dataBase.EnterAsync(authentication);
         }
 
         [TaskMethod]
-        public void Leave(IDataBase dataBase, TaskContext context)
+        public async Task LeaveAsync(IDataBase dataBase, TaskContext context)
         {
-            dataBase.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
             {
-                if (context.IsCompleted(dataBase) == true)
-                {
-                    dataBase.Leave(context.Authentication);
-                    context.Pop(dataBase);
-                }
-            });
+                if (await dataBase.Dispatcher.InvokeAsync(() => dataBase.IsLoaded) == false)
+                    return;
+                if (await dataBase.ContainsAsync(authentication) == false)
+                    return;
+            }
+
+            await dataBase.LeaveAsync(authentication);
+            //if (context.IsCompleted(dataBase) == true)
+            //{
+                
+            //    context.Pop(dataBase);
+            //}
         }
 
-        [TaskMethod(Weight = 10)]
-        public void Rename(IDataBase dataBase, Authentication authentication)
-        {
-            dataBase.Dispatcher.Invoke(() =>
-            {
-                var dataBaseName = RandomUtility.NextIdentifier();
-                dataBase.Rename(authentication, dataBaseName);
-            });
-        }
+        //[TaskMethod(Weight = 10)]
+        //public async Task RenameAsync(IDataBase dataBase, Authentication authentication)
+        //{
+        //    var dataBaseName = RandomUtility.NextIdentifier();
+        //    await dataBase.RenameAsync(authentication, dataBaseName);
+        //}
 
-        [TaskMethod(Weight = 1)]
-        public void Delete(IDataBase dataBase, Authentication authentication)
-        {
-            dataBase.Dispatcher.Invoke(() =>
-            {
-                //dataBase.Delete(authentication);
-            });
-        }
+        //[TaskMethod(Weight = 1)]
+        //public async Task DeleteAsync(IDataBase dataBase, Authentication authentication)
+        //{
+        //    await dataBase.DeleteAsync(authentication);
+        //    context.Pop(dataBase);
+        //}
 
-        [TaskMethod(Weight = 5)]
-        public void Copy(IDataBase dataBase, Authentication authentication)
-        {
-            dataBase.Dispatcher.Invoke(() =>
-            {
-                var dataBaseName = RandomUtility.NextIdentifier();
-                var comment = RandomUtility.NextString();
-                var force = RandomUtility.NextBoolean();
-                dataBase.Copy(authentication, dataBaseName, comment, force);
-            });
-        }
+        //[TaskMethod(Weight = 5)]
+        //public async Task CopyAsync(IDataBase dataBase, Authentication authentication)
+        //{
+        //    var dataBaseName = RandomUtility.NextIdentifier();
+        //    var comment = RandomUtility.NextString();
+        //    var force = RandomUtility.NextBoolean();
+        //    await dataBase.CopyAsync(authentication, dataBaseName, comment, force);
+        //}
 
         [ConfigurationProperty(ScopeType = typeof(ICremaConfiguration))]
         public bool IsEnabled

@@ -45,24 +45,26 @@ namespace Ntreev.Crema.Javascript
 
         public string Login(string address, string userID, string password)
         {
-            if (this.token != null)
-                throw new ArgumentException("이미 로그인되어 있습니다.");
-            var token = this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.Open(address, userID, StringUtility.ToSecureString(password)));
-            var authenticator = this.cremaHost.GetService(typeof(Authenticator)) as Authenticator;
-            this.Initialize(authenticator);
-            this.token = $"{token}";
-            return this.token;
+            //if (this.token != null)
+            //    throw new ArgumentException("이미 로그인되어 있습니다.");
+            //var token = this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.Open(address, userID, StringUtility.ToSecureString(password)));
+            //var authenticator = this.cremaHost.GetService(typeof(Authenticator)) as Authenticator;
+            //this.Initialize(authenticator);
+            //this.token = $"{token}";
+            //return this.token;
+            throw new NotImplementedException();
         }
 
         public void Logout(string token)
         {
-            if (token == null)
-                throw new ArgumentNullException(nameof(token));
-            if (this.token != token)
-                throw new ArgumentException("잘못된 토큰입니다.", nameof(token));
-            this.cremaHost.Close(Guid.Parse(token));
-            this.Release();
-            this.token = null;
+            //if (token == null)
+            //    throw new ArgumentNullException(nameof(token));
+            //if (this.token != token)
+            //    throw new ArgumentException("잘못된 토큰입니다.", nameof(token));
+            //this.cremaHost.Close(Guid.Parse(token));
+            //this.Release();
+            //this.token = null;
+            throw new NotImplementedException();
         }
 
         public Authentication GetAuthentication(IScriptMethod scriptMethod)

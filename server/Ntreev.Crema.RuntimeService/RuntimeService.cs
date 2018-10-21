@@ -67,14 +67,20 @@ namespace Ntreev.Crema.RuntimeService
             get { return Guid.Parse(ServiceID); }
         }
 
-        public void Initialize(Authentication authentication)
+        public async void Initialize(Authentication authentication)
         {
             this.authentication = authentication;
 
-            foreach (var item in this.cremaHost.DataBases)
+            if (this.cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
             {
-                var obj = new RuntimeServiceItem(item, this.dispatcher, authentication);
-                this.items.Add(item.ID, obj);
+                await dataBases.Dispatcher.InvokeAsync(() =>
+                {
+                    foreach (var item in dataBases)
+                    {
+                        var obj = new RuntimeServiceItem(item, this.dispatcher, authentication);
+                        this.items.Add(item.ID, obj);
+                    }
+                });
             }
         }
 
@@ -95,22 +101,17 @@ namespace Ntreev.Crema.RuntimeService
             return this.serializers.FirstOrDefault(item => item.Name == type);
         }
 
-        public ResultBase<GenerationSet> GetCodeGenerationData(string dataBaseName, string tags, string filterExpression, long revision)
+        public async Task<ResultBase<GenerationSet>> GetCodeGenerationDataAsync(string dataBaseName, string tags, string filterExpression, string revision)
         {
             var result = new ResultBase<GenerationSet>();
             try
             {
-                using (var dataBaseItem = UsingDataBase.Set(this.cremaHost, dataBaseName, this.authentication, true))
+                using (var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication))
                 {
                     var dataBaseID = dataBaseItem.DataBase.ID;
-                    var metaSet = this.dispatcher.Invoke(() =>
-                    {
-                        var project = this.GetServiceItem(dataBaseID);
-                        var tagInfo = new TagInfo(tags);
-                        return project.Gerneration(tagInfo, filterExpression, false, revision);
-                    });
-
-                    result.Value = metaSet;
+                    var project = this.GetServiceItem(dataBaseID);
+                    var tagInfo = new TagInfo(tags);
+                    result.Value = await project.GernerationAsync(tagInfo, filterExpression, false, revision);
                 }
             }
             catch (Exception e)
@@ -121,22 +122,17 @@ namespace Ntreev.Crema.RuntimeService
             return result;
         }
 
-        public ResultBase<SerializationSet> GetDataGenerationData(string dataBaseName, string tags, string filterExpression, bool isDevmode, long revision)
+        public async Task<ResultBase<SerializationSet>> GetDataGenerationDataAsync(string dataBaseName, string tags, string filterExpression, bool isDevmode, string revision)
         {
             var result = new ResultBase<SerializationSet>();
             try
             {
-                using (var dataBaseItem = UsingDataBase.Set(this.cremaHost, dataBaseName, this.authentication, true))
+                using (var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication))
                 {
                     var dataBaseID = dataBaseItem.DataBase.ID;
-                    var metaSet = this.dispatcher.Invoke(() =>
-                    {
-                        var project = this.GetServiceItem(dataBaseID);
-                        var tagInfo = (TagInfo)tags;
-                        return project.Serialize(tagInfo, filterExpression, isDevmode, revision);
-                    });
-
-                    result.Value = metaSet;
+                    var project = this.GetServiceItem(dataBaseID);
+                    var tagInfo = (TagInfo)tags;
+                    result.Value = await project.SerializeAsync(tagInfo, filterExpression, isDevmode, revision);
                 }
             }
             catch (Exception e)
@@ -147,25 +143,18 @@ namespace Ntreev.Crema.RuntimeService
             return result;
         }
 
-        public ResultBase<GenerationSet, SerializationSet> GetMetaData(string dataBaseName, string tags, string filterExpression, bool isDevmode, long revision)
+        public async Task<ResultBase<GenerationSet, SerializationSet>> GetMetaDataAsync(string dataBaseName, string tags, string filterExpression, bool isDevmode, string revision)
         {
             var result = new ResultBase<GenerationSet, SerializationSet>();
             try
             {
-                using (var dataBaseItem = UsingDataBase.Set(this.cremaHost, dataBaseName, this.authentication, true))
+                using (var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication))
                 {
                     var dataBaseID = dataBaseItem.DataBase.ID;
-                    var metaSet = this.dispatcher.Invoke(() =>
-                    {
-                        var project = this.GetServiceItem(dataBaseID);
-                        var tagInfo = (TagInfo)tags;
-                        var codeMetaData = project.Gerneration(tagInfo, filterExpression, isDevmode, revision);
-                        var dataMetaData = project.Serialize(tagInfo, filterExpression, isDevmode, revision);
-                        return new Tuple<GenerationSet, SerializationSet>(codeMetaData, dataMetaData);
-                    });
-
-                    result.Value1 = metaSet.Item1;
-                    result.Value2 = metaSet.Item2;
+                    var project = this.GetServiceItem(dataBaseID);
+                    var tagInfo = (TagInfo)tags;
+                    result.Value1 = await project.GernerationAsync(tagInfo, filterExpression, isDevmode, revision);
+                    result.Value2 = await project.SerializeAsync(tagInfo, filterExpression, isDevmode, revision);
                 }
             }
             catch (Exception e)
@@ -176,20 +165,17 @@ namespace Ntreev.Crema.RuntimeService
             return result;
         }
 
-        public ResultBase ResetData(string dataBaseName)
+        public async Task<ResultBase> ResetDataAsync(string dataBaseName)
         {
             var result = new ResultBase();
 
             try
             {
-                using (var dataBaseItem = UsingDataBase.Set(this.cremaHost, dataBaseName, this.authentication, true))
+                using (var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication))
                 {
                     var dataBaseID = dataBaseItem.DataBase.ID;
-                    this.dispatcher.Invoke(() =>
-                    {
-                        var project = this.GetServiceItem(dataBaseID);
-                        project.Reset();
-                    });
+                    var project = this.GetServiceItem(dataBaseID);
+                    await project.ResetAsync();
                 }
             }
             catch (Exception e)
@@ -200,16 +186,16 @@ namespace Ntreev.Crema.RuntimeService
             return result;
         }
 
-        public ResultBase<long> GetRevision(string dataBaseName)
+        public async Task<ResultBase<string>> GetRevisionAsync(string dataBaseName)
         {
-            var result = new ResultBase<long>();
+            var result = new ResultBase<string>();
 
             try
             {
-                using (var dataBaseItem = UsingDataBase.Set(this.cremaHost, dataBaseName, this.authentication, true))
+                using (var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication))
                 {
                     var dataBase = dataBaseItem.DataBase;
-                    result.Value = dataBase.Dispatcher.Invoke(() => dataBase.DataBaseInfo.Revision);
+                    result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo.Revision);
                 }
             }
             catch (Exception e)
@@ -244,10 +230,16 @@ namespace Ntreev.Crema.RuntimeService
             }
         }
 
-        private void CremaHost_Opened(object sender, EventArgs e)
+        private async void CremaHost_Opened(object sender, EventArgs e)
         {
-            this.cremaHost.DataBases.ItemsCreated += DataBases_ItemCreated;
-            this.cremaHost.DataBases.ItemsDeleted += DataBases_ItemDeleted;
+            if (this.cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
+            {
+                await dataBases.Dispatcher.InvokeAsync(() =>
+                {
+                    dataBases.ItemsCreated += DataBases_ItemCreated;
+                    dataBases.ItemsDeleted += DataBases_ItemDeleted;
+                });
+            }
         }
 
         private void CremaHost_Closed(object sender, EventArgs e)

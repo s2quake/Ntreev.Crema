@@ -33,7 +33,6 @@ namespace Ntreev.Crema.ServiceHosts
     public abstract class CremaServiceItemHost : ServiceHost
     {
         private readonly string serviceName;
-        private readonly ICremaHost cremaHost;
         private readonly ILogService logService;
         private readonly int port;
 
@@ -41,7 +40,7 @@ namespace Ntreev.Crema.ServiceHosts
             : base(serviceType, new Uri(string.Format(address, port)))
         {
             this.serviceName = serviceType.Name;
-            this.cremaHost = cremaHost;
+            this.CremaHost = cremaHost;
             this.logService = cremaHost.GetService(typeof(ILogService)) as ILogService;
             this.port = port;
 #if !DEBUG
@@ -55,7 +54,7 @@ namespace Ntreev.Crema.ServiceHosts
             : base(serviceInstance, new Uri(string.Format(address, port)))
         {
             this.serviceName = serviceInstance.GetType().Name;
-            this.cremaHost = cremaHost;
+            this.CremaHost = cremaHost;
             this.logService = cremaHost.GetService(typeof(ILogService)) as ILogService;
             this.port = port;
 #if !DEBUG
@@ -65,10 +64,7 @@ namespace Ntreev.Crema.ServiceHosts
 #endif
         }
 
-        public ICremaHost CremaHost
-        {
-            get { return this.cremaHost; }
-        }
+        public ICremaHost CremaHost { get; }
 
         public abstract object CreateInstance(Message message);
 
@@ -96,10 +92,6 @@ namespace Ntreev.Crema.ServiceHosts
             this.logService.Debug("{0}[{1}] is stopped.", this.serviceName, this.port);
         }
 
-        protected TimeSpan DefaultInactivityTimeout
-        {
-            get;
-            set;
-        }
+        protected TimeSpan DefaultInactivityTimeout { get; set; }
     }
 }

@@ -15,26 +15,22 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data.Properties;
 using Ntreev.Crema.Data.Xml.Schema;
+using Ntreev.Library;
+using Ntreev.Library.IO;
+using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
-using Ntreev.Library;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Data.Properties;
-using Ntreev.Library.IO;
 using System.Security.Cryptography;
 
 namespace Ntreev.Crema.Data
 {
     class InternalDataSet : InternalSetBase, INotifyPropertyChanged
     {
-        private string tableNamespace;
-        private string typeNamespace;
         private int loadingCount;
 
         public InternalDataSet(CremaDataSet target, string dataSetName)
@@ -156,6 +152,16 @@ namespace Ntreev.Crema.Data
         {
             this.ValidateRemoveTable(dataTable);
             this.Sign();
+
+            if (dataTable.ParentName != string.Empty)
+            {
+                var derivedItems = dataTable.DerivedItems.ToArray();
+                foreach (var item in derivedItems)
+                {
+                    this.Tables.Remove(item);
+                }
+            }
+
             foreach (var item in dataTable.ChildItems)
             {
                 this.Tables.Remove(item);
@@ -169,9 +175,9 @@ namespace Ntreev.Crema.Data
                 return false;
             if (dataTable.DataSet != this)
                 return false;
-            if (dataTable.Parent != null)
+            if (dataTable.ParentName != string.Empty && dataTable.TemplatedParentName != string.Empty)
                 return false;
-            return this.Tables.CanRemove(dataTable);
+            return true;
         }
 
         public void BeginLoad()
@@ -229,27 +235,24 @@ namespace Ntreev.Crema.Data
             return dataSet.InternalObject;
         }
 
-        public new CremaDataSet Target
-        {
-            get { return base.Target as CremaDataSet; }
-        }
+        public new CremaDataSet Target => base.Target as CremaDataSet;
 
         public new string Namespace
         {
-            get { return base.Namespace; }
+            get => base.Namespace;
             set
             {
                 base.Namespace = value;
 
                 if (base.Namespace == CremaSchemaObsolete.BaseNamespaceObsolete)
                 {
-                    this.tableNamespace = UriUtility.Combine(base.Namespace, CremaSchemaObsolete.TableDirectoryObsolete);
-                    this.typeNamespace = UriUtility.Combine(base.Namespace, CremaSchemaObsolete.TypeDirectoryObsolete);
+                    this.TableNamespace = UriUtility.Combine(base.Namespace, CremaSchemaObsolete.TableDirectoryObsolete);
+                    this.TypeNamespace = UriUtility.Combine(base.Namespace, CremaSchemaObsolete.TypeDirectoryObsolete);
                 }
                 else
                 {
-                    this.tableNamespace = UriUtility.Combine(base.Namespace, CremaSchema.TableDirectory);
-                    this.typeNamespace = UriUtility.Combine(base.Namespace, CremaSchema.TypeDirectory);
+                    this.TableNamespace = UriUtility.Combine(base.Namespace, CremaSchema.TableDirectory);
+                    this.TypeNamespace = UriUtility.Combine(base.Namespace, CremaSchema.TypeDirectory);
                 }
 
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Namespace)));
@@ -258,20 +261,11 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        public string TableNamespace
-        {
-            get { return this.tableNamespace; }
-        }
+        public string TableNamespace { get; private set; }
 
-        public string TypeNamespace
-        {
-            get { return this.typeNamespace; }
-        }
+        public string TypeNamespace { get; private set; }
 
-        public bool IsLoading
-        {
-            get { return this.loadingCount > 0; }
-        }
+        public bool IsLoading => this.loadingCount > 0;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -450,7 +444,7 @@ namespace Ntreev.Crema.Data
         {
             if (dataTable.DataSet != null)
                 throw new CremaDataException("이미 DataSet에 속해 있는 테이블은 추가할 수 없습니다.");
-            if (dataTable.Parent != null)
+            if (dataTable.Parent != null && dataTable.Parent.DataSet != this)
                 throw new CremaDataException(Resources.Exception_CannotAddChildTable);
         }
 
@@ -466,8 +460,10 @@ namespace Ntreev.Crema.Data
         {
             if (dataTable.DataSet != this)
                 throw new CremaDataException("DataSet에 속해 있지 않은 테이블은 제거할 수 없습니다.");
-            if (dataTable.Parent != null)
-                throw new CremaDataException(Resources.Exception_CannotRemoveChildTable);
+            //if (dataTable.Parent != null)
+            //    throw new CremaDataException(Resources.Exception_CannotRemoveChildTable);
+            if (dataTable.ParentName != string.Empty && dataTable.TemplatedParentName != string.Empty)
+                throw new CremaDataException("상속된 자식 테이블은 제거할 수 없습니다.");
         }
 
         private void ValidateAddType(TypeInfo typeInfo)

@@ -21,13 +21,14 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Security;
-using System.Windows.Threading;
+using System.Threading.Tasks;
+
 namespace Ntreev.Crema.Services
 {
     public interface ICremaHost : IServiceProvider, IDisposable, IDispatcherObject
     {
 #if CLIENT
-        Guid Open(string address, string userID, SecureString password);
+        Task<Guid> OpenAsync(string address, string userID, SecureString password);
 
         string Address { get; }
 
@@ -36,22 +37,20 @@ namespace Ntreev.Crema.Services
         Authority Authority { get; }
 
 #elif SERVER
-        Guid Open();
+        Task<Guid> OpenAsync();
 
-        Authentication Login(string userID, SecureString password);
+        Task<Authentication> LoginAsync(string userID, SecureString password);
 
-        void Logout(Authentication authentication);
+        Task LogoutAsync(Authentication authentication);
 
-        string BasePath { get; }
-
-        string RepositoryPath { get; }
-
-        string WorkingPath { get; }
+        string GetPath(CremaPath pathType, params string[] paths);
 
 #endif
         event EventHandler Opening;
 
         event EventHandler Opened;
+
+        event CloseRequestedEventHandler CloseRequested;
 
         event EventHandler Closing;
 
@@ -61,18 +60,16 @@ namespace Ntreev.Crema.Services
 
         void SaveConfigs();
 
-        void Close(Guid token);
+        Task CloseAsync(Guid token);
 
-        void Shutdown(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message);
+        Task ShutdownAsync(Authentication authentication, int milliseconds, ShutdownType shutdownType, string message);
 
-        void CancelShutdown(Authentication authentication);
+        Task CancelShutdownAsync(Authentication authentication);
 
-        bool IsOpened { get; }
+        ServiceState ServiceState { get; }
 
-        IDataBaseCollection DataBases { get; }
+        //IDataBaseCollection DataBases { get; }
 
         ICremaConfiguration Configs { get; }
-
-        LogVerbose Verbose { get; set; }
     }
 }

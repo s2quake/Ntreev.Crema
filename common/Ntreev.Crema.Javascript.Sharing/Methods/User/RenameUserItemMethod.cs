@@ -40,14 +40,17 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         protected override Delegate CreateDelegate()
         {
-            return new Action<string, string>(this.RenameUserItem);
+            return new Func<string, string, string>(this.RenameUserItem);
         }
 
-        private void RenameUserItem(string userItemPath, string newName)
+        [ReturnParameterName("path")]
+        private string RenameUserItem(string userItemPath, string newName)
         {
             var userItem = this.GetUserItem(userItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            userItem.Dispatcher.Invoke(() => userItem.Rename(authentication, newName));
+            var task = userItem.RenameAsync(authentication, newName);
+            task.Wait();
+            return userItem.Path;
         }
     }
 }

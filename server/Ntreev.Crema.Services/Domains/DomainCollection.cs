@@ -16,12 +16,14 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Data;
 using Ntreev.Library.ObjectModel;
 using System;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains
 {
@@ -40,69 +42,56 @@ namespace Ntreev.Crema.Services.Domains
         private EventHandler<DomainRowEventArgs> domainRowRemoved;
         private EventHandler<DomainPropertyEventArgs> domainPropertyChanged;
 
-        public void InvokeDomainCreatedEvent(Authentication authentication, Domain domain)
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher.VerifyAccess();
+            base.OnCollectionChanged(e);
+        }
+
+        public void InvokeDomainCreatedEvent(Authentication authentication, Domain domain, DomainInfo domainInfo)
         {
             var args = new DomainEventArgs(authentication, domain);
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainCreatedEvent), domain);
             var comment = EventMessageBuilder.BeginDomain(authentication, domain);
-            var domainInfo = domain.DomainInfo;
-            this.Dispatcher.InvokeAsync(() =>
-            {
-                this.CremaHost.Debug(eventLog);
-                this.CremaHost.Info(comment);
-                this.OnDomainCreated(args);
-                this.Context.InvokeItemsCreatedEvent(authentication, new IDomainItem[] { domain }, new object[] { domainInfo });
-            });
+            this.CremaHost.Debug(eventLog);
+            this.CremaHost.Info(comment);
+            this.OnDomainCreated(args);
+            this.Context.InvokeItemsCreatedEvent(authentication, new IDomainItem[] { domain }, new object[] { domainInfo });
         }
 
-        public void InvokeDomainDeletedEvent(Authentication authentication, Domain domain, bool isCanceled)
+        public void InvokeDomainDeletedEvent(Authentication authentication, Domain domain, bool isCanceled, object result)
         {
-            var args = new DomainDeletedEventArgs(authentication, domain, isCanceled);
+            var args = new DomainDeletedEventArgs(authentication, domain, isCanceled, result);
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainDeletedEvent), domain, isCanceled);
             var comment = isCanceled == false ? EventMessageBuilder.EndDomain(authentication, domain) : EventMessageBuilder.CancelDomain(authentication, domain);
-            this.Dispatcher.InvokeAsync(() =>
-            {
-                this.CremaHost.Debug(eventLog);
-                this.CremaHost.Info(comment);
-                this.OnDomainDeleted(args);
-                this.Context.InvokeItemsDeleteEvent(authentication, new IDomainItem[] { domain }, new string[] { domain.Path });
-            });
+            this.CremaHost.Debug(eventLog);
+            this.CremaHost.Info(comment);
+            this.OnDomainDeleted(args);
+            this.Context.InvokeItemsDeleteEvent(authentication, new IDomainItem[] { domain }, new string[] { domain.Path });
         }
 
         public void InvokeDomainRowAddedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows)
         {
             var args = new DomainRowEventArgs(authentication, domain, rows);
-            this.Dispatcher.InvokeAsync(() =>
-            {
-                this.OnDomainRowAdded(args);
-            });
+            this.OnDomainRowAdded(args);
         }
 
         public void InvokeDomainRowChangedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows)
         {
             var args = new DomainRowEventArgs(authentication, domain, rows);
-            this.Dispatcher.InvokeAsync(() =>
-            {
-                this.OnDomainRowChanged(args);
-            });
+            this.OnDomainRowChanged(args);
         }
 
         public void InvokeDomainRowRemovedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows)
         {
             var args = new DomainRowEventArgs(authentication, domain, rows);
-            this.Dispatcher.InvokeAsync(() =>
-            {
-                this.OnDomainRowChanged(args);
-            });
+            this.OnDomainRowChanged(args);
         }
 
         public void InvokeDomainPropertyChangedEvent(Authentication authentication, Domain domain, string propertyName, object value)
         {
             var args = new DomainPropertyEventArgs(authentication, domain, propertyName, value);
-            this.Dispatcher.InvokeAsync(() =>
-            {
-                this.OnDomainPropertyChanged(args);
-            });
+            this.OnDomainPropertyChanged(args);
         }
 
         public void InvokeDomainUserAddedEvent(Authentication authentication, Domain domain, DomainUser domainUser)
@@ -110,12 +99,9 @@ namespace Ntreev.Crema.Services.Domains
             var args = new DomainUserEventArgs(authentication, domain, domainUser);
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainUserAddedEvent), domain, domainUser);
             var comment = EventMessageBuilder.EnterDomainUser(authentication, domain);
-            this.Dispatcher.InvokeAsync(() =>
-            {
-                this.CremaHost.Debug(eventLog);
-                this.CremaHost.Info(comment);
-                this.OnDomainUserAdded(args);
-            });
+            this.CremaHost.Debug(eventLog);
+            this.CremaHost.Info(comment);
+            this.OnDomainUserAdded(args);
         }
 
         public void InvokeDomainUserRemovedEvent(Authentication authentication, Domain domain, DomainUser domainUser, RemoveInfo removeInfo)
@@ -125,110 +111,69 @@ namespace Ntreev.Crema.Services.Domains
             var comment = removeInfo.Reason == RemoveReason.Kick
                 ? EventMessageBuilder.KickDomainUser(authentication, domain, domainUser)
                 : EventMessageBuilder.LeaveDomainUser(authentication, domain);
-            this.Dispatcher.InvokeAsync(() =>
-            {
-                this.CremaHost.Debug(eventLog);
-                this.CremaHost.Info(comment);
-                this.OnDomainUserRemoved(args);
-            });
+            this.CremaHost.Debug(eventLog);
+            this.CremaHost.Info(comment);
+            this.OnDomainUserRemoved(args);
         }
 
         public void InvokeDomainUserChangedEvent(Authentication authentication, Domain domain, DomainUser domainUser)
         {
             var args = new DomainUserEventArgs(authentication, domain, domainUser);
-            this.Dispatcher.InvokeAsync(() =>
-            {
-                this.OnDomainUserChanged(args);
-            });
+            this.OnDomainUserChanged(args);
         }
 
         public void InvokeDomainInfoChangedEvent(Authentication authentication, Domain domain)
         {
             var args = new DomainEventArgs(authentication, domain);
-            this.Dispatcher.InvokeAsync(() =>
-            {
-                this.OnDomainInfoChanged(args);
-            });
+            this.OnDomainInfoChanged(args);
         }
 
         public void InvokeDomainStateChangedEvent(Authentication authentication, Domain domain)
         {
             var args = new DomainEventArgs(authentication, domain);
-            this.Dispatcher.InvokeAsync(() =>
-            {
-                this.OnDomainStateChanged(args);
-            });
-        }
-
-        public void Restore(Authentication authentication, Domain domain)
-        {
-            authentication.Sign();
-            var dataBase = this.Context.CremaHost.DataBases[domain.DataBaseID];
-            var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
-            var category = this.Context.Categories.Prepare(categoryName);
-            domain.Category = category;
-            domain.Dispatcher = new CremaDispatcher(domain);
-            domain.Dispatcher.InvokeAsync(() => this.InvokeDomainCreatedEvent(authentication, domain));
-        }
-
-        public void Add(Authentication authentication, Domain domain)
-        {
-            var dataBase = this.Context.CremaHost.DataBases[domain.DataBaseID];
-            var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
-            var category = this.Context.Categories.Prepare(categoryName);
-            domain.Category = category;
-            domain.Dispatcher = new CremaDispatcher(domain);
-            domain.Logger = new DomainLogger(domain);
-            domain.Dispatcher.InvokeAsync(() => this.InvokeDomainCreatedEvent(authentication, domain));
+            this.OnDomainStateChanged(args);
         }
 
         public bool Contains(Guid domainID)
         {
-            this.Dispatcher.VerifyAccess();
             return this.Contains(domainID.ToString());
         }
 
         public DomainMetaData[] GetMetaData(Authentication authentication)
         {
             this.Dispatcher.VerifyAccess();
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
 
             var domains = this.ToArray<Domain>();
             var metaDataList = new List<DomainMetaData>(domains.Length);
             foreach (var item in domains)
             {
-                var metaData = item.Dispatcher.Invoke(() => item.GetMetaData(authentication));
+                var metaData = item.GetMetaData(authentication);
                 metaDataList.Add(metaData);
             }
             return metaDataList.ToArray();
         }
 
-        public Domain this[Guid domainID]
+        public async Task<DomainMetaData[]> GetMetaDataAsync(Authentication authentication)
         {
-            get
+            var domains = await this.Dispatcher.InvokeAsync(() => this.ToArray<Domain>());
+            var metaDataList = new List<DomainMetaData>(domains.Length);
+            foreach (var item in domains)
             {
-                this.Dispatcher.VerifyAccess();
-                return this[domainID.ToString()];
+                var metaData = await item.GetMetaDataAsync(authentication);
+                metaDataList.Add(metaData);
             }
+            return metaDataList.ToArray();
         }
 
-        public CremaHost CremaHost
-        {
-            get { return this.Context.CremaHost; }
-        }
+        public Domain this[Guid domainID] => this[domainID.ToString()];
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.Context.Dispatcher; }
-        }
+        public CremaHost CremaHost => this.Context.CremaHost;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public CremaDispatcher Dispatcher => this.Context.Dispatcher;
+
+        public new int Count => base.Count;
 
         public event EventHandler<DomainEventArgs> DomainCreated
         {
@@ -455,20 +400,15 @@ namespace Ntreev.Crema.Services.Domains
 
         #region IDomainCollection
 
-        IDomain IDomainCollection.this[Guid domainID]
-        {
-            get { return this[domainID]; }
-        }
+        IDomain IDomainCollection.this[Guid domainID] => this[domainID];
 
         IEnumerator<IDomain> IEnumerable<IDomain>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 

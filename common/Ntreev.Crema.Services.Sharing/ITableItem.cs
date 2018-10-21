@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -28,19 +29,17 @@ namespace Ntreev.Crema.Services
 {
     public interface ITableItem : IAccessible, ILockable, IPermission, IServiceProvider, IDispatcherObject, IExtendedProperties
     {
-        void Rename(Authentication authentication, string newName);
+        Task RenameAsync(Authentication authentication, string newName);
 
-        void Move(Authentication authentication, string parentPath);
+        Task MoveAsync(Authentication authentication, string parentPath);
 
-        void Delete(Authentication authentication);
+        Task DeleteAsync(Authentication authentication);
 
-        void SetProperty(Authentication authentication, string propertyName, string value);
+        Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision);
 
-        LogInfo[] GetLog(Authentication authentication);
+        Task<FindResultInfo[]> FindAsync(Authentication authentication, string text, FindOptions options);
 
-        FindResultInfo[] Find(Authentication authentication, string text, FindOptions options);
-
-        CremaDataSet GetDataSet(Authentication authentication, long revision);
+        Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision);
 
         string Name { get; }
 

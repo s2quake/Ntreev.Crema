@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>97ad6c00-3b71-4e83-97c3-0201bc035471</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Ntreev.Crema.Services.Extensions</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)AccessibleDescriptorUtility.cs" />
+    <None Include="$(MSBuildThisFileDirectory)DataBaseDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)DataBaseDescriptorUtility.cs" />
+    <None Include="$(MSBuildThisFileDirectory)DescriptorBase.cs" />
+    <None Include="$(MSBuildThisFileDirectory)DescriptorPropertyAttribute.cs" />
+    <None Include="$(MSBuildThisFileDirectory)DescriptorPropertyNotifier.cs" />
+    <None Include="$(MSBuildThisFileDirectory)DescriptorTypes.cs" />
+    <None Include="$(MSBuildThisFileDirectory)DomainCategoryDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)DomainDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)DomainDescriptorUtility.cs" />
+    <None Include="$(MSBuildThisFileDirectory)DomainUserDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)DomainUserDescriptorUtility.cs" />
+    <None Include="$(MSBuildThisFileDirectory)IAccessibleDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)IDataBaseDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)IDescriptorBase.cs" />
+    <None Include="$(MSBuildThisFileDirectory)IDomainCategoryDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)IDomainDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)IDomainItemDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)IDomainUserDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)ILockableDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)IPermissionDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)ITableCategoryDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)ITableContentDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)ITableDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)ITableItemDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)ITableTemplateDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)ITypeCategoryDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)ITypeDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)ITypeItemDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)ITypeTemplateDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)IUserCategoryDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)IUserDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)IUserItemDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)LockableDescriptorUtility.cs" />
+    <None Include="$(MSBuildThisFileDirectory)PermissionDescriptorUtility.cs" />
+    <None Include="$(MSBuildThisFileDirectory)TableAttribute.cs" />
+    <None Include="$(MSBuildThisFileDirectory)TableCategoryDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)TableContentDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)TableContentDescriptorUtility.cs" />
+    <None Include="$(MSBuildThisFileDirectory)TableDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)TableDescriptorUtility.cs" />
+    <None Include="$(MSBuildThisFileDirectory)TableItemDescriptorUtility.cs" />
+    <None Include="$(MSBuildThisFileDirectory)TableTemplateDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)TypeAttribute.cs" />
+    <None Include="$(MSBuildThisFileDirectory)TypeCategoryDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)TypeDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)TypeDescriptorUtility.cs" />
+    <None Include="$(MSBuildThisFileDirectory)TypeTemplateDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)UserCategoryDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)UserDescriptor.cs" />
+    <None Include="$(MSBuildThisFileDirectory)UserDescriptorUtility.cs" />
+  </ItemGroup>
+</Project>

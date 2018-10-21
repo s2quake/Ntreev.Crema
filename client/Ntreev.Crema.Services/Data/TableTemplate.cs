@@ -19,10 +19,10 @@ using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.DataBaseService;
 using Ntreev.Crema.Services.Domains;
-using Ntreev.Library;
 using Ntreev.Library.Linq;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -35,105 +35,79 @@ namespace Ntreev.Crema.Services.Data
             this.table = table;
         }
 
-        public override Type GetType(string typeName)
+        public override AccessType GetAccessType(Authentication authentication)
         {
-            var typeContext = this.table.GetService(typeof(TypeContext)) as TypeContext;
-            return typeContext[typeName] as Type;
+            return this.table.GetAccessType(authentication);
         }
 
-        public override ITable Table
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.table;
-            }
-        }
+        public override object Target => this.table;
 
-        public override DomainContext DomainContext
-        {
-            get { return this.table.GetService(typeof(DomainContext)) as DomainContext; }
-        }
+        public override DomainContext DomainContext => this.table.GetService(typeof(DomainContext)) as DomainContext;
 
-        public override string ItemPath
-        {
-            get { return this.table.Path; }
-        }
+        public override string ItemPath => this.table.Path;
 
-        public override CremaHost CremaHost
-        {
-            get { return this.table.CremaHost; }
-        }
+        public override CremaHost CremaHost => this.table.CremaHost;
 
-        public override CremaDispatcher Dispatcher
-        {
-            get { return this.table.Dispatcher; }
-        }
+        public override DataBase DataBase => this.table.DataBase;
 
-        public override DataBase DataBase
-        {
-            get { return this.table.DataBase; }
-        }
+        public override IDispatcherObject DispatcherObject => this.table;
 
-        public override IPermission Permission
-        {
-            get { return this.table; }
-        }
+        public override IPermission Permission => this.table;
 
-        protected override void OnBeginEdit(Authentication authentication, DomainMetaData metaData)
+        protected override async Task OnBeginEditAsync(Authentication authentication)
         {
-            base.OnBeginEdit(authentication, metaData);
+            await base.OnBeginEditAsync(authentication);
             this.table.SetTableState(TableState.IsBeingSetup | TableState.IsMember);
             this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table, });
         }
 
-        protected override void OnEndEdit(Authentication authentication, TableInfo tableInfo)
+        protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
-            this.Container.InvokeTableEndTemplateEdit(authentication, this.table);
-            base.OnEndEdit(authentication, tableInfo);
-            if (tableInfo != TableInfo.Empty)
+            var tableInfos = await base.OnEndEditAsync(authentication, args);
+            if (args is Guid)
             {
+                var tableInfo = tableInfos.First();
                 this.table.UpdateTemplate(tableInfo);
                 this.table.UpdateTags(tableInfo.Tags);
                 this.table.UpdateComment(tableInfo.Comment);
-            }
-            this.table.SetTableState(TableState.None);
+                this.table.SetTableState(TableState.None);
 
-            var items = EnumerableUtility.One(this.table).ToArray();
-            this.Container.InvokeTablesStateChangedEvent(authentication, items);
-            this.Container.InvokeTablesTemplateChangedEvent(authentication, items);
+                var items = EnumerableUtility.One(this.table).ToArray();
+                this.Container.InvokeTablesStateChangedEvent(authentication, items);
+                this.Container.InvokeTablesTemplateChangedEvent(authentication, items);
+            }
+            return tableInfos;
         }
 
-        protected override void OnCancelEdit(Authentication authentication)
+        protected override async Task OnCancelEditAsync(Authentication authentication)
         {
-            base.OnCancelEdit(authentication);
+            await base.OnCancelEditAsync(authentication);
             this.table.SetTableState(TableState.None);
             this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table });
         }
 
-        protected override ResultBase<DomainMetaData> BeginDomain(Authentication authentication)
+        protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
         {
-            return this.Service.BeginTableTemplateEdit(this.table.Name);
+            return Task.Run(() => this.Service.BeginTableTemplateEdit(this.table.Name));
         }
 
-        protected override ResultBase<TableInfo> EndDomain(Authentication authentication, Guid domainID)
+        protected override async Task<TableInfo[]> EndDomainAsync(Authentication authentication, object args)
         {
-            return this.Service.EndTableTemplateEdit(domainID);
+            if (args is Guid domainID)
+            {
+                var result = await Task.Run(() => this.Service.EndTableTemplateEdit(domainID));
+                return result.GetValue();
+            }
+            return args as TableInfo[];
         }
 
-        protected override ResultBase CancelDomain(Authentication authentication, Guid domainID)
+        protected override Task<ResultBase> CancelDomainAsync(Authentication authentication, Guid domainID)
         {
-            return this.Service.CancelTableTemplateEdit(domainID);
+            return Task.Run(() => this.Service.CancelTableTemplateEdit(domainID));
         }
 
-        private TableCollection Container
-        {
-            get { return this.table.Container; }
-        }
+        private TableCollection Container => this.table.Container;
 
-        private IDataBaseService Service
-        {
-            get { return this.table.Service; }
-        }
+        private IDataBaseService Service => this.table.Service;
     }
 }

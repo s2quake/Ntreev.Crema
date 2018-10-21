@@ -15,34 +15,29 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Data.Serializations;
 using Ntreev.Library.IO;
+using Ntreev.Library.Linq;
+using Ntreev.Library.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Library.Linq;
-using Ntreev.Library.Serialization;
-using System.Runtime.Serialization;
 
 namespace Ntreev.Crema.Services.Data
 {
     public abstract class DataServiceItemBase : IDisposable
     {
-        private const string jsonExtension = ".json";
+        //private const string jsonExtension = ".json";
         private const string dataDirectory = "data";
         private const string infoDirectory = "info";
-
-        private readonly IDataBase dataBase;
         private Guid dataBaseID;
-        private string dataBaseName;
-        private ILogService logService;
-        private bool noCache;
+        private readonly ILogService logService;
+        private readonly IObjectSerializer serializer;
         private bool initialized;
         private string workingPath;
         private Dictionary<string, TableInfo> tableInfos = new Dictionary<string, TableInfo>();
@@ -56,19 +51,20 @@ namespace Ntreev.Crema.Services.Data
 
         protected DataServiceItemBase(IDataBase dataBase)
         {
-            this.dataBase = dataBase;
-            this.dataBaseName = dataBase.Name;
-            this.dataBase.Loaded += DataBase_Loaded;
-            this.dataBase.Renamed += DataBase_Renamed;
-            this.dataBase.Unloaded += DataBase_Unloaded;
+            this.DataBase = dataBase;
+            this.DataBaseName = dataBase.Name;
+            this.DataBase.Loaded += DataBase_Loaded;
+            this.DataBase.Renamed += DataBase_Renamed;
+            this.DataBase.Unloaded += DataBase_Unloaded;
             this.logService = dataBase.GetService(typeof(ILogService)) as ILogService;
+            this.serializer = dataBase.GetService(typeof(IObjectSerializer)) as IObjectSerializer;
 
             if (dataBase is DataBase dataBaseInternal)
             {
-                this.noCache = dataBaseInternal.CremaHost.NoCache;
+                this.NoCache = dataBaseInternal.CremaHost.NoCache;
             }
 
-            if (this.noCache == false)
+            if (this.NoCache == false)
                 this.ReadInfo();
 
             if (this.info.Revision != dataBase.DataBaseInfo.Revision)
@@ -90,32 +86,25 @@ namespace Ntreev.Crema.Services.Data
             DirectoryUtility.Prepare(this.BasePath);
             foreach (var item in this.tableInfos)
             {
-                using (var stream = FileUtility.OpenWrite(this.BasePath, CremaSchema.TableDirectory, infoDirectory, item.Key + jsonExtension))
-                {
-                    JsonSerializerUtility.Write(stream, item.Value);
-                }
+                var itemPath = Path.Combine(this.BasePath, CremaSchema.TableDirectory, infoDirectory, item.Key);
+                this.Serializer.Serialize(itemPath, item.Value, ObjectSerializerSettings.Empty);
+
             }
             foreach (var item in this.tableDatas)
             {
-                using (var stream = FileUtility.OpenWrite(this.BasePath, CremaSchema.TableDirectory, dataDirectory, item.Key))
-                {
-                    this.OnSerializeTable(stream, item.Value);
-                }
+                var itemPath = Path.Combine(this.BasePath, CremaSchema.TableDirectory, dataDirectory, item.Key);
+                this.Serializer.Serialize(itemPath, item.Value, ObjectSerializerSettings.Empty);
             }
 
             foreach (var item in this.typeInfos)
             {
-                using (var stream = FileUtility.OpenWrite(this.BasePath, CremaSchema.TypeDirectory, infoDirectory, item.Key + jsonExtension))
-                {
-                    JsonSerializerUtility.Write(stream, item.Value);
-                }
+                var itemPath = Path.Combine(this.BasePath, CremaSchema.TypeDirectory, infoDirectory, item.Key);
+                this.Serializer.Serialize(itemPath, item.Value, ObjectSerializerSettings.Empty);
             }
             foreach (var item in this.typeDatas)
             {
-                using (var stream = FileUtility.OpenWrite(this.BasePath, CremaSchema.TypeDirectory, dataDirectory, item.Key))
-                {
-                    this.OnSerializeTable(stream, item.Value);
-                }
+                var itemPath = Path.Combine(this.BasePath, CremaSchema.TypeDirectory, dataDirectory, item.Key);
+                this.Serializer.Serialize(itemPath, item.Value, ObjectSerializerSettings.Empty);
             }
 
             var tableInfos = this.tableInfos.Select(item => Path.Combine(CremaSchema.TableDirectory, item.Key));
@@ -127,57 +116,48 @@ namespace Ntreev.Crema.Services.Data
             DirectoryUtility.Clean(this.BasePath);
         }
 
-        public void Reset()
+        public async Task ResetAsync()
         {
-            this.dataBase.Dispatcher.Invoke(() =>
+            await this.DataBase.Dispatcher.InvokeAsync(() =>
             {
-                this.dataBase.Loaded -= DataBase_Loaded;
-                this.dataBase.Renamed -= DataBase_Renamed;
-                this.dataBase.Unloaded -= DataBase_Unloaded;
+                this.DataBase.Loaded -= DataBase_Loaded;
+                this.DataBase.Renamed -= DataBase_Renamed;
+                this.DataBase.Unloaded -= DataBase_Unloaded;
             });
-            var dataSet = this.dataBase.Dispatcher.Invoke(() =>
+
+            if (this.DataBase.IsLoaded == false)
+                await this.DataBase.LoadAsync(this.Authentication);
+            var contains = await this.DataBase.Dispatcher.InvokeAsync(() => this.DataBase.Contains(this.Authentication));
+            if (contains == false)
+                await this.DataBase.EnterAsync(this.Authentication);
+
+            var dataSet = null as CremaDataSet;
+            try
             {
-                if (this.DataBase.IsLoaded == false)
-                    this.dataBase.Load(this.Authentication);
-                var contains = this.dataBase.Contains(this.Authentication);
+                dataSet = await this.DataBase.GetDataSetAsync(this.Authentication, DataSetType.All, null, null);
+            }
+            finally
+            {
                 if (contains == false)
-                    this.dataBase.Enter(this.Authentication);
-                try
-                {
-                    return this.dataBase.GetDataSet(this.Authentication, -1);
-                }
-                finally
-                {
-                    if (contains == false)
-                        this.dataBase.Leave(this.Authentication);
-                }
-            });
+                    await this.DataBase.LeaveAsync(this.Authentication);
+            }
 
             DirectoryUtility.Delete(this.BasePath);
             this.Serialize(dataSet, this.info.Revision);
             this.initialized = true;
-            this.dataBase.Dispatcher.Invoke(() =>
+            await this.DataBase.Dispatcher.InvokeAsync(() =>
             {
-                this.dataBase.Loaded += DataBase_Loaded;
-                this.dataBase.Renamed += DataBase_Renamed;
-                this.dataBase.Unloaded += DataBase_Unloaded;
+                this.DataBase.Loaded += DataBase_Loaded;
+                this.DataBase.Renamed += DataBase_Renamed;
+                this.DataBase.Unloaded += DataBase_Unloaded;
             });
         }
 
-        public abstract CremaDispatcher Dispatcher
-        {
-            get;
-        }
+        public abstract CremaDispatcher Dispatcher { get; }
 
-        public IDataBase DataBase
-        {
-            get { return this.dataBase; }
-        }
+        public IDataBase DataBase { get; }
 
-        public abstract string Name
-        {
-            get;
-        }
+        public abstract string Name { get; }
 
         public string BasePath
         {
@@ -185,32 +165,28 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (this.workingPath == null)
                 {
-                    var cremaHost = this.dataBase.GetService(typeof(ICremaHost)) as ICremaHost;
-                    this.workingPath = Path.Combine(cremaHost.WorkingPath, this.Name, this.dataBase.ID.ToString());
+                    if (this.DataBase.GetService(typeof(ICremaHost)) is CremaHost cremaHost)
+                    {
+                        this.workingPath = cremaHost.GetPath(CremaPath.Caches, this.Name, $"{this.DataBase.ID}");
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                    }
                 }
                 return this.workingPath;
             }
         }
 
-        public string DataBaseName
-        {
-            get { return this.dataBaseName; }
-        }
+        public string DataBaseName { get; private set; }
 
-        public long Revision
-        {
-            get { return this.info.Revision; }
-        }
+        public string Revision => this.info.Revision;
 
-        public bool NoCache
-        {
-            get { return this.noCache; }
-        }
+        public bool NoCache { get; private set; }
 
-        public DataServiceItemInfo DataServiceItemInfo
-        {
-            get { return this.info; }
-        }
+        public DataServiceItemInfo DataServiceItemInfo => this.info;
+
+        public IObjectSerializer Serializer => this.serializer;
 
         public event EventHandler Changed;
 
@@ -233,13 +209,17 @@ namespace Ntreev.Crema.Services.Data
 
         protected abstract object GetObject(CremaDataType dataType);
 
-        protected abstract void OnSerializeTable(Stream stream, object tableData);
+        //protected abstract void OnSerializeTable(Stream stream, object tableData);
 
-        protected abstract void OnSerializeType(Stream stream, object tableData);
+        //protected abstract void OnSerializeType(Stream stream, object tableData);
 
-        protected abstract object OnDeserializeTable(Stream stream);
+        //protected abstract object OnDeserializeTable(Stream stream);
 
-        protected abstract object OnDeserializeType(Stream stream);
+        //protected abstract object OnDeserializeType(Stream stream);
+
+        protected abstract System.Type TableDataType { get; }
+
+        protected abstract System.Type TypeDataType { get; }
 
         protected object ReadTable(string name, bool isDevmode)
         {
@@ -284,67 +264,69 @@ namespace Ntreev.Crema.Services.Data
             get;
         }
 
-        private void DataBase_Loaded(object sender, EventArgs e)
+        private async void DataBase_Loaded(object sender, EventArgs e)
         {
-            this.dataBase.TypeContext.ItemsCreated += TypeContext_ItemCreated;
-            this.dataBase.TypeContext.ItemsRenamed += TypeContext_ItemRenamed;
-            this.dataBase.TypeContext.ItemsMoved += TypeContext_ItemMoved;
-            this.dataBase.TypeContext.ItemsDeleted += TypeContext_ItemDeleted;
-            this.dataBase.TypeContext.ItemsChanged += TypeContext_ItemsChanged;
-
-            this.dataBase.TableContext.ItemsCreated += TableContext_ItemCreated;
-            this.dataBase.TableContext.ItemsRenamed += TableContext_ItemRenamed;
-            this.dataBase.TableContext.ItemsMoved += TableContext_ItemMoved;
-            this.dataBase.TableContext.ItemsDeleted += TableContext_ItemDeleted;
-            this.dataBase.TableContext.ItemsChanged += TableContext_ItemsChanged;
-            this.dataBaseID = this.dataBase.ID;
-
-            if (this.dataBase is DataBase dataBaseInternal)
+            if (sender is DataBase dataBase)
             {
-                this.noCache = dataBaseInternal.CremaHost.NoCache;
-            }
-
-            if (this.noCache == true)
-            {
-                this.info.Revision = 0;
-            }
-
-            var domainContext = this.dataBase.GetService(typeof(IDomainContext)) as IDomainContext;
-            domainContext.Domains.DomainCreated += Domains_DomainCreated;
-            domainContext.Domains.DomainDeleted += Domains_DomainDeleted;
-            domainContext.Domains.DomainRowAdded += Domains_DomainRowAdded;
-            domainContext.Domains.DomainRowChanged += Domains_DomainRowChanged;
-            domainContext.Domains.DomainRowRemoved += Domains_DomainRowRemoved;
-
-            var domainItems = new Dictionary<string, IDomain>();
-            foreach (var item in domainContext.Domains)
-            {
-                if (item.DataBaseID != this.dataBaseID)
-                    continue;
-                Collect(item);
-            }
-
-            this.Dispatcher.InvokeAsync(() =>
-            {
-                foreach (var item in domainItems)
+                await dataBase.Dispatcher.InvokeAsync(() =>
                 {
-                    this.domainItems.Add(item.Key, item.Value);
-                }
+                    this.DataBase.TypeContext.ItemsCreated += TypeContext_ItemCreated;
+                    this.DataBase.TypeContext.ItemsRenamed += TypeContext_ItemRenamed;
+                    this.DataBase.TypeContext.ItemsMoved += TypeContext_ItemMoved;
+                    this.DataBase.TypeContext.ItemsDeleted += TypeContext_ItemDeleted;
+                    this.DataBase.TypeContext.ItemsChanged += TypeContext_ItemsChanged;
+
+                    this.DataBase.TableContext.ItemsCreated += TableContext_ItemCreated;
+                    this.DataBase.TableContext.ItemsRenamed += TableContext_ItemRenamed;
+                    this.DataBase.TableContext.ItemsMoved += TableContext_ItemMoved;
+                    this.DataBase.TableContext.ItemsDeleted += TableContext_ItemDeleted;
+                    this.DataBase.TableContext.ItemsChanged += TableContext_ItemsChanged;
+                    this.dataBaseID = this.DataBase.ID;
+                });
+                this.NoCache = dataBase.CremaHost.NoCache;
+            }
+
+            if (this.NoCache == true)
+            {
+                this.info.Revision = null;
+            }
+
+            //var domainContext = this.DataBase.GetService(typeof(IDomainContext)) as IDomainContext;
+            //domainContext.Domains.DomainCreated += Domains_DomainCreated;
+            //domainContext.Domains.DomainDeleted += Domains_DomainDeleted;
+            //domainContext.Domains.DomainRowAdded += Domains_DomainRowAdded;
+            //domainContext.Domains.DomainRowChanged += Domains_DomainRowChanged;
+            //domainContext.Domains.DomainRowRemoved += Domains_DomainRowRemoved;
+
+            //var domainItems = new Dictionary<string, IDomain>();
+            //foreach (var item in domainContext.Domains)
+            //{
+            //    if (item.DataBaseID != this.dataBaseID)
+            //        continue;
+            //    Collect(item);
+            //}
+
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                //foreach (var item in domainItems)
+                //{
+                //    this.domainItems.Add(item.Key, item.Value);
+                //}
                 this.Initialize();
             });
 
-            void Collect(IDomain domain)
-            {
-                if (domain.Host is TableContent content)
-                {
-                    var contents = EnumerableUtility.Friends(content, content.Childs);
-                    var tableNames = contents.Select(item => item.Table.Name).ToArray();
-                    foreach (var item in tableNames)
-                    {
-                        domainItems.Add(item, domain);
-                    }
-                }
-            }
+            //void Collect(IDomain domain)
+            //{
+            //    if (domain.Host is TableContent content)
+            //    {
+            //        var contents = EnumerableUtility.Friends(content, content.Childs);
+            //        var tableNames = contents.Select(item => item.Table.Name).ToArray();
+            //        foreach (var item in tableNames)
+            //        {
+            //            domainItems.Add(item, domain);
+            //        }
+            //    }
+            //}
         }
 
         private void Domains_DomainRowRemoved(object sender, DomainRowEventArgs e)
@@ -364,14 +346,20 @@ namespace Ntreev.Crema.Services.Data
 
         private void DataBase_Renamed(object sender, EventArgs e)
         {
-            this.dataBaseName = this.dataBase.Name;
+            this.DataBaseName = this.DataBase.Name;
         }
 
         private void DataBase_Unloaded(object sender, EventArgs e)
         {
-            var domainContext = this.dataBase.GetService(typeof(IDomainContext)) as IDomainContext;
-            domainContext.Domains.DomainCreated -= Domains_DomainCreated;
-            domainContext.Domains.DomainDeleted -= Domains_DomainDeleted;
+            if (sender is IDataBase dataBase && dataBase.GetService(typeof(IDomainContext)) is IDomainContext domainContext)
+            {
+                domainContext.Dispatcher.Invoke(() =>
+                {
+                    domainContext.Domains.DomainCreated -= Domains_DomainCreated;
+                    domainContext.Domains.DomainDeleted -= Domains_DomainDeleted;
+                });
+            }
+
             this.Dispatcher.InvokeAsync(() =>
             {
                 this.domainItems.Clear();
@@ -437,7 +425,7 @@ namespace Ntreev.Crema.Services.Data
         private void TypeContext_ItemCreated(object sender, Services.ItemsCreatedEventArgs<ITypeItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
-            var revision = this.dataBase.DataBaseInfo.Revision;
+            var revision = this.DataBase.DataBaseInfo.Revision;
 
             this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
         }
@@ -445,7 +433,7 @@ namespace Ntreev.Crema.Services.Data
         private void TypeContext_ItemRenamed(object sender, Services.ItemsRenamedEventArgs<ITypeItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
-            var revision = this.dataBase.DataBaseInfo.Revision;
+            var revision = this.DataBase.DataBaseInfo.Revision;
 
             this.Dispatcher.InvokeAsync(() =>
             {
@@ -461,7 +449,7 @@ namespace Ntreev.Crema.Services.Data
         private void TypeContext_ItemMoved(object sender, Services.ItemsMovedEventArgs<ITypeItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
-            var revision = this.dataBase.DataBaseInfo.Revision;
+            var revision = this.DataBase.DataBaseInfo.Revision;
 
             this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
         }
@@ -469,7 +457,7 @@ namespace Ntreev.Crema.Services.Data
         private void TypeContext_ItemDeleted(object sender, Services.ItemsDeletedEventArgs<ITypeItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
-            var revision = this.dataBase.DataBaseInfo.Revision;
+            var revision = this.DataBase.DataBaseInfo.Revision;
 
             this.Dispatcher.InvokeAsync(() =>
             {
@@ -485,7 +473,7 @@ namespace Ntreev.Crema.Services.Data
         private void TypeContext_ItemsChanged(object sender, Services.ItemsEventArgs<ITypeItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
-            var revision = this.dataBase.DataBaseInfo.Revision;
+            var revision = this.DataBase.DataBaseInfo.Revision;
 
             this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
         }
@@ -493,7 +481,7 @@ namespace Ntreev.Crema.Services.Data
         private void TableContext_ItemCreated(object sender, Services.ItemsCreatedEventArgs<ITableItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
-            var revision = this.dataBase.DataBaseInfo.Revision;
+            var revision = this.DataBase.DataBaseInfo.Revision;
 
             this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
         }
@@ -501,7 +489,7 @@ namespace Ntreev.Crema.Services.Data
         private void TableContext_ItemRenamed(object sender, Services.ItemsRenamedEventArgs<ITableItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
-            var revision = this.dataBase.DataBaseInfo.Revision;
+            var revision = this.DataBase.DataBaseInfo.Revision;
 
             this.Dispatcher.InvokeAsync(() =>
             {
@@ -517,7 +505,7 @@ namespace Ntreev.Crema.Services.Data
         private void TableContext_ItemMoved(object sender, Services.ItemsMovedEventArgs<ITableItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
-            var revision = this.dataBase.DataBaseInfo.Revision;
+            var revision = this.DataBase.DataBaseInfo.Revision;
 
             this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
         }
@@ -525,7 +513,7 @@ namespace Ntreev.Crema.Services.Data
         private void TableContext_ItemDeleted(object sender, Services.ItemsDeletedEventArgs<ITableItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
-            var revision = this.dataBase.DataBaseInfo.Revision;
+            var revision = this.DataBase.DataBaseInfo.Revision;
 
             this.Dispatcher.InvokeAsync(() =>
             {
@@ -541,43 +529,47 @@ namespace Ntreev.Crema.Services.Data
         private void TableContext_ItemsChanged(object sender, Services.ItemsEventArgs<ITableItem> e)
         {
             var dataSet = e.MetaData as CremaDataSet;
-            var revision = this.dataBase.DataBaseInfo.Revision;
+            var revision = this.DataBase.DataBaseInfo.Revision;
 
             this.Dispatcher.InvokeAsync(() => this.Serialize(dataSet, revision));
         }
 
-        private void Initialize()
+        private async void Initialize()
         {
             this.Dispatcher.CheckAccess();
             var error = false;
             try
             {
-                if (this.info.Revision != 0)
+                if (this.info.Revision != null)
                 {
                     foreach (var item in this.info.ItemList)
                     {
                         if (item.StartsWith(CremaSchema.TableDirectory) == true)
                         {
                             var tableName = Path.GetFileName(item);
-                            using (var stream = FileUtility.OpenRead(this.BasePath, CremaSchema.TableDirectory, infoDirectory, tableName + jsonExtension))
                             {
-                                this.tableInfos.Add(tableName, JsonSerializerUtility.Read<TableInfo>(stream));
+                                var itemPath = Path.Combine(this.BasePath, CremaSchema.TableDirectory, infoDirectory, tableName);
+                                var tableInfo = (TableInfo)this.Serializer.Deserialize(itemPath, typeof(TableInfo), ObjectSerializerSettings.Empty);
+                                this.tableInfos.Add(tableName, tableInfo);
                             }
-                            using (var stream = FileUtility.OpenRead(this.BasePath, CremaSchema.TableDirectory, dataDirectory, tableName))
                             {
-                                this.tableDatas.Add(tableName, this.OnDeserializeTable(stream));
+                                var itemPath = Path.Combine(this.BasePath, CremaSchema.TableDirectory, dataDirectory, tableName);
+                                var tableData = this.Serializer.Deserialize(itemPath, this.TableDataType, ObjectSerializerSettings.Empty);
+                                this.tableDatas.Add(tableName, tableData);
                             }
                         }
                         else if (item.StartsWith(CremaSchema.TypeDirectory) == true)
                         {
                             var typeName = Path.GetFileName(item);
-                            using (var stream = FileUtility.OpenRead(this.BasePath, CremaSchema.TypeDirectory, infoDirectory, typeName + jsonExtension))
                             {
-                                this.typeInfos.Add(typeName, JsonSerializerUtility.Read<TypeInfo>(stream));
+                                var itemPath = Path.Combine(this.BasePath, CremaSchema.TypeDirectory, infoDirectory, typeName);
+                                var typeInfo = (TypeInfo)this.Serializer.Deserialize(itemPath, typeof(TypeInfo), ObjectSerializerSettings.Empty);
+                                this.typeInfos.Add(typeName, typeInfo);
                             }
-                            using (var stream = FileUtility.OpenRead(this.BasePath, CremaSchema.TypeDirectory, dataDirectory, typeName))
                             {
-                                this.typeDatas.Add(typeName, this.OnDeserializeType(stream));
+                                var itemPath = Path.Combine(this.BasePath, CremaSchema.TypeDirectory, dataDirectory, typeName);
+                                var typeData = this.Serializer.Deserialize(itemPath, this.TypeDataType, ObjectSerializerSettings.Empty);
+                                this.typeDatas.Add(typeName, typeData);
                             }
                         }
                     }
@@ -594,23 +586,23 @@ namespace Ntreev.Crema.Services.Data
 
             if (error == true)
             {
-                var result = this.dataBase.Dispatcher.Invoke(() =>
+                var result = await Task.Run(async () =>
                 {
-                    var revision = this.dataBase.DataBaseInfo.Revision;
-                    var contains = this.dataBase.Contains(this.Authentication);
+                    var revision = this.DataBase.DataBaseInfo.Revision;
+                    var contains = await this.DataBase.Dispatcher.InvokeAsync(() => this.DataBase.Contains(this.Authentication));
                     if (contains == false)
-                        this.dataBase.Enter(this.Authentication);
-                    var dataSet = this.dataBase.GetDataSet(this.Authentication, -1);
+                        await this.DataBase.EnterAsync(this.Authentication);
+                    var dataSet = await this.DataBase.GetDataSetAsync(this.Authentication, DataSetType.All, null, null);
                     if (contains == false)
-                        this.dataBase.Leave(this.Authentication);
-                    return new Tuple<long, CremaDataSet>(revision, dataSet);
+                        await this.DataBase.LeaveAsync(this.Authentication);
+                    return new Tuple<string, CremaDataSet>(revision, dataSet);
                 });
                 this.Serialize(result.Item2, result.Item1);
             }
             this.initialized = true;
         }
 
-        private void Serialize(CremaDataSet dataSet, long revision)
+        private void Serialize(CremaDataSet dataSet, string revision)
         {
             if (dataSet == null)
                 return;
@@ -712,19 +704,20 @@ namespace Ntreev.Crema.Services.Data
 
         private void WriteInfo()
         {
-            var infoPath = Path.Combine(this.BasePath, "info.json");
-            JsonSerializerUtility.Write(infoPath, this.info, true);
+            var itemPath = Path.Combine(this.BasePath, "info");
+            this.Serializer.Serialize(itemPath, (DataServiceItemSerializationInfo)this.info, ObjectSerializerSettings.Empty);
         }
 
         private void ReadInfo()
         {
-            var infoPath = Path.Combine(this.BasePath, "info.json");
+            var itemPath = Path.Combine(this.BasePath, "info");
 
-            if (FileUtility.Exists(infoPath) == true)
+            if (this.Serializer.Exists(itemPath, typeof(DataServiceItemSerializationInfo), ObjectSerializerSettings.Empty) == true)
             {
                 try
                 {
-                    this.info = JsonSerializerUtility.Read<DataServiceItemInfo>(infoPath);
+                    var value = (DataServiceItemSerializationInfo)this.Serializer.Deserialize(itemPath, typeof(DataServiceItemSerializationInfo), ObjectSerializerSettings.Empty);
+                    this.info = (DataServiceItemInfo)value;
                 }
                 catch (Exception e)
                 {

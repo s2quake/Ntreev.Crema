@@ -38,7 +38,6 @@ namespace Ntreev.Crema.Client.Framework.Dialogs.ViewModels
     public class AccessViewModel : ModalDialogAppBase
     {
         private readonly IAccessible accessible;
-        private readonly Dispatcher dispatcher;
         private readonly Authentication authentication;
         private readonly TreeViewItemViewModel[] userItems;
         private AccessInfo accessInfo;
@@ -53,13 +52,10 @@ namespace Ntreev.Crema.Client.Framework.Dialogs.ViewModels
             this.accessible = accessible;
             if (accessible is IDispatcherObject dispatcherObject)
             {
-                this.dispatcher = dispatcherObject.Dispatcher;
-                this.dispatcher.VerifyAccess();
-                this.accessInfo = accessible.AccessInfo;
+                this.accessInfo = dispatcherObject.Dispatcher.Invoke(() => accessible.AccessInfo);
             }
             else
             {
-                this.dispatcher = base.Dispatcher;
                 this.accessInfo = accessible.AccessInfo;
             }
             this.authentication = authentication;
@@ -114,10 +110,9 @@ namespace Ntreev.Crema.Client.Framework.Dialogs.ViewModels
             if (userItem == null)
                 throw new ArgumentNullException(nameof(userItem));
 
-            if (descriptor.Target is IAccessible accessible)
+            if (descriptor.Target is IAccessible accessible && accessible is IDispatcherObject dispatcherObject)
             {
-                var dispatcher = accessible is IDispatcherObject dispatcherObject ? dispatcherObject.Dispatcher : Application.Current.Dispatcher;
-                return await dispatcher.InvokeAsync(() =>
+                return await dispatcherObject.Dispatcher.InvokeAsync(() =>
                 {
                     return new AccessViewModel(authentication, accessible, userItem);
                 });
@@ -125,13 +120,13 @@ namespace Ntreev.Crema.Client.Framework.Dialogs.ViewModels
             throw new NotImplementedException();
         }
 
-        public async void Add()
+        public async Task AddAsync()
         {
             try
             {
                 var memberID = this.Path;
                 var accessType = this.AccessType;
-                await this.dispatcher.InvokeAsync(() => this.accessible.AddAccessMember(this.authentication, memberID, accessType));
+                await this.accessible.AddAccessMemberAsync(this.authentication, memberID, accessType);
                 this.itemsSource.Add(new AccessItemViewModel(this, memberID, this.AccessType));
                 this.Path = null;
                 this.AccessType = AccessType.Master;
@@ -233,7 +228,7 @@ namespace Ntreev.Crema.Client.Framework.Dialogs.ViewModels
 
         internal new Dispatcher Dispatcher
         {
-            get { return this.dispatcher; }
+            get { return base.Dispatcher; }
         }
 
         internal Authentication Authentication

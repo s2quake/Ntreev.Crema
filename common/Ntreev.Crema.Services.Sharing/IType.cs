@@ -26,21 +26,19 @@ namespace Ntreev.Crema.Services
 {
     public interface IType : IAccessible, ILockable, IPermission, IServiceProvider, IDispatcherObject, IExtendedProperties
     {
-        void Rename(Authentication authentication, string newName);
+        Task RenameAsync(Authentication authentication, string newName);
 
-        void Move(Authentication authentication, string categoryPath);
+        Task MoveAsync(Authentication authentication, string categoryPath);
 
-        void Delete(Authentication authentication);
+        Task DeleteAsync(Authentication authentication);
 
-        void SetTags(Authentication authentication, TagInfo tags);
+        Task<IType> CopyAsync(Authentication authentication, string newTypeName, string categoryPath);
 
-        IType Copy(Authentication authentication, string newTypeName, string categoryPath);
+        Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision);
 
-        CremaDataSet GetDataSet(Authentication authentication, long revision);
+        Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision);
 
-        LogInfo[] GetLog(Authentication authentication);
-
-        FindResultInfo[] Find(Authentication authentication, string text, FindOptions options);
+        Task<FindResultInfo[]> FindAsync(Authentication authentication, string text, FindOptions options);
 
         string Name { get; }
 
@@ -57,8 +55,6 @@ namespace Ntreev.Crema.Services
         ITypeCategory Category { get; }
 
         ITypeTemplate Template { get; }
-
-        TagInfo Tags { get; }
 
         event EventHandler Renamed;
 

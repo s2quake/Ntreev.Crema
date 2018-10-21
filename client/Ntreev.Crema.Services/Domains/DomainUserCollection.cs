@@ -19,6 +19,7 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Library.ObjectModel;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains
 {
@@ -26,7 +27,6 @@ namespace Ntreev.Crema.Services.Domains
     {
         private readonly Domain domain;
         private DomainUser owner;
-        private string ownerUserID;
 
         public DomainUserCollection(Domain domain)
         {
@@ -35,6 +35,10 @@ namespace Ntreev.Crema.Services.Domains
 
         public void Add(DomainUser domainUser)
         {
+            if (domainUser.DomainUserState.HasFlag(DomainUserState.Detached) == true)
+            {
+                int qwer = 0;
+            }
             this.AddBase(domainUser.ID, domainUser);
         }
 
@@ -45,7 +49,6 @@ namespace Ntreev.Crema.Services.Domains
 
         public bool Contains(string userID)
         {
-            this.Dispatcher.VerifyAccess();
             return base.ContainsKey(userID);
         }
 
@@ -61,51 +64,29 @@ namespace Ntreev.Crema.Services.Domains
                 this.owner = value;
                 if (this.owner != null)
                 {
-                    this.ownerUserID = this.owner.ID;
+                    this.OwnerUserID = this.owner.ID;
                     this.owner.IsOwner = true;
                 }
             }
         }
 
-        public string OwnerUserID
-        {
-            get { return this.ownerUserID; }
-        }
+        public string OwnerUserID { get; private set; }
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.domain.Dispatcher; }
-        }
+        public CremaDispatcher Dispatcher => this.domain.Dispatcher;
 
         #region IDomainUserCollection
 
-        IDomainUser IDomainUserCollection.this[string userID]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[userID];
-            }
-        }
+        IDomainUser IDomainUserCollection.this[string userID] => this[userID];
 
-        IDomainUser IDomainUserCollection.Owner
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Owner;
-            }
-        }
+        IDomainUser IDomainUserCollection.Owner => this.Owner;
 
         IEnumerator<IDomainUser> IEnumerable<IDomainUser>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 

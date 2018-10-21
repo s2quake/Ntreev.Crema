@@ -45,18 +45,12 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
         [ReturnParameterName("domainID")]
         private string BeginTypeCreate(string dataBaseName, string categoryPath)
         {
-            if (categoryPath == null)
-                throw new ArgumentNullException(nameof(categoryPath));
-            var dataBase = this.GetDataBase(dataBaseName);
-            return dataBase.Dispatcher.Invoke(() =>
-            {
-                var category = dataBase.TypeContext.Categories[categoryPath];
-                if (category == null)
-                    throw new CategoryNotFoundException(categoryPath);
-                var authentication = this.Context.GetAuthentication(this);
-                var template = category.NewType(authentication);
-                return $"{template.Domain.ID}";
-            });
+            var category = this.GetTypeCategory(dataBaseName, categoryPath);
+            var authentication = this.Context.GetAuthentication(this);
+            var task = category.NewTypeAsync(authentication);
+            task.Wait();
+            var template = task.Result;
+            return $"{template.Domain.ID}";
         }
     }
 }

@@ -32,20 +32,32 @@ namespace Ntreev.Crema.ServiceModel
     [Serializable]
     public struct LogInfo
     {
-        [XmlElement]
+        [DataMember]
+        public string Revision { get; set; }
+
+        [DataMember]
         public string UserID { get; set; }
 
-        [XmlElement]
-        public long Revision { get; set; }
-
-        [XmlElement]
-        public string Comment { get; set; }
-
-        [XmlElement]
+        [DataMember]
         public DateTime DateTime { get; set; }
 
-        [XmlArray]
+        [DataMember]
+        public string Comment { get; set; }
+
+        [DataMember]
         public LogPropertyInfo[] Properties { get; set; }
+
+        public IDictionary<string, object> ToDictionary()
+        {
+            var props = new Dictionary<string, object>
+            {
+                { nameof(this.Revision), this.Revision },
+                { nameof(this.UserID), this.UserID },
+                { nameof(this.DateTime), $"{this.DateTime}" },
+                { nameof(this.Comment), this.Comment },
+            };
+            return props;
+        }
 
         internal bool ContainsProperty(string key)
         {
@@ -71,16 +83,6 @@ namespace Ntreev.Crema.ServiceModel
             return null;
         }
 
-        #region DataMember
-
-        [DataMember]
-        [XmlIgnore]
-        private string Xml
-        {
-            get { return XmlSerializerUtility.GetString(this); }
-            set { this = XmlSerializerUtility.ReadString(this, value); }
-        }
-
-        #endregion
+        public static readonly LogInfo Empty = new LogInfo();
     }
 }

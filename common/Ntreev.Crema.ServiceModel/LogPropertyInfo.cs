@@ -43,22 +43,20 @@ namespace Ntreev.Crema.ServiceModel
         public const string VersionKey = "Version";
         public const string EventLogKey = "EventLog";
 
-        [XmlElement]
+        [DataMember]
         public string Key { get; set; }
 
-        [XmlElement]
+        [DataMember]
         public string Value { get; set; }
 
-        #region DataMember
-
-        [DataMember]
-        [XmlIgnore]
-        private string Xml
+        public IDictionary<string, object> ToDictionary()
         {
-            get { return XmlSerializerUtility.GetString(this); }
-            set { this = XmlSerializerUtility.ReadString(this, value); }
+            var props = new Dictionary<string, object>
+            {
+                { nameof(this.Key), this.Key },
+                { nameof(this.Value), this.Value },
+            };
+            return props;
         }
-
-        #endregion
     }
 }

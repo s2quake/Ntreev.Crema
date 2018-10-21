@@ -26,6 +26,7 @@ using System;
 using Ntreev.Library.IO;
 using Ntreev.ModernUI.Framework;
 using Ntreev.Library.ObjectModel;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 {
@@ -160,11 +161,10 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
             try
             {
                 this.BeginProgress(Resources.Message_Coping);
-                var dispatcher = this.table.Dispatcher;
                 if (this.UseTemplate == true)
-                    await dispatcher.InvokeAsync(() => this.table.Inherit(this.authentication, this.NewName, this.CategoryPath, this.CopyData));
+                    await this.table.InheritAsync(this.authentication, this.NewName, this.CategoryPath, this.CopyData);
                 else
-                    await dispatcher.InvokeAsync(() => this.table.Copy(this.authentication, this.NewName, this.CategoryPath, this.CopyData));
+                    await this.table.CopyAsync(this.authentication, this.NewName, this.CategoryPath, this.CopyData);
                 this.EndProgress();
                 this.TryClose(true);
             }
@@ -183,14 +183,9 @@ namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
 
         private async void VerfiyAction()
         {
-            this.isVerify = await this.table.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.tables.Contains(this.NewName) == true)
-                    return false;
-
-                return this.categories.Contains(this.CategoryPath) == true;
-            });
-
+            if (await this.tables.ContainsAsync(this.NewName) == true)
+                return;
+            this.isVerify = await this.categories.ContainsAsync(this.CategoryPath) == true;
             this.NotifyOfPropertyChange(nameof(this.CanCopy));
         }
     }

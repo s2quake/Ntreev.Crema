@@ -30,10 +30,10 @@ namespace Ntreev.Crema.Javascript.Methods.User
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class SendMessageMethod : UserScriptMethodBase
+    class CreateUserCategoryMethod : UserScriptMethodBase
     {
         [ImportingConstructor]
-        public SendMessageMethod(ICremaHost cremaHost)
+        public CreateUserCategoryMethod(ICremaHost cremaHost)
             : base(cremaHost)
         {
 
@@ -41,14 +41,17 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         protected override Delegate CreateDelegate()
         {
-            return new Action<string, string>(this.SendMessage);
+            return new Func<string, string, string>(this.CreateUserCategory);
         }
 
-        private void SendMessage(string userID, string message)
+        [ReturnParameterName("categoryPath")]
+        private string CreateUserCategory(string parentPath, string categoryName)
         {
-            var user = this.GetUser(userID);
+            var category = this.GetUserCategory(parentPath);
             var authentication = this.Context.GetAuthentication(this);
-            user.Dispatcher.Invoke(() => user.SendMessage(authentication, message));
+            var task = category.AddNewCategoryAsync(authentication, categoryName);
+            task.Wait();
+            return task.Result.Path;
         }
     }
 }

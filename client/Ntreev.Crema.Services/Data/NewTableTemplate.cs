@@ -15,110 +15,120 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services.Domains;
-using Ntreev.Crema.Services.Properties;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data;
-using Ntreev.Library;
-using Ntreev.Library.IO;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.DataBaseService;
+using Ntreev.Crema.Services.Domains;
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Library.Extensions;
-using Ntreev.Library.Serialization;
 
 namespace Ntreev.Crema.Services.Data
 {
     class NewTableTemplate : TableTemplateBase
     {
-        private readonly TableCategory category;
-        private Table table;
+        private object parent;
+        private Table[] tables;
 
         public NewTableTemplate(TableCategory category)
         {
-            this.category = category;
+            this.parent = category ?? throw new ArgumentNullException(nameof(category));
+            this.DispatcherObject = category;
+            this.DomainContext = category.GetService(typeof(DomainContext)) as DomainContext;
+            this.ItemPath = category.Path;
+            this.CremaHost = category.CremaHost;
+            this.DataBase = category.DataBase;
+            this.Permission = category;
             this.IsNew = true;
+            this.Service = category.Service;
         }
 
-        public override Type GetType(string typeName)
+        public NewTableTemplate(Table parent)
         {
-            this.Dispatcher.VerifyAccess();
-            var typeContext = this.category.GetService(typeof(TypeContext)) as TypeContext;
-            return typeContext[typeName] as Type;
+            this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            this.DispatcherObject = parent;
+            this.DomainContext = parent.GetService(typeof(DomainContext)) as DomainContext;
+            this.ItemPath = parent.Path;
+            this.CremaHost = parent.CremaHost;
+            this.DataBase = parent.DataBase;
+            this.Permission = parent;
+            this.IsNew = true;
+            this.Service = parent.Service;
         }
 
-        public override ITable Table
+        public override AccessType GetAccessType(Authentication authentication)
         {
-            get
+            return this.Permission.GetAccessType(authentication);
+        }
+
+        public override object Target => this.tables;
+
+        public override DomainContext DomainContext { get; }
+
+        public override string ItemPath { get; }
+
+        public override CremaHost CremaHost { get; }
+
+        public override DataBase DataBase { get; }
+
+        public override IPermission Permission { get; }
+
+        public override IDispatcherObject DispatcherObject { get; }
+		
+		public IDataBaseService Service { get; }
+
+        protected override async Task OnBeginEditAsync(Authentication authentication)
+        {
+            await base.OnBeginEditAsync(authentication);
+        }
+
+        protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, object args)
+        {
+            var tableInfos = await base.OnEndEditAsync(authentication, args);
+            if (this.parent is TableCategory category)
             {
-                this.Dispatcher.VerifyAccess();
-                return this.table;
+                var tables = category.GetService(typeof(TableCollection)) as TableCollection;
+                if (args is Guid)
+                {
+                    this.tables = tables.AddNew(authentication, tableInfos);
+                }
             }
+            else if (this.parent is Table table)
+            {
+                var tables = table.GetService(typeof(TableCollection)) as TableCollection;
+                if (args is Guid)
+                {
+                    this.tables = tables.AddNew(authentication, tableInfos);
+                }
+            }
+            this.parent = null;
+            return tableInfos;
         }
 
-        public override DomainContext DomainContext
+        protected override async Task OnCancelEditAsync(Authentication authentication)
         {
-            get { return this.category.GetService(typeof(DomainContext)) as DomainContext; }
+            await base.OnCancelEditAsync(authentication);
+            this.parent = null;
         }
 
-        public override string ItemPath
+        protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
         {
-            get { return this.category.Path; }
+            return Task.Run(() => this.Service.BeginNewTable(this.ItemPath));
         }
 
-        public override CremaHost CremaHost
+        protected override async Task<TableInfo[]> EndDomainAsync(Authentication authentication, object args)
         {
-            get { return this.category.CremaHost; }
+            if (args is Guid domainID)
+            {
+                var result = await Task.Run(() => this.Service.EndTableTemplateEdit(domainID));
+                var value = result.GetValue();
+                return value;
+            }
+            return args as TableInfo[];
         }
 
-        public override CremaDispatcher Dispatcher
+        protected override Task<ResultBase> CancelDomainAsync(Authentication authentication, Guid domainID)
         {
-            get { return this.category.Dispatcher; }
-        }
-
-        public override DataBase DataBase
-        {
-            get { return this.category.DataBase; }
-        }
-
-        public override IPermission Permission
-        {
-            get { return this.category; }
-        }
-
-        protected override void OnBeginEdit(Authentication authentication, DomainMetaData metaData)
-        {
-            base.OnBeginEdit(authentication, metaData);
-        }
-
-        protected override void OnEndEdit(Authentication authentication, TableInfo tableInfo)
-        {
-            base.OnEndEdit(authentication, tableInfo);
-            this.table = this.category.Context.Tables.AddNew(authentication, tableInfo);
-            this.table.Container.InvokeTablesCreatedEvent(authentication, new Table[] { this.table, });
-        }
-
-        protected override void OnCancelEdit(Authentication authentication)
-        {
-            base.OnCancelEdit(authentication);
-        }
-
-        protected override ResultBase<DomainMetaData> BeginDomain(Authentication authentication)
-        {
-            return this.category.Service.BeginNewTable(this.category.Path);
-        }
-
-        protected override ResultBase<TableInfo> EndDomain(Authentication authentication, Guid domainID)
-        {
-            return this.category.Service.EndTableTemplateEdit(domainID);
-        }
-
-        protected override ResultBase CancelDomain(Authentication authentication, Guid domainID)
-        {
-            return this.category.Service.CancelTableTemplateEdit(domainID);
+            return Task.Run(() => this.Service.CancelTableTemplateEdit(domainID));
         }
     }
 }

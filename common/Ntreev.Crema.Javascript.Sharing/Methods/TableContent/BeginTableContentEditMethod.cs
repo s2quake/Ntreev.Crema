@@ -45,16 +45,11 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
         [ReturnParameterName("domainID")]
         private string BeginTableContentEdit(string dataBaseName, string tableName)
         {
-            var dataBase = this.GetDataBase(dataBaseName);
-            return dataBase.Dispatcher.Invoke(() =>
-            {
-                var table = dataBase.TableContext.Tables[tableName];
-                if (table == null)
-                    throw new TableNotFoundException(tableName);
-                var authentication = this.Context.GetAuthentication(this);
-                table.Content.BeginEdit(authentication);
-                return $"{table.Content.Domain.ID}";
-            });
+            var table = this.GetTable(dataBaseName, tableName);
+            var authentication = this.Context.GetAuthentication(this);
+            var task = table.Content.BeginEditAsync(authentication);
+            task.Wait();
+            return $"{table.Content.Domain.ID}";
         }
     }
 }

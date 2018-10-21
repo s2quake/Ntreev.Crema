@@ -19,6 +19,7 @@ using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
 using Ntreev.Crema.Client.Framework.Properties;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
@@ -35,25 +36,16 @@ namespace Ntreev.Crema.Client.Framework
         {
             if (descriptor.Target is ITableContent content)
             {
-                var domain = await content.Dispatcher.InvokeAsync(() =>
+                if (content.Domain == null)
                 {
-                    if (content.Domain == null)
-                    {
-                        content.BeginEdit(authentication);
-                    }
-                    return content.Domain;
-                });
-                var isEntered = await domain.Dispatcher.InvokeAsync(() =>
+                    await content.BeginEditAsync(authentication);
+                }
+                var domain = content.Domain;
+                var isEntered = await domain.Users.ContainsAsync(authentication.ID);
+                if (isEntered == false)
                 {
-                    return domain.Users.Contains(authentication.ID);
-                });
-                await content.Dispatcher.InvokeAsync(() =>
-                {
-                    if (isEntered == false)
-                    {
-                        content.EnterEdit(authentication);
-                    }
-                });
+                    await content.EnterEditAsync(authentication);
+                }
             }
             else
             {
@@ -65,19 +57,13 @@ namespace Ntreev.Crema.Client.Framework
         {
             if (descriptor.Target is ITableContent content)
             {
-                var domain = await content.Dispatcher.InvokeAsync(() =>
-                {
-                    content.LeaveEdit(authentication);
-                    return content.Domain;
-                });
+                await content.LeaveEditAsync(authentication);
+                var domain = content.Domain;
                 var isEmpty = await domain.Dispatcher.InvokeAsync(() => domain.Users.Any() == false);
-                await content.Dispatcher.InvokeAsync(() =>
+                if (isEmpty == true)
                 {
-                    if (isEmpty == true)
-                    {
-                        content.EndEdit(authentication);
-                    }
-                });
+                    await content.EndEditAsync(authentication);
+                }
                 return true;
             }
             else

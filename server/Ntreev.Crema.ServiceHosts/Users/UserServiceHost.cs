@@ -55,7 +55,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         public override object CreateInstance(Message message)
         {
-            return new UserService(this.CremaHost, this.cremaService);
+            return new UserService(this.CremaHost);
         }
     }
 }

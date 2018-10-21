@@ -16,162 +16,132 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Users;
 using Ntreev.Library;
-using Ntreev.Library.IO;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
     class RepositoryHost
     {
-        private readonly IRepository repository;
-        private readonly CremaDispatcher dispatcher;
-        private readonly string path;
-        private long revision;
-        private SignatureDate signatureDate;
-
-        public RepositoryHost(IRepository repository, CremaDispatcher dispatcher, string path)
+        public RepositoryHost(IRepository repository, CremaDispatcher dispatcher)
         {
-            this.repository = repository;
-            this.dispatcher = dispatcher;
-            this.path = path;
-            this.revision = this.repository.GetRevision(path);
+            this.Repository = repository;
+            this.Dispatcher = dispatcher ?? new CremaDispatcher(this);
+            this.RepositoryPath = repository.BasePath;
         }
 
         public void Add(string path)
         {
-            this.dispatcher.Invoke(() =>
+            this.Dispatcher.VerifyAccess();
+            this.Repository.Add(path);
+        }
+
+        public void AddRange(string[] paths)
+        {
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in paths)
             {
-                this.repository.Add(path);
-            });
+                this.Repository.Add(item);
+            }
         }
 
         public void Add(string path, string contents)
         {
-            this.dispatcher.Invoke(() =>
-            {
-                this.repository.Add(path, contents);
-            });
+            this.Dispatcher.VerifyAccess();
+            File.WriteAllText(path, contents, Encoding.UTF8);
+            this.Repository.Add(path);
         }
 
         public void Modify(string path, string contents)
         {
-            this.dispatcher.Invoke(() =>
-            {
-                this.repository.Modify(path, contents);
-            });
+            this.Dispatcher.VerifyAccess();
+            File.WriteAllText(path, contents, Encoding.UTF8);
         }
 
         public void Move(string srcPath, string toPath)
         {
-            this.dispatcher.Invoke(() =>
-            {
-                this.repository.Move(srcPath, toPath);
-            });
+            this.Dispatcher.VerifyAccess();
+            this.Repository.Move(srcPath, toPath);
         }
 
-        public void Delete(params string[] paths)
+        public void Delete(string path)
         {
-            this.dispatcher.Invoke(() =>
+            this.Dispatcher.VerifyAccess();
+            this.Repository.Delete(path);
+        }
+
+        public void DeleteRange(string[] paths)
+        {
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in paths)
             {
-                this.repository.Delete(paths);
-            });
+                this.Repository.Delete(item);
+            }
         }
 
         public void Copy(string srcPath, string toPath)
         {
-            this.dispatcher.Invoke(() =>
-            {
-                this.repository.Copy(srcPath, toPath);
-            });
+            this.Dispatcher.VerifyAccess();
+            this.Repository.Copy(srcPath, toPath);
         }
 
         public void Revert()
         {
-            this.dispatcher.Invoke(() =>
-            {
-                this.repository.Revert(this.path);
-            });
+            this.Dispatcher.VerifyAccess();
+            this.Repository.Revert();
         }
 
-        public void Revert(long revision)
+        public void BeginTransaction(string author, string name)
         {
-            this.dispatcher.Invoke(() =>
-            {
-                this.repository.Revert(this.path, revision);
-            });
-        }
-
-        public void BeginTransaction(string name)
-        {
-            this.dispatcher.Invoke(() =>
-            {
-                this.repository.BeginTransaction(this.path, name);
-            });
+            this.Dispatcher.VerifyAccess();
+            this.Repository.BeginTransaction(author, name);
         }
 
         public void EndTransaction()
         {
-            this.dispatcher.Invoke(() =>
-            {
-                this.repository.EndTransaction(this.path);
-            });
+            this.Dispatcher.VerifyAccess();
+            this.Repository.EndTransaction();
         }
 
         public void CancelTransaction()
         {
-            this.dispatcher.Invoke(() =>
-            {
-                this.repository.CancelTransaction(this.path);
-            });
+            this.Dispatcher.VerifyAccess();
+            this.Repository.CancelTransaction();
         }
 
-        public long GetRevision(string path)
+        public Uri GetUri(string path, string revision)
         {
-            return this.dispatcher.Invoke(() => this.repository.GetRevision(path));
-        }
-
-        public Uri GetUri(string path, long revision)
-        {
-            return this.dispatcher.Invoke(() => this.repository.GetUri(path, revision));
+            return this.Repository.GetUri(path, revision);
         }
 
         public string Export(Uri uri, string exportPath)
         {
-            return this.dispatcher.Invoke(() => this.repository.Export(uri, exportPath));
+            return this.Repository.Export(uri, exportPath);
         }
 
-        public void Commit(Authentication authentication, string comment, string eventLog)
+        public void Commit(Authentication authentication, string comment, params LogPropertyInfo[] properties)
         {
-            this.Commit(authentication, null, comment, eventLog);
-        }
-
-        public void Commit(Authentication authentication, IEnumerable<LogPropertyInfo> properties, string comment, string eventLog)
-        {
+            this.Dispatcher.VerifyAccess();
             var propList = new List<LogPropertyInfo>
             {
-                new LogPropertyInfo() { Key = LogPropertyInfo.EventLogKey, Value = eventLog},
                 new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion},
-                new LogPropertyInfo() { Key = LogPropertyInfo.UserIDKey, Value = authentication.ID}
             };
 
             if (properties != null)
                 propList.AddRange(properties);
 
-            var dateTime = this.dispatcher.Invoke(() => this.repository.Commit(this.path, comment, propList));
-            this.revision = this.repository.Revision;
-            this.signatureDate = new SignatureDate(authentication.ID, dateTime);
+            this.Repository.Commit(authentication.ID, comment, propList.ToArray());
             this.OnChanged(EventArgs.Empty);
         }
 
-        public LogInfo[] GetLog(string path, long revision, int count)
+        public LogInfo[] GetLog(string[] paths, string revision)
         {
-            return this.dispatcher.Invoke(() => this.repository.GetLog(path, revision, count));
+            return this.Repository.GetLog(paths, revision);
         }
 
         public string GetDataBaseUri(string repoUri, string itemUri)
@@ -180,44 +150,31 @@ namespace Ntreev.Crema.Services
             var pureRepoUri = Regex.Replace(repoUri, pattern, string.Empty);
             var pureItemUri = Regex.Replace(itemUri, pattern, string.Empty);
             var relativeUri = UriUtility.MakeRelativeOfDirectory(pureRepoUri, pureItemUri);
-            var segments = relativeUri.Split(PathUtility.SeparatorChar);
-            if (segments[0] == "trunk")
-            {
-                pureRepoUri = $"{UriUtility.Combine(pureRepoUri, segments.Take(1).ToArray())}";
-            }
-            else if (segments[0] == "tags")
-            {
-                pureRepoUri = $"{UriUtility.Combine(pureRepoUri, segments.Take(2).ToArray())}";
-            }
-            else if (segments[0] == "branches")
-            {
-                pureRepoUri = $"{UriUtility.Combine(pureRepoUri, segments.Take(2).ToArray())}";
-            }
-
             return pureRepoUri;
         }
 
-        public long Revision
+        public RepositoryItem[] Status(params string[] paths)
         {
-            get { return this.revision; }
+            this.Dispatcher.VerifyAccess();
+            return this.Repository.Status(paths);
         }
 
-        public SignatureDate SignatureDate
+        public void Dispose()
         {
-            get { return this.signatureDate; }
+            //this.Repository.Dispose();
+            if (this.Dispatcher.Owner == this)
+                this.Dispatcher.Dispose();
         }
+
+        public RepositoryInfo RepositoryInfo => this.Repository.RepositoryInfo;
 
         public event EventHandler Changed;
 
-        protected CremaDispatcher Dispatcher
-        {
-            get { return this.dispatcher; }
-        }
+        public CremaDispatcher Dispatcher { get; }
 
-        protected IRepository Repository
-        {
-            get { return this.repository; }
-        }
+        protected IRepository Repository { get; }
+
+        protected string RepositoryPath { get; }
 
         protected void OnChanged(EventArgs e)
         {

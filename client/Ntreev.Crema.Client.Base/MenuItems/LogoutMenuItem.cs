@@ -47,11 +47,11 @@ namespace Ntreev.Crema.Client.Base.MenuItems
             this.DisplayName = Resources.MenuItem_Logout;
         }
 
-        protected override void OnExecute(object parameter)
+        protected override async void OnExecute(object parameter)
         {
             if (AppMessageBox.ShowQuestion(Resources.Message_Logout) == true)
             {
-                this.cremaAppHost.Logout();
+                await this.cremaAppHost.LogoutAsync();
             }
         }
 

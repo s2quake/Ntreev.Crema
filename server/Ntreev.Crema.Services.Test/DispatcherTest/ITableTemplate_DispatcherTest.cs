@@ -132,13 +132,6 @@ namespace Ntreev.Crema.Services.Test.DispatcherTest
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public new void GetType()
-        {
-            template.GetType(string.Empty);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void Domain()
         {
             Console.Write(template.Domain);
@@ -148,7 +141,7 @@ namespace Ntreev.Crema.Services.Test.DispatcherTest
         [ExpectedException(typeof(InvalidOperationException))]
         public void Table()
         {
-            Console.Write(template.Table);
+            Console.Write(template.Target);
         }
 
         [TestMethod]

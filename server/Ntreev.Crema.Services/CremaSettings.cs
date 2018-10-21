@@ -15,72 +15,90 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Library;
+using Ntreev.Library.IO;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace Ntreev.Crema.Services
 {
     class CremaSettings
     {
-        public const string DefaultRepositoryName = "crema";
-        private string repositoryName;
+        private string[] dataBaseList;
 
         public CremaSettings()
         {
-            this.RepositoryName = DefaultRepositoryName;
+
         }
 
-        public string BasePath
+        public string BasePath { get; set; }
+
+        public string RepositoryModule => FileUtility.ReadAllText(this.BasePath, CremaString.Repository, CremaString.Repo);
+
+        public string FileType => FileUtility.ReadAllText(this.BasePath, CremaString.Repository, CremaString.File);
+
+        public string RepositoryDataBasesUrl
         {
-            get;
-            set;
+            get
+            {
+                var urlPath = Path.Combine(this.BasePath, CremaString.Repository, "databasesUrl");
+                if (File.Exists(urlPath) == true)
+                {
+                    var text = File.ReadAllText(urlPath).Trim();
+                    if (text != string.Empty)
+                    {
+                        var url = new Uri(File.ReadAllText(urlPath), UriKind.RelativeOrAbsolute);
+                        if (url.IsAbsoluteUri)
+                        {
+                            return url.ToString();
+                        }
+                        else
+                        {
+                            return UriUtility.Combine(this.BasePath, CremaString.Repository, CremaString.DataBases, text);
+                        }
+                    }
+                }
+                return Path.Combine(this.BasePath, CremaString.Repository, CremaString.DataBases);
+            }
         }
 
-        public string RepositoryName
+        public string RepositoryUsersUrl
         {
-            get { return this.repositoryName ?? DefaultRepositoryName; }
-            set { this.repositoryName = value; }
+            get
+            {
+                var urlPath = Path.Combine(this.BasePath, CremaString.Repository, "usersUrl");
+                if (File.Exists(urlPath) == true)
+                {
+                    var text = File.ReadAllText(urlPath).Trim();
+                    if (text != string.Empty)
+                    {
+                        var url = new Uri(File.ReadAllText(urlPath), UriKind.RelativeOrAbsolute);
+                        if (url.IsAbsoluteUri)
+                        {
+                            return url.ToString();
+                        }
+                        else
+                        {
+                            return UriUtility.Combine(this.BasePath, CremaString.Repository, CremaString.Users, text);
+                        }
+                    }
+                }
+                return Path.Combine(this.BasePath, CremaString.Repository, CremaString.Users);
+            }
         }
 
-        public bool MultiThreading
-        {
-            get;
-            set;
-        }
+        public LogVerbose Verbose { get; set; }
 
-        public string RepositoryModule
-        {
-            get;
-            set;
-        }
-
-        public LogVerbose Verbose
-        {
-            get;
-            set;
-        }
-
-        public bool NoCache
-        {
-            get;
-            set;
-        }
+        public bool NoCache { get; set; }
 
         public string[] DataBaseList
         {
-            get;
-            set;
+            get => this.dataBaseList ?? new string[] { };
+            set => this.dataBaseList = value;
         }
 
 #if DEBUG
-        public bool ValidationMode
-        {
-            get;
-            set;
-        }
+        public bool ValidationMode { get; set; }
 #endif
     }
 }

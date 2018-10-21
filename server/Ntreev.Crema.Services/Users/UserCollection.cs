@@ -15,21 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Properties;
+using Ntreev.Crema.Services.Users.Serializations;
 using Ntreev.Library;
 using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Services.Properties;
-using Ntreev.Crema.Services;
+using System;
 using System.Collections;
-using System.Text.RegularExpressions;
-using Ntreev.Library.Serialization;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Security;
-using Ntreev.Crema.Data.Xml.Schema;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users
 {
@@ -58,257 +55,202 @@ namespace Ntreev.Crema.Services.Users
             return this.BaseAddNew(name, categoryPath, null);
         }
 
-        public User AddNew(Authentication authentication, string userID, string categoryPath, SecureString password, string userName, Authority authority)
+        public async Task<User> AddNewAsync(Authentication authentication, string userID, string categoryPath, SecureString password, string userName, Authority authority)
         {
-            this.ValidateUserCreate(authentication, userID, categoryPath, password);
-            this.Sign(authentication);
-            var designedInfo = new SignatureDate(authentication.ID, DateTime.UtcNow);
-            var userInfo = new UserSerializationInfo()
-            {
-                ID = userID,
-                Password = UserContext.SecureStringToString(password).Encrypt(),
-                Name = userName,
-                Authority = authority,
-                CategoryPath = categoryPath,
-                CreationInfo = designedInfo,
-                ModificationInfo = designedInfo,
-            };
-
-            this.InvokeUserCreate(authentication, userInfo);
-
-            var user = this.BaseAddNew(userID, categoryPath, null);
-            user.Initialize((UserInfo)userInfo, BanInfo.Empty);
-            user.Password = UserContext.StringToSecureString(userInfo.Password);
-            this.InvokeUsersCreatedEvent(authentication, new User[] { user });
-            return user;
-        }
-
-        public void InvokeUserCreate(Authentication authentication, UserSerializationInfo userInfo)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeUserCreate), userInfo.ID, userInfo.Authority, userInfo.CategoryPath);
             try
             {
-                var categories = from UserCategory item in this.Context.Categories
-                                 select item.Path;
-
-                var users = from User item in this.Context.Users select item.SerializationInfo;
-                var userList = users.ToList();
-                userList.Add(userInfo);
-
-                var serializationInfo = new UserContextSerializationInfo()
+                this.ValidateExpired();
+                var userInfo = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    Version = CremaSchema.VersionValue,
-                    Categories = categories.ToArray(),
-                    Users = userList.ToArray(),
-                };
-
-                var xml = DataContractSerializerUtility.GetString(serializationInfo, true);
-
-                this.Repository.Modify(this.Context.UserFilePath, xml);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
+                    this.ValidateUserCreate(authentication, userID, categoryPath, password);
+                    this.CremaHost.Sign(authentication);
+                    var category = this.GetCategory(categoryPath);
+                    return new UserSerializationInfo()
+                    {
+                        ID = userID,
+                        Password = UserContext.SecureStringToString(password).Encrypt(),
+                        Name = userName,
+                        Authority = authority,
+                        CategoryPath = categoryPath,
+                    };
+                });
+                var result = await this.InvokeUserCreateAsync(authentication, userInfo);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, result.CreationInfo);
+                    var user = this.BaseAddNew(userID, categoryPath, null);
+                    user.Initialize((UserInfo)result, BanInfo.Empty);
+                    user.Password = UserContext.StringToSecureString(result.Password);
+                    this.InvokeUsersCreatedEvent(authentication, new User[] { user });
+                    return user;
+                });
             }
             catch (Exception e)
             {
                 this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
+                throw;
             }
         }
 
-        public void InvokeUserRename(Authentication authentication, User user, string newName)
+        public Task<UserSerializationInfo> InvokeUserCreateAsync(Authentication authentication, UserSerializationInfo userInfo)
         {
-            throw new NotImplementedException();
-        }
-
-        public void InvokeUserMove(Authentication authentication, User user, string categoryPath)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeUserMove), user, categoryPath);
-
-            try
+            var message = EventMessageBuilder.CreateUser(authentication, userInfo.ID, userInfo.Name);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                var userInfo = user.SerializationInfo;
-                userInfo.CategoryPath = categoryPath;
-                userInfo.ModificationInfo = new SignatureDate(authentication.ID, DateTime.UtcNow);
-
-                var categories = from UserCategory item in this.Context.Categories
-                                 select item.Path;
-
-                var users = from User item in this.Context.Users
-                            select userInfo.ID == item.ID ? userInfo : item.SerializationInfo;
-
-                var serializationInfo = new UserContextSerializationInfo()
+                try
                 {
-                    Version = CremaSchema.VersionValue,
-                    Categories = categories.ToArray(),
-                    Users = users.ToArray(),
-                };
-
-                var xml = DataContractSerializerUtility.GetString(serializationInfo, true);
-                this.Repository.Modify(this.Context.UserFilePath, xml);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
-        }
-
-        public void InvokeUserDelete(Authentication authentication, User user)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeUserDelete), user);
-
-            try
-            {
-                var categories = from UserCategory item in this.Context.Categories
-                                 select item.Path;
-
-                var users = from User item in this.Context.Users
-                            where item.ID != user.ID
-                            select item.SerializationInfo;
-
-                var serializationInfo = new UserContextSerializationInfo()
+                    var signatureDate = authentication.Sign();
+                    userInfo.CreationInfo = signatureDate;
+                    userInfo.ModificationInfo = signatureDate;
+                    this.Repository.CreateUser(userInfo);
+                    this.Repository.Commit(authentication, message);
+                    return userInfo;
+                }
+                catch
                 {
-                    Version = CremaSchema.VersionValue,
-                    Categories = categories.ToArray(),
-                    Users = users.ToArray(),
-                };
-
-                var xml = DataContractSerializerUtility.GetString(serializationInfo, true);
-                this.Repository.Modify(this.Context.UserFilePath, xml);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeUserChange(Authentication authentication, User user, UserSerializationInfo userInfo)
+        public Task<SignatureDate> InvokeUserMoveAsync(Authentication authentication, UserSerializationInfo userInfo, string categoryPath)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeUserChange), user);
-
-            try
+            var message = EventMessageBuilder.MoveUser(authentication, userInfo.ID, userInfo.Name, userInfo.CategoryPath, categoryPath);
+            var itemPath = this.Context.GeneratePath(userInfo.Path);
+            var categoryItemPath = this.Context.GenerateCategoryPath(categoryPath);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                var categories = from UserCategory item in this.Context.Categories
-                                 select item.Path;
-
-                var users = from User item in this.Context.Users
-                            select item.ID == userInfo.ID ? userInfo : item.SerializationInfo;
-
-                var serializationInfo = new UserContextSerializationInfo()
+                try
                 {
-                    Version = CremaSchema.VersionValue,
-                    Categories = categories.ToArray(),
-                    Users = users.ToArray(),
-                };
-
-                var xml = DataContractSerializerUtility.GetString(serializationInfo, true);
-                this.Repository.Modify(this.Context.UserFilePath, xml);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
-        }
-
-        public void InvokeUserBan(Authentication authentication, User user, BanInfo banInfo)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeUserBan), user, banInfo.Comment);
-
-            try
-            {
-                var userInfo = user.SerializationInfo;
-                userInfo.BanInfo = (BanSerializationInfo)banInfo;
-
-                var categories = from UserCategory item in this.Context.Categories
-                                 select item.Path;
-
-                var users = from User item in this.Context.Users
-                            select userInfo.ID == item.ID ? userInfo : item.SerializationInfo;
-
-                var serializationInfo = new UserContextSerializationInfo()
+                    var signatureDate = authentication.Sign();
+                    userInfo.CategoryPath = categoryPath;
+                    userInfo.ModificationInfo = signatureDate;
+                    this.Repository.MoveUser(signatureDate, itemPath, userInfo, categoryItemPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
                 {
-                    Version = CremaSchema.VersionValue,
-                    Categories = categories.ToArray(),
-                    Users = users.ToArray(),
-                };
-
-                var xml = DataContractSerializerUtility.GetString(serializationInfo, true);
-                this.Repository.Modify(this.Context.UserFilePath, xml);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeUserUnban(Authentication authentication, User user)
+        public Task<SignatureDate> InvokeUserDeleteAsync(Authentication authentication, UserSerializationInfo userInfo)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeUserUnban), user);
-
-            try
+            var message = EventMessageBuilder.DeleteUser(authentication, userInfo.ID);
+            var itemPath = this.Context.GeneratePath(userInfo.Path);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                var userInfo = user.SerializationInfo;
-                userInfo.BanInfo = (BanSerializationInfo)BanInfo.Empty;
-
-                var categories = from UserCategory item in this.Context.Categories
-                                 select item.Path;
-
-                var users = from User item in this.Context.Users
-                            select userInfo.ID == item.ID ? userInfo : item.SerializationInfo;
-
-                var serializationInfo = new UserContextSerializationInfo()
+                try
                 {
-                    Version = CremaSchema.VersionValue,
-                    Categories = categories.ToArray(),
-                    Users = users.ToArray(),
-                };
-
-                var xml = DataContractSerializerUtility.GetString(serializationInfo, true);
-                this.Repository.Modify(this.Context.UserFilePath, xml);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
+                    var signatureDate = authentication.Sign();
+                    this.Repository.DeleteUser(itemPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
-        public void InvokeUserKick(Authentication authentication, User user, string comment)
+        public Task<UserSerializationInfo> InvokeUserChangeAsync(Authentication authentication, UserSerializationInfo userInfo, SecureString password, SecureString newPassword, string userName, Authority? authority)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeUserKick), user, comment);
+            var message = EventMessageBuilder.ChangeUserInfo(authentication, userInfo.ID, userInfo.Name);
+            var itemPath = this.Context.GeneratePath(userInfo.Path);
+            if (newPassword != null)
+                userInfo.Password = UserContext.SecureStringToString(newPassword).Encrypt();
+            if (userName != null)
+                userInfo.Name = userName;
+            if (authority.HasValue)
+                userInfo.Authority = authority.Value;
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    userInfo.ModificationInfo = signatureDate;
+                    this.Repository.ModifyUser(itemPath, userInfo);
+                    this.Repository.Commit(authentication, message);
+                    return userInfo;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
+        }
+
+        public Task<BanInfo> InvokeUserBanAsync(Authentication authentication, UserSerializationInfo userInfo, string comment)
+        {
+            var message = EventMessageBuilder.BanUser(authentication, userInfo.ID, userInfo.Name, comment);
+            var itemPath = this.Context.GeneratePath(userInfo.Path);
+            var banInfo = new BanInfo() { Path = userInfo.Path, Comment = comment };
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    banInfo.SignatureDate = signatureDate;
+                    userInfo.BanInfo = (BanSerializationInfo)banInfo;
+                    this.Repository.ModifyUser(itemPath, userInfo);
+                    this.Repository.Commit(authentication, message);
+                    return banInfo;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
+        }
+
+        public Task<SignatureDate> InvokeUserUnbanAsync(Authentication authentication, UserSerializationInfo userInfo)
+        {
+            var message = EventMessageBuilder.UnbanUser(authentication, userInfo.ID, userInfo.Name);
+            var itemPath = this.Context.GeneratePath(userInfo.Path);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    userInfo.BanInfo = (BanSerializationInfo)BanInfo.Empty;
+                    this.Repository.ModifyUser(itemPath, userInfo);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public void InvokeUsersCreatedEvent(Authentication authentication, User[] users)
         {
             var args = users.Select(item => (object)item.UserInfo).ToArray();
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersCreatedEvent), users);
-            var comment = EventMessageBuilder.CreateUser(authentication, users);
+            var message = EventMessageBuilder.CreateUser(authentication, users);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnUsersCreated(new ItemsCreatedEventArgs<IUser>(authentication, users, args));
             this.Context.InvokeItemsCreatedEvent(authentication, users, args);
-        }
-
-        public void InvokeUsersRenamedEvent(Authentication authentication, User[] users, string[] oldNames, string[] oldPaths)
-        {
-            throw new NotImplementedException();
         }
 
         public void InvokeUsersMovedEvent(Authentication authentication, User[] users, string[] oldPaths, string[] oldCategoryPaths)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersMovedEvent), users, oldPaths, oldCategoryPaths);
-            var comment = EventMessageBuilder.MoveUser(authentication, users, oldCategoryPaths);
+            var message = EventMessageBuilder.MoveUser(authentication, users, oldCategoryPaths);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnUsersMoved(new ItemsMovedEventArgs<IUser>(authentication, users, oldPaths, oldCategoryPaths));
             this.Context.InvokeItemsMovedEvent(authentication, users, oldPaths, oldCategoryPaths);
         }
@@ -316,10 +258,9 @@ namespace Ntreev.Crema.Services.Users
         public void InvokeUsersDeletedEvent(Authentication authentication, User[] users, string[] itemPaths)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersDeletedEvent), itemPaths);
-            var comment = EventMessageBuilder.DeleteUser(authentication, users);
+            var message = EventMessageBuilder.DeleteUser(authentication, users);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnUsersDeleted(new ItemsDeletedEventArgs<IUser>(authentication, users, itemPaths));
             this.Context.InvokeItemsDeleteEvent(authentication, users, itemPaths);
         }
@@ -327,10 +268,9 @@ namespace Ntreev.Crema.Services.Users
         public void InvokeUsersChangedEvent(Authentication authentication, User[] users)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersChangedEvent), users);
-            var comment = EventMessageBuilder.ChangeUserInfo(authentication, users);
+            var message = EventMessageBuilder.ChangeUserInfo(authentication, users);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnUsersChanged(new ItemsEventArgs<IUser>(authentication, users));
             this.Context.InvokeItemsChangedEvent(authentication, users);
         }
@@ -369,11 +309,10 @@ namespace Ntreev.Crema.Services.Users
         public void InvokeUsersBannedEvent(Authentication authentication, User[] users, string[] comments)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersBannedEvent), users, comments);
-            var comment = EventMessageBuilder.BanUser(authentication, users, comments);
+            var message = EventMessageBuilder.BanUser(authentication, users, comments);
             var metaData = EventMetaDataBuilder.Build(users, BanChangeType.Ban, comments);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnUsersBanChanged(new ItemsEventArgs<IUser>(authentication, users, metaData));
             this.Context.InvokeItemsChangedEvent(authentication, users);
         }
@@ -381,11 +320,10 @@ namespace Ntreev.Crema.Services.Users
         public void InvokeUsersUnbannedEvent(Authentication authentication, User[] users)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersUnbannedEvent), users);
-            var comment = EventMessageBuilder.UnbanUser(authentication, users);
+            var message = EventMessageBuilder.UnbanUser(authentication, users);
             var metaData = EventMetaDataBuilder.Build(users, BanChangeType.Unban);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnUsersBanChanged(new ItemsEventArgs<IUser>(authentication, users, metaData));
             this.Context.InvokeItemsChangedEvent(authentication, users);
         }
@@ -396,7 +334,7 @@ namespace Ntreev.Crema.Services.Users
             var comment = EventMessageBuilder.SendMessage(authentication, user, message);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(comment);
-            this.OnMessageReceived(new MessageEventArgs(authentication, new IUser[] { user, }, message, MessageType.None));
+            this.OnMessageReceived(new MessageEventArgs(authentication, new IUser[] { user }, message, MessageType.None));
         }
 
         public void InvokeNotifyMessageEvent(Authentication authentication, User[] users, string message)
@@ -409,29 +347,15 @@ namespace Ntreev.Crema.Services.Users
             this.OnMessageReceived(new MessageEventArgs(authentication, users, message, MessageType.Notification));
         }
 
-        public RepositoryHost Repository
-        {
-            get { return this.Context.Repository; }
-        }
+        public UserRepositoryHost Repository => this.Context.Repository;
 
-        public CremaHost CremaHost
-        {
-            get { return this.Context.CremaHost; }
-        }
+        public CremaHost CremaHost => this.Context.CremaHost;
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.Context.Dispatcher; }
-        }
+        public CremaDispatcher Dispatcher => this.Context.Dispatcher;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public IObjectSerializer Serializer => this.Context.Serializer;
+
+        public new int Count => base.Count;
 
         public event ItemsCreatedEventHandler<IUser> UsersCreated
         {
@@ -682,27 +606,14 @@ namespace Ntreev.Crema.Services.Users
             return IdentifierValidator.Verify(name);
         }
 
-        private void Sign(Authentication authentication)
-        {
-            authentication.Sign();
-        }
-
         #region IUserCollection
 
         bool IUserCollection.Contains(string userID)
         {
-            this.Dispatcher.VerifyAccess();
             return base.Contains(userID);
         }
 
-        IUser IUserCollection.this[string userID]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[userID];
-            }
-        }
+        IUser IUserCollection.this[string userID] => this[userID];
 
         #endregion
 
@@ -710,13 +621,11 @@ namespace Ntreev.Crema.Services.Users
 
         IEnumerator<IUser> IEnumerable<IUser>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 

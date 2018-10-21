@@ -38,8 +38,8 @@ namespace Ntreev.Crema.Data.Test
             var dataSet = new CremaDataSet();
 
             var type1 = new CremaDataType("Type1");
-            var type2 = new CremaDataType("Type1", "/A/");
-            var type3 = new CremaDataType("Type1", "/B/");
+            var type2 = new CremaDataType("Type2", "/A/");
+            var type3 = new CremaDataType("Type3", "/B/");
 
             dataSet.Types.Add(type1);
             dataSet.Types.Add(type2);
@@ -51,8 +51,8 @@ namespace Ntreev.Crema.Data.Test
         {
             var dataSet = new CremaDataSet();
             var type1 = new CremaDataType("Type1");
-            var type2 = new CremaDataType("Type1");
-            var type3 = new CremaDataType("Type1", "/A/");
+            var type2 = new CremaDataType("Type2");
+            var type3 = new CremaDataType("Type3", "/A/");
             var type4 = new CremaDataType("Type1", "/A/");
 
             dataSet.Types.Add(type1);
@@ -84,8 +84,8 @@ namespace Ntreev.Crema.Data.Test
             var dataSet = new CremaDataSet();
 
             dataSet.Types.Add("Type1");
-            dataSet.Types.Add("Type1", "/A/");
-            dataSet.Types.Add("Type1", "/B/");
+            dataSet.Types.Add("Type2", "/A/");
+            dataSet.Types.Add("Type3", "/B/");
         }
 
         [TestMethod]
@@ -96,17 +96,6 @@ namespace Ntreev.Crema.Data.Test
             dataSet.Types.Add("Type1");
             try
             {
-                dataSet.Types.Add("Type1");
-                Assert.Inconclusive();
-            }
-            catch
-            {
-
-            }
-
-            dataSet.Types.Add("Type1", "/A/");
-            try
-            {
                 dataSet.Types.Add("Type1", "/A/");
                 Assert.Inconclusive();
             }
@@ -115,10 +104,21 @@ namespace Ntreev.Crema.Data.Test
 
             }
 
-            dataSet.Types.Add("Type1", "/B/");
+            dataSet.Types.Add("Type2", "/A/");
             try
             {
-                dataSet.Types.Add("Type1", "/B/");
+                dataSet.Types.Add("Type2", "/A/B/");
+                Assert.Inconclusive();
+            }
+            catch
+            {
+
+            }
+
+            dataSet.Types.Add("Type3", "/B/");
+            try
+            {
+                dataSet.Types.Add("Type3", "/B/C/");
                 Assert.Inconclusive();
             }
             catch
@@ -134,13 +134,12 @@ namespace Ntreev.Crema.Data.Test
 
             var type1 = dataSet.Types.Add("Type1");
             Assert.AreEqual(type1, dataSet.Types["Type1"]);
-            Assert.AreEqual(type1, dataSet.Types["Type1", "/"]);
 
-            var type2 = dataSet.Types.Add("Type1", "/A/");
-            Assert.AreEqual(type2, dataSet.Types["Type1", "/A/"]);
+            var type2 = dataSet.Types.Add("Type2", "/A/");
+            Assert.AreEqual(type2, dataSet.Types["Type2", "/A/"]);
 
-            var type3 = dataSet.Types.Add("Type1", "/B/");
-            Assert.AreEqual(type3, dataSet.Types["Type1", "/B/"]);
+            var type3 = dataSet.Types.Add("Type3", "/B/");
+            Assert.AreEqual(type3, dataSet.Types["Type3", "/B/"]);
         }
 
         [TestMethod]
@@ -181,11 +180,11 @@ namespace Ntreev.Crema.Data.Test
         [TestMethod]
         public void IndexerByIndex()
         {
-            CremaDataSet dataSet = new CremaDataSet();
+            var dataSet = new CremaDataSet();
 
             var type1 = dataSet.Types.Add("Type1");
-            var type2 = dataSet.Types.Add("Type1", "/A/");
-            var type3 = dataSet.Types.Add("Type1", "/B/");
+            var type2 = dataSet.Types.Add("Type2", "/A/");
+            var type3 = dataSet.Types.Add("Type3", "/B/");
 
             Assert.AreEqual(dataSet.Types[0], type1);
             Assert.AreEqual(dataSet.Types[1], type2);
@@ -199,11 +198,11 @@ namespace Ntreev.Crema.Data.Test
         [TestMethod]
         public void IndexerByIndex_Fail()
         {
-            CremaDataSet dataSet = new CremaDataSet();
+            var dataSet = new CremaDataSet();
 
             var type1 = dataSet.Types.Add("Type1");
-            var type2 = dataSet.Types.Add("Type1", "/A/");
-            var type3 = dataSet.Types.Add("Type1", "/B/");
+            var type2 = dataSet.Types.Add("Type2", "/A/");
+            var type3 = dataSet.Types.Add("Type3", "/B/");
 
             try
             {
@@ -237,11 +236,11 @@ namespace Ntreev.Crema.Data.Test
         [TestMethod]
         public void Contains()
         {
-            CremaDataSet dataSet = new CremaDataSet();
+            var dataSet = new CremaDataSet();
 
             Assert.IsFalse(dataSet.Types.Contains("Type1"));
-            Assert.IsFalse(dataSet.Types.Contains("Type1", "/A/"));
-            Assert.IsFalse(dataSet.Types.Contains("Type1", "/B/"));
+            Assert.IsFalse(dataSet.Types.Contains("Type2", "/A/"));
+            Assert.IsFalse(dataSet.Types.Contains("Type3", "/B/"));
 
             var type1 = dataSet.Types.Add("Type1");
             Assert.IsTrue(dataSet.Types.Contains("Type1"));
@@ -250,11 +249,11 @@ namespace Ntreev.Crema.Data.Test
             Assert.IsFalse(dataSet.Types.Contains("Type1", "/A/"));
             Assert.IsFalse(dataSet.Types.Contains("Type1", "/B/"));
 
-            var type2 = dataSet.Types.Add("Type1", "/A/");
-            Assert.IsTrue(dataSet.Types.Contains("Type1", "/A/"));
+            var type2 = dataSet.Types.Add("Type2", "/A/");
+            Assert.IsTrue(dataSet.Types.Contains("Type2", "/A/"));
 
-            var type3 = dataSet.Types.Add("Type1", "/B/");
-            Assert.IsTrue(dataSet.Types.Contains("Type1", "/B/"));
+            var type3 = dataSet.Types.Add("Type3", "/B/");
+            Assert.IsTrue(dataSet.Types.Contains("Type3", "/B/"));
         }
 
         [TestMethod]
@@ -272,8 +271,8 @@ namespace Ntreev.Crema.Data.Test
             var dataSet = new CremaDataSet();
 
             var type1 = dataSet.Types.Add("Type1");
-            var type2 = dataSet.Types.Add("Type1", "/A/");
-            var type3 = dataSet.Types.Add("Type1", "/B/");
+            var type2 = dataSet.Types.Add("Type2", "/A/");
+            var type3 = dataSet.Types.Add("Type3", "/B/");
 
             dataSet.Types.Remove(type1);
             Assert.IsNull(type1.DataSet);
@@ -293,8 +292,8 @@ namespace Ntreev.Crema.Data.Test
             CremaDataSet dataSet = new CremaDataSet();
 
             var type1 = dataSet.Types.Add("Type1");
-            var type2 = dataSet.Types.Add("Type1", "/A/");
-            var type3 = dataSet.Types.Add("Type1", "/B/");
+            var type2 = dataSet.Types.Add("Type2", "/A/");
+            var type3 = dataSet.Types.Add("Type3", "/B/");
 
             try
             {
@@ -337,13 +336,13 @@ namespace Ntreev.Crema.Data.Test
             CremaDataSet dataSet = new CremaDataSet();
 
             var type1 = dataSet.Types.Add("Type1");
-            var type2 = dataSet.Types.Add("Type1", "/A/");
-            var type3 = dataSet.Types.Add("Type1", "/B/");
+            var type2 = dataSet.Types.Add("Type2", "/A/");
+            var type3 = dataSet.Types.Add("Type3", "/B/");
 
-            dataSet.Types.Remove("Type1", "/B/");
+            dataSet.Types.Remove("Type3", "/B/");
             Assert.IsNull(type3.DataSet);
 
-            dataSet.Types.Remove("Type1", "/A/");
+            dataSet.Types.Remove("Type2", "/A/");
             Assert.IsNull(type2.DataSet);
 
             dataSet.Types.Remove("Type1");
@@ -358,8 +357,8 @@ namespace Ntreev.Crema.Data.Test
             CremaDataSet dataSet = new CremaDataSet();
 
             var type1 = dataSet.Types.Add("Type1");
-            var type2 = dataSet.Types.Add("Type1", "/A/");
-            var type3 = dataSet.Types.Add("Type1", "/B/");
+            var type2 = dataSet.Types.Add("Type2", "/A/");
+            var type3 = dataSet.Types.Add("Type3", "/B/");
 
             var typeCount = dataSet.Types.Count;
 
@@ -389,7 +388,7 @@ namespace Ntreev.Crema.Data.Test
 
             try
             {
-                dataSet.Types.Remove("Type1");
+                dataSet.Types.Remove("Type2", "/");
                 Assert.Inconclusive();
             }
             catch
@@ -421,8 +420,8 @@ namespace Ntreev.Crema.Data.Test
             CremaDataSet dataSet = new CremaDataSet();
 
             var type1 = dataSet.Types.Add("Type1");
-            var type2 = dataSet.Types.Add("Type1", "/A/");
-            var type3 = dataSet.Types.Add("Type1", "/B/");
+            var type2 = dataSet.Types.Add("Type2", "/A/");
+            var type3 = dataSet.Types.Add("Type3", "/B/");
 
             var type4 = new CremaDataType();
 
@@ -467,8 +466,8 @@ namespace Ntreev.Crema.Data.Test
             CremaDataSet dataSet = new CremaDataSet();
 
             var type1 = dataSet.Types.Add("Type1");
-            var type2 = dataSet.Types.Add("Type1", "/A/");
-            var type3 = dataSet.Types.Add("Type1", "/B/");
+            var type2 = dataSet.Types.Add("Type2", "/A/");
+            var type3 = dataSet.Types.Add("Type3", "/B/");
 
             dataSet.Types.Clear();
             Assert.IsNull(type1.DataSet);

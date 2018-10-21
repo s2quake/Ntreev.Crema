@@ -25,6 +25,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Bot.Tasks
 {
@@ -34,59 +35,39 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass(Weight = 10)]
     public class IDataBaseCollectionTask : ITaskProvider, IConfigurationPropertyProvider
     {
-        [Import]
-        private Lazy<ICremaHost> cremaHost = null;
-
         [ImportingConstructor]
         public IDataBaseCollectionTask()
         {
-            
+
         }
 
-        public void InvokeTask(TaskContext context)
+        public Task InvokeAsync(TaskContext context)
         {
             var dataBases = context.Target as IDataBaseCollection;
             if (context.IsCompleted(dataBases) == true)
             {
                 context.Pop(dataBases);
             }
-            else 
+            else
             {
                 context.Complete(dataBases);
             }
+            return Task.Delay(0);
         }
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.CremaHost.Dispatcher; }
-        }
-
-        public Type TargetType
-        {
-            get { return typeof(IDataBaseCollection); }
-        }
+        public Type TargetType => typeof(IDataBaseCollection);
 
         [TaskMethod(Weight = 10)]
-        public void AddNewDataBase(IDataBaseCollection dataBases, TaskContext context)
+        public async Task AddNewDataBaseAsync(IDataBaseCollection dataBases, TaskContext context)
         {
-            this.Dispatcher.Invoke(() =>
-            {
-                var dataBaseName = RandomUtility.NextIdentifier();
-                var comment = RandomUtility.NextString();
-                dataBases.AddNewDataBase(context.Authentication, dataBaseName, comment);
-            });
+            var authentication = context.Authentication;
+            var dataBaseName = RandomUtility.NextIdentifier();
+            var comment = RandomUtility.NextString();
+            await dataBases.AddNewDataBaseAsync(authentication, dataBaseName, comment);
         }
 
         [ConfigurationProperty(ScopeType = typeof(ICremaConfiguration))]
-        public bool IsEnabled
-        {
-            get; set;
-        }
-
-        private ICremaHost CremaHost
-        {
-            get => this.cremaHost.Value;
-        }
+        public bool IsEnabled { get; set; }
 
         #region IConfigurationPropertyProvider
 

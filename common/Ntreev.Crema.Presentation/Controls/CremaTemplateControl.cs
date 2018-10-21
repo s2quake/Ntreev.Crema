@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public static readonly DependencyProperty TagsProperty = DependencyProperty.RegisterAttached("Tags", typeof(TagInfo), typeof(CremaTemplateControl));
 
-        private DataGridCollectionViewSource viewSource = new DataGridCollectionViewSource();
+        private readonly DataGridCollectionViewSource viewSource = new DataGridCollectionViewSource();
         private ModernDataGridControl dataGridControl;
 
         public CremaTemplateControl()
@@ -144,7 +144,7 @@ namespace Ntreev.Crema.Presentation.Controls
             this.dataGridControl.RowDrag += DataGridControl_RowDrag;
             this.dataGridControl.RowDrop += DataGridControl_RowDrop;
             this.dataGridControl.ItemsSourceChangeCompleted += DataGridControl_ItemsSourceChangeCompleted;
-            BindingOperations.SetBinding(this.viewSource, DataGridCollectionViewSource.SourceProperty, new Binding("ItemsSource") { Source = this, });
+            BindingOperations.SetBinding(this.viewSource, DataGridCollectionViewSource.SourceProperty, new Binding(nameof(ItemsSource)) { Source = this, });
             BindingOperations.SetBinding(this.dataGridControl, ModernDataGridControl.ItemsSourceProperty, new Binding() { Source = this.viewSource, });
             this.dataGridControl.IsDeleteCommandEnabled = true;
         }

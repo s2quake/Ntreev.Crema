@@ -15,12 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableContent
 {
@@ -38,19 +41,26 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
 
         protected override Delegate CreateDelegate()
         {
-            return new Func<string, object[], IDictionary<string, object>>(this.GetTableContentRowFields);
+            return new Func<string, string, object[], IDictionary<string, object>>(this.GetTableContentRowFields);
         }
 
-        private IDictionary<string, object> GetTableContentRowFields(string domainID, object[] keys)
+        private IDictionary<string, object> GetTableContentRowFields(string domainID, string tableName, object[] keys)
         {
             if (keys == null)
                 throw new ArgumentNullException(nameof(keys));
 
-            var content = this.GetDomainHost<ITableContent>(domainID);
+            var contents = this.GetDomainHost<IEnumerable<ITableContent>>(domainID);
+            var content = contents.FirstOrDefault(item => item.Dispatcher.Invoke(() => item.Table.Name) == tableName);
+            if (content == null)
+                throw new TableNotFoundException(tableName);
             var authentication = this.Context.GetAuthentication(this);
-            return content.Dispatcher.Invoke(() =>
+            var task = InvokeAsync();
+            task.Wait();
+            return task.Result;
+
+            async Task<IDictionary< string, object>> InvokeAsync()
             {
-                var row = content.Find(authentication, keys);
+                var row = await content.FindAsync(authentication, keys);
                 var tableInfo = content.Table.TableInfo;
                 var fields = new Dictionary<string, object>(tableInfo.Columns.Length);
                 foreach (var item in tableInfo.Columns)
@@ -58,7 +68,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
                     fields.Add(item.Name, row[item.Name]);
                 }
                 return fields;
-            });
+            };
         }
     }
 }

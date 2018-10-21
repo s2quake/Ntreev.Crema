@@ -36,116 +36,52 @@ namespace Ntreev.Crema.Services
     public class UsingDataBase : IDisposable
     {
         private readonly Action action;
-        private IDataBase dataBase;
-        
+
         private UsingDataBase(Action action)
         {
             this.action = action;
         }
 
-        public static UsingDataBase Set(ICremaHost cremaHost, string dataBaseName, Authentication authentication)
+        public static async Task<UsingDataBase> SetAsync(ICremaHost cremaHost, string dataBaseName, Authentication authentication)
         {
-            return Set(cremaHost, dataBaseName, authentication, false);
+            if (cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
+            {
+                var dataBase = await dataBases.Dispatcher.InvokeAsync(() => dataBases[dataBaseName]);
+                if (dataBase == null)
+                    throw new DataBaseNotFoundException(dataBaseName);
+
+                return await SetAsync(dataBase, authentication);
+            }
+            throw new NotImplementedException();
         }
 
-        public static UsingDataBase Set(ICremaHost cremaHost, string dataBaseName, Authentication authentication, bool dispatch)
+        public static async Task<UsingDataBase> SetAsync(IDataBase dataBase, Authentication authentication)
         {
-            var dataBase = GetDataBase();
-            if (dataBase == null)
-                throw new DataBaseNotFoundException(dataBaseName);
-
-            return Set(dataBase, authentication, dispatch);
-
-            IDataBase GetDataBase()
-            {
-                if (dispatch == true)
-                {
-                    return cremaHost.Dispatcher.Invoke(() => cremaHost.DataBases[dataBaseName]);
-                }
-                else
-                {
-                    return cremaHost.DataBases[dataBaseName];
-                }
-            }
-        }
-
-        public static UsingDataBase Set(IDataBase dataBase, Authentication authentication)
-        {
-            return Set(dataBase, authentication, false);
-        }
-
-        public static UsingDataBase Set(IDataBase dataBase, Authentication authentication, bool dispatch)
-        {
-            Load();
-            var contains = Contains();
-            Enter();
-            return new UsingDataBase(Leave) { dataBase = dataBase };
-
-            void Load()
-            {
-                if (dispatch == true)
-                {
-                    dataBase.Dispatcher.Invoke(() =>
-                    {
-                        if (dataBase.IsLoaded == false)
-                            dataBase.Load(authentication);
-                    });
-                }
-                else if (dataBase.IsLoaded == false)
-                {
-                    dataBase.Load(authentication);
-                }
-            }
-
-            bool Contains()
-            {
-                if (dispatch == true)
-                    return dataBase.Dispatcher.Invoke(() => dataBase.Contains(authentication));
-                else
-                    return dataBase.Contains(authentication);
-            }
-
-            void Enter()
+            if (dataBase.IsLoaded == false)
+                await dataBase.LoadAsync(authentication);
+            var contains = await dataBase.Dispatcher.InvokeAsync(() => dataBase.Contains(authentication));
+            if (contains == false)
+                await dataBase.EnterAsync(authentication);
+            return new UsingDataBase(() =>
             {
                 if (contains == false)
-                {
-                    if (dispatch == true)
-                        dataBase.Dispatcher.Invoke(() => dataBase.Enter(authentication));
-                    else
-                        dataBase.Enter(authentication);
-                }
-            }
-
-            void Leave()
+                    dataBase.LeaveAsync(authentication).Wait();
+            })
             {
-                if (contains == false)
-                {
-                    if (dispatch == true)
-                        dataBase.Dispatcher.Invoke(() => dataBase.Leave(authentication));
-                    else
-                        dataBase.Leave(authentication);
-                }
-            }
+                DataBase = dataBase
+            };
         }
 
-        public static UsingDataBase Set(IServiceProvider serviceProvider, Authentication authentication)
-        {
-            return Set(serviceProvider, authentication, false);
-        }
-
-        public static UsingDataBase Set(IServiceProvider serviceProvider, Authentication authentication, bool dispatch)
+        public static Task<UsingDataBase> SetAsync(IServiceProvider serviceProvider, Authentication authentication)
         {
             if (serviceProvider == null)
                 throw new ArgumentNullException(nameof(serviceProvider));
 
-            return Set(serviceProvider.GetService(typeof(IDataBase)) as IDataBase, authentication, dispatch);            
+            return SetAsync(serviceProvider.GetService(typeof(IDataBase)) as IDataBase, authentication);
         }
 
-        public IDataBase DataBase
-        {
-            get { return this.dataBase; }
-        }
-        
+        public IDataBase DataBase { get; private set; }
+
         #region IDisposable
 
         void IDisposable.Dispose()

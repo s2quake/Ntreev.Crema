@@ -36,120 +36,88 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass(Weight = 10)]
     public class IUserCategoryTask : ITaskProvider
     {
-        private readonly ICremaHost cremaHost;
-        private IUserContext userContext;
-
-        [ImportingConstructor]
-        public IUserCategoryTask(ICremaHost cremaHost)
+        public IUserCategoryTask()
         {
-            this.cremaHost = cremaHost;
-            this.cremaHost.Opened += CremaHost_Opened;
-            this.cremaHost.Closed += CremaHost_Closed;
+
         }
 
-        public void InvokeTask(TaskContext context)
+        public async Task InvokeAsync(TaskContext context)
         {
             var category = context.Target as IUserCategory;
             if (context.IsCompleted(category) == true)
             {
                 context.Pop(category);
             }
+            await Task.Delay(0);
         }
 
-        public Type TargetType
-        {
-            get { return typeof(IUserCategory); }
-        }
-
-        public bool IsEnabled
-        {
-            get { return false; }
-        }
+        public Type TargetType => typeof(IUserCategory);
 
         [TaskMethod]
-        public void Rename(IUserCategory category, TaskContext context)
+        public async Task RenameAsync(IUserCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            var categoryName = RandomUtility.NextIdentifier();
+            if (context.AllowException == false)
             {
-                if (category.Parent == null)
+                if (await category.Dispatcher.InvokeAsync(() => category.Parent) == null)
                     return;
-                var categoryName = RandomUtility.NextIdentifier();
-                category.Rename(context.Authentication, categoryName);
-            });
-        }
-
-        [TaskMethod]
-        public void Move(IUserCategory category, TaskContext context)
-        {
-            category.Dispatcher.Invoke(() =>
-            {
-                if (category.Parent == null)
-                    return;
-                var categories = category.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-                var categoryPath = categories.Random().Path;
-                if (Verify(categoryPath) == false)
-                    return;
-                category.Move(context.Authentication, categoryPath);
-            });
-
-            bool Verify(string categoryPath)
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (categoryPath.StartsWith(category.Path) == true)
-                    return false;
-                if (category.Path == categoryPath)
-                    return false;
-                return true;
             }
+            await category.RenameAsync(authentication, categoryName);
         }
 
         [TaskMethod]
-        public void Delete(IUserCategory category, TaskContext context)
+        public async Task MoveAsync(IUserCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            var categories = category.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
+            if (context.AllowException == false)
             {
-                if (category.Parent == null)
+                if (await category.Dispatcher.InvokeAsync(() => category.Parent) == null)
                     return;
-                if (Verify() == false)
+                if (await category.Dispatcher.InvokeAsync(() => categoryPath.StartsWith(category.Path)) == true)
                     return;
-                category.Delete(context.Authentication);
-                context.Complete(category);
-            });
-
-            bool Verify()
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (category.Parent == null)
-                    return false;
-                if (EnumerableUtility.Descendants<IUserItem, IUser>(category as IUserItem, item => item.Childs).Any() == true)
-                    return false;
-                return true;
+                if (await category.Dispatcher.InvokeAsync(() => category.Path == categoryPath))
+                    return;
+                if (await category.Dispatcher.InvokeAsync(() => category.Parent.Path == categoryPath))
+                    return;
             }
+            await category.MoveAsync(authentication, categoryPath);
+        }
+
+        [TaskMethod]
+        public async Task DeleteAsync(IUserCategory category, TaskContext context)
+        {
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
+            {
+                if (await category.Dispatcher.InvokeAsync(() => category.Parent) == null)
+                    return;
+                if (await category.Dispatcher.InvokeAsync(() => EnumerableUtility.Descendants<IUserItem, IUser>(category as IUserItem, item => item.Childs).Any()) == true)
+                    return;
+            }
+            await category.DeleteAsync(authentication);
+            context.Complete(category);
         }
 
         [TaskMethod(Weight = 10)]
-        public void AddNewCategory(IUserCategory category, TaskContext context)
+        public async Task AddNewCategoryAsync(IUserCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
-            {
-                var categoryName = RandomUtility.NextIdentifier();
-                category.AddNewCategory(context.Authentication, categoryName);
-            });
+            var authentication = context.Authentication;
+            var categoryName = RandomUtility.NextIdentifier();
+            await category.AddNewCategoryAsync(authentication, categoryName);
         }
 
         [TaskMethod]
-        public void AddNewUser(IUserCategory category, TaskContext context)
+        public async Task AddNewUserAsync(IUserCategory category, TaskContext context)
         {
-            category.Dispatcher.Invoke(() =>
-            {
-                var index = RandomUtility.Next(int.MaxValue);
-                var authority = RandomUtility.NextEnum<Authority>();
-                var userID = $"{authority.ToString().ToLower()}_bot_{index}";
-                var userName = "봇" + index;
-                category.AddNewUser(context.Authentication, userID, ToSecureString("1111"), userName, authority);
-            });
+            var authentication = context.Authentication;
+            var index = RandomUtility.Next(int.MaxValue);
+            var authority = RandomUtility.NextEnum<Authority>();
+            var userID = $"{authority.ToString().ToLower()}_bot_{index}";
+            var userName = "봇" + index;
+            await category.AddNewUserAsync(authentication, userID, ToSecureString("1111"), userName, authority);
         }
 
         private static SecureString ToSecureString(string value)
@@ -160,16 +128,6 @@ namespace Ntreev.Crema.Bot.Tasks
                 secureString.AppendChar(item);
             }
             return secureString;
-        }
-
-        private void CremaHost_Opened(object sender, EventArgs e)
-        {
-            this.userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-        }
-
-        private void CremaHost_Closed(object sender, EventArgs e)
-        {
-            this.userContext = null;
         }
     }
 }

@@ -69,24 +69,21 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
             this.address = address;
         }
 
-        public void Login(string address, string userID, SecureString password)
+        public async Task LoginAsync(string address, string userID, SecureString password)
         {
-            this.CremaHost.Dispatcher.Invoke(() =>
-            {
-                this.token = this.CremaHost.Open(address, userID, password);
-                this.CremaHost.Closed += CremaHost_Closed;
-            });
+            this.token = await this.CremaHost.OpenAsync(address, userID, password);
+            await this.CremaHost.Dispatcher.InvokeAsync(() => this.CremaHost.Closed += CremaHost_Closed);
             this.authenticator = this.CremaHost.GetService(typeof(Authenticator)) as Authenticator;
             this.address = address;
             this.Initialize(this.authenticator);
         }
 
-        public void Logout()
+        public async Task LogoutAsync()
         {
             if (this.authenticator == null)
                 throw new Exception("로그인되어 있지 않습니다.");
 
-            this.CremaHost.Dispatcher.Invoke(() => this.CremaHost.Close(this.token));
+            await this.CremaHost.CloseAsync(this.token);
             this.authenticator = null;
             this.token = Guid.Empty;
             this.Release();

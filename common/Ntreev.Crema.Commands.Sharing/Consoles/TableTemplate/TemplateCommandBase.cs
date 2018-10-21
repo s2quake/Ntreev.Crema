@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles.TableTemplate
 {
-    abstract class TemplateCommandBase : CommandBase, ITemplateCommand
+    abstract class TemplateCommandBase : CommandAsyncBase, ITemplateCommand
     {
         protected TemplateCommandBase(string name)
             : base(name)

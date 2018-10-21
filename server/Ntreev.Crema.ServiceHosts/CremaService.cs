@@ -41,100 +41,89 @@ namespace Ntreev.Crema.ServiceHosts
     {
         public const string Namespace = "http://www.ntreev.com";
         private const string cremaString = "Crema";
-        private static readonly CremaDispatcher dispatcher;
-
         private readonly List<ServiceHost> hosts = new List<ServiceHost>();
+        private readonly List<ServiceInfo> serviceInfos = new List<ServiceInfo>();
         private ICremaHost cremaHost;
         private ILogService logService;
-        private int port = AddressUtility.DefaultPort;
         private DescriptorService descriptorService;
         private DescriptorServiceHost descriptorServiceHost;
-        private List<ServiceInfo> serviceInfos = new List<ServiceInfo>();
         private Guid token;
 
         static CremaService()
         {
-            dispatcher = new CremaDispatcher(typeof(CremaServiceItemHost));
+            Dispatcher = new CremaDispatcher(typeof(CremaServiceItemHost));
         }
 
         public CremaService()
         {
-            this.MultiThreading = true;
+
         }
 
-        public void Open()
+        public async Task OpenAsync()
         {
-            this.OnOpening(EventArgs.Empty);
-
-            this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
-            this.logService = this.cremaHost.GetService(typeof(ILogService)) as ILogService;
-
-            this.token = this.cremaHost.Open();
-            this.cremaHost.Opened += CremaHost_Opened;
-            this.cremaHost.Closing += CremaHost_Closing;
-            CremaService.Dispatcher.Invoke(() =>
+            await CremaService.Dispatcher.InvokeAsync(() =>
+            {
+                this.ServiceState = ServiceState.Opening;
+                this.OnOpening(EventArgs.Empty);
+                this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
+                this.logService = this.cremaHost.GetService(typeof(ILogService)) as ILogService;
+            });
+            this.token = await this.cremaHost.OpenAsync();
+            this.cremaHost.Closed += CremaHost_Closed;
+            await CremaService.Dispatcher.InvokeAsync(() =>
             {
                 this.descriptorService = new DescriptorService(this, this.cremaHost);
-                this.descriptorServiceHost = new DescriptorServiceHost(this.cremaHost, this.descriptorService, this.port);
+                this.descriptorServiceHost = new DescriptorServiceHost(this.cremaHost, this.descriptorService, this.Port);
                 this.descriptorServiceHost.Open();
                 this.logService.Info(Resources.ServiceStart, nameof(DescriptorServiceHost));
             });
-            this.StartServices();
-
-            this.OnOpened(EventArgs.Empty);
+            await this.StartServicesAsync();
+            await CremaService.Dispatcher.InvokeAsync(() =>
+            {
+                this.ServiceState = ServiceState.Opened;
+                this.OnOpened(EventArgs.Empty);
+            });
         }
 
-        public void Close()
+        public async Task CloseAsync()
         {
-            this.OnClosing(EventArgs.Empty);
-            this.StopServices();
-            CremaService.Dispatcher.Invoke(() =>
+            await CremaService.Dispatcher.InvokeAsync(() =>
+            {
+                this.OnClosing(EventArgs.Empty);
+            });
+            await this.StopServicesAsync();
+            await CremaService.Dispatcher.InvokeAsync(() =>
             {
                 this.descriptorServiceHost.Close();
                 this.descriptorServiceHost = null;
                 this.descriptorService = null;
                 this.logService.Info(Resources.ServiceStop, nameof(DescriptorServiceHost));
             });
-            if (this.cremaHost.IsOpened == true)
-            {
-                this.cremaHost.Opened -= CremaHost_Opened;
-                this.cremaHost.Closing -= CremaHost_Closing;
-                this.cremaHost.Close(this.token);
-                this.cremaHost.SaveConfigs();
-            }
-            this.token = Guid.Empty;
-            this.OnClosed(EventArgs.Empty);
-        }
-
-        public void Restart()
-        {
-            this.StopServices();
-            this.cremaHost.Dispatcher.Invoke(() => this.CremaHost.Close(this.token));
+            await this.cremaHost.CloseAsync(this.token);
             this.cremaHost.SaveConfigs();
-            this.token = this.cremaHost.Dispatcher.Invoke(() => this.CremaHost.Open());
-            this.StartServices();
+            await CremaService.Dispatcher.InvokeAsync(() =>
+            {
+                this.token = Guid.Empty;
+                this.OnClosed(new ClosedEventArgs(CloseReason.Shutdown, string.Empty));
+            });
         }
 
-        public int Port
+        public async Task RestartAsync()
         {
-            get { return this.port; }
-            set { this.port = value; }
+            await this.StopServicesAsync();
+            await this.cremaHost.CloseAsync(this.token);
+            this.cremaHost.SaveConfigs();
+            this.token = await this.cremaHost.OpenAsync();
+            await this.StartServicesAsync();
         }
 
-        public ICremaHost CremaHost
-        {
-            get { return this.cremaHost; }
-        }
+        public int Port { get; set; } = AddressUtility.DefaultPort;
 
-        public ServiceInfo[] ServiceInfos
-        {
-            get { return this.serviceInfos.ToArray(); }
-        }
+        public ServiceInfo[] ServiceInfos => this.serviceInfos.ToArray();
 
-        public static CremaDispatcher Dispatcher
-        {
-            get { return dispatcher; }
-        }
+        public static CremaDispatcher Dispatcher { get; private set; }
+
+        public ServiceState ServiceState { get; set; }
 
         public event EventHandler Opening;
 
@@ -142,7 +131,7 @@ namespace Ntreev.Crema.ServiceHosts
 
         public event EventHandler Closing;
 
-        public event EventHandler Closed;
+        public event ClosedEventHandler Closed;
 
         public override IEnumerable<Tuple<System.Type, object>> GetParts()
         {
@@ -169,7 +158,7 @@ namespace Ntreev.Crema.ServiceHosts
             this.Closing?.Invoke(this, e);
         }
 
-        protected virtual void OnClosed(EventArgs e)
+        protected virtual void OnClosed(ClosedEventArgs e)
         {
             this.Closed?.Invoke(this, e);
         }
@@ -177,28 +166,68 @@ namespace Ntreev.Crema.ServiceHosts
         protected override void OnDisposed(EventArgs e)
         {
             base.OnDisposed(e);
-            dispatcher.Dispose();
+            Dispatcher.Dispose();
+            AuthenticationUtility.Dispose();
         }
 
-        private void CremaHost_Opened(object sender, EventArgs e)
+        private async void CremaHost_Opened(object sender, EventArgs e)
         {
-            this.StartServices();
-        }
-
-        private void CremaHost_Closing(object sender, EventArgs e)
-        {
-            this.StopServices();
-        }
-
-        private void StartServices()
-        {
-            var providers = this.GetService(typeof(IEnumerable<IServiceHostProvider>)) as IEnumerable<IServiceHostProvider>;
-            var items = providers.TopologicalSort().ToArray();
-            var port = this.port;
-            var version = new Version(FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).ProductVersion);
-
-            CremaService.Dispatcher.Invoke(() =>
+            if (sender is ICremaHost cremaHost)
             {
+                cremaHost.Opened -= CremaHost_Opened;
+                await CremaService.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ServiceState = ServiceState.Opening;
+                });
+                await this.StartServicesAsync();
+                await CremaService.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ServiceState = ServiceState.Opened;
+                });
+            }
+        }
+
+        private async void CremaHost_Closed(object sender, ClosedEventArgs e)
+        {
+            if (sender is ICremaHost cremaHost)
+            {
+                if (e.Reason == CloseReason.Restart)
+                    cremaHost.Opened += CremaHost_Opened;
+                await CremaService.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ServiceState = ServiceState.Closing;
+                });
+                await this.StopServicesAsync();
+                await CremaService.Dispatcher.InvokeAsync(() =>
+                {
+                    if (e.Reason == CloseReason.Shutdown)
+                    {
+                        this.descriptorServiceHost.Close();
+                        this.descriptorServiceHost = null;
+                        this.descriptorService = null;
+                        this.logService.Info(Resources.ServiceStop, nameof(DescriptorServiceHost));
+                        this.cremaHost.SaveConfigs();
+                        this.token = Guid.Empty;
+                        this.ServiceState = ServiceState.Closed;
+                        this.OnClosed(e);
+                    }
+                    else
+                    {
+                        this.ServiceState = ServiceState.Closed;
+                    }
+                });
+            }
+        }
+
+        private Task StartServicesAsync()
+        {
+            return CremaService.Dispatcher.InvokeAsync(() =>
+            {
+                var providers = this.GetService(typeof(IEnumerable<IServiceHostProvider>)) as IEnumerable<IServiceHostProvider>;
+                var items = providers.TopologicalSort().ToArray();
+                var port = this.Port;
+                var version = new Version(FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).ProductVersion);
+
                 if (Environment.OSVersion.Platform == PlatformID.Unix)
                     port += 2;
                 foreach (var item in items)
@@ -226,9 +255,9 @@ namespace Ntreev.Crema.ServiceHosts
             });
         }
 
-        private void StopServices()
+        private Task StopServicesAsync()
         {
-            CremaService.Dispatcher.Invoke(() =>
+            return CremaService.Dispatcher.InvokeAsync(() =>
             {
                 if (this.hosts.Any() == false)
                     return;

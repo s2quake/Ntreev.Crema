@@ -44,11 +44,11 @@ namespace Ntreev.Crema.ServiceHosts
             return this.GetInstance(instanceContext, null);
         }
 
-        public void ReleaseInstance(InstanceContext instanceContext, object instance)
+        public async void ReleaseInstance(InstanceContext instanceContext, object instance)
         {
-            if (instance is IDisposable disposable)
+            if (instance is ICremaServiceItem serviceItem)
             {
-                disposable.Dispose();
+                await serviceItem.CloseAsync(false);
             }
         }
     }

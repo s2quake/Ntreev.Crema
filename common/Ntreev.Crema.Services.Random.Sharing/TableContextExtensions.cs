@@ -21,9 +21,11 @@ using Ntreev.Crema.Services;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Random;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using Ntreev.Library;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Random
 {
@@ -39,138 +41,157 @@ namespace Ntreev.Crema.Services.Random
             MaxRowCount = 10000;
         }
 
-        public static void AddRandomItems(this ITableContext tableContext, Authentication authentication)
+        public static async Task AddRandomItemsAsync(this ITableContext tableContext, Authentication authentication)
         {
-            AddRandomCategories(tableContext, authentication);
-            AddRandomTables(tableContext, authentication);
-            AddRandomChildTables(tableContext, authentication, 10);
-            AddRandomDerivedTables(tableContext, authentication, 10);
+            await AddRandomCategoriesAsync(tableContext, authentication);
+            await AddRandomTablesAsync(tableContext, authentication);
+            await AddRandomChildTablesAsync(tableContext, authentication, 10);
+            await AddRandomDerivedTablesAsync(tableContext, authentication, 10);
         }
 
-        public static void AddRandomCategories(this ITableContext tableContext, Authentication authentication)
+        public static Task AddRandomCategoriesAsync(this ITableContext tableContext, Authentication authentication)
         {
-            AddRandomCategories(tableContext, authentication, RandomUtility.Next(MinTableCategoryCount, MaxTableCategoryCount));
+            return AddRandomCategoriesAsync(tableContext, authentication, RandomUtility.Next(MinTableCategoryCount, MaxTableCategoryCount));
         }
 
-        public static void AddRandomCategories(this ITableContext tableContext, Authentication authentication, int tryCount)
+        public static async Task AddRandomCategoriesAsync(this ITableContext tableContext, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                tableContext.AddRandomCategory(authentication);
+                await tableContext.AddRandomCategoryAsync(authentication);
             }
         }
 
-        public static ITableCategory AddRandomCategory(this ITableCategory category, Authentication authentication)
+        public static Task<ITableCategory> AddRandomCategoryAsync(this ITableCategory category, Authentication authentication)
         {
             var categoryName = RandomUtility.NextIdentifier();
-            return category.AddNewCategory(authentication, categoryName);
+            return category.AddNewCategoryAsync(authentication, categoryName);
         }
 
-        public static ITableCategory AddRandomCategory(this ITableContext tableContext, Authentication authentication)
+        public static Task<ITableCategory> AddRandomCategoryAsync(this ITableContext tableContext, Authentication authentication)
         {
             if (RandomUtility.Within(33) == true)
             {
-                return tableContext.Root.AddRandomCategory(authentication);
+                return tableContext.Root.AddRandomCategoryAsync(authentication);
             }
             else
             {
                 var category = tableContext.Categories.Random();
                 if (GetLevel(category, (i) => i.Parent) > 4)
                     return null;
-                return category.AddRandomCategory(authentication);
+                return category.AddRandomCategoryAsync(authentication);
             }
         }
 
-        public static void AddRandomTables(this ITableContext tableContext, Authentication authentication)
+        public static Task AddRandomTablesAsync(this ITableContext tableContext, Authentication authentication)
         {
-            AddRandomTables(tableContext, authentication, RandomUtility.Next(MinTableCount, MaxTableCount));
+            return AddRandomTablesAsync(tableContext, authentication, RandomUtility.Next(MinTableCount, MaxTableCount));
         }
 
-        public static void AddRandomTables(this ITableContext tableContext, Authentication authentication, int tryCount)
+        public static async Task AddRandomTablesAsync(this ITableContext tableContext, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                AddRandomTable(tableContext, authentication);
+                await AddRandomTableAsync(tableContext, authentication);
             }
         }
 
-        public static ITable AddRandomTable(this ITableContext tableContext, Authentication authentication)
+        public static Task<ITable> AddRandomTableAsync(this ITableContext tableContext, Authentication authentication)
         {
             var category = tableContext.Categories.Random();
-            return AddRandomTable(category, authentication);
+            return AddRandomTableAsync(category, authentication);
         }
 
-        public static ITable AddRandomTable(this ITableCategory category, Authentication authentication)
+        public static async Task<ITable> AddRandomTableAsync(this ITableCategory category, Authentication authentication)
         {
-            var template = category.NewTable(authentication);
-            template.InitializeRandom(authentication);
-            template.EndEdit(authentication);
-            var table = template.Table;
-            AddRandomRows(table, authentication, RandomUtility.Next(MinRowCount, MaxRowCount));
-            return table;
+            var template = await category.NewTableAsync(authentication);
+            await template.InitializeRandomAsync(authentication);
+            await template.EndEditAsync(authentication);
+
+            if (template.Target is ITable[] tables)
+            {
+                foreach (var item in tables)
+                {
+                    await AddRandomRowsAsync(item, authentication, RandomUtility.Next(MinRowCount, MaxRowCount));
+                }
+                return tables.First();
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
-        public static void AddRandomDerivedTables(this ITableContext tableContext, Authentication authentication, int tryCount)
+        public static async Task AddRandomDerivedTablesAsync(this ITableContext tableContext, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                AddRandomDerivedTable(tableContext, authentication);
+                await AddRandomDerivedTableAsync(tableContext, authentication);
             }
         }
 
-        public static ITable AddRandomDerivedTable(this ITableContext tableContext, Authentication authentication)
+        public static Task<ITable> AddRandomDerivedTableAsync(this ITableContext tableContext, Authentication authentication)
         {
             var category = tableContext.Categories.Random();
-            return AddRandomDerivedTable(category, authentication);
+            return AddRandomDerivedTableAsync(category, authentication);
         }
 
-        public static ITable AddRandomDerivedTable(this ITableCategory category, Authentication authentication)
+        public static async Task<ITable> AddRandomDerivedTableAsync(this ITableCategory category, Authentication authentication)
         {
             var tableName = RandomUtility.NextIdentifier();
             var copyData = RandomUtility.NextBoolean();
             var tableContext = category.GetService(typeof(ITableContext)) as ITableContext;
             var table = tableContext.Tables.Random(item => item.TemplatedParent == null && item.Parent == null);
-            return table.Inherit(authentication, tableName, category.Path, copyData);
+            return await table.InheritAsync(authentication, tableName, category.Path, copyData);
         }
 
-        public static void AddRandomChildTables(this ITableContext tableContext, Authentication authentication, int tryCount)
+        public static async Task AddRandomChildTablesAsync(this ITableContext tableContext, Authentication authentication, int tryCount)
         {
             for (var i = 0; i < tryCount; i++)
             {
-                AddRandomChildTable(tableContext, authentication);
+                await AddRandomChildTableAsync(tableContext, authentication);
             }
         }
 
-        public static ITable AddRandomChildTable(this ITableContext tableContext, Authentication authentication)
+        public static Task<ITable> AddRandomChildTableAsync(this ITableContext tableContext, Authentication authentication)
         {
             var table = tableContext.Tables.Random(item => item.TemplatedParent == null && item.Parent == null);
-            return AddRandomChildTable(table, authentication);
+            return AddRandomChildTableAsync(table, authentication);
         }
 
-        public static ITable AddRandomChildTable(this ITable table, Authentication authentication)
+        public static async Task<ITable> AddRandomChildTableAsync(this ITable table, Authentication authentication)
         {
             var copyData = RandomUtility.NextBoolean();
-            var template = table.NewTable(authentication);
-            template.InitializeRandom(authentication);
-            template.EndEdit(authentication);
-            var child = template.Table;
-            AddRandomRows(child, authentication, RandomUtility.Next(MinRowCount, MaxRowCount));
-            return child;
+            var template = await table.NewTableAsync(authentication);
+            await template.InitializeRandomAsync(authentication);
+            await template.EndEditAsync(authentication);
+            if (template.Target is ITable[] tables)
+            {
+                foreach (var item in tables)
+                {
+                    await AddRandomRowsAsync(item, authentication, RandomUtility.Next(MinRowCount, MaxRowCount));
+                }
+                return tables.First();
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
-        public static void AddRandomRows(this ITable table, Authentication authentication, int tryCount)
+        public static async Task AddRandomRowsAsync(this ITable table, Authentication authentication, int tryCount)
         {
             var target = table.Parent ?? table;
             var targetContent = target.Content;
-            targetContent.BeginEdit(authentication);
-            targetContent.EnterEdit(authentication);
+            await targetContent.BeginEditAsync(authentication);
+            await targetContent.EnterEditAsync(authentication);
             var failedCount = 0;
             for (var i = 0; i < tryCount; i++)
             {
                 try
                 {
                     var parentRow = target != table ? targetContent.RandomOrDefault() : null;
-                    AddRandomRow(table, parentRow, authentication);
+                    await AddRandomRowAsync(table, parentRow, authentication);
                 }
                 catch
                 {
@@ -179,18 +200,18 @@ namespace Ntreev.Crema.Services.Random
                 if (failedCount > 3)
                     break;
             }
-            targetContent.LeaveEdit(authentication);
-            targetContent.EndEdit(authentication);
+            await targetContent.LeaveEditAsync(authentication);
+            await targetContent.EndEditAsync(authentication);
         }
 
-        public static ITableRow AddRandomRow(this ITable table, ITableRow parentRow, Authentication authentication)
+        public static async Task<ITableRow> AddRandomRowAsync(this ITable table, ITableRow parentRow, Authentication authentication)
         {
             if (table.Parent != null && parentRow == null)
                 return null;
 
-            var tableRow = table.Content.AddNew(authentication, parentRow?.RelationID);
-            tableRow.InitializeRandom(authentication);
-            table.Content.EndNew(authentication, tableRow);
+            var tableRow = await table.Content.AddNewAsync(authentication, parentRow?.RelationID);
+            await tableRow.InitializeRandomAsync(authentication);
+            await table.Content.EndNewAsync(authentication, tableRow);
             return tableRow;
         }
 

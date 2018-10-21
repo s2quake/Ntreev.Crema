@@ -31,7 +31,7 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.Client.Converters.ToolBarItems
 {
     [Export(typeof(IToolBarItem))]
-    [ParentType("Ntreev.Crema.Client.Tables.Dialogs.ViewModels.LogViewModel, Ntreev.Crema.Client.Tables, Version=3.6.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Client.Tables.Dialogs.ViewModels.LogViewModel, Ntreev.Crema.Client.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ExportRevisionTableToolBarItem : ToolBarItemBase
     {
         [Import]
@@ -62,7 +62,7 @@ namespace Ntreev.Crema.Client.Converters.ToolBarItems
                     if (viewModel is IInfoProvider provider)
                     {
                         var props = provider.Info;
-                        var revision = (long)props["Revision"];
+                        var revision = (string)props["Revision"];
                         var tableName = await tableItem.Dispatcher.InvokeAsync(() => tableItem.Name);
                         var dialog = new CommonSaveFileDialog();
                         dialog.Filters.Add(new CommonFileDialogFilter("excel file", "*.xlsx"));
@@ -71,7 +71,7 @@ namespace Ntreev.Crema.Client.Converters.ToolBarItems
 
                         if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                         {
-                            var dataSet = await tableItem.Dispatcher.InvokeAsync(() => tableItem.GetDataSet(this.authenticator, revision));
+                            var dataSet = await tableItem.GetDataSetAsync(this.authenticator, revision);
                             var writer = new SpreadsheetWriter(dataSet);
                             writer.Write(dialog.FileName);
                             AppMessageBox.Show(Resources.Message_Exported);

@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
 {
@@ -43,7 +44,7 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
             this.DisplayName = Resources.Title_NewType;
         }
 
-        public static Task<NewTypeViewModel> CreateInstanceAsync(Authentication authentication, ITypeCategoryDescriptor descriptor)
+        public static async Task<NewTypeViewModel> CreateInstanceAsync(Authentication authentication, ITypeCategoryDescriptor descriptor)
         {
             if (authentication == null)
                 throw new ArgumentNullException(nameof(authentication));
@@ -52,9 +53,9 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
 
             if (descriptor.Target is ITypeCategory category)
             {
-                return category.Dispatcher.InvokeAsync(() =>
+                var template = await category.NewTypeAsync(authentication);
+                return await category.Dispatcher.InvokeAsync(() =>
                 {
-                    var template = category.NewType(authentication);
                     return new NewTypeViewModel(authentication, category, template);
                 });
             }
@@ -66,16 +67,11 @@ namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
 
         protected async override void Verify(Action<bool> isVerify)
         {
-            var result = await this.category.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.TypeName == string.Empty)
-                    return false;
-
-                if (NameValidator.VerifyName(this.TypeName) == false)
-                    return false;
-
-                return this.typeContext.Types.Contains(this.TypeName) == false;
-            });
+            if (this.TypeName == string.Empty)
+                return;
+            if (NameValidator.VerifyName(this.TypeName) == false)
+                return;
+            var result = await this.typeContext.Types.ContainsAsync(this.TypeName) == false;
             isVerify(result);
         }
     }

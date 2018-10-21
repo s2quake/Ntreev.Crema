@@ -41,10 +41,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             this.cremaService = cremaService;
         }
 
-        public string Name
-        {
-            get { return nameof(UserService); }
-        }
+        public string Name => nameof(UserService);
 
         public ServiceHost CreateInstance(int port)
         {

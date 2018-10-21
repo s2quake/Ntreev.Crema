@@ -24,6 +24,7 @@ using System.Text;
 using Ntreev.Library.IO;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library.ObjectModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
@@ -39,29 +40,29 @@ namespace Ntreev.Crema.Commands.Consoles
 
         }
 
-        public override object GetObject(Authentication authentication, string path)
+        public override Task<object> GetObjectAsync(Authentication authentication, string path)
         {
             throw new NotImplementedException();
         }
 
-        protected override void OnCreate(Authentication authentication, string path, string name)
+        protected override Task OnCreateAsync(Authentication authentication, string path, string name)
         {
             throw new NotImplementedException();
         }
 
-        protected override void OnMove(Authentication authentication, string path, string newPath)
+        protected override Task OnMoveAsync(Authentication authentication, string path, string newPath)
         {
             throw new NotImplementedException();
         }
 
-        protected override void OnDelete(Authentication authentication, string path)
+        protected override Task OnDeleteAsync(Authentication authentication, string path)
         {
             throw new NotImplementedException();
         }
 
-        protected override void OnSetPath(Authentication authentication, string path)
+        protected override Task OnSetPathAsync(Authentication authentication, string path)
         {
-            
+            return Task.Delay(1);
         }
 
         public override string[] GetPaths()

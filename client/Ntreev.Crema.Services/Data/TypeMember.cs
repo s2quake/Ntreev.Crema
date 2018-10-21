@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
 using System;
 using System.Collections.Generic;
@@ -37,96 +38,65 @@ namespace Ntreev.Crema.Services.Data
             this.template = template;
         }
 
-        public TypeMember(TypeTemplateBase template, DataTable table)
+        private TypeMember(TypeTemplateBase template, DataTable table)
             : base(template.Domain, table)
         {
             this.template = template;
-            var query = from DataRow item in table.Rows
-                        select item.Field<string>("Name");
-
-            var newName = NameUtility.GenerateNewName("Type", query);
-            this.SetField(null, "Name", newName);
         }
 
-        public void SetIndex(Authentication authentication, int value)
+        public static async Task<TypeMember> CreateAsync(Authentication authentication, TypeTemplateBase template, DataTable table)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, CremaSchema.Index, value);
-        }
-
-        public void SetName(Authentication authentication, string value)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, CremaSchema.Name, value);
-        }
-
-        public void SetValue(Authentication authentication, long value)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, CremaSchema.Value, value);
-        }
-
-        public void SetComment(Authentication authentication, string value)
-        {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.SetField(authentication, CremaSchema.Comment, value);
-        }
-
-        public int Index
-        {
-            get
+            var domain = template.Domain;
+            var tuple = await domain.Dispatcher.InvokeAsync(() =>
             {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<int>(CremaSchema.Index);
-            }
+                var member = new TypeMember(template, table);
+                var query = from DataRow item in table.Rows
+                            select item.Field<string>(CremaSchema.Name);
+
+                var newName = NameUtility.GenerateNewName("Member", query);
+                return (member, newName);
+            });
+            await tuple.member.SetFieldAsync(authentication, CremaSchema.Name, tuple.newName);
+            return tuple.member;
         }
 
-        public string Name
+        public Task SetIndexAsync(Authentication authentication, int value)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<string>(CremaSchema.Name);
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Index, value);
         }
 
-        public long Value
+        public Task SetNameAsync(Authentication authentication, string value)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<long>(CremaSchema.Value);
-            }
+            return this.SetFieldAsync(authentication, CremaSchema.Name, value);
         }
 
-        public string Comment
+        public Task SetValueAsync(Authentication authentication, long value)
         {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.GetField<string>(CremaSchema.Comment);
-            }
-        }
-        public override DataBase DataBase
-        {
-            get { return this.template.DataBase; }
+            return this.SetFieldAsync(authentication, CremaSchema.Value, value);
         }
 
-        public override CremaDispatcher Dispatcher
+        public Task SetCommentAsync(Authentication authentication, string value)
         {
-            get { return this.template.Dispatcher; }
+            return this.SetFieldAsync(authentication, CremaSchema.Comment, value);
         }
+
+        public int Index => this.GetField<int>(CremaSchema.Index);
+
+        public string Name => this.GetField<string>(CremaSchema.Name);
+
+        public long Value => this.GetField<long>(CremaSchema.Value);
+
+        public string Comment => this.GetField<string>(CremaSchema.Comment);
+
+        public override DataBase DataBase => this.template.DataBase;
+
+        public override CremaDispatcher Dispatcher => this.template.Dispatcher;
+
+        public override CremaHost CremaHost => this.template.CremaHost;
 
         #region ITypeTemplate
 
-        ITypeTemplate ITypeMember.Template
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.template;
-            }
-        }
+        ITypeTemplate ITypeMember.Template => this.template;
 
         #endregion
     }

@@ -15,113 +15,175 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data;
+using Ntreev.Crema.Data.Xml.Schema;
+using Ntreev.Crema.Services.Properties;
+using Ntreev.Crema.Services.Users;
+using Ntreev.Library.IO;
+using Ntreev.Library.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.Services.Data;
-using Ntreev.Crema.Services.Users;
-using Ntreev.Crema.Data.Xml.Schema;
-using System.Collections;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
-using Ntreev.Library.IO;
-using Ntreev.Library.Linq;
-using System.ComponentModel.Composition.Primitives;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Services.Properties;
 
 namespace Ntreev.Crema.Services
 {
     public class CremaBootstrapper : IServiceProvider, IDisposable
     {
         private const string pluginsString = "plugins";
+        private const string serializersString = "serializers";
         private const string repoModulesString = "repo-modules";
-        private const string defaultString = "default";
-        private const string trunkString = "trunk";
-        private const string tagsString = "tags";
-        private const string branchesString = "branches";
         private CremaSettings settings = new CremaSettings();
         private CompositionContainer container;
 
         public CremaBootstrapper()
         {
             this.Initialize();
-            this.settings.RepositoryModule = DefaultRepositoryModule;
-            CremaLog.Debug("default repository module : {0}", this.settings.RepositoryModule);
         }
 
-        public void CreateRepository(string path, string repositoryName, bool force)
+        public static void CreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, bool force)
         {
-            var directoryInfo = new DirectoryInfo(path);
+            ValidateCreateRepository(serviceProvider, basePath, repositoryModule, fileType, force);
+            var repositoryProvider = GetRepositoryProvider(serviceProvider, repositoryModule);
+            var serializer = GetSerializer(serviceProvider, fileType);
 
-            if (directoryInfo.Exists == false && force == true)
-            {
-                DirectoryUtility.Create(directoryInfo.FullName);
-            }
+            var tempPath = PathUtility.GetTempPath(true);
+            var repositoryPath = Path.Combine(basePath, CremaString.Repository);
 
-            if (DirectoryUtility.IsEmpty(directoryInfo.FullName) == false && force == false)
-            {
-                throw new ArgumentException(Resources.Exception_PathIsNotEmptyDirectory, nameof(path));
-            }
-
+            DirectoryUtility.Backup(repositoryPath);
             try
             {
-                var basePath = directoryInfo.FullName;
-                var repoProviders = this.GetInstances(typeof(IRepositoryProvider)).OfType<IRepositoryProvider>();
-                var repoProvider = repoProviders.FirstOrDefault(item => item.Name == this.RepositoryModule);
-                if (repoProvider == null)
-                    throw new InvalidOperationException(Resources.Exception_NoRepositoryModule);
-                var repositoryPath = Path.Combine(basePath, repositoryName);
+                var usersRepo = DirectoryUtility.Prepare(repositoryPath, CremaString.Users);
+                var usersPath = DirectoryUtility.Prepare(tempPath, CremaString.Users);
+                var dataBasesRepo = DirectoryUtility.Prepare(repositoryPath, CremaString.DataBases);
+                var dataBasesPath = DirectoryUtility.Prepare(tempPath, CremaString.DataBases);
+                var dataSet = new CremaDataSet();
 
-                DirectoryUtility.Create(repositoryPath);
-                DirectoryUtility.Prepare(repositoryPath, tagsString);
-                DirectoryUtility.Prepare(repositoryPath, branchesString);
-                DirectoryUtility.Prepare(repositoryPath, trunkString);
-                DirectoryUtility.Prepare(repositoryPath, trunkString, CremaSchema.TypeDirectory);
-                DirectoryUtility.Prepare(repositoryPath, trunkString, CremaSchema.TableDirectory);
+                UserContext.GenerateDefaultUserInfos(usersPath, serializer);
+                repositoryProvider.InitializeRepository(usersRepo, usersPath);
 
-                UserContext.GenerateDefaultUserInfos(repositoryPath);
+                dataSet.WriteToDirectory(dataBasesPath);
+                FileUtility.WriteAllText($"{CremaSchema.MajorVersion}.{CremaSchema.MinorVersion}", dataBasesPath, ".version");
+                repositoryProvider.InitializeRepository(dataBasesRepo, dataBasesPath);
 
-                repoProvider.CreateRepository(basePath, repositoryPath);
+                var repoModulePath = FileUtility.WriteAllText(repositoryProvider.Name, repositoryPath, CremaString.Repo);
+                var fileTypePath = FileUtility.WriteAllText(serializer.Name, repositoryPath, CremaString.File);
+
+                FileUtility.WriteAllText(Resources.Text_README, basePath, "README.md");
+
+                FileUtility.SetReadOnly(repoModulePath, true);
+                FileUtility.SetReadOnly(fileTypePath, true);
+                DirectoryUtility.SetVisible(repositoryPath, false);
+                DirectoryUtility.Clean(repositoryPath);
             }
             catch
             {
+                DirectoryUtility.Restore(repositoryPath);
                 throw;
             }
         }
 
-        public void ValidateRepository(string path, string repositoryName)
+        public static void ValidateRepository(IServiceProvider serviceProvider, string basePath, params string[] dataBaseNames)
         {
-            var directoryInfo = new DirectoryInfo(path);
+            var repositoryModule = GetRepositoryModule(basePath);
+            var fileType = GetFileType(basePath);
+            var repositoryProvider = GetRepositoryProvider(serviceProvider, repositoryModule);
+            var serializer = GetSerializer(serviceProvider, fileType);
+            var validationPath = Path.Combine(basePath, "validation");
+            var logService = new LogServiceHost("validation", validationPath, true) { Verbose = LogVerbose.Info, };
 
-            if (directoryInfo.Exists == false)
-                throw new DirectoryNotFoundException();
+            var repositoryPath = CremaHost.GetPath(basePath, CremaPath.RepositoryDataBases);
+            var items = repositoryProvider.GetRepositories(repositoryPath);
 
-            var basePath = directoryInfo.FullName;
-            var repoProviders = this.GetInstances(typeof(IRepositoryProvider)).OfType<IRepositoryProvider>();
-            var repoProvider = repoProviders.FirstOrDefault(item => item.Name == this.RepositoryModule);
-            var repositoryPath = Path.Combine(basePath, repositoryName);
-            var trunkPath = Path.Combine(repositoryPath, trunkString);
-            var tagsPath = Path.Combine(repositoryPath, tagsString);
-            var branchesPath = Path.Combine(repositoryPath, branchesString);
+            if (dataBaseNames.Length > 0)
+                items = items.Intersect(dataBaseNames).ToArray();
 
-            CremaDataSet.ValidateDirectory(trunkPath);
-            foreach (var item in Directory.GetDirectories(tagsPath))
+            for (var i = 0; i < items.Length; i++)
             {
-                CremaDataSet.ValidateDirectory(item);
+                var item = items[i];
+                var tempPath = Path.Combine(validationPath, item);
+                var repositorySettings = new RepositorySettings()
+                {
+                    BasePath = repositoryPath,
+                    RepositoryName = item,
+                    WorkingPath = tempPath,
+                    LogService = logService,
+                };
+                var repository = repositoryProvider.CreateInstance(repositorySettings);
+                try
+                {
+                    serializer.Validate(repository.BasePath, typeof(CremaDataSet), ObjectSerializerSettings.Empty);
+                    repository.Dispose();
+                    DirectoryUtility.Delete(tempPath);
+                    logService.Info($"[{i + 1}/{items.Length}]{item}: OK");
+                }
+                catch (Exception e)
+                {
+                    logService.Error(e);
+                    logService.Info($"[{i + 1}/{items.Length}]{item}: Fail");
+                }
             }
-            foreach (var item in Directory.GetDirectories(branchesPath))
+        }
+
+        public static void UpgradeRepository(IServiceProvider serviceProvider, string basePath, params string[] dataBaseNames)
+        {
+            var repositoryModule = GetRepositoryModule(basePath);
+            var fileType = GetFileType(basePath);
+            var repositoryProvider = GetRepositoryProvider(serviceProvider, repositoryModule);
+            var serializer = GetSerializer(serviceProvider, fileType);
+            var upgradePath = Path.Combine(basePath, "upgrade");
+            var logService = new LogServiceHost("upgrade", upgradePath, true) { Verbose = LogVerbose.Info, };
+
+            var repositoryPath = CremaHost.GetPath(basePath, CremaPath.RepositoryDataBases);
+            var items = repositoryProvider.GetRepositories(repositoryPath);
+
+            if (dataBaseNames.Length > 0)
+                items = items.Intersect(dataBaseNames).ToArray();
+
+            for (var i = 0; i < items.Length; i++)
             {
-                CremaDataSet.ValidateDirectory(item);
+                var item = items[i];
+                var tempPath = Path.Combine(upgradePath, item);
+                var repositorySettings = new RepositorySettings()
+                {
+                    BasePath = repositoryPath,
+                    RepositoryName = item,
+                    WorkingPath = tempPath,
+                    LogService = logService,
+                };
+                try
+                {
+                    if (UpgradeRepository(repositoryProvider, serializer, repositorySettings) == true)
+                    {
+                        logService.Info($"[{i + 1}/{items.Length}]{item}: upgraded");
+                    }
+                    else
+                    {
+                        logService.Info($"[{i + 1}/{items.Length}]{item}: skip");
+                    }
+                    DirectoryUtility.Delete(tempPath);
+                }
+                catch (Exception e)
+                {
+                    logService.Error(e);
+                    logService.Info($"[{i + 1}/{items.Length}]{item}: fail");
+                }
             }
+        }
+
+        public static void MigrateRepository(IServiceProvider serviceProvider, string basePath, string migrationModule, string repositoryUrl, bool force)
+        {
+            RepositoryMigrator.Migrate(serviceProvider, basePath, migrationModule, repositoryUrl, force);
+        }
+
+        public static void CleanRepository(IServiceProvider serviceProvider, string basePath)
+        {
+            DirectoryUtility.Delete(CremaHost.GetPath(basePath, CremaPath.Caches));
         }
 
         public object GetService(System.Type serviceType)
@@ -154,6 +216,7 @@ namespace Ntreev.Crema.Services
             this.container?.Dispose();
             this.container = null;
             this.OnDisposed(EventArgs.Empty);
+            CremaLog.Release();
         }
 
         public virtual IEnumerable<Tuple<System.Type, object>> GetParts()
@@ -215,54 +278,42 @@ namespace Ntreev.Crema.Services
                     yield return item;
                 }
             }
+
+            var serializersPath = Path.Combine(rootPath, serializersString);
+            if (Directory.Exists(serializersPath) == true)
+            {
+                foreach (var item in Directory.GetDirectories(serializersPath))
+                {
+                    yield return item;
+                }
+            }
         }
 
         public string BasePath
         {
-            get { return this.settings.BasePath; }
+            get => this.settings.BasePath;
             set
             {
-                var fullpath = Path.GetFullPath(value);
+                var fullpath = PathUtility.GetFullPath(value);
                 this.settings.BasePath = PathUtility.GetCaseSensitivePath(fullpath);
             }
         }
 
-        public string RepositoryName
-        {
-            get { return this.settings.RepositoryName; }
-            set { this.settings.RepositoryName = value; }
-        }
-
-        public bool MultiThreading
-        {
-            get { return this.settings.MultiThreading; }
-            set { this.settings.MultiThreading = value; }
-        }
-
         public LogVerbose Verbose
         {
-            get { return this.settings.Verbose; }
-            set { this.settings.Verbose = value; }
-        }
-
-        public string RepositoryModule
-        {
-            get { return this.settings.RepositoryModule; }
-            set { this.settings.RepositoryModule = value ?? DefaultRepositoryModule; }
+            get => this.settings.Verbose;
+            set => this.settings.Verbose = value;
         }
 
         public bool NoCache
         {
-            get { return this.settings.NoCache; }
-            set { this.settings.NoCache = value; }
+            get => this.settings.NoCache;
+            set => this.settings.NoCache = value;
         }
 
         public string Culture
         {
-            get
-            {
-                return $"{System.Globalization.CultureInfo.CurrentCulture}";
-            }
+            get => $"{System.Globalization.CultureInfo.CurrentCulture}";
             set
             {
                 if (value == null)
@@ -277,29 +328,19 @@ namespace Ntreev.Crema.Services
 
         public string[] DataBaseList
         {
-            get { return this.settings.DataBaseList; }
-            set { this.settings.DataBaseList = value; }
+            get => this.settings.DataBaseList;
+            set => this.settings.DataBaseList = value;
         }
 
 #if DEBUG
-
         public bool ValidationMode
         {
-            get { return this.settings.ValidationMode; }
-            set { this.settings.ValidationMode = value; }
+            get => this.settings.ValidationMode;
+            set => this.settings.ValidationMode = value;
         }
-
 #endif
 
-        public static string DefaultRepositoryModule
-        {
-            get { return "svn"; }
-        }
-
-        public static string RepositoryModulesPath
-        {
-            get { return repoModulesString; }
-        }
+        public static string RepositoryModulesPath => repoModulesString;
 
         public event EventHandler Disposed;
 
@@ -349,11 +390,109 @@ namespace Ntreev.Crema.Services
             this.Disposed?.Invoke(this, e);
         }
 
+        internal static IObjectSerializer GetSerializer(IServiceProvider serviceProvider, string fileType)
+        {
+            var serializers = serviceProvider.GetService(typeof(IEnumerable<IObjectSerializer>)) as IEnumerable<IObjectSerializer>;
+            var serializer = serializers.FirstOrDefault(item => item.Name == (fileType ?? "xml"));
+            if (serializer == null)
+                throw new InvalidOperationException("no serializer");
+            return serializer;
+        }
+
+        internal static IRepositoryProvider GetRepositoryProvider(IServiceProvider serviceProvider, string repositoryModule)
+        {
+            var repositoryProviders = serviceProvider.GetService(typeof(IEnumerable<IRepositoryProvider>)) as IEnumerable<IRepositoryProvider>;
+            var repositoryProvider = repositoryProviders.FirstOrDefault(item => item.Name == (repositoryModule ?? "git"));
+            if (repositoryProvider == null)
+                throw new InvalidOperationException(Resources.Exception_NoRepositoryModule);
+            return repositoryProvider;
+        }
+
+        internal static IRepositoryMigrator GetRepositoryMigrator(IServiceProvider serviceProvider, string migrationModule)
+        {
+            var repositoryMigrators = serviceProvider.GetService(typeof(IEnumerable<IRepositoryMigrator>)) as IEnumerable<IRepositoryMigrator>;
+            var repositoryMigrator = repositoryMigrators.FirstOrDefault(item => item.Name == migrationModule);
+            if (repositoryMigrator == null)
+                throw new InvalidOperationException("no repository migrator");
+            return repositoryMigrator;
+        }
+
+        private static string GetRepositoryModule(string basePath)
+        {
+            return FileUtility.ReadAllText(basePath, CremaString.Repository, CremaString.Repo).Trim();
+        }
+
+        private static string GetFileType(string basePath)
+        {
+            return FileUtility.ReadAllText(basePath, CremaString.Repository, CremaString.File).Trim();
+        }
+
         private void Initialize()
         {
             CremaLog.Debug("Initialize.");
             this.OnInitialize();
             CremaLog.Debug("Initialized.");
+        }
+
+        private static void ValidateCreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, bool force)
+        {
+            if (serviceProvider == null)
+                throw new ArgumentNullException(nameof(serviceProvider));
+            if (basePath == null)
+                throw new ArgumentNullException(nameof(basePath));
+
+            var directoryInfo = new DirectoryInfo(basePath);
+            if (directoryInfo.Exists == false && force == true)
+            {
+                DirectoryUtility.Create(directoryInfo.FullName);
+            }
+            if (DirectoryUtility.IsEmpty(directoryInfo.FullName) == false && force == false)
+            {
+                throw new ArgumentException("Path is not an empty directory.", nameof(basePath));
+            }
+        }
+
+        private static bool UpgradeRepository(IRepositoryProvider repositoryProvider, IObjectSerializer serializer, RepositorySettings settings)
+        {
+            var repository = repositoryProvider.CreateInstance(settings);
+            var versionPath = Path.Combine(repository.BasePath, ".version");
+            var version = GetVersion(versionPath);
+            if (version.Major == CremaSchema.MajorVersion && version.Minor == CremaSchema.MinorVersion)
+            {
+                repository.Dispose();
+                return false;
+            }
+            else
+            {
+                var dataSet = serializer.Deserialize(repository.BasePath, typeof(CremaDataSet), ObjectSerializerSettings.Empty) as CremaDataSet;
+                var files = serializer.Serialize(repository.BasePath, dataSet, ObjectSerializerSettings.Empty);
+
+                File.WriteAllText(versionPath, $"{CremaSchema.MajorVersion}.{CremaSchema.MinorVersion}");
+                foreach (var item in repository.Status())
+                {
+                    if (item.Status == RepositoryItemStatus.Untracked)
+                    {
+                        repository.Add(item.Path);
+                    }
+                }
+                repository.Commit(Authentication.SystemID, $"upgrade: {CremaSchema.MajorVersion}.{CremaSchema.MinorVersion}");
+                repository.Dispose();
+                return true;
+            }
+        }
+
+        private static Version GetVersion(string versionPath)
+        {
+            if (File.Exists(versionPath) == false)
+                return new Version();
+            try
+            {
+                return new Version(File.ReadAllText(versionPath));
+            }
+            catch
+            {
+                return new Version();
+            }
         }
     }
 }

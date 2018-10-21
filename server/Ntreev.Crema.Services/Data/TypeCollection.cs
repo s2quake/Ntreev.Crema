@@ -19,13 +19,13 @@ using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
-using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -50,28 +50,71 @@ namespace Ntreev.Crema.Services.Data
             return this.BaseAddNew(name, categoryPath, authentication);
         }
 
-        public Type AddNew(Authentication authentication, CremaDataType dataType)
+        public async Task<Type> AddNewAsync(Authentication authentication, CremaDataType dataType)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(AddNew), dataType.Name, dataType.CategoryPath);
-            this.ValidateAddNew(dataType.Name, dataType.CategoryPath, authentication);
-            this.Sign(authentication);
-            this.InvokeTypeCreate(authentication, dataType.Name, dataType.CategoryPath, dataType);
-            var type = this.BaseAddNew(dataType.Name, dataType.CategoryPath, authentication);
-            type.Initialize(dataType.TypeInfo);
-            this.InvokeTypesCreatedEvent(authentication, new Type[] { type, }, dataType.DataSet);
-            return type;
+            try
+            {
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), dataType.Name, dataType.CategoryPath);
+                    this.ValidateAddNew(dataType.Name, dataType.CategoryPath, authentication);
+                });
+                var dataSet = dataType.DataSet;
+                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, true, false);
+                var typePaths = new string[] { dataType.Path };
+                var signatureDate = await this.InvokeTypeCreateAsync(authentication, typePaths, dataBaseSet);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, signatureDate);
+                    var type = this.BaseAddNew(dataType.Name, dataType.CategoryPath, authentication);
+                    type.Initialize(dataType.TypeInfo);
+                    this.InvokeTypesCreatedEvent(authentication, new Type[] { type }, dataSet);
+                    return type;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public Type Copy(Authentication authentication, string typeName, string newTypeName, string categoryPath)
+        public async Task<Type> CopyAsync(Authentication authentication, string typeName, string newTypeName, string categoryPath)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(TypeCollection.Copy), typeName, newTypeName, categoryPath);
-            this.ValidateCopy(authentication, typeName, newTypeName);
-            var type = this[typeName];
-            var dataType = type.ReadData(authentication);
-            dataType.TypeName = newTypeName;
-            dataType.CategoryPath = categoryPath;
-            dataType.CreationInfo = authentication.SignatureDate;
-            return this.AddNew(authentication, dataType);
+            try
+            {
+                this.ValidateExpired();
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), typeName, newTypeName, categoryPath);
+                    this.ValidateCopy(authentication, typeName, newTypeName);
+                    return (this[typeName], this[typeName].Path);
+                });
+                var type = tuple.Item1;
+                var path = tuple.Path;
+                var itemName = new ItemName(tuple.Path);
+                var targetName = new ItemName(categoryPath, newTypeName);
+                var dataSet = await type.ReadDataForCopyAsync(authentication, targetName);
+                var dataType = dataSet.Types[itemName.Name, itemName.CategoryPath];
+                var newDataType = dataType.Copy(targetName);
+                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, true, false);
+                var typePaths = new string[] { categoryPath + newTypeName };
+                var signatureDate = await this.InvokeTypeCreateAsync(authentication, typePaths, dataBaseSet);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, signatureDate);
+                    var newType = this.BaseAddNew(newTypeName, categoryPath, authentication);
+                    newType.Initialize(newDataType.TypeInfo);
+                    this.InvokeTypesCreatedEvent(authentication, new Type[] { newType }, dataSet);
+                    return newType;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public object GetService(System.Type serviceType)
@@ -79,160 +122,134 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public void InvokeTypeCreate(Authentication authentication, string typeName, string categoryPath, CremaDataType dataType)
+        public Task<SignatureDate> InvokeTypeCreateAsync(Authentication authentication, string[] typePaths, DataBaseSet dataBaseSet)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeCreate), typeName, categoryPath);
-            var schemaPath = this.Context.GenerateTypePath(categoryPath, typeName);
-
-            try
+            var message = EventMessageBuilder.CreateType(authentication, typePaths);
+            var itemPaths = typePaths.Select(item => this.Context.GeneratePath(item)).ToArray();
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Add(schemaPath, dataType.GetXmlSchema());
-                this.Context.InvokeTypeItemCreate(authentication, categoryPath + typeName);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
-        }
-        
-        public void InvokeTypeRename(Authentication authentication, Type type, string newName, CremaDataSet dataSet)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeRename), type, newName);
-            var dataTypes = new DataTypeCollection(dataSet, this.DataBase);
-            var dataTables = new DataTableCollection(dataSet, this.DataBase);
-            var dataType = dataSet.Types[type.Name, type.Category.Path];
-            dataType.TypeName = newName;
-
-            try
-            {
-                dataTypes.Modify(this.Repository, item => item == type);
-                dataTables.Modify(this.Repository);
-                this.Context.InvokeTypeItemRename(authentication, type, newName);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.CreateType(dataBaseSet, typePaths);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
+            });
         }
 
-        public void InvokeTypeMove(Authentication authentication, Type type, string newCategoryPath, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTypeRenameAsync(Authentication authentication, TypeInfo typeInfo, string newName, DataBaseSet dataBaseSet)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeMove), type, newCategoryPath);
-
-            var dataTypes = new DataTypeCollection(dataSet, this.DataBase);
-            var dataTables = new DataTableCollection(dataSet, this.DataBase);
-            var dataType = dataSet.Types[type.Name, type.Category.Path];
-            dataType.CategoryPath = newCategoryPath;
-
-            try
+            var message = EventMessageBuilder.RenameType(authentication, typeInfo.Name, newName);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                dataTypes.Modify(this.Repository, item => item == type);
-                dataTables.Modify(this.Repository);
-                this.Context.InvokeTypeItemMove(authentication, type, newCategoryPath);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.RenameType(dataBaseSet, typeInfo.Path, newName);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
+            });
         }
 
-        public void InvokeTypeDelete(Authentication authentication, Type type, CremaDataSet dataSet)
+        public Task<SignatureDate> InvokeTypeMoveAsync(Authentication authentication, TypeInfo typeInfo, string newCategoryPath, DataBaseSet dataBaseSet)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeDelete), type);
-
-            var dataTypes = new DataTypeCollection(dataSet, this.DataBase);
-            var dataTables = new DataTableCollection(dataSet, this.DataBase);
-            var dataType = dataSet.Types[type.Name, type.Category.Path];
-
-            var query = from table in dataSet.Tables
-                        from column in table.Columns
-                        where column.CremaType == dataType
-                        select column;
-
-            var columns = query.ToArray();
-
-            foreach (var item in columns)
+            var message = EventMessageBuilder.MoveType(authentication, typeInfo.Name, newCategoryPath, typeInfo.CategoryPath);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                item.CremaType = null;
-            }
-
-            dataSet.Types.Remove(dataType);
-
-            try
-            {
-                this.Repository.Delete(type.SchemaPath);
-                dataTables.Modify(this.Repository);
-                this.Context.InvokeTypeItemDelete(authentication, type);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.MoveType(dataBaseSet, typeInfo.Path, newCategoryPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
+            });
         }
 
-        public void InvokeTypeBeginTemplateEdit(Authentication authentication, Type type)
+        public Task<SignatureDate> InvokeTypeDeleteAsync(Authentication authentication, TypeInfo typeInfo, DataBaseSet dataBaseSet)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeBeginTemplateEdit), type);
+            var message = EventMessageBuilder.DeleteType(authentication, typeInfo.Name);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.DeleteType(dataBaseSet, typeInfo.Path);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
+            });
         }
 
-        public void InvokeTypeEndTemplateEdit(Authentication authentication, Type type, CremaDataType dataType)
+        public Task<SignatureDate> InvokeTypeEndTemplateEditAsync(Authentication authentication, string typeName, DataBaseSet dataBaseSet)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeEndTemplateEdit), type);
-
-            var dataTypes = new DataTypeCollection(dataType.DataSet, this.DataBase);
-            var dataTables = new DataTableCollection(dataType.DataSet, this.DataBase);
-
-            try
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                dataTypes.Modify(this.Repository, item => item == type);
-                dataTables.Modify(this.Repository);
-                this.Context.InvokeTypeItemChange(authentication, type);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
-        }
-
-        public void InvokeTypeSetTags(Authentication authentication, Type type, TagInfo tags, CremaDataSet dataSet)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeTypeSetTags), type, tags);
-
-            var dataTypes = new DataTypeCollection(dataSet, this.DataBase);
-            var dataType = dataSet.Types[type.Name, type.Category.Path];
-            dataType.Tags = tags;
-
-            try
-            {
-                dataTypes.Modify(this.Repository, item => item == type);
-                this.Context.InvokeTypeItemChange(authentication, type);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
+                try
+                {
+                    var message = EventMessageBuilder.ChangeTypeTemplate(authentication, typeName);
+                    var signatureDate = authentication.Sign();
+                    this.Repository.ModifyType(dataBaseSet);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
+            });
         }
 
         public void InvokeTypesCreatedEvent(Authentication authentication, Type[] types, CremaDataSet dataSet)
         {
             var args = types.Select(item => (object)item.TypeInfo).ToArray();
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesCreatedEvent), types);
-            var comment = EventMessageBuilder.CreateType(authentication, types);
+            var message = EventMessageBuilder.CreateType(authentication, types);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTypesCreated(new ItemsCreatedEventArgs<IType>(authentication, types, args, dataSet));
             this.Context.InvokeItemsCreatedEvent(authentication, types, args, dataSet);
         }
@@ -240,43 +257,40 @@ namespace Ntreev.Crema.Services.Data
         public void InvokeTypesRenamedEvent(Authentication authentication, Type[] types, string[] oldNames, string[] oldPaths, CremaDataSet dataSet)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesRenamedEvent), types, oldNames, oldPaths);
-            var comment = EventMessageBuilder.RenameType(authentication, types, oldNames);
+            var message = EventMessageBuilder.RenameType(authentication, types, oldNames);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTypesRenamed(new ItemsRenamedEventArgs<IType>(authentication, types, oldNames, oldPaths));
             this.Context.InvokeItemsRenamedEvent(authentication, types, oldNames, oldPaths, dataSet);
         }
-        
+
         public void InvokeTypesMovedEvent(Authentication authentication, Type[] types, string[] oldPaths, string[] oldCategoryPaths, CremaDataSet dataSet)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesMovedEvent), types, oldPaths, oldCategoryPaths);
-            var comment = EventMessageBuilder.MoveType(authentication, types, oldCategoryPaths);
+            var message = EventMessageBuilder.MoveType(authentication, types, oldCategoryPaths);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTypesMoved(new ItemsMovedEventArgs<IType>(authentication, types, oldPaths, oldCategoryPaths));
             this.Context.InvokeItemsMovedEvent(authentication, types, oldPaths, oldCategoryPaths, dataSet);
         }
-        
-        public void InvokeTypesDeletedEvent(Authentication authentication, Type[] types, string[] oldPaths, CremaDataSet dataSet)
+
+        public void InvokeTypesDeletedEvent(Authentication authentication, Type[] types, string[] oldPaths)
         {
+            var dataSet = CremaDataSet.Create(new SignatureDateProvider(authentication.ID));
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesDeletedEvent), oldPaths);
-            var comment = EventMessageBuilder.DeleteType(authentication, types);
+            var message = EventMessageBuilder.DeleteType(authentication, types);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTypesDeleted(new ItemsDeletedEventArgs<IType>(authentication, types, oldPaths));
             this.Context.InvokeItemsDeleteEvent(authentication, types, oldPaths, dataSet);
         }
-        
+
         public void InvokeTypesChangedEvent(Authentication authentication, Type[] types, CremaDataSet dataSet)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesChangedEvent), types);
-            var comment = EventMessageBuilder.ChangeTypeTemplate(authentication, types);
+            var message = EventMessageBuilder.ChangeTypeTemplate(authentication, types);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnTypesChanged(new ItemsEventArgs<IType>(authentication, types));
             this.Context.InvokeItemsChangedEvent(authentication, types, dataSet);
         }
@@ -287,34 +301,17 @@ namespace Ntreev.Crema.Services.Data
             this.OnTypesStateChanged(new ItemsEventArgs<IType>(authentication, types));
         }
 
-        public DataBaseRepositoryHost Repository
-        {
-            get { return this.DataBase.Repository; }
-        }
+        public DataBaseRepositoryHost Repository => this.DataBase.Repository;
 
-        public CremaHost CremaHost
-        {
-            get { return this.Context.CremaHost; }
-        }
+        public CremaHost CremaHost => this.Context.CremaHost;
 
-        public DataBase DataBase
-        {
-            get { return this.Context.DataBase; }
-        }
+        public DataBase DataBase => this.Context.DataBase;
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.Context?.Dispatcher; }
-        }
+        public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public IObjectSerializer Serializer => this.DataBase.Serializer;
+
+        public new int Count => base.Count;
 
         public event ItemsCreatedEventHandler<IType> TypesCreated
         {
@@ -467,27 +464,14 @@ namespace Ntreev.Crema.Services.Data
                 throw new ArgumentException(Resources.Exception_SameTypeNameExist, nameof(newTypeName));
         }
 
-        private void Sign(Authentication authentication)
-        {
-            authentication.Sign();
-        }
-
         #region ITypeCollection
 
         bool ITypeCollection.Contains(string typeName)
         {
-            this.Dispatcher?.VerifyAccess();
             return this.Contains(typeName);
         }
 
-        IType ITypeCollection.this[string typeName]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this[typeName];
-            }
-        }
+        IType ITypeCollection.this[string typeName] => this[typeName];
 
         #endregion
 
@@ -495,13 +479,11 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<IType> IEnumerable<IType>.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.GetEnumerator();
         }
 

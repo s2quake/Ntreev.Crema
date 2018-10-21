@@ -32,34 +32,34 @@ using Ntreev.Library.ObjectModel;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Crema.Services.Users;
-using System.Windows.Threading;
 using Ntreev.Crema.Services.Data;
 using Ntreev.Library.IO;
 
 namespace Ntreev.Crema.Services.Domains
 {
     class DomainContext : ItemContext<Domain, DomainCategory, DomainCollection, DomainCategoryCollection, DomainContext>,
-        IDomainContext, IServiceProvider, IDisposable
+        IDomainContext, IServiceProvider
     {
-        private readonly CremaHost cremaHost;
-        private readonly UserContext userContext;
-        private readonly string basePath;
-
         private ItemsCreatedEventHandler<IDomainItem> itemsCreated;
         private ItemsRenamedEventHandler<IDomainItem> itemsRenamed;
         private ItemsMovedEventHandler<IDomainItem> itemsMoved;
         private ItemsDeletedEventHandler<IDomainItem> itemsDeleted;
 
-        public DomainContext(CremaHost cremaHost, UserContext userContext)
+        public DomainContext(CremaHost cremaHost)
         {
-            this.cremaHost = cremaHost;
-            this.cremaHost.Debug(Resources.Message_DomainContextInitialize);
-            this.userContext = userContext;
-            this.basePath = DirectoryUtility.Prepare(cremaHost.WorkingPath, nameof(Domain).ToLower());
-            this.cremaHost.Opened += CremaHost_Opened;
-            this.cremaHost.Debug(Resources.Message_DomainContextIsCreated);
+            this.CremaHost = cremaHost;
+            this.CremaHost.Debug(Resources.Message_DomainContextInitialize);
+            this.Dispatcher = new CremaDispatcher(this);
+            this.BasePath = cremaHost.GetPath(CremaPath.Domains);
+            this.CremaHost.Opened += CremaHost_Opened;
+            this.CremaHost.Debug(Resources.Message_DomainContextIsCreated);
+        }
 
-            foreach (var item in this.cremaHost.DataBases)
+        public async Task InitializeAsync()
+        {
+            var dataBases = await this.CremaHost.DataBases.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases.ToArray<DataBase>());
+
+            foreach (var item in dataBases)
             {
                 var categoryName = CategoryName.Create(item.Name);
                 var category = this.Categories.AddNew(categoryName);
@@ -89,13 +89,57 @@ namespace Ntreev.Crema.Services.Domains
 
         public object GetService(System.Type serviceType)
         {
-            return this.cremaHost.GetService(serviceType);
+            return this.CremaHost.GetService(serviceType);
+        }
+
+        public async Task RestoreAsync(Authentication authentication, Domain domain)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                authentication.Sign();
+                var dataBase = this.CremaHost.DataBases[domain.DataBaseID];
+                var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
+                var category = this.Categories.Prepare(categoryName);
+                domain.Category = category;
+                //domain.Dispatcher = new CremaDispatcher(domain);
+                this.Domains.InvokeDomainCreatedEvent(authentication, domain, domain.DomainInfo);
+            });
+        }
+
+        public async Task AddAsync(Authentication authentication, Domain domain, DataBase dataBase)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
+                var category = this.Categories.Prepare(categoryName);
+                domain.Category = category;
+                domain.Logger = new DomainLogger(this.Serializer, domain);
+                //domain.Dispatcher = new CremaDispatcher(domain);
+                this.Domains.InvokeDomainCreatedEvent(authentication, domain, domain.DomainInfo);
+            });
+        }
+
+        public async Task RemoveAsync(Authentication authentication, Domain domain, bool isCanceled, object result)
+        {
+            await domain.Logger?.DisposeAsync(true);
+            domain.Logger = null;
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Domains.Remove(domain);
+                //var dispatcher = domain.Dispatcher;
+                //domain.Dispatcher = null;
+
+                domain.Dispose(authentication, isCanceled, result);
+                //dispatcher.Dispose();
+                this.Domains.InvokeDomainDeletedEvent(authentication, domain, isCanceled, result);
+            });
         }
 
         public DomainContextMetaData GetMetaData(Authentication authentication)
         {
             this.Dispatcher.VerifyAccess();
-
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
             return new DomainContextMetaData()
             {
                 DomainCategories = this.Categories.GetMetaData(authentication),
@@ -103,29 +147,124 @@ namespace Ntreev.Crema.Services.Domains
             };
         }
 
-        public DomainCollection Domains
+        public async Task<DomainContextMetaData> GetMetaDataAsync(Authentication authentication)
         {
-            get
+            var domains = await this.Domains.GetMetaDataAsync(authentication);
+            return await this.Dispatcher.InvokeAsync(() =>
             {
-                this.Dispatcher.VerifyAccess();
-                return this.Items;
+                return new DomainContextMetaData()
+                {
+                    DomainCategories = this.Categories.GetMetaData(authentication),
+                    Domains = domains,
+                };
+            });
+        }
+
+        public DomainMetaData[] GetDomainMetaDatas(Authentication authentication, Guid dataBaseID)
+        {
+            return this.Dispatcher.Invoke(() =>
+            {
+                var domains = this.GetDomains(dataBaseID);
+                var metaDataList = new List<DomainMetaData>(domains.Length);
+                foreach (var item in domains)
+                {
+                    metaDataList.Add(item.GetMetaData(authentication));
+                }
+                return metaDataList.ToArray();
+            });
+        }
+
+        public Domain[] GetDomains(Guid dataBaseID)
+        {
+            this.Dispatcher.VerifyAccess();
+            var domainList = new List<Domain>(this.Domains.Count);
+            foreach (var item in this.Domains)
+            {
+                if (item.DataBaseID == dataBaseID)
+                {
+                    domainList.Add(item);
+                }
             }
+            return domainList.ToArray();
         }
 
-        public CremaHost CremaHost
+        public Task<Domain[]> GetDomainsAsync(Guid dataBaseID)
         {
-            get { return this.cremaHost; }
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                var domainList = new List<Domain>(this.Domains.Count);
+                foreach (var item in this.Domains)
+                {
+                    if (item.DataBaseID == dataBaseID)
+                    {
+                        domainList.Add(item);
+                    }
+                }
+                return domainList.ToArray();
+            });
         }
 
-        public string BasePath
+        public Task AttachUsersAsync(Authentication authentication, Guid dataBaseID)
         {
-            get { return this.basePath; }
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                var domains = this.GetDomains(dataBaseID);
+                foreach (var item in domains)
+                {
+                    item.Attach(authentication);
+                }
+            });
         }
 
-        public CremaDispatcher Dispatcher
+        public Task DetachUsersAsync(Authentication authentication, Guid dataBaseID)
         {
-            get { return this.cremaHost.Dispatcher; }
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                var domains = this.GetDomains(dataBaseID);
+                foreach (var item in domains)
+                {
+                    item.Detach(authentication);
+                }
+            });
         }
+
+        public void AttachDomainHost(Authentication[] authentications, IDictionary<Domain, IDomainHost> domainHostByDomain)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                foreach (var item in domainHostByDomain)
+                {
+                    var domain = item.Key;
+                    var domainHost = item.Value;
+                    domain.SetDomainHost(Authentication.System, domainHost);
+                    domain.Attach(authentications);
+                }
+            });
+        }
+
+        public void DetachDomainHost(Authentication[] authentications, IDictionary<Domain, IDomainHost> domainHostByDomain)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                foreach (var item in domainHostByDomain)
+                {
+                    var domain = item.Key;
+                    var domainHost = item.Value;
+                    domain.Detach(authentications);
+                    domain.SetDomainHost(Authentication.System, null);
+                }
+            });
+        }
+
+        public DomainCollection Domains => base.Items;
+
+        public CremaHost CremaHost { get; }
+
+        public string BasePath { get; }
+
+        public CremaDispatcher Dispatcher { get; }
+
+        public IObjectSerializer Serializer => this.CremaHost.Serializer;
 
         public event ItemsCreatedEventHandler<IDomainItem> ItemsCreated
         {
@@ -183,59 +322,105 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public void Restore(Authentication authentication, DataBase dataBase)
+        public async Task RestoreAsync(CremaSettings settings)
         {
-            var succeededCount = 0;
-            var failedCount = 0;
-            var path = Path.Combine(this.basePath, dataBase.ID.ToString());
-            if (Directory.Exists(path) == false)
-                return;
-
-            var dirs = Directory.GetDirectories(path);
-
-            var totalCount = 0;
-            foreach (var item in dirs)
+            if (settings.NoCache == false)
             {
-                var dirInfo = new DirectoryInfo(item);
-                if (Guid.TryParse(dirInfo.Name, out Guid domainID) == false)
-                    continue;
-
-                var restorer = new DomainRestorer(authentication, this, item);
-
-                if (totalCount == 0)
-                    this.cremaHost.Info(Resources.Message_DomainRestorationMessage);
-
-                totalCount++;
-
-                try
+                var dataBases = await this.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases.ToArray<DataBase>());
+                foreach (var item in dataBases)
                 {
-                    restorer.Restore();
-                    this.cremaHost.Debug(Resources.Message_DomainIsRestored_Format, domainID);
-                    succeededCount++;
-                }
-                catch (Exception e)
-                {
-                    this.cremaHost.Error(e.Message);
-                    this.cremaHost.Error(Resources.Message_DomainRestorationIsFailed_Format, domainID);
-                    failedCount++;
+                    await this.RestoreAsync(item);
                 }
             }
-
-            if (succeededCount != 0 || failedCount != 0)
-                this.cremaHost.Debug(string.Format(Resources.Message_RestoreResult_Format, succeededCount, failedCount));
-            else
-                this.cremaHost.Debug(Resources.Message_NotFoundDomainsToRestore);
-
-            if (totalCount != 0)
-                this.cremaHost.Info(Resources.Message_DomainState_Format, totalCount, succeededCount, failedCount);
         }
 
-        public void Dispose()
+        public async Task RestoreAsync(DataBase dataBase)
         {
-            foreach (var item in this.Domains.ToArray<Domain>())
+            var restorers = this.GetDomainRestorers(dataBase);
+            if (restorers.Any() == false)
+                return;
+
+            var tasks = restorers.Select(item => item.RestoreAsync()).ToArray();
+            var result = Task.WhenAll(tasks);
+
+            try
             {
-                item.Dispatcher.Invoke(() => item.Dispose(this));
+                await result;
+                this.CremaHost.Info(string.Format(Resources.Message_RestoreResult_Format, restorers.Length, 0));
             }
+            catch
+            {
+                var exceptions = result.Exception.InnerExceptions;
+                foreach (var item in exceptions)
+                {
+                    this.CremaHost.Error(item);
+                }
+                this.CremaHost.Info(string.Format(Resources.Message_RestoreResult_Format, restorers.Length - exceptions.Count, exceptions.Count));
+            }
+
+            //var path = Path.Combine(this.BasePath, dataBase.ID.ToString());
+            //if (Directory.Exists(path) == false)
+            //    return;
+
+            //var directories = Directory.GetDirectories(path);
+            //var domainList = new List<string>(directories.Length);
+            //foreach (var item in directories)
+            //{
+            //    var directoryInfo = new DirectoryInfo(item);
+            //    if (Guid.TryParse(directoryInfo.Name, out Guid domainID) == true)
+            //    {
+            //        domainList.Add(item);
+            //    }
+            //}
+
+            //if (domainList.Any() == true)
+            //{
+            //    this.CremaHost.Info(Resources.Message_DomainRestorationMessage);
+            //    foreach (var item in domainList)
+            //    {
+            //        var domainID = Guid.Parse(Path.GetFileName(item));
+            //        try
+            //        {
+            //            await DomainRestorer.RestoreAsync(authentication, this, item);
+            //            this.CremaHost.Debug(Resources.Message_DomainIsRestored_Format, domainID);
+            //            succeededCount++;
+            //        }
+            //        catch (Exception e)
+            //        {
+            //            this.CremaHost.Error(e.Message);
+            //            this.CremaHost.Error(Resources.Message_DomainRestorationIsFailed_Format, domainID);
+            //            failedCount++;
+            //        }
+            //    }
+
+            //    this.CremaHost.Info(string.Format(Resources.Message_RestoreResult_Format, succeededCount, failedCount));
+            //}
+            //else
+            //{
+            //    this.CremaHost.Info(Resources.Message_NotFoundDomainsToRestore);
+            //}
+        }
+
+        public async Task DisposeAsync()
+        {
+            var tasks = await this.Dispatcher.InvokeAsync(() =>
+            {
+                var taskList = new List<Task>(this.Domains.Count);
+                foreach (var item in this.Domains.ToArray<Domain>())
+                {
+                    if (item.Logger != null)
+                    {
+                        taskList.Add(item.Logger.DisposeAsync(false));
+                    }
+                }
+                return taskList.ToArray();
+            });
+            await Task.WhenAll();
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.Clear();
+                this.Dispatcher.Dispose();
+            });
         }
 
         protected virtual void OnItemsCreated(ItemsCreatedEventArgs<IDomainItem> e)
@@ -258,68 +443,80 @@ namespace Ntreev.Crema.Services.Domains
             this.itemsDeleted?.Invoke(this, e);
         }
 
-        private void CremaHost_Opened(object sender, EventArgs e)
+        private async void CremaHost_Opened(object sender, EventArgs e)
         {
-            this.cremaHost.DataBases.ItemsCreated += DataBases_ItemsCreated;
-            this.cremaHost.DataBases.ItemsRenamed += DataBases_ItemsRenamed;
-            this.cremaHost.DataBases.ItemsDeleted += DataBases_ItemDeleted;
+            await this.CremaHost.DataBases.Dispatcher.InvokeAsync(() =>
+            {
+                this.CremaHost.DataBases.ItemsCreated += DataBases_ItemsCreated;
+                this.CremaHost.DataBases.ItemsRenamed += DataBases_ItemsRenamed;
+                this.CremaHost.DataBases.ItemsDeleted += DataBases_ItemDeleted;
+            });
         }
 
-        private void DataBases_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
+        private async void DataBases_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
         {
-            var categoryList = new List<DomainCategory>(e.Items.Length);
-            var categoryNameList = new List<string>(e.Items.Length);
-            var categoryPathList = new List<string>(e.Items.Length);
-            for (var i = 0; i < e.Items.Length; i++)
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                var dataBase = e.Items[i];
-                var categoryName = CategoryName.Create(dataBase.Name);
-                var category = this.Categories.AddNew(categoryName);
-                categoryList.Add(category);
-                category.DataBase = dataBase;
-            }
-            Authentication.System.Sign();
-            this.Categories.InvokeCategoriesCreatedEvent(Authentication.System, categoryList.ToArray());
+                var categoryList = new List<DomainCategory>(e.Items.Length);
+                var categoryNameList = new List<string>(e.Items.Length);
+                var categoryPathList = new List<string>(e.Items.Length);
+                for (var i = 0; i < e.Items.Length; i++)
+                {
+                    var dataBase = e.Items[i];
+                    var categoryName = CategoryName.Create(dataBase.Name);
+                    var category = this.Categories.AddNew(categoryName);
+                    category.DataBase = dataBase;
+                    categoryList.Add(category);
+                }
+                this.CremaHost.Sign(Authentication.System);
+                this.Categories.InvokeCategoriesCreatedEvent(Authentication.System, categoryList.ToArray());
+            });
         }
 
-        private void DataBases_ItemsRenamed(object sender, ItemsRenamedEventArgs<IDataBase> e)
+        private async void DataBases_ItemsRenamed(object sender, ItemsRenamedEventArgs<IDataBase> e)
         {
-            var categoryList = new List<DomainCategory>(e.Items.Length);
-            var categoryNameList = new List<string>(e.Items.Length);
-            var categoryPathList = new List<string>(e.Items.Length);
-            for (var i = 0; i < e.Items.Length; i++)
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                var oldName = e.OldNames[i];
-                var newName = e.Items[i].Name;
-                var category = this.Root.Categories[oldName];
-                var categoryName = category.Name;
-                var categoryPath = category.Path;
-                category.Name = newName;
-                categoryList.Add(category);
-                categoryNameList.Add(categoryName);
-                categoryPathList.Add(categoryPath);
-            }
-            Authentication.System.Sign();
-            this.Categories.InvokeCategoriesRenamedEvent(Authentication.System, categoryList.ToArray(), categoryNameList.ToArray(), categoryPathList.ToArray());
+                var categoryList = new List<DomainCategory>(e.Items.Length);
+                var categoryNameList = new List<string>(e.Items.Length);
+                var categoryPathList = new List<string>(e.Items.Length);
+                for (var i = 0; i < e.Items.Length; i++)
+                {
+                    var oldName = e.OldNames[i];
+                    var newName = e.Items[i].Name;
+                    var category = this.Root.Categories[oldName];
+                    var categoryName = category.Name;
+                    var categoryPath = category.Path;
+                    category.Name = newName;
+                    categoryList.Add(category);
+                    categoryNameList.Add(categoryName);
+                    categoryPathList.Add(categoryPath);
+                }
+                this.CremaHost.Sign(Authentication.System);
+                this.Categories.InvokeCategoriesRenamedEvent(Authentication.System, categoryList.ToArray(), categoryNameList.ToArray(), categoryPathList.ToArray());
+            });
         }
 
-        private void DataBases_ItemDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
+        private async void DataBases_ItemDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
         {
-            var categoryList = new List<DomainCategory>(e.Items.Length);
-            var categoryPathList = new List<string>(e.Items.Length);
-            foreach (var item in e.Items)
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                this.DeleteDomains(item);
-                var category = this.Root.Categories[item.Name];
-                var categoryPath = category.Path;
-                var localPath = Path.Combine(this.BasePath, $"{item.ID}");
-                DirectoryUtility.Delete(localPath);
-                category.Dispose();
-                categoryList.Add(category);
-                categoryPathList.Add(categoryPath);
-            }
-            Authentication.System.Sign();
-            this.Categories.InvokeCategoriesDeletedEvent(Authentication.System, categoryList.ToArray(), categoryPathList.ToArray());
+                var categoryList = new List<DomainCategory>(e.Items.Length);
+                var categoryPathList = new List<string>(e.Items.Length);
+                foreach (var item in e.Items)
+                {
+                    this.DeleteDomains(item);
+                    var category = this.Root.Categories[item.Name];
+                    var categoryPath = category.Path;
+                    var localPath = Path.Combine(this.BasePath, $"{item.ID}");
+                    DirectoryUtility.Delete(localPath);
+                    category.Dispose();
+                    categoryList.Add(category);
+                    categoryPathList.Add(categoryPath);
+                }
+                this.CremaHost.Sign(Authentication.System);
+                this.Categories.InvokeCategoriesDeletedEvent(Authentication.System, categoryList.ToArray(), categoryPathList.ToArray());
+            });
         }
 
         private void DeleteDomains(IDataBase dataBase)
@@ -331,57 +528,49 @@ namespace Ntreev.Crema.Services.Domains
                     item.Dispatcher.Invoke(() => item.Dispose(this));
                 }
             }
+
+            DirectoryUtility.Delete(this.BasePath, dataBase.ID.ToString());
+        }
+
+        private DomainRestorer[] GetDomainRestorers(DataBase dataBase)
+        {
+            var path = Path.Combine(this.BasePath, dataBase.ID.ToString());
+            if (Directory.Exists(path) == false)
+                return new DomainRestorer[] { };
+
+            var directories = Directory.GetDirectories(path);
+            var domainRestorerList = new List<DomainRestorer>(directories.Length);
+            foreach (var item in directories)
+            {
+                var directoryInfo = new DirectoryInfo(item);
+                if (Guid.TryParse(directoryInfo.Name, out Guid domainID) == true)
+                {
+                    domainRestorerList.Add(new DomainRestorer(this, item));
+                }
+            }
+
+            return domainRestorerList.ToArray();
         }
 
         #region IDomainContext
 
         bool IDomainContext.Contains(string itemPath)
         {
-            this.Dispatcher.VerifyAccess();
             return this.Contains(itemPath);
         }
 
-        IDomainCollection IDomainContext.Domains
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Domains;
-            }
-        }
+        IDomainCollection IDomainContext.Domains => this.Domains;
 
-        IDomainCategoryCollection IDomainContext.Categories
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Categories;
-            }
-        }
+        IDomainCategoryCollection IDomainContext.Categories => this.Categories;
 
-        IDomainItem IDomainContext.this[string itemPath]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[itemPath] as IDomainItem;
-            }
-        }
+        IDomainItem IDomainContext.this[string itemPath] => this[itemPath] as IDomainItem;
 
-        IDomainCategory IDomainContext.Root
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Root;
-            }
-        }
+        IDomainCategory IDomainContext.Root => this.Root;
 
         #region IEnumerable
 
         IEnumerator<IDomainItem> IEnumerable<IDomainItem>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IDomainItem;
@@ -390,7 +579,6 @@ namespace Ntreev.Crema.Services.Domains
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             foreach (var item in this)
             {
                 yield return item as IDomainItem;
@@ -405,7 +593,7 @@ namespace Ntreev.Crema.Services.Domains
 
         object IServiceProvider.GetService(System.Type serviceType)
         {
-            return (this.cremaHost as ICremaHost).GetService(serviceType);
+            return (this.CremaHost as ICremaHost).GetService(serviceType);
         }
 
         #endregion

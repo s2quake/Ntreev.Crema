@@ -15,23 +15,20 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library;
-using Ntreev.Crema.Services.Users;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Users;
+using Ntreev.Library.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reflection;
-using System.IO;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using System.Collections;
-using Ntreev.Library.Linq;
-using Ntreev.Crema.Services.Data;
-using System.Security;
 using System.ComponentModel.Composition.Primitives;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Security;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
@@ -41,6 +38,7 @@ namespace Ntreev.Crema.Services
         public const string DefaultDataBase = "default";
         private const string pluginsString = "plugins";
 
+        private CremaSettings settings;
         private CompositionContainer container;
 
         static CremaBootstrapper()
@@ -57,13 +55,13 @@ namespace Ntreev.Crema.Services
             this.Initialize();
         }
 
-        public static bool IsOnline(string address, string userID, SecureString password)
+        public static async Task<bool> IsOnlineAsync(string address, string userID, SecureString password)
         {
             var serviceClient = DescriptorServiceFactory.CreateServiceClient(address);
             serviceClient.Open();
             try
             {
-                return serviceClient.IsOnline(userID, UserContext.Encrypt(userID, password));
+                return await Task.Run(() => serviceClient.IsOnline(userID, UserContext.Encrypt(userID, password)));
             }
             finally
             {
@@ -117,6 +115,13 @@ namespace Ntreev.Crema.Services
             this.container.Dispose();
             this.container = null;
             this.OnDisposed(EventArgs.Empty);
+            CremaLog.Release();
+        }
+
+        public LogVerbose Verbose
+        {
+            get => this.settings.Verbose;
+            set => this.settings.Verbose = value;
         }
 
         public event EventHandler Disposed;
@@ -160,10 +165,7 @@ namespace Ntreev.Crema.Services
 
         public string Culture
         {
-            get
-            {
-                return $"{System.Globalization.CultureInfo.CurrentCulture}";
-            }
+            get => $"{System.Globalization.CultureInfo.CurrentCulture}";
             set
             {
                 if (value == null)
@@ -221,12 +223,9 @@ namespace Ntreev.Crema.Services
             }
 
             this.container.Compose(batch);
+            this.settings = this.container.GetExportedValue<CremaSettings>();
         }
 
-        internal static TimeSpan DefaultInactivityTimeout
-        {
-            get;
-            set;
-        }
+        internal static TimeSpan DefaultInactivityTimeout { get; set; }
     }
 }

@@ -16,8 +16,6 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml;
-using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
@@ -30,7 +28,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -47,16 +45,31 @@ namespace Ntreev.Crema.Services.Data
 
         }
 
-        public TableCategory AddNew(Authentication authentication, string name, string parentPath)
+        public async Task<TableCategory> AddNewAsync(Authentication authentication, string name, string parentPath)
         {
-            this.DataBase.ValidateBeginInDataBase(authentication);
-            this.ValidateAddNew(authentication, name, parentPath);
-            this.Sign(authentication);
-            this.InvokeCategoryCreate(authentication, name, parentPath);
-            var category = this.BaseAddNew(name, parentPath, authentication);
-            var items = EnumerableUtility.One(category).ToArray();
-            this.InvokeCategoriesCreatedEvent(authentication, items);
-            return category;
+            try
+            {
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);
+                    this.ValidateAddNew(authentication, name, parentPath);
+                });
+                var sianatureDate = await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication, sianatureDate);
+                    var category = this.BaseAddNew(name, parentPath, authentication);
+                    var items = EnumerableUtility.One(category).ToArray();
+                    this.InvokeCategoriesCreatedEvent(authentication, items);
+                    return category;
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public object GetService(System.Type serviceType)
@@ -64,132 +77,106 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public void InvokeCategoryCreate(Authentication authentication, string name, string parentPath)
+        public Task<SignatureDate> InvokeCategoryCreateAsync(Authentication authentication, string name, string parentPath)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeCategoryCreate), name, parentPath);
-
-            var parent = this[parentPath];
-            parent.ValidateAccessType(authentication, AccessType.Master);
-
-            var path = this.Context.GenerateCategoryPath(parentPath, name);
-            if (Directory.Exists(path) == true)
-                throw new InvalidOperationException(Resources.Exception_SameNamePathExists);
-
-            try
+            var categoryName = new CategoryName(parentPath, name);
+            var itemPath = this.Context.GenerateCategoryPath(parentPath, name);
+            var message = EventMessageBuilder.CreateTableCategory(authentication, categoryName);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                Directory.CreateDirectory(path);
-                this.Repository.Add(path);
-                this.Context.InvokeTableItemCreate(authentication, parentPath + name);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                if (Directory.Exists(path) == true)
-                    Directory.Delete(path);
-                this.Repository.Revert();
-                throw e;
-            }
-        }
-
-        public void InvokeCategoryRename(Authentication authentication, TableCategory category, string name, CremaDataSet dataSet)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeCategoryRename), category, name);
-
-            var categoryName = new CategoryName(category.Path) { Name = name, };
-            var dataTables = new DataTableCollection(dataSet, this.DataBase);
-
-            foreach (var item in dataTables)
-            {
-                var dataTable = item.Key;
-                var table = item.Value;
-                if (table.Path.StartsWith(category.Path) == false)
-                    continue;
-
-                dataTable.CategoryPath = Regex.Replace(dataTable.CategoryPath, "^" + category.Path, categoryName.Path);
-            }
-
-            try
-            {
-                foreach (var item in dataTables)
+                try
                 {
-                    var dataTable = item.Key;
-                    var table = item.Value;
-
-                    if (table.TemplatedParent == null)
-                    {
-                        this.Repository.Modify(table.SchemaPath, dataTable.GetXmlSchema());
-                    }
-                    this.Repository.Modify(table.XmlPath, dataTable.GetXml());
+                    var signatureDate = authentication.Sign();
+                    this.Repository.Lock(itemPath);
+                    this.Repository.CreateTableCategory(itemPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
                 }
-
-                this.Repository.Move(category.LocalPath, this.Context.GenerateCategoryPath(categoryName.Path));
-                this.Context.InvokeTableItemRename(authentication, category, name);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
-        }
-
-        public void InvokeCategoryMove(Authentication authentication, TableCategory category, string parentPath, CremaDataSet dataSet)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeCategoryMove), category, parentPath);
-
-            var categoryName = new CategoryName(parentPath, category.Name);
-            var dataTables = new DataTableCollection(dataSet, this.DataBase);
-
-            foreach (var item in dataTables)
-            {
-                var dataTable = item.Key;
-                var table = item.Value;
-                if (table.Path.StartsWith(category.Path) == false)
-                    continue;
-
-                dataTable.CategoryPath = Regex.Replace(dataTable.CategoryPath, "^" + category.Path, categoryName.Path);
-            }
-
-            try
-            {
-                foreach (var item in dataTables)
+                catch
                 {
-                    var dataTable = item.Key;
-                    var table = item.Value;
-
-                    if (table.TemplatedParent == null)
-                    {
-                        this.Repository.Modify(table.SchemaPath, dataTable.GetXmlSchema());
-                    }
-                    this.Repository.Modify(table.XmlPath, dataTable.GetXml());
+                    this.Repository.Revert();
+                    throw;
                 }
-
-                this.Repository.Move(category.LocalPath, this.Context.GenerateCategoryPath(categoryName));
-                this.Context.InvokeTableItemMove(authentication, category, parentPath);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
+                finally
+                {
+                    this.Repository.Unlock(itemPath);
+                }
+            });
         }
 
-        public void InvokeCategoryDelete(Authentication authentication, TableCategory category)
+        public Task<SignatureDate> InvokeCategoryRenameAsync(Authentication authentication, string categoryPath, string name, DataBaseSet dataBaseSet)
         {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeCategoryDelete), category);
+            var newCategoryPath = new CategoryName(categoryPath) { Name = name };
+            var message = EventMessageBuilder.RenameTableCategory(authentication, categoryPath, newCategoryPath);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.RenameTableCategory(dataBaseSet, categoryPath, newCategoryPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
+            });
+        }
 
-            try
+        public Task<SignatureDate> InvokeCategoryMoveAsync(Authentication authentication, string categoryPath, string parentPath, DataBaseSet dataBaseSet)
+        {
+            var categoryName = new CategoryName(categoryPath);
+            var newCategoryPath = new CategoryName(parentPath, categoryName.Name);
+            var message = EventMessageBuilder.MoveTableCategory(authentication, categoryPath, categoryName.ParentPath, parentPath);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Delete(category.LocalPath);
-                this.Context.InvokeTableItemDelete(authentication, category);
-            }
-            catch (Exception e)
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.MoveTableCategory(dataBaseSet, categoryPath, newCategoryPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
+            });
+        }
+
+        public Task<SignatureDate> InvokeCategoryDeleteAsync(Authentication authentication, string categoryPath, DataBaseSet dataBaseSet)
+        {
+            var message = EventMessageBuilder.DeleteTableCategory(authentication, categoryPath);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.DeleteTableCategory(dataBaseSet, categoryPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+                finally
+                {
+                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                }
+            });
         }
 
         public void InvokeCategoriesCreatedEvent(Authentication authentication, TableCategory[] categories)
@@ -197,76 +184,55 @@ namespace Ntreev.Crema.Services.Data
             var args = categories.Select(item => (object)null).ToArray();
             var dataSet = CremaDataSet.Create(new SignatureDateProvider(authentication.ID));
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesCreatedEvent), categories);
-            var comment = EventMessageBuilder.CreateTableCategory(authentication, categories);
+            var message = EventMessageBuilder.CreateTableCategory(authentication, categories);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnCategoriesCreated(new ItemsCreatedEventArgs<ITableCategory>(authentication, categories, args));
             this.Context.InvokeItemsCreatedEvent(authentication, categories, args, dataSet);
         }
-        
+
         public void InvokeCategoriesRenamedEvent(Authentication authentication, TableCategory[] categories, string[] oldNames, string[] oldPaths, CremaDataSet dataSet)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesRenamedEvent), categories, oldNames, oldPaths);
-            var comment = EventMessageBuilder.RenameTableCategory(authentication, categories, oldNames);
+            var message = EventMessageBuilder.RenameTableCategory(authentication, categories, oldNames);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnCategoriesRenamed(new ItemsRenamedEventArgs<ITableCategory>(authentication, categories, oldNames, oldPaths, dataSet));
             this.Context.InvokeItemsRenamedEvent(authentication, categories, oldNames, oldPaths, dataSet);
         }
-        
+
         public void InvokeCategoriesMovedEvent(Authentication authentication, TableCategory[] categories, string[] oldPaths, string[] oldParentPaths, CremaDataSet dataSet)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesMovedEvent), categories, oldPaths, oldParentPaths);
-            var comment = EventMessageBuilder.MoveTableCategory(authentication, categories, oldParentPaths);
+            var message = EventMessageBuilder.MoveTableCategory(authentication, categories, oldPaths, oldParentPaths);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnCategoriesMoved(new ItemsMovedEventArgs<ITableCategory>(authentication, categories, oldPaths, oldParentPaths, dataSet));
             this.Context.InvokeItemsMovedEvent(authentication, categories, oldPaths, oldParentPaths, dataSet);
         }
-        
+
         public void InvokeCategoriesDeletedEvent(Authentication authentication, TableCategory[] categories, string[] categoryPaths)
         {
             var dataSet = CremaDataSet.Create(new SignatureDateProvider(authentication.ID));
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesDeletedEvent), categoryPaths);
-            var comment = EventMessageBuilder.DeleteTableCategory(authentication, categories);
+            var message = EventMessageBuilder.DeleteTableCategory(authentication, categories);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnCategoriesDeleted(new ItemsDeletedEventArgs<ITableCategory>(authentication, categories, categoryPaths, dataSet));
             this.Context.InvokeItemsDeletedEvent(authentication, categories, categoryPaths, dataSet);
         }
 
-        public DataBaseRepositoryHost Repository
-        {
-            get { return this.DataBase.Repository; }
-        }
+        public DataBaseRepositoryHost Repository => this.DataBase.Repository;
 
-        public CremaHost CremaHost
-        {
-            get { return this.Context.CremaHost; }
-        }
+        public CremaHost CremaHost => this.Context.CremaHost;
 
-        public DataBase DataBase
-        {
-            get { return this.Context.DataBase; }
-        }
+        public DataBase DataBase => this.Context.DataBase;
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.Context?.Dispatcher; }
-        }
+        public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public IObjectSerializer Serializer => this.DataBase.Serializer;
+
+        public new int Count => base.Count;
 
         public event ItemsCreatedEventHandler<ITableCategory> CategoriesCreated
         {
@@ -358,43 +324,27 @@ namespace Ntreev.Crema.Services.Data
             this.categoriesDeleted?.Invoke(this, e);
         }
 
-        private void Sign(Authentication authentication)
-        {
-            authentication.Sign();
-        }
-
         private void ValidateAddNew(Authentication authentication, string name, string parentPath)
         {
             base.ValidateAddNew(name, parentPath, null);
             var parent = this[parentPath];
             parent.ValidateAccessType(authentication, AccessType.Master);
+
+            var path = this.Context.GenerateCategoryPath(parentPath, name);
+            if (Directory.Exists(path) == true)
+                throw new InvalidOperationException(Resources.Exception_SameNamePathExists);
         }
 
         #region ITableCategoryCollection
 
         bool ITableCategoryCollection.Contains(string categoryPath)
         {
-            this.Dispatcher?.VerifyAccess();
             return this.Contains(categoryPath);
         }
 
-        ITableCategory ITableCategoryCollection.Root
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this.Root;
-            }
-        }
+        ITableCategory ITableCategoryCollection.Root => this.Root;
 
-        ITableCategory ITableCategoryCollection.this[string categoryPath]
-        {
-            get
-            {
-                this.Dispatcher?.VerifyAccess();
-                return this[categoryPath];
-            }
-        }
+        ITableCategory ITableCategoryCollection.this[string categoryPath] => this[categoryPath];
 
         #endregion
 
@@ -402,13 +352,11 @@ namespace Ntreev.Crema.Services.Data
 
         IEnumerator<ITableCategory> IEnumerable<ITableCategory>.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher?.VerifyAccess();
             return this.GetEnumerator();
         }
 

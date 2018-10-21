@@ -17,10 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains
@@ -28,37 +25,39 @@ namespace Ntreev.Crema.Services.Domains
     class DomainUser : DomainUserBase, IDomainUser
     {
         private readonly Domain domain;
+        bool metadata;
 
-        public DomainUser(Domain domain, DomainUserInfo domainUserInfo, DomainUserState domainUserState)
+        public DomainUser(Domain domain, DomainUserInfo domainUserInfo, DomainUserState domainUserState, bool metadata)
         {
             this.domain = domain;
             base.DomainUserInfo = domainUserInfo;
             base.DomainUserState = domainUserState;
+            this.metadata = metadata;
         }
 
-        public void BeginEdit(Authentication authentication, DomainLocationInfo location)
+        public Task BeginEditAsync(Authentication authentication, DomainLocationInfo location)
         {
-            this.domain.BeginUserEdit(authentication, location);
+            return this.domain.BeginUserEditAsync(authentication, location);
         }
 
-        public void EndEdit(Authentication authentication)
+        public Task EndEditAsync(Authentication authentication)
         {
-            this.domain.EndUserEdit(authentication);
+            return this.domain.EndUserEditAsync(authentication);
         }
 
-        public void SetLocation(Authentication authentication, DomainLocationInfo location)
+        public Task SetLocationAsync(Authentication authentication, DomainLocationInfo location)
         {
-            this.domain.SetUserLocation(authentication, location);
+            return this.domain.SetUserLocationAsync(authentication, location);
         }
 
-        public void Kick(Authentication authentication, string comment)
+        public Task KickAsync(Authentication authentication, string comment)
         {
-            this.domain.Kick(authentication, base.DomainUserInfo.UserID, comment);
+            return this.domain.KickAsync(authentication, base.DomainUserInfo.UserID, comment);
         }
 
-        public void SetOwner(Authentication authentication)
+        public Task SetOwnerAsync(Authentication authentication)
         {
-            this.domain.SetOwner(authentication, base.DomainUserInfo.UserID);
+            return this.domain.SetOwnerAsync(authentication, base.DomainUserInfo.UserID);
         }
 
         public DomainUserMetaData GetMetaData(Authentication authentication)
@@ -74,40 +73,16 @@ namespace Ntreev.Crema.Services.Domains
             return metaData;
         }
 
-        public new DomainUserInfo DomainUserInfo
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.DomainUserInfo;
-            }
-        }
+        public new DomainUserInfo DomainUserInfo => base.DomainUserInfo;
 
-        public new DomainUserState DomainUserState
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.DomainUserState;
-            }
-        }
+        public new DomainUserState DomainUserState => base.DomainUserState;
 
-        public string ID
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.DomainUserInfo.UserID;
-            }
-        }
+        public string ID => base.DomainUserInfo.UserID;
 
         public DomainLocationInfo Location
         {
-            get { return base.DomainUserInfo.Location; }
-            set
-            {
-                base.UpdateLocation(value);
-            }
+            get => base.DomainUserInfo.Location;
+            set => base.UpdateLocation(value);
         }
 
         public CremaDispatcher Dispatcher => this.domain.Dispatcher;

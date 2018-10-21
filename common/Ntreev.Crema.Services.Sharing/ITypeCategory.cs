@@ -23,26 +23,28 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using Ntreev.Library;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
     public interface ITypeCategory : IAccessible, ILockable, IPermission, IServiceProvider, IDispatcherObject, IExtendedProperties
     {
-        void Rename(Authentication authentication, string newName);
+        Task RenameAsync(Authentication authentication, string newName);
 
-        void Move(Authentication authentication, string parentPath);
+        Task MoveAsync(Authentication authentication, string parentPath);
 
-        void Delete(Authentication authentication);
+        Task DeleteAsync(Authentication authentication);
 
-        ITypeCategory AddNewCategory(Authentication authentication, string name);
+        Task<ITypeCategory> AddNewCategoryAsync(Authentication authentication, string name);
 
-        ITypeTemplate NewType(Authentication authentication);
+        Task<ITypeTemplate> NewTypeAsync(Authentication authentication);
 
-        CremaDataSet GetDataSet(Authentication authentication, long revision);
+        Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision);
 
-        LogInfo[] GetLog(Authentication authentication);
+        Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision);
 
-        FindResultInfo[] Find(Authentication authentication, string text, FindOptions options);
+        Task<FindResultInfo[]> FindAsync(Authentication authentication, string text, FindOptions options);
 
         string Name { get; }
 

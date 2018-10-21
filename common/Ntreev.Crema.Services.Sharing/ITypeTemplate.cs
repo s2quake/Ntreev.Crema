@@ -16,30 +16,34 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ITypeTemplate : IEnumerable<ITypeMember>, IDispatcherObject
+    public interface ITypeTemplate : IEnumerable<ITypeMember>, IDispatcherObject, IPermission
     {
-        void BeginEdit(Authentication authentication);
+        Task BeginEditAsync(Authentication authentication);
 
-        void EndEdit(Authentication authentication);
+        Task EndEditAsync(Authentication authentication);
 
-        void CancelEdit(Authentication authentication);
+        Task CancelEditAsync(Authentication authentication);
 
-        void SetTypeName(Authentication authentication, string value);
+        Task SetTypeNameAsync(Authentication authentication, string value);
 
-        void SetIsFlag(Authentication authentication, bool value);
+        Task SetIsFlagAsync(Authentication authentication, bool value);
 
-        void SetComment(Authentication authentication, string value);
+        Task SetTagsAsync(Authentication authentication, TagInfo tags);
 
-        ITypeMember AddNew(Authentication authentication);
+        Task SetCommentAsync(Authentication authentication, string value);
 
-        void EndNew(Authentication authentication, ITypeMember member);
+        Task<ITypeMember> AddNewAsync(Authentication authentication);
+
+        Task EndNewAsync(Authentication authentication, ITypeMember member);
 
         bool Contains(string memberName);
 

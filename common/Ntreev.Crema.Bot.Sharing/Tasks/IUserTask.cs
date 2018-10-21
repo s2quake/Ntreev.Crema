@@ -34,24 +34,23 @@ namespace Ntreev.Crema.Bot.Tasks
     [TaskClass(Weight = 10)]
     public class IUserTask : ITaskProvider
     {
-        private readonly ICremaHost cremaHost;
-        private IUserContext userContext;
-
-        [ImportingConstructor]
-        public IUserTask(ICremaHost cremaHost)
+        public IUserTask()
         {
-            this.cremaHost = cremaHost;
-            this.cremaHost.Opened += CremaHost_Opened;
-            this.cremaHost.Closed += CremaHost_Closed;
+
         }
 
-        public void InvokeTask(TaskContext context)
+        public Task InvokeAsync(TaskContext context)
         {
             var user = context.Target as IUser;
             if (context.IsCompleted(user) == true)
             {
                 context.Pop(user);
             }
+            else if (RandomUtility.Within(50) == true)
+            {
+                context.Complete(user);
+            }
+            return Task.Delay(0);
         }
 
         public Type TargetType
@@ -65,146 +64,92 @@ namespace Ntreev.Crema.Bot.Tasks
         }
 
         [TaskMethod]
-        public void Move(IUser user, TaskContext context)
+        public async Task MoveAsync(IUser user, TaskContext context)
         {
-            user.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            var categories = user.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
+            var categoryPath = await categories.Dispatcher.InvokeAsync(() => categories.Random().Path);
+            if (context.AllowException == false)
             {
-                var categories = user.GetService(typeof(IUserCategoryCollection)) as IUserCategoryCollection;
-                var categoryPath = categories.Random().Path;
-                if (Verify(categoryPath) == false)
+                if (await user.Dispatcher.InvokeAsync(() => user.Category.Path) == categoryPath)
                     return;
-                user.Move(context.Authentication, categoryPath);
-            });
-
-            bool Verify(string categoryPath)
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (user.Category.Path == categoryPath)
-                    return false;
-                return true;
             }
+            await user.MoveAsync(authentication, categoryPath);
         }
 
         [TaskMethod(Weight = 1)]
-        public void Delete(IUser user, TaskContext context)
+        public async Task DeleteAsync(IUser user, TaskContext context)
         {
-            user.Dispatcher.Invoke(() =>
-            {
-                //user.Delete(authentication);
-            });
+            var authentication = context.Authentication;
+            await user.DeleteAsync(authentication);
+            context.Pop(user);
         }
 
         [TaskMethod]
-        public void ChangeUserInfo(IUser user, TaskContext context)
+        public async Task ChangeUserInfoAsync(IUser user, TaskContext context)
         {
-            user.Dispatcher.Invoke(() =>
-            {
-                //user.ChangeUserInfo(authentication);
-            });
+            await Task.Delay(0);
         }
 
         [TaskMethod]
-        public void SendMessage(IUser user, TaskContext context)
+        public async Task SendMessageAsync(IUser user, TaskContext context)
         {
-            user.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            var message = RandomUtility.NextString();
+            if (context.AllowException == false)
             {
-                var message = RandomUtility.NextString();
-                if (Verify(message) == false)
+                if (message == string.Empty)
                     return;
-                user.SendMessage(context.Authentication, message);
-            });
-
-            bool Verify(string message)
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (string.IsNullOrEmpty(message) == true)
-                    return false;
-                if (user.UserState != UserState.Online)
-                    return false;
-                return true;
-            }
-        }
-
-        [TaskMethod]
-        public void Kick(IUser user, TaskContext context)
-        {
-            user.Dispatcher.Invoke(() =>
-            {
-                var comment = RandomUtility.NextString();
-                if (Verify(comment) == false)
+                if (await user.Dispatcher.InvokeAsync(() => user.UserState) != UserState.Online)
                     return;
-                user.Kick(context.Authentication, comment);
-            });
-
-            bool Verify(string comment)
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (string.IsNullOrEmpty(comment) == true)
-                    return false;
-                if (user.Authority == Authority.Admin)
-                    return false;
-                if (user.UserState != UserState.Online)
-                    return false;
-                return true;
             }
+            await user.SendMessageAsync(authentication, message);
         }
 
-        [TaskMethod]
-        public void Ban(IUser user, TaskContext context)
+        [TaskMethod(Authority = Authority.Admin)]
+        public async Task KickAsync(IUser user, TaskContext context)
         {
-            user.Dispatcher.Invoke(() =>
+            var authentication = context.Authentication;
+            var comment = RandomUtility.NextString();
+            if (context.AllowException == false)
             {
-                var comment = RandomUtility.NextString();
-                if (Verify(comment) == false)
+                if (comment == string.Empty)
                     return;
-                user.Ban(context.Authentication, comment);
-            });
-
-            bool Verify(string comment)
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (string.IsNullOrEmpty(comment) == true)
-                    return false;
-                if (user.BanInfo.Path != string.Empty)
-                    return false;
-                if (user.Authority == Authority.Admin)
-                    return false;
-                return true;
-            }
-        }
-
-        [TaskMethod]
-        public void Unban(IUser user, TaskContext context)
-        {
-            user.Dispatcher.Invoke(() =>
-            {
-                if (Verify() == false)
+                if (await user.Dispatcher.InvokeAsync(() => user.Authority) == Authority.Admin)
                     return;
-                user.Unban(context.Authentication);
-            });
-
-            bool Verify()
-            {
-                if (context.AllowException == true)
-                    return true;
-                if (user.BanInfo.Path != user.Path)
-                    return false;
-                return true;
+                if (await user.Dispatcher.InvokeAsync(() => user.UserState) != UserState.Online)
+                    return;
             }
+            await user.KickAsync(authentication, comment);
         }
 
-        private void CremaHost_Opened(object sender, EventArgs e)
+        [TaskMethod(Authority = Authority.Admin)]
+        public async Task BanAsync(IUser user, TaskContext context)
         {
-            this.userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            var authentication = context.Authentication;
+            var comment = RandomUtility.NextString();
+            if (context.AllowException == false)
+            {
+                if (comment == string.Empty)
+                    return;
+                if (await user.Dispatcher.InvokeAsync(() => user.BanInfo.Path) != string.Empty)
+                    return;
+                if (await user.Dispatcher.InvokeAsync(() => user.Authority) == Authority.Admin)
+                    return;
+            }
+            await user.BanAsync(authentication, comment);
         }
 
-        private void CremaHost_Closed(object sender, EventArgs e)
+        [TaskMethod(Authority = Authority.Admin)]
+        public async Task UnbanAsync(IUser user, TaskContext context)
         {
-            this.userContext = null;
+            var authentication = context.Authentication;
+            if (context.AllowException == false)
+            {
+                if (await user.Dispatcher.InvokeAsync(() => user.BanInfo.Path) != user.Path)
+                    return;
+            }
+            await user.UnbanAsync(authentication);
         }
     }
 }

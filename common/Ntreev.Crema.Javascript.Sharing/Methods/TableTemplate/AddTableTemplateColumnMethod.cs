@@ -15,12 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data;
 using Ntreev.Crema.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 {
@@ -29,8 +31,6 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
     [Category(nameof(TableTemplate))]
     class AddTableTemplateColumnMethod : DomainScriptMethodBase
     {
-        private const string typeNameDescription = "boolean, string, int, float, double, dateTime, unsignedInt, long, short, unsignedLong, unsignedByte, duration, unsignedShort, byte, guid or typePath(e.g., /categoryPath/typeName)";
-
         [ImportingConstructor]
         public AddTableTemplateColumnMethod(ICremaHost cremaHost)
             : base(cremaHost)
@@ -44,7 +44,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
         }
 
         private void AddTableTemplateColumn(string domainID, string columnName,
-            [Description(typeNameDescription)]
+            [TypeNamesDescriptionAttribute]
             string typeName, string comment, bool? isKey)
         {
             if (columnName == null)
@@ -54,17 +54,29 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 
             var template = this.GetDomainHost<ITableTemplate>(domainID);
             var authentication = this.Context.GetAuthentication(this);
-            template.Dispatcher.Invoke(() =>
+            var task = InvokeAsync();
+            task.Wait();
+
+            async Task InvokeAsync()
             {
-                var column = template.AddNew(authentication);
-                column.SetName(authentication, columnName);
-                column.SetDataType(authentication, typeName);
+                var column = await template.AddNewAsync(authentication);
+                await column.SetNameAsync(authentication, columnName);
+                await column.SetDataTypeAsync(authentication, typeName);
                 if (comment != null)
-                    column.SetComment(authentication, comment);
+                    await column.SetCommentAsync(authentication, comment);
                 if (isKey != null)
-                    column.SetIsKey(authentication, isKey.Value);
-                template.EndNew(authentication, column);
-            });
+                    await column.SetIsKeyAsync(authentication, isKey.Value);
+                await template.EndNewAsync(authentication, column);
+            };
+        }
+
+        class TypeNamesDescriptionAttribute : DescriptionAttribute
+        {
+            public TypeNamesDescriptionAttribute()
+                : base(string.Join(", ", CremaDataTypeUtility.GetBaseTypeNames()) + " or typePath(e.g., /categoryPath/typeName)")
+            {
+                
+            }
         }
     }
 }

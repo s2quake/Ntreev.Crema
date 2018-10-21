@@ -51,9 +51,10 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         </Grid.RowDefinitions>
         <nmfc:ExpandableToolBar ItemsSource="{Binding ToolBarItems}" />
 
+        <!--wpftoolkit 버그로 인해 예외가 발생하여 처음에는 Collapsed로 설정-->
         <nmgc:ModernDataGridControl x:Name="gridControl" Grid.Row="1" ReadOnly="True" SelectionMode="Single" SelectionUnit="Row" AutoCreateColumns="False"
                                     BorderThickness="1" BorderBrush="{DynamicResource ItemBorder}"
-                                    ItemsSource="{Binding ItemsSource}"
+                                    ItemsSource="{Binding ItemsSource}" Visibility="Collapsed"
                                     SelectedItem="{Binding SelectedItem, Mode=TwoWay}" >
             <nmgc:ModernDataGridControl.Columns>
                 <xcdg:Column Title="{x:Static p:Resources.Label_UserID}" FieldName="UserID" />

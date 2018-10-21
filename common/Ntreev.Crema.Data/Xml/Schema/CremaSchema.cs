@@ -16,20 +16,14 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #pragma warning disable 0612
+using Ntreev.Library;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Schema;
-using System.Diagnostics;
-using System.IO;
-using Ntreev.Crema.Data.Properties;
-using Ntreev.Crema.Data;
-using System.Xml;
-using System.ComponentModel;
-using System.Collections;
 using System.Data;
-using Ntreev.Library;
+using System.Diagnostics;
+using System.Linq;
+using System.Xml;
+using System.Xml.Schema;
 
 namespace Ntreev.Crema.Data.Xml.Schema
 {
@@ -47,8 +41,8 @@ namespace Ntreev.Crema.Data.Xml.Schema
         public const string XmlExtension = ".xml";
 
         public const string Version = "Version";
-        public static readonly int MajorVersion = 3;
-        public static readonly int MinorVersion = 6;
+        public static readonly int MajorVersion = 4;
+        public static readonly int MinorVersion = 0;
         public static readonly string VersionValue = $"{MajorVersion}.{MinorVersion}";
         public const string TableInfo = "TableInfo";
         public const string TypeInfo = "TypeInfo";
@@ -61,6 +55,8 @@ namespace Ntreev.Crema.Data.Xml.Schema
         public const string Modifier = "Modifier";
         public const string Tags = "Tags";
         public const string Enable = "Enable";
+        public const string TypeName = "TypeName";
+        public const string IsFlag = "IsFlag";
         public const string Comment = "Comment";
         public const string ReadOnly = "ReadOnly";
         [Obsolete]
@@ -68,11 +64,13 @@ namespace Ntreev.Crema.Data.Xml.Schema
         public const string CategoryPath = "CategoryPath";
         public const string TemplateNamespace = "TemplateNamespace";
         public const string RelationID = "RelationID";
+        public const string ParentID = "ParentID";
         [Obsolete]
         public const string Description = "Description";
         public const string Index = "__Index__";
         public const string Name = "Name";
         public const string ColumnName = "ColumnName";
+        public const string TableName = "TableName";
         public const string Value = "Value";
         public const string DataType = "DataType";
         public const string DefaultValue = "DefaultValue";
@@ -94,12 +92,6 @@ namespace Ntreev.Crema.Data.Xml.Schema
         private readonly static string[] reservedNames = new string[]
         {
             CremaSchemaObsolete.DataLocation ,
-            //CremaSchema.Tags ,
-            //CremaSchema.Enable ,
-            //CremaSchema.Creator ,
-            //CremaSchema.CreatedDateTime ,
-            //CremaSchema.Modifier ,
-            //CremaSchema.ModifiedDateTime ,
             CremaSchema.RelationID,
         };
 
@@ -209,17 +201,6 @@ namespace Ntreev.Crema.Data.Xml.Schema
         public static void SchemaValidationEventHandler(object sender, ValidationEventArgs e)
         {
             Trace.WriteLine(e.Message);
-        }
-
-        [Obsolete]
-        public static XmlSchema GetDefaultStringTypeSchema(string typeName)
-        {
-            //string s = Resources.StringType.Replace("{typename}", typeName);
-            //using (StringReader sr = new StringReader(s))
-            //{
-            //    return XmlSchema.Read(sr, CremaSchema.SchemaValidationEventHandler);
-            //}
-            throw new NotImplementedException();
         }
 
         public static string[] ReservedNames

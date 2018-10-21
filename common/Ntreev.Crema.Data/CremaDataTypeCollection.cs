@@ -15,50 +15,37 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml;
-using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data.Properties;
+using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library;
-using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Runtime.Serialization;
-using System.Threading;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace Ntreev.Crema.Data
 {
-    public class CremaDataTypeCollection : IEnumerable<CremaDataType>, ICollection
+    public sealed class CremaDataTypeCollection : IEnumerable<CremaDataType>, ICollection
     {
         private readonly InternalDataSet dataSet;
         private readonly DataTableCollection tables;
         private readonly List<InternalDataType> itemList = new List<InternalDataType>();
+        private readonly Dictionary<string, InternalDataType> itemsByName = new Dictionary<string, InternalDataType>();
+        private readonly Dictionary<string, InternalDataType> itemsByNamespace = new Dictionary<string, InternalDataType>();
 
         internal CremaDataTypeCollection(InternalDataSet dataSet)
         {
             this.dataSet = dataSet;
             this.tables = dataSet.Tables;
             this.tables.CollectionChanged += Tables_CollectionChanged;
-            this.tables.CollectionChanging += Tables_CollectionChanging;
+            //this.tables.CollectionChanging += Tables_CollectionChanging;
             this.dataSet.PropertyChanged += InternalDataSet_PropertyChanged;
         }
 
-        public CremaDataType this[int index]
-        {
-            get { return this.itemList[index].Target; }
-        }
+        public CremaDataType this[int index] => this.itemList[index].Target;
 
         public CremaDataType this[string name]
         {
@@ -115,10 +102,7 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        public CremaDataType this[Guid typeID]
-        {
-            get { return this.SingleOrDefault(item => item.TypeID == typeID); }
-        }
+        public CremaDataType this[Guid typeID] => this.SingleOrDefault(item => item.TypeID == typeID);
 
         public CremaDataType Add()
         {
@@ -206,18 +190,27 @@ namespace Ntreev.Crema.Data
 
         public void Remove(CremaDataType type)
         {
-            Validate();
-            this.tables.Remove(type.InternalObject);
+            this.Remove(type, false);
+        }
 
-            void Validate()
+        public void Remove(CremaDataType type, bool force)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+            if (type.DataSet != this.dataSet.Target)
+                throw new ArgumentException(Resources.Exception_NotIncludedInDataSet, nameof(type));
+            if (force == false && type.HasReference == true)
+                throw new InvalidOperationException("현재 타입이 사용되고 있는 테이블이 있기때문에 삭제할 수 없습니다");
+
+            if (force == true)
             {
-                if (type == null)
-                    throw new ArgumentNullException(nameof(type));
-                if (type.DataSet != this.dataSet.Target)
-                    throw new ArgumentException(Resources.Exception_NotIncludedInDataSet, nameof(type));
-                if (type.HasReference == true)
-                    throw new InvalidOperationException("현재 타입이 사용되고 있는 테이블이 있기때문에 삭제할 수 없습니다");
+                var columns = type.ReferencedColumns;
+                foreach (var item in columns)
+                {
+                    item.CremaType = null;
+                }
             }
+            this.tables.Remove(type.InternalObject);
         }
 
         public void Remove(string name)
@@ -228,6 +221,10 @@ namespace Ntreev.Crema.Data
             {
                 var item = this.itemList[index];
                 this.tables.Remove(item);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(name));
             }
 
             void Validate()
@@ -245,6 +242,10 @@ namespace Ntreev.Crema.Data
             {
                 var item = this.itemList[index];
                 this.tables.Remove(item);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(name));
             }
 
             void Validate()
@@ -297,16 +298,13 @@ namespace Ntreev.Crema.Data
             this.ValidateClear();
             var query = from item in this.itemList orderby item.Name select item;
             this.tables.CollectionChanged -= Tables_CollectionChanged;
-            this.tables.CollectionChanging -= Tables_CollectionChanging;
-            this.OnCollectionChanging(new CollectionChangeEventArgs(CollectionChangeAction.Refresh, null));
             foreach (var item in query.Reverse())
             {
                 this.tables.Remove(item);
             }
             this.itemList.Clear();
-            this.OnCollectionChanged(new CollectionChangeEventArgs(CollectionChangeAction.Refresh, null));
             this.tables.CollectionChanged += Tables_CollectionChanged;
-            this.tables.CollectionChanging += Tables_CollectionChanging;
+            this.InvokeCollectionChanged(new CollectionChangeEventArgs(CollectionChangeAction.Refresh, null));
         }
 
         public void CopyTo(Array array, int index)
@@ -320,26 +318,14 @@ namespace Ntreev.Crema.Data
             arrayList.CopyTo(array, index);
         }
 
-        public int Count
-        {
-            get { return this.itemList.Count; }
-        }
+        public int Count => this.itemList.Count;
 
         public event CollectionChangeEventHandler CollectionChanged;
 
-        public event CollectionChangeEventHandler CollectionChanging;
-
-        protected virtual void OnCollectionChanged(CollectionChangeEventArgs e)
+        private void InvokeCollectionChanged(CollectionChangeEventArgs e)
         {
             this.CollectionChanged?.Invoke(this, e);
         }
-
-        protected virtual void OnCollectionChanging(CollectionChangeEventArgs e)
-        {
-            this.CollectionChanging?.Invoke(this, e);
-        }
-
-
 
         private void ValidateAdd(string name, string categoryPath)
         {
@@ -381,14 +367,6 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        private void Tables_CollectionChanging(object sender, CollectionChangeEventArgs e)
-        {
-            if (e.Element is InternalDataType dataType)
-            {
-                this.OnCollectionChanging(e);
-            }
-        }
-
         private void Tables_CollectionChanged(object sender, CollectionChangeEventArgs e)
         {
             switch (e.Action)
@@ -398,9 +376,12 @@ namespace Ntreev.Crema.Data
                         if (e.Element is InternalDataType dataType)
                         {
                             this.itemList.Add(dataType);
+                            this.itemsByName.Add(dataType.Name, dataType);
+                            this.itemsByNamespace.Add(dataType.Namespace, dataType);
                             dataType.DefaultView.Sort = $"{CremaSchema.Index} ASC";
                             dataType.BuildNamespace();
-                            this.OnCollectionChanged(e);
+                            this.InvokeCollectionChanged(e);
+                            dataType.PropertyChanged += DataType_PropertyChanged;
                         }
                     }
                     break;
@@ -408,10 +389,13 @@ namespace Ntreev.Crema.Data
                     {
                         if (e.Element is InternalDataType dataType)
                         {
+                            dataType.PropertyChanged -= DataType_PropertyChanged;
+                            this.itemsByNamespace.Remove(dataType.Namespace);
+                            this.itemsByName.Remove(dataType.Name);
                             this.itemList.Remove(dataType);
                             dataType.DefaultView.Sort = $"{CremaSchema.Index} ASC";
                             dataType.BuildNamespace();
-                            this.OnCollectionChanged(e);
+                            this.InvokeCollectionChanged(e);
                         }
                     }
                     break;
@@ -420,6 +404,26 @@ namespace Ntreev.Crema.Data
                         this.itemList.Clear();
                     }
                     break;
+            }
+        }
+
+        private void DataType_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender is InternalDataType dataType)
+            {
+                if (e.PropertyName == nameof(InternalDataType.Name))
+                {
+                    var value = this.itemsByName.First(item => item.Value == dataType);
+                    this.itemsByName.Remove(value.Key);
+                    this.itemsByName.Add(dataType.Name, dataType);
+                }
+                else if (e.PropertyName == nameof(InternalDataType.Namespace))
+                {
+                    var value = this.itemsByNamespace.First(item => item.Value == dataType);
+                    this.itemsByNamespace.Remove(value.Key);
+                    this.itemsByNamespace.Add(dataType.Namespace, dataType);
+
+                }
             }
         }
 

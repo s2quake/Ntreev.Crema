@@ -24,6 +24,7 @@ using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
@@ -41,21 +42,24 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         protected override Delegate CreateDelegate()
         {
-            return new Func<string, string, long?, IDictionary<int, object>>(GetTableData);
+            return new Func<string, string, string, IDictionary<int, object>>(GetTableData);
         }
 
-        private IDictionary<int, object> GetTableData(string dataBaseName, string tableName, long? revision)
+        private IDictionary<int, object> GetTableData(string dataBaseName, string tableName, string revision)
         {
             var table = this.GetTable(dataBaseName, tableName);
-            var revisionValue = revision ?? -1;
+            var revisionValue = revision;
             var authentication = this.Context.GetAuthentication(this);
+            var task = InvokeAsync();
+            task.Wait();
+            return task.Result;
 
-            return table.Dispatcher.Invoke(() =>
+            async Task<IDictionary<int, object>> InvokeAsync()
             {
-                var dataSet = table.GetDataSet(authentication, revisionValue);
+                var dataSet = await table.GetDataSetAsync(authentication, revisionValue);
                 var dataTable = dataSet.Tables[tableName];
                 return this.GetDataRows(dataTable);
-            });
+            };
         }
 
         private IDictionary<int, object> GetDataRows(CremaDataTable dataTable)

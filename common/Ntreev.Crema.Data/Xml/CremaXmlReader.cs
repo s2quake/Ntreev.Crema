@@ -35,6 +35,7 @@ namespace Ntreev.Crema.Data.Xml
         private readonly CremaDataSet dataSet;
         private readonly CremaDataTable dataTable;
         private readonly ItemName itemName;
+        private readonly Version version40 = new Version(4, 0);
         private Dictionary<string, CremaDataTable> tables;
         private Version version = new Version();
 
@@ -93,7 +94,7 @@ namespace Ntreev.Crema.Data.Xml
             this.BeginLoad();
             this.ReadHeaderInfo(reader);
 
-            if (reader.IsEmptyElement == false)
+            if (reader.IsEmptyElement == false && this.OmitContent == false)
             {
                 reader.ReadStartElement();
                 reader.MoveToContent();
@@ -124,6 +125,8 @@ namespace Ntreev.Crema.Data.Xml
             var doc = XDocument.Load(xmlReader, LoadOptions.PreserveWhitespace);
             this.ReadModifyInfo(doc);
         }
+
+        public bool OmitContent { get; set; }
 
         protected virtual void OnRowInsertAction(CremaDataTable dataTable, CremaDataRow dataRow)
         {
@@ -220,19 +223,11 @@ namespace Ntreev.Crema.Data.Xml
                     this.tables.Add(item.Name, item);
                 }
             }
-
-            foreach (var item in this.tables)
-            {
-                if (item.Value.Rows.Count > 0)
-                {
-                    throw new CremaDataException("'{0}'은(는) 데이터가 존재하기 때문에 읽어들일 수 없습니다.", item.Value.TableName);
-                }
-            }
         }
 
         private void ReadHeaderInfo(XmlReader reader)
         {
-            if (this.version.Major < CremaSchema.MajorVersion)
+            if (this.version < new Version(3, 0))
             {
                 this.ReadHeaderInfoVersion2(reader);
                 return;
@@ -249,7 +244,7 @@ namespace Ntreev.Crema.Data.Xml
                     var count = item.Name + CremaSchema.CountExtension;
                     var id = item.Name + CremaSchema.IDExtension;
                     item.MinimumCapacity = reader.GetAttributeAsInt32(count);
-                    item.InternalContentsInfo = reader.GetAttributeAsModificationInfo(user, dateTime);
+                    item.InternalContentsInfo = reader.GetAttributeAsSignatureDate(user, dateTime);
                     item.InternalTableID = reader.GetAttributeAsGuid(id);
                 }
             }
@@ -258,15 +253,25 @@ namespace Ntreev.Crema.Data.Xml
                 var categoryPath = CremaDataSet.GetTableCategoryPath(this.dataSet, reader.NamespaceURI);
                 var tableName = CremaDataSet.GetTableName(this.dataSet, reader.NamespaceURI);
                 var dataTable = this.dataTable ?? this.dataSet.Tables[tableName, categoryPath];
-                foreach (var item in EnumerableUtility.Friends(dataTable, dataTable.Childs))
+                var items = EnumerableUtility.Friends(dataTable, dataTable.Childs);
+                foreach (var item in items)
                 {
                     var user = item.Name + CremaSchema.ModifierExtension;
                     var dateTime = item.Name + CremaSchema.ModifiedDateTimeExtension;
                     var count = item.Name + CremaSchema.CountExtension;
                     var id = item.Name + CremaSchema.IDExtension;
-                    item.MinimumCapacity = reader.GetAttributeAsInt32(count);
-                    item.InternalContentsInfo = reader.GetAttributeAsModificationInfo(user, dateTime);
-                    item.InternalTableID = reader.GetAttributeAsGuid(id);
+                    if (reader.TryGetAttributeAsInt32(count, out var countValue) == true)
+                    {
+                        item.MinimumCapacity = countValue;
+                    }
+                    if (reader.TryGetAttributeAsSignatureDate(user, dateTime, out var dateTimeValue) == true)
+                    {
+                        item.InternalContentsInfo = dateTimeValue;
+                    }
+                    if (reader.TryGetAttributeAsGuid(id, out var idValue))
+                    {
+                        item.InternalTableID = idValue;
+                    }
                 }
             }
             else
@@ -275,19 +280,35 @@ namespace Ntreev.Crema.Data.Xml
                 var dataTable = this.dataTable ?? this.dataSet.Tables[this.itemName.Name, this.itemName.CategoryPath];
                 if (reader.NamespaceURI != tableNamespace)
                 {
-                    var creationInfo = reader.GetAttributeAsModificationInfo(CremaSchema.Creator, CremaSchema.CreatedDateTime);
-                    dataTable.InternalCreationInfo = creationInfo;
+
+                    var name = dataTable.TemplatedParentName;
+                    var user = name + CremaSchema.CreatorExtension;
+                    var dateTime = name + CremaSchema.CreatedDateTimeExtension;
+                    if (reader.TryGetAttributeAsSignatureDate(user, dateTime, out var dateTimeValue) == true)
+                    {
+                        dataTable.InternalCreationInfo = dateTimeValue;
+                    }
                 }
-                foreach (var item in EnumerableUtility.Friends(dataTable, dataTable.Childs))
+                var items = this.version < new Version(4, 0) ? EnumerableUtility.FamilyTree(dataTable, item => item.Childs) : Enumerable.Repeat(dataTable, 1);
+                foreach (var item in items)
                 {
                     var serializableName = item.GetXmlPath(reader.NamespaceURI);
                     var user = serializableName + CremaSchema.ModifierExtension;
                     var dateTime = serializableName + CremaSchema.ModifiedDateTimeExtension;
                     var count = serializableName + CremaSchema.CountExtension;
                     var id = serializableName + CremaSchema.IDExtension;
-                    item.MinimumCapacity = reader.GetAttributeAsInt32(count);
-                    item.InternalContentsInfo = reader.GetAttributeAsModificationInfo(user, dateTime);
-                    item.InternalTableID = reader.GetAttributeAsGuid(id);
+                    if (reader.TryGetAttributeAsInt32(count, out var countValue) == true)
+                    {
+                        item.MinimumCapacity = countValue;
+                    }
+                    if (reader.TryGetAttributeAsSignatureDate(user, dateTime, out var dateTimeValue) == true)
+                    {
+                        item.InternalContentsInfo = dateTimeValue;
+                    }
+                    if (reader.TryGetAttributeAsGuid(id, out var idValue))
+                    {
+                        item.InternalTableID = idValue;
+                    }
                 }
             }
         }
@@ -298,21 +319,21 @@ namespace Ntreev.Crema.Data.Xml
             if (this.itemName != null)
             {
                 var dataTable = this.dataSet.Tables[this.itemName.Name, this.itemName.CategoryPath];
-                dataTable.InternalContentsInfo = reader.GetAttributeAsModificationInfo(CremaSchema.Modifier, CremaSchema.ModifiedDateTime);
+                dataTable.InternalContentsInfo = reader.GetAttributeAsSignatureDate(CremaSchema.Modifier, CremaSchema.ModifiedDateTime);
             }
             else
             {
                 var categoryPath = this.dataSet.GetTableCategoryPath(reader.NamespaceURI);
                 var tableName = this.dataSet.GetTableName(reader.NamespaceURI);
                 var dataTable = this.dataSet.Tables[tableName, categoryPath];
-                dataTable.InternalContentsInfo = reader.GetAttributeAsModificationInfo(CremaSchema.Modifier, CremaSchema.ModifiedDateTime);
+                dataTable.InternalContentsInfo = reader.GetAttributeAsSignatureDate(CremaSchema.Modifier, CremaSchema.ModifiedDateTime);
             }
         }
 
         //[Obsolete("for 2.0")]
         private void ReadModifiedDateTimeVersion2(CremaDataTable dataTable, CremaDataRow dataRow)
         {
-            if (this.version.Major >= CremaSchema.MajorVersion)
+            if (this.version >= new Version(3, 0))
                 return;
 
             var dateTimeValue = dataRow.GetAttribute(CremaSchema.ModifiedDateTime);
@@ -400,7 +421,7 @@ namespace Ntreev.Crema.Data.Xml
             // 태그 조차도 없는것은 null값을 의미 하기 때문
             // <a /> 처럼 기본값이 있는 태그가 존재하면 read할때 한번 호출이 되기 때문에 그때 기본값을 입력하고 지금은 다 초기화 시킴
             // 3.5에서는 이부분을 수정했지만 이하 버전에서는 구분이 되어 있지 않았음.
-            if (this.version.Major >= CremaSchema.MajorVersion && this.version.Minor >= CremaSchema.MinorVersion)
+            if (this.version >= new Version(3, 5))
             {
                 foreach (var item in dataTable.Columns)
                 {
@@ -424,7 +445,7 @@ namespace Ntreev.Crema.Data.Xml
                     {
                         this.ReadValue(reader, dataRow, dataColumn);
                     }
-                    else if (dataTable.Childs.Contains(reader.Name) == true)
+                    else if (this.version < this.version40 && dataTable.Childs.Contains(reader.Name) == true)
                     {
                         if (dataRow.RowState == DataRowState.Detached)
                         {
@@ -470,6 +491,10 @@ namespace Ntreev.Crema.Data.Xml
                 if (columnName == CremaSchema.RelationID)
                 {
                     dataRow.RelationID = reader.Value;
+                }
+                else if (columnName == CremaSchema.ParentID)
+                {
+                    dataRow.ParentID = reader.Value;
                 }
                 else if (columnName != "xmlns")
                 {

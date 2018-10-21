@@ -26,6 +26,9 @@ using Ntreev.Crema.Data.Xml;
 using Ntreev.Crema.Data.Random;
 using Ntreev.Library.Random;
 using Ntreev.Crema.Data.Xml.Schema;
+using Ntreev.Library.IO;
+using System.Threading;
+using Ntreev.Library;
 
 namespace Ntreev.Crema.Data.Test
 {
@@ -518,6 +521,132 @@ namespace Ntreev.Crema.Data.Test
             childTable2.ImportRow(childRow1);
         }
 
+        [TestMethod]
+        public void RemoveChildTest()
+        {
+            var dataSet = new CremaDataSet();
+            var dataTable = dataSet.Tables.Add();
+            var derivedTable = dataTable.Inherit();
+
+            var childTable = dataTable.Childs.Add();
+            var derivedChildTable = derivedTable.Childs[childTable.TableName];
+
+            dataSet.Tables.Remove(childTable);
+
+            Assert.IsNull(childTable.DataSet);
+            Assert.IsNull(derivedChildTable.DataSet);
+        }
+
+        [TestMethod]
+        public void CanRemoveChildTest()
+        {
+            var dataSet = new CremaDataSet();
+            var dataTable = dataSet.Tables.Add();
+            var derivedTable = dataTable.Inherit();
+
+            var childTable = dataTable.Childs.Add();
+            var derivedChildTable = derivedTable.Childs[childTable.TableName];
+
+            var canRemove = dataSet.Tables.CanRemove(childTable);
+
+            Assert.IsTrue(canRemove);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(CremaDataException))]
+        public void RemoveDerivedChildTest_Fail()
+        {
+            var dataSet = new CremaDataSet();
+            var dataTable = dataSet.Tables.Add();
+            var derivedTable = dataTable.Inherit();
+
+            var childTable = dataTable.Childs.Add();
+            var derivedChildTable = derivedTable.Childs[childTable.TableName];
+
+            dataSet.Tables.Remove(derivedChildTable);
+        }
+
+        [TestMethod]
+        public void CanRemoveDerivedChildTest()
+        {
+            var dataSet = new CremaDataSet();
+            var dataTable = dataSet.Tables.Add();
+            var derivedTable = dataTable.Inherit();
+
+            var childTable = dataTable.Childs.Add();
+            var derivedChildTable = derivedTable.Childs[childTable.TableName];
+
+            var canRemove = dataSet.Tables.CanRemove(derivedChildTable);
+
+            Assert.IsFalse(canRemove);
+        }
+
+        [TestMethod]
+        public void RemoveChildWithoutParentTest()
+        {
+            var dataSet = new CremaDataSet();
+            var dataTable = dataSet.Tables.Add();
+            var derivedTable = dataTable.Inherit();
+
+            var childTable = dataTable.Childs.Add();
+            var derivedChildTable = derivedTable.Childs[childTable.TableName];
+
+            var tempPath = PathUtility.GetTempPath(true);
+
+            try
+            {
+                dataSet.WriteToDirectory(tempPath);
+
+                var dataSet2 = new CremaDataSet();
+                dataSet2.ReadTable(Path.Combine(tempPath, CremaSchema.TableDirectory, childTable.Name + CremaSchema.XmlExtension));
+                dataSet2.ReadTable(Path.Combine(tempPath, CremaSchema.TableDirectory, derivedChildTable.Name + CremaSchema.XmlExtension));
+
+                var childTable2 = dataSet2.Tables[childTable.Name];
+                var derivedChildTable2 = dataSet2.Tables[derivedChildTable.Name];
+
+                dataSet2.Tables.Remove(childTable2);
+
+                Assert.IsNull(childTable2.DataSet);
+                Assert.IsNull(derivedChildTable2.DataSet);
+            }
+            finally
+            {
+                DirectoryUtility.Delete(tempPath);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(CremaDataException))]
+        public void RemoveChildWithoutParentTest_Fail()
+        {
+            var dataSet = new CremaDataSet();
+            var dataTable = dataSet.Tables.Add();
+            var derivedTable = dataTable.Inherit();
+
+            var childTable = dataTable.Childs.Add();
+            var derivedChildTable = derivedTable.Childs[childTable.TableName];
+
+            var tempPath = PathUtility.GetTempPath(true);
+
+            try
+            {
+                dataSet.WriteToDirectory(tempPath);
+
+                var dataSet2 = new CremaDataSet();
+                dataSet2.ReadTable(Path.Combine(tempPath, CremaSchema.TableDirectory, childTable.Name + CremaSchema.XmlExtension));
+                dataSet2.ReadTable(Path.Combine(tempPath, CremaSchema.TableDirectory, derivedChildTable.Name + CremaSchema.XmlExtension));
+
+                var childTable2 = dataSet2.Tables[childTable.Name];
+                var derivedChildTable2 = dataSet2.Tables[derivedChildTable.Name];
+
+                dataSet2.Tables.Remove(derivedChildTable2);
+            }
+            finally
+            {
+                DirectoryUtility.Delete(tempPath);
+            }
+        }
+
         // 키 해제시 관계값을 갱신하는데 assert 형태로 코딩되어 있는 부분이 호출되지 않도록 처리함.
         // if (this.RowState != DataRowState.Detached)
         //     throw new InvalidOperationException();
@@ -546,6 +675,162 @@ namespace Ntreev.Crema.Data.Test
             var r3 = dataTable.AddRow("3", "1", "3");
 
             c3.IsKey = false;
+        }
+
+        [TestMethod]
+        public void CreateChildOfChild()
+        {
+            var dataSet = new CremaDataSet();
+            var dataTable = dataSet.Tables.Add();
+            var childTable = dataTable.Childs.Add();
+            var ct = childTable.Childs.Add();
+        }
+
+        [TestMethod]
+        public void InheritChildOfChild()
+        {
+            var dataSet = new CremaDataSet();
+            var dataTable1 = dataSet.Tables.Add();
+            var dataTable2 = dataTable1.Childs.Add();
+            var dataTable3 = dataTable2.Childs.Add();
+
+            var derivedTable1 = dataTable1.Inherit();
+            var derivedTable2 = derivedTable1.Childs.First();
+            var derivedTable3 = derivedTable2.Childs.First();
+
+            Thread.Sleep(1000);
+
+            Assert.AreNotEqual(dataTable1.TableName, derivedTable1.TableName);
+            Assert.AreEqual(dataTable2.TableName, derivedTable2.TableName);
+            Assert.AreEqual(dataTable3.TableName, derivedTable3.TableName);
+
+            Assert.AreEqual(dataTable1.Name, derivedTable1.TemplatedParentName);
+            Assert.AreEqual(dataTable2.Name, derivedTable2.TemplatedParentName);
+            Assert.AreEqual(dataTable3.Name, derivedTable3.TemplatedParentName);
+
+            Assert.AreNotEqual(dataTable1.TableID, derivedTable1.TableID);
+            Assert.AreNotEqual(dataTable2.TableID, derivedTable2.TableID);
+            Assert.AreNotEqual(dataTable3.TableID, derivedTable3.TableID);
+
+            Assert.AreNotEqual(dataTable1.CreationInfo, derivedTable1.CreationInfo);
+            Assert.AreEqual(dataTable2.CreationInfo, derivedTable2.CreationInfo);
+            Assert.AreEqual(dataTable3.CreationInfo, derivedTable3.CreationInfo);
+        }
+
+        [TestMethod]
+        public void InheritChildOfChild2()
+        {
+            var dataSet = new CremaDataSet();
+            var dataTable1 = dataSet.Tables.Add();
+            var dataTable2 = dataTable1.Childs.Add();
+            var dataTable3 = dataTable2.Childs.Add();
+
+            Thread.Sleep(1000);
+
+            var derivedTable1 = dataTable1.Inherit();
+            var derivedTable2 = derivedTable1.Childs.First();
+            var derivedTable3 = derivedTable2.Childs.First();
+
+            var identifier2 = RandomUtility.NextIdentifier();
+            var identifier3 = RandomUtility.NextIdentifier();
+
+            if (identifier2 == identifier3)
+                return;
+
+            dataTable2.TableName = identifier2;
+            dataTable3.TableName = identifier3;
+
+            Assert.AreNotEqual(dataTable1.TableName, derivedTable1.TableName);
+            Assert.AreEqual(dataTable2.TableName, derivedTable2.TableName);
+            Assert.AreEqual(dataTable3.TableName, derivedTable3.TableName);
+
+            Assert.AreEqual(dataTable1.Name, derivedTable1.TemplatedParentName);
+            Assert.AreEqual(dataTable2.Name, derivedTable2.TemplatedParentName);
+            Assert.AreEqual(dataTable3.Name, derivedTable3.TemplatedParentName);
+        }
+
+        [TestMethod]
+        public void CopyChildOfChild()
+        {
+            var dataSet = new CremaDataSet();
+            var dataTable1 = dataSet.Tables.Add();
+            var dataTable2 = dataTable1.Childs.Add();
+            var dataTable3 = dataTable2.Childs.Add();
+
+            Thread.Sleep(1000);
+
+            var copiedTable1 = dataTable1.Copy();
+            var copiedTable2 = copiedTable1.Childs.First();
+            var copiedTable3 = copiedTable2.Childs.First();
+
+            Assert.AreNotEqual(dataTable1.TableName, copiedTable1.TableName);
+            Assert.AreEqual(dataTable2.TableName, copiedTable2.TableName);
+            Assert.AreEqual(dataTable3.TableName, copiedTable3.TableName);
+
+            Assert.AreEqual(copiedTable1.TemplatedParentName, string.Empty);
+            Assert.AreEqual(copiedTable2.TemplatedParentName, string.Empty);
+            Assert.AreEqual(copiedTable3.TemplatedParentName, string.Empty);
+
+            Assert.AreNotEqual(dataTable1.TableID, copiedTable1.TableID);
+            Assert.AreNotEqual(dataTable2.TableID, copiedTable2.TableID);
+            Assert.AreNotEqual(dataTable3.TableID, copiedTable3.TableID);
+
+            Assert.AreNotEqual(dataTable1.CreationInfo, copiedTable1.CreationInfo);
+            Assert.AreNotEqual(dataTable2.CreationInfo, copiedTable2.CreationInfo);
+            Assert.AreNotEqual(dataTable3.CreationInfo, copiedTable3.CreationInfo);
+        }
+
+        [TestMethod]
+        public void CopyChildTable()
+        {
+            var dataSet = new CremaDataSet();
+            var dataTable = dataSet.Tables.Add();
+            var childTable1 = dataTable.Childs.Add();
+            var derivedTable = dataTable.Inherit();
+            derivedTable.CategoryPath = RandomUtility.NextCategoryPath();
+            var childTable2 = childTable1.Copy();
+
+            var derivedChild1 = derivedTable.Childs[childTable1.TableName];
+            var derivedChild2 = derivedTable.Childs[childTable2.TableName];
+
+            Assert.AreEqual(derivedTable.CategoryPath, derivedChild1.CategoryPath);
+            Assert.AreEqual(derivedTable.CategoryPath, derivedChild2.CategoryPath);
+
+            Assert.AreEqual(dataTable.Childs.Count, derivedTable.Childs.Count);
+
+            Assert.AreEqual(childTable1.TableName, derivedChild1.TableName);
+            Assert.AreEqual(childTable2.TableName, derivedChild2.TableName);
+
+            Assert.AreEqual(childTable1.Name, derivedChild1.TemplatedParentName);
+            Assert.AreEqual(childTable2.Name, derivedChild2.TemplatedParentName);
+        }
+
+        [TestMethod]
+        public void SignatureDateTest()
+        {
+            var dataSet = new CremaDataSet();
+            var identifier = RandomUtility.NextIdentifier();
+            dataSet.SignatureDateProvider = new SignatureDateProvider(identifier);
+            var table1 = dataSet.Tables.Add();
+            var derived1 = table1.Inherit();
+            var child1 = table1.Childs.Add();
+            var child2 = derived1.Childs[child1.TableName];
+            var cc1 = child1.Childs.Add();
+            var cc2 = child1.Childs[cc1.TableName];
+
+            Assert.AreEqual(table1.CreationInfo.ID, identifier);
+            Assert.AreEqual(derived1.CreationInfo.ID, identifier);
+            Assert.AreEqual(child1.CreationInfo.ID, identifier);
+            Assert.AreEqual(child2.CreationInfo.ID, identifier);
+            Assert.AreEqual(cc1.CreationInfo.ID, identifier);
+            Assert.AreEqual(cc2.CreationInfo.ID, identifier);
+
+            Assert.AreNotEqual(table1.CreationInfo.DateTime, DateTime.MinValue);
+            Assert.AreNotEqual(derived1.CreationInfo.DateTime, DateTime.MinValue);
+            Assert.AreNotEqual(child1.CreationInfo.DateTime, DateTime.MinValue);
+            Assert.AreNotEqual(child2.CreationInfo.DateTime, DateTime.MinValue);
+            Assert.AreNotEqual(cc1.CreationInfo.DateTime, DateTime.MinValue);
+            Assert.AreNotEqual(cc2.CreationInfo.DateTime, DateTime.MinValue);
         }
     }
 }

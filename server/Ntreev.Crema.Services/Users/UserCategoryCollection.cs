@@ -15,21 +15,20 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Ntreev.Crema.ServiceModel;
-using System.IO;
-using System.Xml.Serialization;
+using Ntreev.Crema.Services.Users.Serializations;
+using Ntreev.Library;
+using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Services;
-using System.Collections;
 using Ntreev.Library.Serialization;
-using System.Text.RegularExpressions;
-using Ntreev.Crema.Services.Properties;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
-using Ntreev.Crema.Data.Xml.Schema;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users
 {
@@ -46,241 +45,175 @@ namespace Ntreev.Crema.Services.Users
 
         }
 
-        public UserCategory AddNew(Authentication authentication, string name, string parentPath)
+        public async Task<UserCategory> AddNewAsync(Authentication authentication, string name, string parentPath)
         {
-            this.ValidateAddNew(authentication, name, parentPath);
-            this.InvokeCategoryCreate(authentication, name, parentPath);
-            var category = this.BaseAddNew(name, parentPath, authentication);
-            authentication.Sign();
-            this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
-            return category;
-        }
-
-        public void InvokeCategoryCreate(Authentication authentication, string name, string parentPath)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeCategoryCreate), name, parentPath);
-
             try
             {
-                var categories = from UserCategory item in this.Context.Categories
-                                 where item != this.Root
-                                 select item.Path;
-
-                var categoryList = categories.ToList();
-                categoryList.Add(new CategoryName(parentPath, name));
-
-                var users = from User item in this.Context.Users
-                            select item.SerializationInfo;
-
-                var serializationInfo = new UserContextSerializationInfo()
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    Version = CremaSchema.VersionValue,
-                    Categories = categoryList.OrderBy(item => item).ToArray(),
-                    Users = users.ToArray(),
-                };
-
-                var xml = DataContractSerializerUtility.GetString(serializationInfo, true);
-                this.Repository.Modify(this.Context.UserFilePath, xml);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);
+                    this.ValidateAddNew(authentication, name, parentPath);
+                });
+                await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication);
+                    var category = this.BaseAddNew(name, parentPath, authentication);
+                    this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
+                    return category;
+                });
             }
             catch (Exception e)
             {
                 this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
+                throw;
             }
+        }
+
+        public Task InvokeCategoryCreateAsync(Authentication authentication, string name, string parentPath)
+        {
+            var categoryName = new CategoryName(parentPath, name);
+            var itemPath = this.Context.GenerateCategoryPath(parentPath, name);
+            var message = EventMessageBuilder.CreateUserCategory(authentication, categoryName);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    this.Repository.CreateCategory(authentication, itemPath);
+                    this.Repository.Commit(authentication, message);
+                }
+                catch
+                {
+                    DirectoryUtility.Delete(itemPath);
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
+        }
+
+        public Task<SignatureDate> InvokeCategoryRenameAsync(Authentication authentication, string categoryPath, string name, UserSerializationInfo[] userInfos)
+        {
+            var newCategoryName = new CategoryName(categoryPath) { Name = name, };
+            var message = EventMessageBuilder.RenameUserCategory(authentication, categoryPath, name);
+            var query = from User item in this.Context.Users
+                        where item.Category.Path.StartsWith(categoryPath)
+                        select item.SerializationInfo;
+            var users = query.ToArray();
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.RenameCategory(authentication, users, categoryPath, newCategoryName);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
+        }
+
+        public Task<SignatureDate> InvokeCategoryMoveAsync(Authentication authentication, string categoryPath, string parentPath, UserSerializationInfo[] userInfos)
+        {
+            var categoryName = new CategoryName(categoryPath);
+            var newCategoryName = new CategoryName(parentPath, categoryName.Name);
+            var message = EventMessageBuilder.MoveUserCategory(authentication, categoryPath, categoryName.ParentPath, parentPath);
+            var query = from User item in this.Context.Users
+                        where item.Category.Path.StartsWith(categoryPath)
+                        select item.SerializationInfo;
+            var users = query.ToArray();
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.MoveCategory(authentication, users, categoryPath, newCategoryName);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
+        }
+
+        public Task<SignatureDate> InvokeCategoryDeleteAsync(Authentication authentication, string categoryPath)
+        {
+            var message = EventMessageBuilder.DeleteUserCategory(authentication, categoryPath);
+            var itemPath = this.Context.GeneratePath(categoryPath);
+            return this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                try
+                {
+                    var signatureDate = authentication.Sign();
+                    this.Repository.Delete(itemPath);
+                    this.Repository.Commit(authentication, message);
+                    return signatureDate;
+                }
+                catch
+                {
+                    this.Repository.Revert();
+                    throw;
+                }
+            });
         }
 
         public void InvokeCategoriesCreatedEvent(Authentication authentication, UserCategory[] categories)
         {
             var args = categories.Select(item => (object)null).ToArray();
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesCreatedEvent), categories);
-            var comment = EventMessageBuilder.CreateUserCategory(authentication, categories);
+            var message = EventMessageBuilder.CreateUserCategory(authentication, categories);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnCategoriesCreated(new ItemsCreatedEventArgs<IUserCategory>(authentication, categories, args));
             this.Context.InvokeItemsCreatedEvent(authentication, categories, args);
-        }
-
-        public void InvokeCategoryRename(Authentication authentication, UserCategory category, string name)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeCategoryRename), category, name);
-
-            try
-            {
-                var categoryPath = (string)new CategoryName(category.Parent.Path, name);
-
-                var categories = from UserCategory item in this.Context.Categories
-                                 where item != this.Root
-                                 select item.Path;
-
-                var users = from User item in this.Context.Users
-                            select item.SerializationInfo;
-
-                var categoryArray = categories.ToArray();
-                var userArray = users.ToArray();
-
-                for (var i = 0; i < categoryArray.Length; i++)
-                {
-                    categoryArray[i] = Regex.Replace(categoryArray[i], "^" + category.Path, categoryPath);
-                }
-
-                for (var i = 0; i < userArray.Length; i++)
-                {
-                    userArray[i].CategoryPath = Regex.Replace(userArray[i].CategoryPath, "^" + category.Path, categoryPath);
-                }
-
-                var serializationInfo = new UserContextSerializationInfo()
-                {
-                    Version = CremaSchema.VersionValue,
-                    Categories = categoryArray,
-                    Users = userArray,
-                };
-
-                var xml = DataContractSerializerUtility.GetString(serializationInfo, true);
-                this.Repository.Modify(this.Context.UserFilePath, xml);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
         }
 
         public void InvokeCategoriesRenamedEvent(Authentication authentication, UserCategory[] categories, string[] oldNames, string[] oldPaths)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesRenamedEvent), categories, oldNames, oldPaths);
-            var comment = EventMessageBuilder.RenameUserCategory(authentication, categories, oldNames);
+            var message = EventMessageBuilder.RenameUserCategory(authentication, categories, oldPaths);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnCategoriesRenamed(new ItemsRenamedEventArgs<IUserCategory>(authentication, categories, oldNames, oldPaths));
             this.Context.InvokeItemsRenamedEvent(authentication, categories, oldNames, oldPaths);
-        }
-
-        public void InvokeCategoryMove(Authentication authentication, UserCategory category, string parentPath)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeCategoryMove), category, parentPath);
-
-            try
-            {
-                var categoryPath = (string)new CategoryName(parentPath, category.Name);
-
-                var categories = from UserCategory item in this.Context.Categories
-                                 where item != this.Root
-                                 select item.Path;
-
-                var users = from User item in this.Context.Users
-                            select item.SerializationInfo;
-
-                var categoryArray = categories.ToArray();
-                var userArray = users.ToArray();
-
-                for (var i = 0; i < categoryArray.Length; i++)
-                {
-                    categoryArray[i] = Regex.Replace(categoryArray[i], "^" + category.Path, categoryPath);
-                }
-
-                for (var i = 0; i < userArray.Length; i++)
-                {
-                    userArray[i].CategoryPath = Regex.Replace(userArray[i].CategoryPath, "^" + category.Path, categoryPath);
-                }
-
-                var serializationInfo = new UserContextSerializationInfo()
-                {
-                    Version = CremaSchema.VersionValue,
-                    Categories = categoryArray,
-                    Users = userArray,
-                };
-
-                var xml = DataContractSerializerUtility.GetString(serializationInfo, true);
-                this.Repository.Modify(this.Context.UserFilePath, xml);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
         }
 
         public void InvokeCategoriesMovedEvent(Authentication authentication, UserCategory[] categories, string[] oldPaths, string[] oldParentPaths)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesMovedEvent), categories, oldPaths, oldParentPaths);
-            var comment = EventMessageBuilder.MoveUserCategory(authentication, categories, oldParentPaths);
+            var message = EventMessageBuilder.MoveUserCategory(authentication, categories, oldPaths, oldParentPaths);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnCategoriesMoved(new ItemsMovedEventArgs<IUserCategory>(authentication, categories, oldPaths, oldParentPaths));
             this.Context.InvokeItemsMovedEvent(authentication, categories, oldPaths, oldParentPaths);
-        }
-
-        public void InvokeCategoryDelete(Authentication authentication, UserCategory category)
-        {
-            this.CremaHost.DebugMethod(authentication, this, nameof(InvokeCategoryDelete), category);
-
-            try
-            {
-                var categories = from UserCategory item in this.Context.Categories
-                                 where item != this.Root || item.Path.StartsWith(category.Path) == false
-                                 select item.Path;
-
-                var users = from User item in this.Context.Users
-                            select item.SerializationInfo;
-
-                var serializationInfo = new UserContextSerializationInfo()
-                {
-                    Version = CremaSchema.VersionValue,
-                    Categories = categories.ToArray(),
-                    Users = users.ToArray(),
-                };
-
-                var xml = DataContractSerializerUtility.GetString(serializationInfo, true);
-                this.Repository.Modify(this.Context.UserFilePath, xml);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                this.Repository.Revert();
-                throw e;
-            }
         }
 
         public void InvokeCategoriesDeletedEvent(Authentication authentication, UserCategory[] categories, string[] categoryPaths)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesDeletedEvent), categoryPaths);
-            var comment = EventMessageBuilder.DeleteUserCategory(authentication, categories);
+            var message = EventMessageBuilder.DeleteUserCategory(authentication, categories);
             this.CremaHost.Debug(eventLog);
-            this.Repository.Commit(authentication, comment, eventLog);
-            this.CremaHost.Info(comment);
+            this.CremaHost.Info(message);
             this.OnCategoriesDeleted(new ItemsDeletedEventArgs<IUserCategory>(authentication, categories, categoryPaths));
             this.Context.InvokeItemsDeleteEvent(authentication, categories, categoryPaths);
         }
 
-        public RepositoryHost Repository
-        {
-            get { return this.Context.Repository; }
-        }
+        public UserRepositoryHost Repository => this.Context.Repository;
 
-        public CremaHost CremaHost
-        {
-            get { return this.Context.CremaHost; }
-        }
+        public CremaHost CremaHost => this.Context.CremaHost;
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.Context.Dispatcher; }
-        }
+        public CremaDispatcher Dispatcher => this.Context.Dispatcher;
 
-        public new int Count
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return base.Count;
-            }
-        }
+        public IObjectSerializer Serializer => this.Context.Serializer;
+
+        public new int Count => base.Count;
 
         public event ItemsCreatedEventHandler<IUserCategory> CategoriesCreated
         {
@@ -384,27 +317,12 @@ namespace Ntreev.Crema.Services.Users
 
         bool IUserCategoryCollection.Contains(string categoryPath)
         {
-            this.Dispatcher.VerifyAccess();
             return this.Contains(categoryPath);
         }
 
-        IUserCategory IUserCategoryCollection.Root
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this.Root;
-            }
-        }
+        IUserCategory IUserCategoryCollection.Root => this.Root;
 
-        IUserCategory IUserCategoryCollection.this[string categoryPath]
-        {
-            get
-            {
-                this.Dispatcher.VerifyAccess();
-                return this[categoryPath];
-            }
-        }
+        IUserCategory IUserCategoryCollection.this[string categoryPath] => this[categoryPath];
 
         #endregion
 
@@ -412,13 +330,11 @@ namespace Ntreev.Crema.Services.Users
 
         IEnumerator<IUserCategory> IEnumerable<IUserCategory>.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            this.Dispatcher.VerifyAccess();
             return this.GetEnumerator();
         }
 

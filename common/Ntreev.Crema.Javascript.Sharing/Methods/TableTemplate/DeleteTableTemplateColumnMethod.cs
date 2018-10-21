@@ -46,13 +46,11 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
         {
             var template = this.GetDomainHost<ITableTemplate>(domainID);
             var authentication = this.Context.GetAuthentication(this);
-            template.Dispatcher.Invoke(() =>
-            {
-                var member = template[columnName];
-                if (member == null)
-                    throw new ItemNotFoundException(columnName);
-                member.Delete(authentication);
-            });
+            var member = template[columnName];
+            if (member == null)
+                throw new ItemNotFoundException(columnName);
+            var task = member.DeleteAsync(authentication);
+            task.Wait();
         }
     }
 }

@@ -111,7 +111,7 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
-        public virtual bool IsBeingEdited
+        public bool IsBeingEdited
         {
             get { return this.typeState.HasFlag(TypeState.IsBeingEdited); }
             set

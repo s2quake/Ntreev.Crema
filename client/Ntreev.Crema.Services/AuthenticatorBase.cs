@@ -19,11 +19,7 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
@@ -35,7 +31,7 @@ namespace Ntreev.Crema.Services
 
         protected AuthenticatorBase()
         {
-            if (this.GetType().Attributes.HasFlag(TypeAttributes.Public) == true)
+            if (this.GetType().IsPublic == true || this.GetType().IsNestedPublic == true)
                 throw new InvalidOperationException(Resources.Exception_NotAllowedAsPublic);
             this.name = this.GetType().Assembly.FullName;
             this.pluginID = GuidUtility.FromName(name);

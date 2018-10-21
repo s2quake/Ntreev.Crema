@@ -51,7 +51,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authenticator.cs" />
@@ -88,9 +87,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\licenses\Newtonsoft.Json.Schema.license">
-      <Link>Licenses\Newtonsoft.Json.Schema.license</Link>
-    </EmbeddedResource>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -99,11 +95,11 @@
       <Project>{6478450a-dfa5-445d-890f-bc5f57c9a148}</Project>
       <Name>Ntreev.Crema.ServiceModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\sub-modules\Ntreev.Library.Commands\Ntreev.Library.Commands\Ntreev.Library.Commands.csproj">
+    <ProjectReference Include="..\..\sub-modules\Ntreev.Library.Commands\Ntreev.Library.Commands.Net45\Ntreev.Library.Commands.csproj">
       <Project>{ceb280c0-463f-4e09-a00c-ce3a8326f6ff}</Project>
       <Name>Ntreev.Library.Commands</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj">
+    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library.Net45\Ntreev.Library.csproj">
       <Project>{1918437f-4fbf-4731-ac5b-981a4a4cb1f1}</Project>
       <Name>Ntreev.Library</Name>
     </ProjectReference>

@@ -100,13 +100,13 @@ namespace Ntreev.Crema.Services.Test.DispatcherTest
         [TestMethod]
         public void Preview()
         {
-            category.GetDataSet(authentication, -1);
+            category.GetDataSet(authentication, null);
         }
 
         [TestMethod]
         public void GetLog()
         {
-            category.GetLog(authentication);
+            category.GetLog(authentication, null);
         }
 
         [TestMethod]
