@@ -51,7 +51,7 @@ namespace Ntreev.Crema.ServiceHosts
             this.logService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(ICremaServiceItem.CloseAsync)}");
         }
 
-        protected void InvokeEvent(string userID, string exceptionUserID, Action action)
+        protected void InvokeEvent(string userID, string exceptionUserID, Action action, string name = null)
         {
             if (userID != null && userID == exceptionUserID)
                 return;
@@ -61,25 +61,13 @@ namespace Ntreev.Crema.ServiceHosts
                 try
                 {
                     action();
+                    if (name != null)
+                        System.Diagnostics.Trace.WriteLine(name);
                 }
                 catch (Exception e)
                 {
                     this.logService.Error(e);
                 }
-
-                //if (this.sessionID == null || (userID != null && userID == exceptionUserID))
-                //    return;
-                //if (this.Channel != null)
-                //{
-                //    try
-                //    {
-                //        action();
-                //    }
-                //    catch (Exception e)
-                //    {
-                //        this.logService.Error(e);
-                //    }
-                //}
             });
         }
 

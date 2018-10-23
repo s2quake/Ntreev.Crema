@@ -25,21 +25,6 @@ var RandomUtility = /** @class */ (function () {
     RandomUtility.Within = function (percent) {
         return percent >= RandomUtility.next(100);
     };
-    // boolean
-    // string
-    // single
-    // double
-    // int8
-    // uint8
-    // int16
-    // uint16
-    // int32
-    // uint32
-    // int64
-    // uint64
-    // datetime
-    // duration
-    // guid
     RandomUtility.nextBoolean = function () {
         return RandomUtility.next(2) === 0;
     };
@@ -51,7 +36,7 @@ var RandomUtility = /** @class */ (function () {
         }
         return list.join(" ");
     };
-    RandomUtility.nextSingle = function () {
+    RandomUtility.nextFloat = function () {
         var minValue = -3.40282347E+38;
         var maxValue = 3.40282347E+38;
         return Math.random() * (maxValue - minValue) + minValue;
@@ -119,8 +104,8 @@ var RandomUtility = /** @class */ (function () {
                 return RandomUtility.nextBoolean();
             case "string":
                 return RandomUtility.nextString();
-            case "single":
-                return RandomUtility.nextSingle();
+            case "float":
+                return RandomUtility.nextFloat();
             case "double":
                 return RandomUtility.nextDouble();
             case "int8":
@@ -146,7 +131,7 @@ var RandomUtility = /** @class */ (function () {
             case "guid":
                 return RandomUtility.nextGuid();
             default:
-                throw "not implementaion";
+                throw "not implemented.";
         }
     };
     return RandomUtility;

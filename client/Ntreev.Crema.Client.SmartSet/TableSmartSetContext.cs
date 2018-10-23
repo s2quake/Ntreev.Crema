@@ -39,6 +39,7 @@ using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.Crema.Client.SmartSet.BrowserItems.ViewModels;
 using Ntreev.Crema.Client.Tables.BrowserItems.ViewModels;
 using Ntreev.Library.IO;
+using Dispatcher = System.Windows.Threading.Dispatcher;
 
 namespace Ntreev.Crema.Client.SmartSet
 {

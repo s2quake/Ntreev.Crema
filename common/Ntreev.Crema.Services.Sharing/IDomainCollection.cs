@@ -32,9 +32,9 @@ namespace Ntreev.Crema.Services
 
         Task<DomainMetaData[]> GetMetaDataAsync(Authentication authentication);
 
-        event EventHandler<DomainEventArgs> DomainCreated;
+        event EventHandler<DomainsCreatedEventArgs> DomainsCreated;
 
-        event EventHandler<DomainDeletedEventArgs> DomainDeleted;
+        event EventHandler<DomainsDeletedEventArgs> DomainsDeleted;
 
         event EventHandler<DomainEventArgs> DomainInfoChanged;
 

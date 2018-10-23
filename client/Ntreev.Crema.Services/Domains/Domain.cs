@@ -72,7 +72,7 @@ namespace Ntreev.Crema.Services.Domains
                         this.CremaHost.Sign(authentication, result);
                         this.Dispose();
                         this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled, result.GetValue()));
-                        container.InvokeDomainDeletedEvent(authentication, this, isCanceled, result.GetValue());
+                        container.InvokeDomainDeletedEvent(authentication, new Domain[] { this }, new bool[] { isCanceled }, new object[] { result.GetValue() });
                     });
                     return null;
                 }
@@ -401,6 +401,10 @@ namespace Ntreev.Crema.Services.Domains
             else
             {
                 this.OnInitialize(metaData);
+                if(this.DataDispatcher != null)
+                {
+                    int qwer = 0;
+                }
                 this.DataDispatcher = new CremaDispatcher(this);
                 this.initialized = true;
                 foreach (var item in metaData.Users)

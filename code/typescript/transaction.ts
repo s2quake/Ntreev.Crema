@@ -1,7 +1,7 @@
 /// <reference path="./crema.d.ts" />
 
 let dataBaseName: string = "master";
-let token: string = login("admin", "admin");
+let token: string = login("localhost", "admin1", "admin");
 
 if (isDataBaseLoaded(dataBaseName) === false) {
     loadDataBase(dataBaseName);

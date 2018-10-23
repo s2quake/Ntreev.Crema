@@ -99,6 +99,24 @@ namespace Ntreev.Crema.Services.Data
             return this.Dispatcher.InvokeAsync(() => this.Unlock(itemPaths));
         }
 
+        public Task BeginTransactionAsync(string author, string name)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                this.BeginTransaction(author, name);
+            });
+        }
+
+        public Task EndTransactionAsync()
+        {
+            return this.Dispatcher.InvokeAsync(this.EndTransaction);
+        }
+
+        public Task CancelTransactionAsync()
+        {
+            return this.Dispatcher.InvokeAsync(this.CancelTransaction);
+        }
+
         public void RefreshItems()
         {
             var typeDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);

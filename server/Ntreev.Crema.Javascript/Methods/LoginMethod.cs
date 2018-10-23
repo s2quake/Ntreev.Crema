@@ -41,7 +41,9 @@ namespace Ntreev.Crema.Javascript.Methods
         {
             if (this.Context is ScriptMethodContext context)
             {
-                var token = context.Login(userID, password);
+                var task = context.LoginAsync(userID, password);
+                task.Wait();
+                var token = task.Result;
                 context.Properties[ScriptMethodContext.LoginKey] = true;
                 return token;
             }

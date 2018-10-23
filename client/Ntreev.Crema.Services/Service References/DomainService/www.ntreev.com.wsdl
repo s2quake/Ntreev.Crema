@@ -96,11 +96,11 @@
   <wsdl:message name="IDomainService_OnServiceClosed_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnServiceClosed" />
   </wsdl:message>
-  <wsdl:message name="IDomainService_OnDomainCreated_OutputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:OnDomainCreated" />
+  <wsdl:message name="IDomainService_OnDomainsCreated_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnDomainsCreated" />
   </wsdl:message>
-  <wsdl:message name="IDomainService_OnDomainDeleted_OutputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:OnDomainDeleted" />
+  <wsdl:message name="IDomainService_OnDomainsDeleted_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnDomainsDeleted" />
   </wsdl:message>
   <wsdl:message name="IDomainService_OnDomainInfoChanged_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnDomainInfoChanged" />
@@ -189,11 +189,11 @@
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnServiceClosed">
       <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnServiceClosed" message="tns:IDomainService_OnServiceClosed_OutputCallbackMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnDomainCreated">
-      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnDomainCreated" message="tns:IDomainService_OnDomainCreated_OutputCallbackMessage" />
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnDomainsCreated">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnDomainsCreated" message="tns:IDomainService_OnDomainsCreated_OutputCallbackMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnDomainDeleted">
-      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnDomainDeleted" message="tns:IDomainService_OnDomainDeleted_OutputCallbackMessage" />
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnDomainsDeleted">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnDomainsDeleted" message="tns:IDomainService_OnDomainsDeleted_OutputCallbackMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnDomainInfoChanged">
       <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnDomainInfoChanged" message="tns:IDomainService_OnDomainInfoChanged_OutputCallbackMessage" />

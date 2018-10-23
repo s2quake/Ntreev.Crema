@@ -935,22 +935,23 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseCollectionServiceCallback.OnDataBasesReset(SignatureDate signatureDate, string[] dataBaseNames, DomainMetaData[] metaDatas)
+        void IDataBaseCollectionServiceCallback.OnDataBasesReset(SignatureDate signatureDate, string[] dataBaseNames, DataBaseMetaData[] metaDatas)
         {
             try
             {
-                var authentication = await this.UserContext.AuthenticateAsync(signatureDate);
+                var authentication = this.UserContext.Authenticate(signatureDate);
                 var dataBases = new DataBase[dataBaseNames.Length];
-                await this.Dispatcher.InvokeAsync(() =>
+                this.Dispatcher.Invoke(() =>
                 {
                     for (var i = 0; i < dataBaseNames.Length; i++)
                     {
                         var dataBaseName = dataBaseNames[i];
+                        var metaData = metaDatas[i];
                         var dataBase = this[dataBaseName];
                         dataBases[i] = dataBase;
-                        dataBase.SetReset(authentication, metaDatas);
+                        dataBase.SetReset(authentication, metaData);
                     }
-                    this.InvokeItemsResetEvent(authentication, dataBases);
+                    //this.InvokeItemsResetEvent(authentication, dataBases, metaData);
                 });
             }
             catch (Exception e)

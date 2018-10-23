@@ -122,8 +122,8 @@ namespace Ntreev.Crema.Client.Base.PropertyItems.ViewModels
             {
                 var items = await domainCollection.Dispatcher.InvokeAsync(() =>
                 {
-                    domainCollection.DomainCreated += Domains_DomainCreated;
-                    domainCollection.DomainDeleted += Domains_DomainDeleted;
+                    domainCollection.DomainsCreated += Domains_DomainsCreated;
+                    domainCollection.DomainsDeleted += Domains_DomainsDeleted;
                     var domains = domainCollection.ToArray();
                     var itemList = new List<DomainListItemBase>(domains.Length);
                     foreach (var item in domains)
@@ -146,36 +146,41 @@ namespace Ntreev.Crema.Client.Base.PropertyItems.ViewModels
 
         }
 
-        private void Domains_DomainDeleted(object sender, DomainDeletedEventArgs e)
+        private void Domains_DomainsDeleted(object sender, DomainsDeletedEventArgs e)
         {
-            var domainInfo = e.DomainInfo;
             this.Dispatcher.InvokeAsync(() =>
             {
-                for (var i = 0; i < this.domains.Count; i++)
+                foreach (var item in e.DomainInfos)
                 {
-                    if (this.domains[i].DomainID == domainInfo.DomainID)
+                    for (var i = 0; i < this.domains.Count; i++)
                     {
-                        this.domains.RemoveAt(i);
-                        break;
+                        if (this.domains[i].DomainID == item.DomainID)
+                        {
+                            this.domains.RemoveAt(i);
+                            break;
+                        }
                     }
                 }
             });
         }
 
-        private void Domains_DomainCreated(object sender, DomainEventArgs e)
+        private void Domains_DomainsCreated(object sender, DomainsEventArgs e)
         {
             if (sender is IDomainCollection domainCollection)
             {
-                var domain = e.Domain;
-                var dispatcher = domain.Dispatcher;
-                if (dispatcher == null)
-                    return;
-                var viewModel = domain.Dispatcher.Invoke(() => new DomainListItemBase(this.authenticator, domain, true, this));
-                this.Dispatcher.InvokeAsync(() =>
+                foreach (var item in e.Domains)
                 {
-                    this.compositionService?.SatisfyImportsOnce(viewModel);
-                    this.domains.Add(viewModel);
-                });
+                    var domain = item;
+                    var dispatcher = domain.Dispatcher;
+                    if (dispatcher == null)
+                        return;
+                    var viewModel = domain.Dispatcher.Invoke(() => new DomainListItemBase(this.authenticator, domain, true, this));
+                    this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.compositionService?.SatisfyImportsOnce(viewModel);
+                        this.domains.Add(viewModel);
+                    });
+                }
             }
         }
     }

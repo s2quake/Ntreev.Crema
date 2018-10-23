@@ -40,7 +40,7 @@ namespace Ntreev.Crema.Javascript.Methods.ListenerHosts.Domains
         {
             if (this.cremaHost.GetService(typeof(IDomainContext)) is IDomainContext domainContext)
             {
-                domainContext.Dispatcher.Invoke(() => domainContext.Domains.DomainCreated += Domains_DomainCreated);
+                domainContext.Dispatcher.Invoke(() => domainContext.Domains.DomainsCreated += Domains_DomainsCreated);
             }
         }
 
@@ -48,11 +48,11 @@ namespace Ntreev.Crema.Javascript.Methods.ListenerHosts.Domains
         {
             if (this.cremaHost.GetService(typeof(IDomainContext)) is IDomainContext domainContext)
             {
-                domainContext.Dispatcher.Invoke(() => domainContext.Domains.DomainCreated -= Domains_DomainCreated);
+                domainContext.Dispatcher.Invoke(() => domainContext.Domains.DomainsCreated -= Domains_DomainsCreated);
             }
         }
 
-        private void Domains_DomainCreated(object sender, DomainEventArgs e)
+        private void Domains_DomainsCreated(object sender, DomainsEventArgs e)
         {
             this.Invoke(null);
         }

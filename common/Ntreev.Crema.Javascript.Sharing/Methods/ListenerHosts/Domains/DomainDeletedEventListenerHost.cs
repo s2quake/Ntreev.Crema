@@ -40,7 +40,7 @@ namespace Ntreev.Crema.Javascript.Methods.ListenerHosts.Domains
         {
             if (this.cremaHost.GetService(typeof(IDomainContext)) is IDomainContext domainContext)
             {
-                domainContext.Dispatcher.Invoke(() => domainContext.Domains.DomainDeleted += Domains_DomainDeleted);
+                domainContext.Dispatcher.Invoke(() => domainContext.Domains.DomainsDeleted += Domains_DomainsDeleted);
             }
         }
 
@@ -48,11 +48,11 @@ namespace Ntreev.Crema.Javascript.Methods.ListenerHosts.Domains
         {
             if (this.cremaHost.GetService(typeof(IDomainContext)) is IDomainContext domainContext)
             {
-                domainContext.Dispatcher.Invoke(() => domainContext.Domains.DomainDeleted -= Domains_DomainDeleted);
+                domainContext.Dispatcher.Invoke(() => domainContext.Domains.DomainsDeleted -= Domains_DomainsDeleted);
             }
         }
 
-        private void Domains_DomainDeleted(object sender, DomainEventArgs e)
+        private void Domains_DomainsDeleted(object sender, DomainsEventArgs e)
         {
             this.Invoke(null);
         }

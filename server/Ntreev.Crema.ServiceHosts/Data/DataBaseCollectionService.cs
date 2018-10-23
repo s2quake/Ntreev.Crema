@@ -35,6 +35,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
     partial class DataBaseCollectionService : CremaServiceItemBase<IDataBaseCollectionEventCallback>, IDataBaseCollectionService
     {
         private Authentication authentication;
+        private readonly Dictionary<Guid, ITransaction> transactionByID = new Dictionary<Guid, ITransaction>();
 
         public DataBaseCollectionService(ICremaHost cremaHost)
             : base(cremaHost.GetService(typeof(ILogService)) as ILogService)
@@ -342,14 +343,15 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return result;
         }
 
-        public async Task<ResultBase> BeginTransactionAsync(string dataBaseName)
+        public async Task<ResultBase<Guid>> BeginTransactionAsync(string dataBaseName)
         {
-            var result = new ResultBase();
+            var result = new ResultBase<Guid>();
             try
             {
                 var dataBase = await this.GetDataBaseAsync(dataBaseName);
                 var transaction = await dataBase.BeginTransactionAsync(this.authentication);
-                dataBase.ExtendedProperties[typeof(ITransaction)] = transaction;
+                this.transactionByID[transaction.ID] = transaction;
+                result.Value = transaction.ID;
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -359,15 +361,15 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return result;
         }
 
-        public async Task<ResultBase> EndTransactionAsync(string dataBaseName)
+        public async Task<ResultBase> EndTransactionAsync(Guid transactionID)
         {
             var result = new ResultBase();
             try
             {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                var transaction = dataBase.ExtendedProperties[typeof(ITransaction)] as ITransaction;
+                var transaction = this.transactionByID[transactionID];
                 await transaction.CommitAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
+                this.transactionByID.Remove(transactionID);
             }
             catch (Exception e)
             {
@@ -376,15 +378,15 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return result;
         }
 
-        public async Task<ResultBase> CancelTransactionAsync(string dataBaseName)
+        public async Task<ResultBase<DataBaseMetaData>> CancelTransactionAsync(Guid transactionID)
         {
-            var result = new ResultBase();
+            var result = new ResultBase<DataBaseMetaData>();
             try
             {
-                var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                var transaction = dataBase.ExtendedProperties[typeof(ITransaction)] as ITransaction;
-                await transaction.RollbackAsync(this.authentication);
+                var transaction = this.transactionByID[transactionID];
+                result.Value = await transaction.RollbackAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
+                this.transactionByID.Remove(transactionID);
             }
             catch (Exception e)
             {
@@ -492,7 +494,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var exceptionUserID = e.UserID;
             var signatureDate = e.SignatureDate;
             var itemNames = e.Items.Select(item => item.Name).ToArray();
-            var metaDatas = e.MetaData as DomainMetaData[];
+            var metaDatas = e.MetaData as DataBaseMetaData[];
             this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnDataBasesReset(signatureDate, itemNames, metaDatas));
         }
 

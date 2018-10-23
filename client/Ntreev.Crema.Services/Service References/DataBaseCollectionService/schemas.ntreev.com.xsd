@@ -294,6 +294,7 @@
       <xs:enumeration value="Loading" />
       <xs:enumeration value="Loaded" />
       <xs:enumeration value="Unloading" />
+      <xs:enumeration value="Progressing" />
       <xs:enumeration value="Unloaded">
         <xs:annotation>
           <xs:appinfo>
@@ -606,6 +607,40 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ResultBaseOfArrayOfLogInfoq8erDhHE" nillable="true" type="tns:ResultBaseOfArrayOfLogInfoq8erDhHE" />
+  <xs:complexType name="ResultBaseOfguid">
+    <xs:annotation>
+      <xs:appinfo>
+        <GenericType Name="ResultBaseOf{0}{#}" Namespace="http://schemas.ntreev.com" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">
+          <GenericParameter Name="guid" Namespace="http://schemas.microsoft.com/2003/10/Serialization/">
+          </GenericParameter>
+        </GenericType>
+        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
+      <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
+      <xs:element minOccurs="0" name="Value" type="ser:guid" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ResultBaseOfguid" nillable="true" type="tns:ResultBaseOfguid" />
+  <xs:complexType name="ResultBaseOfDataBaseMetaDataq8erDhHE">
+    <xs:annotation>
+      <xs:appinfo>
+        <GenericType Name="ResultBaseOf{0}{#}" Namespace="http://schemas.ntreev.com" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">
+          <GenericParameter Name="DataBaseMetaData" Namespace="http://schemas.ntreev.com">
+          </GenericParameter>
+        </GenericType>
+        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
+      <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
+      <xs:element minOccurs="0" name="Value" type="tns:DataBaseMetaData" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ResultBaseOfDataBaseMetaDataq8erDhHE" nillable="true" type="tns:ResultBaseOfDataBaseMetaDataq8erDhHE" />
   <xs:complexType name="CloseInfo">
     <xs:annotation>
       <xs:appinfo>
@@ -637,213 +672,6 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ArrayOfDataBaseInfo" nillable="true" type="tns:ArrayOfDataBaseInfo" />
-  <xs:complexType name="ArrayOfDomainMetaData">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="DomainMetaData" type="tns:DomainMetaData" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfDomainMetaData" nillable="true" type="tns:ArrayOfDomainMetaData" />
-  <xs:complexType name="DomainMetaData">
-    <xs:annotation>
-      <xs:appinfo>
-        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
-      </xs:appinfo>
-    </xs:annotation>
-    <xs:sequence>
-      <xs:element minOccurs="0" name="Data" nillable="true" type="xs:base64Binary" />
-      <xs:element minOccurs="0" name="DomainID" type="ser:guid" />
-      <xs:element minOccurs="0" name="DomainInfo" type="tns:DomainInfo" />
-      <xs:element minOccurs="0" name="DomainState" type="tns:DomainState" />
-      <xs:element xmlns:q2="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="ModifiedTables" nillable="true" type="q2:ArrayOfstring" />
-      <xs:element minOccurs="0" name="Users" nillable="true" type="tns:ArrayOfDomainUserMetaData" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="DomainMetaData" nillable="true" type="tns:DomainMetaData" />
-  <xs:complexType name="DomainInfo">
-    <xs:annotation>
-      <xs:appinfo>
-        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
-      </xs:appinfo>
-    </xs:annotation>
-    <xs:sequence>
-      <xs:element minOccurs="0" name="CategoryName" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="CreationInfo" type="tns:SignatureDate" />
-      <xs:element minOccurs="0" name="DataBaseID" type="ser:guid" />
-      <xs:element minOccurs="0" name="DomainID" type="ser:guid" />
-      <xs:element minOccurs="0" name="DomainType" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="ItemPath" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="ItemType" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="ModificationInfo" type="tns:SignatureDate" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="DomainInfo" nillable="true" type="tns:DomainInfo" />
-  <xs:simpleType name="DomainState">
-    <xs:list>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="None">
-            <xs:annotation>
-              <xs:appinfo>
-                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">0</EnumerationValue>
-              </xs:appinfo>
-            </xs:annotation>
-          </xs:enumeration>
-          <xs:enumeration value="IsActivated">
-            <xs:annotation>
-              <xs:appinfo>
-                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
-              </xs:appinfo>
-            </xs:annotation>
-          </xs:enumeration>
-          <xs:enumeration value="IsModified">
-            <xs:annotation>
-              <xs:appinfo>
-                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
-              </xs:appinfo>
-            </xs:annotation>
-          </xs:enumeration>
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:list>
-  </xs:simpleType>
-  <xs:element name="DomainState" nillable="true" type="tns:DomainState" />
-  <xs:complexType name="ArrayOfDomainUserMetaData">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="DomainUserMetaData" type="tns:DomainUserMetaData" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfDomainUserMetaData" nillable="true" type="tns:ArrayOfDomainUserMetaData" />
-  <xs:complexType name="DomainUserMetaData">
-    <xs:annotation>
-      <xs:appinfo>
-        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
-      </xs:appinfo>
-    </xs:annotation>
-    <xs:sequence>
-      <xs:element minOccurs="0" name="DomainUserInfo" type="tns:DomainUserInfo" />
-      <xs:element minOccurs="0" name="DomainUserState" type="tns:DomainUserState" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="DomainUserMetaData" nillable="true" type="tns:DomainUserMetaData" />
-  <xs:complexType name="DomainUserInfo">
-    <xs:annotation>
-      <xs:appinfo>
-        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
-      </xs:appinfo>
-    </xs:annotation>
-    <xs:sequence>
-      <xs:element minOccurs="0" name="AccessType" type="tns:DomainAccessType" />
-      <xs:element minOccurs="0" name="Location" type="tns:DomainLocationInfo" />
-      <xs:element minOccurs="0" name="UserID" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="UserName" nillable="true" type="xs:string" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="DomainUserInfo" nillable="true" type="tns:DomainUserInfo" />
-  <xs:simpleType name="DomainAccessType">
-    <xs:list>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="None">
-            <xs:annotation>
-              <xs:appinfo>
-                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">0</EnumerationValue>
-              </xs:appinfo>
-            </xs:annotation>
-          </xs:enumeration>
-          <xs:enumeration value="Read">
-            <xs:annotation>
-              <xs:appinfo>
-                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
-              </xs:appinfo>
-            </xs:annotation>
-          </xs:enumeration>
-          <xs:enumeration value="ReadWrite">
-            <xs:annotation>
-              <xs:appinfo>
-                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">3</EnumerationValue>
-              </xs:appinfo>
-            </xs:annotation>
-          </xs:enumeration>
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:list>
-  </xs:simpleType>
-  <xs:element name="DomainAccessType" nillable="true" type="tns:DomainAccessType" />
-  <xs:complexType name="DomainLocationInfo">
-    <xs:annotation>
-      <xs:appinfo>
-        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
-      </xs:appinfo>
-    </xs:annotation>
-    <xs:sequence>
-      <xs:element minOccurs="0" name="ColumnName" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="KeyInfos" nillable="true" type="tns:ArrayOfDomainFieldInfo" />
-      <xs:element minOccurs="0" name="TableName" nillable="true" type="xs:string" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="DomainLocationInfo" nillable="true" type="tns:DomainLocationInfo" />
-  <xs:complexType name="ArrayOfDomainFieldInfo">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="DomainFieldInfo" type="tns:DomainFieldInfo" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfDomainFieldInfo" nillable="true" type="tns:ArrayOfDomainFieldInfo" />
-  <xs:complexType name="DomainFieldInfo">
-    <xs:annotation>
-      <xs:appinfo>
-        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
-      </xs:appinfo>
-    </xs:annotation>
-    <xs:sequence>
-      <xs:element minOccurs="0" name="Type" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="Value" nillable="true" type="xs:string" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="DomainFieldInfo" nillable="true" type="tns:DomainFieldInfo" />
-  <xs:simpleType name="DomainUserState">
-    <xs:list>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="None">
-            <xs:annotation>
-              <xs:appinfo>
-                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">0</EnumerationValue>
-              </xs:appinfo>
-            </xs:annotation>
-          </xs:enumeration>
-          <xs:enumeration value="IsBeingEdited">
-            <xs:annotation>
-              <xs:appinfo>
-                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
-              </xs:appinfo>
-            </xs:annotation>
-          </xs:enumeration>
-          <xs:enumeration value="Online">
-            <xs:annotation>
-              <xs:appinfo>
-                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">2</EnumerationValue>
-              </xs:appinfo>
-            </xs:annotation>
-          </xs:enumeration>
-          <xs:enumeration value="IsModified">
-            <xs:annotation>
-              <xs:appinfo>
-                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">4</EnumerationValue>
-              </xs:appinfo>
-            </xs:annotation>
-          </xs:enumeration>
-          <xs:enumeration value="IsOwner">
-            <xs:annotation>
-              <xs:appinfo>
-                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">8</EnumerationValue>
-              </xs:appinfo>
-            </xs:annotation>
-          </xs:enumeration>
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:list>
-  </xs:simpleType>
-  <xs:element name="DomainUserState" nillable="true" type="tns:DomainUserState" />
   <xs:complexType name="ArrayOfDataBaseState">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="DataBaseState" type="tns:DataBaseState" />

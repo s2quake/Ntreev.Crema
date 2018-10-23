@@ -79,11 +79,14 @@ namespace Ntreev.Crema.Services.Data
             return tableInfos;
         }
 
-        protected override async Task OnCancelEditAsync(Authentication authentication)
+        protected override async Task OnCancelEditAsync(Authentication authentication, object args)
         {
-            await base.OnCancelEditAsync(authentication);
-            this.table.SetTableState(TableState.None);
-            this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table });
+            await base.OnCancelEditAsync(authentication, args);
+            if (args is Guid)
+            {
+                this.table.SetTableState(TableState.None);
+                this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table });
+            }
         }
 
         protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
@@ -101,9 +104,13 @@ namespace Ntreev.Crema.Services.Data
             return args as TableInfo[];
         }
 
-        protected override Task<ResultBase> CancelDomainAsync(Authentication authentication, Guid domainID)
+        protected override async Task<ResultBase> CancelDomainAsync(Authentication authentication, object args)
         {
-            return Task.Run(() => this.Service.CancelTableTemplateEdit(domainID));
+            if (args is Guid domainID)
+            {
+                return await Task.Run(() => this.Service.CancelTableTemplateEdit(domainID));
+            }
+            return new ResultBase() { SignatureDate = authentication.SignatureDate };
         }
 
         private TableCollection Container => this.table.Container;

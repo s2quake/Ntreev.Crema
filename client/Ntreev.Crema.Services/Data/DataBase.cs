@@ -561,34 +561,35 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
+        public void LockForTransaction(Authentication authentication, Guid transactionID)
+        {
+            if (this.IsLocked == false)
+            {
+                this.Lock(authentication, $"{transactionID}");
+                this.DataBases.InvokeItemsLockedEvent(authentication, new IDataBase[] { this }, new string[] { $"{transactionID}", });
+            }
+        }
+
+        public void UnlockForTransaction(Authentication authentication, Guid transactionID)
+        {
+            if (this.LockInfo.Comment == $"{transactionID}" && this.IsLocked == true)
+            {
+                this.Unlock(authentication);
+                this.DataBases.InvokeItemsUnlockedEvent(authentication, new IDataBase[] { this });
+            }
+        }
+
         public async Task<DataBaseTransaction> BeginTransactionAsync(Authentication authentication)
         {
             try
             {
                 this.ValidateExpired();
-                return await await this.Dispatcher.InvokeAsync(async () =>
+                var transaction = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var result = await Task.Run(() => this.DataBases.Service.BeginTransaction(base.Name));
-                    this.CremaHost.Sign(authentication, result);
-                    if (this.IsLocked == false)
-                    {
-                        base.Lock(authentication, $"{this.ID}");
-                        this.DataBases.InvokeItemsLockedEvent(authentication, new IDataBase[] { this }, new string[] { $"{this.ID}", });
-                    }
-                    var transaction = new DataBaseTransaction(authentication, this, this.DataBases.Service);
-                    transaction.Disposed += (s, e) =>
-                    {
-                        this.Dispatcher.InvokeAsync(() =>
-                        {
-                            if (this.LockInfo.Comment == $"{this.ID}" && this.IsLocked == true)
-                            {
-                                base.Unlock(authentication);
-                                this.DataBases.InvokeItemsUnlockedEvent(authentication, new IDataBase[] { this });
-                            }
-                        });
-                    };
-                    return transaction;
+                    return new DataBaseTransaction(authentication, this, this.DataBases.Service);
                 });
+                await transaction.BeginAsync(authentication);
+                return transaction;
             }
             catch (Exception e)
             {
@@ -651,39 +652,63 @@ namespace Ntreev.Crema.Services.Data
 
         public void SetResetting(Authentication authentication)
         {
-            this.TypeContext?.Dispose();
-            this.TableContext?.Dispose();
+            if (this.Dispatcher.Owner is DataBase)
+            {
+                //this.DetachDomainHost();
+                this.TypeContext?.Dispose();
+                this.TypeContext = null;
+                this.TableContext?.Dispose();
+                this.TypeContext = null;
+            }
+            
             this.IsResetting = true;
             base.ResettingDataBase(authentication);
             this.DataBases.InvokeItemsResettingEvent(authentication, new IDataBase[] { this, });
 
-            if (this.Dispatcher.Owner is DataBase)
-            {
-                this.DetachDomainHost();
-            }
+            
 
-            this.DomainContext.DeleteDomains(authentication, this.ID);
+            //this.DomainContext.DeleteDomains(authentication, this.ID);
         }
 
         // TODO: SetReset
-        public void SetReset(Authentication authentication, DomainMetaData[] metaDatas)
+        public void SetReset(Authentication authentication, DataBaseMetaData metaData)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
             //var domains = metaDatas.Where(item => item.DomainInfo.DataBaseID == this.ID).ToArray();
-            //await this.CremaHost.DomainContext.AddDomainsAsync(domains);
-            //if (this.Dispatcher.Owner is DataBase)
-            //{
-            //    var result = await Task.Run(() => this.service.GetMetaData());
-            //    this.TypeContext = new TypeContext(this, result.GetValue());
-            //    this.TableContext = new TableContext(this, result.GetValue());
-            //    this.AttachDomainHost();
-            //    base.UpdateLockParent();
-            //    base.UpdateAccessParent();
-            //}
+            //await this.CremaHost.DomainContext.AddDomainsAsync(domains);\
+
+            if (this.Dispatcher.Owner is DataBase)
+            {
+                this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.TypeContext = new TypeContext(this, metaData);
+                    this.TableContext = new TableContext(this, metaData);
+                    this.AttachDomainHost();
+                    base.UpdateLockParent();
+                    base.UpdateAccessParent();
+                    base.ResetDataBase(authentication);
+                    this.DataBases.InvokeItemsResetEvent(authentication, new IDataBase[] { this, });
+                });
+            }
+            else
+            {
+                base.ResetDataBase(authentication);
+                this.DataBases.InvokeItemsResetEvent(authentication, new IDataBase[] { this, });
+            }
 
             //this.IsResetting = false;
-            //base.ResetDataBase(authentication);
-            //this.DataBases.InvokeItemsResetEvent(authentication, new IDataBase[] { this, });
+
+        }
+
+        public void SetReset2(Authentication authentication, DataBaseMetaData metaData)
+        {
+                this.TypeContext = new TypeContext(this, metaData);
+                this.TableContext = new TableContext(this, metaData);
+                this.AttachDomainHost();
+                base.UpdateLockParent();
+                base.UpdateAccessParent();
+                base.ResetDataBase(authentication);
+                this.DataBases.InvokeItemsResetEvent(authentication, new IDataBase[] { this, });
         }
 
         public void SetAuthenticationEntered(Authentication authentication)

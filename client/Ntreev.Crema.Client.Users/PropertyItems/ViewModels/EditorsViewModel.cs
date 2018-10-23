@@ -124,8 +124,8 @@ namespace Ntreev.Crema.Client.Users.PropertyItems.ViewModels
             {
                 var items = await domainCollection.Dispatcher.InvokeAsync(() =>
                 {
-                    domainCollection.DomainCreated += Domains_DomainCreated;
-                    domainCollection.DomainDeleted += Domains_DomainDeleted;
+                    domainCollection.DomainsCreated += Domains_DomainsCreated;
+                    domainCollection.DomainsDeleted += Domains_DomainsDeleted;
                     var domains = domainCollection.ToArray();
                     var itemList = new List<DomainTreeItemBase>(domains.Length);
                     foreach (var item in domains)
@@ -148,35 +148,40 @@ namespace Ntreev.Crema.Client.Users.PropertyItems.ViewModels
             this.domains.Clear();
         }
 
-        private void Domains_DomainDeleted(object sender, DomainDeletedEventArgs e)
+        private void Domains_DomainsDeleted(object sender, DomainsDeletedEventArgs e)
         {
-            var domainInfo = e.DomainInfo;
             this.Dispatcher.InvokeAsync(() =>
             {
-                for (var i = 0; i < this.domains.Count; i++)
+                foreach (var item in e.DomainInfos)
                 {
-                    if (this.domains[i].DomainID == domainInfo.DomainID)
+                    for (var i = 0; i < this.domains.Count; i++)
                     {
-                        this.domains.RemoveAt(i);
-                        break;
+                        if (this.domains[i].DomainID == item.DomainID)
+                        {
+                            this.domains.RemoveAt(i);
+                            break;
+                        }
                     }
                 }
                 this.SelectObject(this.descriptor);
             });
         }
 
-        private void Domains_DomainCreated(object sender, DomainEventArgs e)
+        private void Domains_DomainsCreated(object sender, DomainsEventArgs e)
         {
             if (sender is IDomainCollection domainCollection)
             {
-                var domain = e.Domain;
-                var viewModel = domain.Dispatcher.Invoke(() => new DomainTreeItemBase(this.authenticator, domain, true, this));
-                this.Dispatcher.InvokeAsync(() =>
+                foreach (var item in e.Domains)
                 {
-                    this.compositionService?.SatisfyImportsOnce(viewModel);
-                    this.domains.Add(viewModel);
-                    this.SelectObject(this.descriptor);
-                });
+                    var domain = item;
+                    var viewModel = domain.Dispatcher.Invoke(() => new DomainTreeItemBase(this.authenticator, domain, true, this));
+                    this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.compositionService?.SatisfyImportsOnce(viewModel);
+                        this.domains.Add(viewModel);
+                        this.SelectObject(this.descriptor);
+                    });
+                }
             }
         }
     }

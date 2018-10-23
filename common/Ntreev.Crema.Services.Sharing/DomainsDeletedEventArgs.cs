@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,12 +25,20 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ITransaction : IDispatcherObject
+    public class DomainsDeletedEventArgs : DomainsEventArgs
     {
-        Task CommitAsync(Authentication authentication);
+        public DomainsDeletedEventArgs(Authentication authentication, IDomain[] domains, bool[] isCanceleds, object[] results)
+            : base(authentication, domains)
+        {
+            this.IsCanceleds = isCanceleds;
+            this.Results = results;
+            this.Authentication = authentication;
+        }
 
-        Task<DataBaseMetaData> RollbackAsync(Authentication authentication);
+        public bool[] IsCanceleds { get; }
 
-        Guid ID { get; }
+        public object[] Results { get; }
+
+        internal Authentication Authentication { get; }
     }
 }

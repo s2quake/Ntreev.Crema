@@ -290,6 +290,23 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ResultBase" nillable="true" type="tns:ResultBase" />
+  <xs:complexType name="ResultBaseOfArrayOfDomainMetaDataq8erDhHE">
+    <xs:annotation>
+      <xs:appinfo>
+        <GenericType Name="ResultBaseOf{0}{#}" Namespace="http://schemas.ntreev.com" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">
+          <GenericParameter Name="ArrayOfDomainMetaData" Namespace="http://schemas.ntreev.com">
+          </GenericParameter>
+        </GenericType>
+        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
+      <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
+      <xs:element minOccurs="0" name="Value" nillable="true" type="tns:ArrayOfDomainMetaData" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ResultBaseOfArrayOfDomainMetaDataq8erDhHE" nillable="true" type="tns:ResultBaseOfArrayOfDomainMetaDataq8erDhHE" />
   <xs:complexType name="ArrayOfDomainRowInfo">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="DomainRowInfo" type="tns:DomainRowInfo" />

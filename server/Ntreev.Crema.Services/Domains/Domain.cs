@@ -102,7 +102,7 @@ namespace Ntreev.Crema.Services.Domains
                         this.Logger = null;
                         this.Dispose();
                         this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled, null));
-                        container.InvokeDomainDeletedEvent(authentication, this, isCanceled, null);
+                        container.InvokeDomainDeletedEvent(authentication, new Domain[] { this }, new bool[] { isCanceled }, new object[] { null });
                     });
                     return null;
                 }
@@ -396,7 +396,7 @@ namespace Ntreev.Crema.Services.Domains
                 DomainState = base.DomainState,
                 ModifiedTables = this.modifiedTableList.ToArray(),
             };
-            if (this.Users.ContainsKey(authentication.ID) == true)
+            if (this.Users.ContainsKey(authentication.ID) == true || authentication.IsSystem == true)
             {
                 if (this.data == null)
                     this.data = this.DataDispatcher.Invoke(() => this.SerializeSource(this.Source));
@@ -508,7 +508,7 @@ namespace Ntreev.Crema.Services.Domains
                 domainUser.DomainUserState &= ~DomainUserState.Detached;
                 this.CremaHost.Sign(authentication);
                 this.OnUserAdded(new DomainUserEventArgs(authentication, this, domainUser));
-                this.Container.InvokeDomainUserAddedEvent(authentication, this, domainUser);
+                this.Container?.InvokeDomainUserAddedEvent(authentication, this, domainUser);
             });
         }
 
@@ -528,11 +528,11 @@ namespace Ntreev.Crema.Services.Domains
             {
                 this.CremaHost.Sign(authentication);
                 this.OnUserRemoved(new DomainUserRemovedEventArgs(authentication, this, domainUser, RemoveInfo.Empty));
-                this.Container.InvokeDomainUserRemovedEvent(authentication, this, domainUser, RemoveInfo.Empty);
+                this.Container?.InvokeDomainUserRemovedEvent(authentication, this, domainUser, RemoveInfo.Empty);
                 if (isMaster == true && this.Users.Owner != null)
                 {
                     this.OnUserChanged(new DomainUserEventArgs(authentication, this, this.Users.Owner));
-                    this.Container.InvokeDomainUserChangedEvent(authentication, this, this.Users.Owner);
+                    this.Container?.InvokeDomainUserChangedEvent(authentication, this, this.Users.Owner);
                 }
             });
         }
@@ -550,7 +550,7 @@ namespace Ntreev.Crema.Services.Domains
                 base.DomainState &= ~DomainState.IsActivated;
             }
             this.OnDomainStateChanged(new DomainEventArgs(authentication, this));
-            this.Container.InvokeDomainStateChangedEvent(authentication, this);
+            this.Container?.InvokeDomainStateChangedEvent(authentication, this);
         }
 
         public async Task SetDomainHostAsync(IDomainHost host)
@@ -609,7 +609,9 @@ namespace Ntreev.Crema.Services.Domains
 
         public object Source { get; }
 
-        public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
+        public new DomainContext Context { get; set; }
+
+        public CremaDispatcher Dispatcher => this.Context.Dispatcher;
 
         public CremaDispatcher DataDispatcher => this.Logger?.Dispatcher;
 
@@ -1203,7 +1205,7 @@ namespace Ntreev.Crema.Services.Domains
             {
                 return this.Category.DataBase;
             }
-            return (this.Context as IServiceProvider).GetService(serviceType);
+            return (base.Context as IServiceProvider).GetService(serviceType);
         }
 
         #endregion

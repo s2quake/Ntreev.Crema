@@ -69,7 +69,7 @@ namespace Ntreev.Crema.Services.Data
             this.repositoryDispatcher = new CremaDispatcher(this);
         }
 
-        public async void RestoreStateAsync(CremaSettings settings)
+        public async Task RestoreStateAsync(CremaSettings settings)
         {
             var dataBaseList = new List<DataBase>(this.Count);
             if (settings.NoCache == false)
@@ -307,7 +307,7 @@ namespace Ntreev.Crema.Services.Data
             this.OnItemsResetting(new ItemsEventArgs<IDataBase>(authentication, items));
         }
 
-        public void InvokeItemsResetEvent(Authentication authentication, IDataBase[] items, DomainMetaData[] metaDatas)
+        public void InvokeItemsResetEvent(Authentication authentication, IDataBase[] items, DataBaseMetaData[] metaDatas)
         {
             this.CremaHost.DebugMethodMany(authentication, this, nameof(InvokeItemsResetEvent), items);
             this.CremaHost.Info(EventMessageBuilder.ResetDataBase(authentication, items));

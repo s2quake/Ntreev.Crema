@@ -32,43 +32,43 @@ namespace Ntreev.Crema.ServiceHosts.Domains
     public interface IDomainEventCallback
     {
         [OperationContract(IsOneWay = true)]
-        void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo, long index);
+        void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo);
 
         [OperationContract(IsOneWay = true)]
-        void OnDomainCreated(SignatureDate signatureDate, DomainInfo domainInfo, DomainState domainState, long index);
+        void OnDomainsCreated(SignatureDate signatureDate, DomainMetaData[] metaDatas);
 
         [OperationContract(IsOneWay = true)]
         [ServiceKnownType(typeof(TableInfo))]
         [ServiceKnownType(typeof(TableInfo[]))]
         [ServiceKnownType(typeof(TypeInfo))]
         [ServiceKnownType(typeof(TypeInfo[]))]
-        void OnDomainDeleted(SignatureDate signatureDate, Guid domainID, bool IsCanceled, object result, long index);
+        void OnDomainsDeleted(SignatureDate signatureDate, Guid[] domainIDs, bool[] IsCanceleds, object[] results);
 
         [OperationContract(IsOneWay = true)]
-        void OnDomainInfoChanged(SignatureDate signatureDate, Guid domainID, DomainInfo domainInfo, long index);
+        void OnDomainInfoChanged(SignatureDate signatureDate, Guid domainID, DomainInfo domainInfo);
 
         [OperationContract(IsOneWay = true)]
-        void OnDomainStateChanged(SignatureDate signatureDate, Guid domainID, DomainState domainState, long index);
+        void OnDomainStateChanged(SignatureDate signatureDate, Guid domainID, DomainState domainState);
 
         [OperationContract(IsOneWay = true)]
-        void OnUserAdded(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState, long index);
+        void OnUserAdded(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState);
 
         [OperationContract(IsOneWay = true)]
-        void OnUserChanged(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState, long index);
+        void OnUserChanged(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState);
 
         [OperationContract(IsOneWay = true)]
-        void OnUserRemoved(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, RemoveInfo removeInfo, long index);
+        void OnUserRemoved(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, RemoveInfo removeInfo);
 
         [OperationContract(IsOneWay = true)]
-        void OnRowAdded(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows, long index);
+        void OnRowAdded(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract(IsOneWay = true)]
-        void OnRowChanged(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows, long index);
+        void OnRowChanged(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract(IsOneWay = true)]
-        void OnRowRemoved(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows, long index);
+        void OnRowRemoved(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract(IsOneWay = true)]
-        void OnPropertyChanged(SignatureDate signatureDate, Guid domainID, string propertyName, object value, long index);
+        void OnPropertyChanged(SignatureDate signatureDate, Guid domainID, string propertyName, object value);
     }
 }

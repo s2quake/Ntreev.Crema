@@ -89,13 +89,13 @@ namespace Ntreev.Crema.ServiceHosts.Data
         ResultBase<DataBaseInfo> Revert(string dataBaseName, string revision);
 
         [OperationContract]
-        ResultBase BeginTransaction(string dataBaseName);
+        ResultBase<Guid> BeginTransaction(string dataBaseName);
 
         [OperationContract]
-        ResultBase EndTransaction(string dataBaseName);
+        ResultBase EndTransaction(Guid transactionID);
 
         [OperationContract]
-        ResultBase CancelTransaction(string dataBaseName);
+        ResultBase<DataBaseMetaData> CancelTransaction(Guid transactionID);
 
         [OperationContract]
         bool IsAlive();

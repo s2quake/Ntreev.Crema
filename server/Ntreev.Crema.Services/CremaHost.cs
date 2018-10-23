@@ -153,8 +153,8 @@ namespace Ntreev.Crema.Services
                     this.Info("Crema module has been started.");
                     this.ServiceState = ServiceState.Opened;
                     this.OnOpened(EventArgs.Empty);
-                    this.DataBases.RestoreStateAsync(this.settings);
                 });
+                await this.DataBases.RestoreStateAsync(this.settings);
             }
             catch (Exception e)
             {

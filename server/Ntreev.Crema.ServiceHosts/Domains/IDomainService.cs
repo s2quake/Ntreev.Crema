@@ -40,7 +40,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         ResultBase Unsubscribe();
 
         [OperationContract]
-        ResultBase<DomainContextMetaData> GetMetaData();
+        ResultBase<DomainMetaData[]> GetMetaData(Guid dataBaseID);
 
         [OperationContract]
         ResultBase SetUserLocation(Guid domainID, DomainLocationInfo location);

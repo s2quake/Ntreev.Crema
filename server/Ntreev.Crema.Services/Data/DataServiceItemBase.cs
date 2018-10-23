@@ -355,8 +355,8 @@ namespace Ntreev.Crema.Services.Data
             {
                 domainContext.Dispatcher.Invoke(() =>
                 {
-                    domainContext.Domains.DomainCreated -= Domains_DomainCreated;
-                    domainContext.Domains.DomainDeleted -= Domains_DomainDeleted;
+                    //domainContext.Domains.DomainsCreated -= Domains_DomainsCreated;
+                    //domainContext.Domains.DomainsDeleted -= Domains_DomainsDeleted;
                 });
             }
 
@@ -375,47 +375,47 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        private void Domains_DomainDeleted(object sender, DomainEventArgs e)
-        {
-            if (e.DomainInfo.DataBaseID != this.dataBaseID)
-                return;
+        //private void Domains_DomainsDeleted(object sender, DomainsEventArgs e)
+        //{
+        //    if (e.DomainInfo.DataBaseID != this.dataBaseID)
+        //        return;
 
-            var domainInfo = e.DomainInfo;
-            if (domainInfo.ItemType == nameof(TableContent))
-            {
-                this.Dispatcher?.InvokeAsync(() =>
-                {
-                    foreach (var item in this.domainItems.ToArray())
-                    {
-                        if (item.Value.DataBaseID == domainInfo.DataBaseID)
-                        {
-                            this.domainItems.Remove(item.Key);
-                        }
-                    }
-                });
-            }
-        }
+        //    var domainInfo = e.DomainInfo;
+        //    if (domainInfo.ItemType == nameof(TableContent))
+        //    {
+        //        this.Dispatcher?.InvokeAsync(() =>
+        //        {
+        //            foreach (var item in this.domainItems.ToArray())
+        //            {
+        //                if (item.Value.DataBaseID == domainInfo.DataBaseID)
+        //                {
+        //                    this.domainItems.Remove(item.Key);
+        //                }
+        //            }
+        //        });
+        //    }
+        //}
 
-        private void Domains_DomainCreated(object sender, DomainEventArgs e)
-        {
-            var domains = sender as IDomainCollection;
-            var domain = domains[e.DomainInfo.DomainID];
-            if (domain == null || domain.DataBaseID != this.dataBaseID)
-                return;
+        //private void Domains_DomainsCreated(object sender, DomainEventArgs e)
+        //{
+        //    var domains = sender as IDomainCollection;
+        //    var domain = domains[e.DomainInfo.DomainID];
+        //    if (domain == null || domain.DataBaseID != this.dataBaseID)
+        //        return;
 
-            if (domain.Host is TableContent content)
-            {
-                var contents = EnumerableUtility.Friends(content, content.Childs);
-                var tableNames = contents.Select(item => item.Table.Name).ToArray();
-                this.Dispatcher.InvokeAsync(() =>
-                {
-                    foreach (var item in tableNames)
-                    {
-                        this.domainItems.Add(item, domain);
-                    }
-                });
-            }
-        }
+        //    if (domain.Host is TableContent content)
+        //    {
+        //        var contents = EnumerableUtility.Friends(content, content.Childs);
+        //        var tableNames = contents.Select(item => item.Table.Name).ToArray();
+        //        this.Dispatcher.InvokeAsync(() =>
+        //        {
+        //            foreach (var item in tableNames)
+        //            {
+        //                this.domainItems.Add(item, domain);
+        //            }
+        //        });
+        //    }
+        //}
 
         private void DeleteDomainFiles(DomainInfo domainInfo)
         {

@@ -39,7 +39,9 @@ namespace Ntreev.Crema.Javascript.Methods
         {
             if (this.Context is ScriptMethodContext context)
             {
-                return context.Login(address, userID, password);
+                var task = context.LoginAsync(address, userID, password);
+                task.Wait();
+                return task.Result;
             }
             throw new NotImplementedException();
         }

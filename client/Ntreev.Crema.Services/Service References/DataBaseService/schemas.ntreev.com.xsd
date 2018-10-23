@@ -301,6 +301,7 @@
       <xs:enumeration value="Loading" />
       <xs:enumeration value="Loaded" />
       <xs:enumeration value="Unloading" />
+      <xs:enumeration value="Progressing" />
       <xs:enumeration value="Unloaded">
         <xs:annotation>
           <xs:appinfo>
@@ -901,6 +902,13 @@
             <xs:annotation>
               <xs:appinfo>
                 <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">8</EnumerationValue>
+              </xs:appinfo>
+            </xs:annotation>
+          </xs:enumeration>
+          <xs:enumeration value="Detached">
+            <xs:annotation>
+              <xs:appinfo>
+                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">16</EnumerationValue>
               </xs:appinfo>
             </xs:annotation>
           </xs:enumeration>

@@ -30,8 +30,8 @@ namespace Ntreev.Crema.Services.Domains
     class DomainCollection : ItemContainer<Domain, DomainCategory, DomainCollection, DomainCategoryCollection, DomainContext>,
         IDomainCollection
     {
-        private EventHandler<DomainEventArgs> domainCreated;
-        private EventHandler<DomainDeletedEventArgs> domainDeleted;
+        private EventHandler<DomainsCreatedEventArgs> domainsCreated;
+        private EventHandler<DomainsDeletedEventArgs> domainsDeleted;
         private EventHandler<DomainEventArgs> domainInfoChanged;
         private EventHandler<DomainEventArgs> domainStateChanged;
         private EventHandler<DomainUserEventArgs> domainUserAdded;
@@ -48,26 +48,38 @@ namespace Ntreev.Crema.Services.Domains
             base.OnCollectionChanged(e);
         }
 
-        public void InvokeDomainCreatedEvent(Authentication authentication, Domain domain, DomainInfo domainInfo)
+        public void InvokeDomainCreatedEvent(Authentication authentication, Domain[] domains)
         {
-            var args = new DomainEventArgs(authentication, domain);
-            var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainCreatedEvent), domain);
-            var comment = EventMessageBuilder.BeginDomain(authentication, domain);
-            this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
-            this.OnDomainCreated(args);
-            this.Context.InvokeItemsCreatedEvent(authentication, new IDomainItem[] { domain }, new object[] { domainInfo });
+            var domainInfos = domains.Select(item => (object)item.DomainInfo).ToArray();
+            var metaDatas = domains.Select(item => item.GetMetaData(authentication)).ToArray();
+            var args = new DomainsCreatedEventArgs(authentication, domains, metaDatas);
+            foreach (var item in domains)
+            {
+                var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainCreatedEvent), item);
+                var comment = EventMessageBuilder.BeginDomain(authentication, item);
+                this.CremaHost.Debug(eventLog);
+                this.CremaHost.Info(comment);
+            }
+            this.OnDomainsCreated(args);
+            this.Context.InvokeItemsCreatedEvent(authentication, domains, domainInfos);
         }
 
-        public void InvokeDomainDeletedEvent(Authentication authentication, Domain domain, bool isCanceled, object result)
+        public void InvokeDomainDeletedEvent(Authentication authentication, Domain[] domains, bool[] isCanceleds, object[] results)
         {
-            var args = new DomainDeletedEventArgs(authentication, domain, isCanceled, result);
-            var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainDeletedEvent), domain, isCanceled);
-            var comment = isCanceled == false ? EventMessageBuilder.EndDomain(authentication, domain) : EventMessageBuilder.CancelDomain(authentication, domain);
-            this.CremaHost.Debug(eventLog);
-            this.CremaHost.Info(comment);
-            this.OnDomainDeleted(args);
-            this.Context.InvokeItemsDeleteEvent(authentication, new IDomainItem[] { domain }, new string[] { domain.Path });
+            var itemPaths = domains.Select(item => item.Path).ToArray();
+            var args = new DomainsDeletedEventArgs(authentication, domains, isCanceleds, results);
+            for (var i = 0; i < domains.Length; i++)
+            {
+                var item = domains[i];
+                var result = results[i];
+                var isCanceled = isCanceleds[i];
+                var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainDeletedEvent), item, isCanceled);
+                var comment = isCanceled == false ? EventMessageBuilder.EndDomain(authentication, item) : EventMessageBuilder.CancelDomain(authentication, item);
+                this.CremaHost.Debug(eventLog);
+                this.CremaHost.Info(comment);
+            }
+            this.OnDomainsDeleted(args);
+            this.Context.InvokeItemsDeleteEvent(authentication, domains, itemPaths);
         }
 
         public void InvokeDomainRowAddedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows)
@@ -175,31 +187,31 @@ namespace Ntreev.Crema.Services.Domains
 
         public new int Count => base.Count;
 
-        public event EventHandler<DomainEventArgs> DomainCreated
+        public event EventHandler<DomainsCreatedEventArgs> DomainsCreated
         {
             add
             {
                 this.Dispatcher.VerifyAccess();
-                this.domainCreated += value;
+                this.domainsCreated += value;
             }
             remove
             {
                 this.Dispatcher.VerifyAccess();
-                this.domainCreated -= value;
+                this.domainsCreated -= value;
             }
         }
 
-        public event EventHandler<DomainDeletedEventArgs> DomainDeleted
+        public event EventHandler<DomainsDeletedEventArgs> DomainsDeleted
         {
             add
             {
                 this.Dispatcher.VerifyAccess();
-                this.domainDeleted += value;
+                this.domainsDeleted += value;
             }
             remove
             {
                 this.Dispatcher.VerifyAccess();
-                this.domainDeleted -= value;
+                this.domainsDeleted -= value;
             }
         }
 
@@ -343,14 +355,14 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        protected virtual void OnDomainCreated(DomainEventArgs e)
+        protected virtual void OnDomainsCreated(DomainsCreatedEventArgs e)
         {
-            this.domainCreated?.Invoke(this, e);
+            this.domainsCreated?.Invoke(this, e);
         }
 
-        protected virtual void OnDomainDeleted(DomainDeletedEventArgs e)
+        protected virtual void OnDomainsDeleted(DomainsDeletedEventArgs e)
         {
-            this.domainDeleted?.Invoke(this, e);
+            this.domainsDeleted?.Invoke(this, e);
         }
 
         protected virtual void OnDomainInfoChanged(DomainEventArgs e)

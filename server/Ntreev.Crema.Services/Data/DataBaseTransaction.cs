@@ -28,27 +28,51 @@ namespace Ntreev.Crema.Services.Data
 {
     class DataBaseTransaction : ITransaction
     {
-        private readonly Authentication authentication;
+        private Authentication authentication;
         private readonly DataBase dataBase;
         private readonly DataBaseRepositoryHost repository;
         private readonly TypeInfo[] typeInfos;
         private readonly TableInfo[] tableInfos;
         private readonly string transactionPath;
         private readonly string domainPath;
-        private bool isDisposed;
 
         public DataBaseTransaction(Authentication authentication, DataBase dataBase, DataBaseRepositoryHost repository)
         {
             this.authentication = authentication;
             this.dataBase = dataBase;
+            this.dataBase.Dispatcher.VerifyAccess();
             this.repository = repository;
             this.typeInfos = dataBase.TypeContext.Types.Select((Type item) => item.TypeInfo).ToArray();
             this.tableInfos = dataBase.TableContext.Tables.Select((Table item) => item.TableInfo).ToArray();
-            this.transactionPath = dataBase.CremaHost.GetPath(CremaPath.Transactions, $"{dataBase.ID}");
-            this.domainPath = dataBase.CremaHost.GetPath(CremaPath.Domains, $"{dataBase.ID}");
-            this.CopyDomains(authentication);
-            this.repository.BeginTransaction(authentication.ID, dataBase.Name);
-            this.authentication.Expired += Authentication_Expired;
+            this.transactionPath = this.CremaHost.GetPath(CremaPath.Transactions, $"{dataBase.ID}");
+            this.domainPath = this.CremaHost.GetPath(CremaPath.Domains, $"{dataBase.ID}");
+        }
+
+        public async void BeginAsync(Authentication authentication)
+        {
+            try
+            {
+                this.ValidateExpired();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.dataBase.DataBaseState = DataBaseState.Progressing;
+                });
+                await this.DomainContext.BeginTransactionAsync(authentication, this.domainPath, this.transactionPath);
+                await this.repository.BeginTransactionAsync(authentication.ID, dataBase.Name);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ID = Guid.NewGuid();
+                    this.dataBase.LockForTransaction(authentication, this.ID);
+                    this.CremaHost.Sign(authentication);
+                    this.authentication.Expired += Authentication_Expired;
+                });
+            }
+            catch (Exception e)
+            {
+                await this.Dispatcher.InvokeAsync(() => this.dataBase.DataBaseState = DataBaseState.Loaded);
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public async Task CommitAsync(Authentication authentication)
@@ -59,41 +83,54 @@ namespace Ntreev.Crema.Services.Data
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ValidateCommit(authentication);
-                    this.dataBase.VerifyAccess(authentication);
+                    this.dataBase.DataBaseState = DataBaseState.Progressing;
+                });
+                await this.repository.EndTransactionAsync();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication);
-                    this.repository.EndTransaction();
                     this.authentication.Expired -= Authentication_Expired;
-                    this.isDisposed = true;
-                    this.OnDisposed(EventArgs.Empty);
+                    this.authentication = null;
+                    this.dataBase.DataBaseState = DataBaseState.Loaded;
+                    this.dataBase.UnlockForTransaction(authentication, this.ID);
                 });
             }
             catch (Exception e)
             {
+                await this.Dispatcher.InvokeAsync(() => this.dataBase.DataBaseState = DataBaseState.Loaded);
                 this.CremaHost.Error(e);
                 throw;
             }
         }
 
-        public async Task RollbackAsync(Authentication authentication)
+        public async Task<DataBaseMetaData> RollbackAsync(Authentication authentication)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(async () =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ValidateRollback(authentication);
-                    this.dataBase.VerifyAccess(authentication);
+                    this.dataBase.DataBaseState = DataBaseState.Progressing;
+                });
+                await this.dataBase.ResettingDataBaseAsync(authentication);
+                await this.DomainContext.DeleteDomainsAsync(Authentication.System, this.dataBase.ID);
+                await this.repository.CancelTransactionAsync();
+                await this.DomainContext.CancelTransactionAsync(this.domainPath, this.transactionPath);
+                await this.DomainContext.RestoreAsync(this.dataBase);
+                await this.dataBase.ResetDataBaseAsync(authentication, this.typeInfos, this.tableInfos);
+                return await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.CremaHost.Sign(authentication);
-                    await this.dataBase.ResettingDataBaseAsync(authentication);
-                    await this.RollbackDomainsAsync(authentication);
-                    await this.dataBase.ResetDataBaseAsync(authentication, this.typeInfos, this.tableInfos);
                     this.authentication.Expired -= Authentication_Expired;
-                    this.isDisposed = true;
-                    this.OnDisposed(EventArgs.Empty);
+                    this.dataBase.DataBaseState = DataBaseState.Loaded;
+                    this.dataBase.UnlockForTransaction(authentication, this.ID);
+                    return this.dataBase.GetMetaData(authentication);
                 });
             }
             catch (Exception e)
             {
+                await this.Dispatcher.InvokeAsync(() => this.dataBase.DataBaseState = DataBaseState.Loaded);
                 this.CremaHost.Error(e);
                 throw;
             }
@@ -103,52 +140,26 @@ namespace Ntreev.Crema.Services.Data
 
         public CremaHost CremaHost => this.dataBase.CremaHost;
 
-        public event EventHandler Disposed;
+        public DomainContext DomainContext => this.CremaHost.DomainContext;
 
-        protected virtual void OnDisposed(EventArgs e)
-        {
-            this.Disposed?.Invoke(this, e);
-        }
+        public Guid ID { get; private set; }
 
         private async void Authentication_Expired(object sender, EventArgs e)
         {
             this.authentication.Expired -= Authentication_Expired;
+            this.authentication = null;
             await this.RollbackAsync(this.authentication);
-        }
-
-        private void CopyDomains(Authentication authentication)
-        {
-            DirectoryUtility.Delete(this.transactionPath);
-            if (DirectoryUtility.Exists(this.domainPath) == true)
-                DirectoryUtility.Copy(this.domainPath, this.transactionPath);
-        }
-
-        private async Task RollbackDomainsAsync(Authentication authentication)
-        {
-            this.repository.CancelTransaction();
-
-            if (this.dataBase.GetService(typeof(DomainContext)) is DomainContext domainContext)
-            {
-                if (DirectoryUtility.Exists(this.transactionPath) == true)
-                    DirectoryUtility.Copy(this.transactionPath, this.domainPath);
-                await domainContext.RestoreAsync(this.dataBase);
-                DirectoryUtility.Delete(this.transactionPath);
-            }
-            else
-            {
-                throw new NotImplementedException();
-            }
         }
 
         private void ValidateCommit(Authentication authentication)
         {
-            if (this.isDisposed == true)
+            if (this.authentication == null)
                 throw new InvalidOperationException(Resources.Exception_Expired);
         }
 
         private void ValidateRollback(Authentication authentication)
         {
-            if (this.isDisposed == true)
+            if (this.authentication == null)
                 throw new InvalidOperationException(Resources.Exception_Expired);
         }
     }

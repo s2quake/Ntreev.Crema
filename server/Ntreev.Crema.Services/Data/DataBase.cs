@@ -512,32 +512,37 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
+        public void LockForTransaction(Authentication authentication, Guid transactionID)
+        {
+            if (this.IsLocked == false)
+            {
+                this.Lock(authentication, $"{transactionID}");
+                this.DataBases.InvokeItemsLockedEvent(authentication, new IDataBase[] { this }, new string[] { $"{transactionID}", });
+            }
+        }
+
+        public void UnlockForTransaction(Authentication authentication, Guid transactionID)
+        {
+            if (this.LockInfo.Comment == $"{transactionID}" && this.IsLocked == true)
+            {
+                this.Unlock(authentication);
+                this.DataBases.InvokeItemsUnlockedEvent(authentication, new IDataBase[] { this });
+            }
+        }
+
         public async Task<DataBaseTransaction> BeginTransactionAsync(Authentication authentication)
         {
             try
             {
                 this.ValidateExpired();
-                return await this.Dispatcher.InvokeAsync(() =>
+                var transaction = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ValidateBeginTransaction(authentication);
-                    this.CremaHost.Sign(authentication);
-                    if (this.IsLocked == false)
-                    {
-                        this.Lock(authentication, $"{this.ID}");
-                    }
-                    var transaction = new DataBaseTransaction(authentication, this, this.Repository);
-                    transaction.Disposed += (s, e) =>
-                    {
-                        this.Dispatcher.InvokeAsync(() =>
-                        {
-                            if (this.LockInfo.Comment == $"{this.ID}" && this.IsLocked == true)
-                            {
-                                this.Unlock(authentication);
-                            }
-                        });
-                    };
-                    return transaction;
+                    
+                    return new DataBaseTransaction(authentication, this, this.Repository);
                 });
+                transaction.BeginAsync(authentication);
+                return transaction;
             }
             catch (Exception e)
             {
@@ -601,14 +606,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (this.IsLoaded == true)
                     this.DetachDomainHost();
-            });
-            var domains = await this.DomainContext.GetDomainsAsync(this.ID);
-            foreach (var item in domains)
-            {
-                await item.DeleteAsync(authentication, true);
-            }
-            await this.Dispatcher.InvokeAsync(() =>
-            {
+
                 this.TypeContext?.Dispose();
                 this.TypeContext = null;
                 this.TableContext?.Dispose();
@@ -648,9 +646,7 @@ namespace Ntreev.Crema.Services.Data
                 base.UpdateAccessParent();
 
                 this.AttachDomainHost();
-                var metaDatas = this.DomainContext.GetDomainMetaDatas(authentication, this.ID);
-
-                this.DataBases.InvokeItemsResetEvent(authentication, new IDataBase[] { this }, metaDatas);
+                this.DataBases.InvokeItemsResetEvent(authentication, new IDataBase[] { this }, new DataBaseMetaData[] { this.GetMetaData(authentication) });
             });
         }
 
@@ -749,7 +745,11 @@ namespace Ntreev.Crema.Services.Data
 
         public new DataBaseInfo DataBaseInfo => base.DataBaseInfo;
 
-        public new DataBaseState DataBaseState => base.DataBaseState;
+        public new DataBaseState DataBaseState
+        {
+            get => base.DataBaseState;
+            set => base.DataBaseState = value;
+        }
 
         public AuthenticationInfo[] AuthenticationInfos { get; private set; }
 
@@ -1397,7 +1397,7 @@ namespace Ntreev.Crema.Services.Data
 
         private void ValidateLoad(Authentication authentication)
         {
-            if (this.IsLoaded == true)
+            if (base.DataBaseState != DataBaseState.None)
                 throw new InvalidOperationException(Resources.Exception_DataBaseHasBeenLoaded);
             if (authentication.IsSystem == false && authentication.IsAdmin == false)
                 throw new PermissionDeniedException();
@@ -1407,7 +1407,7 @@ namespace Ntreev.Crema.Services.Data
 
         private void ValidateUnload(Authentication authentication)
         {
-            if (this.IsLoaded == false)
+            if (base.DataBaseState == DataBaseState.Loaded)
                 throw new InvalidOperationException(Resources.Exception_DataBaseHasNotBeenLoaded);
             if (authentication.IsSystem == false && authentication.IsAdmin == false)
                 throw new PermissionDeniedException();

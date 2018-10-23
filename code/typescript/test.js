@@ -202,6 +202,8 @@ var RandomDataBaseUtility = /** @class */ (function () {
     };
     RandomDataBaseUtility.inheritTable = function (dataBaseName) {
         var table = RandomDataBaseUtility.getTable(dataBaseName);
+        if (table == null)
+            return null;
         var tableName = RandomUtility.nextIdentifier();
         var categoryPath = RandomDataBaseUtility.getTableCategory(dataBaseName);
         var copyContent = RandomUtility.Within(25) ? true : null;
@@ -685,7 +687,7 @@ var Program = /** @class */ (function () {
     function Program() {
     }
     Program.main = function () {
-        var dataBaseName = "default";
+        var dataBaseName = "master";
         var token = login("admin", "admin");
         if (isDataBaseLoaded(dataBaseName) === false) {
             loadDataBase(dataBaseName);
@@ -693,22 +695,22 @@ var Program = /** @class */ (function () {
         if (isDataBaseEntered(dataBaseName) === false) {
             enterDataBase(dataBaseName);
         }
-        for (var i = 0; i < 10; i++) {
-            var count = RandomUtility.nextInRange(10, 100);
-            try {
-                Program.doTask(dataBaseName, count);
-            }
-            finally {
-                leaveDataBase(dataBaseName);
-                logout(token);
-            }
+        var count = RandomUtility.nextInRange(1, 2);
+        try {
+            Program.doTask(dataBaseName, count);
         }
+        finally {
+            leaveDataBase(dataBaseName);
+            logout(token);
+        }
+        // for (let i: number = 0; i < 2; i++) {
+        // }
     };
     Program.doTask = function (dataBaseName, count) {
         var transactionID = beginDataBaseTransaction(dataBaseName);
         try {
             RandomTask.run(dataBaseName, count);
-            endDataBaseTransaction(transactionID);
+            cancelDataBaseTransaction(transactionID);
         }
         catch (e) {
             cancelDataBaseTransaction(transactionID);

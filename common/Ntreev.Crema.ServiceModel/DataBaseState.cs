@@ -41,6 +41,9 @@ namespace Ntreev.Crema.ServiceModel
         Unloading,
 
         [EnumMember]
+        Progressing,
+
+        [EnumMember]
         Unloaded = None,
     }
 }

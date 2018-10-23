@@ -43,9 +43,9 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return this.InvokeTask(Task.Run(() => this.UnsubscribeAsync()));
         }
 
-        public ResultBase<DomainContextMetaData> GetMetaData()
+        public ResultBase<DomainMetaData[]> GetMetaData(Guid dataBaseID)
         {
-            return this.InvokeTask(Task.Run(() => this.GetMetaDataAsync()));
+            return this.InvokeTask(Task.Run(() => this.GetMetaDataAsync(dataBaseID)));
         }
 
         public ResultBase SetUserLocation(Guid domainID, DomainLocationInfo location)

@@ -123,19 +123,19 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return this.InvokeTask(Task.Run(() => this.RevertAsync(dataBaseName, revision)));
         }
 
-        public ResultBase BeginTransaction(string dataBaseName)
+        public ResultBase<Guid> BeginTransaction(string dataBaseName)
         {
             return this.InvokeTask(Task.Run(() => this.BeginTransactionAsync(dataBaseName)));
         }
 
-        public ResultBase EndTransaction(string dataBaseName)
+        public ResultBase EndTransaction(Guid transactionID)
         {
-            return this.InvokeTask(Task.Run(() => this.EndTransactionAsync(dataBaseName)));
+            return this.InvokeTask(Task.Run(() => this.EndTransactionAsync(transactionID)));
         }
 
-        public ResultBase CancelTransaction(string dataBaseName)
+        public ResultBase<DataBaseMetaData> CancelTransaction(Guid transactionID)
         {
-            return this.InvokeTask(Task.Run(() => this.CancelTransactionAsync(dataBaseName)));
+            return this.InvokeTask(Task.Run(() => this.CancelTransactionAsync(transactionID)));
         }
 
         public bool IsAlive()

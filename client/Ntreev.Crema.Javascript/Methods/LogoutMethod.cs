@@ -39,7 +39,8 @@ namespace Ntreev.Crema.Javascript.Methods
         {
             if (this.Context is ScriptMethodContext context)
             {
-                context.Logout(token);
+                var task = context.LogoutAsync(token);
+                task.Wait();
                 return;
             }
             throw new NotImplementedException();

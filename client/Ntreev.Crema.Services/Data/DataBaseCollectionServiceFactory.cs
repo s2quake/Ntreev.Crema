@@ -82,7 +82,7 @@ namespace Ntreev.Crema.Services.Data
             throw new NotImplementedException();
         }
 
-        void IDataBaseCollectionServiceCallback.OnDataBasesReset(SignatureDate signatureDate, string[] dataBaseNames, DomainMetaData[] metaDatas)
+        void IDataBaseCollectionServiceCallback.OnDataBasesReset(SignatureDate signatureDate, string[] dataBaseNames, DataBaseMetaData[] metaDatas)
         {
             throw new NotImplementedException();
         }

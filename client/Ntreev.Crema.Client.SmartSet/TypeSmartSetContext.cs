@@ -36,6 +36,7 @@ using Ntreev.ModernUI.Framework;
 using Ntreev.Library.Linq;
 using System.Windows.Threading;
 using Ntreev.ModernUI.Framework.ViewModels;
+using Dispatcher = System.Windows.Threading.Dispatcher;
 
 namespace Ntreev.Crema.Client.SmartSet
 {

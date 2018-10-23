@@ -55,6 +55,7 @@ namespace Ntreev.Crema.Services.Domains
                 var binding = CremaHost.CreateBinding(serviceInfo);
                 var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/DomainService");
                 var instanceContext = new InstanceContext(this);
+                instanceContext.SynchronizationContext = this.Dispatcher.SynchronizationContext;
 
                 this.service = new DomainServiceClient(instanceContext, binding, endPointAddress);
                 this.service.Open();
@@ -81,22 +82,42 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public async Task<DomainMetaData[]> RestoreAsync(Authentication authentication, DataBase dataBase)
+        public Task DeleteDomainsAsync(Authentication authentication, Guid dataBaseID)
         {
-            var result = await Task.Run(() => this.service.GetMetaData());
-            this.CremaHost.Sign(authentication, result);
-
-            var metaData = result.GetValue();
-            var metaDataList = new List<DomainMetaData>(metaData.Domains.Length);
-            foreach (var item in metaData.Domains)
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                if (item.DomainInfo.DataBaseID == dataBase.ID)
+                var domains = this.GetDomains(dataBaseID);
+                var itemPaths = domains.Select(item => item.Path).ToArray();
+                foreach (var item in domains)
                 {
-                    metaDataList.Add(item);
+                    item.Dispose(authentication, true, null);
                 }
-            }
-            return metaDataList.ToArray();
+                this.InvokeItemsDeleteEvent(authentication, domains, itemPaths);
+            });
         }
+
+        //public async Task RestoreAsync(Authentication authentication, Guid dataBaseID)
+        //{
+        //    var result = await Task.Run(() => this.service.GetMetaData(dataBaseID));
+        //    await this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        this.CremaHost.Sign(authentication, result);
+        //        this.Restore(authentication, result.Value);
+        //    });
+
+
+        //    //var metaData = result.GetValue();
+        //    //var metaDataList = new List<DomainMetaData>(metaData.Domains.Length);
+        //    //foreach (var item in metaData.Domains)
+        //    //{
+        //    //    if (item.DomainInfo.DataBaseID == dataBase.ID)
+        //    //    {
+        //    //        metaDataList.Add(item);
+        //    //    }
+        //    //}
+        //    //return metaDataList.ToArray();
+        //    //return null;
+        //}
 
         public void InvokeItemsCreatedEvent(Authentication authentication, IDomainItem[] items, object[] args)
         {
@@ -149,12 +170,27 @@ namespace Ntreev.Crema.Services.Domains
         private string b;
         public async Task CloseAsync(CloseInfo closeInfo)
         {
-            await this.Dispatcher.DisposeAsync();
             this.service.Unsubscribe();
             this.service.Close();
             this.service = null;
             this.timer?.Dispose();
             this.timer = null;
+
+            var tasks = await this.Dispatcher.InvokeAsync(() =>
+            {
+                var taskList = new List<Task>(this.Domains.Count);
+                foreach (var item in this.Domains.ToArray<Domain>())
+                {
+                    if (item.DataDispatcher != null)
+                    {
+                        taskList.Add(item.DataDispatcher.DisposeAsync());
+                    }
+                }
+                return taskList.ToArray();
+            });
+            await Task.WhenAll(tasks);
+            await this.Dispatcher.DisposeAsync();
+            
             this.Dispatcher = null;
             this.b = nameof(CloseAsync);
         }
@@ -375,6 +411,16 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
+        private void Restore(Authentication authentication, DomainMetaData[] metaDatas)
+        {
+            foreach (var item in metaDatas)
+            {
+                var domainInfo = item.DomainInfo;
+                var domain = this.Domains[item.DomainID];
+                domain.Initialize(authentication, item);
+            }
+        }
+
         private async void DataBases_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
         {
             var authentication = await this.UserContext.AuthenticateAsync(e.SignatureDate);
@@ -470,49 +516,29 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        private long index = -1;
-        private long endindex = -1;
-        private void SetIndex(long index)
-        {
-            if (this.index + 1 != index)
-            {
-                int wer = 0;
-            }
-            this.index = index;
-        }
-
-        private void EndIndex(long index)
-        {
-            if (this.endindex + 1 != index)
-            {
-                int wer = 0;
-            }
-            this.endindex = index;
-        }
-
         #region IDomainServiceCallback
 
-        void IDomainServiceCallback.OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo, long index)
+        void IDomainServiceCallback.OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
-            this.SetIndex(index);
             this.service.Close();
             this.service = null;
             this.timer?.Dispose();
             this.timer = null;
             this.Dispatcher.Dispose();
             this.Dispatcher = null;
-            this.EndIndex(index);
             this.CremaHost.RemoveServiceAsync(this);
         }
 
-        void IDomainServiceCallback.OnDomainCreated(SignatureDate signatureDate, DomainInfo domainInfo, DomainState domainState, long index)
+        void IDomainServiceCallback.OnDomainsCreated(SignatureDate signatureDate, DomainMetaData[] metaDatas)
         {
-            this.SetIndex(index);
             try
             {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() => this.Domains.AddDomain(authentication, domainInfo));
-                this.EndIndex(index);
+                
+                //this.Dispatcher.Invoke(() =>
+                //{
+                    var authentication = this.UserContext.Authenticate(signatureDate);
+                    this.Domains.AddDomain(authentication, metaDatas);
+                //});
             }
             catch (Exception e)
             {
@@ -520,9 +546,8 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDomainServiceCallback.OnDomainDeleted(SignatureDate signatureDate, Guid domainID, bool isCanceled, object result, long index)
+        void IDomainServiceCallback.OnDomainsDeleted(SignatureDate signatureDate, Guid[] domainIDs, bool[] isCanceleds, object[] results)
         {
-            this.SetIndex(index);
             try
             {
                 if (this.CremaHost.UserID == signatureDate.ID)
@@ -530,18 +555,32 @@ namespace Ntreev.Crema.Services.Domains
                     int qwer = 0;
                 }
                 var authentication = this.UserContext.Authenticate(signatureDate);
-                var domainHost = this.Dispatcher?.Invoke(() =>
+                //var domainHosts = this.Dispatcher?.Invoke(() =>
+                //{
+                    var domainHostList = new List<IDomainHost>(domainIDs.Length);
+                    var domainList = new List<Domain>(domainIDs.Length);
+                    for (var i = 0; i < domainIDs.Length; i++)
+                    {
+                        var domainID = domainIDs[i];
+                        var isCanceled = isCanceleds[i];
+                        var result = results[i];
+                        var domain = this.GetDomain(domainID);
+                        var domainHost = domain.Host;
+                        domain.Dispose(authentication, isCanceled, null);
+                        domainHostList.Add(domainHost);
+                        domainList.Add(domain);
+                    }
+                    this.Domains.InvokeDomainDeletedEvent(authentication, domainList.ToArray(), isCanceleds, results);
+                //    return domainHostList.ToArray();
+                //});
+                for (var i = 0; i < domainIDs.Length; i++)
                 {
-                    var domain = this.GetDomain(domainID);
-                    if (domain.Host != null)
-                        return domain.Host;
-                    domain.Dispose(authentication, isCanceled, null);
-                    this.Domains.InvokeDomainDeletedEvent(authentication, domain, isCanceled, null);
-                    return null;
-                });
-                if (domainHost != null)
-                    domainHost.DeleteAsync(authentication, isCanceled, result);
-                this.EndIndex(index);
+                    var domainHost = domainHostList[i];
+                    var isCanceled = isCanceleds[i];
+                    var result = results[i];
+                    if (domainHost != null)
+                        domainHost.DeleteAsync(authentication, isCanceled, result);
+                }
             }
             catch (Exception e)
             {
@@ -549,9 +588,8 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDomainServiceCallback.OnDomainInfoChanged(SignatureDate signatureDate, Guid domainID, DomainInfo domainInfo, long index)
+        void IDomainServiceCallback.OnDomainInfoChanged(SignatureDate signatureDate, Guid domainID, DomainInfo domainInfo)
         {
-            this.SetIndex(index);
             try
             {
                 var authentication = this.UserContext.Authenticate(signatureDate);
@@ -560,7 +598,6 @@ namespace Ntreev.Crema.Services.Domains
                     var domain = this.GetDomain(domainID);
                     domain.InvokeDomainInfoChanged(authentication, domainInfo);
                 });
-                this.EndIndex(index);
             }
             catch (Exception e)
             {
@@ -568,18 +605,16 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDomainServiceCallback.OnDomainStateChanged(SignatureDate signatureDate, Guid domainID, DomainState domainState, long index)
+        void IDomainServiceCallback.OnDomainStateChanged(SignatureDate signatureDate, Guid domainID, DomainState domainState)
         {
-            this.SetIndex(index);
             try
             {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() =>
-                {
+                //this.Dispatcher.Invoke(() =>
+                //{
+                    var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
                     domain.InvokeDomainStateChanged(authentication, domainState);
-                });
-                this.EndIndex(index);
+                //});
             }
             catch (Exception e)
             {
@@ -587,9 +622,8 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDomainServiceCallback.OnUserAdded(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState, long index)
+        void IDomainServiceCallback.OnUserAdded(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState)
         {
-            this.SetIndex(index);
             try
             {
                 var authentication = this.UserContext.Authenticate(signatureDate);
@@ -599,7 +633,6 @@ namespace Ntreev.Crema.Services.Domains
                     var domain = this.GetDomain(domainID);
                     domain.InvokeUserAdded(authentication, domainUserInfo, domainUserState, false);
                 });
-                this.EndIndex(index);
             }
             catch (Exception e)
             {
@@ -607,9 +640,8 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDomainServiceCallback.OnUserRemoved(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, RemoveInfo removeInfo, long index)
+        void IDomainServiceCallback.OnUserRemoved(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, RemoveInfo removeInfo)
         {
-            this.SetIndex(index);
             try
             {
                 var authentication = this.UserContext.Authenticate(signatureDate);
@@ -618,7 +650,6 @@ namespace Ntreev.Crema.Services.Domains
                     var domain = this.GetDomain(domainID);
                     domain.InvokeUserRemoved(authentication, domainUserInfo, removeInfo);
                 });
-                this.EndIndex(index);
             }
             catch (Exception e)
             {
@@ -626,9 +657,8 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDomainServiceCallback.OnUserChanged(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState, long index)
+        void IDomainServiceCallback.OnUserChanged(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState)
         {
-            this.SetIndex(index);
             try
             {
                 var authentication = this.UserContext.Authenticate(signatureDate);
@@ -637,7 +667,6 @@ namespace Ntreev.Crema.Services.Domains
                     var domain = this.GetDomain(domainID);
                     domain.InvokeUserChanged(authentication, domainUserInfo, domainUserState);
                 });
-                this.EndIndex(index);
             }
             catch (Exception e)
             {
@@ -645,9 +674,8 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDomainServiceCallback.OnRowAdded(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows, long index)
+        void IDomainServiceCallback.OnRowAdded(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows)
         {
-            this.SetIndex(index);
             try
             {
                 var authentication = this.UserContext.Authenticate(signatureDate);
@@ -656,7 +684,6 @@ namespace Ntreev.Crema.Services.Domains
                     var domain = this.GetDomain(domainID);
                     domain.InvokeRowAddedAsync(authentication, rows);
                 });
-                    this.EndIndex(index);
             }
             catch (Exception e)
             {
@@ -664,9 +691,8 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDomainServiceCallback.OnRowChanged(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows, long index)
+        void IDomainServiceCallback.OnRowChanged(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows)
         {
-            this.SetIndex(index);
             try
             {
                 var authentication = this.UserContext.Authenticate(signatureDate);
@@ -675,7 +701,6 @@ namespace Ntreev.Crema.Services.Domains
                     var domain = this.GetDomain(domainID);
                     domain.InvokeRowChangedAsync(authentication, rows);
                 });
-                this.EndIndex(index);
             }
             catch (Exception e)
             {
@@ -683,9 +708,8 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDomainServiceCallback.OnRowRemoved(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows, long index)
+        void IDomainServiceCallback.OnRowRemoved(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows)
         {
-            this.SetIndex(index);
             try
             {
                 var authentication = this.UserContext.Authenticate(signatureDate);
@@ -694,7 +718,6 @@ namespace Ntreev.Crema.Services.Domains
                     var domain = this.GetDomain(domainID);
                     domain.InvokeRowRemovedAsync(authentication, rows);
                 });
-                this.EndIndex(index);
             }
             catch (Exception e)
             {
@@ -702,9 +725,8 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDomainServiceCallback.OnPropertyChanged(SignatureDate signatureDate, Guid domainID, string propertyName, object value, long index)
+        void IDomainServiceCallback.OnPropertyChanged(SignatureDate signatureDate, Guid domainID, string propertyName, object value)
         {
-            this.SetIndex(index);
             try
             {
                 var authentication = this.UserContext.Authenticate(signatureDate);
@@ -713,7 +735,6 @@ namespace Ntreev.Crema.Services.Domains
                     var domain = this.GetDomain(domainID);
                     domain.InvokePropertyChangedAsync(authentication, propertyName, value);
                 });
-                this.EndIndex(index);
             }
             catch (Exception e)
             {

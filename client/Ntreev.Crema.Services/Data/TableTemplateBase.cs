@@ -140,7 +140,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync));
                 });
-                await this.OnCancelEditAsync(authentication);
+                await this.OnCancelEditAsync(authentication, this.domain.ID);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.OnEditCanceled(EventArgs.Empty);
@@ -348,11 +348,11 @@ namespace Ntreev.Crema.Services.Data
             return tableInfos;
         }
 
-        protected virtual async Task OnCancelEditAsync(Authentication authentication)
+        protected virtual async Task OnCancelEditAsync(Authentication authentication, object args)
         {
-            var result = await this.CancelDomainAsync(authentication, this.domain.ID);
+            var result = await this.CancelDomainAsync(authentication, args);
             this.CremaHost.Sign(authentication, result);
-            if (this.domain != null)
+            if (args is Guid)
             {
                 await this.DetachDomainEventAsync();
                 await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true, null);
@@ -402,7 +402,7 @@ namespace Ntreev.Crema.Services.Data
 
         protected abstract Task<TableInfo[]> EndDomainAsync(Authentication authentication, object args);
 
-        protected abstract Task<ResultBase> CancelDomainAsync(Authentication authentication, Guid domainID);
+        protected abstract Task<ResultBase> CancelDomainAsync(Authentication authentication, object args);
 
         private async void Table_RowDeleted(object sender, DataRowChangeEventArgs e)
         {
@@ -566,7 +566,7 @@ namespace Ntreev.Crema.Services.Data
             else
             {
                 var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, null);
-                await this.OnCancelEditAsync(authentication);
+                await this.OnCancelEditAsync(authentication, result);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.OnEditCanceled(args);

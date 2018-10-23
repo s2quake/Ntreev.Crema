@@ -67,11 +67,18 @@ namespace Ntreev.Crema.Services.Domains
                     await this.RestoreDomainAsync();
                 });
             }
+            catch
+            {
+                this.domain = null;
+                throw;
+            }
             finally
             {
                 this.Dispose();
             }
         }
+
+        public Domain Domain => this.domain;
 
         private void CollectCompletedActions()
         {
@@ -114,7 +121,8 @@ namespace Ntreev.Crema.Services.Domains
             this.authentications = users.ToDictionary(item => item.ID);
             this.domain = (Domain)Activator.CreateInstance(domainType, domainSerializationInfo, source);
             this.domain.Logger = domainLogger;
-            await this.domainContext.RestoreAsync(this.authentications[domainInfo.CreationInfo.ID], this.domain);
+            this.domain.Context = this.domainContext;
+            //await this.domainContext.RestoreAsync(this.authentications[domainInfo.CreationInfo.ID], this.domain);
         }
 
         private async Task RestoreDomainAsync()

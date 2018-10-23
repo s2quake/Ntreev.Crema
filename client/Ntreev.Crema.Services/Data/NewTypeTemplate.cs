@@ -74,9 +74,9 @@ namespace Ntreev.Crema.Services.Data
             return typeInfos;
         }
 
-        protected override async Task OnCancelEditAsync(Authentication authentication)
+        protected override async Task OnCancelEditAsync(Authentication authentication, object args)
         {
-            await base.OnCancelEditAsync(authentication);
+            await base.OnCancelEditAsync(authentication, args);
         }
 
         protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
@@ -94,9 +94,13 @@ namespace Ntreev.Crema.Services.Data
             return args as TypeInfo[];
         }
 
-        protected override Task<ResultBase> CancelDomainAsync(Authentication authentication, Guid domainID)
+        protected override async Task<ResultBase> CancelDomainAsync(Authentication authentication, object args)
         {
-            return Task.Run(() => this.Service.CancelTypeTemplateEdit(domainID));
+            if (args is Guid domainID)
+            {
+                return await Task.Run(() => this.Service.CancelTypeTemplateEdit(domainID));
+            }
+            return new ResultBase() { SignatureDate = authentication.SignatureDate };
         }
 
         public IDataBaseService Service => this.category.Service;

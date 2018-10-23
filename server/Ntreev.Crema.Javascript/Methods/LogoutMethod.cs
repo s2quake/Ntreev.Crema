@@ -42,7 +42,8 @@ namespace Ntreev.Crema.Javascript.Methods
             base.OnDisposed();
             if (this.Context is ScriptMethodContext context && context.Properties.ContainsKey(ScriptMethodContext.LoginKey) == true)
             {
-                context.Logout();
+                var task = context.LogoutAsync();
+                task.Wait();
                 context.Properties.Remove(ScriptMethodContext.LoginKey);
             }
         }
@@ -51,7 +52,8 @@ namespace Ntreev.Crema.Javascript.Methods
         {
             if (this.Context is ScriptMethodContext context)
             {
-                context.Logout(token);
+                var task = context.LogoutAsync(token);
+                task.Wait();
                 context.Properties.Remove(ScriptMethodContext.LoginKey);
                 return;
             }

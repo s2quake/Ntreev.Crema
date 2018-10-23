@@ -92,19 +92,19 @@ namespace Ntreev.Crema.Services.Domains
             return this.CremaHost.GetService(serviceType);
         }
 
-        public async Task RestoreAsync(Authentication authentication, Domain domain)
-        {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                authentication.Sign();
-                var dataBase = this.CremaHost.DataBases[domain.DataBaseID];
-                var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
-                var category = this.Categories.Prepare(categoryName);
-                domain.Category = category;
-                //domain.Dispatcher = new CremaDispatcher(domain);
-                this.Domains.InvokeDomainCreatedEvent(authentication, domain, domain.DomainInfo);
-            });
-        }
+        //public async Task RestoreAsync(Authentication authentication, Domain domain)
+        //{
+        //    await this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        authentication.Sign();
+        //        var dataBase = this.CremaHost.DataBases[domain.DataBaseID];
+        //        var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
+        //        //var category = this.Categories.Prepare(categoryName);
+        //        //domain.Category = category;
+        //        //domain.Dispatcher = new CremaDispatcher(domain);
+        //        //this.Domains.InvokeDomainCreatedEvent(authentication, domain, domain.DomainInfo);
+        //    });
+        //}
 
         public async Task AddAsync(Authentication authentication, Domain domain, DataBase dataBase)
         {
@@ -113,9 +113,9 @@ namespace Ntreev.Crema.Services.Domains
                 var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
                 var category = this.Categories.Prepare(categoryName);
                 domain.Category = category;
+                domain.Context = this;
                 domain.Logger = new DomainLogger(this.Serializer, domain);
-                //domain.Dispatcher = new CremaDispatcher(domain);
-                this.Domains.InvokeDomainCreatedEvent(authentication, domain, domain.DomainInfo);
+                this.Domains.InvokeDomainCreatedEvent(authentication, new Domain[] { domain });
             });
         }
 
@@ -131,7 +131,7 @@ namespace Ntreev.Crema.Services.Domains
 
                 domain.Dispose(authentication, isCanceled, result);
                 //dispatcher.Dispose();
-                this.Domains.InvokeDomainDeletedEvent(authentication, domain, isCanceled, result);
+                this.Domains.InvokeDomainDeletedEvent(authentication, new Domain[] { domain },new bool[] { isCanceled }, new object[] { result });
             });
         }
 
@@ -204,6 +204,21 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
+        public Task DeleteDomainsAsync(Authentication authentication, Guid dataBaseID)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                var domains = this.GetDomains(dataBaseID);
+                var isCanceleds = domains.Select(item => true).ToArray();
+                var results = domains.Select(item => (object)null).ToArray();
+                foreach (var item in domains)
+                {
+                    item.Dispose(authentication, true, null);
+                }
+                this.Domains.InvokeDomainDeletedEvent(authentication, domains, isCanceleds, results);
+            });
+        }
+
         public Task AttachUsersAsync(Authentication authentication, Guid dataBaseID)
         {
             return this.Dispatcher.InvokeAsync(() =>
@@ -253,6 +268,36 @@ namespace Ntreev.Crema.Services.Domains
                     domain.Detach(authentications);
                     domain.SetDomainHost(Authentication.System, null);
                 }
+            });
+        }
+
+        public Task BeginTransactionAsync(Authentication authentication, string sourcePath, string destPath)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                DirectoryUtility.Delete(destPath);
+                if (DirectoryUtility.Exists(sourcePath) == true)
+                    DirectoryUtility.Copy(sourcePath, destPath);
+            });
+        }
+
+        public Task EndTransactionAsync(Authentication authentication, string domainPath, string transactionPath)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                DirectoryUtility.Delete(transactionPath);
+                if (DirectoryUtility.Exists(domainPath) == true)
+                    DirectoryUtility.Copy(domainPath, transactionPath);
+            });
+        }
+
+        public Task CancelTransactionAsync(string domainPath, string transactionPath)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                if (DirectoryUtility.Exists(transactionPath) == true)
+                    DirectoryUtility.Copy(transactionPath, domainPath);
+                DirectoryUtility.Delete(transactionPath);
             });
         }
 
@@ -336,7 +381,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public async Task RestoreAsync(DataBase dataBase)
         {
-            var restorers = this.GetDomainRestorers(dataBase);
+            var restorers = this.GetDomainRestorers(dataBase.ID);
             if (restorers.Any() == false)
                 return;
 
@@ -346,6 +391,17 @@ namespace Ntreev.Crema.Services.Domains
             try
             {
                 await result;
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var domains = restorers.Where(item => item.Domain != null).Select(item => item.Domain).ToArray();
+                    foreach(var item in domains)
+                    {
+                        var categoryName = CategoryName.Create(dataBase.Name, item.DomainInfo.ItemType);
+                        var category = this.Categories.Prepare(categoryName);
+                        item.Category = category;
+                    }
+                    this.Domains.InvokeDomainCreatedEvent(Authentication.System, domains);
+                });
                 this.CremaHost.Info(string.Format(Resources.Message_RestoreResult_Format, restorers.Length, 0));
             }
             catch
@@ -357,48 +413,6 @@ namespace Ntreev.Crema.Services.Domains
                 }
                 this.CremaHost.Info(string.Format(Resources.Message_RestoreResult_Format, restorers.Length - exceptions.Count, exceptions.Count));
             }
-
-            //var path = Path.Combine(this.BasePath, dataBase.ID.ToString());
-            //if (Directory.Exists(path) == false)
-            //    return;
-
-            //var directories = Directory.GetDirectories(path);
-            //var domainList = new List<string>(directories.Length);
-            //foreach (var item in directories)
-            //{
-            //    var directoryInfo = new DirectoryInfo(item);
-            //    if (Guid.TryParse(directoryInfo.Name, out Guid domainID) == true)
-            //    {
-            //        domainList.Add(item);
-            //    }
-            //}
-
-            //if (domainList.Any() == true)
-            //{
-            //    this.CremaHost.Info(Resources.Message_DomainRestorationMessage);
-            //    foreach (var item in domainList)
-            //    {
-            //        var domainID = Guid.Parse(Path.GetFileName(item));
-            //        try
-            //        {
-            //            await DomainRestorer.RestoreAsync(authentication, this, item);
-            //            this.CremaHost.Debug(Resources.Message_DomainIsRestored_Format, domainID);
-            //            succeededCount++;
-            //        }
-            //        catch (Exception e)
-            //        {
-            //            this.CremaHost.Error(e.Message);
-            //            this.CremaHost.Error(Resources.Message_DomainRestorationIsFailed_Format, domainID);
-            //            failedCount++;
-            //        }
-            //    }
-
-            //    this.CremaHost.Info(string.Format(Resources.Message_RestoreResult_Format, succeededCount, failedCount));
-            //}
-            //else
-            //{
-            //    this.CremaHost.Info(Resources.Message_NotFoundDomainsToRestore);
-            //}
         }
 
         public async Task DisposeAsync()
@@ -415,7 +429,7 @@ namespace Ntreev.Crema.Services.Domains
                 }
                 return taskList.ToArray();
             });
-            await Task.WhenAll();
+            await Task.WhenAll(tasks);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.Clear();
@@ -532,9 +546,9 @@ namespace Ntreev.Crema.Services.Domains
             DirectoryUtility.Delete(this.BasePath, dataBase.ID.ToString());
         }
 
-        private DomainRestorer[] GetDomainRestorers(DataBase dataBase)
+        private DomainRestorer[] GetDomainRestorers(Guid dataBaseID)
         {
-            var path = Path.Combine(this.BasePath, dataBase.ID.ToString());
+            var path = Path.Combine(this.BasePath, $"{dataBaseID}");
             if (Directory.Exists(path) == false)
                 return new DomainRestorer[] { };
 

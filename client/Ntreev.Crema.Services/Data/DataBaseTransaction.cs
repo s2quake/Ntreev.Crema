@@ -36,20 +36,27 @@ namespace Ntreev.Crema.Services.Data
             this.service = service;
         }
 
+        public async Task BeginAsync(Authentication authentication)
+        {
+            var result = await Task.Run(() => this.service.BeginTransaction(this.dataBase.Name));
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.CremaHost.Sign(authentication, result);
+                this.ID = result.Value;
+                this.dataBase.LockForTransaction(authentication, this.ID);
+            });
+        }
+
         public async Task CommitAsync(Authentication authentication)
         {
             try
             {
                 this.ValidateExpired();
-                var name = await this.Dispatcher.InvokeAsync(() =>
-                 {
-                     this.dataBase.VerifyAccess(authentication);
-                     return this.dataBase.Name;
-                 });
-                var result = await Task.Run(() => this.service.EndTransaction(name));
+                var result = await Task.Run(() => this.service.EndTransaction(this.ID));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
+                    this.dataBase.UnlockForTransaction(authentication, this.ID);
                     this.OnDisposed(EventArgs.Empty);
                 });
             }
@@ -60,23 +67,29 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task RollbackAsync(Authentication authentication)
+        public async Task<DataBaseMetaData> RollbackAsync(Authentication authentication)
         {
             try
             {
                 this.ValidateExpired();
-                var name = await this.Dispatcher.InvokeAsync(() =>
+                var result = await Task.Run(() => this.service.CancelTransaction(this.ID));
+
+                await this.dataBase.Dispatcher.InvokeAsync(() =>
                 {
-                    this.dataBase.VerifyAccess(authentication);
-                    return this.dataBase.Name;
+                    this.dataBase.SetResetting(authentication);
+                    this.dataBase.SetReset2(authentication, result.GetValue());
                 });
-                var result = await Task.Run(() => this.service.CancelTransaction(this.dataBase.Name));
-                this.CremaHost.Sign(authentication, result);
-                await this.RollbackDomainsAsync(authentication);
+
+                //await this.DomainContext.DeleteDomainsAsync(authentication, this.dataBase.ID);
+                //await this.DomainContext.RestoreAsync(authentication, this.dataBase.ID);
+                
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.CremaHost.Sign(authentication, result);
+                    this.dataBase.UnlockForTransaction(authentication, this.ID);
                     this.OnDisposed(EventArgs.Empty);
                 });
+                return result.GetValue();
             }
             catch (Exception e)
             {
@@ -84,14 +97,7 @@ namespace Ntreev.Crema.Services.Data
                 throw;
             }
         }
-
-        private async Task RollbackDomainsAsync(Authentication authentication)
-        {
-            this.dataBase.SetResetting(authentication);
-            var metaDatas = await this.DomainContext.RestoreAsync(authentication, this.dataBase);
-            this.dataBase.SetReset(authentication, metaDatas);
-        }
-
+         
         public void Dispose()
         {
             this.authentication = null;
@@ -100,6 +106,8 @@ namespace Ntreev.Crema.Services.Data
         public CremaDispatcher Dispatcher => this.dataBase.Dispatcher;
 
         public CremaHost CremaHost => this.dataBase.CremaHost;
+
+        public Guid ID { get; private set; }
 
         public event EventHandler Disposed;
 

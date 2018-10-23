@@ -72,6 +72,8 @@ class RandomDataBaseUtility {
 
     public static inheritTable(dataBaseName: string): string {
         let table: string = RandomDataBaseUtility.getTable(dataBaseName);
+        if (table == null)
+            return null;
         let tableName: string = RandomUtility.nextIdentifier();
         let categoryPath: string = RandomDataBaseUtility.getTableCategory(dataBaseName);
         let copyContent: boolean = RandomUtility.Within(25) ? true : null;
@@ -573,7 +575,7 @@ class RandomTask {
 
 class Program {
     public static main(): void {
-        let dataBaseName: string = "default";
+        let dataBaseName: string = "master";
         let token: string = login("admin", "admin");
 
         if (isDataBaseLoaded(dataBaseName) === false) {
@@ -584,22 +586,24 @@ class Program {
             enterDataBase(dataBaseName);
         }
 
-        for (let i: number = 0; i < 10; i++) {
-            let count: number = RandomUtility.nextInRange(10, 100);
-            try {
-                Program.doTask(dataBaseName, count);
-            } finally {
-                leaveDataBase(dataBaseName);
-                logout(token);
-            }
+        let count: number = RandomUtility.nextInRange(1, 2);
+        try {
+            Program.doTask(dataBaseName, count);
+        } finally {
+            leaveDataBase(dataBaseName);
+            logout(token);
         }
+
+        // for (let i: number = 0; i < 2; i++) {
+
+        // }
     }
 
     private static doTask(dataBaseName: string, count: number): void {
         let transactionID: string = beginDataBaseTransaction(dataBaseName);
         try {
             RandomTask.run(dataBaseName, count);
-            endDataBaseTransaction(transactionID);
+            cancelDataBaseTransaction(transactionID);
         } catch (e) {
             cancelDataBaseTransaction(transactionID);
             throw e;
