@@ -124,6 +124,9 @@
     <Compile Include="BrowserService.cs" />
     <Compile Include="BrowserItems\ViewModels\TableTreeViewItemViewModel.cs" />
     <Compile Include="BrowserItems\ViewModels\TableCategoryTreeViewItemViewModel.cs" />
+    <Compile Include="Dialogs\ViewModels\NewRowItemViewModel.cs" />
+    <Compile Include="Dialogs\ViewModels\NewRowViewModel.cs" />
+    <Compile Include="Dialogs\ViewModels\NewColumnViewModel.cs" />
     <Compile Include="Dialogs\ViewModels\EditTemplateViewModel.cs" />
     <Compile Include="Dialogs\ViewModels\CopyTableViewModel.cs" />
     <Compile Include="BrowserItems\ViewModels\TableRootTreeViewItemViewModel.cs" />
@@ -156,6 +159,13 @@
     </Compile>
     <Compile Include="Dialogs\Views\LogView.xaml.cs">
       <DependentUpon>LogView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Views\NewColumnView.xaml.cs">
+      <DependentUpon>NewColumnView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Views\NewRowContentTemplateSelector.cs" />
+    <Compile Include="Dialogs\Views\NewRowView.xaml.cs">
+      <DependentUpon>NewRowView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Views\PreviewTableDocumentView.xaml.cs">
       <DependentUpon>PreviewTableDocumentView.xaml</DependentUpon>
@@ -292,6 +302,14 @@
     <Page Include="Dialogs\Views\CopyTableView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\Views\NewColumnView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Views\NewRowView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Views\PreviewTableCategoryView.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -28,6 +28,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data;
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels;
 
 namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 {
@@ -48,6 +49,12 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             //{
             //    this.dataTable = dataSet.Tables[this.Name];
             //}
+        }
+
+        public async Task NewRowAsync()
+        {
+            var dialog = await NewRowViewModel.CreateAsync(this.authentication, this.descriptor.ContentDescriptor.Target as ITableContent);
+            dialog.ShowDialog();
         }
 
         //public TableItemViewModel(Authentication authentication, TableDescriptor descriptor, CremaDataSet dataSet, object owner)

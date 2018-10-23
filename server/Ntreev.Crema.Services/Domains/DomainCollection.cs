@@ -167,17 +167,17 @@ namespace Ntreev.Crema.Services.Domains
             return metaDataList.ToArray();
         }
 
-        public async Task<DomainMetaData[]> GetMetaDataAsync(Authentication authentication)
-        {
-            var domains = await this.Dispatcher.InvokeAsync(() => this.ToArray<Domain>());
-            var metaDataList = new List<DomainMetaData>(domains.Length);
-            foreach (var item in domains)
-            {
-                var metaData = await item.GetMetaDataAsync(authentication);
-                metaDataList.Add(metaData);
-            }
-            return metaDataList.ToArray();
-        }
+        //public async Task<DomainMetaData[]> GetMetaDataAsync(Authentication authentication)
+        //{
+        //    var domains = await this.Dispatcher.InvokeAsync(() => this.ToArray<Domain>());
+        //    var metaDataList = new List<DomainMetaData>(domains.Length);
+        //    foreach (var item in domains)
+        //    {
+        //        var metaData = await item.GetMetaDataAsync(authentication);
+        //        metaDataList.Add(metaData);
+        //    }
+        //    return metaDataList.ToArray();
+        //}
 
         public Domain this[Guid domainID] => this[domainID.ToString()];
 

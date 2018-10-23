@@ -20,6 +20,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
+                    xmlns:cal="http://www.caliburnproject.org"
                     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                     xmlns:local="clr-namespace:Ntreev.Crema.Presentation.Tables.Documents.Views"
                     xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
@@ -112,7 +113,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <local:TableSourceColumnManagerRow />
             </DataTemplate>
             <DataTemplate>
-                <Label Content="구현" />
+                <Button Content="추가..." x:Name="NewRow" Focusable="False" cal:Bind.Model="{Binding}" />
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding Path=ReadOnly, RelativeSource={RelativeSource AncestorType={x:Type xcdg:DataGridControl}}}" Value="True">
+                        <Setter TargetName="NewRow" Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
             </DataTemplate>
             <DataTemplate>
                 <Border x:Name="RowSplitter" BorderThickness="0 0 1 1" Height="3" VerticalAlignment="Bottom"

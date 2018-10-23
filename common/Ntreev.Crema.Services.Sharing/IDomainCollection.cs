@@ -30,8 +30,6 @@ namespace Ntreev.Crema.Services
 
         IDomain this[Guid domainID] { get; }
 
-        Task<DomainMetaData[]> GetMetaDataAsync(Authentication authentication);
-
         event EventHandler<DomainsCreatedEventArgs> DomainsCreated;
 
         event EventHandler<DomainsDeletedEventArgs> DomainsDeleted;

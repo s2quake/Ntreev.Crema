@@ -1,0 +1,127 @@
+﻿<UserControl x:Class="Ntreev.Crema.Presentation.Tables.Dialogs.Views.NewRowView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
+             xmlns:nmgc="clr-namespace:Ntreev.ModernUI.Framework.DataGrid.Controls;assembly=Ntreev.ModernUI.Framework.DataGrid"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:local="clr-namespace:Ntreev.Crema.Presentation.Tables.Dialogs.Views"
+             xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Tables.Properties"
+             mc:Ignorable="d" Width="400">
+
+    <UserControl.Resources>
+
+        <local:NewRowContentTemplateSelector x:Key="newRowContentTemplateSelector" />
+
+        <Style x:Key="ItemContainer_Style" TargetType="{x:Type HeaderedContentControl}" BasedOn="{StaticResource PropertyItemsControl_ItemContainerStyle}">
+            <Setter Property="Header" Value="{Binding Name}" />
+        </Style>
+
+        <DataTemplate x:Key="System.Boolean">
+            <CheckBox IsChecked="{Binding Value}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="System.String">
+            <TextBox Text="{Binding Value}" />
+        </DataTemplate>
+
+
+        <DataTemplate x:Key="System.Single">
+            <nmgc:NumericTextBox NumberStyles="Float"
+                                 NullValue="{x:Null}"
+                                 Text="{Binding Value, StringFormat=R}">
+            </nmgc:NumericTextBox>
+        </DataTemplate>
+
+
+        <DataTemplate x:Key="System.Double">
+            <nmgc:NumericTextBox NumberStyles="Float"
+                                 NullValue="{x:Null}"
+                                 Text="{Binding Value, StringFormat=R}">
+            </nmgc:NumericTextBox>
+        </DataTemplate>
+
+
+        <DataTemplate x:Key="System.SByte">
+            <nmgc:NumericTextBox NumberStyles="Integer"
+                                 NullValue="{x:Null}"
+                                 Text="{Binding Value}" >
+            </nmgc:NumericTextBox>
+        </DataTemplate>
+
+
+        <DataTemplate x:Key="System.Byte">
+            <nmgc:NumericTextBox NumberStyles="Integer"
+                                 NullValue="{x:Null}"
+                                 Text="{Binding Value}" >
+            </nmgc:NumericTextBox>
+        </DataTemplate>
+
+        <DataTemplate x:Key="System.Int16">
+            <nmgc:NumericTextBox NumberStyles="Integer"
+                                 NullValue="{x:Null}"
+                                 Text="{Binding Value}" >
+            </nmgc:NumericTextBox>
+        </DataTemplate>
+
+        <DataTemplate x:Key="System.UInt16">
+            <nmgc:NumericTextBox NumberStyles="Integer"
+                                 NullValue="{x:Null}"
+                                 Text="{Binding Value}" >
+            </nmgc:NumericTextBox>
+        </DataTemplate>
+
+        <DataTemplate x:Key="System.Int32">
+            <nmgc:NumericTextBox NumberStyles="Integer"
+                                 NullValue="{x:Null}"
+                                 Text="{Binding Value}" >
+            </nmgc:NumericTextBox>
+        </DataTemplate>
+
+        <DataTemplate x:Key="System.UInt32">
+            <nmgc:NumericTextBox NumberStyles="Integer"
+                                 NullValue="{x:Null}"
+                                 Text="{Binding Value}" >
+            </nmgc:NumericTextBox>
+        </DataTemplate>
+
+        <DataTemplate x:Key="System.Int64">
+            <nmgc:NumericTextBox NumberStyles="Integer"
+                                 NullValue="{x:Null}"
+                                 Text="{Binding Value}" >
+            </nmgc:NumericTextBox>
+        </DataTemplate>
+
+        <DataTemplate x:Key="System.UInt64">
+            <nmgc:NumericTextBox NumberStyles="Integer"
+                                 NullValue="{x:Null}"
+                                 Text="{Binding Value}" >
+            </nmgc:NumericTextBox>
+        </DataTemplate>
+
+        <DataTemplate x:Key="System.DateTime">
+            <xctk:DateTimePicker Value="{Binding Value}">
+            </xctk:DateTimePicker>
+        </DataTemplate>
+
+        <DataTemplate x:Key="System.TimeSpan">
+            <nmgc:TimeSpanUpDown InternalValue="{Binding Value}" />
+
+        </DataTemplate>
+
+    </UserControl.Resources>
+
+    <StackPanel>
+        <nmfc:PropertyItemsControl ItemsSource="{Binding Items}" 
+                                   ItemContainerStyle="{StaticResource ItemContainer_Style}"
+                                   ContentTemplateSelector="{StaticResource newRowContentTemplateSelector}" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="Insert" Content="{x:Static p:Resources.Button_OK}" IsDefault="True" Style="{DynamicResource Dialog_Button_Style}" />
+            <Border Width="4" />
+            <Button x:Name="TryClose" Content="{x:Static p:Resources.Button_Close}" Style="{DynamicResource Dialog_Button_Style}" />
+        </StackPanel>
+    </StackPanel>
+
+</UserControl>

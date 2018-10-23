@@ -34,7 +34,6 @@ namespace Ntreev.Crema.Services.Data
         private TableTemplateDomain domain;
         private DataTable table;
 
-        private readonly HashSet<DataRow> rowsToAdd = new HashSet<DataRow>();
         private List<TableColumn> items;
 
         private EventHandler editBegun;
@@ -54,7 +53,6 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
                 });
                 var column = await TableColumn.CreateAsync(authentication, this, this.TemplateSource.View.Table);
-                await this.Dispatcher.InvokeAsync(() => this.rowsToAdd.Add(column.Row));
                 return column;
             }
             catch (Exception e)
@@ -74,11 +72,6 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndNewAsync));
                 });
                 await column.EndNewAsync(authentication);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.items.Add(column);
-                    this.rowsToAdd.Remove(column.Row);
-                });
             }
             catch (Exception e)
             {
@@ -344,7 +337,6 @@ namespace Ntreev.Crema.Services.Data
             this.IsModified = false;
             this.table = null;
             this.items = null;
-            this.rowsToAdd.Clear();
             return tableInfos;
         }
 
@@ -366,7 +358,6 @@ namespace Ntreev.Crema.Services.Data
             this.IsModified = false;
             this.table = null;
             this.items = null;
-            this.rowsToAdd.Clear();
         }
 
         protected virtual void OnAttach(Domain domain)
@@ -419,10 +410,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    if (this.rowsToAdd.Contains(e.Row) == false)
-                    {
-                        this.items.Add(new TableColumn(this, e.Row));
-                    }
+                    this.items.Add(new TableColumn(this, e.Row));
                 });
             }
         }

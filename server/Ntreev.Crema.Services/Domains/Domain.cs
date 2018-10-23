@@ -250,9 +250,9 @@ namespace Ntreev.Crema.Services.Domains
                     this.CremaHost.Sign(authentication);
                     base.UpdateModificationInfo(authentication.SignatureDate);
                     this.OnRowRemoved(new DomainRowEventArgs(authentication, this, rows));
-                    this.Container.InvokeDomainRowRemovedEvent(authentication, this, rows);
-                    this.Container.InvokeDomainStateChangedEvent(authentication, this);
-                    this.Container.InvokeDomainInfoChangedEvent(authentication, this);
+                    this.Container?.InvokeDomainRowRemovedEvent(authentication, this, rows);
+                    this.Container?.InvokeDomainStateChangedEvent(authentication, this);
+                    this.Container?.InvokeDomainInfoChangedEvent(authentication, this);
                 });
             }
             catch (Exception e)

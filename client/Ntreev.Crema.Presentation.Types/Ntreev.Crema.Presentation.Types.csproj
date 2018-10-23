@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authenticator.cs" />
+    <Compile Include="Dialogs\ViewModels\NewMemberViewModel.cs" />
     <Compile Include="Dialogs\ViewModels\LogInfoViewModel.cs" />
     <Compile Include="Dialogs\ViewModels\PreviewDocumentViewModel.cs" />
     <Compile Include="Dialogs\ViewModels\PreviewTypeCategoryTreeViewItemViewModel.cs" />
@@ -104,6 +105,9 @@
     <Compile Include="Dialogs\ViewModels\PreviewTreeViewItemViewModelBuilder.cs" />
     <Compile Include="Dialogs\Views\LogView.xaml.cs">
       <DependentUpon>LogView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Views\NewMemberView.xaml.cs">
+      <DependentUpon>NewMemberView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Views\PreviewTypeCategoryView.xaml.cs">
       <DependentUpon>PreviewTypeCategoryView.xaml</DependentUpon>
@@ -259,6 +263,10 @@
     <Page Include="BrowserItems\Views\TypeBrowserView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\Views\NewMemberView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\Views\PreviewTypeCategoryView.xaml">
       <SubType>Designer</SubType>

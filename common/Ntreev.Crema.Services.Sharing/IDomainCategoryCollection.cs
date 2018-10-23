@@ -27,8 +27,6 @@ namespace Ntreev.Crema.Services
     {
         bool Contains(string categoryPath);
 
-        string[] GetMetaData(Authentication authentication);
-
         IDomainCategory Root { get; }
 
         IDomainCategory this[string categoryPath] { get; }

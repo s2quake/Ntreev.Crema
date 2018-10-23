@@ -97,6 +97,28 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             }
         }
 
+        public async Task NewColumnAsync()
+        {
+            var items = await this.template.Dispatcher.InvokeAsync(() => this.template.Select(item => item.Name).ToArray());
+            var selectableTypes = await this.template.Dispatcher.InvokeAsync(() => this.template.SelectableTypes);
+            var name = NameUtility.GenerateNewName("Column", items);
+            var dialog = new NewColumnViewModel(selectableTypes)
+            {
+                Name = name,
+                IsKey = items.Any() == false,
+                DataType = typeof(string).GetTypeName()
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                var member = await this.template.AddNewAsync(this.authentication);
+                await member.SetNameAsync(this.authentication, dialog.Name);
+                await member.SetDataTypeAsync(this.authentication, dialog.DataType);
+                await member.SetCommentAsync(this.authentication, dialog.Comment);
+                await member.SetIsKeyAsync(this.authentication, dialog.IsKey);
+                await this.template.EndNewAsync(this.authentication, member);
+            }
+        }
+
         public bool IsReadOnly
         {
             get { return this.isReadOnly; }

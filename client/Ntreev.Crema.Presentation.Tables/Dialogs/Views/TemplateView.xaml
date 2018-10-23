@@ -22,6 +22,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
+             xmlns:cal="http://www.caliburnproject.org"
              xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
              xmlns:nmfm="clr-namespace:Ntreev.ModernUI.Framework.Markup;assembly=Ntreev.ModernUI.Framework"
              xmlns:nmgc="clr-namespace:Ntreev.ModernUI.Framework.DataGrid.Controls;assembly=Ntreev.ModernUI.Framework.DataGrid"
@@ -49,7 +50,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     <nmgc:ModernColumnManagerRow />
                 </DataTemplate>
                 <DataTemplate>
-                    <Label Content="구현" Visibility="{nmfm:VisibilityBinding Path=(xcdg:DataGridControl.DataGridContext).DataGridControl.ReadOnly, RelativeSource={RelativeSource self}, Inverse=True}" />
+                    <Button Content="추가..." x:Name="NewColumn" Focusable="False" cal:Bind.Model="{Binding}" />
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Path=ReadOnly, RelativeSource={RelativeSource AncestorType={x:Type xcdg:DataGridControl}}}" Value="True">
+                            <Setter TargetName="NewColumn" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
                 </DataTemplate>
                 <DataTemplate>
                     <Grid xcdg:TableView.CanScrollHorizontally="False" Height="3" VerticalAlignment="Bottom"

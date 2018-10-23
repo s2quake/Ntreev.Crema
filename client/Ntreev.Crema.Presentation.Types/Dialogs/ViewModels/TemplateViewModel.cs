@@ -28,6 +28,7 @@ using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Ntreev.Library;
 
 namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 {
@@ -88,6 +89,25 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             {
                 this.EndProgress();
                 AppMessageBox.ShowError(e);
+            }
+        }
+
+        public async Task NewMemberAsync()
+        {
+            var items = await this.template.Dispatcher.InvokeAsync(() => this.template.Select(item => item.Name).ToArray());
+            var name = NameUtility.GenerateNewName("Member", items);
+            var dialog = new NewMemberViewModel()
+            {
+                Name = name,
+                Value = items.Length,
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                var member = await this.template.AddNewAsync(this.authentication);
+                await member.SetNameAsync(this.authentication, dialog.Name);
+                await member.SetValueAsync(this.authentication, dialog.Value);
+                await member.SetCommentAsync(this.authentication, dialog.Comment);
+                await this.template.EndNewAsync(this.authentication, member);
             }
         }
 

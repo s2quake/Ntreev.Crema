@@ -440,8 +440,8 @@ namespace Ntreev.Crema.Services.Users
                 this.timer = null;
                 this.Dispatcher.Dispose();
                 this.Dispatcher = null;
-                this.CremaHost.RemoveServiceAsync(this, closeInfo);
             });
+            this.CremaHost.RemoveServiceAsync(this, closeInfo);
         }
 
         void IUserServiceCallback.OnUsersChanged(SignatureDate signatureDate, UserInfo[] userInfos)

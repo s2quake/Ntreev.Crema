@@ -1157,12 +1157,15 @@ namespace Ntreev.Crema.Services.Data
 
         private async void Service_Faulted(object sender, EventArgs e)
         {
-            this.service.Abort();
-            this.service = null;
-            this.timer?.Dispose();
-            this.timer = null;
-            this.Dispatcher.Dispose();
-            this.Dispatcher = null;
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.service.Abort();
+                this.service = null;
+                this.timer?.Dispose();
+                this.timer = null;
+                this.Dispatcher.Dispose();
+                this.Dispatcher = null;
+            });
             await this.CremaHost.RemoveServiceAsync(this);
         }
 
@@ -1182,15 +1185,18 @@ namespace Ntreev.Crema.Services.Data
 
         #region IDataBaseServiceCallback
 
-        async void IDataBaseServiceCallback.OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
+        void IDataBaseServiceCallback.OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
-            this.service.Close();
-            this.service = null;
-            this.timer?.Dispose();
-            this.timer = null;
-            this.Dispatcher.Dispose();
-            this.Dispatcher = null;
-            await this.CremaHost.RemoveServiceAsync(this);
+            this.Dispatcher.Invoke(() =>
+            {
+                this.service.Close();
+                this.service = null;
+                this.timer?.Dispose();
+                this.timer = null;
+                this.Dispatcher.Dispose();
+                this.Dispatcher = null;
+            });
+            this.CremaHost.RemoveServiceAsync(this);
         }
 
         void IDataBaseServiceCallback.OnTablesChanged(SignatureDate signatureDate, TableInfo[] tableInfos)

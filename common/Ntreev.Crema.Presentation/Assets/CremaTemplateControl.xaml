@@ -69,7 +69,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     <ncpv:SelectableTypesConverter x:Key="SelectableTypesConverter" />
     <ncpv:SelectableTypeConverter x:Key="SelectableTypeConverter" />
 
-    <Style x:Key="ComboBoxItem_Style" TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+    <Style x:Key="SelectableType_ComboBoxItem_Style" TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ComboBoxItem}">
@@ -122,7 +122,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                           DisplayMemberPath="Name"
                           DropDownOpened="ComboBox_DropDownOpened" DropDownClosed="ComboBox_DropDownClosed" 
                           Template="{StaticResource DataCell_Editable_ComboBox_Template}"
-                          ItemContainerStyle="{StaticResource ComboBoxItem_Style}">
+                          ItemContainerStyle="{StaticResource SelectableType_ComboBoxItem_Style}">
                     <ComboBox.Resources>
                         <Style TargetType="{x:Type Popup}">
                             <Setter Property="PlacementTarget" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type xcdg:Cell}}}" />

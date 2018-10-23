@@ -34,7 +34,6 @@ namespace Ntreev.Crema.Services.Data
         private TypeDomain domain;
         private DataTable table;
 
-        private readonly HashSet<DataRow> rowsToAdd = new HashSet<DataRow>();
         private List<TypeMember> items;
 
         private EventHandler editBegun;
@@ -54,7 +53,6 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
                 });
                 var member = await TypeMember.CreateAsync(authentication, this, this.TypeSource.View.Table);
-                await this.Dispatcher.InvokeAsync(() => this.rowsToAdd.Add(member.Row));
                 return member;
             }
             catch (Exception e)
@@ -74,11 +72,6 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndNewAsync));
                 });
                 await member.EndNewAsync(authentication);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.items.Add(member);
-                    this.rowsToAdd.Remove(member.Row);
-                });
             }
             catch (Exception e)
             {
@@ -332,7 +325,6 @@ namespace Ntreev.Crema.Services.Data
             this.IsModified = false;
             this.table = null;
             this.items = null;
-            this.rowsToAdd.Clear();
             return typeInfos;
         }
 
@@ -354,7 +346,6 @@ namespace Ntreev.Crema.Services.Data
             this.IsModified = false;
             this.table = null;
             this.items = null;
-            this.rowsToAdd.Clear();
         }
 
         protected virtual void OnAttach(Domain domain)
@@ -408,10 +399,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    if (this.rowsToAdd.Contains(e.Row) == false)
-                    {
-                        this.items.Add(new TypeMember(this, e.Row));
-                    }
+                    this.items.Add(new TypeMember(this, e.Row));
                 });
             }
         }

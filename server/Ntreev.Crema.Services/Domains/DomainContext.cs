@@ -92,20 +92,6 @@ namespace Ntreev.Crema.Services.Domains
             return this.CremaHost.GetService(serviceType);
         }
 
-        //public async Task RestoreAsync(Authentication authentication, Domain domain)
-        //{
-        //    await this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        authentication.Sign();
-        //        var dataBase = this.CremaHost.DataBases[domain.DataBaseID];
-        //        var categoryName = CategoryName.Create(dataBase.Name, domain.DomainInfo.ItemType);
-        //        //var category = this.Categories.Prepare(categoryName);
-        //        //domain.Category = category;
-        //        //domain.Dispatcher = new CremaDispatcher(domain);
-        //        //this.Domains.InvokeDomainCreatedEvent(authentication, domain, domain.DomainInfo);
-        //    });
-        //}
-
         public async Task AddAsync(Authentication authentication, Domain domain, DataBase dataBase)
         {
             await this.Dispatcher.InvokeAsync(() =>
@@ -131,7 +117,7 @@ namespace Ntreev.Crema.Services.Domains
 
                 domain.Dispose(authentication, isCanceled, result);
                 //dispatcher.Dispose();
-                this.Domains.InvokeDomainDeletedEvent(authentication, new Domain[] { domain },new bool[] { isCanceled }, new object[] { result });
+                this.Domains.InvokeDomainDeletedEvent(authentication, new Domain[] { domain }, new bool[] { isCanceled }, new object[] { result });
             });
         }
 
@@ -147,18 +133,18 @@ namespace Ntreev.Crema.Services.Domains
             };
         }
 
-        public async Task<DomainContextMetaData> GetMetaDataAsync(Authentication authentication)
-        {
-            var domains = await this.Domains.GetMetaDataAsync(authentication);
-            return await this.Dispatcher.InvokeAsync(() =>
-            {
-                return new DomainContextMetaData()
-                {
-                    DomainCategories = this.Categories.GetMetaData(authentication),
-                    Domains = domains,
-                };
-            });
-        }
+        //public async Task<DomainContextMetaData> GetMetaDataAsync(Authentication authentication)
+        //{
+        //    var domains = await this.Domains.GetMetaDataAsync(authentication);
+        //    return await this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        return new DomainContextMetaData()
+        //        {
+        //            DomainCategories = this.Categories.GetMetaData(authentication),
+        //            Domains = domains,
+        //        };
+        //    });
+        //}
 
         public DomainMetaData[] GetDomainMetaDatas(Authentication authentication, Guid dataBaseID)
         {
@@ -391,18 +377,6 @@ namespace Ntreev.Crema.Services.Domains
             try
             {
                 await result;
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    var domains = restorers.Where(item => item.Domain != null).Select(item => item.Domain).ToArray();
-                    foreach(var item in domains)
-                    {
-                        var categoryName = CategoryName.Create(dataBase.Name, item.DomainInfo.ItemType);
-                        var category = this.Categories.Prepare(categoryName);
-                        item.Category = category;
-                    }
-                    this.Domains.InvokeDomainCreatedEvent(Authentication.System, domains);
-                });
-                this.CremaHost.Info(string.Format(Resources.Message_RestoreResult_Format, restorers.Length, 0));
             }
             catch
             {
@@ -411,7 +385,22 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.Error(item);
                 }
-                this.CremaHost.Info(string.Format(Resources.Message_RestoreResult_Format, restorers.Length - exceptions.Count, exceptions.Count));
+            }
+            finally
+            {
+                var count = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var domains = restorers.Where(item => item.Domain != null).Select(item => item.Domain).ToArray();
+                    foreach (var item in domains)
+                    {
+                        var categoryName = CategoryName.Create(dataBase.Name, item.DomainInfo.ItemType);
+                        var category = this.Categories.Prepare(categoryName);
+                        item.Category = category;
+                    }
+                    this.Domains.InvokeDomainCreatedEvent(Authentication.System, domains);
+                    return domains.Length;
+                });
+                this.CremaHost.Info(string.Format(Resources.Message_RestoreResult_Format, count, restorers.Length - count));
             }
         }
 
