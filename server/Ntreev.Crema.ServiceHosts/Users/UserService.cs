@@ -467,37 +467,29 @@ namespace Ntreev.Crema.ServiceHosts.Users
             this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnUsersLoggedIn(signatureDate, userIDs));
         }
 
-        private async void Users_UsersLoggedOut(object sender, Services.ItemsEventArgs<IUser> e)
+        private void Users_UsersLoggedOut(object sender, Services.ItemsEventArgs<IUser> e)
         {
             var actionUserID = e.UserID;
             var contains = e.Items.Any(item => item.ID == this.authentication.ID);
             var closeInfo = (CloseInfo)e.MetaData;
             var signatureDate = e.SignatureDate;
-            //if (actionUserID != this.authentication.ID && contains == true)
-            //{
-            //    
-            //    this.InvokeEvent(null, null, () =>
-            //    {
-            //        this.Callback?.OnServiceClosed(signatureDate, closeInfo);
-            //        this.Channel.Close(TimeSpan.FromSeconds(10));
-            //    });
-            //}
-            //else
+            var userID = this.authentication.ID;
+            var exceptionUserID = e.UserID;
+            var userIDs = e.Items.Select(item => item.ID).ToArray();
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnUsersLoggedOut(signatureDate, userIDs, closeInfo));
             if (actionUserID != this.authentication.ID && contains == true)
             {
-
-            }
-
-            {
-                var userID = this.authentication.ID;
-                var exceptionUserID = e.UserID;
-                var userIDs = e.Items.Select(item => item.ID).ToArray();
-                this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnUsersLoggedOut(signatureDate, userIDs, closeInfo));
-
-            }
-            if (actionUserID != this.authentication.ID && contains == true)
-            {
-                await this.DetachEventHandlersAsync();
+                this.UserContext.Users.UsersStateChanged -= Users_UsersStateChanged;
+                this.UserContext.Users.UsersChanged -= Users_UsersChanged;
+                this.UserContext.ItemsCreated -= UserContext_ItemsCreated;
+                this.UserContext.ItemsRenamed -= UserContext_ItemsRenamed;
+                this.UserContext.ItemsMoved -= UserContext_ItemsMoved;
+                this.UserContext.ItemsDeleted -= UserContext_ItemsDeleted;
+                this.UserContext.Users.UsersLoggedIn -= Users_UsersLoggedIn;
+                this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
+                this.UserContext.Users.UsersKicked -= Users_UsersKicked;
+                this.UserContext.Users.UsersBanChanged -= Users_UsersBanChanged;
+                this.UserContext.Users.MessageReceived -= UserContext_MessageReceived;
                 this.authentication = null;
                 this.Channel.Abort();
             }

@@ -55,8 +55,6 @@ namespace Ntreev.Crema.Services.Domains
                 var binding = CremaHost.CreateBinding(serviceInfo);
                 var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/DomainService");
                 var instanceContext = new InstanceContext(this);
-                instanceContext.SynchronizationContext = this.Dispatcher.SynchronizationContext;
-
                 this.service = new DomainServiceClient(instanceContext, binding, endPointAddress);
                 this.service.Open();
                 if (this.service is ICommunicationObject service)
@@ -190,7 +188,7 @@ namespace Ntreev.Crema.Services.Domains
             });
             await Task.WhenAll(tasks);
             await this.Dispatcher.DisposeAsync();
-            
+
             this.Dispatcher = null;
             this.b = nameof(CloseAsync);
         }
@@ -238,13 +236,13 @@ namespace Ntreev.Crema.Services.Domains
         {
             //this.Dispatcher.Invoke(() =>
             //{
-                foreach (var item in domainHostByDomain)
-                {
-                    var domain = item.Key;
-                    var domainHost = item.Value;
-                    domain.Detach(authentications);
-                    domain.SetDomainHost(Authentication.System, null);
-                }
+            foreach (var item in domainHostByDomain)
+            {
+                var domain = item.Key;
+                var domainHost = item.Value;
+                domain.Detach(authentications);
+                domain.SetDomainHost(Authentication.System, null);
+            }
             //});
         }
 
@@ -533,12 +531,12 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
-                
-                //this.Dispatcher.Invoke(() =>
-                //{
+
+                this.Dispatcher.Invoke(() =>
+                {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     this.Domains.AddDomain(authentication, metaDatas);
-                //});
+                });
             }
             catch (Exception e)
             {
@@ -554,9 +552,10 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     int qwer = 0;
                 }
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                //var domainHosts = this.Dispatcher?.Invoke(() =>
-                //{
+
+                this.Dispatcher.Invoke(() =>
+                {
+                    var authentication = this.UserContext.Authenticate(signatureDate);
                     var domainHostList = new List<IDomainHost>(domainIDs.Length);
                     var domainList = new List<Domain>(domainIDs.Length);
                     for (var i = 0; i < domainIDs.Length; i++)
@@ -571,16 +570,17 @@ namespace Ntreev.Crema.Services.Domains
                         domainList.Add(domain);
                     }
                     this.Domains.InvokeDomainDeletedEvent(authentication, domainList.ToArray(), isCanceleds, results);
-                //    return domainHostList.ToArray();
-                //});
-                for (var i = 0; i < domainIDs.Length; i++)
-                {
-                    var domainHost = domainHostList[i];
-                    var isCanceled = isCanceleds[i];
-                    var result = results[i];
-                    if (domainHost != null)
-                        domainHost.DeleteAsync(authentication, isCanceled, result);
-                }
+                    //return domainHostList.ToArray();
+
+                    for (var i = 0; i < domainIDs.Length; i++)
+                    {
+                        var domainHost = domainHostList[i];
+                        var isCanceled = isCanceleds[i];
+                        var result = results[i];
+                        if (domainHost != null)
+                            domainHost.DeleteAsync(authentication, isCanceled, result);
+                    }
+                });
             }
             catch (Exception e)
             {
@@ -609,12 +609,12 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
-                //this.Dispatcher.Invoke(() =>
-                //{
+                this.Dispatcher.Invoke(() =>
+                {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
                     domain.InvokeDomainStateChanged(authentication, domainState);
-                //});
+                });
             }
             catch (Exception e)
             {

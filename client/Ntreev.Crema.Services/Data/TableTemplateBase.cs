@@ -330,7 +330,7 @@ namespace Ntreev.Crema.Services.Data
         protected virtual async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
             var tableInfos = await this.EndDomainAsync(authentication, args);
-            if (this.domain != null)
+            if (args is Guid)
             {
                 await this.DetachDomainEventAsync();
                 await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false, tableInfos);

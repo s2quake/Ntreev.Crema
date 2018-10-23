@@ -191,7 +191,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     tableInfoByName.Add(item.Name, item);
                 }
-                if (this.domain != null)
+                if (args is Guid)
                 {
                     await this.DetachDomainEventAsync();
                     await this.DomainContext.DeleteAsync(authentication, this.domain, false, tableInfos);
@@ -221,7 +221,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     var result = await Task.Run(() => this.Service.CancelTableContentEdit(name));
                 }
-                if (this.domain != null)
+                if (args is Guid)
                 {
                     await this.DetachDomainEventAsync();
                     await this.DomainContext.DeleteAsync(authentication, this.domain, true, null);

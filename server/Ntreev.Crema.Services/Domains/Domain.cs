@@ -129,7 +129,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.Sign(authentication);
                     this.OnUserChanged(new DomainUserEventArgs(authentication, this, domainUser));
-                    this.Container.InvokeDomainUserChangedEvent(authentication, this, domainUser);
+                    this.Container?.InvokeDomainUserChangedEvent(authentication, this, domainUser);
                 });
             }
             catch (Exception e)
@@ -154,7 +154,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.Sign(authentication);
                     this.OnUserChanged(new DomainUserEventArgs(authentication, this, domainUser));
-                    this.Container.InvokeDomainUserChangedEvent(authentication, this, domainUser);
+                    this.Container?.InvokeDomainUserChangedEvent(authentication, this, domainUser);
                 });
             }
             catch (Exception e)
@@ -184,9 +184,9 @@ namespace Ntreev.Crema.Services.Domains
                     this.CremaHost.Sign(authentication);
                     base.UpdateModificationInfo(authentication.SignatureDate);
                     this.OnRowAdded(new DomainRowEventArgs(authentication, this, rows));
-                    this.Container.InvokeDomainRowAddedEvent(authentication, this, rows);
-                    this.Container.InvokeDomainStateChangedEvent(authentication, this);
-                    this.Container.InvokeDomainInfoChangedEvent(authentication, this);
+                    this.Container?.InvokeDomainRowAddedEvent(authentication, this, rows);
+                    this.Container?.InvokeDomainStateChangedEvent(authentication, this);
+                    this.Container?.InvokeDomainInfoChangedEvent(authentication, this);
                 });
                 return result;
             }
@@ -217,9 +217,9 @@ namespace Ntreev.Crema.Services.Domains
                     this.CremaHost.Sign(authentication);
                     base.UpdateModificationInfo(authentication.SignatureDate);
                     this.OnRowChanged(new DomainRowEventArgs(authentication, this, rows));
-                    this.Container.InvokeDomainRowChangedEvent(authentication, this, rows);
-                    this.Container.InvokeDomainStateChangedEvent(authentication, this);
-                    this.Container.InvokeDomainInfoChangedEvent(authentication, this);
+                    this.Container?.InvokeDomainRowChangedEvent(authentication, this, rows);
+                    this.Container?.InvokeDomainStateChangedEvent(authentication, this);
+                    this.Container?.InvokeDomainInfoChangedEvent(authentication, this);
                 });
                 return result;
             }
@@ -282,9 +282,9 @@ namespace Ntreev.Crema.Services.Domains
                     this.CremaHost.Sign(authentication);
                     base.UpdateModificationInfo(authentication.SignatureDate);
                     this.OnPropertyChanged(new DomainPropertyEventArgs(authentication, this, propertyName, value));
-                    this.Container.InvokeDomainPropertyChangedEvent(authentication, this, propertyName, value);
-                    this.Container.InvokeDomainStateChangedEvent(authentication, this);
-                    this.Container.InvokeDomainInfoChangedEvent(authentication, this);
+                    this.Container?.InvokeDomainPropertyChangedEvent(authentication, this, propertyName, value);
+                    this.Container?.InvokeDomainStateChangedEvent(authentication, this);
+                    this.Container?.InvokeDomainInfoChangedEvent(authentication, this);
                 });
             }
             catch (Exception e)
@@ -309,7 +309,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.Sign(authentication);
                     this.OnUserChanged(new DomainUserEventArgs(authentication, this, domainUser));
-                    this.Container.InvokeDomainUserChangedEvent(authentication, this, domainUser);
+                    this.Container?.InvokeDomainUserChangedEvent(authentication, this, domainUser);
                 });
             }
             catch (Exception e)
@@ -338,7 +338,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.Sign(authentication);
                     this.OnUserRemoved(new DomainUserRemovedEventArgs(authentication, this, domainUser, removeInfo));
-                    this.Container.InvokeDomainUserRemovedEvent(authentication, this, domainUser, removeInfo);
+                    this.Container?.InvokeDomainUserRemovedEvent(authentication, this, domainUser, removeInfo);
                     return domainUser.DomainUserInfo;
                 });
             }
@@ -373,7 +373,7 @@ namespace Ntreev.Crema.Services.Domains
                         this.Container.InvokeDomainUserChangedEvent(authentication, this, oldOwner);
                     }
                     this.OnUserChanged(new DomainUserEventArgs(authentication, this, newOwner));
-                    this.Container.InvokeDomainUserChangedEvent(authentication, this, newOwner);
+                    this.Container?.InvokeDomainUserChangedEvent(authentication, this, newOwner);
                 });
             }
             catch (Exception e)

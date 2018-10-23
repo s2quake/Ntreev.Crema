@@ -318,7 +318,7 @@ namespace Ntreev.Crema.Services.Data
         protected virtual async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
             var typeInfos = await this.EndDomainAsync(authentication, args);
-            if (this.domain != null)
+            if (args is Guid)
             {
                 await this.DetachDomainEventAsync();
                 await this.DomainContext.DeleteAsync(authentication, this.domain, false, typeInfos);
@@ -340,7 +340,7 @@ namespace Ntreev.Crema.Services.Data
         {
             var result = await this.CancelDomainAsync(authentication, args);
             this.CremaHost.Sign(authentication, result);
-            if (this.domain != null)
+            if (args is Guid)
             {
                 await this.DetachDomainEventAsync();
                 await this.DomainContext.DeleteAsync(authentication, this.domain, true, null);
