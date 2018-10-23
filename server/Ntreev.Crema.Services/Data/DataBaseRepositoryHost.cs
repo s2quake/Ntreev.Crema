@@ -117,6 +117,12 @@ namespace Ntreev.Crema.Services.Data
             return this.Dispatcher.InvokeAsync(this.CancelTransaction);
         }
 
+        public override void CancelTransaction()
+        {
+            base.CancelTransaction();
+            this.itemPaths.Clear();
+        }
+
         public void RefreshItems()
         {
             var typeDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);

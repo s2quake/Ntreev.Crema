@@ -108,7 +108,7 @@ namespace Ntreev.Crema.Services
             this.Repository.EndTransaction();
         }
 
-        public void CancelTransaction()
+        public virtual void CancelTransaction()
         {
             this.Dispatcher.VerifyAccess();
             this.Repository.CancelTransaction();
