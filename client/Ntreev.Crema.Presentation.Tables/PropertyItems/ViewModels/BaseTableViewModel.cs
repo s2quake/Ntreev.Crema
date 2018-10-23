@@ -19,7 +19,7 @@ using System;
 using System.Linq;
 using System.ComponentModel.Composition;
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
@@ -29,11 +29,11 @@ using System.Collections;
 using Ntreev.ModernUI.Framework;
 using System.ComponentModel;
 using Ntreev.Library.Linq;
-using Ntreev.Crema.Client.Tables.Properties;
+using Ntreev.Crema.Presentation.Tables.Properties;
 using Ntreev.ModernUI.Framework.ViewModels;
-using Ntreev.Crema.Client.Tables.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
 
-namespace Ntreev.Crema.Client.Tables.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]

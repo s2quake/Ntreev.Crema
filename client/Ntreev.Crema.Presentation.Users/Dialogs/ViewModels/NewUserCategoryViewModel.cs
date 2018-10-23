@@ -24,10 +24,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
-using Ntreev.Crema.Client.Users.Properties;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Users.Properties;
+using Ntreev.Crema.Presentation.Framework;
 
-namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 {
     public class NewUserCategoryViewModel : NewCategoryAsyncViewModel
     {

@@ -23,19 +23,19 @@ using System.Collections.Specialized;
 using System.Collections.ObjectModel;
 using Ntreev.Crema.Services;
 using System.Windows.Input;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Caliburn.Micro;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.Users.Dialogs.ViewModels;
-using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Users.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
 using System.Windows;
 using Ntreev.ModernUI.Framework.ViewModels;
 using System.Threading.Tasks;
 using System.ComponentModel;
-using Ntreev.Crema.Client.Users.MenuItems;
+using Ntreev.Crema.Presentation.Users.MenuItems;
 
-namespace Ntreev.Crema.Client.Users.BrowserItems.ViewModels
+namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
 {
     public class UserTreeViewItemViewModel : UserTreeItemBase
     {

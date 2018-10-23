@@ -22,7 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Client.Types.Dialogs.Views
+namespace Ntreev.Crema.Presentation.Types.Dialogs.Views
 {
     partial class CopyTypeView : UserControl
     {

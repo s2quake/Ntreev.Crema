@@ -28,17 +28,17 @@ using System.ComponentModel.Composition;
 using System.Windows;
 using System.Xml.Serialization;
 using System.Xml;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library;
 using System.Collections.ObjectModel;
-using Ntreev.Crema.Client.Types;
+using Ntreev.Crema.Presentation.Types;
 using Ntreev.ModernUI.Framework;
 using Ntreev.Library.Linq;
 using System.Windows.Threading;
 using Ntreev.ModernUI.Framework.ViewModels;
 using Dispatcher = System.Windows.Threading.Dispatcher;
 
-namespace Ntreev.Crema.Client.SmartSet
+namespace Ntreev.Crema.Presentation.SmartSet
 {
     [Export]
     class TypeSmartSetContext : ItemContext<TypeSmartSet, TypeSmartSetCategory, TypeSmartSetCollection, TypeSmartSetCategoryCollection, TypeSmartSetContext>,

@@ -27,10 +27,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.Tables.Properties;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Tables.Properties;
+using Ntreev.Crema.Presentation.Framework;
 
-namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 {
     public class NewChildTableViewModel : TemplateViewModel
     {

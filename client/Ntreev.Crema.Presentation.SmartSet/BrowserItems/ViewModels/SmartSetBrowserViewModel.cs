@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using System.ComponentModel.Composition;
 using Caliburn.Micro;
 using System.Collections.ObjectModel;
@@ -29,20 +29,20 @@ using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Threading;
 using System.Windows.Input;
-using Ntreev.Crema.Client.Tables.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
 using System.Xml.Serialization;
 using System.Xml.Schema;
 using System.Xml;
 using Ntreev.ModernUI.Framework;
 using Ntreev.Library;
-using Ntreev.Crema.Client.SmartSet.Dialogs.ViewModels;
-using Ntreev.Crema.Client.SmartSet.BrowserItems.Views;
+using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.SmartSet.BrowserItems.Views;
 using System.IO;
 using Ntreev.Library.Serialization;
 using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.Library.ObjectModel;
 
-namespace Ntreev.Crema.Client.SmartSet.BrowserItems.ViewModels
+namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
     abstract class SmartSetBrowserViewModel : TreeViewBase, ISmartSetBrowser, IPartImportsSatisfiedNotification
     {

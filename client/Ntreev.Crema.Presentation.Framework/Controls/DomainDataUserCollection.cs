@@ -25,7 +25,7 @@ using Ntreev.Crema.Services;
 using System.Collections.ObjectModel;
 using Ntreev.Crema.ServiceModel;
 
-namespace Ntreev.Crema.Client.Framework.Controls
+namespace Ntreev.Crema.Presentation.Framework.Controls
 {
     class DomainDataUserCollection : ObservableCollection<DomainDataUser>
     {

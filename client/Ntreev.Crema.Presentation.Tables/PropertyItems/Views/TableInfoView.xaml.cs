@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace Ntreev.Crema.Client.Tables.PropertyItems.Views
+namespace Ntreev.Crema.Presentation.Tables.PropertyItems.Views
 {
     partial class TableInfoView : UserControl
     {

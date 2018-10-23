@@ -39,7 +39,7 @@ using System.Windows.Threading;
 using Xceed.Wpf.DataGrid;
 using Xceed.Wpf.DataGrid.Export;
 
-namespace Ntreev.Crema.Client.Framework.Controls
+namespace Ntreev.Crema.Presentation.Framework.Controls
 {
     public class DomainDataGridControl : ModernDataGridControl
     {

@@ -32,7 +32,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-namespace Ntreev.Crema.Client.Tables.Documents.Views
+namespace Ntreev.Crema.Presentation.Tables.Documents.Views
 {
     [TemplatePart(Name = "PART_SearchBox", Type = typeof(SearchBox))]
     class TableSourceControl : CremaDataTableItemControl

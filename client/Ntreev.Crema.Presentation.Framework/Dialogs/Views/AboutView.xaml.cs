@@ -31,7 +31,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Client.Framework.Dialogs.Views
+namespace Ntreev.Crema.Presentation.Framework.Dialogs.Views
 {
     /// <summary>
     /// AboutView.xaml에 대한 상호 작용 논리

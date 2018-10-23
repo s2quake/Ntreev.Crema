@@ -26,7 +26,7 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
-namespace Ntreev.Crema.Client.SmartSet.Rules.ViewModels
+namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
 {
     public abstract class RuleItem : PropertyChangedBase, IRuleItem
     {

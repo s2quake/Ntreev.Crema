@@ -23,7 +23,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Client.Framework.Controls
+namespace Ntreev.Crema.Presentation.Framework.Controls
 {
     public class NameValidationRule : ValidationRule
     {

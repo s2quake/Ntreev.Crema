@@ -23,10 +23,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Caliburn.Micro;
 
-namespace Ntreev.Crema.Client.Converters.Dialogs.Views
+namespace Ntreev.Crema.Presentation.Converters.Dialogs.Views
 {
     partial class ExportOptionView : UserControl
     {

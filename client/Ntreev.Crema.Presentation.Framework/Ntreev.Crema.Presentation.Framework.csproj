@@ -7,8 +7,8 @@
     <ProjectGuid>{4C1FBD82-BCA7-44D2-B832-BFA2AB80EEBB}</ProjectGuid>
     <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ntreev.Crema.Client.Framework</RootNamespace>
-    <AssemblyName>Ntreev.Crema.Client.Framework</AssemblyName>
+    <RootNamespace>Ntreev.Crema.Presentation.Framework</RootNamespace>
+    <AssemblyName>Ntreev.Crema.Presentation.Framework</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

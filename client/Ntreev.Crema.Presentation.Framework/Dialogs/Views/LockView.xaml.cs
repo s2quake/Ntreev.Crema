@@ -22,7 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Client.Framework.Dialogs.Views
+namespace Ntreev.Crema.Presentation.Framework.Dialogs.Views
 {
     partial class LockView : UserControl
     {

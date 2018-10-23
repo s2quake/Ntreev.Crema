@@ -27,7 +27,7 @@ using System.Text;
 using System.Xml.Serialization;
 using Ntreev.Library;
 
-namespace Ntreev.Crema.Client.SmartSet.Rules.ViewModels
+namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
 {
     public abstract class TagsRuleViewModel : PropertyChangedBase, IRule
     {

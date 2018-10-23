@@ -15,9 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Users.Properties;
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Users.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Users.Properties;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Users.Dialogs.ViewModels;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.ModernUI.Framework;
 using System;
@@ -29,11 +29,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Users.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [ParentType("Ntreev.Crema.Client.Base.IPropertyService, Ntreev.Crema.Client.Base, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Base.IPropertyService, Ntreev.Crema.Presentation.Base, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class DataBaseUsersViewModel : PropertyItemBase
     {
         private readonly ObservableCollection<DataBaseUserItemViewModel> users = new ObservableCollection<DataBaseUserItemViewModel>();

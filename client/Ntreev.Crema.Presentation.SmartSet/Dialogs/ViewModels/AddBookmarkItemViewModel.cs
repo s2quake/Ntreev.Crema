@@ -26,15 +26,15 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using Ntreev.Library.Linq;
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Tables;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Tables;
 using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.Client.Tables.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
 using Ntreev.Library.IO;
-using Ntreev.Crema.Client.SmartSet.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels;
 
-namespace Ntreev.Crema.Client.SmartSet.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
 {
     public class AddBookmarkItemViewModel : ModalDialogAppBase
     {

@@ -25,7 +25,7 @@ using Ntreev.ModernUI.Framework;
 using System.Threading;
 using System.Windows;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     public abstract class BackgroundTaskBase : PropertyChangedBase, IBackgroundTask
     {

@@ -15,10 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Base.MenuItems;
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Users.Dialogs.ViewModels;
-using Ntreev.Crema.Client.Users.Properties;
+using Ntreev.Crema.Presentation.Base.MenuItems;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Users.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Users.Properties;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.ViewModels;
@@ -30,7 +30,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Ntreev.Crema.Client.Users.MenuItems.FileMenus
+namespace Ntreev.Crema.Presentation.Users.MenuItems.FileMenus
 {
     [Export(typeof(IMenuItem))]
     [ParentType(typeof(FileMenuItem))]

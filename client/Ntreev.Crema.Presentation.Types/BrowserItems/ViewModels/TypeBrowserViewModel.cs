@@ -18,7 +18,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using System.Windows;
@@ -32,11 +32,11 @@ using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.Library.Linq;
 using System.Collections;
 using System.Windows.Threading;
-using Ntreev.Crema.Client.Types.Properties;
+using Ntreev.Crema.Presentation.Types.Properties;
 using System.Threading.Tasks;
 using Ntreev.Library;
 
-namespace Ntreev.Crema.Client.Types.BrowserItems.ViewModels
+namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
 {
     [Export(typeof(IBrowserItem))]
     [Export(typeof(ITypeBrowser))]

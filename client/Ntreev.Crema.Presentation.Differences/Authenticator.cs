@@ -25,10 +25,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library;
 
-namespace Ntreev.Crema.Client.Differences
+namespace Ntreev.Crema.Presentation.Differences
 {
     [Export(typeof(IPlugin))]
     [Export(typeof(Authenticator))]

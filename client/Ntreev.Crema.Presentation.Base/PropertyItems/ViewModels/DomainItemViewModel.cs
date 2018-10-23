@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Base.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Base.PropertyItems.ViewModels
 {
     class DomainItemViewModel : PropertyChangedBase
     {

@@ -25,7 +25,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Base.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 {
     public class LogInfoViewModel : ListBoxItemViewModel, IInfoProvider
     {

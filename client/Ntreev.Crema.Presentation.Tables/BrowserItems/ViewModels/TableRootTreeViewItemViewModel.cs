@@ -20,14 +20,14 @@ using Ntreev.Crema.Services;
 using System;
 using System.Linq;
 using System.Windows;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library.Linq;
 using Caliburn.Micro;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
 using Ntreev.ModernUI.Framework;
 
-namespace Ntreev.Crema.Client.Tables.BrowserItems.ViewModels
+namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
 {
     public class TableRootTreeViewItemViewModel : TableCategoryTreeViewItemViewModel
     {

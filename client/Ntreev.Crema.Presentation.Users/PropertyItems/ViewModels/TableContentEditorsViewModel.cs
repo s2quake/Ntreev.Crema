@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library;
@@ -30,16 +30,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Ntreev.Crema.Client.Users.PropertyItems.Views;
+using Ntreev.Crema.Presentation.Users.PropertyItems.Views;
 using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Client.Users.Properties;
+using Ntreev.Crema.Presentation.Users.Properties;
 
-namespace Ntreev.Crema.Client.Users.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [Dependency("Ntreev.Crema.Client.Tables.PropertyItems.ViewModels.TableInfoViewModel, Ntreev.Crema.Client.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Client.Tables.IPropertyService, Ntreev.Crema.Client.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [Dependency("Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels.TableInfoViewModel, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Tables.IPropertyService, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class TableContentEditorsViewModel : EditorsViewModel
     {
         [ImportingConstructor]

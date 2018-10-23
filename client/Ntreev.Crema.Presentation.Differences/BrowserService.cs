@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Library.Linq;
 using System;
@@ -25,11 +25,11 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Windows;
 using Ntreev.Crema.Data.Diff;
-using Ntreev.Crema.Client.Differences.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
 
-namespace Ntreev.Crema.Client.Differences
+namespace Ntreev.Crema.Presentation.Differences
 {
-    [Export(typeof(Ntreev.Crema.Client.Framework.IBrowserService))]
+    [Export(typeof(Ntreev.Crema.Presentation.Framework.IBrowserService))]
     [InheritedExport(typeof(IBrowserService))]
     [InheritedExport(typeof(BrowserService))]
     class BrowserService : BrowserServiceBase, IBrowserService

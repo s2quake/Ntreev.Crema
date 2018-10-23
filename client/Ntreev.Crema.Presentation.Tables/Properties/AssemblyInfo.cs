@@ -21,9 +21,9 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
-[assembly: AssemblyTitle("Ntreev.Crema.Client.Tables")]
+[assembly: AssemblyTitle("Ntreev.Crema.Presentation.Tables")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("Ntreev.Crema.Client.Tables")]
+[assembly: AssemblyProduct("Ntreev.Crema.Presentation.Tables")]
 [assembly: ComVisible(false)]
 
 [assembly: ThemeInfo(

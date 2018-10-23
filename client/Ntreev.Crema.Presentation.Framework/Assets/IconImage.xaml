@@ -27,13 +27,13 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/lock_checked.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/lock_checked.png" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsLocked}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
             <DataTrigger Binding="{Binding IsLockInherited}" Value="True">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/lock.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/lock.png" />
             </DataTrigger>
             <DataTrigger Binding="{Binding IsLockOwner}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource Accent}" />
@@ -57,19 +57,19 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     <Style x:Key="AccessImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/access_member.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/access_member.png" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsPrivate}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
             <DataTrigger Binding="{Binding IsAccessInherited}" Value="True">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/access.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/access.png" />
             </DataTrigger>
             <DataTrigger Binding="{Binding IsAccessOwner}" Value="True">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/access_owner.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/access_owner.png" />
             </DataTrigger>
             <DataTrigger Binding="{Binding IsAccessMember}" Value="False">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/access_restriction.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/access_restriction.png" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -96,7 +96,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     <Style x:Key="TypeEditingImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="ToolTip" Value="편집중입니다." />
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/edit.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/edit.png" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsBeingEdited}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
@@ -129,7 +129,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     <Style x:Key="TableEditingImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="ToolTip" Value="편집중입니다." />
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/edit.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/edit.png" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsBeingEdited}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
@@ -161,7 +161,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <Style x:Key="TableSettingImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
         <Setter Property="Visibility" Value="Collapsed" />
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/setting.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/setting.png" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsBeingSetup}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
@@ -192,10 +192,10 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     </Style>
 
     <Style x:Key="CategoryImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/folder_c.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/folder_c.png" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsExpanded}" Value="True">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/folder_o.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/folder_o.png" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -209,10 +209,10 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     </Style>
 
     <Style x:Key="TypeImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/type_enum.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/type_enum.png" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsFlag}" Value="True">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/type_flag.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/type_flag.png" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -226,13 +226,13 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     </Style>
 
     <Style x:Key="TableImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/table.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/table.png" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsInherited}" Value="True">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/table_derived.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/table_derived.png" />
             </DataTrigger>
             <DataTrigger Binding="{Binding IsBaseTemplate}" Value="True">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/table_base.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/table_base.png" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -246,7 +246,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     </Style>
 
     <Style x:Key="DataBaseImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/database.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/database.png" />
     </Style>
 
     <Style x:Key="Selectable_DataBaseImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource DataBaseImage_Style}">
@@ -258,13 +258,13 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     </Style>
 
     <Style x:Key="UserIcon_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/user_member.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/user_member.png" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsAdmin}" Value="True">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/user_admin.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/user_admin.png" />
             </DataTrigger>
             <DataTrigger Binding="{Binding IsGuest}" Value="True">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/user_guest.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/user_guest.png" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -289,24 +289,24 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     </Style>
 
     <Style x:Key="DataBaseUserIcon_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/user_member.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/user_member.png" />
         <Setter Property="Foreground" Value="{DynamicResource Accent}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Authority}" Value="Admin">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/user_admin.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/user_admin.png" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Authority}" Value="Guest">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/user_guest.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/user_guest.png" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
 
     <Style x:Key="DomainUserImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/user_member.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/user_member.png" />
         <Setter Property="Foreground" Value="{DynamicResource ItemTextDisabled}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding CanWrite}" Value="False">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/user_guest.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/user_guest.png" />
             </DataTrigger>
             <DataTrigger Binding="{Binding IsOnline}" Value="True">
                 <Setter Property="Foreground" Value="{Binding Foreground}" />
@@ -322,10 +322,10 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     </Style>
 
     <Style x:Key="DomainImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/table.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/table.png" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding DomainInfo.ItemType}" Value="TypeTemplate">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/type_enum.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/type_enum.png" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -340,20 +340,20 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <Style x:Key="DomainItemTypeImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
         <Setter Property="Height" Value="16" />
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/edit.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/edit.png" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding DomainInfo.ItemType}" Value="TypeTemplate">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/setting.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/setting.png" />
             </DataTrigger>
             <DataTrigger Binding="{Binding DomainInfo.ItemType}" Value="TableTemplate">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/setting.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/setting.png" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
 
     <Style x:Key="IsModifiedImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
         <Setter Property="Height" Value="16" />
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/small_star.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/small_star.png" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsModified}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
@@ -363,7 +363,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <Style x:Key="IsOwnerImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
         <Setter Property="Margin" Value="2 0" />
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Framework;component/Images/star.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Framework;component/Images/star.png" />
         <Setter Property="Foreground" Value="{DynamicResource ItemTextDisabled}" />
         <Setter Property="Visibility" Value="Collapsed" />
         <Style.Triggers>

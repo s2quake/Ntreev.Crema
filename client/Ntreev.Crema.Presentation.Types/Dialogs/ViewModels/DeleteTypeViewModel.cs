@@ -15,9 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
-using Ntreev.Crema.Client.Types.Properties;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Types.Properties;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using System;
@@ -27,7 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
-namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 {
     public class DeleteTypeViewModel : DeleteAsyncAppViewModel
     {

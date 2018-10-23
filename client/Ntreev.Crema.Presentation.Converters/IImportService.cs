@@ -21,7 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Converters
+namespace Ntreev.Crema.Presentation.Converters
 {
     public interface IImportService
     {

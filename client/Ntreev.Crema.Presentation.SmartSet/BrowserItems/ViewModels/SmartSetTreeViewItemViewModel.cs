@@ -24,16 +24,16 @@ using System.Collections.ObjectModel;
 using Ntreev.Crema.Services;
 using System.Windows;
 using System.Windows.Threading;
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.SmartSet.Properties;
-using Ntreev.Crema.Client.Tables.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.SmartSet.Properties;
+using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.SmartSet.Dialogs.ViewModels;
-using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
 using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 
-namespace Ntreev.Crema.Client.SmartSet.BrowserItems.ViewModels
+namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
     class SmartSetTreeViewItemViewModel : TreeViewItemViewModel
     {

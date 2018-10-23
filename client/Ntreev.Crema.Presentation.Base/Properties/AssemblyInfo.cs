@@ -24,9 +24,9 @@ using System.Windows;
 // 어셈블리의 일반 정보는 다음 특성 집합을 통해 제어됩니다.
 // 어셈블리와 관련된 정보를 수정하려면
 // 이 특성 값을 변경하십시오.
-[assembly: AssemblyTitle("Ntreev.Crema.Client.Base")]
+[assembly: AssemblyTitle("Ntreev.Crema.Presentation.Base")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("Ntreev.Crema.Client.Base")]
+[assembly: AssemblyProduct("Ntreev.Crema.Presentation.Base")]
 [assembly: ComVisible(false)]
 
 //지역화 가능 응용 프로그램 빌드를 시작하려면 

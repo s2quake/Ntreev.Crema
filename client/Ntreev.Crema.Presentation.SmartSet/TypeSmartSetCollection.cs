@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library.ObjectModel;
 
-namespace Ntreev.Crema.Client.SmartSet
+namespace Ntreev.Crema.Presentation.SmartSet
 {
     class TypeSmartSetCollection : ItemContainer<TypeSmartSet, TypeSmartSetCategory, TypeSmartSetCollection, TypeSmartSetCategoryCollection, TypeSmartSetContext>
     {

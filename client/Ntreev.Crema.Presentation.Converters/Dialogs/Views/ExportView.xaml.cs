@@ -23,11 +23,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Converters.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels;
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Client.Converters.Dialogs.Views
+namespace Ntreev.Crema.Presentation.Converters.Dialogs.Views
 {
     partial class ExportView : UserControl
     {

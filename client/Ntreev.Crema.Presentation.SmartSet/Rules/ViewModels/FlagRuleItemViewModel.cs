@@ -23,7 +23,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Ntreev.Crema.Client.SmartSet.Rules.ViewModels
+namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
 {
     class FlagRuleItemViewModel : RuleItem
     {

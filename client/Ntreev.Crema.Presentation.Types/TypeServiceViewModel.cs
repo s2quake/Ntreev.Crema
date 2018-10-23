@@ -16,10 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Types.Dialogs.ViewModels;
-using Ntreev.Crema.Client.Types.Documents.ViewModels;
-using Ntreev.Crema.Client.Types.Properties;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Types.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Types.Documents.ViewModels;
+using Ntreev.Crema.Presentation.Types.Properties;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using System;
@@ -37,7 +37,7 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using Ntreev.Crema.Services.Extensions;
 
-namespace Ntreev.Crema.Client.Types
+namespace Ntreev.Crema.Presentation.Types
 {
     [Export(typeof(IContentService))]
     [InheritedExport(typeof(TypeServiceViewModel))]

@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library.Linq;
 using Caliburn.Micro;
 using System.ComponentModel.Composition;
@@ -30,7 +30,7 @@ using System.Reflection;
 using System.Collections;
 using Ntreev.ModernUI.Framework;
 
-namespace Ntreev.Crema.Client.Base.MenuItems
+namespace Ntreev.Crema.Presentation.Base.MenuItems
 {
     [Export(typeof(IMenuService))]
     public class MainMenuViewModel : MenuServiceBase

@@ -22,7 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Ntreev.Crema.Client.Framework.Assets
+namespace Ntreev.Crema.Presentation.Framework.Assets
 {
     partial class BrowserTreeView : ResourceDictionary
     {

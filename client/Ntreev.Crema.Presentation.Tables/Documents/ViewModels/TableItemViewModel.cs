@@ -27,9 +27,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 
-namespace Ntreev.Crema.Client.Tables.Documents.ViewModels
+namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 {
     class TableItemViewModel : TableListItemBase, ITableDocumentItem, ITableContentDescriptor
     {

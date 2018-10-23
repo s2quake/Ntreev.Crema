@@ -26,9 +26,9 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using System.Xml;
-using Ntreev.Crema.Client.SmartSet.Properties;
+using Ntreev.Crema.Presentation.SmartSet.Properties;
 
-namespace Ntreev.Crema.Client.SmartSet.Rules.ViewModels
+namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
 {
     class DateTimeRuleItemViewModel : OperatorRuleItemViewModel<DateTime>
     {

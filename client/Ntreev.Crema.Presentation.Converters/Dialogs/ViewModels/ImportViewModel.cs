@@ -37,11 +37,11 @@ using Ntreev.ModernUI.Framework;
 using Ntreev.Library;
 using System.ComponentModel;
 using Ntreev.Library.Linq;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.ModernUI.Framework.ViewModels;
-using Ntreev.Crema.Client.Converters.Properties;
+using Ntreev.Crema.Presentation.Converters.Properties;
 
-namespace Ntreev.Crema.Client.Converters.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
 {
     public class ImportViewModel : ModalDialogAppBase
     {

@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Types.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data.Xml.Schema;
@@ -33,9 +33,9 @@ using Ntreev.Crema.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
 using System.ComponentModel.Composition;
-using TypeDescriptor = Ntreev.Crema.Client.Framework.TypeDescriptor;
+using TypeDescriptor = Ntreev.Crema.Presentation.Framework.TypeDescriptor;
 
-namespace Ntreev.Crema.Client.Types.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels
 {
     class TypeListBoxItemViewModel : TypeListItemBase
     {

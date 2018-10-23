@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Services;
 
-namespace Ntreev.Crema.Client.Converters.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
 {
     abstract class ExportTreeViewItemViewModel : CheckableTreeViewItemViewModel
     {

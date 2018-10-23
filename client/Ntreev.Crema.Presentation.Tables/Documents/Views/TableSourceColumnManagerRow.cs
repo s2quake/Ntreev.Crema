@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using Xceed.Wpf.DataGrid;
 
-namespace Ntreev.Crema.Client.Tables.Documents.Views
+namespace Ntreev.Crema.Presentation.Tables.Documents.Views
 {
     class TableSourceColumnManagerRow : ModernColumnManagerRow
     {

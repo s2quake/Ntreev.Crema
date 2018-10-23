@@ -27,7 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     public abstract class DescriptorListItemBase<T> : ListBoxItemViewModel where T : DescriptorBase
     {

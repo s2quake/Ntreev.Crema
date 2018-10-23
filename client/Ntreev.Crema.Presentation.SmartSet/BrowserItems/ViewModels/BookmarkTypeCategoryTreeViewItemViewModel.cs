@@ -28,9 +28,9 @@ using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using System.ComponentModel.Composition;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.SmartSet.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
 
-namespace Ntreev.Crema.Client.SmartSet.BrowserItems.ViewModels
+namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
     class BookmarkTypeCategoryTreeViewItemViewModel : BookmarkCategoryTreeViewItemViewModel
     {

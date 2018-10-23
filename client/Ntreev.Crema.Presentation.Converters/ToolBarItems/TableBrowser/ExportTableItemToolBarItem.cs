@@ -15,9 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Converters.Dialogs.ViewModels;
-using Ntreev.Crema.Client.Converters.Properties;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Converters.Properties;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
@@ -26,10 +26,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Converters.ToolBarItems.TableBrowser
+namespace Ntreev.Crema.Presentation.Converters.ToolBarItems.TableBrowser
 {
     [Export(typeof(IToolBarItem))]
-    [ParentType("Ntreev.Crema.Client.Tables.ITableBrowser, Ntreev.Crema.Client.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Tables.ITableBrowser, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ExportRevisionDataBaseToolBarItem : ToolBarItemBase
     {
         [Import]
@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Client.Converters.ToolBarItems.TableBrowser
         [ImportingConstructor]
         public ExportRevisionDataBaseToolBarItem()
         {
-            this.Icon = "/Ntreev.Crema.Client.Converters;component/Images/spreadsheet.png";
+            this.Icon = "/Ntreev.Crema.Presentation.Converters;component/Images/spreadsheet.png";
             this.DisplayName = Resources.MenuItem_Export;
         }
 

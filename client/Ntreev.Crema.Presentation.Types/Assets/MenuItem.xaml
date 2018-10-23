@@ -19,9 +19,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-                    xmlns:p="clr-namespace:Ntreev.Crema.Client.Types.Properties">
+                    xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Types.Properties">
 
-    <nmfc:IconImage x:Key="type_icon" Source="/Ntreev.Crema.Client.Framework;component/Images/type_enum.png" Style="{StaticResource MenuItem_IconImage_Style}" x:Shared="False" />
+    <nmfc:IconImage x:Key="type_icon" Source="/Ntreev.Crema.Presentation.Framework;component/Images/type_enum.png" Style="{StaticResource MenuItem_IconImage_Style}" x:Shared="False" />
 
     <Style x:Key="NewType_MenuItem_Style" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
         <Setter Property="Header" Value="{x:Static p:Resources.MenuItem_NewType}" />

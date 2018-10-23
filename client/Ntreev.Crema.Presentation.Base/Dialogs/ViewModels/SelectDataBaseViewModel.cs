@@ -24,12 +24,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Crema.Client.Base.Properties;
+using Ntreev.Crema.Presentation.Base.Properties;
 using System.ComponentModel.Composition;
-using Ntreev.Crema.Client.Base.Services.ViewModels;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Base.Services.ViewModels;
+using Ntreev.Crema.Presentation.Framework;
 
-namespace Ntreev.Crema.Client.Base.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 {
     public class SelectDataBaseViewModel : ModalDialogBase
     {

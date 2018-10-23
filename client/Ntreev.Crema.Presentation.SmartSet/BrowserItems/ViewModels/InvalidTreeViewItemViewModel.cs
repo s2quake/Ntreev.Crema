@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.IO;
 
-namespace Ntreev.Crema.Client.SmartSet.BrowserItems.ViewModels
+namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
     class InvalidTreeViewItemViewModel : TreeViewItemViewModel
     {

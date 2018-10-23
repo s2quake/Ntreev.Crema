@@ -15,9 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Users.BrowserItems.ViewModels;
-using Ntreev.Crema.Client.Users.Properties;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Users.Properties;
 using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
@@ -26,7 +26,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Users.ToolBarItems
+namespace Ntreev.Crema.Presentation.Users.ToolBarItems
 {
     [Export(typeof(IToolBarItem))]
     [ParentType(typeof(UserBrowserViewModel))]
@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Client.Users.ToolBarItems
         [ImportingConstructor]
         public BanUserToolbarItem()
         {
-            this.Icon = "/Ntreev.Crema.Client.Users;component/Images/ban.png";
+            this.Icon = "/Ntreev.Crema.Presentation.Users;component/Images/ban.png";
             this.DisplayName = Resources.MenuItem_Ban;
         }
 

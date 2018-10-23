@@ -15,7 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-namespace Ntreev.Crema.Client.Tables.Properties {
+namespace Ntreev.Crema.Presentation.Tables.Properties {
     
     
     // 이 클래스를 사용하여 설정 클래스에 대한 특정 이벤트를 처리할 수 있습니다.

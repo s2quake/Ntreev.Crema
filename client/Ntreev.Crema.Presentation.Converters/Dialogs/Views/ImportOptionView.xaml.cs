@@ -30,7 +30,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Client.Converters.Dialogs.Views
+namespace Ntreev.Crema.Presentation.Converters.Dialogs.Views
 {
     /// <summary>
     /// ExportInfoControl.xaml에 대한 상호 작용 논리

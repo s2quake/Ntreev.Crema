@@ -16,18 +16,18 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Linq;
-using Ntreev.Crema.Client.Users.Properties;
+using Ntreev.Crema.Presentation.Users.Properties;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using System;
 using System.Threading.Tasks;
 using Ntreev.Library.ObjectModel;
 using System.Windows.Threading;
-using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 
-namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 {
     public class RenameCategoryViewModel : RenameAsyncViewModel
     {

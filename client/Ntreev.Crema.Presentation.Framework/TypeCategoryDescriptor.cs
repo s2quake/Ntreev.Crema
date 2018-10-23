@@ -22,16 +22,16 @@ using System.Windows;
 using System.Windows.Threading;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
 using System.Windows.Input;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ntreev.ModernUI.Framework.ViewModels;
 using System.Collections.ObjectModel;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     public class TypeCategoryDescriptor : DescriptorBase, ITypeCategoryDescriptor, ITypeItemDescriptor, ILockableDescriptor, IPermissionDescriptor, IAccessibleDescriptor
     {

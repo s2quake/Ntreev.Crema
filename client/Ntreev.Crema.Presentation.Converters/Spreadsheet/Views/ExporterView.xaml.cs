@@ -30,12 +30,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Ntreev.Crema.Client.Converters;
+using Ntreev.Crema.Presentation.Converters;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library;
 
-namespace Ntreev.Crema.Client.Converters.Spreadsheet.Views
+namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.Views
 {
     /// <summary>
     /// ExportInfoControl.xaml에 대한 상호 작용 논리

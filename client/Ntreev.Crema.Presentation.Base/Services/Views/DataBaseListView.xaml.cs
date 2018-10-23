@@ -15,7 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
@@ -35,7 +35,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Client.Base.Services.Views
+namespace Ntreev.Crema.Presentation.Base.Services.Views
 {
     /// <summary>
     /// DataBaseSelectionView.xaml에 대한 상호 작용 논리

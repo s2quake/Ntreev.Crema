@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library;
@@ -30,10 +30,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Ntreev.Crema.Client.Users.PropertyItems.Views;
-using Ntreev.Crema.Client.Users.Properties;
+using Ntreev.Crema.Presentation.Users.PropertyItems.Views;
+using Ntreev.Crema.Presentation.Users.Properties;
 
-namespace Ntreev.Crema.Client.Users.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     abstract class EditorsViewModel : PropertyItemBase
     {

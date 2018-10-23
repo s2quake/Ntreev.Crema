@@ -25,9 +25,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xceed.Wpf.DataGrid;
-using Ntreev.Crema.Client.Framework.Properties;
+using Ntreev.Crema.Presentation.Framework.Properties;
 
-namespace Ntreev.Crema.Client.Framework.Controls
+namespace Ntreev.Crema.Presentation.Framework.Controls
 {
     public class DomainTextClipboardExporter : ModernTextClipboardExporter
     {

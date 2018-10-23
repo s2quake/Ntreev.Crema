@@ -26,7 +26,7 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     public interface ICremaAppHost : IServiceProvider
     {

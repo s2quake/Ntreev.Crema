@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.Framework.Properties;
+using Ntreev.Crema.Presentation.Framework.Properties;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 
-namespace Ntreev.Crema.Client.Framework.MenuItems.Domains
+namespace Ntreev.Crema.Presentation.Framework.MenuItems.Domains
 {
     [Export(typeof(IMenuItem))]
     [ParentType(typeof(DomainTreeItemBase))]

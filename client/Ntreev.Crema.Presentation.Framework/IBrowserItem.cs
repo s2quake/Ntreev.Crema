@@ -21,7 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     /// <summary>
     /// 상속 객체를 ViewAware 으로 상속받았을시에는 view가 여러개 생기지 않음

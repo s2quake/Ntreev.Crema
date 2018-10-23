@@ -30,7 +30,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Client.Types.Dialogs.Views
+namespace Ntreev.Crema.Presentation.Types.Dialogs.Views
 {
     /// <summary>
     /// PreviewTypeCategoryView.xaml에 대한 상호 작용 논리

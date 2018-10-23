@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Ntreev.Crema.Client.Converters.Properties;
+using Ntreev.Crema.Presentation.Converters.Properties;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.Spreadsheet;
 using Ntreev.ModernUI.Framework;
@@ -28,10 +28,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Converters.ToolBarItems
+namespace Ntreev.Crema.Presentation.Converters.ToolBarItems
 {
     [Export(typeof(IToolBarItem))]
-    [ParentType("Ntreev.Crema.Client.Tables.Dialogs.ViewModels.LogViewModel, Ntreev.Crema.Client.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels.LogViewModel, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ExportRevisionTableToolBarItem : ToolBarItemBase
     {
         [Import]
@@ -40,7 +40,7 @@ namespace Ntreev.Crema.Client.Converters.ToolBarItems
         [ImportingConstructor]
         public ExportRevisionTableToolBarItem()
         {
-            this.Icon = "/Ntreev.Crema.Client.Converters;component/Images/spreadsheet.png";
+            this.Icon = "/Ntreev.Crema.Presentation.Converters;component/Images/spreadsheet.png";
             this.DisplayName = Resources.MenuItem_Export;
         }
 

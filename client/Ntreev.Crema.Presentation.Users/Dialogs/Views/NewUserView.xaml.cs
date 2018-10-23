@@ -27,7 +27,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace Ntreev.Crema.Client.Users.Dialogs.Views
+namespace Ntreev.Crema.Presentation.Users.Dialogs.Views
 {
     partial class NewUserView : UserControl
     {

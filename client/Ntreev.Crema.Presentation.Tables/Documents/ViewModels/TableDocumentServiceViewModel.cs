@@ -16,9 +16,9 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Tables.Documents.Views;
-using Ntreev.Crema.Client.Tables.Properties;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Tables.Documents.Views;
+using Ntreev.Crema.Presentation.Tables.Properties;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.ModernUI.Framework;
@@ -31,10 +31,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Collections;
-using Ntreev.Crema.Client.Tables.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
 using Ntreev.Library.Linq;
 
-namespace Ntreev.Crema.Client.Tables.Documents.ViewModels
+namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 {
     [Export(typeof(ITableDocumentService))]
     [InheritedExport(typeof(TableDocumentServiceViewModel))]

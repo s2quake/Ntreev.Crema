@@ -31,7 +31,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Client.Differences.PropertyItems.Views
+namespace Ntreev.Crema.Presentation.Differences.PropertyItems.Views
 {
     /// <summary>
     /// TemplateColumnInfoView.xaml에 대한 상호 작용 논리

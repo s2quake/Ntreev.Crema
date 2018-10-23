@@ -20,7 +20,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using System.Windows;
@@ -28,9 +28,9 @@ using Ntreev.ModernUI.Framework;
 using System.ComponentModel;
 using Ntreev.Library;
 using Ntreev.Crema.Data;
-using Ntreev.Crema.Client.Users.Properties;
+using Ntreev.Crema.Presentation.Users.Properties;
 
-namespace Ntreev.Crema.Client.Users.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     public class UserInfoViewModel : PropertyItemBase
     {

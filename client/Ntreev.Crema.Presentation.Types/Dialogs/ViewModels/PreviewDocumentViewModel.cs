@@ -23,7 +23,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 {
     class PreviewDocumentViewModel : DocumentServiceBase<PreviewTypeDocumentViewModel>
     {

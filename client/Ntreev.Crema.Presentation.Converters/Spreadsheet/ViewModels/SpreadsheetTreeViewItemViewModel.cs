@@ -27,7 +27,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Ntreev.Crema.Data;
 
-namespace Ntreev.Crema.Client.Converters.Spreadsheet.ViewModels
+namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.ViewModels
 {
     class SpreadsheetTreeViewItemViewModel : CheckableTreeViewItemViewModel
     {

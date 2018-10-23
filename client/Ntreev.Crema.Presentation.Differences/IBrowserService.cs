@@ -19,11 +19,11 @@ using System.Collections.Generic;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using System;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 
-namespace Ntreev.Crema.Client.Differences
+namespace Ntreev.Crema.Presentation.Differences
 {
-    public interface IBrowserService : Ntreev.Crema.Client.Framework.IBrowserService
+    public interface IBrowserService : Ntreev.Crema.Presentation.Framework.IBrowserService
     {
         
     }

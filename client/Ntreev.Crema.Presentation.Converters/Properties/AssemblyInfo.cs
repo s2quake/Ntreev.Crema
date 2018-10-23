@@ -21,9 +21,9 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
-[assembly: AssemblyTitle("Ntreev.Crema.Client.Converters")]
+[assembly: AssemblyTitle("Ntreev.Crema.Presentation.Converters")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("Ntreev.Crema.Client.Converters")]
+[assembly: AssemblyProduct("Ntreev.Crema.Presentation.Converters")]
 [assembly: ComVisible(false)]
 
 [assembly:ThemeInfo(

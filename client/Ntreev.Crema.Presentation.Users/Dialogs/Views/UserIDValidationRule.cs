@@ -25,7 +25,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Client.Users.Dialogs.Views
+namespace Ntreev.Crema.Presentation.Users.Dialogs.Views
 {
     class UserIDValidationRule : ValidationRule
     {

@@ -24,7 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     public class DomainUserListItemBase : DescriptorTreeItemBase<DomainUserDescriptor>, IDomainUserDescriptor
     {

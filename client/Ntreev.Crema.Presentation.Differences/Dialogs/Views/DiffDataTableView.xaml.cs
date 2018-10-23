@@ -30,7 +30,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Client.Differences.Dialogs.Views
+namespace Ntreev.Crema.Presentation.Differences.Dialogs.Views
 {
     /// <summary>
     /// DiffDataTableView.xaml에 대한 상호 작용 논리

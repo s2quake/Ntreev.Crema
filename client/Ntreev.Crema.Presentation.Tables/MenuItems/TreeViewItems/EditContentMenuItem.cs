@@ -15,10 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Tables.BrowserItems.ViewModels;
-using Ntreev.Crema.Client.Tables.Documents.ViewModels;
-using Ntreev.Crema.Client.Tables.Properties;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Tables.Documents.ViewModels;
+using Ntreev.Crema.Presentation.Tables.Properties;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using System;
@@ -29,7 +29,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Tables.MenuItems.TreeViewItems
+namespace Ntreev.Crema.Presentation.Tables.MenuItems.TreeViewItems
 {
     [Export(typeof(IMenuItem))]
     [ParentType(typeof(TableTreeViewItemViewModel))]

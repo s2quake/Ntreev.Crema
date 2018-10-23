@@ -19,14 +19,14 @@ using System;
 using System.Linq;
 using System.ComponentModel.Composition;
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.Data;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using System.Threading.Tasks;
-using Ntreev.Crema.Client.Tables.Properties;
+using Ntreev.Crema.Presentation.Tables.Properties;
 using System.Windows;
 using System.Collections;
 using System.Threading;
@@ -35,7 +35,7 @@ using Ntreev.Library.Linq;
 using Ntreev.Crema.ServiceModel;
 using System.Collections.Generic;
 
-namespace Ntreev.Crema.Client.Tables.Documents.ViewModels
+namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 {
     class TableViewerViewModel : TableDocumentBase
     {

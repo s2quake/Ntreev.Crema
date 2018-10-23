@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Ntreev.Crema.Client.SmartSet.Properties {
+namespace Ntreev.Crema.Presentation.SmartSet.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Client.SmartSet.Properties {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Ntreev.Crema.Client.SmartSet.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Ntreev.Crema.Presentation.SmartSet.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

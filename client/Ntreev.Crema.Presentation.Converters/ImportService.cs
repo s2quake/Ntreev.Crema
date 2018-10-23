@@ -23,7 +23,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Converters
+namespace Ntreev.Crema.Presentation.Converters
 {
     [Export(typeof(IImportService))]
     class ImportService : IImportService

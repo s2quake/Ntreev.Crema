@@ -21,7 +21,7 @@ using System.Linq;
 using System.Text;
 using Ntreev.Crema.ServiceModel;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     public class RequiredAuthorityAttribute : Attribute
     {

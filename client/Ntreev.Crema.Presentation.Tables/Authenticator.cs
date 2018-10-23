@@ -23,10 +23,10 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library;
 
-namespace Ntreev.Crema.Client.Tables
+namespace Ntreev.Crema.Presentation.Tables
 {
     [Export(typeof(IPlugin))]
     [Export(typeof(Authenticator))]

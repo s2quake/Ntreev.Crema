@@ -22,18 +22,18 @@ using System.Windows;
 using System.Windows.Threading;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Caliburn.Micro;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.Types.Dialogs.ViewModels;
-using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Types.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
 using System.Windows.Input;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ntreev.ModernUI.Framework.ViewModels;
-using Ntreev.Crema.Client.Types.Properties;
+using Ntreev.Crema.Presentation.Types.Properties;
 
-namespace Ntreev.Crema.Client.Types.BrowserItems.ViewModels
+namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
 {
     public class TypeCategoryTreeViewItemViewModel : TypeCategoryTreeItemBase
     {

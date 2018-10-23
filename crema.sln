@@ -23,15 +23,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Spreadsheet", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client", "client", "{51988BAC-DDBB-475A-BF13-576A97678AB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Client.Converters", "client\Ntreev.Crema.Client.Converters\Ntreev.Crema.Client.Converters.csproj", "{AE494F06-18FB-452A-85A4-AE25F0399AC2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Presentation.Converters", "client\Ntreev.Crema.Presentation.Converters\Ntreev.Crema.Presentation.Converters.csproj", "{AE494F06-18FB-452A-85A4-AE25F0399AC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Client.Framework", "client\Ntreev.Crema.Client.Framework\Ntreev.Crema.Client.Framework.csproj", "{4C1FBD82-BCA7-44D2-B832-BFA2AB80EEBB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Presentation.Framework", "client\Ntreev.Crema.Presentation.Framework\Ntreev.Crema.Presentation.Framework.csproj", "{4C1FBD82-BCA7-44D2-B832-BFA2AB80EEBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Client.SmartSet", "client\Ntreev.Crema.Client.SmartSet\Ntreev.Crema.Client.SmartSet.csproj", "{6145E470-9838-4E40-B500-6F215B2703BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Presentation.SmartSet", "client\Ntreev.Crema.Presentation.SmartSet\Ntreev.Crema.Presentation.SmartSet.csproj", "{6145E470-9838-4E40-B500-6F215B2703BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Client.Tables", "client\Ntreev.Crema.Client.Tables\Ntreev.Crema.Client.Tables.csproj", "{92B62CA2-3246-4AB0-B190-B3D3381F15A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Presentation.Tables", "client\Ntreev.Crema.Presentation.Tables\Ntreev.Crema.Presentation.Tables.csproj", "{92B62CA2-3246-4AB0-B190-B3D3381F15A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Client.Types", "client\Ntreev.Crema.Client.Types\Ntreev.Crema.Client.Types.csproj", "{2128377D-74C2-4677-A96F-A82682672ECE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Presentation.Types", "client\Ntreev.Crema.Presentation.Types\Ntreev.Crema.Presentation.Types.csproj", "{2128377D-74C2-4677-A96F-A82682672ECE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Services", "client\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj", "{0EAC90AB-7C7E-47E3-9954-148B45521FCB}"
 EndProject
@@ -43,9 +43,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.ModernUI.Framework",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Library", "sub-modules\Ntreev.Library\Ntreev.Library.Net45\Ntreev.Library.csproj", "{1918437F-4FBF-4731-AC5B-981A4A4CB1F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Client.Users", "client\Ntreev.Crema.Client.Users\Ntreev.Crema.Client.Users.csproj", "{ABC6F21C-0B20-4070-A09A-94990EA0DB2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Presentation.Users", "client\Ntreev.Crema.Presentation.Users\Ntreev.Crema.Presentation.Users.csproj", "{ABC6F21C-0B20-4070-A09A-94990EA0DB2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Client.Base", "client\Ntreev.Crema.Client.Base\Ntreev.Crema.Client.Base.csproj", "{5775FED7-233E-48B2-8F83-538DC1123527}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Presentation.Base", "client\Ntreev.Crema.Presentation.Base\Ntreev.Crema.Presentation.Base.csproj", "{5775FED7-233E-48B2-8F83-538DC1123527}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "version", "version", "{F159D190-2B68-49A5-9B54-ED6970FFEA6F}"
 EndProject
@@ -53,7 +53,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Tools.Framewor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Commands", "client\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj", "{21901648-9205-46C1-91F0-2A3D7847BFC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Client.Console", "client\Ntreev.Crema.Client.Console\Ntreev.Crema.Client.Console.csproj", "{A455A6AC-41D0-476C-BB23-E7ADFA5D7D78}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Presentation.Console", "client\Ntreev.Crema.Presentation.Console\Ntreev.Crema.Presentation.Console.csproj", "{A455A6AC-41D0-476C-BB23-E7ADFA5D7D78}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.AssemblyInfo", "common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.shproj", "{AD0EBA0C-D167-4722-A2A7-82B17E1FC9AA}"
 EndProject
@@ -89,7 +89,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Tools.Runtime"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Tools.View", "tools\Ntreev.Crema.Tools.View\Ntreev.Crema.Tools.View.csproj", "{EDBC5495-35F7-4CE5-A1C6-57018043DCF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Client.Differences", "client\Ntreev.Crema.Client.Differences\Ntreev.Crema.Client.Differences.csproj", "{2E1EF97A-E9D5-4732-9558-B566F3D00DDA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Presentation.Differences", "client\Ntreev.Crema.Presentation.Differences\Ntreev.Crema.Presentation.Differences.csproj", "{2E1EF97A-E9D5-4732-9558-B566F3D00DDA}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Commands.Sharing", "common\Ntreev.Crema.Commands.Sharing\Ntreev.Crema.Commands.Sharing.shproj", "{3D3128AA-908D-44C4-9EFD-0E1A903F5287}"
 EndProject

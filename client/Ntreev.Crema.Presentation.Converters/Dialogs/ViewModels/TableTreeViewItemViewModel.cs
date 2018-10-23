@@ -26,9 +26,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Ntreev.Library;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 
-namespace Ntreev.Crema.Client.Converters.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
 {
     class TableTreeViewItemViewModel : ExportTreeViewItemViewModel
     {

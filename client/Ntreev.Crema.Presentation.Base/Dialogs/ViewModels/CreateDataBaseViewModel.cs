@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.ModernUI.Framework;
@@ -26,9 +26,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Client.Base.Properties;
+using Ntreev.Crema.Presentation.Base.Properties;
 
-namespace Ntreev.Crema.Client.Base.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 {
     public class CreateDataBaseViewModel : ModalDialogAppBase
     {

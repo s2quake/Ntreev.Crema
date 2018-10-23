@@ -22,7 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Client.Tables.PropertyItems.Views
+namespace Ntreev.Crema.Presentation.Tables.PropertyItems.Views
 {
     partial class ReferencedTablesView : UserControl
     {

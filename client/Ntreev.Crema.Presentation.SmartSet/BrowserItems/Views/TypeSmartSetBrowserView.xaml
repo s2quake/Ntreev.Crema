@@ -16,20 +16,20 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ====================================================================================================================-->
-<UserControl x:Class="Ntreev.Crema.Client.SmartSet.BrowserItems.Views.TypeSmartSetBrowserView"
+<UserControl x:Class="Ntreev.Crema.Presentation.SmartSet.BrowserItems.Views.TypeSmartSetBrowserView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-             xmlns:ncfc="clr-namespace:Ntreev.Crema.Client.Framework.Controls;assembly=Ntreev.Crema.Client.Framework"
+             xmlns:ncfc="clr-namespace:Ntreev.Crema.Presentation.Framework.Controls;assembly=Ntreev.Crema.Presentation.Framework"
              mc:Ignorable="d" 
              d:DesignWidth="300">
 
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Ntreev.Crema.Client.SmartSet;component/Assets/TreeView.xaml" />
+                <ResourceDictionary Source="/Ntreev.Crema.Presentation.SmartSet;component/Assets/TreeView.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style TargetType="{x:Type nmfc:IconButton}" BasedOn="{StaticResource ToolBar_IconButton_Style}" />
         </ResourceDictionary>
@@ -41,8 +41,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <nmfc:ExpandableToolBar ItemsSource="{Binding ToolBarItems}">
-            <nmfc:IconButton x:Name="CollapseAll" Source="/Ntreev.Crema.Client.Framework;component/Images/collapse_all.png" />
-            <nmfc:IconButton x:Name="NewSmartSet" Source="/Ntreev.Crema.Client.Framework;component/Images/plus.png" />
+            <nmfc:IconButton x:Name="CollapseAll" Source="/Ntreev.Crema.Presentation.Framework;component/Images/collapse_all.png" />
+            <nmfc:IconButton x:Name="NewSmartSet" Source="/Ntreev.Crema.Presentation.Framework;component/Images/plus.png" />
         </nmfc:ExpandableToolBar>
         <ncfc:BrowserTreeView x:Name="treeView" Grid.Row="1" nmfc:TreeViewUtility.SelectedItemBindingPath="SelectedItem"
                               ItemsSource="{Binding Items}">

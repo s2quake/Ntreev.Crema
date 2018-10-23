@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using Ntreev.ModernUI.Framework.Controls;
 
-namespace Ntreev.Crema.Client.SmartSet.Dialogs.Views
+namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.Views
 {
     partial class MoveBookmarkItemView : UserControl
     {

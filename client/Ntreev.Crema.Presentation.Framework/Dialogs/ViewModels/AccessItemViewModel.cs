@@ -26,7 +26,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
-namespace Ntreev.Crema.Client.Framework.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 {
     public class AccessItemViewModel : PropertyChangedBase
     {

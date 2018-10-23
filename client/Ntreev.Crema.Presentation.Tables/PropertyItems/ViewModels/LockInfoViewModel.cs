@@ -18,7 +18,7 @@
 using System;
 using System.ComponentModel.Composition;
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
@@ -26,9 +26,9 @@ using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using System.Windows;
 using System.ComponentModel;
-using Ntreev.Crema.Client.Tables.Properties;
+using Ntreev.Crema.Presentation.Tables.Properties;
 
-namespace Ntreev.Crema.Client.Tables.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]

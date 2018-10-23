@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.SmartSet.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.SmartSet.PropertyItems.ViewModels
 {
     public class RuleItemViewModel : PropertyChangedBase
     {

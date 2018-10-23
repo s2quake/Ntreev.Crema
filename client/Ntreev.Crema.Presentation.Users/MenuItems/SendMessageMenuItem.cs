@@ -15,9 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.Users.Properties;
+using Ntreev.Crema.Presentation.Users.Properties;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,7 +30,7 @@ using System.Windows.Media.Imaging;
 using Ntreev.Library;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Client.Users.MenuItems
+namespace Ntreev.Crema.Presentation.Users.MenuItems
 {
     [Export(typeof(IMenuItem))]
     [ParentType(typeof(UserTreeItemBase))]
@@ -46,7 +46,7 @@ namespace Ntreev.Crema.Client.Users.MenuItems
 
         public SendMessageMenuItem()
         {
-            this.Icon = "/Ntreev.Crema.Client.Users;component/Images/message.png";
+            this.Icon = "/Ntreev.Crema.Presentation.Users;component/Images/message.png";
             this.DisplayName = Resources.MenuItem_SendMessage;
         }
 

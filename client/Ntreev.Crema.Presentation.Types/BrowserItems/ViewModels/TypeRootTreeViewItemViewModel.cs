@@ -21,7 +21,7 @@ using System;
 using Ntreev.ModernUI.Framework;
 using System.Collections.Generic;
 
-namespace Ntreev.Crema.Client.Types.BrowserItems.ViewModels
+namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
 {
     class TypeRootTreeViewItemViewModel : TypeCategoryTreeViewItemViewModel
     {

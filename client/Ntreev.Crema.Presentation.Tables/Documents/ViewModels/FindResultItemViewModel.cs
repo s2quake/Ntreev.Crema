@@ -26,7 +26,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Tables.Documents.ViewModels
+namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 {
     class FindResultItemViewModel : PropertyChangedBase
     {

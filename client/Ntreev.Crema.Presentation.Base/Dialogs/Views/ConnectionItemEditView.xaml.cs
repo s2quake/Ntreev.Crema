@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Base.Dialogs.ViewModels;
-using Ntreev.Crema.Client.Base.Services.ViewModels;
+using Ntreev.Crema.Presentation.Base.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Base.Services.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +32,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Client.Base.Dialogs.Views
+namespace Ntreev.Crema.Presentation.Base.Dialogs.Views
 {
     /// <summary>
     /// ConnectionItemEditView.xaml에 대한 상호 작용 논리

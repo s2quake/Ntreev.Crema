@@ -20,9 +20,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Ntreev.Crema.Client.Types
+namespace Ntreev.Crema.Presentation.Types
 {
-    public interface IPropertyService : Ntreev.Crema.Client.Framework.IPropertyService
+    public interface IPropertyService : Ntreev.Crema.Presentation.Framework.IPropertyService
     {
         
     }

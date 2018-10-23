@@ -23,7 +23,7 @@
 //using System.Xml;
 //using System.Reflection;
 
-//namespace Ntreev.Crema.Client.SmartSet
+//namespace Ntreev.Crema.Presentation.SmartSet
 //{
 //    class RuleCollection : List<IRule>, IXmlSerializable
 //    {
@@ -43,7 +43,7 @@
 
 //            while (reader.NodeType != XmlNodeType.EndElement)
 //            {
-//                string ruleType = "Ntreev.Crema.Client.SmartSet." + reader.Name;
+//                string ruleType = "Ntreev.Crema.Presentation.SmartSet." + reader.Name;
 
 //                Type type = Type.GetType(ruleType);
 //                XmlSerializer serializer = XmlSerializer.FromTypes(new Type[] { type, })[0];

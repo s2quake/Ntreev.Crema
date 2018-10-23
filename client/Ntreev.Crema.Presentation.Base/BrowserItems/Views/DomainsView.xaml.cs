@@ -31,7 +31,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Client.Base.BrowserItems.Views
+namespace Ntreev.Crema.Presentation.Base.BrowserItems.Views
 {
     /// <summary>
     /// DomainsView.xaml에 대한 상호 작용 논리

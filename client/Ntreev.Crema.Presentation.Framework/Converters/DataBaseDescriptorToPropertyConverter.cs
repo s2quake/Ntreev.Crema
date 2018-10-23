@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Ntreev.Crema.Client.Framework.Converters
+namespace Ntreev.Crema.Presentation.Framework.Converters
 {
     public class DataBaseDescriptorToPropertyConverter : IValueConverter
     {

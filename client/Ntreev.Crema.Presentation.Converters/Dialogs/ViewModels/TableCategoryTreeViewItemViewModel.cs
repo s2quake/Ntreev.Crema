@@ -22,13 +22,13 @@ using System.Windows;
 using System.Windows.Threading;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.ModernUI.Framework;
 using System.ComponentModel;
 using Ntreev.Crema.Data;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Converters.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
 {
     class TableCategoryTreeViewItemViewModel : ExportTreeViewItemViewModel
     {

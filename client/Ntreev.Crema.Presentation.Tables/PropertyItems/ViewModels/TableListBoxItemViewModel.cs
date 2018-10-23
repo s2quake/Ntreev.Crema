@@ -16,8 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Tables.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data.Xml.Schema;
@@ -36,7 +36,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Client.Tables.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 {
     public class TableListBoxItemViewModel : TableListItemBase
     {

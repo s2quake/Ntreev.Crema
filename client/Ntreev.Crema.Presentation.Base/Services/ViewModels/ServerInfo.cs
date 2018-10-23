@@ -24,9 +24,9 @@ using System.Xml.Serialization;
 using System.Windows.Media;
 using Ntreev.Crema.Services;
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 
-namespace Ntreev.Crema.Client.Base.Services.ViewModels
+namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 {
     [Obsolete]
     public struct ServerInfo

@@ -24,7 +24,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
-namespace Ntreev.Crema.Client.Framework.Assets
+namespace Ntreev.Crema.Presentation.Framework.Assets
 {
     partial class CremaUILight : ResourceDictionary
     {

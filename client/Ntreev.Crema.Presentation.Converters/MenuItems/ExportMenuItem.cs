@@ -19,18 +19,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using System.ComponentModel.Composition;
 using System.Windows;
 using Caliburn.Micro;
 using System.Windows.Input;
-using Ntreev.Crema.Client.Converters.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels;
 using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.Converters.Properties;
+using Ntreev.Crema.Presentation.Converters.Properties;
 
-namespace Ntreev.Crema.Client.Converters.MenuItems
+namespace Ntreev.Crema.Presentation.Converters.MenuItems
 {
     [Export(typeof(IMenuItem))]
     [ParentType(typeof(IToolMenuItem))]

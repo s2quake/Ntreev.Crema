@@ -30,7 +30,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Client.Types.BrowserItems.Views
+namespace Ntreev.Crema.Presentation.Types.BrowserItems.Views
 {
     /// <summary>
     /// Interaction logic for TypeBrowserView.xaml

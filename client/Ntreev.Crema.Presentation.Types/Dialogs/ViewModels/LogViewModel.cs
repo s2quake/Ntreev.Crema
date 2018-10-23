@@ -30,14 +30,14 @@ using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Types.Properties;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Types.Properties;
 using Ntreev.ModernUI.Framework;
 using System.Collections;
 using System.Windows.Input;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 {
     public class LogViewModel : ModalDialogBase
     {

@@ -25,7 +25,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 {
     class PreviewTableTreeViewItemViewModel : ItemTreeViewItemViewModel
     {

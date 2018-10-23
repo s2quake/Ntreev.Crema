@@ -15,7 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework.Controls;
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
@@ -36,9 +36,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Ntreev.Crema.Client.Types.MenuItems.TypeMenus;
+using Ntreev.Crema.Presentation.Types.MenuItems.TypeMenus;
 
-namespace Ntreev.Crema.Client.Types.Documents.Views
+namespace Ntreev.Crema.Presentation.Types.Documents.Views
 {
     /// <summary>
     /// Interaction logic for TypeView.xaml

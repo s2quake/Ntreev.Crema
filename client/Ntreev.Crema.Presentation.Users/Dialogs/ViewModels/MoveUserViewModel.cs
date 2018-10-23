@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Linq;
-using Ntreev.Crema.Client.Users.Properties;
+using Ntreev.Crema.Presentation.Users.Properties;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using System.IO;
@@ -24,9 +24,9 @@ using System.Threading.Tasks;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using System.Windows.Threading;
 using System;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 
-namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 {
     public class MoveUserViewModel : MoveAsyncViewModel
     {

@@ -26,7 +26,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Ntreev.Crema.Client.Tables.Documents.Assets
+namespace Ntreev.Crema.Presentation.Tables.Documents.Assets
 {
     partial class TableSourceControl : ResourceDictionary
     {
@@ -46,7 +46,7 @@ namespace Ntreev.Crema.Client.Tables.Documents.Assets
 
             var data = e.Data;
             var item = e.Item;
-            if (data.GetDataPresent(typeof(int)) == true && sender is Ntreev.Crema.Client.Tables.Documents.Views.TableSourceDataGridControl gridControl)
+            if (data.GetDataPresent(typeof(int)) == true && sender is Ntreev.Crema.Presentation.Tables.Documents.Views.TableSourceDataGridControl gridControl)
             {
                 var index = (int)data.GetData(typeof(int));
                 var authenticator = gridControl.Domain.GetService(typeof(Authenticator)) as Authenticator;

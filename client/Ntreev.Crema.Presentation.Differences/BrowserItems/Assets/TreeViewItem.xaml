@@ -20,15 +20,15 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
                     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-                    xmlns:vm="clr-namespace:Ntreev.Crema.Client.Differences.BrowserItems.ViewModels">
+                    xmlns:vm="clr-namespace:Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels">
 
     <Style x:Key="TypeImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
         <Setter Property="Foreground" Value="{DynamicResource WindowText}" />
         <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Differences;component/Images/type_enum.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Differences;component/Images/type_enum.png" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsFlag}" Value="True">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Differences;component/Images/type_flag.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Differences;component/Images/type_flag.png" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -36,19 +36,19 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     <Style x:Key="TemplateImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
         <Setter Property="Foreground" Value="{DynamicResource WindowText}" />
         <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Differences;component/Images/template.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Differences;component/Images/template.png" />
     </Style>
 
     <Style x:Key="TableImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
         <Setter Property="Foreground" Value="{DynamicResource WindowText}" />
         <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
-        <Setter Property="Source" Value="/Ntreev.Crema.Client.Differences;component/Images/table.png" />
+        <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Differences;component/Images/table.png" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsInherited}" Value="True">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Differences;component/Images/table_derived.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Differences;component/Images/table_derived.png" />
             </DataTrigger>
             <DataTrigger Binding="{Binding IsBaseTemplate}" Value="True">
-                <Setter Property="Source" Value="/Ntreev.Crema.Client.Differences;component/Images/table_base.png" />
+                <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Differences;component/Images/table_base.png" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

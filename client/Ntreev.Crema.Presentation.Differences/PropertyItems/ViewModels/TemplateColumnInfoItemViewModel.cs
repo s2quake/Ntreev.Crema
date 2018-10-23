@@ -25,7 +25,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Differences.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
 {
     class TemplateColumnInfoItemViewModel
     {

@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
@@ -36,12 +36,12 @@ using Ntreev.ModernUI.Framework;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.IO;
 using System.Windows;
-using Ntreev.Crema.Client.Types.Properties;
-using Ntreev.Crema.Client.Types.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Types.Properties;
+using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
 using Ntreev.Library.Linq;
 using Ntreev.ModernUI.Framework.ViewModels;
 
-namespace Ntreev.Crema.Client.Types.Documents.ViewModels
+namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
 {
     class TypeDataFinderViewModel : DocumentBase, IDocument
     {

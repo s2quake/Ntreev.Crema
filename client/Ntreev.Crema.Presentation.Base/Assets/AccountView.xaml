@@ -18,6 +18,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 ====================================================================================================================-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:Ntreev.Crema.Client.Base.Assets">
+                    xmlns:local="clr-namespace:Ntreev.Crema.Presentation.Base.Assets">
     
 </ResourceDictionary>

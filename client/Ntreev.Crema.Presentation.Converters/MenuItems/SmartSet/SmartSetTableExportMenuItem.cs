@@ -15,9 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Converters.Dialogs.ViewModels;
-using Ntreev.Crema.Client.Converters.Properties;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Converters.Properties;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
@@ -30,10 +30,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Converters.MenuItems.SmartSet
+namespace Ntreev.Crema.Presentation.Converters.MenuItems.SmartSet
 {
     [Export(typeof(IMenuItem))]
-    [ParentType("Ntreev.Crema.Client.SmartSet.BrowserItems.ViewModels.SmartSetTreeViewItemViewModel, Ntreev.Crema.Client.SmartSet, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels.SmartSetTreeViewItemViewModel, Ntreev.Crema.Presentation.SmartSet, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class SmartSetTableExportMenuItem : MenuItemBase
     {
         private readonly ICremaAppHost cremaAppHost;

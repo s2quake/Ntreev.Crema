@@ -21,11 +21,11 @@ using System.Windows.Input;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.ModernUI.Framework;
 using Ntreev.Crema.Services;
 
-namespace Ntreev.Crema.Client.Tables
+namespace Ntreev.Crema.Presentation.Tables
 {
     public interface ITableDocument : IDocument
     {

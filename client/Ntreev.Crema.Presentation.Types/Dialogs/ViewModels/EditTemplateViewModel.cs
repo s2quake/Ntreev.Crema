@@ -23,13 +23,13 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data;
 using Ntreev.ModernUI.Framework;
 
-namespace Ntreev.Crema.Client.Types.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 {
     public class EditTemplateViewModel : TemplateViewModel
     {

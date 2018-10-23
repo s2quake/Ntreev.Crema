@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using System.ComponentModel.Composition;
 using Caliburn.Micro;
 using System.Collections.ObjectModel;
@@ -30,18 +30,18 @@ using Ntreev.Crema.ServiceModel;
 using System.Windows;
 using System.Windows.Threading;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.Users.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Users.Dialogs.ViewModels;
 using Ntreev.ModernUI.Framework.ViewModels;
-using Ntreev.Crema.Client.Users.Properties;
+using Ntreev.Crema.Presentation.Users.Properties;
 using Ntreev.Library;
 
-namespace Ntreev.Crema.Client.Users.BrowserItems.ViewModels
+namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
 {
     [Export(typeof(IBrowserItem))]
     [Export(typeof(UserBrowserViewModel))]
-    [ParentType("Ntreev.Crema.Client.Tables.IBrowserService, Ntreev.Crema.Client.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Client.Types.IBrowserService, Ntreev.Crema.Client.Types, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Client.Base.IBrowserService, Ntreev.Crema.Client.Base, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Tables.IBrowserService, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Types.IBrowserService, Ntreev.Crema.Presentation.Types, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Base.IBrowserService, Ntreev.Crema.Presentation.Base, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class UserBrowserViewModel : TreeViewBase, IBrowserItem
     {
         private readonly ICremaAppHost cremaAppHost;

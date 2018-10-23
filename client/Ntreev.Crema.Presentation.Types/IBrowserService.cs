@@ -19,9 +19,9 @@ using System.Collections.Generic;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 
-namespace Ntreev.Crema.Client.Types
+namespace Ntreev.Crema.Presentation.Types
 {
-    public interface IBrowserService : Ntreev.Crema.Client.Framework.IBrowserService
+    public interface IBrowserService : Ntreev.Crema.Presentation.Framework.IBrowserService
     {
 
     }

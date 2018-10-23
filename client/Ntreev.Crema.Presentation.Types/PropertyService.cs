@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using System.ComponentModel.Composition;
 using Caliburn.Micro;
 using System.Reflection;
@@ -27,13 +27,13 @@ using Ntreev.Crema.Services;
 using System.Threading.Tasks;
 using System.Threading;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Client.Types.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
 using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 
-namespace Ntreev.Crema.Client.Types
+namespace Ntreev.Crema.Presentation.Types
 {
-    [Export(typeof(Ntreev.Crema.Client.Framework.IPropertyService))]
+    [Export(typeof(Ntreev.Crema.Presentation.Framework.IPropertyService))]
     [Export(typeof(IPropertyService))]
     [Export(typeof(PropertyService))]
     class PropertyService : PropertyServiceBase, IPropertyService

@@ -274,7 +274,7 @@
       <ProductName>Microsoft .NET Framework 4.5%28x86 및 x64%29</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+    <BootstrapperPackage Include="Microsoft.Net.Presentation.3.5">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
       <Install>false</Install>
@@ -314,37 +314,37 @@
       <Project>{21901648-9205-46c1-91f0-2a3d7847bfc6}</Project>
       <Name>Ntreev.Crema.Commands</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Client.Base\Ntreev.Crema.Client.Base.csproj">
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Base\Ntreev.Crema.Presentation.Base.csproj">
       <Project>{5775fed7-233e-48b2-8f83-538dc1123527}</Project>
-      <Name>Ntreev.Crema.Client.Base</Name>
+      <Name>Ntreev.Crema.Presentation.Base</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Client.Console\Ntreev.Crema.Client.Console.csproj">
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Console\Ntreev.Crema.Presentation.Console.csproj">
       <Project>{a455a6ac-41d0-476c-bb23-e7adfa5d7d78}</Project>
-      <Name>Ntreev.Crema.Client.Console</Name>
+      <Name>Ntreev.Crema.Presentation.Console</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Client.Converters\Ntreev.Crema.Client.Converters.csproj">
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Converters\Ntreev.Crema.Presentation.Converters.csproj">
       <Project>{ae494f06-18fb-452a-85a4-ae25f0399ac2}</Project>
-      <Name>Ntreev.Crema.Client.Converters</Name>
+      <Name>Ntreev.Crema.Presentation.Converters</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Client.Differences\Ntreev.Crema.Client.Differences.csproj">
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Differences\Ntreev.Crema.Presentation.Differences.csproj">
       <Project>{2e1ef97a-e9d5-4732-9558-b566f3d00dda}</Project>
-      <Name>Ntreev.Crema.Client.Differences</Name>
+      <Name>Ntreev.Crema.Presentation.Differences</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Client.Framework\Ntreev.Crema.Client.Framework.csproj">
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Framework\Ntreev.Crema.Presentation.Framework.csproj">
       <Project>{4c1fbd82-bca7-44d2-b832-bfa2ab80eebb}</Project>
-      <Name>Ntreev.Crema.Client.Framework</Name>
+      <Name>Ntreev.Crema.Presentation.Framework</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Client.Tables\Ntreev.Crema.Client.Tables.csproj">
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Tables\Ntreev.Crema.Presentation.Tables.csproj">
       <Project>{92b62ca2-3246-4ab0-b190-b3d3381f15a5}</Project>
-      <Name>Ntreev.Crema.Client.Tables</Name>
+      <Name>Ntreev.Crema.Presentation.Tables</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Client.Types\Ntreev.Crema.Client.Types.csproj">
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Types\Ntreev.Crema.Presentation.Types.csproj">
       <Project>{2128377d-74c2-4677-a96f-a82682672ece}</Project>
-      <Name>Ntreev.Crema.Client.Types</Name>
+      <Name>Ntreev.Crema.Presentation.Types</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Client.Users\Ntreev.Crema.Client.Users.csproj">
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Users\Ntreev.Crema.Presentation.Users.csproj">
       <Project>{abc6f21c-0b20-4070-a09a-94990ea0db2d}</Project>
-      <Name>Ntreev.Crema.Client.Users</Name>
+      <Name>Ntreev.Crema.Presentation.Users</Name>
     </ProjectReference>
     <ProjectReference Include="..\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.csproj">
       <Project>{92ae7f66-00c6-4e96-8abf-cdecd55c004e}</Project>

@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Users.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Users.Dialogs.ViewModels;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.ModernUI.Framework;
@@ -29,14 +29,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
 using Ntreev.ModernUI.Framework.ViewModels;
 using System.Windows.Input;
-using Ntreev.Crema.Client.Users.Properties;
+using Ntreev.Crema.Presentation.Users.Properties;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Client.Users.BrowserItems.ViewModels
+namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
 {
     public class UserCategoryTreeViewItemViewModel : UserCategoryTreeItemBase
     {

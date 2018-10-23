@@ -22,7 +22,7 @@ using System.Text;
 using Caliburn.Micro;
 using System.Windows.Media;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     public interface IConnectionItem
     {

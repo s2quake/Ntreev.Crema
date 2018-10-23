@@ -24,7 +24,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Client.Base.Controls
+namespace Ntreev.Crema.Presentation.Base.Controls
 {
     public class ConnectionListBox : ListBox
     {

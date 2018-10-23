@@ -24,9 +24,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ntreev.Library;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 
-namespace Ntreev.Crema.Client.SmartSet
+namespace Ntreev.Crema.Presentation.SmartSet
 {
     [Export(typeof(IPlugin))]
     [Export(typeof(Authenticator))]

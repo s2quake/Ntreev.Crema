@@ -21,9 +21,9 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
-[assembly: AssemblyTitle("Ntreev.Crema.Client.SmartSet")]
+[assembly: AssemblyTitle("Ntreev.Crema.Presentation.SmartSet")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("Ntreev.Crema.Client.SmartSet")]
+[assembly: AssemblyProduct("Ntreev.Crema.Presentation.SmartSet")]
 [assembly: ComVisible(false)]
 
 //지역화 가능 응용 프로그램 빌드를 시작하려면 

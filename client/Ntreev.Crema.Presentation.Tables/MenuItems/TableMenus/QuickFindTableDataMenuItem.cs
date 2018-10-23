@@ -15,9 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Tables.Properties;
-using Ntreev.Crema.Client.Tables.Documents.Views;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Tables.Properties;
+using Ntreev.Crema.Presentation.Tables.Documents.Views;
 using Ntreev.Library.IO;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.ViewModels;
@@ -31,7 +31,7 @@ using System.Windows;
 using System.Windows.Input;
 using Ntreev.ModernUI.Framework.Controls;
 
-namespace Ntreev.Crema.Client.Tables.MenuItems.TableMenus
+namespace Ntreev.Crema.Presentation.Tables.MenuItems.TableMenus
 {
     [Export(typeof(IMenuItem))]
     [Export(typeof(QuickFindTableDataMenuItem))]

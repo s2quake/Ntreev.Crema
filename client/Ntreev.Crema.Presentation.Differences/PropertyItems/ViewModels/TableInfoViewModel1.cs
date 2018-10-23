@@ -26,10 +26,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ntreev.Crema.Data.Diff;
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Differences.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
 
-namespace Ntreev.Crema.Client.Differences.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [ParentType(typeof(PropertyService))]

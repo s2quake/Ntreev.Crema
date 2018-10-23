@@ -24,7 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Ntreev.Crema.Client.Console
+namespace Ntreev.Crema.Presentation.Console
 {
     class ConsoleCommandControl : TerminalControl
     {

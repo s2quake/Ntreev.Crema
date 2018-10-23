@@ -20,16 +20,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using System.Windows;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using System.Threading.Tasks;
 using Ntreev.ModernUI.Framework;
 using System.Security;
-using Ntreev.Crema.Client.Users.Properties;
+using Ntreev.Crema.Presentation.Users.Properties;
 
-namespace Ntreev.Crema.Client.Users.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 {
     public class ChangePasswordViewModel : ModalDialogAppBase
     {

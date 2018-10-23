@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Types.Documents.ViewModels
+namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
 {
     class SelectFieldStrategy
     {

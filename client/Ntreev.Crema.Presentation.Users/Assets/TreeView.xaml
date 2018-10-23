@@ -20,11 +20,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
                     xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-                    xmlns:p="clr-namespace:Ntreev.Crema.Client.Users.Properties"
-                    xmlns:vm="clr-namespace:Ntreev.Crema.Client.Users.BrowserItems.ViewModels">
+                    xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Users.Properties"
+                    xmlns:vm="clr-namespace:Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Ntreev.Crema.Client.Users;component/Assets/MenuItem.xaml" />
+        <ResourceDictionary Source="/Ntreev.Crema.Presentation.Users;component/Assets/MenuItem.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <HierarchicalDataTemplate DataType="{x:Type vm:UserCategoryTreeViewItemViewModel}" ItemsSource="{Binding Items}">

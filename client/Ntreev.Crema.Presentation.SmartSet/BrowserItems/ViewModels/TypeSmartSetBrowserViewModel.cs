@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using System.ComponentModel.Composition;
 using Caliburn.Micro;
 using System.Collections.ObjectModel;
@@ -29,23 +29,23 @@ using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Threading;
 using System.Windows.Input;
-using Ntreev.Crema.Client.Types.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
 using System.Xml.Serialization;
 using System.Xml.Schema;
 using System.Xml;
-using Ntreev.Crema.Client.Types;
+using Ntreev.Crema.Presentation.Types;
 using Ntreev.ModernUI.Framework;
 using Ntreev.Library;
-using Ntreev.Crema.Client.SmartSet.Dialogs.ViewModels;
-using Ntreev.Crema.Client.SmartSet.BrowserItems.Views;
+using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.SmartSet.BrowserItems.Views;
 using System.IO;
 using Ntreev.Library.Serialization;
 using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.Library.Linq;
-using Ntreev.Crema.Client.SmartSet.Properties;
+using Ntreev.Crema.Presentation.SmartSet.Properties;
 using Ntreev.Library.ObjectModel;
 
-namespace Ntreev.Crema.Client.SmartSet.BrowserItems.ViewModels
+namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
     [Export(typeof(IBrowserItem))]
     [Export(typeof(TypeSmartSetBrowserViewModel))]
@@ -56,7 +56,7 @@ namespace Ntreev.Crema.Client.SmartSet.BrowserItems.ViewModels
     {
         private readonly TypeSmartSetContext smartSetContext;
         [Import]
-        private Lazy<Ntreev.Crema.Client.Types.IPropertyService> propertyService = null;
+        private Lazy<Ntreev.Crema.Presentation.Types.IPropertyService> propertyService = null;
         [Import]
         private Lazy<ITypeBrowser> typeBrowser = null;
         [Import]

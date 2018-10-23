@@ -22,7 +22,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Client.Framework.Controls
+namespace Ntreev.Crema.Presentation.Framework.Controls
 {
     public static class PasswordHelper
     {

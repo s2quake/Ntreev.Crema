@@ -24,9 +24,9 @@ using System.Windows.Threading;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using Ntreev.Library.IO;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
 
-namespace Ntreev.Crema.Client.SmartSet.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
 {
     class RenameBookmarkCategoryViewModel : RenameAppViewModel
     {

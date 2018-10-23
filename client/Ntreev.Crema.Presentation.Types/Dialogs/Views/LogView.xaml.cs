@@ -27,7 +27,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows;
 
-namespace Ntreev.Crema.Client.Types.Dialogs.Views
+namespace Ntreev.Crema.Presentation.Types.Dialogs.Views
 {
     public partial class LogView : UserControl
     {

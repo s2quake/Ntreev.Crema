@@ -24,10 +24,10 @@ using System.Xml.Serialization;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using System.ComponentModel.Composition;
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.SmartSet.Properties;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.SmartSet.Properties;
 
-namespace Ntreev.Crema.Client.SmartSet.Rules.ViewModels.Tables
+namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels.Tables
 {
     [Export(typeof(IRule))]
     class KeyCountRuleViewModel : OperatorRule<int>

@@ -26,14 +26,14 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.Tables.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
 using System.Collections.Specialized;
 using System.Xml.Schema;
 using System.Xml;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using System.Collections;
 
-namespace Ntreev.Crema.Client.SmartSet
+namespace Ntreev.Crema.Presentation.SmartSet
 {
     class TableSmartSet : ItemBase<TableSmartSet, TableSmartSetCategory, TableSmartSetCollection, TableSmartSetCategoryCollection, TableSmartSetContext>,
         IXmlSerializable, ISmartSet

@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Ntreev.Crema.Client.Console
+namespace Ntreev.Crema.Presentation.Console
 {
     class ConsoleWriter : StringWriter
     {

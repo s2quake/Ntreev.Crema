@@ -24,12 +24,12 @@ using Ntreev.Crema.Data;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.SmartSet.Dialogs.Views;
-using Ntreev.Crema.Client.SmartSet.Properties;
+using Ntreev.Crema.Presentation.SmartSet.Dialogs.Views;
+using Ntreev.Crema.Presentation.SmartSet.Properties;
 
-namespace Ntreev.Crema.Client.SmartSet.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
 {
     [View(typeof(SmartSetEditView))]
     class SmartSetEditViewModel : ModalDialogBase

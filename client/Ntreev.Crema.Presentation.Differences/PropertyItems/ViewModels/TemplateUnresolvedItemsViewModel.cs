@@ -15,9 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Differences.BrowserItems.ViewModels;
-using Ntreev.Crema.Client.Differences.Properties;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Differences.Properties;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library;
 using Ntreev.Library.Linq;
 using Ntreev.ModernUI.Framework;
@@ -31,7 +31,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Differences.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [ParentType(typeof(PropertyService))]

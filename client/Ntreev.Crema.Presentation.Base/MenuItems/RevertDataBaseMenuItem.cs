@@ -1,4 +1,4 @@
-﻿using Ntreev.Crema.Client.Base.Dialogs.ViewModels;
+﻿using Ntreev.Crema.Presentation.Base.Dialogs.ViewModels;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.ViewModels;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Base.MenuItems
+namespace Ntreev.Crema.Presentation.Base.MenuItems
 {
     [Export(typeof(IMenuItem))]
     [ParentType(typeof(LogInfoViewModel))]

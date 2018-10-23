@@ -35,11 +35,11 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Ntreev.Crema.Services;
 using System.ComponentModel.Composition;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library;
-using Ntreev.Crema.Client.Tables.MenuItems.TableMenus;
+using Ntreev.Crema.Presentation.Tables.MenuItems.TableMenus;
 
-namespace Ntreev.Crema.Client.Tables.Documents.Views
+namespace Ntreev.Crema.Presentation.Tables.Documents.Views
 {
     /// <summary>
     /// TableItemView.xaml에 대한 상호 작용 논리

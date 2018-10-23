@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library;
@@ -35,9 +35,9 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Windows;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.Console.Properties;
+using Ntreev.Crema.Presentation.Console.Properties;
 
-namespace Ntreev.Crema.Client.Console
+namespace Ntreev.Crema.Presentation.Console
 {
     [Export(typeof(IContentService))]
     [InheritedExport(typeof(ConsoleViewModel))]

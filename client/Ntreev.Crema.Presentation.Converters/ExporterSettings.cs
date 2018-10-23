@@ -22,10 +22,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Converters.Properties;
+using Ntreev.Crema.Presentation.Converters.Properties;
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Client.Converters
+namespace Ntreev.Crema.Presentation.Converters
 {
     public class ExporterSettings : PropertyChangedBase
     {

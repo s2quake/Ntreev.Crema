@@ -20,9 +20,9 @@ using Ntreev.Crema.Services;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 
-namespace Ntreev.Crema.Client.Converters.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
 {
     class TableRootTreeViewItemViewModel : TableCategoryTreeViewItemViewModel
     {

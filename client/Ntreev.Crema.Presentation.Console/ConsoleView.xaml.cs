@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Commands;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Commands.Consoles;
 using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
@@ -40,7 +40,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Ntreev.Crema.Javascript;
 
-namespace Ntreev.Crema.Client.Console
+namespace Ntreev.Crema.Presentation.Console
 {
     /// <summary>
     /// ConsoleView.xaml에 대한 상호 작용 논리

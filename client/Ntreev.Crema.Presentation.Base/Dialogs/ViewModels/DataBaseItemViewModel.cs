@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using System;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ using System.Windows;
 using System.Windows.Media;
 using Ntreev.ModernUI.Framework.ViewModels;
 
-namespace Ntreev.Crema.Client.Base.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 {
     public class DataBaseItemViewModel : DataBaseListItemBase
     {

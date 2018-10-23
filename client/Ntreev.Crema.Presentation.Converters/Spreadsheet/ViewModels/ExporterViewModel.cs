@@ -16,8 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Converters.Spreadsheet.Views;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Converters.Spreadsheet.Views;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data;
@@ -36,7 +36,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Ntreev.Library.IO;
 
-namespace Ntreev.Crema.Client.Converters.Spreadsheet.ViewModels
+namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.ViewModels
 {
     [Export(typeof(IExporter))]
     class ExporterViewModel : Screen, IExporter

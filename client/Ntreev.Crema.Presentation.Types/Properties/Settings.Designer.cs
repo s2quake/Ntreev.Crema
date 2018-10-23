@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Ntreev.Crema.Client.Types.Properties {
+namespace Ntreev.Crema.Presentation.Types.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

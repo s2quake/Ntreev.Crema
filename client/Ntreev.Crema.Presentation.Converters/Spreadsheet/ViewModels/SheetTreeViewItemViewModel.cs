@@ -23,7 +23,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Converters.Spreadsheet.ViewModels
+namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.ViewModels
 {
     class SheetTreeViewItemViewModel : CheckableTreeViewItemViewModel
     {

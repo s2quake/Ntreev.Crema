@@ -21,7 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Differences
+namespace Ntreev.Crema.Presentation.Differences
 {
     public interface IDifferenceDocumentService
     {

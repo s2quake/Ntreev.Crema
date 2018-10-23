@@ -16,11 +16,11 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Linq;
-using Ntreev.Crema.Client.Tables.Properties;
+using Ntreev.Crema.Presentation.Tables.Properties;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using System.IO;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using System.Threading.Tasks;
 using System;
 using Ntreev.Library.IO;
@@ -28,7 +28,7 @@ using Ntreev.ModernUI.Framework;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Crema.Services.Extensions;
 
-namespace Ntreev.Crema.Client.Tables.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 {
     public class CopyTableViewModel : ModalDialogBase
     {

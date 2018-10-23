@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using System.ComponentModel.Composition;
 using Caliburn.Micro;
 using System.Reflection;
@@ -31,9 +31,9 @@ using Ntreev.Library.Linq;
 using Ntreev.ModernUI.Framework;
 using System.Windows;
 
-namespace Ntreev.Crema.Client.Tables
+namespace Ntreev.Crema.Presentation.Tables
 {
-    [Export(typeof(Ntreev.Crema.Client.Framework.IPropertyService))]
+    [Export(typeof(Ntreev.Crema.Presentation.Framework.IPropertyService))]
     [Export(typeof(IPropertyService))]
     [Export(typeof(PropertyService))]
     class PropertyService : PropertyServiceBase, IPropertyService

@@ -24,9 +24,9 @@ using System.Windows;
 // 어셈블리의 일반 정보는 다음 특성 집합을 통해 제어됩니다.
 // 어셈블리와 관련된 정보를 수정하려면
 // 이 특성 값을 변경하십시오.
-[assembly: AssemblyTitle("Ntreev.Crema.Client.Users")]
+[assembly: AssemblyTitle("Ntreev.Crema.Presentation.Users")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("Ntreev.Crema.Client.Users")]
+[assembly: AssemblyProduct("Ntreev.Crema.Presentation.Users")]
 [assembly: ComVisible(false)]
 
 [assembly: ThemeInfo(

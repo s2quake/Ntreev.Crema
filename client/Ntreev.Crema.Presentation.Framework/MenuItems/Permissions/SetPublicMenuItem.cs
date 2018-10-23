@@ -15,7 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Framework.Properties;
+using Ntreev.Crema.Presentation.Framework.Properties;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.Controls;
 using System;
@@ -27,7 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
-namespace Ntreev.Crema.Client.Framework.MenuItems.Permissions
+namespace Ntreev.Crema.Presentation.Framework.MenuItems.Permissions
 {
     [Export(typeof(IMenuItem))]
     [ParentType(typeof(TableTreeItemBase))]

@@ -7,8 +7,8 @@
     <ProjectGuid>{5775FED7-233E-48B2-8F83-538DC1123527}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ntreev.Crema.Client.Base</RootNamespace>
-    <AssemblyName>Ntreev.Crema.Client.Base</AssemblyName>
+    <RootNamespace>Ntreev.Crema.Presentation.Base</RootNamespace>
+    <AssemblyName>Ntreev.Crema.Presentation.Base</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -242,9 +242,9 @@
       <Project>{20c3d3dd-de99-4126-9449-bca12e4d255d}</Project>
       <Name>Ntreev.ModernUI.Framework</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Client.Framework\Ntreev.Crema.Client.Framework.csproj">
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Framework\Ntreev.Crema.Presentation.Framework.csproj">
       <Project>{4c1fbd82-bca7-44d2-b832-bfa2ab80eebb}</Project>
-      <Name>Ntreev.Crema.Client.Framework</Name>
+      <Name>Ntreev.Crema.Presentation.Framework</Name>
     </ProjectReference>
     <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj">
       <Project>{0eac90ab-7c7e-47e3-9954-148b45521fcb}</Project>

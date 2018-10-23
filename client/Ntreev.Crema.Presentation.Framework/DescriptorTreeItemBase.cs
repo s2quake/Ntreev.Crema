@@ -24,7 +24,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     public abstract class DescriptorTreeItemBase<T> : TreeViewItemViewModel where T : IDescriptorBase
     {

@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Framework.Controls;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Framework.Controls;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
@@ -41,7 +41,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Xceed.Wpf.DataGrid;
 
-namespace Ntreev.Crema.Client.Types.Dialogs.Views
+namespace Ntreev.Crema.Presentation.Types.Dialogs.Views
 {
     /// <summary>
     /// Interaction logic for TemplateView.xaml

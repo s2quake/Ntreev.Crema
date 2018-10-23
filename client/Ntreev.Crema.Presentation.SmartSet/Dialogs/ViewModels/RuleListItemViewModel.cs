@@ -26,10 +26,10 @@ using System.Windows;
 using System.Windows.Threading;
 using System.Reflection;
 using System.ComponentModel;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.ModernUI.Framework;
 
-namespace Ntreev.Crema.Client.SmartSet.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
 {
     class RuleListItemViewModel : PropertyChangedBase
     {

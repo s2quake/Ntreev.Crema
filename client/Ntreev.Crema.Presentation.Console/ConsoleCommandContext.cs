@@ -36,7 +36,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Console
+namespace Ntreev.Crema.Presentation.Console
 {
     [Export(typeof(ConsoleCommandContext))]
     public class ConsoleCommandContext : ConsoleCommandContextBase

@@ -23,7 +23,7 @@ using System.ComponentModel.Composition.Primitives;
 using System.Linq;
 using System.Windows;
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using System.ComponentModel;
 using System.Reflection;
 using System.Windows.Controls;

@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using System;
 using System.Linq;
@@ -28,9 +28,9 @@ using Ntreev.Library.Linq;
 using System.Windows;
 using Ntreev.ModernUI.Framework;
 
-namespace Ntreev.Crema.Client.Tables
+namespace Ntreev.Crema.Presentation.Tables
 {
-    [Export(typeof(Ntreev.Crema.Client.Framework.IBrowserService))]
+    [Export(typeof(Ntreev.Crema.Presentation.Framework.IBrowserService))]
     [InheritedExport(typeof(IBrowserService))]
     [InheritedExport(typeof(BrowserService))]
     class BrowserService : BrowserServiceBase, IBrowserService

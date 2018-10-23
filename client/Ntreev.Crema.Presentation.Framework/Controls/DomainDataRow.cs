@@ -35,7 +35,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Xceed.Wpf.DataGrid;
 
-namespace Ntreev.Crema.Client.Framework.Controls
+namespace Ntreev.Crema.Presentation.Framework.Controls
 {
     public class DomainDataRow : ModernDataRow
     {

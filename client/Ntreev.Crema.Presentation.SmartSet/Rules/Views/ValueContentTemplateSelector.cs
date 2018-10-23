@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Client.SmartSet.Rules.Views
+namespace Ntreev.Crema.Presentation.SmartSet.Rules.Views
 {
     class ValueContentTemplateSelector : DataTemplateSelector
     {

@@ -22,7 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Ntreev.Crema.Client.SmartSet.Assets
+namespace Ntreev.Crema.Presentation.SmartSet.Assets
 {
     partial class TreeView : ResourceDictionary
     {

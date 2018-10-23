@@ -24,7 +24,7 @@ using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using System.Threading;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     public class BackgroundTask : BackgroundTaskBase
     {

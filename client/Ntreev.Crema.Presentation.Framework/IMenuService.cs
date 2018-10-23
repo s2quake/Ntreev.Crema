@@ -24,7 +24,7 @@ using Caliburn.Micro;
 using System.Collections;
 using Ntreev.ModernUI.Framework;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     public interface IMenuService
     {

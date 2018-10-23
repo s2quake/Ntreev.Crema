@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Client.Base.Assets
+namespace Ntreev.Crema.Presentation.Base.Assets
 {
     partial class ConnectionListBox : ResourceDictionary
     {

@@ -18,7 +18,7 @@
 using System;
 using System.Linq;
 using System.ComponentModel.Composition;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
@@ -28,17 +28,17 @@ using System.Collections;
 using Ntreev.ModernUI.Framework;
 using System.ComponentModel;
 using Ntreev.Library.Linq;
-using Ntreev.Crema.Client.Types.Properties;
+using Ntreev.Crema.Presentation.Types.Properties;
 using Ntreev.ModernUI.Framework.ViewModels;
-using TypeDescriptor = Ntreev.Crema.Client.Framework.TypeDescriptor;
-using Ntreev.Crema.Client.Types.BrowserItems.ViewModels;
+using TypeDescriptor = Ntreev.Crema.Presentation.Framework.TypeDescriptor;
+using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
 
-namespace Ntreev.Crema.Client.Types.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [Dependency("Ntreev.Crema.Client.Tables.PropertyItems.ViewModels.TableInfoViewModel, Ntreev.Crema.Client.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Client.Tables.IPropertyService, Ntreev.Crema.Client.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [Dependency("Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels.TableInfoViewModel, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Tables.IPropertyService, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ReferencedTypesViewModel : PropertyItemBase, ISelector
     {
         [Import]

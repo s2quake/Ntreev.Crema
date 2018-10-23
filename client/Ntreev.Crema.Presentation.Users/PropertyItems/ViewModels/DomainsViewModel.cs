@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.Base.Services.ViewModels;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Base.Services.ViewModels;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
@@ -28,13 +28,13 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Crema.Client.Users.Properties;
+using Ntreev.Crema.Presentation.Users.Properties;
 
-namespace Ntreev.Crema.Client.Users.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [ParentType("Ntreev.Crema.Client.Base.IPropertyService, Ntreev.Crema.Client.Base, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Base.IPropertyService, Ntreev.Crema.Presentation.Base, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class DomainsViewModel : PropertyItemBase
     {
         private readonly ICremaAppHost cremaAppHost;

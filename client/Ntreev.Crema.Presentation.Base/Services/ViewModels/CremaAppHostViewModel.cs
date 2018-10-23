@@ -32,11 +32,11 @@ using System.Xml.Serialization;
 using Caliburn.Micro;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Client.Base.Properties;
+using Ntreev.Crema.Presentation.Base.Properties;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Base.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Base.Dialogs.ViewModels;
 using System.ComponentModel.Composition.Hosting;
 using System.Collections.ObjectModel;
 using System.Collections;
@@ -46,7 +46,7 @@ using System.Windows.Input;
 using System.ComponentModel;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 
-namespace Ntreev.Crema.Client.Base.Services.ViewModels
+namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 {
     [Export(typeof(ICremaAppHost)), PartCreationPolicy(CreationPolicy.Shared)]
     [Export]
@@ -91,8 +91,8 @@ namespace Ntreev.Crema.Client.Base.Services.ViewModels
 
         static CremaAppHostViewModel()
         {
-            themes.Add("Dark", new Uri("/Ntreev.Crema.Client.Framework;component/Assets/CremaUI.Dark.xaml", UriKind.Relative));
-            themes.Add("Light", new Uri("/Ntreev.Crema.Client.Framework;component/Assets/CremaUI.Light.xaml", UriKind.Relative));
+            themes.Add("Dark", new Uri("/Ntreev.Crema.Presentation.Framework;component/Assets/CremaUI.Dark.xaml", UriKind.Relative));
+            themes.Add("Light", new Uri("/Ntreev.Crema.Presentation.Framework;component/Assets/CremaUI.Light.xaml", UriKind.Relative));
         }
 
         public static Dictionary<string, Uri> Themes

@@ -15,9 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Client.SmartSet.Properties;
-using Ntreev.Crema.Client.SmartSet.Dialogs.ViewModels;
-using Ntreev.Crema.Client.Tables.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.SmartSet.Properties;
+using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.Controls;
 using System;
@@ -28,12 +28,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
-using Ntreev.Crema.Client.SmartSet.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels;
 using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.Library.Linq;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 
-namespace Ntreev.Crema.Client.SmartSet.MenuItems
+namespace Ntreev.Crema.Presentation.SmartSet.MenuItems
 {
     [Export(typeof(IMenuItem))]
     [ParentType(typeof(TableTreeViewItemViewModel))]
@@ -46,7 +46,7 @@ namespace Ntreev.Crema.Client.SmartSet.MenuItems
 
         public AddBookmarkTableMenu()
         {
-            this.Icon = "/Ntreev.Crema.Client.SmartSet;component/Images/star.png";
+            this.Icon = "/Ntreev.Crema.Presentation.SmartSet;component/Images/star.png";
             this.DisplayName = Resources.MenuItem_AddToBookmark;
             this.HideOnDisabled = true;
         }

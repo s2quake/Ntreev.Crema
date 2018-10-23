@@ -22,7 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Client.Tables.Documents.Views
+namespace Ntreev.Crema.Presentation.Tables.Documents.Views
 {
     static class TableSourceCommands
     {

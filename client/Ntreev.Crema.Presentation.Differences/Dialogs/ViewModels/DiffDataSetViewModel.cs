@@ -25,7 +25,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Differences.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
 {
     [Obsolete]
     public class DiffDataSetViewModel : ModalDialogBase

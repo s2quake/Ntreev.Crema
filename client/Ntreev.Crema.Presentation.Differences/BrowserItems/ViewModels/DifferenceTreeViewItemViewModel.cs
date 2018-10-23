@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Differences.BrowserItems.ViewModels
+namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
 {
     class DifferenceTreeViewItemViewModel : TreeViewItemViewModel
     {

@@ -22,7 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Client.Types.PropertyItems.Views
+namespace Ntreev.Crema.Presentation.Types.PropertyItems.Views
 {
     partial class ReferencedTypesView : UserControl
     {

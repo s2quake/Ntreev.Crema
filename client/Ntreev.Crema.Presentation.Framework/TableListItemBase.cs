@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data.Xml.Schema;
@@ -35,7 +35,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     public class TableListItemBase : DescriptorListItemBase<TableDescriptor>, ITableDescriptor, IAccessibleDescriptor, IPermissionDescriptor, ILockableDescriptor, IPartImportsSatisfiedNotification
     {

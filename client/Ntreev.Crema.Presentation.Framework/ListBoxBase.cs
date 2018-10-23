@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     public abstract class ListBoxBase<T> : ListBoxViewModel<T> where T : ListBoxItemViewModel
     {

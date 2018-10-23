@@ -18,12 +18,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 ====================================================================================================================-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:vm="clr-namespace:Ntreev.Crema.Client.Types.BrowserItems.ViewModels"
+                    xmlns:vm="clr-namespace:Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels"
                     xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-                    xmlns:p="clr-namespace:Ntreev.Crema.Client.Types.Properties">
+                    xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Types.Properties">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Ntreev.Crema.Client.Types;component/Assets/MenuItem.xaml" />
+        <ResourceDictionary Source="/Ntreev.Crema.Presentation.Types;component/Assets/MenuItem.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <HierarchicalDataTemplate DataType="{x:Type vm:TypeRootTreeViewItemViewModel}" ItemsSource="{Binding Items}">

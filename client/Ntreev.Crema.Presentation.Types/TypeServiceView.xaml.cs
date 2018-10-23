@@ -32,7 +32,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Client.Types
+namespace Ntreev.Crema.Presentation.Types
 {
     /// <summary>
     /// TypeServiceView.xaml에 대한 상호 작용 논리

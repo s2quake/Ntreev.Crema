@@ -23,16 +23,16 @@ using System.Collections.Specialized;
 using System.Collections.ObjectModel;
 using Ntreev.Crema.Services;
 using System.Windows.Input;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
 using System.Windows;
 using Ntreev.ModernUI.Framework.ViewModels;
 using System.Threading.Tasks;
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     public class UserDescriptor : DescriptorBase, IUserDescriptor, IUserItemDescriptor
     {

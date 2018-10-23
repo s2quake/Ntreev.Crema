@@ -35,13 +35,13 @@ using System.Xml;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Services.DomainService;
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Tables.Documents.ViewModels;
+using Ntreev.Crema.Presentation.Tables.Documents.ViewModels;
 using Ntreev.ModernUI.Framework.Controls;
 using Xceed.Wpf.DataGrid;
 using Ntreev.Crema.Services;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Client.Tables.Documents.Views
+namespace Ntreev.Crema.Presentation.Tables.Documents.Views
 {
     /// <summary>
     /// Interaction logic for TableEditorView.xaml

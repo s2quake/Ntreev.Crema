@@ -18,14 +18,14 @@
 using System;
 using System.Windows;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.ModernUI.Framework;
 using System.Linq;
 using System.Windows.Input;
-using Ntreev.Crema.Client.Framework.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
 using Ntreev.Library.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
@@ -34,7 +34,7 @@ using Ntreev.Crema.Data;
 using Ntreev.Library;
 using System.Windows.Threading;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     public class TypeTreeItemBase : DescriptorTreeItemBase<TypeDescriptor>, ITypeItemDescriptor, ITypeDescriptor, IPermissionDescriptor, ILockableDescriptor, IAccessibleDescriptor
     {

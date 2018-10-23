@@ -21,9 +21,9 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
-[assembly: AssemblyTitle("Ntreev.Crema.Client.Types")]
+[assembly: AssemblyTitle("Ntreev.Crema.Presentation.Types")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("Ntreev.Crema.Client.Types")]
+[assembly: AssemblyProduct("Ntreev.Crema.Presentation.Types")]
 [assembly: ComVisible(false)]
 
 //In order to begin building localizable applications, set 

@@ -23,15 +23,15 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Ntreev.Crema.Client.Converters;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Converters;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Data;
 //using Ntreev.Crema.Data.Automation;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.Spreadsheet;
 using Ntreev.Crema.ServiceModel;
 
-namespace Ntreev.Crema.Client.Converters.Excel
+namespace Ntreev.Crema.Presentation.Converters.Excel
 {
     static class ExcelConverter
     {

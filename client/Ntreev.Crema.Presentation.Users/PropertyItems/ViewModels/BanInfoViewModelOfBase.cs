@@ -18,7 +18,7 @@
 using System;
 using System.ComponentModel.Composition;
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
@@ -27,12 +27,12 @@ using Ntreev.ModernUI.Framework;
 using System.Windows;
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Client.Users.PropertyItems.ViewModels
+namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [Dependency("Ntreev.Crema.Client.Base.PropertyItems.ViewModels.TableInfoViewModel, Ntreev.Crema.Client.Base, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Client.Base.IPropertyService, Ntreev.Crema.Client.Base, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [Dependency("Ntreev.Crema.Presentation.Base.PropertyItems.ViewModels.TableInfoViewModel, Ntreev.Crema.Presentation.Base, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Base.IPropertyService, Ntreev.Crema.Presentation.Base, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
     public class BanInfoViewModelOfBase : BanInfoViewModel
     {
 

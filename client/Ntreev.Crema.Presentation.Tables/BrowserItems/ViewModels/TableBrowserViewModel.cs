@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using System.ComponentModel.Composition;
 using Caliburn.Micro;
 using System.Collections.ObjectModel;
@@ -28,7 +28,7 @@ using Ntreev.Crema.ServiceModel;
 using System.Windows.Input;
 using System.Threading.Tasks;
 using System.Threading;
-using Ntreev.Crema.Client.Tables.Properties;
+using Ntreev.Crema.Presentation.Tables.Properties;
 using Ntreev.ModernUI.Framework;
 using System.Xml.Serialization;
 using System.Xml.Schema;
@@ -41,7 +41,7 @@ using Ntreev.ModernUI.Framework.ViewModels;
 using System.Collections;
 using System.Windows.Threading;
 
-namespace Ntreev.Crema.Client.Tables.BrowserItems.ViewModels
+namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
 {
     [Export(typeof(IBrowserItem))]
     [Export(typeof(ITableBrowser))]

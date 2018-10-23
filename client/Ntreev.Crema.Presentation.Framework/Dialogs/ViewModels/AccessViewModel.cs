@@ -22,8 +22,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.Client.Framework;
-using Ntreev.Crema.Client.Framework.Properties;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Framework.Properties;
 using Ntreev.ModernUI.Framework;
 using System.Windows.Threading;
 using Ntreev.Crema.ServiceModel;
@@ -33,7 +33,7 @@ using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 
-namespace Ntreev.Crema.Client.Framework.Dialogs.ViewModels
+namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 {
     public class AccessViewModel : ModalDialogAppBase
     {

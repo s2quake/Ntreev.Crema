@@ -35,15 +35,15 @@ using System.Xml;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Services.DomainService;
 using Caliburn.Micro;
-using Ntreev.Crema.Client.Types.Documents.ViewModels;
+using Ntreev.Crema.Presentation.Types.Documents.ViewModels;
 using Ntreev.ModernUI.Framework;
 using System.ComponentModel.Composition;
 using Ntreev.Library;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.ModernUI.Framework.Controls;
 using Xceed.Wpf.DataGrid;
 
-namespace Ntreev.Crema.Client.Types.Documents.Views
+namespace Ntreev.Crema.Presentation.Types.Documents.Views
 {
     /// <summary>
     /// Interaction logic for TypeViewerView.xaml

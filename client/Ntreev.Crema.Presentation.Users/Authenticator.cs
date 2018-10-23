@@ -25,7 +25,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Ntreev.Library;
 
-namespace Ntreev.Crema.Client.Users
+namespace Ntreev.Crema.Presentation.Users
 {
     [Export(typeof(IPlugin))]
     [Export(typeof(Authenticator))]

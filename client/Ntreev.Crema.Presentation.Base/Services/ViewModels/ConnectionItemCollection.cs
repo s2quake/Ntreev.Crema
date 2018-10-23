@@ -33,7 +33,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Xml.Serialization;
 
-namespace Ntreev.Crema.Client.Base.Services.ViewModels
+namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 {
     class ConnectionItemCollection : ObservableCollection<ConnectionItemViewModel>, IPartImportsSatisfiedNotification
     {
