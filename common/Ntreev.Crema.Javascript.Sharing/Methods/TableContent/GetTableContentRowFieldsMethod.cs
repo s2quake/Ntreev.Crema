@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,7 +31,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableContent))]
-    class GetTableContentRowFieldsMethod : DomainScriptMethodBase
+    class GetTableContentRowFieldsMethod : ScriptFuncTaskBase<string, string, object[], IDictionary<string, object>>
     {
         [ImportingConstructor]
         public GetTableContentRowFieldsMethod(ICremaHost cremaHost)
@@ -39,36 +40,25 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, object[], IDictionary<string, object>>(this.GetTableContentRowFields);
-        }
-
-        private IDictionary<string, object> GetTableContentRowFields(string domainID, string tableName, object[] keys)
+        protected override async Task<IDictionary<string, object>> OnExecuteAsync(string domainID, string tableName, object[] keys)
         {
             if (keys == null)
                 throw new ArgumentNullException(nameof(keys));
 
-            var contents = this.GetDomainHost<IEnumerable<ITableContent>>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var contents = domain.Host as IEnumerable<ITableContent>;
             var content = contents.FirstOrDefault(item => item.Dispatcher.Invoke(() => item.Table.Name) == tableName);
             if (content == null)
                 throw new TableNotFoundException(tableName);
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-            return task.Result;
-
-            async Task<IDictionary< string, object>> InvokeAsync()
+            var row = await content.FindAsync(authentication, keys);
+            var tableInfo = content.Table.TableInfo;
+            var fields = new Dictionary<string, object>(tableInfo.Columns.Length);
+            foreach (var item in tableInfo.Columns)
             {
-                var row = await content.FindAsync(authentication, keys);
-                var tableInfo = content.Table.TableInfo;
-                var fields = new Dictionary<string, object>(tableInfo.Columns.Length);
-                foreach (var item in tableInfo.Columns)
-                {
-                    fields.Add(item.Name, row[item.Name]);
-                }
-                return fields;
-            };
+                fields.Add(item.Name, row[item.Name]);
+            }
+            return fields;
         }
     }
 }

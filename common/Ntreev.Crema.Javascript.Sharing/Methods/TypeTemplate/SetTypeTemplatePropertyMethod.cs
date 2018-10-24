@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,7 +30,7 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TypeTemplate))]
-    class SetTypeTemplatePropertyMethod : DomainScriptMethodBase
+    class SetTypeTemplatePropertyMethod : ScriptActionTaskBase<string, TypeProperties, object>
     {
         [ImportingConstructor]
         public SetTypeTemplatePropertyMethod(ICremaHost cremaHost)
@@ -38,37 +39,27 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string domainID, TypeProperties propertyName, object value)
         {
-            return new Action<string, TypeProperties, object>(this.SetTypeTemplateProperty);
-        }
-
-        private void SetTypeTemplateProperty(string domainID, TypeProperties propertyName, object value)
-        {
-            var template = this.GetDomainHost<ITypeTemplate>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var template = domain.Host as ITypeTemplate;
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-
-            async Task InvokeAsync()
+            if (propertyName == TypeProperties.Name)
             {
-                if (propertyName == TypeProperties.Name)
-                {
-                    await template.SetTypeNameAsync(authentication, (string)value);
-                }
-                else if (propertyName == TypeProperties.IsFlag)
-                {
-                    await template.SetIsFlagAsync(authentication, (bool)value);
-                }
-                else if (propertyName == TypeProperties.Comment)
-                {
-                    await template.SetCommentAsync(authentication, (string)value);
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-            };
+                await template.SetTypeNameAsync(authentication, (string)value);
+            }
+            else if (propertyName == TypeProperties.IsFlag)
+            {
+                await template.SetIsFlagAsync(authentication, (bool)value);
+            }
+            else if (propertyName == TypeProperties.Comment)
+            {
+                await template.SetCommentAsync(authentication, (string)value);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

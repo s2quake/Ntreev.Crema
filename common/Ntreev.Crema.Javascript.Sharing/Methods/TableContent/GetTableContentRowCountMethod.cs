@@ -17,19 +17,21 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableContent
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableContent))]
-    class GetTableContentRowCountMethod : DomainScriptMethodBase
+    class GetTableContentRowCountMethod : ScriptFuncTaskBase<string, string, object[], string, object>
     {
         [ImportingConstructor]
         public GetTableContentRowCountMethod(ICremaHost cremaHost)
@@ -38,22 +40,16 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, object[], string, object>(this.GetTableContentRowCount);
-        }
-
-        private object GetTableContentRowCount(string domainID, string tableName, object[] keys, string columnName)
+        protected override async Task<object> OnExecuteAsync(string domainID, string tableName, object[] keys, string columnName)
         {
             if (keys == null)
                 throw new ArgumentNullException(nameof(keys));
-
-            var contents = this.GetDomainHost<IEnumerable<ITableContent>>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var contents = domain.Host as IEnumerable<ITableContent>;
             var content = contents.FirstOrDefault(item => item.Dispatcher.Invoke(() => item.Table.Name) == tableName);
             if (content == null)
                 throw new TableNotFoundException(tableName);
-            var authentication = this.Context.GetAuthentication(this);
-            return content.Dispatcher.Invoke(() => content.Count);
+            return await content.Dispatcher.InvokeAsync(() => content.Count);
         }
     }
 }

@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -23,13 +24,14 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class MoveTableMethod : DataBaseScriptMethodBase
+    class MoveTableMethod : ScriptActionTaskBase<string, string, string>
     {
         [ImportingConstructor]
         public MoveTableMethod(ICremaHost cremaHost)
@@ -38,17 +40,11 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string dataBaseName, string tableName, string categoryPath)
         {
-            return new Action<string, string, string>(this.MoveTable);
-        }
-
-        private void MoveTable(string dataBaseName, string tableName, string categoryPath)
-        {
-            var table = this.GetTable(dataBaseName, tableName);
+            var table = await this.CremaHost.GetTableAsync(dataBaseName, tableName);
             var authentication = this.Context.GetAuthentication(this);
-            var task = table.MoveAsync(authentication, categoryPath);
-            task.Wait();
+            await table.MoveAsync(authentication, categoryPath);
         }
     }
 }

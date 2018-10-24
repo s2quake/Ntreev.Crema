@@ -26,13 +26,15 @@ using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class ContainsTableMethod : DataBaseScriptMethodBase
+    class ContainsTableMethod : ScriptFuncTaskBase<string, string, bool>
     {
         [ImportingConstructor]
         public ContainsTableMethod(ICremaHost cremaHost)
@@ -41,9 +43,9 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override Task<bool> OnExecuteAsync(string dataBaseName, string tableName)
         {
-            return new Func<string, string, bool>(ContainsTable);
+            return this.CremaHost.ContainsTableAsync(dataBaseName, tableName);
         }
     }
 }

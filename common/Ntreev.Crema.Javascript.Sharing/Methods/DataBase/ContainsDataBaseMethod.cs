@@ -26,24 +26,26 @@ using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class ContainsDataBaseMethod : DataBaseScriptMethodBase
+    class ContainsDataBaseMethod : ScriptFuncTaskBase<string, bool>
     {
         [ImportingConstructor]
         public ContainsDataBaseMethod(ICremaHost cremaHost)
-            : base(cremaHost)
+           : base(cremaHost)
         {
-            
+
         }
 
-        protected override Delegate CreateDelegate()
+        protected override Task<bool> OnExecuteAsync(string dataBaseName)
         {
-            return new Func<string, bool>(ContainsDataBase);
+            return this.CremaHost.ContainsDataBaseAsync(dataBaseName);
         }
     }
 }

@@ -23,13 +23,15 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class MoveTableItemMethod : DataBaseScriptMethodBase
+    class MoveTableItemMethod : ScriptFuncTaskBase<string, string, string, string>
     {
         [ImportingConstructor]
         public MoveTableItemMethod(ICremaHost cremaHost)
@@ -38,18 +40,12 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, string, string>(this.MoveTableItem);
-        }
-
         [ReturnParameterName("path")]
-        private string MoveTableItem(string dataBaseName, string tableItemPath, string parentPath)
+        protected override async Task<string> OnExecuteAsync(string dataBaseName, string tableItemPath, string parentPath)
         {
-            var tableItem = this.GetTableItem(dataBaseName, tableItemPath);
+            var tableItem = await this.CremaHost.GetTableItemAsync(dataBaseName, tableItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            var task = tableItem.MoveAsync(authentication, parentPath);
-            task.Wait();
+            await tableItem.MoveAsync(authentication, parentPath);
             return tableItem.Path;
         }
     }

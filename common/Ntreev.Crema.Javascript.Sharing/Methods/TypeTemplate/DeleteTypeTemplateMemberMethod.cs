@@ -17,18 +17,20 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TypeTemplate))]
-    class DeleteTypeTemplateMemberMethod : DomainScriptMethodBase
+    class DeleteTypeTemplateMemberMethod : ScriptActionTaskBase<string, string>
     {
         [ImportingConstructor]
         public DeleteTypeTemplateMemberMethod(ICremaHost cremaHost)
@@ -37,20 +39,15 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string domainID, string memberName)
         {
-            return new Action<string, string>(this.DeleteTypeTemplateMember);
-        }
-
-        private void DeleteTypeTemplateMember(string domainID, string memberName)
-        {
-            var template = this.GetDomainHost<ITypeTemplate>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var template = domain.Host as ITypeTemplate;
             var authentication = this.Context.GetAuthentication(this);
             var member = template[memberName];
             if (member == null)
                 throw new ItemNotFoundException(memberName);
-            var task = member.DeleteAsync(authentication);
-            task.Wait();
+            await member.DeleteAsync(authentication);
         }
     }
 }

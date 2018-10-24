@@ -18,18 +18,20 @@
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TypeTemplate))]
-    class GetTypeTemplateMemberPropertyMethod : DomainScriptMethodBase
+    class GetTypeTemplateMemberPropertyMethod : ScriptFuncTaskBase<string, string, TypeMemberProperties, object>
     {
         [ImportingConstructor]
         public GetTypeTemplateMemberPropertyMethod(ICremaHost cremaHost)
@@ -38,15 +40,11 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<object> OnExecuteAsync(string domainID, string memberName, TypeMemberProperties propertyName)
         {
-            return new Func<string, string, TypeMemberProperties, object>(this.GetTypeTemplateMemberProperty);
-        }
-
-        private object GetTypeTemplateMemberProperty(string domainID, string memberName, TypeMemberProperties propertyName)
-        {
-            var template = this.GetDomainHost<ITypeTemplate>(domainID);
-            return template.Dispatcher.Invoke(() =>
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var template = domain.Host as ITypeTemplate;
+            return await template.Dispatcher.InvokeAsync(() =>
             {
                 var member = template[memberName];
                 if (member == null)

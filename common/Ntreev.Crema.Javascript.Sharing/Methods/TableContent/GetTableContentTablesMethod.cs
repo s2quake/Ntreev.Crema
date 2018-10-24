@@ -17,19 +17,21 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableContent
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableContent))]
-    class GetTableContentTablesMethod : DomainScriptMethodBase
+    class GetTableContentTablesMethod : ScriptFuncTaskBase<string, string[]>
     {
         [ImportingConstructor]
         public GetTableContentTablesMethod(ICremaHost cremaHost)
@@ -38,15 +40,12 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<string[]> OnExecuteAsync(string domainID)
         {
-            return new Func<string, string[]>(this.GetTableContentTables);
-        }
-
-        private string[] GetTableContentTables(string domainID)
-        {
-            var contents = this.GetDomainHost<IEnumerable<ITableContent>>(domainID);
-            return contents.Select(item => item.Dispatcher.Invoke(() => item.Table.Name)).ToArray();
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var contents = domain.Host as IEnumerable<ITableContent>;
+            var content = contents.First();
+            return await content.Dispatcher.InvokeAsync(() => contents.Select(item => item.Table.Name).ToArray());
         }
     }
 }

@@ -26,13 +26,14 @@ using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class GetTableItemLogInfoMethod : DataBaseScriptMethodBase
+    class GetTableItemLogInfoMethod : ScriptFuncTaskBase<string, string, string, IDictionary<string, object>[]>
     {
         [ImportingConstructor]
         public GetTableItemLogInfoMethod(ICremaHost cremaHost)
@@ -41,24 +42,12 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<IDictionary<string, object>[]> OnExecuteAsync(string dataBaseName, string tableItemPath, string revision = null)
         {
-            return new Func<string, string, string, IDictionary<string, object>[]>(GetTableItemLogInfo);
-        }
-
-        private IDictionary<string, object>[] GetTableItemLogInfo(string dataBaseName, string tableItemPath, string revision = null)
-        {
-            var tableItem = this.GetTableItem(dataBaseName, tableItemPath);
+            var tableItem = await this.CremaHost.GetTableItemAsync(dataBaseName, tableItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-            return task.Result;
-
-            async Task<IDictionary<string, object>[]> InvokeAsync()
-            {
-                var logInfos = await tableItem.GetLogAsync(authentication, revision);
-                return this.GetLogInfo(logInfos);
-            };
+            var logInfos = await tableItem.GetLogAsync(authentication, revision);
+            return this.GetLogInfo(logInfos);
         }
 
         private IDictionary<string, object>[] GetLogInfo(LogInfo[] logInfos)

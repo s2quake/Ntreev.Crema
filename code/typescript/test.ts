@@ -586,7 +586,7 @@ class Program {
             enterDataBase(dataBaseName);
         }
 
-        let count: number = RandomUtility.nextInRange(1, 2);
+        let count: number = RandomUtility.nextInRange(10, 100);
         try {
             Program.doTask(dataBaseName, count);
         } finally {
@@ -603,7 +603,7 @@ class Program {
         let transactionID: string = beginDataBaseTransaction(dataBaseName);
         try {
             RandomTask.run(dataBaseName, count);
-            cancelDataBaseTransaction(transactionID);
+            endDataBaseTransaction(transactionID);
         } catch (e) {
             cancelDataBaseTransaction(transactionID);
             throw e;

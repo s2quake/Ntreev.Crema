@@ -17,18 +17,20 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableTemplate))]
-    class CancelTableTemplateEditMethod : DomainScriptMethodBase
+    class CancelTableTemplateEditMethod : ScriptActionTaskBase<string>
     {
         [ImportingConstructor]
         public CancelTableTemplateEditMethod(ICremaHost cremaHost)
@@ -37,17 +39,12 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string domainID)
         {
-            return new Action<string>(this.CancelTableTemplateEdit);
-        }
-
-        private void CancelTableTemplateEdit(string domainID)
-        {
-            var template = this.GetDomainHost<ITableTemplate>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var template = domain.Host as ITableTemplate;
             var authentication = this.Context.GetAuthentication(this);
-            var task = template.CancelEditAsync(authentication);
-            task.Wait();
+            await template.CancelEditAsync(authentication);
         }
     }
 }

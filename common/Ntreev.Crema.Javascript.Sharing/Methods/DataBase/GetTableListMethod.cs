@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class GetTableListMethod : DataBaseScriptMethodBase
+    class GetTableListMethod : ScriptFuncTaskBase<string, string[]>
     {
         [ImportingConstructor]
         public GetTableListMethod(ICremaHost cremaHost)
@@ -37,15 +39,10 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<string[]> OnExecuteAsync(string dataBaseName)
         {
-            return new Func<string, string[]>(this.GetTableList);
-        }
-
-        private string[] GetTableList(string dataBaseName)
-        {
-            var dataBase = this.GetDataBase(dataBaseName);
-            return dataBase.Dispatcher.Invoke(() => dataBase.TableContext.Tables.Select(item => item.Name).ToArray());
+            var dataBase = await this.CremaHost.GetDataBaseAsync(dataBaseName);
+            return await dataBase.Dispatcher.InvokeAsync(() => dataBase.TableContext.Tables.Select(item => item.Name).ToArray());
         }
     }
 }

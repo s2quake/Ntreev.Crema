@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.Library;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableTemplate))]
-    class SetTableTemplatePropertyMethod : DomainScriptMethodBase
+    class SetTableTemplatePropertyMethod : ScriptActionTaskBase<string, TableProperties, object>
     {
         [ImportingConstructor]
         public SetTableTemplatePropertyMethod(ICremaHost cremaHost)
@@ -39,37 +40,27 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string domainID, TableProperties propertyName, object value)
         {
-            return new Action<string, TableProperties, object>(this.SetTableTemplateProperty);
-        }
-
-        private void SetTableTemplateProperty(string domainID, TableProperties propertyName, object value)
-        {
-            var template = this.GetDomainHost<ITableTemplate>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var template = domain.Host as ITableTemplate;
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-            
-            async Task InvokeAsync()
+            if (propertyName == TableProperties.Name)
             {
-                if (propertyName == TableProperties.Name)
-                {
-                    await template.SetTableNameAsync(authentication, (string)value);
-                }
-                else if (propertyName == TableProperties.Tags)
-                {
-                    await template.SetTagsAsync(authentication, (TagInfo)(string)value);
-                }
-                else if (propertyName == TableProperties.Comment)
-                {
-                    await template.SetCommentAsync(authentication, (string)value);
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-            };
+                await template.SetTableNameAsync(authentication, (string)value);
+            }
+            else if (propertyName == TableProperties.Tags)
+            {
+                await template.SetTagsAsync(authentication, (TagInfo)(string)value);
+            }
+            else if (propertyName == TableProperties.Comment)
+            {
+                await template.SetCommentAsync(authentication, (string)value);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

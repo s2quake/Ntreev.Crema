@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class IsDataBaseEnteredMethod : DataBaseScriptMethodBase
+    class IsDataBaseEnteredMethod : ScriptFuncTaskBase<string, bool>
     {
         [ImportingConstructor]
         public IsDataBaseEnteredMethod(ICremaHost cremaHost)
@@ -37,16 +39,11 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<bool> OnExecuteAsync(string dataBaseName)
         {
-            return new Func<string, bool>(this.IsDataBaseLoaded);
-        }
-
-        private bool IsDataBaseLoaded(string dataBaseName)
-        {
-            var dataBase = this.GetDataBase(dataBaseName);
+            var dataBase = await this.CremaHost.GetDataBaseAsync(dataBaseName);
             var authentication = this.Context.GetAuthentication(this);
-            return dataBase.Dispatcher.Invoke(() => dataBase.Contains(authentication));
+            return await dataBase.Dispatcher.InvokeAsync(() => dataBase.Contains(authentication));
         }
     }
 }

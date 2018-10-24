@@ -360,6 +360,12 @@ namespace Ntreev.Crema.Javascript
                 return "number";
             else if (type == typeof(decimal))
                 return "number";
+            else if (type == typeof(Task))
+                return "void";
+            else if (IsTaskType(type))
+            {
+                return this.GetTypeString(type.GetGenericArguments()[0]);
+            }
             else if (IsDelegateType(type))
             {
                 return type.Name;
@@ -447,6 +453,19 @@ namespace Ntreev.Crema.Javascript
                 sb.AppendLine();
         }
 
+        private MethodInfo GetBaseMethod(IScriptMethod scriptMethod)
+        {
+            foreach (var item in scriptMethod.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance))
+            {
+                foreach (var attr in item.GetCustomAttributes(true))
+                {
+                    if (attr is BaseDelegateAttribute)
+                        return item;
+                }
+            }
+            return scriptMethod.Delegate.Method;
+        }
+
         private void WriteMethods(StringBuilder sb, IEnumerable<IScriptMethod> methodItems)
         {
             var query = from item in methodItems
@@ -460,7 +479,7 @@ namespace Ntreev.Crema.Javascript
                 sb.AppendLine($"// {groupItem.Key}");
                 foreach (var item in groupItem)
                 {
-                    var methodInfo = item.Delegate.Method;
+                    var methodInfo = this.GetBaseMethod(item);
                     var parameters = methodInfo.GetParameters();
 
                     if (methodInfo.GetCustomAttribute<ReturnParameterNameAttribute>() is ReturnParameterNameAttribute attr)
@@ -520,6 +539,11 @@ namespace Ntreev.Crema.Javascript
                         where IsDelegateType(parameterInfo.ParameterType)
                         select parameterInfo.ParameterType;
             return query.Distinct();
+        }
+
+        internal static bool IsTaskType(Type type)
+        {
+            return type.IsGenericType && (type.GetGenericTypeDefinition() == typeof(Task<>));
         }
 
         internal static bool IsDictionaryType(Type type)

@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -23,13 +24,14 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class EndDataBaseTransactionMethod : DataBaseScriptMethodBase
+    class EndDataBaseTransactionMethod : ScriptActionTaskBase<string>
     {
         [ImportingConstructor]
         public EndDataBaseTransactionMethod(ICremaHost cremaHost)
@@ -38,12 +40,7 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Action<string>(this.EndDataBaseTransaction);
-        }
-
-        private void EndDataBaseTransaction(string transactionID)
+        protected override async Task OnExecuteAsync(string transactionID)
         {
             if (transactionID == null)
                 throw new ArgumentNullException(nameof(transactionID));
@@ -52,8 +49,7 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
             if (this.Context.Properties[transactionID] is ITransaction transaction)
             {
                 var authentication = this.Context.GetAuthentication(this);
-                var task = transaction.CommitAsync(authentication);
-                task.Wait();
+                await transaction.CommitAsync(authentication);
                 this.Context.Properties.Remove(transactionID);
             }
             else

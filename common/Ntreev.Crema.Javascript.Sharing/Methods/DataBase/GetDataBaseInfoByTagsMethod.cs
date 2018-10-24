@@ -27,13 +27,15 @@ using Ntreev.Crema.Data.Xml.Schema;
 using System.Reflection;
 using Ntreev.Library;
 using Ntreev.Library.IO;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class GetDataBaseInfoByTagsMethod : DataBaseScriptMethodBase
+    class GetDataBaseInfoByTagsMethod : ScriptFuncTaskBase<string, string, IDictionary<string, object>>
     {
         [ImportingConstructor]
         public GetDataBaseInfoByTagsMethod(ICremaHost cremaHost)
@@ -42,15 +44,10 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<IDictionary<string, object>> OnExecuteAsync(string dataBaseName, string tags)
         {
-            return new Func<string, string, IDictionary<string, object>>(this.GetDataBaseInfoByTags);
-        }
-
-        private IDictionary<string, object> GetDataBaseInfoByTags(string dataBaseName, string tags)
-        {
-            var dataBase = this.GetDataBase(dataBaseName);
-            return dataBase.Dispatcher.Invoke(() =>
+            var dataBase = await this.CremaHost.GetDataBaseAsync(dataBaseName);
+            return await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 var dataBaseInfo = dataBase.DataBaseInfo;
                 dataBaseInfo.Tags = (TagInfo)tags;

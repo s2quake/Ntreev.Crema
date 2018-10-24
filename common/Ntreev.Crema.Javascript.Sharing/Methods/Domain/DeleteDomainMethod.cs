@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.Domain
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(Domain))]
-    class DeleteDomainMethod : DomainScriptMethodBase
+    class DeleteDomainMethod : ScriptActionTaskBase<string, bool>
     {
         [ImportingConstructor]
         public DeleteDomainMethod(ICremaHost cremaHost)
@@ -37,17 +39,11 @@ namespace Ntreev.Crema.Javascript.Methods.Domain
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string domainID, bool isCancel = false)
         {
-            return new Action<string, bool>(this.DeleteDomain);
-        }
-
-        private void DeleteDomain(string domainID, bool isCancel = false)
-        {
-            var domain = this.GetDomain(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
             var authentication = this.Context.GetAuthentication(this);
-            var task = domain.DeleteAsync(authentication, isCancel);
-            task.Wait();
+            await domain.DeleteAsync(authentication, isCancel);
         }
     }
 }

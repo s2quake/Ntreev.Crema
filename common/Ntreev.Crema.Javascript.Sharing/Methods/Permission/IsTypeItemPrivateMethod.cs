@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.Permission
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(Permission))]
-    class IsTypeItemPrivateMethod : DataBaseScriptMethodBase
+    class IsTypeItemPrivateMethod : ScriptFuncTaskBase<string, string, bool>
     {
         [ImportingConstructor]
         public IsTypeItemPrivateMethod(ICremaHost cremaHost)
@@ -37,15 +39,10 @@ namespace Ntreev.Crema.Javascript.Methods.Permission
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<bool> OnExecuteAsync(string dataBaseName, string typeItemPath)
         {
-            return new Func<string, string, bool>(this.IsTypeItemPrivate);
-        }
-
-        private bool IsTypeItemPrivate(string dataBaseName, string typeItemPath)
-        {
-            var typeItem = this.GetTypeItem(dataBaseName, typeItemPath);
-            return typeItem.Dispatcher.Invoke(() => typeItem.IsPrivate);
+            var typeItem = await this.CremaHost.GetTypeItemAsync(dataBaseName, typeItemPath);
+            return await typeItem.Dispatcher.InvokeAsync(() => typeItem.IsPrivate);
         }
     }
 }

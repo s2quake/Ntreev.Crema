@@ -122,6 +122,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Methods\User\RenameUserCategoryMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\User\RenameUserItemMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\User\CreateUserCategoryMethod.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BaseDelegateAttribute.cs" />
     <None Include="$(MSBuildThisFileDirectory)Consoles\GenerateDeclarationCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\IO\CreateDirectoryMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\IO\DirectoryExistsMethod.cs" />

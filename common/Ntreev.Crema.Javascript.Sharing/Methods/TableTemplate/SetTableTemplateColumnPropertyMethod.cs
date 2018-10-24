@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.Library;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableTemplate))]
-    class SetTableTemplateColumnPropertyMethod : DomainScriptMethodBase
+    class SetTableTemplateColumnPropertyMethod : ScriptActionTaskBase<string, string, TableColumnProperties, object>
     {
         [ImportingConstructor]
         public SetTableTemplateColumnPropertyMethod(ICremaHost cremaHost)
@@ -39,77 +40,67 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Action<string, string, TableColumnProperties, object>(this.SetTableTemplateColumnProperty);
-        }
-
-        private void SetTableTemplateColumnProperty(string domainID, string columnName, TableColumnProperties propertyName, object value)
+        protected override async Task OnExecuteAsync(string domainID, string columnName, TableColumnProperties propertyName, object value)
         {
             if (columnName == null)
             {
                 throw new ArgumentNullException(nameof(columnName));
             }
 
-            var template = this.GetDomainHost<ITableTemplate>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var template = domain.Host as ITableTemplate;
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-
-            async Task InvokeAsync()
+            var column = template[columnName];
+            if (column == null)
+                throw new ItemNotFoundException(columnName);
+            if (propertyName == TableColumnProperties.Index)
             {
-                var column = template[columnName];
-                if (column == null)
-                    throw new ItemNotFoundException(columnName);
-                if (propertyName == TableColumnProperties.Index)
-                {
-                    await column.SetIndexAsync(authentication, Convert.ToInt32(value));
-                }
-                else if (propertyName == TableColumnProperties.IsKey)
-                {
-                    await column.SetIsKeyAsync(authentication, (bool)value);
-                }
-                else if (propertyName == TableColumnProperties.IsUnique)
-                {
-                    await column.SetIsUniqueAsync(authentication, (bool)value);
-                }
-                else if (propertyName == TableColumnProperties.Name)
-                {
-                    await column.SetNameAsync(authentication, (string)value);
-                }
-                else if (propertyName == TableColumnProperties.DataType)
-                {
-                    await column.SetDataTypeAsync(authentication, (string)value);
-                }
-                else if (propertyName == TableColumnProperties.DefaultValue)
-                {
-                    await column.SetDefaultValueAsync(authentication, $"{value}");
-                }
-                else if (propertyName == TableColumnProperties.Comment)
-                {
-                    await column.SetCommentAsync(authentication, (string)value);
-                }
-                else if (propertyName == TableColumnProperties.AutoIncrement)
-                {
-                    await column.SetAutoIncrementAsync(authentication, (bool)value);
-                }
-                else if (propertyName == TableColumnProperties.Tags)
-                {
-                    await column.SetTagsAsync(authentication, (TagInfo)(string)value);
-                }
-                else if (propertyName == TableColumnProperties.IsReadOnly)
-                {
-                    await column.SetIsReadOnlyAsync(authentication, (bool)value);
-                }
-                else if (propertyName == TableColumnProperties.AllowNull)
-                {
-                    await column.SetAllowNullAsync(authentication, (bool)value);
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-            };
+                await column.SetIndexAsync(authentication, Convert.ToInt32(value));
+            }
+            else if (propertyName == TableColumnProperties.IsKey)
+            {
+                await column.SetIsKeyAsync(authentication, (bool)value);
+            }
+            else if (propertyName == TableColumnProperties.IsUnique)
+            {
+                await column.SetIsUniqueAsync(authentication, (bool)value);
+            }
+            else if (propertyName == TableColumnProperties.Name)
+            {
+                await column.SetNameAsync(authentication, (string)value);
+            }
+            else if (propertyName == TableColumnProperties.DataType)
+            {
+                await column.SetDataTypeAsync(authentication, (string)value);
+            }
+            else if (propertyName == TableColumnProperties.DefaultValue)
+            {
+                await column.SetDefaultValueAsync(authentication, $"{value}");
+            }
+            else if (propertyName == TableColumnProperties.Comment)
+            {
+                await column.SetCommentAsync(authentication, (string)value);
+            }
+            else if (propertyName == TableColumnProperties.AutoIncrement)
+            {
+                await column.SetAutoIncrementAsync(authentication, (bool)value);
+            }
+            else if (propertyName == TableColumnProperties.Tags)
+            {
+                await column.SetTagsAsync(authentication, (TagInfo)(string)value);
+            }
+            else if (propertyName == TableColumnProperties.IsReadOnly)
+            {
+                await column.SetIsReadOnlyAsync(authentication, (bool)value);
+            }
+            else if (propertyName == TableColumnProperties.AllowNull)
+            {
+                await column.SetAllowNullAsync(authentication, (bool)value);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

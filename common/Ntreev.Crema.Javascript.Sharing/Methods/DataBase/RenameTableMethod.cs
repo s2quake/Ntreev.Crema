@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -23,13 +24,14 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class RenameTableMethod : DataBaseScriptMethodBase
+    class RenameTableMethod : ScriptActionTaskBase<string, string, string>
     {
         [ImportingConstructor]
         public RenameTableMethod(ICremaHost cremaHost)
@@ -38,17 +40,11 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string dataBaseName, string tableName, string newTableName)
         {
-            return new Action<string, string, string>(this.RenameTable);
-        }
-
-        private void RenameTable(string dataBaseName, string tableName, string newTableName)
-        {
-            var table = this.GetTable(dataBaseName, tableName);
+            var table = await this.CremaHost.GetTableAsync(dataBaseName, tableName);
             var authentication = this.Context.GetAuthentication(this);
-            var task = table.RenameAsync(authentication, newTableName);
-            task.Wait();
+            await table.RenameAsync(authentication, newTableName);
         }
     }
 }

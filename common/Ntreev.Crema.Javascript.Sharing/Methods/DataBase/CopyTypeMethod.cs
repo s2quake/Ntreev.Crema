@@ -23,13 +23,16 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
+using Ntreev.Library.IO;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class CopyTypeMethod : DataBaseScriptMethodBase
+    class CopyTypeMethod : ScriptActionTaskBase<string, string, string, string>
     {
         [ImportingConstructor]
         public CopyTypeMethod(ICremaHost cremaHost)
@@ -38,17 +41,11 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string dataBaseName, string typeName, string newTypeName, string categoryPath)
         {
-            return new Action<string, string, string, string>(this.CopyType);
-        }
-
-        private void CopyType(string dataBaseName, string typeName, string newTypeName, string categoryPath)
-        {
-            var type = this.GetType(dataBaseName, typeName);
+            var type = await this.CremaHost.GetTypeAsync(dataBaseName, typeName);
             var authentication = this.Context.GetAuthentication(this);
-            var task = type.CopyAsync(authentication, newTypeName, categoryPath ?? "/");
-            task.Wait();
+            await type.CopyAsync(authentication, newTypeName, categoryPath ?? PathUtility.Separator);
         }
     }
 }

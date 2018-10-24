@@ -23,13 +23,16 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
+using Ntreev.Library.IO;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class CopyTableMethod : DataBaseScriptMethodBase
+    class CopyTableMethod : ScriptActionTaskBase<string, string, string, string, bool?>
     {
         [ImportingConstructor]
         public CopyTableMethod(ICremaHost cremaHost)
@@ -38,17 +41,11 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string dataBaseName, string tableName, string newTableName, string categoryPath, bool? copyContent)
         {
-            return new Action<string, string, string, string, bool?>(this.CopyTable);
-        }
-
-        private void CopyTable(string dataBaseName, string tableName, string newTableName, string categoryPath, bool? copyContent)
-        {
-            var table = this.GetTable(dataBaseName, tableName);
+            var table = await this.CremaHost.GetTableAsync(dataBaseName, tableName);
             var authentication = this.Context.GetAuthentication(this);
-            var task = table.CopyAsync(authentication, newTableName, categoryPath ?? "/", copyContent ?? false);
-            task.Wait();
+            await table.CopyAsync(authentication, newTableName, categoryPath ?? PathUtility.Separator, copyContent ?? false);
         }
     }
 }

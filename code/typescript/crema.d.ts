@@ -55,6 +55,11 @@ declare enum CremaEvents {
     DataBaseAccessChanged = 33,
     DataBaseLockChanged = 34
 }
+declare enum DataSetType {
+    All = 0,
+    OmitContent = 1,
+    TypeOnly = 2
+}
 declare enum TableColumnProperties {
     Index = 0,
     IsKey = 1,
@@ -96,7 +101,6 @@ declare function removeEventListener(eventName: CremaEvents, listener: CremaEven
 declare function sleep(millisecondsTimeout: number): void;
 
 // DataBase
-/** @returns transactionID */
 declare function beginDataBaseTransaction(dataBaseName: string): string;
 declare function cancelDataBaseTransaction(transactionID: string): void;
 declare function containsDataBase(dataBaseName: string): boolean;
@@ -121,18 +125,18 @@ declare function deleteTypeCategory(dataBaseName: string, categoryPath: string):
 declare function deleteTypeItem(dataBaseName: string, typeItemPath: string): void;
 declare function endDataBaseTransaction(transactionID: string): void;
 declare function enterDataBase(dataBaseName: string): void;
-declare function getDataBaseData(dataBaseName: string, revision: string): string;
+declare function getDataBaseData(dataBaseName: string, dataSetType: DataSetType, filterExpression: string, revision: string): string;
 declare function getDataBaseInfo(dataBaseName: string): { [key: string]: any; };
 declare function getDataBaseInfoByTags(dataBaseName: string, tags: string): { [key: string]: any; };
 declare function getDataBaseList(): string[];
-declare function getDataBaseLogInfo(dataBaseName: string): { [key: string]: any; }[];
+declare function getDataBaseLogInfo(dataBaseName: string, revision: string): { [key: string]: any; }[];
 declare function getTableCategoryList(dataBaseName: string): string[];
 declare function getTableData(dataBaseName: string, tableName: string, revision: string): { [key: number]: any; };
 declare function getTableInfo(dataBaseName: string, tableName: string): { [key: string]: any; };
 declare function getTableInfoByTags(dataBaseName: string, tableName: string, tags: string): { [key: string]: any; };
 declare function getTableItemData(dataBaseName: string, tableItemPath: string, revision: string): { [key: string]: { [key: number]: any; }; };
 declare function getTableItemList(dataBaseName: string): string[];
-declare function getTableItemLogInfo(dataBaseName: string, tableItemPath: string): { [key: string]: any; }[];
+declare function getTableItemLogInfo(dataBaseName: string, tableItemPath: string, revision: string): { [key: string]: any; }[];
 declare function getTableList(dataBaseName: string): string[];
 declare function getTableListByTags(dataBaseName: string, tags: string): string[];
 declare function getTypeCategoryList(dataBaseName: string): string[];
@@ -141,7 +145,7 @@ declare function getTypeInfo(dataBaseName: string, typeName: string): { [key: st
 declare function getTypeInfoByTags(dataBaseName: string, typeName: string, tags: string): { [key: string]: any; };
 declare function getTypeItemData(dataBaseName: string, typeItemPath: string, revision: string): { [key: string]: { [key: number]: any; }; };
 declare function getTypeItemList(dataBaseName: string): string[];
-declare function getTypeItemLogInfo(dataBaseName: string, typeItemPath: string): { [key: string]: any; }[];
+declare function getTypeItemLogInfo(dataBaseName: string, typeItemPath: string, revision: string): { [key: string]: any; }[];
 declare function getTypeList(dataBaseName: string): string[];
 declare function getTypeListByTags(dataBaseName: string, tags: string): string[];
 declare function inheritTable(dataBaseName: string, tableName: string, newTableName: string, categoryPath: string, copyContent?: boolean): void;
@@ -228,7 +232,7 @@ declare function setTableContentRowField(domainID: string, tableName: string, ke
 declare function setTableContentRowFields(domainID: string, tableName: string, keys: any[], fields: { [key: string]: any; }): void;
 
 // TableTemplate
-/** @param typeName boolean, string, single, double, int8, uint8, int16, uint16, int32, uint32, int64, uint64, datetime, duration, guid or typePath(e.g., /categoryPath/typeName) */
+/** @param typeName boolean, string, float, double, int8, uint8, int16, uint16, int32, uint32, int64, uint64, datetime, duration, guid or typePath(e.g., /categoryPath/typeName) */
 declare function addTableTemplateColumn(domainID: string, columnName: string, typeName: string, comment: string, isKey?: boolean): void;
 /** @returns domainID */
 declare function beginTableCreate(dataBaseName: string, parentPath: string): string;

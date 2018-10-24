@@ -60,6 +60,10 @@
       <Project>{1918437f-4fbf-4731-ac5b-981a4a4cb1f1}</Project>
       <Name>Ntreev.Library</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Ntreev.Crema.Services.Extensions\Ntreev.Crema.Services.Extensions.csproj">
+      <Project>{0261747b-0a44-4fb0-8e27-2ce4baf2153b}</Project>
+      <Name>Ntreev.Crema.Services.Extensions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj">
       <Project>{b7b4c207-7729-4147-96c4-b55e85647a66}</Project>
       <Name>Ntreev.Crema.Services</Name>

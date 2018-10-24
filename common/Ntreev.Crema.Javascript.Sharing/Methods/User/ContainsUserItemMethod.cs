@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.User
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class ContainsUserItemMethod : UserScriptMethodBase
+    class ContainsUserItemMethod : ScriptFuncTaskBase<string, bool>
     {
         [ImportingConstructor]
         public ContainsUserItemMethod(ICremaHost cremaHost)
@@ -37,14 +39,9 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override Task<bool> OnExecuteAsync(string userItemPath)
         {
-            return new Func<string, bool>(this.ContainsUserItem);
-        }
-
-        private bool ContainsUserItem(string userItemPath)
-        {
-            return this.UserContext.Dispatcher.Invoke(() => this.UserContext.Contains(userItemPath));
+            return this.CremaHost.ContainsUserItemAsync(userItemPath);
         }
     }
 }

@@ -25,13 +25,14 @@ using System.ComponentModel;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
 using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class GetTableItemDataMethod : DataBaseScriptMethodBase
+    class GetTableItemDataMethod : ScriptFuncTaskBase<string, string, string, IDictionary<string, IDictionary<int, object>>>
     {
         [ImportingConstructor]
         public GetTableItemDataMethod(ICremaHost cremaHost)
@@ -40,30 +41,18 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<IDictionary<string, IDictionary<int, object>>> OnExecuteAsync(string dataBaseName, string tableItemPath, string revision)
         {
-            return new Func<string, string, string, IDictionary<string, IDictionary<int, object>>>(GetTableItemData);
-        }
-
-        private IDictionary<string, IDictionary<int, object>> GetTableItemData(string dataBaseName, string tableItemPath, string revision)
-        {
-            var tableItem = this.GetTableItem(dataBaseName, tableItemPath);
+            var tableItem = await this.CremaHost.GetTableItemAsync(dataBaseName, tableItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-            return task.Result;
-
-            async Task<IDictionary<string, IDictionary<int, object>>> InvokeAsync()
+            var dataSet = await tableItem.GetDataSetAsync(authentication, revision);
+            var tables = new Dictionary<string, IDictionary<int, object>>(dataSet.Tables.Count);
+            foreach (var item in dataSet.Tables)
             {
-                var dataSet = await tableItem.GetDataSetAsync(authentication, revision);
-                var tables = new Dictionary<string, IDictionary<int, object>>(dataSet.Tables.Count);
-                foreach (var item in dataSet.Tables)
-                {
-                    var rows = this.GetDataRows(item);
-                    tables.Add(item.Name, rows);
-                }
-                return tables;
-            };
+                var rows = this.GetDataRows(item);
+                tables.Add(item.Name, rows);
+            }
+            return tables;
         }
 
         private IDictionary<int, object> GetDataRows(CremaDataTable dataTable)

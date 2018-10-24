@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -23,13 +24,15 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
+using Ntreev.Library.IO;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class InheritTableMethod : DataBaseScriptMethodBase
+    class InheritTableMethod : ScriptActionTaskBase<string, string, string, string, bool?>
     {
         [ImportingConstructor]
         public InheritTableMethod(ICremaHost cremaHost)
@@ -38,17 +41,11 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string dataBaseName, string tableName, string newTableName, string categoryPath, bool? copyContent)
         {
-            return new Action<string, string, string, string, bool?>(this.InheritTable);
-        }
-
-        private void InheritTable(string dataBaseName, string tableName, string newTableName, string categoryPath, bool? copyContent)
-        {
-            var table = this.GetTable(dataBaseName, tableName);
+            var table = await this.CremaHost.GetTableAsync(dataBaseName, tableName);
             var authentication = this.Context.GetAuthentication(this);
-            var task = table.InheritAsync(authentication, newTableName, categoryPath ?? "/", copyContent ?? false);
-            task.Wait();
+            await table.InheritAsync(authentication, newTableName, categoryPath ?? PathUtility.Separator, copyContent ?? false);
         }
     }
 }

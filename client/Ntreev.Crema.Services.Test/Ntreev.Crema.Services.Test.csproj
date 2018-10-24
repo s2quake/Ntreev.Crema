@@ -229,6 +229,10 @@
       <Project>{1918437f-4fbf-4731-ac5b-981a4a4cb1f1}</Project>
       <Name>Ntreev.Library</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Ntreev.Crema.Services.Extentions\Ntreev.Crema.Services.Extentions.csproj">
+      <Project>{5a7af7db-03ca-4daa-9845-55721c0473dd}</Project>
+      <Name>Ntreev.Crema.Services.Extentions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Ntreev.Crema.Services.Random\Ntreev.Crema.Services.Random.csproj">
       <Project>{d3c76815-432c-4bc5-9815-04c2f1e905cd}</Project>
       <Name>Ntreev.Crema.Services.Random</Name>

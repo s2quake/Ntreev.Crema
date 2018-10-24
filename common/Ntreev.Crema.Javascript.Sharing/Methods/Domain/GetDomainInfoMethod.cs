@@ -23,13 +23,15 @@ using System.ComponentModel.Composition;
 using System.Text;
 using Ntreev.Crema.Data.Xml.Schema;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.Domain
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(Domain))]
-    class GetDomainInfoMethod : DomainScriptMethodBase
+    class GetDomainInfoMethod : ScriptFuncTaskBase<string, IDictionary<string, object>>
     {
         [ImportingConstructor]
         public GetDomainInfoMethod(ICremaHost cremaHost)
@@ -38,14 +40,9 @@ namespace Ntreev.Crema.Javascript.Methods.Domain
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<IDictionary<string, object>> OnExecuteAsync(string domainID)
         {
-            return new Func<string, IDictionary<string, object>>(GetDomainInfo);
-        }
-
-        private IDictionary<string, object> GetDomainInfo(string domainID)
-        {
-            var domain = this.GetDomain(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
             var domainInfo = domain.DomainInfo;
             var props = new Dictionary<string, object>
             {

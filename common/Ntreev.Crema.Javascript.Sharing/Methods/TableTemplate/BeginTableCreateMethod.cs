@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableTemplate))]
-    class BeginTableCreateMethod : DataBaseScriptMethodBase
+    class BeginTableCreateMethod : ScriptFuncTaskBase<string, string, string>
     {
         [ImportingConstructor]
         public BeginTableCreateMethod(ICremaHost cremaHost)
@@ -39,49 +40,38 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, string>(this.BeginTableCreate);
-        }
-
         [ReturnParameterName("domainID")]
-        private string BeginTableCreate(string dataBaseName, string parentPath)
+        protected override async Task<string> OnExecuteAsync(string dataBaseName, string parentPath)
         {
-            var dataBase = this.GetDataBase(dataBaseName);
-            var task = InvokeAsync();
-            task.Wait();
-            return task.Result;
+            var dataBase = await this.CremaHost.GetDataBaseAsync(dataBaseName);
 
-            async Task<string> InvokeAsync()
+            if (NameValidator.VerifyCategoryPath(parentPath) == true)
             {
-                if (NameValidator.VerifyCategoryPath(parentPath) == true)
-                {
-                    var category = dataBase.TableContext.Categories[parentPath];
-                    if (category == null)
-                        throw new CategoryNotFoundException(parentPath);
-                    var authentication = this.Context.GetAuthentication(this);
-                    var template = await category.NewTableAsync(authentication);
-                    return $"{template.Domain.ID}";
-                }
-                else if (NameValidator.VerifyItemPath(parentPath) == true)
-                {
-                    var table = dataBase.TableContext[parentPath] as ITable;
-                    if (table == null)
-                        throw new CategoryNotFoundException(parentPath);
-                    var authentication = this.Context.GetAuthentication(this);
-                    var template = await table.NewTableAsync(authentication);
-                    return $"{template.Domain.ID}";
-                }
-                else
-                {
-                    var table = dataBase.TableContext.Tables[parentPath] as ITable;
-                    if (table == null)
-                        throw new CategoryNotFoundException(parentPath);
-                    var authentication = this.Context.GetAuthentication(this);
-                    var template = await table.NewTableAsync(authentication);
-                    return $"{template.Domain.ID}";
-                }
-            };
+                var category = dataBase.TableContext.Categories[parentPath];
+                if (category == null)
+                    throw new CategoryNotFoundException(parentPath);
+                var authentication = this.Context.GetAuthentication(this);
+                var template = await category.NewTableAsync(authentication);
+                return $"{template.Domain.ID}";
+            }
+            else if (NameValidator.VerifyItemPath(parentPath) == true)
+            {
+                var table = dataBase.TableContext[parentPath] as ITable;
+                if (table == null)
+                    throw new CategoryNotFoundException(parentPath);
+                var authentication = this.Context.GetAuthentication(this);
+                var template = await table.NewTableAsync(authentication);
+                return $"{template.Domain.ID}";
+            }
+            else
+            {
+                var table = dataBase.TableContext.Tables[parentPath] as ITable;
+                if (table == null)
+                    throw new CategoryNotFoundException(parentPath);
+                var authentication = this.Context.GetAuthentication(this);
+                var template = await table.NewTableAsync(authentication);
+                return $"{template.Domain.ID}";
+            }
         }
     }
 }

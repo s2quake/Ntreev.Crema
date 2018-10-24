@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.Domain
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(Domain))]
-    class GetDomainUserListMethod : DomainScriptMethodBase
+    class GetDomainUserListMethod : ScriptFuncTaskBase<string, string[]>
     {
         [ImportingConstructor]
         public GetDomainUserListMethod(ICremaHost cremaHost)
@@ -37,15 +39,10 @@ namespace Ntreev.Crema.Javascript.Methods.Domain
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<string[]> OnExecuteAsync(string domainID)
         {
-            return new Func<string, string[]>(this.GetDomainUserList);
-        }
-
-        private string[] GetDomainUserList(string domainID)
-        {
-            var domain = this.GetDomain(domainID);
-            return domain.Dispatcher.Invoke(() =>
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            return await domain.Dispatcher.InvokeAsync(() =>
             {
                 return domain.Users.Select(item => item.ID).ToArray();
             });

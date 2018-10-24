@@ -16,19 +16,21 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class UnloadDataBaseMethod : DataBaseScriptMethodBase
+    class UnloadDataBaseMethod : ScriptActionTaskBase<string>
     {
         [ImportingConstructor]
         public UnloadDataBaseMethod(ICremaHost cremaHost)
@@ -37,17 +39,11 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string dataBaseName)
         {
-            return new Action<string>(this.UnloadDataBase);
-        }
-
-        private void UnloadDataBase(string dataBaseName)
-        {
-            var dataBase = this.GetDataBase(dataBaseName);
+            var dataBase = await this.CremaHost.GetDataBaseAsync(dataBaseName);
             var authentication = this.Context.GetAuthentication(this);
-            var task = dataBase.UnloadAsync(authentication);
-            task.Wait();
+            await dataBase.UnloadAsync(authentication);
         }
     }
 }

@@ -461,6 +461,10 @@
       <Project>{20c3d3dd-de99-4126-9449-bca12e4d255d}</Project>
       <Name>Ntreev.ModernUI.Framework</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Ntreev.Crema.Services.Extentions\Ntreev.Crema.Services.Extentions.csproj">
+      <Project>{5a7af7db-03ca-4daa-9845-55721c0473dd}</Project>
+      <Name>Ntreev.Crema.Services.Extentions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj">
       <Project>{0eac90ab-7c7e-47e3-9954-148b45521fcb}</Project>
       <Name>Ntreev.Crema.Services</Name>

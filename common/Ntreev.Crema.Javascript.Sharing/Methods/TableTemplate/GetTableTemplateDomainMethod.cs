@@ -16,18 +16,20 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableTemplate))]
-    class GetTableTemplateDomainMethod : DataBaseScriptMethodBase
+    class GetTableTemplateDomainMethod : ScriptFuncTaskBase<string, string, string>
     {
         [ImportingConstructor]
         public GetTableTemplateDomainMethod(ICremaHost cremaHost)
@@ -36,16 +38,11 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, string>(this.GetTableTemplateDomain);
-        }
-
         [ReturnParameterName("domainID")]
-        private string GetTableTemplateDomain(string dataBaseName, string tableName)
+        protected override async Task<string> OnExecuteAsync(string dataBaseName, string tableName)
         {
-            var table = this.GetTable(dataBaseName, tableName);
-            return table.Dispatcher.Invoke(() =>
+            var table = await this.CremaHost.GetTableAsync(dataBaseName, tableName);
+            return await table.Dispatcher.InvokeAsync(() =>
             {
                 if (table.Template.Domain != null)
                     return $"{table.Template.Domain.ID}";

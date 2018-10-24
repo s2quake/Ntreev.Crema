@@ -16,37 +16,35 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class CreateDataBaseMethod : DataBaseScriptMethodBase
+    class CreateDataBaseMethod : ScriptActionTaskBase<string, string>
     {
         [ImportingConstructor]
         public CreateDataBaseMethod(ICremaHost cremaHost)
             : base(cremaHost)
         {
-            
+
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Action<string, string>(this.CreateDataBase);
-        }
-
-        private void CreateDataBase(string dataBaseName, string comment)
+        protected override async Task OnExecuteAsync(string dataBaseName, string comment)
         {
             var authentication = this.Context.GetAuthentication(this);
-            var task = this.DataBases.AddNewDataBaseAsync(authentication, dataBaseName, comment);
-            task.Wait();
+            await this.DataBases.AddNewDataBaseAsync(authentication, dataBaseName, comment);
         }
+
+        private IDataBaseCollection DataBases => this.CremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
     }
 }

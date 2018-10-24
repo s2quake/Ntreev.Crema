@@ -695,7 +695,7 @@ var Program = /** @class */ (function () {
         if (isDataBaseEntered(dataBaseName) === false) {
             enterDataBase(dataBaseName);
         }
-        var count = RandomUtility.nextInRange(1, 2);
+        var count = RandomUtility.nextInRange(10, 100);
         try {
             Program.doTask(dataBaseName, count);
         }
@@ -710,7 +710,7 @@ var Program = /** @class */ (function () {
         var transactionID = beginDataBaseTransaction(dataBaseName);
         try {
             RandomTask.run(dataBaseName, count);
-            cancelDataBaseTransaction(transactionID);
+            endDataBaseTransaction(transactionID);
         }
         catch (e) {
             cancelDataBaseTransaction(transactionID);

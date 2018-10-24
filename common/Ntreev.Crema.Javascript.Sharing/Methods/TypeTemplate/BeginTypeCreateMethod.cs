@@ -17,18 +17,20 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TypeTemplate))]
-    class BeginTypeCreateMethod : DataBaseScriptMethodBase
+    class BeginTypeCreateMethod : ScriptFuncTaskBase<string, string, string>
     {
         [ImportingConstructor]
         public BeginTypeCreateMethod(ICremaHost cremaHost)
@@ -37,19 +39,12 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, string>(this.BeginTypeCreate);
-        }
-
         [ReturnParameterName("domainID")]
-        private string BeginTypeCreate(string dataBaseName, string categoryPath)
+        protected override async Task<string> OnExecuteAsync(string dataBaseName, string categoryPath)
         {
-            var category = this.GetTypeCategory(dataBaseName, categoryPath);
+            var category = await this.CremaHost.GetTypeCategoryAsync(dataBaseName, categoryPath);
             var authentication = this.Context.GetAuthentication(this);
-            var task = category.NewTypeAsync(authentication);
-            task.Wait();
-            var template = task.Result;
+            var template = await category.NewTypeAsync(authentication);
             return $"{template.Domain.ID}";
         }
     }

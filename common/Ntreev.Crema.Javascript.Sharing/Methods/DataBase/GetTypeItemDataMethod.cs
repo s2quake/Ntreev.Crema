@@ -25,13 +25,14 @@ using System.ComponentModel;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
 using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class GetTypeItemDataMethod : DataBaseScriptMethodBase
+    class GetTypeItemDataMethod : ScriptFuncTaskBase<string, string, string, IDictionary<string, IDictionary<int, object>>>
     {
         [ImportingConstructor]
         public GetTypeItemDataMethod(ICremaHost cremaHost)
@@ -40,30 +41,18 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<IDictionary<string, IDictionary<int, object>>> OnExecuteAsync(string dataBaseName, string typeItemPath, string revision)
         {
-            return new Func<string, string, string, IDictionary<string, IDictionary<int, object>>>(GetTypeItemData);
-        }
-
-        private IDictionary<string, IDictionary<int, object>> GetTypeItemData(string dataBaseName, string typeItemPath, string revision)
-        {
-            var typeItem = this.GetTypeItem(dataBaseName, typeItemPath);
+            var typeItem = await this.CremaHost.GetTypeItemAsync(dataBaseName, typeItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-            return task.Result;
-
-            async Task<IDictionary<string, IDictionary<int, object>>> InvokeAsync()
+            var dataSet = await typeItem.GetDataSetAsync(authentication, revision);
+            var types = new Dictionary<string, IDictionary<int, object>>(dataSet.Types.Count);
+            foreach (var item in dataSet.Types)
             {
-                var dataSet = await typeItem.GetDataSetAsync(authentication, revision);
-                var types = new Dictionary<string, IDictionary<int, object>>(dataSet.Types.Count);
-                foreach (var item in dataSet.Types)
-                {
-                    var members = this.GetTypeMembers(item);
-                    types.Add(item.Name, members);
-                }
-                return types;
-            };
+                var members = this.GetTypeMembers(item);
+                types.Add(item.Name, members);
+            }
+            return types;
         }
 
         private IDictionary<int, object> GetTypeMembers(CremaDataType dataType)

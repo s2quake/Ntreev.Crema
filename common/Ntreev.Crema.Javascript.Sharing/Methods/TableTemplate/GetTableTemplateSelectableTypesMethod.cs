@@ -24,13 +24,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableTemplate))]
-    class GetTableTemplateSelectableTypesMethod : DomainScriptMethodBase
+    class GetTableTemplateSelectableTypesMethod : ScriptFuncTaskBase<string, string[]>
     {
         [ImportingConstructor]
         public GetTableTemplateSelectableTypesMethod(ICremaHost cremaHost)
@@ -39,15 +41,11 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<string[]> OnExecuteAsync(string domainID)
         {
-            return new Func<string, string[]>(this.GetTableTemplateSelectableTypes);
-        }
-
-        private string[] GetTableTemplateSelectableTypes(string domainID)
-        {
-            var template = this.GetDomainHost<ITableTemplate>(domainID);
-            return template.Dispatcher.Invoke(() => template.SelectableTypes);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var template = domain.Host as ITableTemplate;
+            return await template.Dispatcher.InvokeAsync(() => template.SelectableTypes);
         }
     }
 }

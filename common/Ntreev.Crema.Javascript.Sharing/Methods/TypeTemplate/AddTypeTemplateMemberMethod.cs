@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,7 +29,7 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TypeTemplate))]
-    class AddTypeTemplateMemberMethod : DomainScriptMethodBase
+    class AddTypeTemplateMemberMethod : ScriptActionTaskBase<string, string, long, string>
     {
         [ImportingConstructor]
         public AddTypeTemplateMemberMethod(ICremaHost cremaHost)
@@ -37,27 +38,17 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string domainID, string memberName, long value, string comment)
         {
-            return new Action<string, string, long, string>(this.AddTypeTemplateMember);
-        }
-
-        private void AddTypeTemplateMember(string domainID, string memberName, long value, string comment)
-        {
-            var template = this.GetDomainHost<ITypeTemplate>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var template = domain.Host as ITypeTemplate;
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-
-            async Task InvokeAsync()
-            {
-                var typeMember = await template.AddNewAsync(authentication);
-                await typeMember.SetNameAsync(authentication, memberName);
-                await typeMember.SetValueAsync(authentication, value);
-                if (comment != null)
-                    await typeMember.SetCommentAsync(authentication, comment);
-                await template.EndNewAsync(authentication, typeMember);
-            };
+            var typeMember = await template.AddNewAsync(authentication);
+            await typeMember.SetNameAsync(authentication, memberName);
+            await typeMember.SetValueAsync(authentication, value);
+            if (comment != null)
+                await typeMember.SetCommentAsync(authentication, comment);
+            await template.EndNewAsync(authentication, typeMember);
         }
     }
 }

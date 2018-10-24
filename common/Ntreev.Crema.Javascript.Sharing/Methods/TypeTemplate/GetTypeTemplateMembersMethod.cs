@@ -24,13 +24,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TypeTemplate))]
-    class GetTypeTemplateMembersMethod : DomainScriptMethodBase
+    class GetTypeTemplateMembersMethod : ScriptFuncTaskBase<string, string[]>
     {
         [ImportingConstructor]
         public GetTypeTemplateMembersMethod(ICremaHost cremaHost)
@@ -39,15 +41,11 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<string[]> OnExecuteAsync(string domainID)
         {
-            return new Func<string, string[]>(this.GetTypeTemplateMembers);
-        }
-
-        private string[] GetTypeTemplateMembers(string domainID)
-        {
-            var template = this.GetDomainHost<ITypeTemplate>(domainID);
-            return template.Dispatcher.Invoke(() => template.Select(item => item.Name).ToArray());
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var template = domain.Host as ITypeTemplate;
+            return await template.Dispatcher.InvokeAsync(() => template.Select(item => item.Name).ToArray());
         }
     }
 }

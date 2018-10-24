@@ -17,19 +17,21 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.Library;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableTemplate))]
-    class GetTableTemplateColumnPropertyMethod : DomainScriptMethodBase
+    class GetTableTemplateColumnPropertyMethod : ScriptFuncTaskBase<string, string, TableColumnProperties, object>
     {
         [ImportingConstructor]
         public GetTableTemplateColumnPropertyMethod(ICremaHost cremaHost)
@@ -38,19 +40,15 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, TableColumnProperties, object>(this.GetTableTemplateColumnProperty);
-        }
-
-        private object GetTableTemplateColumnProperty(string domainID, string columnName, TableColumnProperties propertyName)
+        protected override async Task<object> OnExecuteAsync(string domainID, string columnName, TableColumnProperties propertyName)
         {
             if (columnName == null)
                 throw new ArgumentNullException(nameof(columnName));
 
-            var template = this.GetDomainHost<ITableTemplate>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var template = domain.Host as ITableTemplate;
             var authentication = this.Context.GetAuthentication(this);
-            return template.Dispatcher.Invoke(() =>
+            return await template.Dispatcher.InvokeAsync(() =>
             {
                 var column = template[columnName];
                 if (column == null)

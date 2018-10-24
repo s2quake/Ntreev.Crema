@@ -18,6 +18,7 @@
 using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,7 +32,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableContent))]
-    class AddTableContentRowMethod : DomainScriptMethodBase
+    class AddTableContentRowMethod : ScriptFuncTaskBase<string, string, IDictionary<string, object>, object[]>
     {
         [ImportingConstructor]
         public AddTableContentRowMethod(ICremaHost cremaHost)
@@ -40,40 +41,28 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, IDictionary<string, object>, object[]>(this.AddTableContentRow);
-        }
-
         [ReturnParameterName("keys")]
-        private object[] AddTableContentRow(string domainID, string tableName, IDictionary<string, object> fields)
+        protected override async Task<object[]> OnExecuteAsync(string domainID, string tableName, IDictionary<string, object> fields)
         {
             if (fields == null)
                 throw new ArgumentNullException(nameof(fields));
-
-            var contents = this.GetDomainHost<IEnumerable<ITableContent>>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var contents = domain.Host as IEnumerable<ITableContent>;
             var content = contents.FirstOrDefault(item => item.Dispatcher.Invoke(() => item.Table.Name) == tableName);
             if (content == null)
                 throw new TableNotFoundException(tableName);
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-            return task.Result;
-
-            async Task<object[]> InvokeAsync()
+            var tableInfo = content.Table.TableInfo;
+            var row = await content.AddNewAsync(authentication, null);
+            foreach (var item in fields)
             {
-                var tableInfo = content.Table.TableInfo;
-                var row = await content.AddNewAsync(authentication, null);
-                foreach (var item in fields)
-                {
-                    var typeName = tableInfo.Columns.First(i => i.DataType == item.Key).DataType;
-                    var type = CremaDataTypeUtility.GetType(typeName);
-                    var value = CremaConvert.ChangeType(item.Value, type);
-                    await row.SetFieldAsync(authentication, item.Key, value);
-                }
-                await content.EndNewAsync(authentication, row);
-                return tableInfo.Columns.Select(item => row[item.Name]).ToArray();
-            };
+                var typeName = tableInfo.Columns.First(i => i.DataType == item.Key).DataType;
+                var type = CremaDataTypeUtility.GetType(typeName);
+                var value = CremaConvert.ChangeType(item.Value, type);
+                await row.SetFieldAsync(authentication, item.Key, value);
+            }
+            await content.EndNewAsync(authentication, row);
+            return tableInfo.Columns.Select(item => row[item.Name]).ToArray();
         }
     }
 }

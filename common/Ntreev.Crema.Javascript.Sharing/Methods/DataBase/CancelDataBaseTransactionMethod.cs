@@ -23,13 +23,14 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class CancelDataBaseTransactionMethod : DataBaseScriptMethodBase
+    class CancelDataBaseTransactionMethod : ScriptActionTaskBase<string>
     {
         [ImportingConstructor]
         public CancelDataBaseTransactionMethod(ICremaHost cremaHost)
@@ -38,12 +39,7 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Action<string>(this.CancelDataBaseTransaction);
-        }
-
-        private void CancelDataBaseTransaction(string transactionID)
+        protected override async Task OnExecuteAsync(string transactionID)
         {
             if (transactionID == null)
                 throw new ArgumentNullException(nameof(transactionID));
@@ -52,8 +48,7 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
             if (this.Context.Properties[transactionID] is ITransaction transaction)
             {
                 var authentication = this.Context.GetAuthentication(this);
-                var task = transaction.RollbackAsync(authentication);
-                task.Wait();
+                await transaction.RollbackAsync(authentication);
                 this.Context.Properties.Remove(transactionID);
             }
             else

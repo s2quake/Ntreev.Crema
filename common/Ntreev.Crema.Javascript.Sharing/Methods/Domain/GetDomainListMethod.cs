@@ -22,31 +22,30 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.Domain
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(Domain))]
-    class GetDomainListMethod : ScriptMethodBase
+    class GetDomainListMethod : ScriptFuncTaskBase<string[]>
     {
-        [Import]
-        private Lazy<ICremaHost> cremaHost = null;
-
-        protected override Delegate CreateDelegate()
+        [ImportingConstructor]
+        public GetDomainListMethod(ICremaHost cremaHost)
+            : base(cremaHost)
         {
-            return new Func<string[]>(this.GetDomainList);
+
         }
 
-        private string[] GetDomainList()
+        protected override Task<string[]> OnExecuteAsync()
         {
-            var domainContext = this.CremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
-            return domainContext.Dispatcher.Invoke(() =>
+            return this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
-                return domainContext.Domains.Select(item => $"{item.ID}").ToArray();
+                return this.DomainContext.Domains.Select(item => $"{item.ID}").ToArray();
             });
         }
 
-        private ICremaHost CremaHost => this.cremaHost.Value;
+        private IDomainContext DomainContext => this.CremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
     }
 }

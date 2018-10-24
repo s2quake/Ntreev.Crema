@@ -23,13 +23,15 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class DeleteDataBaseMethod : DataBaseScriptMethodBase
+    class DeleteDataBaseMethod : ScriptActionTaskBase<string>
     {
         [ImportingConstructor]
         public DeleteDataBaseMethod(ICremaHost cremaHost)
@@ -38,17 +40,11 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string dataBaseName)
         {
-            return new Action<string>(this.DeleteDataBase);
-        }
-
-        private void DeleteDataBase(string dataBaseName)
-        {
-            var dataBase = this.GetDataBase(dataBaseName);
+            var dataBase = await this.CremaHost.GetDataBaseAsync(dataBaseName);
             var authentication = this.Context.GetAuthentication(this);
-            var task = dataBase.DeleteAsync(authentication);
-            task.Wait();
+            await dataBase.DeleteAsync(authentication);
         }
     }
 }

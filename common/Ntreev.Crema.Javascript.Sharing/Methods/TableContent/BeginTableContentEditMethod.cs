@@ -17,18 +17,20 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableContent
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableContent))]
-    class BeginTableContentEditMethod : DataBaseScriptMethodBase
+    class BeginTableContentEditMethod : ScriptFuncTaskBase<string, string, string>
     {
         [ImportingConstructor]
         public BeginTableContentEditMethod(ICremaHost cremaHost)
@@ -37,18 +39,12 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, string>(this.BeginTableContentEdit);
-        }
-
         [ReturnParameterName("domainID")]
-        private string BeginTableContentEdit(string dataBaseName, string tableName)
+        protected override async Task<string> OnExecuteAsync(string dataBaseName, string tableName)
         {
-            var table = this.GetTable(dataBaseName, tableName);
+            var table = await this.CremaHost.GetTableAsync(dataBaseName, tableName);
             var authentication = this.Context.GetAuthentication(this);
-            var task = table.Content.BeginEditAsync(authentication);
-            task.Wait();
+            await table.Content.BeginEditAsync(authentication);
             return $"{table.Content.Domain.ID}";
         }
     }

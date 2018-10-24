@@ -18,18 +18,20 @@
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TypeTemplate))]
-    class ContainsTypeTemplateMemberMethod : DomainScriptMethodBase
+    class ContainsTypeTemplateMemberMethod : ScriptFuncTaskBase<string, string, bool>
     {
         [ImportingConstructor]
         public ContainsTypeTemplateMemberMethod(ICremaHost cremaHost)
@@ -38,15 +40,11 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<bool> OnExecuteAsync(string domainID, string memberName)
         {
-            return new Func<string, string, bool>(this.ContainsTypeTemplateMember);
-        }
-
-        private bool ContainsTypeTemplateMember(string domainID, string memberName)
-        {
-            var template = this.GetDomainHost<ITypeTemplate>(domainID);
-            return template.Dispatcher.Invoke(() => template.Contains(memberName));
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var template = domain.Host as ITypeTemplate;
+            return await template.ContainsAsync(memberName);
         }
     }
 }

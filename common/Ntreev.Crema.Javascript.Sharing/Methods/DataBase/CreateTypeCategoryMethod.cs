@@ -23,13 +23,15 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class CreateTypeCategoryMethod : DataBaseScriptMethodBase
+    class CreateTypeCategoryMethod : ScriptFuncTaskBase<string, string, string, string>
     {
         [ImportingConstructor]
         public CreateTypeCategoryMethod(ICremaHost cremaHost)
@@ -38,19 +40,13 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, string, string>(this.CreateTypeCategory);
-        }
-
         [ReturnParameterName("categoryPath")]
-        private string CreateTypeCategory(string dataBaseName, string parentPath, string categoryName)
+        protected override async Task<string> OnExecuteAsync(string dataBaseName, string parentPath, string categoryName)
         {
-            var category = this.GetTypeCategory(dataBaseName, parentPath);
+            var category = await this.CremaHost.GetTypeCategoryAsync(dataBaseName, parentPath);
             var authentication = this.Context.GetAuthentication(this);
-            var task = category.AddNewCategoryAsync(authentication, categoryName);
-            task.Wait();
-            return task.Result.Path;
+            var newCategory = await category.AddNewCategoryAsync(authentication, categoryName);
+            return newCategory.Path;
         }
     }
 }

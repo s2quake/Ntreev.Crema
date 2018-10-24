@@ -17,19 +17,21 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableContent
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableContent))]
-    class ContainsTableContentRowMethod : DomainScriptMethodBase
+    class ContainsTableContentRowMethod : ScriptFuncTaskBase<string, string, object[], bool>
     {
         [ImportingConstructor]
         public ContainsTableContentRowMethod(ICremaHost cremaHost)
@@ -38,17 +40,13 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, object[], bool>(this.ContainsTableContentRow);
-        }
-
-        private bool ContainsTableContentRow(string domainID, string tableName, object[] keys)
+        protected override async Task<bool> OnExecuteAsync(string domainID, string tableName, object[] keys)
         {
             if (keys == null)
                 throw new ArgumentNullException(nameof(keys));
 
-            var contents = this.GetDomainHost<IEnumerable<ITableContent>>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var contents = domain.Host as IEnumerable<ITableContent>;
             var content = contents.FirstOrDefault(item => item.Dispatcher.Invoke(() => item.Table.Name) == tableName);
             if (content == null)
                 throw new TableNotFoundException(tableName);

@@ -16,18 +16,20 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TypeTemplate))]
-    class GetTypeTemplateDomainMethod : DataBaseScriptMethodBase
+    class GetTypeTemplateDomainMethod : ScriptFuncTaskBase<string, string, string>
     {
         [ImportingConstructor]
         public GetTypeTemplateDomainMethod(ICremaHost cremaHost)
@@ -36,16 +38,11 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, string>(this.GetTypeTemplateDomain);
-        }
-
         [ReturnParameterName("domainID")]
-        private string GetTypeTemplateDomain(string dataBaseName, string typeName)
+        protected override async Task<string> OnExecuteAsync(string dataBaseName, string typeName)
         {
-            var type = this.GetType(dataBaseName, typeName);
-            return type.Dispatcher.Invoke(() =>
+            var type = await this.CremaHost.GetTypeAsync(dataBaseName, typeName);
+            return await type.Dispatcher.InvokeAsync(() =>
             {
                 if (type.Template.Domain != null)
                     return $"{type.Template.Domain.ID}";

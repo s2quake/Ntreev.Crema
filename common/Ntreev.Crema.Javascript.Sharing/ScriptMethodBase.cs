@@ -22,25 +22,32 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services;
 
 namespace Ntreev.Crema.Javascript
 {
     public abstract class ScriptMethodBase : IScriptMethod
     {
-        private readonly string name;
         private Delegate delegateVariable;
 
         protected ScriptMethodBase()
         {
-            this.name = ToCamelCase(this.GetType().Name);
+            this.Name = ToCamelCase(this.GetType().Name);
         }
 
         protected ScriptMethodBase(string name)
         {
-            this.name = name;
+            this.Name = name;
         }
 
-        public string Name => this.name;
+        protected ScriptMethodBase(ICremaHost cremaHost)
+        {
+            this.Name = ToCamelCase(this.GetType().Name);
+            this.CremaHost = cremaHost;
+        }
+
+        public string Name { get; }
 
         public Delegate Delegate
         {
@@ -72,6 +79,8 @@ namespace Ntreev.Crema.Javascript
 
         }
 
+        protected ICremaHost CremaHost { get; }
+
         private static string ToCamelCase(string text)
         {
             var name = Regex.Replace(text, @"^([A-Z])", MatchEvaluator);
@@ -93,5 +102,462 @@ namespace Ntreev.Crema.Javascript
         {
             this.OnInitialized();
         }
+    }
+
+    public abstract class ScriptActionBase<T> : ScriptMethodBase
+    {
+        protected override sealed Delegate CreateDelegate()
+        {
+            return new Action<T>(this.OnExecute);
+        }
+
+        [BaseDelegate]
+        protected abstract void OnExecute(T arg);
+    }
+
+    public abstract class ScriptFuncBase<TResult> : ScriptMethodBase
+    {
+        protected override sealed Delegate CreateDelegate()
+        {
+            return new Func<TResult>(this.OnExecute);
+        }
+
+        [BaseDelegate]
+        protected abstract TResult OnExecute();
+    }
+
+    public abstract class ScriptActionTaskBase<T> : ScriptMethodBase
+    {
+        public ScriptActionTaskBase()
+        {
+
+        }
+
+        public ScriptActionTaskBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public ScriptActionTaskBase(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+
+        }
+
+        protected override sealed Delegate CreateDelegate()
+        {
+            return new Action<T>((arg) =>
+            {
+                var task = this.OnExecuteAsync(arg);
+                try
+                {
+                    task.Wait();
+                }
+                catch (AggregateException e)
+                {
+                    throw e.InnerException;
+                }
+            });
+        }
+
+        [BaseDelegate]
+        protected abstract Task OnExecuteAsync(T arg);
+    }
+
+    public abstract class ScriptActionTaskBase<T1, T2> : ScriptMethodBase
+    {
+        public ScriptActionTaskBase()
+        {
+
+        }
+
+        public ScriptActionTaskBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public ScriptActionTaskBase(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+
+        }
+
+        protected override sealed Delegate CreateDelegate()
+        {
+            return new Action<T1, T2>((arg1, arg2) =>
+            {
+                var task = this.OnExecuteAsync(arg1, arg2);
+                try
+                {
+                    task.Wait();
+                }
+                catch (AggregateException e)
+                {
+                    throw e.InnerException;
+                }
+            });
+        }
+
+        [BaseDelegate]
+        protected abstract Task OnExecuteAsync(T1 arg1, T2 arg2);
+    }
+
+    public abstract class ScriptActionTaskBase<T1, T2, T3> : ScriptMethodBase
+    {
+        public ScriptActionTaskBase()
+        {
+
+        }
+
+        public ScriptActionTaskBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public ScriptActionTaskBase(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+
+        }
+
+        protected override sealed Delegate CreateDelegate()
+        {
+            return new Action<T1, T2, T3>((arg1, arg2, arg3) =>
+            {
+                var task = this.OnExecuteAsync(arg1, arg2, arg3);
+                try
+                {
+                    task.Wait();
+                }
+                catch (AggregateException e)
+                {
+                    throw e.InnerException;
+                }
+            });
+        }
+
+        [BaseDelegate]
+        protected abstract Task OnExecuteAsync(T1 arg1, T2 arg2, T3 arg3);
+    }
+
+    public abstract class ScriptActionTaskBase<T1, T2, T3, T4> : ScriptMethodBase
+    {
+        public ScriptActionTaskBase()
+        {
+
+        }
+
+        public ScriptActionTaskBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public ScriptActionTaskBase(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+
+        }
+
+        protected override sealed Delegate CreateDelegate()
+        {
+            return new Action<T1, T2, T3, T4>((arg1, arg2, arg3, arg4) =>
+            {
+                var task = this.OnExecuteAsync(arg1, arg2, arg3, arg4);
+                try
+                {
+                    task.Wait();
+                }
+                catch (AggregateException e)
+                {
+                    throw e.InnerException;
+                }
+            });
+        }
+
+        [BaseDelegate]
+        protected abstract Task OnExecuteAsync(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+    }
+
+    public abstract class ScriptActionTaskBase<T1, T2, T3, T4, T5> : ScriptMethodBase
+    {
+        public ScriptActionTaskBase()
+        {
+
+        }
+
+        public ScriptActionTaskBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public ScriptActionTaskBase(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+
+        }
+
+        protected override sealed Delegate CreateDelegate()
+        {
+            return new Action<T1, T2, T3, T4, T5>((arg1, arg2, arg3, arg4, arg5) =>
+            {
+                var task = this.OnExecuteAsync(arg1, arg2, arg3, arg4, arg5);
+                try
+                {
+                    task.Wait();
+                }
+                catch (AggregateException e)
+                {
+                    throw e.InnerException;
+                }
+            });
+        }
+
+        [BaseDelegate]
+        protected abstract Task OnExecuteAsync(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
+    }
+
+    public abstract class ScriptFuncTaskBase<TResult> : ScriptMethodBase
+    {
+        public ScriptFuncTaskBase()
+        {
+
+        }
+
+        public ScriptFuncTaskBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public ScriptFuncTaskBase(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+
+        }
+
+        protected override sealed Delegate CreateDelegate()
+        {
+            return new Func<TResult>(() =>
+            {
+                var task = this.OnExecuteAsync();
+                try
+                {
+                    task.Wait();
+                }
+                catch (AggregateException e)
+                {
+                    throw e.InnerException;
+                }
+                return task.Result;
+            });
+        }
+
+        [BaseDelegate]
+        protected abstract Task<TResult> OnExecuteAsync();
+    }
+
+    public abstract class ScriptFuncTaskBase<T, TResult> : ScriptMethodBase
+    {
+        public ScriptFuncTaskBase()
+        {
+
+        }
+
+        public ScriptFuncTaskBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public ScriptFuncTaskBase(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+
+        }
+
+        protected override sealed Delegate CreateDelegate()
+        {
+            return new Func<T, TResult>((arg) =>
+            {
+                var task = this.OnExecuteAsync(arg);
+                try
+                {
+                    task.Wait();
+                }
+                catch (AggregateException e)
+                {
+                    throw e.InnerException;
+                }
+                return task.Result;
+            });
+        }
+
+        [BaseDelegate]
+        protected abstract Task<TResult> OnExecuteAsync(T arg);
+    }
+
+    public abstract class ScriptFuncTaskBase<T1, T2, TResult> : ScriptMethodBase
+    {
+        public ScriptFuncTaskBase()
+        {
+
+        }
+
+        public ScriptFuncTaskBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public ScriptFuncTaskBase(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+
+        }
+
+        protected override sealed Delegate CreateDelegate()
+        {
+            return new Func<T1, T2, TResult>((arg1, arg2) =>
+            {
+                var task = this.OnExecuteAsync(arg1, arg2);
+                try
+                {
+                    task.Wait();
+                }
+                catch (AggregateException e)
+                {
+                    throw e.InnerException;
+                }
+                return task.Result;
+            });
+        }
+
+        [BaseDelegate]
+        protected abstract Task<TResult> OnExecuteAsync(T1 arg1, T2 arg2);
+    }
+
+    public abstract class ScriptFuncTaskBase<T1, T2, T3, TResult> : ScriptMethodBase
+    {
+        public ScriptFuncTaskBase()
+        {
+
+        }
+
+        public ScriptFuncTaskBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public ScriptFuncTaskBase(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+
+        }
+
+        protected override sealed Delegate CreateDelegate()
+        {
+            return new Func<T1, T2, T3, TResult>((arg1, arg2, arg3) =>
+            {
+                var task = this.OnExecuteAsync(arg1, arg2, arg3);
+                try
+                {
+                    task.Wait();
+                }
+                catch (AggregateException e)
+                {
+                    throw e.InnerException;
+                }
+                return task.Result;
+            });
+        }
+
+        [BaseDelegate]
+        protected abstract Task<TResult> OnExecuteAsync(T1 arg1, T2 arg2, T3 arg3);
+    }
+
+    public abstract class ScriptFuncTaskBase<T1, T2, T3, T4, TResult> : ScriptMethodBase
+    {
+        public ScriptFuncTaskBase()
+        {
+
+        }
+
+        public ScriptFuncTaskBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public ScriptFuncTaskBase(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+
+        }
+
+        protected override sealed Delegate CreateDelegate()
+        {
+            return new Func<T1, T2, T3, T4, TResult>((arg1, arg2, arg3, arg4) =>
+            {
+                var task = this.OnExecuteAsync(arg1, arg2, arg3, arg4);
+                try
+                {
+                    task.Wait();
+                }
+                catch (AggregateException e)
+                {
+                    throw e.InnerException;
+                }
+                return task.Result;
+            });
+        }
+
+        [BaseDelegate]
+        protected abstract Task<TResult> OnExecuteAsync(T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+    }
+
+    public abstract class ScriptFuncTaskBase<T1, T2, T3, T4, T5, TResult> : ScriptMethodBase
+    {
+        public ScriptFuncTaskBase()
+        {
+
+        }
+
+        public ScriptFuncTaskBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public ScriptFuncTaskBase(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+
+        }
+
+        protected override sealed Delegate CreateDelegate()
+        {
+            return new Func<T1, T2, T3, T4, T5, TResult>((arg1, arg2, arg3, arg4, arg5) =>
+            {
+                var task = this.OnExecuteAsync(arg1, arg2, arg3, arg4, arg5);
+                try
+                {
+                    task.Wait();
+                }
+                catch (AggregateException e)
+                {
+                    throw e.InnerException;
+                }
+                return task.Result;
+            });
+        }
+
+        [BaseDelegate]
+        protected abstract Task<TResult> OnExecuteAsync(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
     }
 }

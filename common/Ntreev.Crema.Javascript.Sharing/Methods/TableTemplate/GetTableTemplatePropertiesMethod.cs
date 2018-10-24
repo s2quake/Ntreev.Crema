@@ -18,18 +18,20 @@
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableTemplate))]
-    class GetTableTemplatePropertiesMethod : DomainScriptMethodBase
+    class GetTableTemplatePropertiesMethod : ScriptFuncTaskBase<string, string, IDictionary<string, object>>
     {
         [ImportingConstructor]
         public GetTableTemplatePropertiesMethod(ICremaHost cremaHost)
@@ -38,15 +40,11 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<IDictionary<string, object>> OnExecuteAsync(string domainID, string columnName)
         {
-            return new Func<string, string, IDictionary<string, object>>(this.GetTableTemplateProperties);
-        }
-
-        private IDictionary<string, object> GetTableTemplateProperties(string domainID, string columnName)
-        {
-            var template = this.GetDomainHost<ITableTemplate>(domainID);
-            return template.Dispatcher.Invoke(() =>
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var template = domain.Host as ITableTemplate;
+            return await template.Dispatcher.InvokeAsync(() =>
             {
                 return new Dictionary<string, object>()
                 {

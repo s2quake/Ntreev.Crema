@@ -17,19 +17,21 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableContent
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableContent))]
-    class EndTableContentEditMethod : DomainScriptMethodBase
+    class EndTableContentEditMethod : ScriptActionTaskBase<string>
     {
         [ImportingConstructor]
         public EndTableContentEditMethod(ICremaHost cremaHost)
@@ -38,18 +40,13 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string domainID)
         {
-            return new Action<string>(this.EndTableContentEdit);
-        }
-
-        private void EndTableContentEdit(string domainID)
-        {
-            var contents = this.GetDomainHost<IEnumerable<ITableContent>>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var contents = domain.Host as IEnumerable<ITableContent>;
             var authentication = this.Context.GetAuthentication(this);
             var content = contents.First();
-            var task = content.EndEditAsync(authentication);
-            task.Wait();
+            await content.EndEditAsync(authentication);
         }
     }
 }

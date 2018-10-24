@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.Permission
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(Permission))]
-    class PublicTypeItemMethod : DataBaseScriptMethodBase
+    class PublicTypeItemMethod : ScriptActionTaskBase<string, string>
     {
         [ImportingConstructor]
         public PublicTypeItemMethod(ICremaHost cremaHost)
@@ -37,17 +39,11 @@ namespace Ntreev.Crema.Javascript.Methods.Permission
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string dataBaseName, string typeItemPath)
         {
-            return new Action<string, string>(this.SetTypeItemPublic);
-        }
-
-        private void SetTypeItemPublic(string dataBaseName, string typeItemPath)
-        {
-            var typeItem = this.GetTypeItem(dataBaseName, typeItemPath);
+            var typeItem = await this.CremaHost.GetTypeItemAsync(dataBaseName, typeItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            var task = typeItem.SetPublicAsync(authentication);
-            task.Wait();
+            await typeItem.SetPublicAsync(authentication);
         }
     }
 }

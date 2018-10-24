@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,7 +30,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableTemplate))]
-    class BeginTableTemplateEditMethod : DataBaseScriptMethodBase
+    class BeginTableTemplateEditMethod : ScriptFuncTaskBase<string, string, string>
     {
         [ImportingConstructor]
         public BeginTableTemplateEditMethod(ICremaHost cremaHost)
@@ -38,25 +39,13 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, string>(this.BeginTableTemplateEdit);
-        }
-
         [ReturnParameterName("domainID")]
-        private string BeginTableTemplateEdit(string dataBaseName, string tableName)
+        protected override async Task<string> OnExecuteAsync(string dataBaseName, string tableName)
         {
-            var table = this.GetTable(dataBaseName, tableName);
+            var table = await this.CremaHost.GetTableAsync(dataBaseName, tableName);
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-            return task.Result;
-
-            async Task<string> InvokeAsync()
-            {
-                await table.Template.BeginEditAsync(authentication);
-                return $"{table.Template.Domain.ID}";
-            };
+            await table.Template.BeginEditAsync(authentication);
+            return $"{table.Template.Domain.ID}";
         }
     }
 }

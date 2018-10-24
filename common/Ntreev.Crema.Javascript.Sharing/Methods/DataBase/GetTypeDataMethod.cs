@@ -25,13 +25,14 @@ using System.ComponentModel;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
 using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class GetTypeDataMethod : DataBaseScriptMethodBase
+    class GetTypeDataMethod : ScriptFuncTaskBase<string, string, string, IDictionary<int, object>>
     {
         [ImportingConstructor]
         public GetTypeDataMethod(ICremaHost cremaHost)
@@ -40,26 +41,14 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<IDictionary<int, object>> OnExecuteAsync(string dataBaseName, string typeName, string revision)
         {
-            return new Func<string, string, string, IDictionary<int, object>>(GetTypeData);
-        }
-
-        private IDictionary<int, object> GetTypeData(string dataBaseName, string typeName, string revision)
-        {
-            var type = this.GetType(dataBaseName, typeName);
+            var type = await this.CremaHost.GetTypeAsync(dataBaseName, typeName);
             var revisionValue = revision;
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-            return task.Result;
-
-            async Task<IDictionary< int, object>> InvokeAsync()
-            {
-                var dataSet = await type.GetDataSetAsync(authentication, revisionValue);
-                var dataType = dataSet.Types[typeName];
-                return this.GetTypeMembers(dataType);
-            };
+            var dataSet = await type.GetDataSetAsync(authentication, revisionValue);
+            var dataType = dataSet.Types[typeName];
+            return this.GetTypeMembers(dataType);
         }
 
         private IDictionary<int, object> GetTypeMembers(CremaDataType dataType)

@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.Domain
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(Domain))]
-    class ContainsDomainUserMethod : DomainScriptMethodBase
+    class ContainsDomainUserMethod : ScriptFuncTaskBase<string, string, bool>
     {
         [ImportingConstructor]
         public ContainsDomainUserMethod(ICremaHost cremaHost)
@@ -37,18 +39,10 @@ namespace Ntreev.Crema.Javascript.Methods.Domain
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<bool> OnExecuteAsync(string domainID, string userID)
         {
-            return new Func<string, string, bool>(this.ContainsDomainUser);
-        }
-
-        private bool ContainsDomainUser(string domainID, string userID)
-        {
-            var domain = this.GetDomain(domainID);
-            return domain.Dispatcher.Invoke(() =>
-            {
-                return domain.Users.Contains(userID);
-            });
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            return await domain.Users.ContainsAsync(userID);
         }
     }
 }

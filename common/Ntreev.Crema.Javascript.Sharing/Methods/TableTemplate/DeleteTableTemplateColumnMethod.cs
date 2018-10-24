@@ -17,18 +17,20 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableTemplate))]
-    class DeleteTableTemplateColumnMethod : DomainScriptMethodBase
+    class DeleteTableTemplateColumnMethod : ScriptActionTaskBase<string, string>
     {
         [ImportingConstructor]
         public DeleteTableTemplateColumnMethod(ICremaHost cremaHost)
@@ -37,20 +39,15 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string domainID, string columnName)
         {
-            return new Action<string, string>(this.DeleteTableTemplateColumn);
-        }
-
-        private void DeleteTableTemplateColumn(string domainID, string columnName)
-        {
-            var template = this.GetDomainHost<ITableTemplate>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var template = domain.Host as ITableTemplate;
             var authentication = this.Context.GetAuthentication(this);
             var member = template[columnName];
             if (member == null)
                 throw new ItemNotFoundException(columnName);
-            var task = member.DeleteAsync(authentication);
-            task.Wait();
+            await member.DeleteAsync(authentication);
         }
     }
 }

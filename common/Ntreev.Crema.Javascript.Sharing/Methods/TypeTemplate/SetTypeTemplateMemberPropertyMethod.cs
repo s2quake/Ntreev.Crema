@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,7 +30,7 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TypeTemplate))]
-    class SetTypeTemplateMemberPropertyMethod : DomainScriptMethodBase
+    class SetTypeTemplateMemberPropertyMethod : ScriptActionTaskBase<string, string, TypeMemberProperties, object>
     {
         [ImportingConstructor]
         public SetTypeTemplateMemberPropertyMethod(ICremaHost cremaHost)
@@ -38,40 +39,30 @@ namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string domainID, string memberName, TypeMemberProperties propertyName, object value)
         {
-            return new Action<string, string, TypeMemberProperties, object>(this.SetTypeMemberTemplateProperty);
-        }
-
-        private void SetTypeMemberTemplateProperty(string domainID, string memberName, TypeMemberProperties propertyName, object value)
-        {
-            var template = this.GetDomainHost<ITypeTemplate>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var template = domain.Host as ITypeTemplate;
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-
-            async Task InvokeAsync()
+            var member = template[memberName];
+            if (member == null)
+                throw new ItemNotFoundException(memberName);
+            if (propertyName == TypeMemberProperties.Name)
             {
-                var member = template[memberName];
-                if (member == null)
-                    throw new ItemNotFoundException(memberName);
-                if (propertyName == TypeMemberProperties.Name)
-                {
-                    await member.SetNameAsync(authentication, (string)value);
-                }
-                else if (propertyName == TypeMemberProperties.Value)
-                {
-                    await member.SetValueAsync(authentication, Convert.ToInt64(value));
-                }
-                else if (propertyName == TypeMemberProperties.Comment)
-                {
-                    await member.SetCommentAsync(authentication, (string)value);
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-            };
+                await member.SetNameAsync(authentication, (string)value);
+            }
+            else if (propertyName == TypeMemberProperties.Value)
+            {
+                await member.SetValueAsync(authentication, Convert.ToInt64(value));
+            }
+            else if (propertyName == TypeMemberProperties.Comment)
+            {
+                await member.SetCommentAsync(authentication, (string)value);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

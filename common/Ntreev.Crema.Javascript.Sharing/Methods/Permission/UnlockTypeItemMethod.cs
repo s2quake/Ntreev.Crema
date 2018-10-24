@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.Permission
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(Permission))]
-    class UnlockTypeItemMethod : DataBaseScriptMethodBase
+    class UnlockTypeItemMethod : ScriptActionTaskBase<string, string>
     {
         [ImportingConstructor]
         public UnlockTypeItemMethod(ICremaHost cremaHost)
@@ -37,17 +39,11 @@ namespace Ntreev.Crema.Javascript.Methods.Permission
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string dataBaseName, string typeItemPath)
         {
-            return new Action<string, string>(this.UnlockTypeItem);
-        }
-
-        private void UnlockTypeItem(string dataBaseName, string typeItemPath)
-        {
-            var typeItem = this.GetTypeItem(dataBaseName, typeItemPath);
+            var typeItem = await this.CremaHost.GetTypeItemAsync(dataBaseName, typeItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            var task = typeItem.UnlockAsync(authentication);
-            task.Wait();
+            await typeItem.UnlockAsync(authentication);
         }
     }
 }

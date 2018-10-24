@@ -25,13 +25,14 @@ using System.ComponentModel;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
 using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class GetTableDataMethod : DataBaseScriptMethodBase
+    class GetTableDataMethod : ScriptFuncTaskBase<string, string, string, IDictionary<int, object>>
     {
         [ImportingConstructor]
         public GetTableDataMethod(ICremaHost cremaHost)
@@ -40,26 +41,14 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<IDictionary<int, object>> OnExecuteAsync(string dataBaseName, string tableName, string revision)
         {
-            return new Func<string, string, string, IDictionary<int, object>>(GetTableData);
-        }
-
-        private IDictionary<int, object> GetTableData(string dataBaseName, string tableName, string revision)
-        {
-            var table = this.GetTable(dataBaseName, tableName);
+            var table = await this.CremaHost.GetTableAsync(dataBaseName, tableName);
             var revisionValue = revision;
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-            return task.Result;
-
-            async Task<IDictionary<int, object>> InvokeAsync()
-            {
-                var dataSet = await table.GetDataSetAsync(authentication, revisionValue);
-                var dataTable = dataSet.Tables[tableName];
-                return this.GetDataRows(dataTable);
-            };
+            var dataSet = await table.GetDataSetAsync(authentication, revisionValue);
+            var dataTable = dataSet.Tables[tableName];
+            return this.GetDataRows(dataTable);
         }
 
         private IDictionary<int, object> GetDataRows(CremaDataTable dataTable)

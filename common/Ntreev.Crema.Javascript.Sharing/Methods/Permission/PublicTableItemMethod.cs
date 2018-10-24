@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.Permission
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(Permission))]
-    class PublicTableItemMethod : DataBaseScriptMethodBase
+    class PublicTableItemMethod : ScriptActionTaskBase<string, string>
     {
         [ImportingConstructor]
         public PublicTableItemMethod(ICremaHost cremaHost)
@@ -37,17 +39,11 @@ namespace Ntreev.Crema.Javascript.Methods.Permission
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string dataBaseName, string tableItemPath)
         {
-            return new Action<string, string>(this.SetTableItemPublic);
-        }
-
-        private void SetTableItemPublic(string dataBaseName, string tableItemPath)
-        {
-            var tableItem = this.GetTableItem(dataBaseName, tableItemPath);
+            var tableItem = await this.CremaHost.GetTableItemAsync(dataBaseName, tableItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            var task = tableItem.SetPublicAsync(authentication);
-            task.Wait();
+            await tableItem.SetPublicAsync(authentication);
         }
     }
 }

@@ -71,6 +71,10 @@
       <Project>{20dab068-f188-4ec5-96fa-227c11bba46d}</Project>
       <Name>Ntreev.Crema.Commands</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Ntreev.Crema.Services.Extensions\Ntreev.Crema.Services.Extensions.csproj">
+      <Project>{0261747b-0a44-4fb0-8e27-2ce4baf2153b}</Project>
+      <Name>Ntreev.Crema.Services.Extensions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Ntreev.Crema.Services.Random\Ntreev.Crema.Services.Random.csproj">
       <Project>{138c9b99-d30b-4e3b-89f0-381a03515431}</Project>
       <Name>Ntreev.Crema.Services.Random</Name>

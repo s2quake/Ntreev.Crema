@@ -63,6 +63,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.ID = Guid.NewGuid();
                     this.dataBase.LockForTransaction(authentication, this.ID);
+                    this.dataBase.DataBaseState = DataBaseState.Loaded;
                     this.CremaHost.Sign(authentication);
                     this.authentication.Expired += Authentication_Expired;
                 });

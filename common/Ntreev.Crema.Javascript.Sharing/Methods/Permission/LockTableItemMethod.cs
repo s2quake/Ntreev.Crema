@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.Permission
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(Permission))]
-    class LockTableItemMethod : DataBaseScriptMethodBase
+    class LockTableItemMethod : ScriptActionTaskBase<string, string, string>
     {
         [ImportingConstructor]
         public LockTableItemMethod(ICremaHost cremaHost)
@@ -37,17 +39,11 @@ namespace Ntreev.Crema.Javascript.Methods.Permission
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string dataBaseName, string tableItemPath, string comment)
         {
-            return new Action<string, string, string>(this.LockTableItem);
-        }
-
-        private void LockTableItem(string dataBaseName, string tableItemPath, string comment)
-        {
-            var tableItem = this.GetTableItem(dataBaseName, tableItemPath);
+            var tableItem = await this.CremaHost.GetTableItemAsync(dataBaseName, tableItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            var task = tableItem.LockAsync(authentication, comment);
-            task.Wait();
+            await tableItem.LockAsync(authentication, comment);
         }
     }
 }

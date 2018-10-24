@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.Permission
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(Permission))]
-    class UnlockDataBaseMethod : DataBaseScriptMethodBase
+    class UnlockDataBaseMethod : ScriptActionTaskBase<string>
     {
         [ImportingConstructor]
         public UnlockDataBaseMethod(ICremaHost cremaHost)
@@ -37,17 +39,11 @@ namespace Ntreev.Crema.Javascript.Methods.Permission
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string dataBaseName)
         {
-            return new Action<string>(this.UnlockDataBase);
-        }
-
-        private void UnlockDataBase(string dataBaseName)
-        {
-            var dataBase = this.GetDataBase(dataBaseName);
+            var dataBase = await this.CremaHost.GetDataBaseAsync(dataBaseName);
             var authentication = this.Context.GetAuthentication(this);
-            var task = dataBase.UnlockAsync(authentication);
-            task.Wait();
+            await dataBase.UnlockAsync(authentication);
         }
     }
 }

@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -26,13 +27,14 @@ using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class ContainsTypeItemMethod : DataBaseScriptMethodBase
+    class ContainsTypeItemMethod : ScriptFuncTaskBase<string, string, bool>
     {
         [ImportingConstructor]
         public ContainsTypeItemMethod(ICremaHost cremaHost)
@@ -41,9 +43,9 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override Task<bool> OnExecuteAsync(string dataBaseName, string typeItemPath)
         {
-            return new Func<string, string, bool>(ContainsTypeItem);
+            return this.CremaHost.ContainsTypeItemAsync(dataBaseName, typeItemPath);
         }
     }
 }

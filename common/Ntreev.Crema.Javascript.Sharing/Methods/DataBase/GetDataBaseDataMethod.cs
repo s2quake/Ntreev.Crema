@@ -26,13 +26,14 @@ using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class GetDataBaseDataMethod : DataBaseScriptMethodBase
+    class GetDataBaseDataMethod : ScriptFuncTaskBase<string, DataSetType, string, string, string>
     {
         [ImportingConstructor]
         public GetDataBaseDataMethod(ICremaHost cremaHost)
@@ -41,24 +42,12 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<string> OnExecuteAsync(string dataBaseName, DataSetType dataSetType, string filterExpression, string revision)
         {
-            return new Func<string, DataSetType, string, string, string>(GetDataBaseData);
-        }
-
-        private string GetDataBaseData(string dataBaseName, DataSetType dataSetType, string filterExpression, string revision)
-        {
-            var dataBase = this.GetDataBase(dataBaseName);
+            var dataBase = await this.CremaHost.GetDataBaseAsync(dataBaseName);
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-            return task.Result;
-
-            async Task<string> InvokeAsync()
-            {
-                var dataSet = await dataBase.GetDataSetAsync(authentication, dataSetType, filterExpression, revision);
-                return dataSet.GetXml();
-            };
+            var dataSet = await dataBase.GetDataSetAsync(authentication, dataSetType, filterExpression, revision);
+            return dataSet.GetXml();
         }
 
         private IDictionary<int, object> GetDataRows(CremaDataTable dataTable)

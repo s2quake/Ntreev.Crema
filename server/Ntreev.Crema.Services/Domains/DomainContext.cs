@@ -135,19 +135,6 @@ namespace Ntreev.Crema.Services.Domains
             };
         }
 
-        //public async Task<DomainContextMetaData> GetMetaDataAsync(Authentication authentication)
-        //{
-        //    var domains = await this.Domains.GetMetaDataAsync(authentication);
-        //    return await this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        return new DomainContextMetaData()
-        //        {
-        //            DomainCategories = this.Categories.GetMetaData(authentication),
-        //            Domains = domains,
-        //        };
-        //    });
-        //}
-
         public DomainMetaData[] GetDomainMetaDatas(Authentication authentication, Guid dataBaseID)
         {
             return this.Dispatcher.Invoke(() =>
@@ -201,6 +188,7 @@ namespace Ntreev.Crema.Services.Domains
                 var results = domains.Select(item => (object)null).ToArray();
                 foreach (var item in domains)
                 {
+                    item.Logger.Dispatcher.Dispose();
                     item.Dispose(authentication, true, null);
                 }
                 this.Domains.InvokeDomainDeletedEvent(authentication, domains, isCanceleds, results);

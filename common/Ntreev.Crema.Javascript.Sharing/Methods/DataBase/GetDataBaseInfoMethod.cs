@@ -25,13 +25,15 @@ using System.ComponentModel;
 using Ntreev.Crema.Data.Xml.Schema;
 using System.Reflection;
 using Ntreev.Crema.Data;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(DataBase))]
-    class GetDataBaseInfoMethod : DataBaseScriptMethodBase
+    class GetDataBaseInfoMethod : ScriptFuncTaskBase<string, IDictionary<string, object>>
     {
         [ImportingConstructor]
         public GetDataBaseInfoMethod(ICremaHost cremaHost)
@@ -40,15 +42,10 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<IDictionary<string, object>> OnExecuteAsync(string dataBaseName)
         {
-            return new Func<string, IDictionary<string, object>>(this.GetDataBaseInfo);
-        }
-
-        private IDictionary<string, object> GetDataBaseInfo(string dataBaseName)
-        {
-            var dataBase = this.GetDataBase(dataBaseName);
-            return dataBase.Dispatcher.Invoke(() =>
+            var dataBase = await this.CremaHost.GetDataBaseAsync(dataBaseName);
+            return await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 var dataBaseInfo = dataBase.DataBaseInfo;
                 var props = new Dictionary<string, object>

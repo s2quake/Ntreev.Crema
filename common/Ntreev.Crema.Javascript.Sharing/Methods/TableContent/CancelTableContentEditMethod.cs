@@ -17,19 +17,21 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableContent
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableContent))]
-    class CancelTableContentEditMethod : DomainScriptMethodBase
+    class CancelTableContentEditMethod : ScriptActionTaskBase<string>
     {
         [ImportingConstructor]
         public CancelTableContentEditMethod(ICremaHost cremaHost)
@@ -38,18 +40,13 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string domainID)
         {
-            return new Action<string>(this.CancelTableContentEdit);
-        }
-
-        private void CancelTableContentEdit(string domainID)
-        {
-            var contents = this.GetDomainHost<IEnumerable<ITableContent>>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var contents = domain.Host as IEnumerable<ITableContent>;
             var authentication = this.Context.GetAuthentication(this);
             var content = contents.First();
-            var task = content.CancelEditAsync(authentication);
-            task.Wait();
+            await content.CancelEditAsync(authentication);
         }
     }
 }

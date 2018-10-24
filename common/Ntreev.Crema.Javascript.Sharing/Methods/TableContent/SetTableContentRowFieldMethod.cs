@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,7 +31,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(TableContent))]
-    class SetTableContentRowFieldMethod : DomainScriptMethodBase
+    class SetTableContentRowFieldMethod : ScriptActionTaskBase<string, string, object[], string, object>
     {
         [ImportingConstructor]
         public SetTableContentRowFieldMethod(ICremaHost cremaHost)
@@ -39,31 +40,21 @@ namespace Ntreev.Crema.Javascript.Methods.TableContent
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Action<string, string, object[], string, object>(this.SetTableContentRowField);
-        }
-
-        private void SetTableContentRowField(string domainID, string tableName, object[] keys, string columnName, object value)
+        protected override async Task OnExecuteAsync(string domainID, string tableName, object[] keys, string columnName, object value)
         {
             if (keys == null)
                 throw new ArgumentNullException(nameof(keys));
             if (columnName == null)
                 throw new ArgumentNullException(nameof(columnName));
 
-            var contents = this.GetDomainHost<IEnumerable<ITableContent>>(domainID);
+            var domain = await this.CremaHost.GetDomainAsync(Guid.Parse(domainID));
+            var contents = domain.Host as IEnumerable<ITableContent>;
             var content = contents.FirstOrDefault(item => item.Dispatcher.Invoke(() => item.Table.Name) == tableName);
             if (content == null)
                 throw new TableNotFoundException(tableName);
             var authentication = this.Context.GetAuthentication(this);
-            var task = InvokeAsync();
-            task.Wait();
-
-            async Task InvokeAsync()
-            {
-                var row = await content.FindAsync(authentication, keys);
-                await row.SetFieldAsync(authentication, columnName, value);
-            }
+            var row = await content.FindAsync(authentication, keys);
+            await row.SetFieldAsync(authentication, columnName, value);
         }
     }
 }

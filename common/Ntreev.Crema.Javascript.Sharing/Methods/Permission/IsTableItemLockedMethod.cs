@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.Permission
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(Permission))]
-    class IsTableItemLockedMethod : DataBaseScriptMethodBase
+    class IsTableItemLockedMethod : ScriptFuncTaskBase<string, string, bool>
     {
         [ImportingConstructor]
         public IsTableItemLockedMethod(ICremaHost cremaHost)
@@ -37,15 +39,10 @@ namespace Ntreev.Crema.Javascript.Methods.Permission
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<bool> OnExecuteAsync(string dataBaseName, string tableItemPath)
         {
-            return new Func<string, string, bool>(this.IsTableItemLocked);
-        }
-
-        private bool IsTableItemLocked(string dataBaseName, string tableItemPath)
-        {
-            var tableItem = this.GetTableItem(dataBaseName, tableItemPath);
-            return tableItem.Dispatcher.Invoke(() => tableItem.IsLocked);
+            var tableItem = await this.CremaHost.GetTableItemAsync(dataBaseName, tableItemPath);
+            return await tableItem.Dispatcher.InvokeAsync(() => tableItem.IsLocked);
         }
     }
 }
