@@ -89,7 +89,7 @@ namespace Ntreev.Crema.Services.Data
                 var tables = category.GetService(typeof(TableCollection)) as TableCollection;
                 if (args is Guid)
                 {
-                    this.tables = tables.AddNew(authentication, tableInfos);
+                    this.tables = await tables.AddNewAsync(authentication, tableInfos);
                 }
             }
             else if (this.parent is Table table)
@@ -97,7 +97,7 @@ namespace Ntreev.Crema.Services.Data
                 var tables = table.GetService(typeof(TableCollection)) as TableCollection;
                 if (args is Guid)
                 {
-                    this.tables = tables.AddNew(authentication, tableInfos);
+                    this.tables = await tables.AddNewAsync(authentication, tableInfos);
                 }
             }
             this.parent = null;

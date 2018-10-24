@@ -354,7 +354,7 @@ namespace Ntreev.Crema.Data
 
         public string ConvertToString(long value)
         {
-            if(this.namesCache == null)
+            if (this.namesCache == null)
             {
                 this.GetNamesValues(out this.namesCache, out this.valuesCache, false);
             }

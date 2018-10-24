@@ -74,6 +74,7 @@ namespace Ntreev.Crema.Services.Domains
 
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
+            this.Dispatcher?.VerifyAccess();
             base.OnCollectionChanged(e);
 
             switch (e.Action)

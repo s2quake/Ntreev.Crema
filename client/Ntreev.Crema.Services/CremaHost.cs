@@ -112,16 +112,7 @@ namespace Ntreev.Crema.Services
             });
         }
 
-        //public Task AddServiceAsync(ICremaService service)
-        //{
-        //    return this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        this.services.Add(service);
-        //        CremaLog.Debug($"{service.GetType().Name} Initialized.");
-        //    });
-        //}
-
-        public async Task RemoveServiceAsync(ICremaService service)
+        public async void RemoveServiceAsync(ICremaService service)
         {
             var isAny = await this.Dispatcher.InvokeAsync(() =>
             {
@@ -137,10 +128,10 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        public Task RemoveServiceAsync(ICremaService service, CloseInfo closeInfo)
+        public void RemoveServiceAsync(ICremaService service, CloseInfo closeInfo)
         {
             this.closeInfo = closeInfo;
-            return this.RemoveServiceAsync(service);
+            this.RemoveServiceAsync(service);
         }
 
         public Task InvokeCloseAsync(CloseInfo closeInfo)
@@ -371,16 +362,6 @@ namespace Ntreev.Crema.Services
 
         public Authority Authority { get; private set; }
 
-        //public User User
-        //{
-        //    get
-        //    {
-        //        if (this.ServiceState != ServiceState.Opened)
-        //            return null;
-        //        return this.UserContext.Users[this.UserID];
-        //    }
-        //}
-
         public DataBaseCollection DataBases { get; private set; }
 
         public DomainContext DomainContext { get; private set; }
@@ -503,9 +484,8 @@ namespace Ntreev.Crema.Services
             serviceClient.Open();
             try
             {
-                var version = serviceClient.GetVersion();
-                Console.WriteLine(version);
-                var serviceInfos = serviceClient.GetServiceInfos();
+                var version = await Task.Run(() => serviceClient.GetVersion());
+                var serviceInfos = await Task.Run(() => serviceClient.GetServiceInfos());
                 return serviceInfos.ToDictionary(item => item.Name);
             }
             finally

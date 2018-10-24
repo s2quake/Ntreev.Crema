@@ -30,7 +30,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
         {
             get
             {
-                foreach(var item in Enum.GetValues(typeof(OperatorType)))
+                foreach (var item in Enum.GetValues(typeof(OperatorType)))
                 {
                     yield return (OperatorType)item;
                 }

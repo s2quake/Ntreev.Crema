@@ -164,7 +164,7 @@ namespace Ntreev.Crema.Services.Data
                 this.Contents = tableList.Select(item => item.Content).ToArray();
                 foreach (var item in this.Contents)
                 {
-                    item.domain = domain;
+                    item.Domain = domain;
                     item.domainHost = this;
                     item.Table.SetTableState(TableState.IsBeingEdited);
                 }
@@ -191,7 +191,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     tableInfoByName.Add(item.Name, item);
                 }
-                if (args is Guid)
+                if (args is string)
                 {
                     await this.DetachDomainEventAsync();
                     await this.DomainContext.DeleteAsync(authentication, this.domain, false, tableInfos);
@@ -201,7 +201,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     foreach (var item in this.Contents)
                     {
-                        item.domain = null;
+                        item.Domain = null;
                         item.IsModified = false;
                         item.dataTable = null;
                         if (tableInfoByName.ContainsKey(item.Table.Name))
@@ -221,17 +221,16 @@ namespace Ntreev.Crema.Services.Data
                 {
                     var result = await Task.Run(() => this.Service.CancelTableContentEdit(name));
                 }
-                if (args is Guid)
+                if (args is string)
                 {
                     await this.DetachDomainEventAsync();
                     await this.DomainContext.DeleteAsync(authentication, this.domain, true, null);
                 }
                 await this.Container.Dispatcher.InvokeAsync(() =>
                 {
-
                     foreach (var item in this.Contents)
                     {
-                        item.domain = null;
+                        item.Domain = null;
                         item.IsModified = false;
                         item.dataTable = null;
                         item.Table.SetTableState(TableState.None);
@@ -285,20 +284,6 @@ namespace Ntreev.Crema.Services.Data
             public CremaHost CremaHost => this.Container.CremaHost;
 
             public TableCollection Container { get; }
-
-            //private async void Domain_Deleted(object sender, DomainDeletedEventArgs e)
-            //{
-            //    if (e.IsCanceled == false)
-            //    {
-            //        await this.EndContentAsync(e.Authentication, null);
-            //        await this.Dispatcher.InvokeAsync(() => this.InvokeEditEndedEvent(e));
-            //    }
-            //    else
-            //    {
-            //        await this.CancelContentAsync(e.Authentication, null);
-            //        await this.Dispatcher.InvokeAsync(() => this.InvokeEditCanceledEvent(e));
-            //    }
-            //}
 
             private void Domain_RowAdded(object sender, DomainRowEventArgs e)
             {
@@ -383,7 +368,7 @@ namespace Ntreev.Crema.Services.Data
                 this.domain = null;
                 foreach (var item in this.Contents)
                 {
-                    item.domain = null;
+                    item.Domain = null;
                     item.dataTable = null;
                 }
             }
@@ -397,7 +382,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     var tableState = TableState.IsBeingEdited;
                     item.domainHost = this;
-                    item.domain = domain;
+                    item.Domain = domain;
                     if (dataSet != null)
                     {
                         item.dataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];

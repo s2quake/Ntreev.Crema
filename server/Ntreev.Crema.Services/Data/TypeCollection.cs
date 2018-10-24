@@ -45,6 +45,7 @@ namespace Ntreev.Crema.Services.Data
 
         public Type AddNew(Authentication authentication, string name, string categoryPath)
         {
+            this.Dispatcher.VerifyAccess();
             if (NameValidator.VerifyName(name) == false)
                 throw new ArgumentException(string.Format(Resources.Exception_InvalidName_Format, name), nameof(name));
             return this.BaseAddNew(name, categoryPath, authentication);
@@ -453,6 +454,12 @@ namespace Ntreev.Crema.Services.Data
         protected virtual void OnTypesChanged(ItemsEventArgs<IType> e)
         {
             this.typesChanged?.Invoke(this, e);
+        }
+
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher?.VerifyAccess();
+            base.OnCollectionChanged(e);
         }
 
         private void ValidateCopy(Authentication authentication, string typeName, string newTypeName)

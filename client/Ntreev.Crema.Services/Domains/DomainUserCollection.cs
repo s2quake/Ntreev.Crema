@@ -19,6 +19,7 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Library.ObjectModel;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains
@@ -73,6 +74,12 @@ namespace Ntreev.Crema.Services.Domains
         public string OwnerUserID { get; private set; }
 
         public CremaDispatcher Dispatcher => this.domain.Dispatcher;
+
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher?.VerifyAccess();
+            base.OnCollectionChanged(e);
+        }
 
         #region IDomainUserCollection
 

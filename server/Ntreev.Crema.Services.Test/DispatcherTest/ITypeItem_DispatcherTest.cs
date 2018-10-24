@@ -134,7 +134,7 @@ namespace Ntreev.Crema.Services.Test.DispatcherTest
         [ExpectedException(typeof(InvalidOperationException))]
         public void Childs()
         {
-            foreach(var item in typeItem.Childs)
+            foreach (var item in typeItem.Childs)
             {
                 Console.Write(item);
             }

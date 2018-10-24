@@ -580,6 +580,12 @@ namespace Ntreev.Crema.Services.Users
             this.messageReceived?.Invoke(this, e);
         }
 
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher?.VerifyAccess();
+            base.OnCollectionChanged(e);
+        }
+
         private void ValidateUserCreate(Authentication authentication, string userID, string categoryPath, SecureString password)
         {
             if (authentication.Types.HasFlag(AuthenticationType.Administrator) == false)

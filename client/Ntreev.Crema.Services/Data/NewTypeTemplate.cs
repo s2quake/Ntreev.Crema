@@ -69,7 +69,7 @@ namespace Ntreev.Crema.Services.Data
             var typeInfo = typeInfos.First();
             if (args is Guid)
             {
-                this.type = this.Types.AddNew(authentication, typeInfo);
+                this.type = await this.Types.AddNewAsync(authentication, typeInfo);
             }
             return typeInfos;
         }

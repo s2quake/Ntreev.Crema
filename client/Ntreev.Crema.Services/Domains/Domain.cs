@@ -76,7 +76,7 @@ namespace Ntreev.Crema.Services.Domains
                     });
                     return null;
                 }
-                
+
             }
             catch (Exception e)
             {
@@ -401,7 +401,7 @@ namespace Ntreev.Crema.Services.Domains
             else
             {
                 this.OnInitialize(metaData);
-                if(this.DataDispatcher != null)
+                if (this.DataDispatcher != null)
                 {
                     int qwer = 0;
                 }

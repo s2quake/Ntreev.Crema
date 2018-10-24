@@ -209,7 +209,7 @@ namespace Ntreev.Crema.Services.Users
 
         public CremaHost CremaHost => this.Context.CremaHost;
 
-        public CremaDispatcher Dispatcher => this.Context.Dispatcher;
+        public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
 
         public IObjectSerializer Serializer => this.Context.Serializer;
 
@@ -303,6 +303,12 @@ namespace Ntreev.Crema.Services.Users
         protected virtual void OnCategoriesDeleted(ItemsDeletedEventArgs<IUserCategory> e)
         {
             this.categoriesDeleted?.Invoke(this, e);
+        }
+
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher?.VerifyAccess();
+            base.OnCollectionChanged(e);
         }
 
         private void ValidateAddNew(Authentication authentication, string name, string parentPath)

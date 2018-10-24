@@ -578,6 +578,12 @@ namespace Ntreev.Crema.Services.Domains
             this.domainPropertyChanged?.Invoke(this, e);
         }
 
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher?.VerifyAccess();
+            base.OnCollectionChanged(e);
+        }
+
         #region IDomainCollection
 
         IDomain IDomainCollection.this[Guid domainID]

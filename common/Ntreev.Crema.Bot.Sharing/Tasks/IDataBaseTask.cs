@@ -46,26 +46,29 @@ namespace Ntreev.Crema.Bot.Tasks
             }
             else 
             {
-                if (await dataBase.ContainsAsync(authentication) == true)
+                if (await dataBase.ContainsAsync(authentication) == false)
+                    return;
+
+                if (RandomUtility.Within(35) == true)
                 {
-                    if (RandomUtility.Within(35) == true)
+                    var typeItem = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TypeContext.Random());
+                    await typeItem.Dispatcher.InvokeAsync(() =>
                     {
-                        var typeItem = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TypeContext.Random());
-                        context.Push(typeItem);
-                    }
-                    else
-                    {
-                        var tableItem = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TableContext.Random());
-                        context.Push(tableItem);
-                    }
+                        if (typeItem.VerifyAccessType(authentication, AccessType.Guest) == true)
+                        {
+                            context.Push(typeItem);
+                        }
+                    });
+                }
+                else
+                {
+                    var tableItem = await dataBase.Dispatcher.InvokeAsync(() => dataBase.TableContext.Random());
+                    context.Push(tableItem);
                 }
             }
         }
 
-        public Type TargetType
-        {
-            get { return typeof(IDataBase); }
-        }
+        public Type TargetType => typeof(IDataBase);
 
         [TaskMethod]
         public async Task EnterAsync(IDataBase dataBase, TaskContext context)

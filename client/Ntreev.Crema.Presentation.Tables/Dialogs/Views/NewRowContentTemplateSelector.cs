@@ -21,9 +21,14 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.Views
                     if (CremaDataTypeUtility.IsBaseType(viewModel.DataType) == true)
                     {
                         var dataType = CremaDataTypeUtility.GetType(viewModel.DataType);
-                        return (DataTemplate)fe.FindResource(dataType.FullName); 
+                        return (DataTemplate)fe.FindResource(dataType.FullName);
                     }
-                    return (DataTemplate)fe.FindResource("Content_Template");
+                    else
+                    {
+                        if (viewModel.IsFlag == true)
+                            return (DataTemplate)fe.FindResource("CremaFlagTypeSelector");
+                        return (DataTemplate)fe.FindResource("CremaTypeSelector");
+                    }
                 }
             }
             return base.SelectTemplate(item, container);

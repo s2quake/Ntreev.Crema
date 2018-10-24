@@ -31,13 +31,10 @@ namespace Ntreev.Crema.Services.Data
 {
     partial class TableContent : ITableContent
     {
-        private Domain domain;
         private CremaDataTable dataTable;
         private DataTable internalTable;
 
         private List<TableRow> items;
-        //private readonly Dictionary<DataRow, TableRow> rows = new Dictionary<DataRow, TableRow>();
-        //private readonly HashSet<DataRow> rowsToAdd = new HashSet<DataRow>();
 
         private EventHandler editBegun;
         private EventHandler editEnded;
@@ -52,20 +49,6 @@ namespace Ntreev.Crema.Services.Data
         public override string ToString()
         {
             return this.Table.ToString();
-        }
-
-        //protected Task AddAsync(TableRow row)
-        //{
-        //    return this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        this.items.Add(row);
-        //        this.dataTable.ExtendedProperties[row.Row] = row;
-        //    });
-        //}
-
-        protected void Clear()
-        {
-            //this.rows.Clear();
         }
 
         public Task<TableRow> FindAsync(Authentication authentication, params object[] keys)
@@ -212,7 +195,7 @@ namespace Ntreev.Crema.Services.Data
                     this.ValidateEnter(authentication);
                     return this.GetAccessType(authentication);
                 });
-                await this.domain.AddUserAsync(authentication, accessType);
+                await this.Domain.AddUserAsync(authentication, accessType);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
@@ -236,7 +219,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(LeaveEditAsync), this.Table);
                     this.ValidateLeave(authentication);
                 });
-                await this.domain.RemoveUserAsync(authentication);
+                await this.Domain.RemoveUserAsync(authentication);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
@@ -265,7 +248,7 @@ namespace Ntreev.Crema.Services.Data
                     TableName = name,
                     Keys = DomainRowInfo.ClearKey,
                 };
-                await this.domain.RemoveRowAsync(authentication, new DomainRowInfo[] { rowInfo });
+                await this.Domain.RemoveRowAsync(authentication, new DomainRowInfo[] { rowInfo });
             }
             catch (Exception e)
             {
@@ -283,7 +266,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
                 });
-                var row = await this.domain.Dispatcher.InvokeAsync(() => new TableRow(this, this.dataTable.DefaultView.Table, relationID));
+                var row = await this.Domain.Dispatcher.InvokeAsync(() => new TableRow(this, this.dataTable.DefaultView.Table, relationID));
                 return row;
             }
             catch (Exception e)
@@ -329,9 +312,9 @@ namespace Ntreev.Crema.Services.Data
             {
                 item.OnValidateEndEdit(authentication, this);
             }
-            this.domain.Dispatcher?.Invoke(() =>
+            this.Domain.Dispatcher?.Invoke(() =>
             {
-                var isOwner = this.domain.Users.OwnerUserID == authentication.ID;
+                var isOwner = this.Domain.Users.OwnerUserID == authentication.ID;
                 if (isAdmin == false && isOwner == false)
                     throw new NotImplementedException();
             });
@@ -363,9 +346,9 @@ namespace Ntreev.Crema.Services.Data
             {
                 item.OnValidateCancelEdit(authentication, this);
             }
-            this.domain.Dispatcher.Invoke(() =>
+            this.Domain.Dispatcher.Invoke(() =>
             {
-                if (isAdmin == false && this.domain.Users.Owner.ID != authentication.ID)
+                if (isAdmin == false && this.Domain.Users.Owner.ID != authentication.ID)
                     throw new NotImplementedException();
             });
         }
@@ -378,7 +361,7 @@ namespace Ntreev.Crema.Services.Data
             if (this.Table.DataBase.Version.Major != CremaSchema.MajorVersion || this.DataBase.Version.Minor != CremaSchema.MinorVersion)
                 throw new InvalidOperationException("database version is low.");
 
-            if (this.domain != null)
+            if (this.Domain != null)
                 throw new InvalidOperationException();
             if (this.ServiceState != ServiceState.None)
                 throw new InvalidOperationException(Resources.Exception_ItIsAlreadyBeingEdited);
@@ -392,7 +375,7 @@ namespace Ntreev.Crema.Services.Data
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void OnValidateEndEdit(Authentication authentication, object target)
         {
-            if (this.domain == null)
+            if (this.Domain == null)
                 throw new InvalidOperationException();
             if (this.ServiceState != ServiceState.Opened)
                 throw new InvalidOperationException();
@@ -401,7 +384,7 @@ namespace Ntreev.Crema.Services.Data
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void OnValidateCancelEdit(Authentication authentication, object target)
         {
-            if (this.domain == null)
+            if (this.Domain == null)
                 throw new InvalidOperationException();
             if (this.ServiceState != ServiceState.Opened)
                 throw new InvalidOperationException();
@@ -412,7 +395,7 @@ namespace Ntreev.Crema.Services.Data
         {
             this.Table.ValidateAccessType(authentication, AccessType.Guest);
 
-            if (this.domain == null)
+            if (this.Domain == null)
                 throw new InvalidOperationException();
             if (this.ServiceState != ServiceState.Opened)
                 throw new InvalidOperationException();
@@ -428,13 +411,13 @@ namespace Ntreev.Crema.Services.Data
         {
             this.Table.ValidateAccessType(authentication, AccessType.Guest);
 
-            if (this.domain == null)
+            if (this.Domain == null)
                 throw new InvalidOperationException();
             if (this.ServiceState != ServiceState.Opened)
                 throw new InvalidOperationException();
         }
 
-        public Domain Domain => this.domain;
+        public Domain Domain { get; private set; }
 
         public IPermission Permission => this.Table;
 

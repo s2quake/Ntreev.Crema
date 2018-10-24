@@ -154,7 +154,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public CremaDispatcher Dispatcher => this.Context.Dispatcher;
+        public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
 
         protected virtual void OnCategoriesCreated(ItemsCreatedEventArgs<IDomainCategory> e)
         {
@@ -174,6 +174,12 @@ namespace Ntreev.Crema.Services.Domains
         protected virtual void OnCategoriesDeleted(ItemsDeletedEventArgs<IDomainCategory> e)
         {
             this.categoriesDeleted?.Invoke(this, e);
+        }
+
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher?.VerifyAccess();
+            base.OnCollectionChanged(e);
         }
 
         #region IDomainCategoryCollection

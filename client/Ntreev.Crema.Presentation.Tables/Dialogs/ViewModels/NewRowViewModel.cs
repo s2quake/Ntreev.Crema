@@ -37,26 +37,43 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly Authentication authentication;
         private readonly ITableRow row;
         private readonly TableInfo tableInfo;
+        private readonly Dictionary<string, TypeInfo> typeInfoByName;
         private readonly List<NewRowItemViewModel> items = new List<NewRowItemViewModel>();
 
-        public NewRowViewModel(Authentication authentication, ITableRow row, TableInfo tableInfo)
+        private NewRowViewModel(Authentication authentication, ITableRow row, TableInfo tableInfo, TypeInfo[] typeInfos)
         {
             this.authentication = authentication;
             this.row = row;
             this.tableInfo = tableInfo;
+            this.typeInfoByName = typeInfos.ToDictionary(item => item.Path);
             foreach (var item in this.tableInfo.Columns)
             {
-                var itemViewModel = new NewRowItemViewModel(authentication, row, item);
-                this.items.Add(itemViewModel);
+                if (CremaDataTypeUtility.IsBaseType(item.DataType) == false)
+                {
+                    var typeInfo = this.typeInfoByName[item.DataType];
+                    this.items.Add(new NewRowItemViewModel(authentication, row, item, typeInfo));
+                }
+                else
+                {
+                    this.items.Add(new NewRowItemViewModel(authentication, row, item));
+                }
             }
             this.DisplayName = "New Row";
         }
 
         public static async Task<NewRowViewModel> CreateAsync(Authentication authentication, ITableContent content)
         {
-            var tableInfo = await content.Dispatcher.InvokeAsync(() => content.Table.TableInfo);
+            var tuple = await content.Dispatcher.InvokeAsync(() =>
+            {
+                var table = content.Table;
+                var domain = content.Domain;
+                var dataSet = domain.Source as CremaDataSet;
+                var tableInfo = dataSet.Tables[table.Name, table.Category.Path].TableInfo;
+                var typeInfos = dataSet.Types.Select(item => item.TypeInfo).ToArray();
+                return (tableInfo, typeInfos);
+            });
             var row = await content.AddNewAsync(authentication, null);
-            return new NewRowViewModel(authentication, row, tableInfo);
+            return new NewRowViewModel(authentication, row, tuple.tableInfo, tuple.typeInfos);
         }
 
         public IReadOnlyList<NewRowItemViewModel> Items => this.items;

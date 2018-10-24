@@ -52,6 +52,7 @@ namespace Ntreev.Crema.Services.Data
 
         public Table AddNew(Authentication authentication, string name, string categoryPath)
         {
+            this.Dispatcher.VerifyAccess();
             if (NameValidator.VerifyName(name) == false)
                 throw new ArgumentException(string.Format(Resources.Exception_InvalidName_Format, name), nameof(name));
             return this.BaseAddNew(name, categoryPath, authentication);
@@ -67,15 +68,18 @@ namespace Ntreev.Crema.Services.Data
             var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, true);
             var tablePaths = dataTables.Select(item => item.Path).ToArray();
             await this.InvokeTableCreateAsync(authentication, tablePaths, dataBaseSet);
-            foreach (var item in dataTables)
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                var table = this.AddNew(authentication, item.Name, item.CategoryPath);
-                if (item.TemplatedParentName != string.Empty)
-                    table.TemplatedParent = this[item.TemplatedParentName];
-                table.Initialize(item.TableInfo);
-                tableList.Add(table);
-            }
-            this.InvokeTablesCreatedEvent(authentication, tableList.ToArray(), dataSet);
+                foreach (var item in dataTables)
+                {
+                    var table = this.AddNew(authentication, item.Name, item.CategoryPath);
+                    if (item.TemplatedParentName != string.Empty)
+                        table.TemplatedParent = this[item.TemplatedParentName];
+                    table.Initialize(item.TableInfo);
+                    tableList.Add(table);
+                }
+                this.InvokeTablesCreatedEvent(authentication, tableList.ToArray(), dataSet);
+            });
             return tableList.ToArray();
         }
 
@@ -536,6 +540,12 @@ namespace Ntreev.Crema.Services.Data
         protected virtual void OnTablesChanged(ItemsEventArgs<ITable> e)
         {
             this.tablesChanged?.Invoke(this, e);
+        }
+
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher?.VerifyAccess();
+            base.OnCollectionChanged(e);
         }
 
         protected override Table NewItem(params object[] args)

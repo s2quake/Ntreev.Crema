@@ -53,18 +53,21 @@ namespace Ntreev.Crema.Services.Data
             return this.BaseAddNew(name, categoryPath, authentication);
         }
 
-        public Table[] AddNew(Authentication authentication, TableInfo[] tableInfos)
+        public Task<Table[]> AddNewAsync(Authentication authentication, TableInfo[] tableInfos)
         {
-            var tableList = new List<Table>(tableInfos.Length);
-            foreach (var item in tableInfos)
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                var table = this.AddNew(authentication, item.Name, item.CategoryPath);
-                if (item.TemplatedParent != string.Empty)
-                    table.TemplatedParent = this[item.TemplatedParent];
-                table.Initialize(item);
-            }
-            this.InvokeTablesCreatedEvent(authentication, tableList.ToArray());
-            return tableList.ToArray();
+                var tableList = new List<Table>(tableInfos.Length);
+                foreach (var item in tableInfos)
+                {
+                    var table = this.AddNew(authentication, item.Name, item.CategoryPath);
+                    if (item.TemplatedParent != string.Empty)
+                        table.TemplatedParent = this[item.TemplatedParent];
+                    table.Initialize(item);
+                }
+                this.InvokeTablesCreatedEvent(authentication, tableList.ToArray());
+                return tableList.ToArray();
+            });
         }
 
         public async Task<Table> InheritAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
@@ -78,10 +81,10 @@ namespace Ntreev.Crema.Services.Data
                     return table.Name;
                 });
                 var result = await Task.Run(() => this.Service.InheritTable(name, newTableName, categoryPath, copyContent));
+                var tables = await this.AddNewAsync(authentication, result.GetValue());
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    this.AddNew(authentication, result.GetValue());
                     return this[newTableName];
                 });
             }
@@ -103,10 +106,10 @@ namespace Ntreev.Crema.Services.Data
                     return table.Name;
                 });
                 var result = await Task.Run(() => this.Service.CopyTable(name, newTableName, categoryPath, copyContent));
+                var tables = this.AddNewAsync(authentication, result.GetValue());
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    this.AddNew(authentication, result.GetValue());
                     return this[newTableName];
                 });
             }
@@ -325,6 +328,12 @@ namespace Ntreev.Crema.Services.Data
         protected virtual void OnTablesChanged(ItemsEventArgs<ITable> e)
         {
             this.tablesChanged?.Invoke(this, e);
+        }
+
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher?.VerifyAccess();
+            base.OnCollectionChanged(e);
         }
 
         protected override Table NewItem(params object[] args)

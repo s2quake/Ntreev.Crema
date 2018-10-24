@@ -500,7 +500,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.Dispatcher.Dispose();
                 this.Dispatcher = null;
             });
-            await this.CremaHost.RemoveServiceAsync(this);
+            this.CremaHost.RemoveServiceAsync(this);
         }
 
         private async void Timer_Elapsed(object sender, ElapsedEventArgs e)

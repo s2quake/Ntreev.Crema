@@ -390,10 +390,10 @@ namespace Ntreev.Crema.Services.Data
                 });
                 if (value == true)
                 {
-                    var signatureDate = await this.ReleaseServiceAsync();
-                    authentication.SignatureDate = signatureDate;
                     await this.Dispatcher.InvokeAsync(() =>
                     {
+                        var signatureDate = this.ReleaseService();
+                        authentication.SignatureDate = signatureDate;
                         this.DetachDomainHost();
                         this.TypeContext.Dispose();
                         this.TypeContext = null;
@@ -639,7 +639,7 @@ namespace Ntreev.Crema.Services.Data
             if (this.Dispatcher.Owner is DataBase)
             {
                 this.DetachDomainHost();
-                this.ReleaseServiceAsync();
+                this.ReleaseService();
             }
             this.authentications.Clear();
             this.TableContext?.Dispose();
@@ -660,12 +660,12 @@ namespace Ntreev.Crema.Services.Data
                 this.TableContext?.Dispose();
                 this.TypeContext = null;
             }
-            
+
             this.IsResetting = true;
             base.ResettingDataBase(authentication);
             this.DataBases.InvokeItemsResettingEvent(authentication, new IDataBase[] { this, });
 
-            
+
 
             //this.DomainContext.DeleteDomains(authentication, this.ID);
         }
@@ -702,13 +702,13 @@ namespace Ntreev.Crema.Services.Data
 
         public void SetReset2(Authentication authentication, DataBaseMetaData metaData)
         {
-                this.TypeContext = new TypeContext(this, metaData);
-                this.TableContext = new TableContext(this, metaData);
-                this.AttachDomainHost();
-                base.UpdateLockParent();
-                base.UpdateAccessParent();
-                base.ResetDataBase(authentication);
-                this.DataBases.InvokeItemsResetEvent(authentication, new IDataBase[] { this, });
+            this.TypeContext = new TypeContext(this, metaData);
+            this.TableContext = new TableContext(this, metaData);
+            this.AttachDomainHost();
+            base.UpdateLockParent();
+            base.UpdateAccessParent();
+            base.ResetDataBase(authentication);
+            this.DataBases.InvokeItemsResetEvent(authentication, new IDataBase[] { this, });
         }
 
         public void SetAuthenticationEntered(Authentication authentication)
@@ -1139,7 +1139,7 @@ namespace Ntreev.Crema.Services.Data
             base.OnDataBaseStateChanged(e);
         }
 
-        private async Task<SignatureDate> ReleaseServiceAsync()
+        private SignatureDate ReleaseService()
         {
             var result = this.service.Unsubscribe();
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
@@ -1151,7 +1151,7 @@ namespace Ntreev.Crema.Services.Data
             this.service = null;
 
             result.Validate();
-            await this.CremaHost.RemoveServiceAsync(this);
+            this.CremaHost.RemoveServiceAsync(this);
             return result.SignatureDate;
         }
 
@@ -1166,7 +1166,7 @@ namespace Ntreev.Crema.Services.Data
                 this.Dispatcher.Dispose();
                 this.Dispatcher = null;
             });
-            await this.CremaHost.RemoveServiceAsync(this);
+            this.CremaHost.RemoveServiceAsync(this);
         }
 
         private async void Timer_Elapsed(object sender, ElapsedEventArgs e)

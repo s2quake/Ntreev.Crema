@@ -111,7 +111,7 @@ namespace Ntreev.Crema.Services.Domains
         private bool d;
         public Task DisposeAsync(bool delete)
         {
-            if(this.d == true)
+            if (this.d == true)
             {
                 int qwer = 0;
             }
@@ -125,7 +125,7 @@ namespace Ntreev.Crema.Services.Domains
                 if (delete == true)
                 {
                     DirectoryUtility.Delete(this.basePath);
-                    if(Directory.Exists(this.basePath) == true)
+                    if (Directory.Exists(this.basePath) == true)
                     {
                         int qwer = 0;
                     }

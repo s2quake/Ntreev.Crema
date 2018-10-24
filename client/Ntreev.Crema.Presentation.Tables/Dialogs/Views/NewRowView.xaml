@@ -17,98 +17,89 @@
 
         <Style x:Key="ItemContainer_Style" TargetType="{x:Type HeaderedContentControl}" BasedOn="{StaticResource PropertyItemsControl_ItemContainerStyle}">
             <Setter Property="Header" Value="{Binding Name}" />
+            <Setter Property="Height" Value="24" />
         </Style>
 
         <DataTemplate x:Key="System.Boolean">
-            <CheckBox IsChecked="{Binding Value}" />
+            <CheckBox IsChecked="{Binding Value}" HorizontalAlignment="Left" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.String">
             <TextBox Text="{Binding Value}" />
         </DataTemplate>
 
-
         <DataTemplate x:Key="System.Single">
-            <nmgc:NumericTextBox NumberStyles="Float"
-                                 NullValue="{x:Null}"
-                                 Text="{Binding Value, StringFormat=R}">
-            </nmgc:NumericTextBox>
+            <nmgc:NumericTextBox NumberStyles="Float" NullValue="{x:Null}" Text="{Binding Value, StringFormat=R}" />
         </DataTemplate>
-
-
+        
         <DataTemplate x:Key="System.Double">
-            <nmgc:NumericTextBox NumberStyles="Float"
-                                 NullValue="{x:Null}"
-                                 Text="{Binding Value, StringFormat=R}">
-            </nmgc:NumericTextBox>
+            <nmgc:NumericTextBox NumberStyles="Float" NullValue="{x:Null}" Text="{Binding Value, StringFormat=R}" />
         </DataTemplate>
-
 
         <DataTemplate x:Key="System.SByte">
-            <nmgc:NumericTextBox NumberStyles="Integer"
-                                 NullValue="{x:Null}"
-                                 Text="{Binding Value}" >
-            </nmgc:NumericTextBox>
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
         </DataTemplate>
 
 
         <DataTemplate x:Key="System.Byte">
-            <nmgc:NumericTextBox NumberStyles="Integer"
-                                 NullValue="{x:Null}"
-                                 Text="{Binding Value}" >
-            </nmgc:NumericTextBox>
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.Int16">
-            <nmgc:NumericTextBox NumberStyles="Integer"
-                                 NullValue="{x:Null}"
-                                 Text="{Binding Value}" >
-            </nmgc:NumericTextBox>
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.UInt16">
-            <nmgc:NumericTextBox NumberStyles="Integer"
-                                 NullValue="{x:Null}"
-                                 Text="{Binding Value}" >
-            </nmgc:NumericTextBox>
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.Int32">
-            <nmgc:NumericTextBox NumberStyles="Integer"
-                                 NullValue="{x:Null}"
-                                 Text="{Binding Value}" >
-            </nmgc:NumericTextBox>
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.UInt32">
-            <nmgc:NumericTextBox NumberStyles="Integer"
-                                 NullValue="{x:Null}"
-                                 Text="{Binding Value}" >
-            </nmgc:NumericTextBox>
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.Int64">
-            <nmgc:NumericTextBox NumberStyles="Integer"
-                                 NullValue="{x:Null}"
-                                 Text="{Binding Value}" >
-            </nmgc:NumericTextBox>
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.UInt64">
-            <nmgc:NumericTextBox NumberStyles="Integer"
-                                 NullValue="{x:Null}"
-                                 Text="{Binding Value}" >
-            </nmgc:NumericTextBox>
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.DateTime">
-            <xctk:DateTimePicker Value="{Binding Value}">
-            </xctk:DateTimePicker>
+            <xctk:DateTimePicker Value="{Binding Value}" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.TimeSpan">
             <nmgc:TimeSpanUpDown InternalValue="{Binding Value}" />
+        </DataTemplate>
 
+        <DataTemplate x:Key="CremaTypeSelector">
+            <ComboBox Text="{Binding Value}" IsEditable="True" 
+                          ItemsSource="{Binding Items}"
+                          DisplayMemberPath="Name"
+                          Template="{StaticResource DataCell_Editable_ComboBox_Template}" >
+                <ComboBox.Resources>
+                    <Style TargetType="{x:Type Popup}">
+                        <Setter Property="PlacementTarget" Value="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type HeaderedContentControl}}}" />
+                    </Style>
+                </ComboBox.Resources>
+            </ComboBox>
+        </DataTemplate>
+
+        <DataTemplate x:Key="CremaFlagTypeSelector">
+            <nmfc:FlagControl Text="{Binding Value}" DisplayMemberPath="Name" NumericMemberPath="Value"
+                                      ItemsSource="{Binding Items}" >
+                <nmfc:FlagControl.Resources>
+                    <Style TargetType="{x:Type Popup}">
+                        <Setter Property="PlacementTarget" Value="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type HeaderedContentControl}}}" />
+                        <Setter Property="Width" Value="{Binding Path=ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type HeaderedContentControl}}}" />
+                    </Style>
+                </nmfc:FlagControl.Resources>
+            </nmfc:FlagControl>
         </DataTemplate>
 
     </UserControl.Resources>

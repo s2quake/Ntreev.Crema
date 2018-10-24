@@ -58,13 +58,15 @@ namespace Ntreev.Crema.Services.Domains
         public async Task InitializeAsync()
         {
             var dataBases = await this.CremaHost.DataBases.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases.ToArray<DataBase>());
-
-            foreach (var item in dataBases)
+            await this.Dispatcher.InvokeAsync(() =>
             {
-                var categoryName = CategoryName.Create(item.Name);
-                var category = this.Categories.AddNew(categoryName);
-                category.DataBase = item;
-            }
+                foreach (var item in dataBases)
+                {
+                    var categoryName = CategoryName.Create(item.Name);
+                    var category = this.Categories.AddNew(categoryName);
+                    category.DataBase = item;
+                }
+            });
         }
 
         public void InvokeItemsCreatedEvent(Authentication authentication, IDomainItem[] items, object[] args)

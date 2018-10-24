@@ -113,7 +113,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <local:TableSourceColumnManagerRow />
             </DataTemplate>
             <DataTemplate>
-                <Button Content="추가..." x:Name="NewRow" Focusable="False" cal:Bind.Model="{Binding}" />
+                <Button Content="추가..." x:Name="NewRow" Focusable="False" cal:Bind.Model="{Binding}" xcdg:TableView.CanScrollHorizontally="False" />
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding Path=ReadOnly, RelativeSource={RelativeSource AncestorType={x:Type xcdg:DataGridControl}}}" Value="True">
                         <Setter TargetName="NewRow" Property="Visibility" Value="Collapsed" />

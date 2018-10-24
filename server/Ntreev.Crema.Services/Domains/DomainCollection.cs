@@ -41,13 +41,7 @@ namespace Ntreev.Crema.Services.Domains
         private EventHandler<DomainRowEventArgs> domainRowChanged;
         private EventHandler<DomainRowEventArgs> domainRowRemoved;
         private EventHandler<DomainPropertyEventArgs> domainPropertyChanged;
-
-        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
-        {
-            this.Dispatcher.VerifyAccess();
-            base.OnCollectionChanged(e);
-        }
-
+        
         public void InvokeDomainCreatedEvent(Authentication authentication, Domain[] domains)
         {
             var domainInfos = domains.Select(item => (object)item.DomainInfo).ToArray();
@@ -408,6 +402,12 @@ namespace Ntreev.Crema.Services.Domains
         protected virtual void OnDomainPropertyChanged(DomainPropertyEventArgs e)
         {
             this.domainPropertyChanged?.Invoke(this, e);
+        }
+
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher?.VerifyAccess();
+            base.OnCollectionChanged(e);
         }
 
         #region IDomainCollection

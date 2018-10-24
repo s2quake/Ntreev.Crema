@@ -82,7 +82,7 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                int count =0 ;
+                int count = 0;
                 var tuple = await this.domain.Dispatcher.InvokeAsync(() =>
                 {
                     if (this.Row != null)
@@ -96,13 +96,7 @@ namespace Ntreev.Crema.Services.Data
                 var fields11 = tuple.fields;
                 await this.domain.Dispatcher.InvokeAsync(() =>
                 {
-                    var sss = fields11;
                     this.Row = this.table.Rows.Find(keys);
-                    if (this.Row == null)
-                    {
-                        var row = this.table.Rows.Find(keys);
-                        int qwer = 0;
-                    }
                     this.fields = null;
                 });
             }

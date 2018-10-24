@@ -32,11 +32,9 @@ namespace Ntreev.Crema.Services.Data
 {
     partial class TableContent : ITableContent
     {
-        private Domain domain;
         private CremaDataTable dataTable;
         private DataTable internalTable;
 
-        //private readonly Dictionary<DataRow, TableRow> rows = new Dictionary<DataRow, TableRow>();
         private readonly HashSet<DataRow> rowsToAdd = new HashSet<DataRow>();
 
         private EventHandler editBegun;
@@ -61,11 +59,6 @@ namespace Ntreev.Crema.Services.Data
                 this.dataTable.ExtendedProperties[row.Row] = row;
                 this.rowsToAdd.Remove(row.Row);
             });
-        }
-
-        protected void Clear()
-        {
-            //this.rows.Clear();
         }
 
         public Task<TableRow> FindAsync(Authentication authentication, params object[] keys)
@@ -226,7 +219,7 @@ namespace Ntreev.Crema.Services.Data
                     TableName = name,
                     Keys = DomainRowInfo.ClearKey,
                 };
-                await this.domain.RemoveRowAsync(authentication, new DomainRowInfo[] { rowInfo });
+                await this.Domain.RemoveRowAsync(authentication, new DomainRowInfo[] { rowInfo });
             }
             catch (Exception e)
             {
@@ -245,7 +238,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
                     this.ValidateAddNew(authentication);
                 });
-                var row = await this.domain.Dispatcher.InvokeAsync(() => new TableRow(this, this.dataTable.DefaultView.Table, relationID));
+                var row = await this.Domain.Dispatcher.InvokeAsync(() => new TableRow(this, this.dataTable.DefaultView.Table, relationID));
                 await this.Dispatcher.InvokeAsync(() => this.rowsToAdd.Add(row.Row));
                 return row;
             }
@@ -275,7 +268,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Domain Domain => this.domain;
+        public Domain Domain { get; private set; }
 
         public IPermission Permission => this.Table;
 
@@ -403,7 +396,7 @@ namespace Ntreev.Crema.Services.Data
         {
             if (authentication == null)
                 throw new ArgumentNullException(nameof(authentication));
-            if (this.domain == null)
+            if (this.Domain == null)
                 throw new InvalidOperationException("domain is null");
         }
 

@@ -214,6 +214,12 @@ namespace Ntreev.Crema.Services.Data
             this.categoriesDeleted?.Invoke(this, e);
         }
 
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher?.VerifyAccess();
+            base.OnCollectionChanged(e);
+        }
+
         #region ITableCategoryCollection
 
         bool ITableCategoryCollection.Contains(string categoryPath)

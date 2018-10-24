@@ -156,11 +156,11 @@ namespace Ntreev.Crema.Services.Data
                 {
                     foreach (var item in this.Contents)
                     {
-                        item.domain = this.domain;
+                        item.Domain = this.domain;
                         item.domainHost = this;
                         item.DataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
                         item.Table.SetTableState(TableState.IsBeingEdited);
-                        item.IsModified = this.domain.ModifiedTables.Contains(item.dataTable.Name);
+                        item.IsModified = domain.ModifiedTables.Contains(item.dataTable.Name);
                     }
                 });
                 await this.AttachDomainEventAsync();
@@ -196,7 +196,7 @@ namespace Ntreev.Crema.Services.Data
                             var tableInfo = item.DataTable.TableInfo;
                             item.Table.UpdateContent(item.DataTable.TableInfo);
                         }
-                        item.domain = null;
+                        item.Domain = null;
                         item.IsModified = false;
                         item.dataTable = null;
                         item.Table.SetTableState(TableState.None);
@@ -220,7 +220,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     foreach (var item in this.Contents)
                     {
-                        item.domain = null;
+                        item.Domain = null;
                         item.IsModified = false;
                         item.dataTable = null;
                         item.Table.SetTableState(TableState.None);
@@ -319,7 +319,7 @@ namespace Ntreev.Crema.Services.Data
                 this.domain = null;
                 foreach (var item in this.Contents)
                 {
-                    item.domain = null;
+                    item.Domain = null;
                     item.dataTable = null;
                 }
             }
@@ -334,7 +334,7 @@ namespace Ntreev.Crema.Services.Data
                 foreach (var item in this.Contents)
                 {
                     item.domainHost = this;
-                    item.domain = domain;
+                    item.Domain = domain;
                     item.DataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
                     item.Table.IsBeingEdited = true;
                     item.ServiceState = ServiceState.Opened;

@@ -50,7 +50,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     <nmgc:ModernColumnManagerRow />
                 </DataTemplate>
                 <DataTemplate>
-                    <Button Content="추가..." x:Name="NewMember" Focusable="False" cal:Bind.Model="{Binding}" />
+                    <Button Content="추가..." x:Name="NewMember" Focusable="False" cal:Bind.Model="{Binding}" xcdg:TableView.CanScrollHorizontally="False" />
                     <DataTemplate.Triggers>
                         <DataTrigger Binding="{Binding Path=ReadOnly, RelativeSource={RelativeSource AncestorType={x:Type xcdg:DataGridControl}}}" Value="True">
                             <Setter TargetName="NewMember" Property="Visibility" Value="Collapsed" />

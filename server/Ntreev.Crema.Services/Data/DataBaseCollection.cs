@@ -28,6 +28,7 @@ using Ntreev.Library.Serialization;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -692,6 +693,12 @@ namespace Ntreev.Crema.Services.Data
         protected virtual void OnItemsLockChanged(ItemsEventArgs<IDataBase> e)
         {
             this.itemsLockChanged?.Invoke(this, e);
+        }
+
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher?.VerifyAccess();
+            base.OnCollectionChanged(e);
         }
 
         private void ValidateCopyDataBase(Authentication authentication, DataBase dataBase, string newDataBaseName, bool force)

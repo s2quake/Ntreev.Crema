@@ -433,6 +433,12 @@ namespace Ntreev.Crema.Services.Users
             this.messageReceived?.Invoke(this, e);
         }
 
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher?.VerifyAccess();
+            base.OnCollectionChanged(e);
+        }
+
         #region IUserCollection
 
         bool IUserCollection.Contains(string userID)

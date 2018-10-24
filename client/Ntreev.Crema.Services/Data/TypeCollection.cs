@@ -52,22 +52,16 @@ namespace Ntreev.Crema.Services.Data
             return this.BaseAddNew(name, categoryPath, authentication);
         }
 
-        public Type AddNew(Authentication authentication, TypeInfo typeInfo)
+        public Task<Type> AddNewAsync(Authentication authentication, TypeInfo typeInfo)
         {
-            try
+            return this.Dispatcher.InvokeAsync(() =>
             {
-                this.CremaHost.DebugMethod(authentication, this, nameof(AddNew), typeInfo.Name, typeInfo.CategoryPath);
                 var type = this.BaseAddNew(typeInfo.Name, typeInfo.CategoryPath, authentication);
                 type.Initialize(typeInfo);
                 var items = EnumerableUtility.One(type).ToArray();
                 this.InvokeTypesCreatedEvent(authentication, items);
                 return type;
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            });
         }
 
         public async Task<Type> CopyAsync(Authentication authentication, string typeName, string newTypeName, string categoryPath)
@@ -80,10 +74,11 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), typeName, newTypeName, categoryPath);
                 });
                 var result = await Task.Run(() => this.Context.Service.CopyType(typeName, newTypeName, categoryPath));
+                var type = await this.AddNewAsync(authentication, result.GetValue());
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    return this.AddNew(authentication, result.GetValue());
+                    return type;
                 });
             }
             catch (Exception e)
@@ -293,6 +288,12 @@ namespace Ntreev.Crema.Services.Data
         protected virtual void OnTypesChanged(ItemsEventArgs<IType> e)
         {
             this.typesChanged?.Invoke(this, e);
+        }
+
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher?.VerifyAccess();
+            base.OnCollectionChanged(e);
         }
 
         #region ITypeCollection

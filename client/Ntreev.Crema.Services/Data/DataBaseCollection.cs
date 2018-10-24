@@ -28,6 +28,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Ntreev.Library;
 using System.Timers;
+using System.Collections.Specialized;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -740,6 +741,12 @@ namespace Ntreev.Crema.Services.Data
             this.itemsLockChanged?.Invoke(this, e);
         }
 
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            this.Dispatcher?.VerifyAccess();
+            base.OnCollectionChanged(e);
+        }
+
         private void Initialize(DataBaseCollectionMetaData metaData)
         {
             for (var i = 0; i < metaData.DataBases.Length; i++)
@@ -775,7 +782,7 @@ namespace Ntreev.Crema.Services.Data
                 this.Dispatcher.Dispose();
                 this.Dispatcher = null;
             });
-            await this.CremaHost.RemoveServiceAsync(this);
+            this.CremaHost.RemoveServiceAsync(this);
         }
 
         #region IDataBaseCollectionServiceCallback
