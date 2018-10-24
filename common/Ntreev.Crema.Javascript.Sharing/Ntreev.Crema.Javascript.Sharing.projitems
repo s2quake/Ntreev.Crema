@@ -123,13 +123,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)Methods\User\RenameUserItemMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\User\CreateUserCategoryMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BaseDelegateAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScriptMethodBase.cs" />
     <None Include="$(MSBuildThisFileDirectory)Consoles\GenerateDeclarationCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\IO\CreateDirectoryMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\IO\DirectoryExistsMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\IO\FileExistsMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\User\ContainsUserItemMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\User\ContainsUserMethod.cs" />
-    <None Include="$(MSBuildThisFileDirectory)UserScriptMethodBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IScriptMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\DataBase\CancelDataBaseTransactionMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\DataBase\ContainsDataBaseMethod.cs" />

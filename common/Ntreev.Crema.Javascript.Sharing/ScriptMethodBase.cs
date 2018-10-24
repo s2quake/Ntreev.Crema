@@ -106,6 +106,23 @@ namespace Ntreev.Crema.Javascript
 
     public abstract class ScriptActionBase<T> : ScriptMethodBase
     {
+        public ScriptActionBase()
+        {
+
+        }
+
+        public ScriptActionBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public ScriptActionBase(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+
+        }
+
         protected override sealed Delegate CreateDelegate()
         {
             return new Action<T>(this.OnExecute);
@@ -117,6 +134,23 @@ namespace Ntreev.Crema.Javascript
 
     public abstract class ScriptFuncBase<TResult> : ScriptMethodBase
     {
+        public ScriptFuncBase()
+        {
+
+        }
+
+        public ScriptFuncBase(string name)
+            : base(name)
+        {
+
+        }
+
+        public ScriptFuncBase(ICremaHost cremaHost)
+            : base(cremaHost)
+        {
+
+        }
+
         protected override sealed Delegate CreateDelegate()
         {
             return new Func<TResult>(this.OnExecute);
