@@ -129,8 +129,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Methods\IO\FileExistsMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\User\ContainsUserItemMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\User\ContainsUserMethod.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UserScriptMethodBase.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DomainScriptMethodBase.cs" />
+    <None Include="$(MSBuildThisFileDirectory)UserScriptMethodBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IScriptMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\DataBase\CancelDataBaseTransactionMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\DataBase\ContainsDataBaseMethod.cs" />
@@ -246,10 +245,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Methods\User\GetUserInfoMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\LogMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\User\SendMessageMethod.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataBaseScriptMethodBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IScriptMethodContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ReturnParameterNameAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ScriptMethodBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\User\GetUserListMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Methods\DataBase\GetDataBaseListMethod.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ScriptContextBase.cs" />

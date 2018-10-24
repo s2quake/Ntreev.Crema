@@ -23,13 +23,15 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.User
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class MoveUserMethod : UserScriptMethodBase
+    class MoveUserMethod : ScriptFuncTaskBase<string, string, string>
     {
         [ImportingConstructor]
         public MoveUserMethod(ICremaHost cremaHost)
@@ -38,18 +40,12 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, string>(this.MoveUser);
-        }
-
         [ReturnParameterName("userPath")]
-        private string MoveUser(string userID, string parentPath)
+        protected override async Task<string> OnExecuteAsync(string userID, string parentPath)
         {
-            var user = this.GetUser(userID);
+            var user = await this.CremaHost.GetUserAsync(userID);
             var authentication = this.Context.GetAuthentication(this);
-            var task = user.MoveAsync(authentication, parentPath);
-            task.Wait();
+            await user.MoveAsync(authentication, parentPath);
             return user.Path;
         }
     }

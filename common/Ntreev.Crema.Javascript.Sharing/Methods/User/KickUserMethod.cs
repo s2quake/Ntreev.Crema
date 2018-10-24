@@ -23,13 +23,15 @@ using System.ComponentModel.Composition;
 using System.Text;
 using Ntreev.Crema.ServiceModel;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.User
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class KickUserMethod : UserScriptMethodBase
+    class KickUserMethod : ScriptActionTaskBase<string, string>
     {
         [ImportingConstructor]
         public KickUserMethod(ICremaHost cremaHost)
@@ -38,17 +40,11 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string userID, string comment = null)
         {
-            return new Action<string, string>(KickUser);
-        }
-
-        private void KickUser(string userID, string comment = null)
-        {
-            var user = this.GetUser(userID);
+            var user = await this.CremaHost.GetUserAsync(userID);
             var authentication = this.Context.GetAuthentication(this);
-            var task = user.KickAsync(authentication, comment);
-            task.Wait();
+            await user.KickAsync(authentication, comment);
         }
     }
 }

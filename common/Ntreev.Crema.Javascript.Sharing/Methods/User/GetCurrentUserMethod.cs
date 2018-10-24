@@ -23,21 +23,24 @@ using System.ComponentModel.Composition;
 using System.Text;
 using Ntreev.Crema.Data.Xml.Schema;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.User
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class GetCurrentUserMethod : ScriptMethodBase
+    class GetCurrentUserMethod : ScriptFuncBase<string>
     {
-        protected override Delegate CreateDelegate()
+        [ImportingConstructor]
+        public GetCurrentUserMethod(ICremaHost cremaHost)
+            : base(cremaHost)
         {
-            return new Func<string>(GetCurrentUser);
+
         }
 
         [ReturnParameterName("userID")]
-        private string GetCurrentUser()
+        protected override string OnExecute()
         {
             var authetication = this.Context.GetAuthentication(this);
             return authetication.ID;

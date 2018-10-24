@@ -22,31 +22,27 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.GetUserItemLists.User
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class GetUserItemListMethod : ScriptMethodBase
+    class GetUserItemListMethod : ScriptFuncTaskBase<string[]>
     {
-        [Import]
-        private Lazy<ICremaHost> cremaHost = null;
-
-        protected override Delegate CreateDelegate()
+        [ImportingConstructor]
+        public GetUserItemListMethod(ICremaHost cremaHost)
+            : base(cremaHost)
         {
-            return new Func<string[]>(this.GetUserItemList);
+
         }
 
-        private string[] GetUserItemList()
+        protected override Task<string[]> OnExecuteAsync()
         {
-            var userContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            return userContext.Dispatcher.Invoke(() =>
-            {
-                return userContext.Select(item => item.Path).ToArray();
-            });
+            return this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Select(item => item.Path).ToArray());
         }
 
-        private ICremaHost CremaHost => this.cremaHost.Value;
+        private IUserContext UserContext => this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
     }
 }

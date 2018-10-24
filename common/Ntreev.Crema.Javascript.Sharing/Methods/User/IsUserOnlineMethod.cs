@@ -23,13 +23,15 @@ using System.ComponentModel.Composition;
 using System.Text;
 using Ntreev.Crema.ServiceModel;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.User
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class IsUserOnlineMethod : UserScriptMethodBase
+    class IsUserOnlineMethod : ScriptFuncTaskBase<string, bool>
     {
         [ImportingConstructor]
         public IsUserOnlineMethod(ICremaHost cremaHost)
@@ -38,15 +40,10 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<bool> OnExecuteAsync(string userID)
         {
-            return new Func<string, bool>(IsUserOnline);
-        }
-
-        private bool IsUserOnline(string userID)
-        {
-            var user = this.GetUser(userID);
-            return user.Dispatcher.Invoke(() => user.UserState == UserState.Online);
+            var user = await this.CremaHost.GetUserAsync(userID);
+            return await user.Dispatcher.InvokeAsync(() => user.UserState == UserState.Online);
         }
     }
 }

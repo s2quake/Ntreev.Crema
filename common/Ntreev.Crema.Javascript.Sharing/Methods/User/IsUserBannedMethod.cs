@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.User
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class IsUserBannedMethod : UserScriptMethodBase
+    class IsUserBannedMethod : ScriptFuncTaskBase<string, bool>
     {
         [ImportingConstructor]
         public IsUserBannedMethod(ICremaHost cremaHost)
@@ -37,15 +39,10 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<bool> OnExecuteAsync(string userID)
         {
-            return new Func<string, bool>(IsUserBanned);
-        }
-
-        private bool IsUserBanned(string userID)
-        {
-            var user = this.GetUser(userID);
-            return user.Dispatcher.Invoke(() => user.BanInfo.Path != string.Empty);
+            var user = await this.CremaHost.GetUserAsync(userID);
+            return await user.Dispatcher.InvokeAsync(() => user.BanInfo.Path != string.Empty);
         }
     }
 }

@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.User
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class GetUserStateMethod : UserScriptMethodBase
+    class GetUserStateMethod : ScriptFuncTaskBase<string, string>
     {
         [ImportingConstructor]
         public GetUserStateMethod(ICremaHost cremaHost)
@@ -37,15 +39,10 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<string> OnExecuteAsync(string userID)
         {
-            return new Func<string, string>(GetUserState);
-        }
-
-        private string GetUserState(string userID)
-        {
-            var user = this.GetUser(userID);
-            return user.Dispatcher.Invoke(() => $"{user.UserState}");
+            var user = await this.CremaHost.GetUserAsync(userID);
+            return await user.Dispatcher.InvokeAsync(() => $"{user.UserState}");
         }
     }
 }

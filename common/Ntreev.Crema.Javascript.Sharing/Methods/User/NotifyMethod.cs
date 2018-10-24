@@ -30,7 +30,7 @@ namespace Ntreev.Crema.Javascript.Methods.User
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class NotifyMethod : UserScriptMethodBase
+    class NotifyMethod : ScriptActionTaskBase<string>
     {
         [ImportingConstructor]
         public NotifyMethod(ICremaHost cremaHost)
@@ -39,16 +39,12 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Action<string>(this.Notify);
-        }
-
-        private void Notify(string message)
+        protected override async Task OnExecuteAsync(string message)
         {
             var authentication = this.Context.GetAuthentication(this);
-            var task = this.UserContext.NotifyMessageAsync(authentication, message);
-            task.Wait();
+            await this.UserContext.NotifyMessageAsync(authentication, message);
         }
+
+        private IUserContext UserContext => this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
     }
 }

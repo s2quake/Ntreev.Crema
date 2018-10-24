@@ -23,13 +23,15 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.User
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class DeleteUserCategoryMethod : UserScriptMethodBase
+    class DeleteUserCategoryMethod : ScriptActionTaskBase<string>
     {
         [ImportingConstructor]
         public DeleteUserCategoryMethod(ICremaHost cremaHost)
@@ -38,17 +40,11 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string userItemPath)
         {
-            return new Action<string>(this.DeleteUserCategory);
-        }
-
-        private void DeleteUserCategory(string userItemPath)
-        {
-            var category = this.GetUserCategory(userItemPath);
+            var category = await this.CremaHost.GetUserCategoryAsync(userItemPath);
             var authentication = this.Context.GetAuthentication(this);
-            var task = category.DeleteAsync(authentication);
-            task.Wait();
+            await category.DeleteAsync(authentication);
         }
     }
 }

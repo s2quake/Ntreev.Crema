@@ -22,13 +22,14 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.User
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class GetUserListMethod : UserScriptMethodBase
+    class GetUserListMethod : ScriptFuncTaskBase<string[]>
     {
         [ImportingConstructor]
         public GetUserListMethod(ICremaHost cremaHost)
@@ -37,15 +38,11 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override Task<string[]> OnExecuteAsync()
         {
-            return new Func<string[]>(this.GetUserList);
+            return this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users.Select(item => item.ID).ToArray());
         }
 
-        private string[] GetUserList()
-        {
-            var userContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            return userContext.Dispatcher.Invoke(() => userContext.Users.Select(item => item.ID).ToArray());
-        }
+        private IUserContext UserContext => this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
     }
 }

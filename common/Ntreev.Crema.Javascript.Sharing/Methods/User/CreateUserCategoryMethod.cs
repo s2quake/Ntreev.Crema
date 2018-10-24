@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.Library;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace Ntreev.Crema.Javascript.Methods.User
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class SendMessageMethod : UserScriptMethodBase
+    class SendMessageMethod : ScriptActionTaskBase<string, string>
     {
         [ImportingConstructor]
         public SendMessageMethod(ICremaHost cremaHost)
@@ -39,17 +40,11 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string userID, string message)
         {
-            return new Action<string, string>(this.SendMessage);
-        }
-
-        private void SendMessage(string userID, string message)
-        {
-            var user = this.GetUser(userID);
+            var user = await this.CremaHost.GetUserAsync(userID);
             var authentication = this.Context.GetAuthentication(this);
-            var task = user.SendMessageAsync(authentication, message);
-            task.Wait();
+            await user.SendMessageAsync(authentication, message);
         }
     }
 }

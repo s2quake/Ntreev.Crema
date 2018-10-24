@@ -22,13 +22,15 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.User
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class UnbanUserMethod : UserScriptMethodBase
+    class UnbanUserMethod : ScriptActionTaskBase<string>
     {
         [ImportingConstructor]
         public UnbanUserMethod(ICremaHost cremaHost)
@@ -37,17 +39,11 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task OnExecuteAsync(string userID)
         {
-            return new Action<string>(UnbanUser);
-        }
-
-        private void UnbanUser(string userID)
-        {
-            var user = this.GetUser(userID);
+            var user = await this.CremaHost.GetUserAsync(userID);
             var authentication = this.Context.GetAuthentication(this);
-            var task = user.UnbanAsync(authentication);
-            task.Wait();
+            await user.UnbanAsync(authentication);
         }
     }
 }

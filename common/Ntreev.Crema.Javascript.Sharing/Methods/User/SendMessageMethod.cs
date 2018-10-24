@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.Library;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace Ntreev.Crema.Javascript.Methods.User
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class CreateUserCategoryMethod : UserScriptMethodBase
+    class CreateUserCategoryMethod : ScriptFuncTaskBase<string, string, string>
     {
         [ImportingConstructor]
         public CreateUserCategoryMethod(ICremaHost cremaHost)
@@ -39,19 +40,13 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, string>(this.CreateUserCategory);
-        }
-
         [ReturnParameterName("categoryPath")]
-        private string CreateUserCategory(string parentPath, string categoryName)
+        protected override async Task<string> OnExecuteAsync(string parentPath, string categoryName)
         {
-            var category = this.GetUserCategory(parentPath);
+            var category = await this.CremaHost.GetUserCategoryAsync(parentPath);
             var authentication = this.Context.GetAuthentication(this);
-            var task = category.AddNewCategoryAsync(authentication, categoryName);
-            task.Wait();
-            return task.Result.Path;
+            var newCategory = await category.AddNewCategoryAsync(authentication, categoryName);
+            return newCategory.Path;
         }
     }
 }

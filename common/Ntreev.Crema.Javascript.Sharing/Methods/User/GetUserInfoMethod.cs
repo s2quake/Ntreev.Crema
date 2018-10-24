@@ -23,13 +23,15 @@ using System.ComponentModel.Composition;
 using System.Text;
 using Ntreev.Crema.Data.Xml.Schema;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.User
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class GetUserInfoMethod : UserScriptMethodBase
+    class GetUserInfoMethod : ScriptFuncTaskBase<string, IDictionary<string, object>>
     {
         [ImportingConstructor]
         public GetUserInfoMethod(ICremaHost cremaHost)
@@ -38,15 +40,10 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         }
 
-        protected override Delegate CreateDelegate()
+        protected override async Task<IDictionary<string, object>> OnExecuteAsync(string userID)
         {
-            return new Func<string, IDictionary<string, object>>(GetUserInfo);
-        }
-
-        private IDictionary<string, object> GetUserInfo(string userID)
-        {
-            var user = this.GetUser(userID);
-            return user.Dispatcher.Invoke(() =>
+            var user = await this.CremaHost.GetUserAsync(userID);
+            return await user.Dispatcher.InvokeAsync(() =>
             {
                 var userInfo = user.UserInfo;
                 var props = new Dictionary<string, object>

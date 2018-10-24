@@ -23,13 +23,15 @@ using System.ComponentModel.Composition;
 using System.Text;
 using System.ComponentModel;
 using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
+using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Javascript.Methods.User
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [Category(nameof(User))]
-    class RenameUserCategoryMethod : UserScriptMethodBase
+    class RenameUserCategoryMethod : ScriptFuncTaskBase<string, string, string>
     {
         [ImportingConstructor]
         public RenameUserCategoryMethod(ICremaHost cremaHost)
@@ -38,18 +40,12 @@ namespace Ntreev.Crema.Javascript.Methods.User
 
         }
 
-        protected override Delegate CreateDelegate()
-        {
-            return new Func<string, string, string>(this.RenameUserCategory);
-        }
-
         [ReturnParameterName("categoryPath")]
-        private string RenameUserCategory(string categoryPath, string newName)
+        protected override async Task<string> OnExecuteAsync(string categoryPath, string newName)
         {
-            var category = this.GetUserCategory(categoryPath);
+            var category = await this.CremaHost.GetUserCategoryAsync(categoryPath);
             var authentication = this.Context.GetAuthentication(this);
-            var task = category.RenameAsync(authentication, newName);
-            task.Wait();
+            await category.RenameAsync(authentication, newName);
             return category.Path;
         }
     }
