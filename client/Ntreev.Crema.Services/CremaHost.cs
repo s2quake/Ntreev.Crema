@@ -236,7 +236,7 @@ namespace Ntreev.Crema.Services
                 {
                     this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, shutdownType, message);
                 });
-                var result = await Task.Run(() => this.UserContext.Service.Shutdown(milliseconds, shutdownType, message));
+                var result = await this.InvokeServiceAsync(() => this.UserContext.Service.Shutdown(milliseconds, shutdownType, message));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Sign(authentication, result);
@@ -257,7 +257,7 @@ namespace Ntreev.Crema.Services
                 {
                     this.DebugMethod(authentication, this, nameof(CancelShutdownAsync));
                 });
-                var result = await Task.Run(() => this.UserContext.Service.CancelShutdown());
+                var result = await this.InvokeServiceAsync(() => this.UserContext.Service.CancelShutdown());
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Sign(authentication, result);
@@ -323,6 +323,20 @@ namespace Ntreev.Crema.Services
         public void Sign(Authentication authentication, SignatureDate signatureDate)
         {
             authentication.Sign(signatureDate.DateTime);
+        }
+
+        public async Task<ResultBase<TResult>> InvokeServiceAsync<TResult>(Func<ResultBase<TResult>> func)
+        {
+            var result = await Task.Run(func);
+            result.Validate();
+            return result;
+        }
+
+        public async Task<ResultBase> InvokeServiceAsync(Func<ResultBase> func)
+        {
+            var result = await Task.Run(func);
+            result.Validate();
+            return result;
         }
 
         // mac의 mono 환경에서는 바인딩 값이 서버와 다를 경우 접속이 거부되는 현상이 있음(버그로 추정)

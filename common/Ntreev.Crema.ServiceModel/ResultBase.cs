@@ -82,12 +82,6 @@ namespace Ntreev.Crema.ServiceModel
                 throw new CremaFaultException(this.Fault.Message);
             }
         }
-
-        public T GetValue()
-        {
-            this.Validate();
-            return this.Value;
-        }
     }
 
     [DataContract(Namespace = SchemaUtility.Namespace)]

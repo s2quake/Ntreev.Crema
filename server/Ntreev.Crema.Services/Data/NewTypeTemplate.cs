@@ -115,7 +115,5 @@ namespace Ntreev.Crema.Services.Data
             dataType.CategoryPath = this.category.Path;
             return dataType;
         }
-
-        private DataBaseRepositoryHost Repository => this.DataBase.Repository;
     }
 }

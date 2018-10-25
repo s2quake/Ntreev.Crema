@@ -270,6 +270,8 @@ namespace Ntreev.Crema.Services.Data
 
         public CremaDispatcher Dispatcher => this.DispatcherObject.Dispatcher;
 
+        public DataBaseRepositoryHost Repository => this.DataBase.Repository;
+
         public string TypeName => this.TypeSource.Name;
 
         public bool IsFlag => this.TypeSource.IsFlag;
@@ -427,6 +429,7 @@ namespace Ntreev.Crema.Services.Data
             this.TypeSource = domain.Source as CremaDataType;
             this.domain = domain as TypeDomain;
             this.ItemPaths = this.domain.ItemPaths;
+            this.Repository.Dispatcher.Invoke(() => this.Repository.Lock(this.ItemPaths));
             if (this.TypeSource != null)
             {
                 this.table = this.TypeSource.View.Table;

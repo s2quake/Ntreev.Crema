@@ -36,12 +36,9 @@ using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 {
-    public abstract class TemplateViewModel : ModalDialogAppBase
+    public abstract class TemplateViewModel : ModalDialogAppBase, INotifyDataErrorInfo
     {
         private readonly Authentication authentication;
-        private ITableTemplate template;
-        private IDomain domain;
-        private bool isNew;
         private bool isReadOnly;
         private bool isModified;
         private bool isValid;
@@ -50,10 +47,11 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         private TagInfo tags;
         private string[] selectableTypes;
         private int count;
-        private object source;
-
         [Import]
         private IFlashService flashService = null;
+
+        private EventHandler<DataErrorsChangedEventArgs> errorsChanged;
+        private string tableNameError;
 
         protected TemplateViewModel(Authentication authentication, ITableTemplate template)
             : this(authentication, template, false)
@@ -64,11 +62,11 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         protected TemplateViewModel(Authentication authentication, ITableTemplate template, bool isNew)
         {
             this.authentication = authentication;
-            this.isNew = isNew;
-            this.template = template;
-            this.template.EditEnded += Template_EditEnded;
-            this.template.EditCanceled += Template_EditCanceled;
-            this.template.Changed += Template_Changed;
+            this.IsNew = isNew;
+            this.Template = template;
+            this.Template.EditEnded += Template_EditEnded;
+            this.Template.EditCanceled += Template_EditCanceled;
+            this.Template.Changed += Template_Changed;
             this.DisplayName = Resources.Title_TableTemplateEditing;
         }
 
@@ -77,15 +75,15 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             try
             {
                 this.BeginProgress(this.IsNew ? Resources.Message_Creating : Resources.Message_Changing);
-                await this.template.EndEditAsync(this.authentication);
-                await this.template.Dispatcher.InvokeAsync(() =>
+                await this.Template.EndEditAsync(this.authentication);
+                await this.Template.Dispatcher.InvokeAsync(() =>
                 {
-                    this.template.EditEnded -= Template_EditEnded;
-                    this.template.EditCanceled -= Template_EditCanceled;
-                    this.template.Changed -= Template_Changed;
+                    this.Template.EditEnded -= Template_EditEnded;
+                    this.Template.EditCanceled -= Template_EditCanceled;
+                    this.Template.Changed -= Template_Changed;
                 });
-                this.domain = null;
-                this.template = null;
+                this.Domain = null;
+                this.Template = null;
                 this.isModified = false;
                 this.EndProgress();
                 this.TryClose(true);
@@ -99,8 +97,8 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 
         public async Task NewColumnAsync()
         {
-            var items = await this.template.Dispatcher.InvokeAsync(() => this.template.Select(item => item.Name).ToArray());
-            var selectableTypes = await this.template.Dispatcher.InvokeAsync(() => this.template.SelectableTypes);
+            var items = await this.Template.Dispatcher.InvokeAsync(() => this.Template.Select(item => item.Name).ToArray());
+            var selectableTypes = await this.Template.Dispatcher.InvokeAsync(() => this.Template.SelectableTypes);
             var name = NameUtility.GenerateNewName("Column", items);
             var dialog = new NewColumnViewModel(selectableTypes)
             {
@@ -110,18 +108,18 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             };
             if (dialog.ShowDialog() == true)
             {
-                var member = await this.template.AddNewAsync(this.authentication);
+                var member = await this.Template.AddNewAsync(this.authentication);
                 await member.SetNameAsync(this.authentication, dialog.Name);
                 await member.SetDataTypeAsync(this.authentication, dialog.DataType);
                 await member.SetCommentAsync(this.authentication, dialog.Comment);
                 await member.SetIsKeyAsync(this.authentication, dialog.IsKey);
-                await this.template.EndNewAsync(this.authentication, member);
+                await this.Template.EndNewAsync(this.authentication, member);
             }
         }
 
         public bool IsReadOnly
         {
-            get { return this.isReadOnly; }
+            get => this.isReadOnly;
             set
             {
                 this.isReadOnly = value;
@@ -129,20 +127,11 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             }
         }
 
-        public bool IsNew
-        {
-            get { return this.isNew; }
-        }
+        public bool IsNew { get; }
 
-        public ITableTemplate Template
-        {
-            get { return this.template; }
-        }
+        public ITableTemplate Template { get; private set; }
 
-        public object Source
-        {
-            get { return this.source; }
-        }
+        public object Source { get; private set; }
 
         public IEnumerable SelectableTypes
         {
@@ -158,39 +147,41 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             }
         }
 
-        public IDomain Domain
-        {
-            get { return this.domain; }
-        }
+        public IDomain Domain { get; private set; }
 
         public string TableName
         {
             get { return this.tableName ?? string.Empty; }
             set
             {
+                this.tableName = value;
                 InvokeAsync();
                 async void InvokeAsync()
                 {
-                    await this.template.SetTableNameAsync(this.authentication, value);
-                    this.tableName = value;
-                    this.NotifyOfPropertyChange(nameof(this.TableName));
-                    this.Verify(this.VerifyAction);
+                    try
+                    {
+                        await this.Template.SetTableNameAsync(this.authentication, value);
+                        this.tableNameError = null;
+                    }
+                    catch (Exception e)
+                    {
+                        this.tableNameError = e.Message;
+                    }
+                    finally
+                    {
+                        this.Verify(this.VerifyAction);
+                        this.errorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(nameof(this.TableName)));
+                    }
                 }
             }
         }
 
         public string Comment
         {
-            get { return this.comment ?? string.Empty; }
+            get => this.comment ?? string.Empty;
             set
             {
-                InvokeAsync();
-                async void InvokeAsync()
-                {
-                    await this.template.SetCommentAsync(this.authentication, value);
-                    this.comment = value;
-                    this.NotifyOfPropertyChange(nameof(this.Comment));
-                }
+                this.comment = value;
             }
         }
 
@@ -200,11 +191,13 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             {
                 if (this.IsProgressing == true || this.isReadOnly == true)
                     return false;
-                if (this.template == null)
+                if (this.Template == null)
                     return false;
                 if (this.count == 0)
                     return false;
                 if (this.IsModified == false)
+                    return false;
+                if (this.tableNameError != null)
                     return false;
                 return this.isValid;
             }
@@ -212,7 +205,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 
         public bool IsModified
         {
-            get { return this.isModified; }
+            get => this.isModified;
             set
             {
                 this.isModified = value;
@@ -223,13 +216,13 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 
         public TagInfo Tags
         {
-            get { return this.tags; }
+            get => this.tags;
             set
             {
                 InvokeAsync();
                 async void InvokeAsync()
                 {
-                    await this.template.SetTagsAsync(this.authentication, value);
+                    await this.Template.SetTagsAsync(this.authentication, value);
                     this.tags = value;
                     this.NotifyOfPropertyChange(nameof(this.Tags));
                 }
@@ -238,7 +231,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 
         public async override void CanClose(Action<bool> callback)
         {
-            if (this.template == null || this.IsModified == false)
+            if (this.Template == null || this.IsModified == false)
             {
                 callback(true);
                 return;
@@ -249,19 +242,24 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             if (result == null)
                 return;
 
-            if (this.template != null && result == true)
+            if (this.Template != null && result == true)
             {
+                if (this.tableNameError != null)
+                {
+                    AppMessageBox.Show(this.tableNameError);
+                    return;
+                }
                 this.BeginProgress(this.IsNew ? Resources.Message_Creating : Resources.Message_Changing);
                 try
                 {
-                    await this.template.EndEditAsync(this.authentication);
-                    await this.template.Dispatcher.InvokeAsync(() =>
+                    await this.Template.EndEditAsync(this.authentication);
+                    await this.Template.Dispatcher.InvokeAsync(() =>
                     {
-                        this.template.EditEnded -= Template_EditEnded;
-                        this.template.EditCanceled -= Template_EditCanceled;
-                        this.template.Changed -= Template_Changed;
+                        this.Template.EditEnded -= Template_EditEnded;
+                        this.Template.EditCanceled -= Template_EditCanceled;
+                        this.Template.Changed -= Template_Changed;
                     });
-                    this.template = null;
+                    this.Template = null;
                     this.EndProgress();
                 }
                 catch (Exception e)
@@ -287,16 +285,16 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         protected async override void OnInitialize()
         {
             base.OnInitialize();
-            await this.template.Dispatcher.InvokeAsync(() =>
+            await this.Template.Dispatcher.InvokeAsync(() =>
             {
-                this.domain = this.template.Domain;
-                this.tableName = this.template.TableName;
-                this.comment = this.template.Comment;
-                this.tags = this.template.Tags;
-                this.selectableTypes = this.template.SelectableTypes;
-                this.count = this.template.Count;
-                this.source = this.domain.Source;
-                this.isModified = this.template.IsModified;
+                this.Domain = this.Template.Domain;
+                this.tableName = this.Template.TableName;
+                this.comment = this.Template.Comment;
+                this.tags = this.Template.Tags;
+                this.selectableTypes = this.Template.SelectableTypes;
+                this.count = this.Template.Count;
+                this.Source = this.Domain.Source;
+                this.isModified = this.Template.IsModified;
             });
             this.Refresh();
             this.Verify(this.VerifyAction);
@@ -306,22 +304,22 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         {
             base.OnDeactivate(close);
 
-            if (this.template != null)
+            if (this.Template != null)
             {
-                await this.template.CancelEditAsync(this.authentication);
-                await this.template.Dispatcher.InvokeAsync(() =>
+                await this.Template.CancelEditAsync(this.authentication);
+                await this.Template.Dispatcher.InvokeAsync(() =>
                 {
-                    this.template.EditEnded -= Template_EditEnded;
-                    this.template.EditCanceled -= Template_EditCanceled;
-                    this.template.Changed -= Template_Changed;
+                    this.Template.EditEnded -= Template_EditEnded;
+                    this.Template.EditCanceled -= Template_EditCanceled;
+                    this.Template.Changed -= Template_Changed;
                 });
             }
-            this.template = null;
+            this.Template = null;
         }
 
         protected override void OnCancel()
         {
-            this.template = null;
+            this.Template = null;
             base.OnCancel();
         }
 
@@ -329,10 +327,10 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         {
             if (e is DomainDeletedEventArgs ex)
             {
-                this.template.EditEnded -= Template_EditEnded;
-                this.template.EditCanceled -= Template_EditCanceled;
-                this.template.Changed -= Template_Changed;
-                this.template = null;
+                this.Template.EditEnded -= Template_EditEnded;
+                this.Template.EditCanceled -= Template_EditCanceled;
+                this.Template.Changed -= Template_Changed;
+                this.Template = null;
 
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -347,10 +345,10 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         {
             if (e is DomainDeletedEventArgs ex)
             {
-                this.template.EditEnded -= Template_EditEnded;
-                this.template.EditCanceled -= Template_EditCanceled;
-                this.template.Changed -= Template_Changed;
-                this.template = null;
+                this.Template.EditEnded -= Template_EditEnded;
+                this.Template.EditCanceled -= Template_EditCanceled;
+                this.Template.Changed -= Template_Changed;
+                this.Template = null;
 
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -363,8 +361,8 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 
         private void Template_Changed(object sender, EventArgs e)
         {
-            this.isModified = this.template.IsModified;
-            this.count = this.template.Count;
+            this.isModified = this.Template.IsModified;
+            this.count = this.Template.Count;
             this.Dispatcher.InvokeAsync(() =>
             {
                 this.Verify(this.VerifyAction);
@@ -376,5 +374,26 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             this.isValid = isValid;
             this.NotifyOfPropertyChange(nameof(this.CanChange));
         }
+
+        #region INotifyDataErrorInfo
+
+        bool INotifyDataErrorInfo.HasErrors => this.tableNameError != null;
+
+        event EventHandler<DataErrorsChangedEventArgs> INotifyDataErrorInfo.ErrorsChanged
+        {
+            add { this.errorsChanged += value; }
+            remove { this.errorsChanged -= value; }
+        }
+
+        IEnumerable INotifyDataErrorInfo.GetErrors(string propertyName)
+        {
+            if (propertyName == nameof(this.TableName))
+            {
+                return new string[] { this.tableNameError };
+            }
+            return Enumerable.Empty<string>();
+        }
+
+        #endregion
     }
 }

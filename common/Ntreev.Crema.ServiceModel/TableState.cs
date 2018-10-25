@@ -48,12 +48,14 @@ namespace Ntreev.Crema.ServiceModel
         /// 클라이언트 측에서 편집에 참여하고 있는지에 대한 여부를 표시
         /// </summary>
         [EnumMember]
+        [Obsolete]
         IsMember = 4,
 
         /// <summary>
         /// 클라이언트 측에서 편집에 주인인지에 대한 여부를 표시
         /// </summary>
         [EnumMember]
+        [Obsolete]
         IsOwner = 8,
     }
 }

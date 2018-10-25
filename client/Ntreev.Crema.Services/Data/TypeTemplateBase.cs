@@ -287,7 +287,7 @@ namespace Ntreev.Crema.Services.Data
         {
             var result = await this.BeginDomainAsync(authentication);
             this.CremaHost.Sign(authentication, result);
-            var metaData = result.GetValue();
+            var metaData = result.Value;
             this.domain = await this.DomainContext.CreateAsync(authentication, metaData) as TypeDomain;
             this.domain.IsNew = this.IsNew;
             this.domain.Host = this;

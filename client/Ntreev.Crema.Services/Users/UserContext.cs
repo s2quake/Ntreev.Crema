@@ -73,7 +73,7 @@ namespace Ntreev.Crema.Services.Users
                     this.timer.Elapsed += Timer_Elapsed;
                     this.timer.Start();
 #endif
-                    var metaData = result.GetValue();
+                    var metaData = result.Value;
                     foreach (var item in metaData.Categories)
                     {
                         if (item == this.Root.Path)

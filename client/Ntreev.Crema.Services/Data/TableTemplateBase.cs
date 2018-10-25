@@ -299,7 +299,7 @@ namespace Ntreev.Crema.Services.Data
             var result = await this.BeginDomainAsync(authentication);
             this.CremaHost.Sign(authentication, result);
 
-            var metaData = result.GetValue();
+            var metaData = result.Value;
             this.domain = await this.DomainContext.CreateAsync(authentication, metaData) as TableTemplateDomain;
             this.domain.IsNew = this.IsNew;
             this.domain.Host = this;
@@ -343,7 +343,6 @@ namespace Ntreev.Crema.Services.Data
         protected virtual async Task OnCancelEditAsync(Authentication authentication, object args)
         {
             var result = await this.CancelDomainAsync(authentication, args);
-            this.CremaHost.Sign(authentication, result);
             if (args is Guid)
             {
                 await this.DetachDomainEventAsync();

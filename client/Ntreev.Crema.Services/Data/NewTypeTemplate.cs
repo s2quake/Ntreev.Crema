@@ -88,8 +88,8 @@ namespace Ntreev.Crema.Services.Data
         {
             if (args is Guid domainID)
             {
-                var result = await Task.Run(() => this.Service.EndTypeTemplateEdit(domainID));
-                return result.GetValue();
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTypeTemplateEdit(domainID));
+                return result.Value;
             }
             return args as TypeInfo[];
         }

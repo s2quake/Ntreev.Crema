@@ -191,9 +191,9 @@ namespace Ntreev.Crema.Services.Data
                     return this.Table.Name;
                 });
                 await this.domainHost.LeaveContentAsync(authentication, name);
-                //    var result = await Task.Run(() => this.Service.LeaveTableContentEdit(this.Table.Name));
+                //    var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.LeaveTableContentEdit(this.Table.Name));
                 //    this.CremaHost.Sign(authentication, result);
-                //    this.domain.Dispatcher.Invoke(() => this.domain.Release(authentication, result.GetValue()));
+                //    this.domain.Dispatcher.Invoke(() => this.domain.Release(authentication, result.Value));
                 //    this.domainHost.LeaveContent(authentication);
                 //});
             }

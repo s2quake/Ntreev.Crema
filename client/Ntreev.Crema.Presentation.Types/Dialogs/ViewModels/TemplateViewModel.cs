@@ -29,10 +29,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Ntreev.Library;
+using System.Collections;
 
 namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 {
-    public abstract class TemplateViewModel : ModalDialogAppBase
+    public abstract class TemplateViewModel : ModalDialogAppBase, INotifyDataErrorInfo
     {
         private readonly Authentication authentication;
         private ITypeTemplate template;
@@ -49,6 +50,9 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 
         [Import]
         private IFlashService flashService = null;
+
+        private EventHandler<DataErrorsChangedEventArgs> errorsChanged;
+        private string typeNameError;
 
         protected TemplateViewModel(Authentication authentication, ITypeTemplate template)
             : this(authentication, template, false)
@@ -146,13 +150,25 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             get { return this.typeName ?? string.Empty; }
             set
             {
+                this.typeName = value;
+                this.NotifyOfPropertyChange(nameof(this.TypeName));
                 InvokeAsync();
                 async void InvokeAsync()
                 {
-                    await this.template.SetTypeNameAsync(this.authentication, value);
-                    this.typeName = value;
-                    this.NotifyOfPropertyChange(nameof(this.TypeName));
-                    this.Verify(this.VerifyAction);
+                    try
+                    {
+                        await this.template.SetTypeNameAsync(this.authentication, value);
+                        this.typeNameError = null;
+                    }
+                    catch (Exception e)
+                    {
+                        this.typeNameError = e.Message;
+                    }
+                    finally
+                    {
+                        this.Verify(this.VerifyAction);
+                        this.errorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(nameof(this.TypeName)));
+                    }
                 }
             }
         }
@@ -162,13 +178,8 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             get { return this.comment ?? string.Empty; }
             set
             {
-                InvokeAsync();
-                async void InvokeAsync()
-                {
-                    await this.template.SetCommentAsync(this.authentication, value);
-                    this.comment = value;
-                    this.NotifyOfPropertyChange(nameof(this.Comment));
-                };
+                this.comment = value;
+                this.NotifyOfPropertyChange(nameof(this.Comment));
             }
         }
 
@@ -183,6 +194,8 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
                 if (this.count == 0)
                     return false;
                 if (this.IsModified == false)
+                    return false;
+                if (this.typeNameError != null)
                     return false;
                 return this.isValid;
             }
@@ -229,6 +242,11 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 
             if (this.template != null && result == true)
             {
+                if (this.typeNameError != null)
+                {
+                    AppMessageBox.Show(this.typeNameError);
+                    return;
+                }
                 this.BeginProgress(this.IsNew ? Resources.Message_Creating : Resources.Message_Changing);
                 try
                 {
@@ -353,5 +371,26 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             this.isValid = isValid;
             this.NotifyOfPropertyChange(nameof(this.CanChange));
         }
+
+        #region INotifyDataErrorInfo
+
+        bool INotifyDataErrorInfo.HasErrors => this.typeNameError != null;
+
+        event EventHandler<DataErrorsChangedEventArgs> INotifyDataErrorInfo.ErrorsChanged
+        {
+            add { this.errorsChanged += value; }
+            remove { this.errorsChanged -= value; }
+        }
+
+        IEnumerable INotifyDataErrorInfo.GetErrors(string propertyName)
+        {
+            if (propertyName == nameof(this.TypeName))
+            {
+                return new string[] { this.typeNameError };
+            }
+            return Enumerable.Empty<string>();
+        }
+
+        #endregion
     }
 }

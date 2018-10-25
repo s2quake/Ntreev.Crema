@@ -244,6 +244,12 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
         }
 
+        internal void UpdateKeys()
+        {
+            this.keys = CremaDataRowUtility.GetKeys(this.DataContext);
+            this.tableName = CremaDataRowUtility.GetTableName(this.DataContext);
+        }
+
         internal bool IsBeginEnding
         {
             get;

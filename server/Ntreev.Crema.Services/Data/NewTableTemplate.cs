@@ -186,8 +186,6 @@ namespace Ntreev.Crema.Services.Data
 
         private TableCollection Container { get; }
 
-        private DataBaseRepositoryHost Repository => this.DataBase.Repository;
-
         public TableContext Context => this.Container.Context;
     }
 }

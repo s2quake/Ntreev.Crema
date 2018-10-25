@@ -227,6 +227,8 @@ namespace Ntreev.Crema.Services.Data
 
         public CremaDispatcher Dispatcher => this.DispatcherObject.Dispatcher;
 
+        public DataBaseRepositoryHost Repository => this.DataBase.Repository;
+
         public string TableName => this.TemplateSource.TableName;
 
         public TagInfo Tags => this.TemplateSource.Tags;
@@ -400,6 +402,7 @@ namespace Ntreev.Crema.Services.Data
             this.TemplateSource = domain.Source as CremaTemplate;
             this.domain = domain as TableTemplateDomain;
             this.ItemPaths = this.domain.ItemPaths;
+            this.Repository.Dispatcher.Invoke(() => this.Repository.Lock(this.ItemPaths));
             if (this.TemplateSource != null)
             {
                 this.table = this.TemplateSource.View.Table;

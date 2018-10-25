@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,7 +33,7 @@ namespace Ntreev.Crema.Services.Data
     {
         private TableContentDomainHost domainHost;
 
-        public class TableContentDomainHost : IDomainHost
+        public class TableContentDomainHost : IDomainHost, IEnumerable<ITableContent>
         {
             private Domain domain;
 
@@ -142,11 +143,11 @@ namespace Ntreev.Crema.Services.Data
 
             public async Task<SignatureDate> BeginContentAsync(Authentication authentication, string name)
             {
-                var result = await Task.Run(() => this.Service.BeginTableContentEdit(name));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.BeginTableContentEdit(name));
                 this.CremaHost.Sign(authentication, result);
                 if (this.domain == null)
                 {
-                    this.domain = await this.DomainContext.CreateAsync(authentication, result.GetValue());
+                    this.domain = await this.DomainContext.CreateAsync(authentication, result.Value);
                     this.domain.Host = this;
                 }
                 var domainInfo = this.domain.DomainInfo;
@@ -177,8 +178,8 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (args is string name)
                 {
-                    var result = await Task.Run(() => this.Service.EndTableContentEdit(name));
-                    return result.GetValue();
+                    var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTableContentEdit(name));
+                    return result.Value;
                 }
                 return args as TableInfo[];                
             }
@@ -219,7 +220,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (args is string name)
                 {
-                    var result = await Task.Run(() => this.Service.CancelTableContentEdit(name));
+                    var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTableContentEdit(name));
                 }
                 if (args is string)
                 {
@@ -241,8 +242,8 @@ namespace Ntreev.Crema.Services.Data
 
             public async Task EnterContentAsync(Authentication authentication, string name)
             {
-                var result = await Task.Run(() => this.Service.EnterTableContentEdit(name));
-                await this.domain.InitializeAsync(authentication, result.GetValue());
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EnterTableContentEdit(name));
+                await this.domain.InitializeAsync(authentication, result.Value);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var dataSet = domain.Source as CremaDataSet;
@@ -262,8 +263,8 @@ namespace Ntreev.Crema.Services.Data
 
             public async Task LeaveContentAsync(Authentication authentication, string name)
             {
-                var result = await Task.Run(() => this.Service.LeaveTableContentEdit(name));
-                await this.domain.ReleaseAsync(authentication, result.GetValue());
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.LeaveTableContentEdit(name));
+                await this.domain.ReleaseAsync(authentication, result.Value);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     foreach (var item in this.Contents)
@@ -417,6 +418,26 @@ namespace Ntreev.Crema.Services.Data
                         this.InvokeEditCanceledEvent(args);
                     });
                     return null;
+                }
+            }
+
+            #endregion
+
+            #region IEnumerable
+
+            IEnumerator<ITableContent> IEnumerable<ITableContent>.GetEnumerator()
+            {
+                foreach (var item in this.Contents)
+                {
+                    yield return item;
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                foreach (var item in this.Contents)
+                {
+                    yield return item;
                 }
             }
 

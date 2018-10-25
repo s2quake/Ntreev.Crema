@@ -83,6 +83,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
+        protected override void OnAttach(Domain domain)
+        {
+            this.type.IsBeingEdited = true;
+            base.OnAttach(domain);
+        }
+
         protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
         {
             return Task.Run(() => this.Service.BeginTypeTemplateEdit(this.type.Name));
@@ -92,8 +98,8 @@ namespace Ntreev.Crema.Services.Data
         {
             if (args is Guid domainID)
             {
-                var result = await Task.Run(() => this.Service.EndTypeTemplateEdit(domainID));
-                return result.GetValue();
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTypeTemplateEdit(domainID));
+                return result.Value;
             }
             return args as TypeInfo[];
         }

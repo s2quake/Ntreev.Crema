@@ -68,7 +68,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.timer.Elapsed += Timer_Elapsed;
                 this.timer.Start();
 #endif
-                var metaData = result.GetValue();
+                var metaData = result.Value;
                 this.Initialize(metaData);
                 this.CremaHost.DataBases.Dispatcher.Invoke(() =>
                 {
@@ -96,7 +96,7 @@ namespace Ntreev.Crema.Services.Domains
 
         //public async Task RestoreAsync(Authentication authentication, Guid dataBaseID)
         //{
-        //    var result = await Task.Run(() => this.service.GetMetaData(dataBaseID));
+        //    var result = await this.CremaHost.InvokeServiceAsync(() => this.service.GetMetaData(dataBaseID));
         //    await this.Dispatcher.InvokeAsync(() =>
         //    {
         //        this.CremaHost.Sign(authentication, result);
@@ -104,7 +104,7 @@ namespace Ntreev.Crema.Services.Domains
         //    });
 
 
-        //    //var metaData = result.GetValue();
+        //    //var metaData = result.Value;
         //    //var metaDataList = new List<DomainMetaData>(metaData.Domains.Length);
         //    //foreach (var item in metaData.Domains)
         //    //{

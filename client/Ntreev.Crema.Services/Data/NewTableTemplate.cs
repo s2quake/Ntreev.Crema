@@ -119,8 +119,8 @@ namespace Ntreev.Crema.Services.Data
         {
             if (args is Guid domainID)
             {
-                var result = await Task.Run(() => this.Service.EndTableTemplateEdit(domainID));
-                var value = result.GetValue();
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTableTemplateEdit(domainID));
+                var value = result.Value;
                 return value;
             }
             return args as TableInfo[];

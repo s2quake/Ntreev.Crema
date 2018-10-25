@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
                     return base.Path;
                 });
-                var result = await Task.Run(() => this.Service.SetPublicTypeItem(path));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.SetPublicTypeItem(path));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -79,7 +79,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
                     return base.Path;
                 });
-                var result = await Task.Run(() => this.Service.SetPrivateTypeItem(path));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.SetPrivateTypeItem(path));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -104,7 +104,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddAccessMemberAsync), this, memberID, accessType);
                     return base.Path;
                 });
-                var result = await Task.Run(() => this.Service.AddAccessMemberTypeItem(path, memberID, accessType));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.AddAccessMemberTypeItem(path, memberID, accessType));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -129,7 +129,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetAccessMemberAsync), this, memberID, accessType);
                     return base.Path;
                 });
-                var result = await Task.Run(() => this.Service.SetAccessMemberTypeItem(path, memberID, accessType));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.SetAccessMemberTypeItem(path, memberID, accessType));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -154,7 +154,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveAccessMemberAsync), this, memberID);
                     return base.Path;
                 });
-                var result = await Task.Run(() => this.Service.RemoveAccessMemberTypeItem(path, memberID));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.RemoveAccessMemberTypeItem(path, memberID));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -179,7 +179,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(Lock), this, comment);
                     return base.Path;
                 });
-                var result = await Task.Run(() => this.Service.LockTypeItem(path, comment));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.LockTypeItem(path, comment));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -204,7 +204,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnlockAsync), this);
                     return base.Path;
                 });
-                var result = await Task.Run(() => this.Service.UnlockTypeItem(path));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.UnlockTypeItem(path));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -233,7 +233,7 @@ namespace Ntreev.Crema.Services.Data
                     var path = base.Path;
                     return (items, oldNames, oldPaths, path);
                 });
-                var result = await Task.Run(() => this.Service.RenameTypeItem(tuple.path, name));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.RenameTypeItem(tuple.path, name));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -262,7 +262,7 @@ namespace Ntreev.Crema.Services.Data
                     var path = base.Path;
                     return (items, oldPaths, oldCategoryPaths, path);
                 });
-                var result = await Task.Run(() => this.Service.MoveTypeItem(tuple.path, categoryPath));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.MoveTypeItem(tuple.path, categoryPath));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -290,7 +290,7 @@ namespace Ntreev.Crema.Services.Data
                     var path = base.Path;
                     return (items, oldPaths, path);
                 });
-                var result = await Task.Run(() => this.Service.DeleteTypeItem(tuple.path));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.DeleteTypeItem(tuple.path));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var container = this.Container;
@@ -316,11 +316,11 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, revision);
                     return base.Path;
                 });
-                var result = await Task.Run(() => this.Service.GetTypeItemDataSet(path, revision));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.GetTypeItemDataSet(path, revision));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    return result.GetValue();
+                    return result.Value;
                 });
             }
             catch (Exception e)
@@ -340,11 +340,11 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetLogAsync), this);
                     return base.Path;
                 });
-                var result = await Task.Run(() => this.Service.GetTypeItemLog(path, revision));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.GetTypeItemLog(path, revision));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    return result.GetValue();
+                    return result.Value;
                 });
             }
             catch (Exception e)
@@ -364,11 +364,11 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(FindAsync), this, text, options);
                     return base.Path;
                 });
-                var result = await Task.Run(() => this.Service.FindTypeItem(path, text, options));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.FindTypeItem(path, text, options));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    return result.GetValue();
+                    return result.Value;
                 });
             }
             catch (Exception e)

@@ -56,7 +56,7 @@ namespace Ntreev.Crema.Services.Users
                      var path = base.Path;
                      return (items, oldPaths, oldCategoryPaths, path);
                  });
-                var result = await Task.Run(() => this.Service.MoveUserItem(this.Path, categoryPath));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.MoveUserItem(this.Path, categoryPath));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -84,7 +84,7 @@ namespace Ntreev.Crema.Services.Users
                     var path = base.Path;
                     return (items, oldPaths, path);
                 });
-                var result = await Task.Run(() => this.Service.DeleteUserItem(tuple.path));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.DeleteUserItem(tuple.path));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var container = this.Container;
@@ -113,7 +113,7 @@ namespace Ntreev.Crema.Services.Users
                     var id = this.ID;
                     return (items, comments, id);
                 });
-                var result = await Task.Run(() => this.Service.Kick(tuple.id, comment ?? string.Empty));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.Kick(tuple.id, comment ?? string.Empty));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -143,11 +143,11 @@ namespace Ntreev.Crema.Services.Users
                     var id = this.ID;
                     return (items, comments, id);
                 });
-                var result = await Task.Run(() => this.Service.Ban(tuple.id, comment ?? string.Empty));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.Ban(tuple.id, comment ?? string.Empty));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    base.Ban(authentication, result.GetValue());
+                    base.Ban(authentication, result.Value);
                     this.Container.InvokeUsersBannedEvent(authentication, tuple.items, tuple.comments);
                     if (this.IsOnline == true)
                     {
@@ -176,7 +176,7 @@ namespace Ntreev.Crema.Services.Users
                     var id = this.ID;
                     return (items, id);
                 });
-                var result = await Task.Run(() => this.Service.Unban(tuple.id));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.Unban(tuple.id));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -208,11 +208,11 @@ namespace Ntreev.Crema.Services.Users
                     throw new ArgumentNullException(nameof(newPassword));
                 var p1 = password == null ? null : UserContext.Encrypt(userInfo.ID, password);
                 var p2 = newPassword == null ? null : UserContext.Encrypt(userInfo.ID, newPassword);
-                var result = await Task.Run(() => this.Service.ChangeUserInfo(userInfo.ID, p1, p2, userName, authority));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.ChangeUserInfo(userInfo.ID, p1, p2, userName, authority));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    base.UpdateUserInfo(result.GetValue());
+                    base.UpdateUserInfo(result.Value);
                     this.Container.InvokeUsersChangedEvent(authentication, new User[] { this });
                 });
             }
@@ -233,7 +233,7 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(SendMessageAsync), this, message);
                     return base.UserInfo;
                 });
-                var result = await Task.Run(() => this.Service.SendMessage(userInfo.ID, message));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.SendMessage(userInfo.ID, message));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);

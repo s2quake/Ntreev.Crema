@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task BeginAsync(Authentication authentication)
         {
-            var result = await Task.Run(() => this.service.BeginTransaction(this.dataBase.Name));
+            var result = await this.CremaHost.InvokeServiceAsync(() => this.service.BeginTransaction(this.dataBase.Name));
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.CremaHost.Sign(authentication, result);
@@ -52,7 +52,7 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                var result = await Task.Run(() => this.service.EndTransaction(this.ID));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.service.EndTransaction(this.ID));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -72,12 +72,12 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                var result = await Task.Run(() => this.service.CancelTransaction(this.ID));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.service.CancelTransaction(this.ID));
 
                 await this.dataBase.Dispatcher.InvokeAsync(() =>
                 {
                     this.dataBase.SetResetting(authentication);
-                    this.dataBase.SetReset2(authentication, result.GetValue());
+                    this.dataBase.SetReset2(authentication, result.Value);
                 });
 
                 //await this.DomainContext.DeleteDomainsAsync(authentication, this.dataBase.ID);
@@ -89,7 +89,7 @@ namespace Ntreev.Crema.Services.Data
                     this.dataBase.UnlockForTransaction(authentication, this.ID);
                     this.OnDisposed(EventArgs.Empty);
                 });
-                return result.GetValue();
+                return result.Value;
             }
             catch (Exception e)
             {

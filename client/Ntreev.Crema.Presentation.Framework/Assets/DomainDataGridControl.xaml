@@ -28,9 +28,14 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         <Grid>
             <Border x:Name="ContentBorder" Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}"
                     BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
-                <xcdg:CellContentPresenter x:Name="PART_CellContentPresenter" 
-                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                <Grid>
+                    <xcdg:CellContentPresenter x:Name="PART_CellContentPresenter"
+                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    <ncfc:DomainContentPresenter x:Name="PART_CellDisplayContentPresenter" Visibility="Hidden" 
+                                                 HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </Grid>
             </Border>
             <Border x:Name="InnerBorder" BorderThickness="1" Visibility="Hidden" />
             <Border x:Name="UserBorder" BorderThickness="1" />
@@ -114,6 +119,10 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             </Trigger>
             <Trigger Property="IsUserEditing" Value="False">
                 <Setter TargetName="ContentBorder" Property="Background" Value="{Binding Background, RelativeSource={RelativeSource TemplatedParent}}" />
+            </Trigger>
+            <Trigger Property="IsContentUpdating" Value="True">
+                <Setter TargetName="PART_CellDisplayContentPresenter" Property="Visibility" Value="Visible" />
+                <Setter TargetName="PART_CellContentPresenter" Property="Visibility" Value="Hidden" />
             </Trigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>

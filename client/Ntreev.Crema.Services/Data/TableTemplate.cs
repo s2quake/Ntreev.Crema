@@ -57,7 +57,7 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task OnBeginEditAsync(Authentication authentication)
         {
             await base.OnBeginEditAsync(authentication);
-            this.table.SetTableState(TableState.IsBeingSetup | TableState.IsMember);
+            this.table.IsBeingSetup = true;
             this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table, });
         }
 
@@ -89,6 +89,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
+        protected override void OnAttach(Domain domain)
+        {
+            this.table.IsBeingSetup = true;
+            base.OnAttach(domain);
+        }
+
         protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
         {
             return Task.Run(() => this.Service.BeginTableTemplateEdit(this.table.Name));
@@ -98,8 +104,8 @@ namespace Ntreev.Crema.Services.Data
         {
             if (args is Guid domainID)
             {
-                var result = await Task.Run(() => this.Service.EndTableTemplateEdit(domainID));
-                return result.GetValue();
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTableTemplateEdit(domainID));
+                return result.Value;
             }
             return args as TableInfo[];
         }

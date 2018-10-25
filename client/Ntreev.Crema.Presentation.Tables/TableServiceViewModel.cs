@@ -236,8 +236,9 @@ namespace Ntreev.Crema.Presentation.Tables
                 var itemPath = item.DomainInfo.ItemPath;
                 var itemType = item.DomainInfo.ItemType;
 
-                if (item.Host is ITableContent content)
+                if (item.Host is IEnumerable<ITableContent> contents)
                 {
+                    var content = contents.First();
                     var table = content.Table;
                     var tableDescriptor = this.browser.GetDescriptor(table.Path) as ITableDescriptor;
                     restoreList.Add(new System.Action(() => this.DocumentService.OpenTable(this.authenticator, tableDescriptor)));

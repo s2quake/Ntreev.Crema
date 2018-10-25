@@ -42,6 +42,14 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 {
     public class DomainDataCell : ModernDataCell
     {
+        private static readonly DependencyPropertyKey DisplayContentPropertyKey =
+            DependencyProperty.RegisterReadOnly(nameof(DisplayContent), typeof(object), typeof(DomainDataCell), new UIPropertyMetadata(null));
+        public static readonly DependencyProperty DisplayContentProperty = DisplayContentPropertyKey.DependencyProperty;
+
+        private static readonly DependencyPropertyKey IsContentUpdatingPropertyKey =
+            DependencyProperty.RegisterReadOnly(nameof(IsContentUpdating), typeof(bool), typeof(DomainDataCell), new FrameworkPropertyMetadata(false));
+        public static readonly DependencyProperty IsContentUpdatingProperty = IsContentUpdatingPropertyKey.DependencyProperty;
+
         public static readonly DependencyProperty UserIDProperty =
             DependencyProperty.Register("UserID", typeof(string), typeof(DomainDataCell));
 
@@ -94,6 +102,18 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             parser.SelectRange();
         }
 
+        public object DisplayContent
+        {
+            get { return (object)this.GetValue(DisplayContentProperty); }
+            private set { this.SetValue(DisplayContentPropertyKey, value); }
+        }
+
+        public bool IsContentUpdating
+        {
+            get { return (bool)this.GetValue(IsContentUpdatingProperty); }
+            private set { this.SetValue(IsContentUpdatingPropertyKey, value); }
+        }
+
         public IEnumerable Users
         {
             get { return this.users; }
@@ -101,26 +121,26 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
         public Brush UserBrush
         {
-            get { return (Brush)GetValue(UserBrushProperty); }
-            private set { SetValue(UserBrushProperty, value); }
+            get { return (Brush)this.GetValue(UserBrushProperty); }
+            private set { this.SetValue(UserBrushProperty, value); }
         }
 
         public bool HasUser
         {
-            get { return (bool)GetValue(HasUserProperty); }
-            private set { SetValue(HasUserProperty, value); }
+            get { return (bool)this.GetValue(HasUserProperty); }
+            private set { this.SetValue(HasUserProperty, value); }
         }
 
         public bool IsUserEditing
         {
-            get { return (bool)GetValue(IsUserEditingProperty); }
-            private set { SetValue(IsUserEditingProperty, value); }
+            get { return (bool)this.GetValue(IsUserEditingProperty); }
+            private set { this.SetValue(IsUserEditingProperty, value); }
         }
 
         public bool IsClientAlone
         {
-            get { return (bool)GetValue(IsClientAloneProperty); }
-            private set { SetValue(IsClientAloneProperty, value); }
+            get { return (bool)this.GetValue(IsClientAloneProperty); }
+            private set { this.SetValue(IsClientAloneProperty, value); }
         }
 
         public bool CanReset
@@ -170,22 +190,22 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
         protected override async void OnEditEnded()
         {
+            var editingContent = this.EditingContent;
+            var content = this.Content;
             base.OnEditEnded();
             var parentRow = this.ParentRow as DomainDataRow;
             if (parentRow.IsBeginEnding == false)
-                parentRow.EndEdit();
-            await this.RequestEditEndAsync();
-        }
-
-        protected override async void OnEditEnding(CancelRoutedEventArgs e)
-        {
-            var editingContent = this.EditingContent;
-            var content = this.Content;
-            base.OnEditEnding(e);
+                parentRow.CancelEdit();
             if (editingContent != content)
             {
                 await this.RequestSetRowAsync(editingContent);
             }
+            await this.RequestEditEndAsync();
+        }
+
+        protected override void OnEditEnding(CancelRoutedEventArgs e)
+        {
+            base.OnEditEnding(e);
         }
 
         protected override async void OnEditCanceled()
@@ -196,11 +216,21 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
                 this.ParentRow.CancelEdit();
             this.Focus();
             await this.RequestEditEndAsync();
+            
         }
 
         protected override void OnContentChanged(object oldContent, object newContent)
         {
             base.OnContentChanged(oldContent, newContent);
+            if (this.IsContentUpdating == true)
+            {
+                this.IsContentUpdating = false;
+            }
+
+            if (object.Equals(oldContent, newContent) == false && this.ParentRow is DomainDataRow dataRow)
+            {
+                dataRow.UpdateKeys();
+            }
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -386,18 +416,30 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
         private async Task RequestSetRowAsync(object value)
         {
+            var isReadOnly = this.ReadOnly;
             try
             {
                 var domain = this.GridControl.Domain;
                 var item = this.DataContext;
                 var fieldName = this.FieldName;
                 var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
-
+                this.ReadOnly = true;
+                this.DisplayContent = value;
+                this.EditingContent = value;
+                this.IsContentUpdating = true;
                 await domain.SetRowAsync(authenticator, item, fieldName, value);
             }
             catch (Exception e)
             {
                 AppMessageBox.ShowError(e);
+                this.DisplayContent = null;
+                this.EditingContent = this.Content;
+                this.IsContentUpdating = false;
+                this.ReadOnly = isReadOnly;
+            }
+            finally
+            {
+                this.ReadOnly = isReadOnly;
             }
         }
 

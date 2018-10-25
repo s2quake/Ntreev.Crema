@@ -77,7 +77,7 @@ namespace Ntreev.Crema.Services.Data
                 }
 
                 var result = this.service.Subscribe(authenticationToken);
-                var metaData = result.GetValue();
+                var metaData = result.Value;
 #if !DEBUG
                 this.timer = new Timer(30000);
                 this.timer.Elapsed += Timer_Elapsed;
@@ -93,7 +93,7 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseLock), dataBase, comment);
             var result = this.service.Lock(dataBase.Name, comment);
             result.Validate(authentication);
-            return result.GetValue();
+            return result.Value;
         }
 
         public void InvokeDataBaseUnlock(Authentication authentication, DataBase dataBase)
@@ -108,7 +108,7 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseSetPrivate), dataBase);
             var result = this.service.SetPrivate(dataBase.Name);
             result.Validate(authentication);
-            return result.GetValue();
+            return result.Value;
         }
 
         public void InvokeDataBaseSetPublic(Authentication authentication, DataBase dataBase)
@@ -123,7 +123,7 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseAddAccessMember), dataBase, memberID, accessType);
             var result = this.service.AddAccessMember(dataBase.Name, memberID, accessType);
             result.Validate(authentication);
-            return result.GetValue();
+            return result.Value;
         }
 
         public AccessMemberInfo InvokeDataBaseSetAccessMember(Authentication authentication, DataBase dataBase, string memberID, AccessType accessType)
@@ -131,7 +131,7 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseSetAccessMember), dataBase, memberID, accessType);
             var result = this.service.SetAccessMember(dataBase.Name, memberID, accessType);
             result.Validate(authentication);
-            return result.GetValue();
+            return result.Value;
         }
 
         public void InvokeDataBaseRemoveAccessMember(Authentication authentication, DataBase dataBase, string memberID)
@@ -150,11 +150,11 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewDataBaseAsync), dataBaseName, comment);
                 });
-                var result = await Task.Run(() => this.service.Create(dataBaseName, comment));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.service.Create(dataBaseName, comment));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    var dataBase = new DataBase(this, result.GetValue());
+                    var dataBase = new DataBase(this, result.Value);
                     this.AddBase(dataBase.Name, dataBase);
                     this.InvokeItemsCreateEvent(authentication, new DataBase[] { dataBase }, comment);
                     return dataBase;
@@ -223,11 +223,11 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyDataBaseAsync), dataBase, newDataBaseName, comment, force);
                     return dataBase.Name;
                 });
-                var result = await Task.Run(() => this.service.Copy(name, newDataBaseName, comment, force));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.service.Copy(name, newDataBaseName, comment, force));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
-                    var dataBaseInfo = result.GetValue();
+                    var dataBaseInfo = result.Value;
                     var newDataBase = new DataBase(this, dataBaseInfo);
                     this.AddBase(newDataBase.Name, newDataBase);
                     this.InvokeItemsCreateEvent(authentication, new DataBase[] { newDataBase }, comment);
@@ -248,7 +248,7 @@ namespace Ntreev.Crema.Services.Data
 
             var result = this.service.GetLog(dataBase.Name, revision);
             result.Validate(authentication);
-            return result.GetValue() ?? new LogInfo[] { };
+            return result.Value ?? new LogInfo[] { };
         }
 
         public void Revert(Authentication authentication, DataBase dataBase, string revision)
@@ -258,7 +258,7 @@ namespace Ntreev.Crema.Services.Data
 
             var result = this.service.Revert(dataBase.Name, revision);
             result.Validate(authentication);
-            dataBase.SetDataBaseInfo(result.GetValue());
+            dataBase.SetDataBaseInfo(result.Value);
             this.InvokeItemsRevertedEvent(authentication, new DataBase[] { dataBase }, new string[] { revision });
         }
 

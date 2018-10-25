@@ -113,8 +113,6 @@ namespace Ntreev.Crema.Services.Data
 
         private TypeCollection Container => this.type.Container;
 
-        private DataBaseRepositoryHost Repository => this.type.Repository;
-
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override void OnValidateBeginEdit(Authentication authentication, object target)
         {
