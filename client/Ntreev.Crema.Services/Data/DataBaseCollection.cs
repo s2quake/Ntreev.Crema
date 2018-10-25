@@ -457,7 +457,6 @@ namespace Ntreev.Crema.Services.Data
             this.OnItemsLockChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData));
         }
 
-        private string b;
         public async Task CloseAsync(CloseInfo closeInfo)
         {
             await this.Dispatcher.DisposeAsync();
@@ -467,7 +466,6 @@ namespace Ntreev.Crema.Services.Data
             this.timer?.Dispose();
             this.timer = null;
             this.Dispatcher = null;
-            this.b = nameof(CloseAsync);
         }
 
         public ResultBase LoadDataBase(DataBase dataBase)

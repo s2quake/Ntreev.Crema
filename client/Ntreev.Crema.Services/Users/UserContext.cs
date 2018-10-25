@@ -228,38 +228,38 @@ namespace Ntreev.Crema.Services.Users
             return metaData;
         }
 
-        public async Task<UserContextMetaData> GetMetaDataAsync(Authentication authentication)
-        {
-            this.ValidateExpired();
-            return await this.Dispatcher.InvokeAsync(() =>
-            {
-                var metaData = new UserContextMetaData();
+        //public async Task<UserContextMetaData> GetMetaDataAsync(Authentication authentication)
+        //{
+        //    this.ValidateExpired();
+        //    return await this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        var metaData = new UserContextMetaData();
 
-                {
-                    var query = from UserCategory item in this.Categories
-                                where item != this.Root
-                                orderby item.Path
-                                select item.Path;
+        //        {
+        //            var query = from UserCategory item in this.Categories
+        //                        where item != this.Root
+        //                        orderby item.Path
+        //                        select item.Path;
 
-                    metaData.Categories = query.ToArray();
-                }
+        //            metaData.Categories = query.ToArray();
+        //        }
 
-                {
-                    var query = from User item in this.Users
-                                orderby item.Category.Path
-                                select new UserMetaData()
-                                {
-                                    Path = item.Path,
-                                    UserInfo = item.UserInfo,
-                                    UserState = item.UserState,
-                                    BanInfo = item.BanInfo,
-                                };
-                    metaData.Users = query.ToArray();
-                }
+        //        {
+        //            var query = from User item in this.Users
+        //                        orderby item.Category.Path
+        //                        select new UserMetaData()
+        //                        {
+        //                            Path = item.Path,
+        //                            UserInfo = item.UserInfo,
+        //                            UserState = item.UserState,
+        //                            BanInfo = item.BanInfo,
+        //                        };
+        //            metaData.Users = query.ToArray();
+        //        }
 
-                return metaData;
-            });
-        }
+        //        return metaData;
+        //    });
+        //}
 
         public async Task NotifyMessageAsync(Authentication authentication, string[] userIDs, string message)
         {
@@ -282,7 +282,6 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        private string b;
         public async Task CloseAsync(CloseInfo closeInfo)
         {
             await this.Dispatcher.DisposeAsync();
@@ -292,7 +291,6 @@ namespace Ntreev.Crema.Services.Users
             this.timer?.Dispose();
             this.timer = null;
             this.Dispatcher = null;
-            this.b = nameof(CloseAsync);
         }
 
         public User CurrentUser { get; private set; }
@@ -448,7 +446,7 @@ namespace Ntreev.Crema.Services.Users
         {
             try
             {
-                 this.Dispatcher.Invoke(() =>
+                this.Dispatcher.Invoke(() =>
                 {
                     var authentication = this.AuthenticateInternal(signatureDate);
                     var users = new User[userInfos.Length];

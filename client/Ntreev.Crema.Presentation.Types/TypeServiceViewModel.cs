@@ -237,8 +237,7 @@ namespace Ntreev.Crema.Presentation.Types
             var domainContext = dataBase.GetService(typeof(IDomainContext)) as IDomainContext;
             var items = await await domainContext.Dispatcher.InvokeAsync(async () =>
             {
-                var domains = domainContext.Domains.Where(item => item.DataBaseID == dataBase.ID)
-                                                   .ToArray();
+                var domains = domainContext.Domains.Where(item => item.DataBaseID == dataBase.ID).ToArray();
                 var restoreList = new List<System.Action>();
 
                 foreach (var item in domains)
