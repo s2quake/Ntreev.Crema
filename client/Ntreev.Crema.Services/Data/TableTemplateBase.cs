@@ -41,6 +41,10 @@ namespace Ntreev.Crema.Services.Data
         private EventHandler editCanceled;
         private EventHandler changed;
 
+        private EventHandler editorsChanged;
+
+        private string editor;
+
         public abstract AccessType GetAccessType(Authentication authentication);
 
         public async Task<TableColumn> AddNewAsync(Authentication authentication)
@@ -176,6 +180,8 @@ namespace Ntreev.Crema.Services.Data
 
         public int Count => this.items.Count;
 
+        public string Editor => this.editor ?? string.Empty;
+
         public abstract DomainContext DomainContext { get; }
 
         public abstract string ItemPath { get; }
@@ -274,6 +280,20 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
+        public event EventHandler EditorsChanged
+        {
+            add
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.editorsChanged += value;
+            }
+            remove
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.editorsChanged -= value;
+            }
+        }
+
         protected virtual void OnEditBegun(EventArgs e)
         {
             this.editBegun?.Invoke(this, e);
@@ -292,6 +312,11 @@ namespace Ntreev.Crema.Services.Data
         protected virtual void OnChanged(EventArgs e)
         {
             this.changed?.Invoke(this, e);
+        }
+
+        protected virtual void OnEditorsChanged(EventArgs e)
+        {
+            this.editorsChanged?.Invoke(this, e);
         }
 
         protected virtual async Task OnBeginEditAsync(Authentication authentication)
@@ -317,15 +342,16 @@ namespace Ntreev.Crema.Services.Data
 
             //await this.DomainContext.Domains.AddAsync(authentication, this.domain, this.DataBase);
             //await this.domain.AddUserAsync(authentication, DomainAccessType.ReadWrite);
-            await this.AttachDomainEventAsync();
+            await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
+            await this.domain.Dispatcher.InvokeAsync(this.RefreshEditors);
         }
 
         protected virtual async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
             var tableInfos = await this.EndDomainAsync(authentication, args);
-            if (args is Guid)
+            if (this.domain != null)
             {
-                await this.DetachDomainEventAsync();
+                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                 await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false, tableInfos);
                 this.domain = null;
             }
@@ -337,15 +363,16 @@ namespace Ntreev.Crema.Services.Data
             this.IsModified = false;
             this.table = null;
             this.items = null;
+            this.editor = null;
             return tableInfos;
         }
 
         protected virtual async Task OnCancelEditAsync(Authentication authentication, object args)
         {
             var result = await this.CancelDomainAsync(authentication, args);
-            if (args is Guid)
+            if (this.domain != null)
             {
-                await this.DetachDomainEventAsync();
+                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                 await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true, null);
                 this.domain = null;
             }
@@ -357,6 +384,7 @@ namespace Ntreev.Crema.Services.Data
             this.IsModified = false;
             this.table = null;
             this.items = null;
+            this.editor = null;
         }
 
         protected virtual void OnAttach(Domain domain)
@@ -377,7 +405,8 @@ namespace Ntreev.Crema.Services.Data
                 this.table.RowChanged += Table_RowChanged;
             }
             this.IsModified = this.domain.IsModified;
-            this.AttachDomainEvent();
+            this.domain.Dispatcher.Invoke(this.AttachDomainEvent);
+            this.domain.Dispatcher.Invoke(this.RefreshEditors);
         }
 
         protected virtual void OnDetach()
@@ -453,50 +482,64 @@ namespace Ntreev.Crema.Services.Data
             await this.Dispatcher.InvokeAsync(() => this.OnChanged(e));
         }
 
+        private async void Domain_UserAdded(object sender, DomainUserEventArgs e)
+        {
+            this.RefreshEditors();
+            await this.Dispatcher.InvokeAsync(() => this.OnEditorsChanged(e));
+        }
+
+        private async void Domain_UserChanged(object sender, DomainUserEventArgs e)
+        {
+            this.RefreshEditors();
+            await this.Dispatcher.InvokeAsync(() => this.OnEditorsChanged(e));
+        }
+
+        private async void Domain_UserRemoved(object sender, DomainUserRemovedEventArgs e)
+        {
+            this.RefreshEditors();
+            await this.Dispatcher.InvokeAsync(() => this.OnEditorsChanged(e));
+        }
+
+        int refcount;
+
         private void AttachDomainEvent()
         {
-            this.domain.Dispatcher.Invoke(() =>
+            this.domain.Dispatcher.VerifyAccess();
+            if (refcount != 0)
             {
-                this.domain.RowAdded += Domain_RowAdded;
-                this.domain.RowChanged += Domain_RowChanged;
-                this.domain.RowRemoved += Domain_RowRemoved;
-                this.domain.PropertyChanged += Domain_PropertyChanged;
-            });
+                System.Diagnostics.Debugger.Launch();
+            }
+            this.domain.RowAdded += Domain_RowAdded;
+            this.domain.RowChanged += Domain_RowChanged;
+            this.domain.RowRemoved += Domain_RowRemoved;
+            this.domain.PropertyChanged += Domain_PropertyChanged;
+            this.domain.UserAdded += Domain_UserAdded;
+            this.domain.UserChanged += Domain_UserChanged;
+            this.domain.UserRemoved += Domain_UserRemoved;
+            refcount++;
         }
 
         private void DetachDomainEvent()
         {
-            this.domain.Dispatcher.Invoke(() =>
+            this.domain.Dispatcher.VerifyAccess();
+            this.domain.RowAdded -= Domain_RowAdded;
+            this.domain.RowChanged -= Domain_RowChanged;
+            this.domain.RowRemoved -= Domain_RowRemoved;
+            this.domain.PropertyChanged -= Domain_PropertyChanged;
+            this.domain.UserAdded -= Domain_UserAdded;
+            this.domain.UserChanged -= Domain_UserChanged;
+            this.domain.UserRemoved -= Domain_UserRemoved;
+            if (refcount != 1)
             {
-                this.domain.RowAdded -= Domain_RowAdded;
-                this.domain.RowChanged -= Domain_RowChanged;
-                this.domain.RowRemoved -= Domain_RowRemoved;
-                this.domain.PropertyChanged -= Domain_PropertyChanged;
-            });
+                System.Diagnostics.Debugger.Launch();
+            }
+            refcount--;
         }
 
-        private Task AttachDomainEventAsync()
+        private void RefreshEditors()
         {
-            return this.domain.Dispatcher.InvokeAsync(() =>
-            {
-                //this.domain.Deleted += Domain_Deleted;
-                this.domain.RowAdded += Domain_RowAdded;
-                this.domain.RowChanged += Domain_RowChanged;
-                this.domain.RowRemoved += Domain_RowRemoved;
-                this.domain.PropertyChanged += Domain_PropertyChanged;
-            });
-        }
-
-        private Task DetachDomainEventAsync()
-        {
-            return this.domain.Dispatcher.InvokeAsync(() =>
-            {
-                //this.domain.Deleted -= Domain_Deleted;
-                this.domain.RowAdded -= Domain_RowAdded;
-                this.domain.RowChanged -= Domain_RowChanged;
-                this.domain.RowRemoved -= Domain_RowRemoved;
-                this.domain.PropertyChanged -= Domain_PropertyChanged;
-            });
+            this.domain.Dispatcher.VerifyAccess();
+            this.editor = this.domain.Users.OwnerUserID;
         }
 
         #region ITableTemplate

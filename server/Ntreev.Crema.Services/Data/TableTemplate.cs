@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task OnBeginEditAsync(Authentication authentication)
         {
             await base.OnBeginEditAsync(authentication);
-            this.table.IsBeingSetup = true;
+            this.table.TableState = TableState.IsBeingSetup;
             this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
         }
 
@@ -76,7 +76,7 @@ namespace Ntreev.Crema.Services.Data
             this.table.UpdateTemplate(template.TableInfo);
             this.table.UpdateTags(template.Tags);
             this.table.UpdateComment(template.Comment);
-            this.table.IsBeingSetup = true;
+            this.table.TableState = TableState.None;
             this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
             this.Container.InvokeTablesTemplateChangedEvent(authentication, this.tables, dataSet);
             return tableInfos;
@@ -86,13 +86,13 @@ namespace Ntreev.Crema.Services.Data
         {
             await base.OnCancelEditAsync(authentication);
             await this.Repository.UnlockAsync(this.ItemPaths);
-            this.table.IsBeingSetup = false;
+            this.table.TableState = TableState.None;
             this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
         }
 
         protected override void OnAttach(Domain domain)
         {
-            this.table.IsBeingSetup = true;
+            this.table.TableState = TableState.IsBeingSetup;
             base.OnAttach(domain);
         }
 

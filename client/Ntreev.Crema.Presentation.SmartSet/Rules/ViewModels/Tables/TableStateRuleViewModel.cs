@@ -57,7 +57,6 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels.Tables
                 yield return new EnumMemberInfo(Resources.Text_None, (long)TableState.None);
                 yield return new EnumMemberInfo(Resources.Text_IsBeingEdited, (long)TableState.IsBeingEdited);
                 yield return new EnumMemberInfo(Resources.Text_IsBeingSetup, (long)TableState.IsBeingSetup);
-                yield return new EnumMemberInfo(Resources.Text_IsMember, (long)TableState.IsMember, Resources.Comment_IsMember);
             }
         }
     }

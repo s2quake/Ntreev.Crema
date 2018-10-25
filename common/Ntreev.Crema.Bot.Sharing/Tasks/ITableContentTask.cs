@@ -75,7 +75,7 @@ namespace Ntreev.Crema.Bot.Tasks
                 {
                     await content.BeginEditAsync(authentication);
                 }
-                else if (tableState.HasFlag(TableState.IsBeingSetup) == true)
+                else if (tableState == TableState.IsBeingSetup)
                 {
                     context.Pop(content);
                     context.Complete(context.Target);

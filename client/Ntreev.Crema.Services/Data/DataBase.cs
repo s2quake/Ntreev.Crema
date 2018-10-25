@@ -1244,7 +1244,7 @@ namespace Ntreev.Crema.Services.Data
                     {
                         var table = this.TableContext.Tables[tableNames[i]];
                         var state = states[i];
-                        table.SetTableState(state);
+                        table.TableState = state;
                         tables[i] = table;
                     }
                     this.TableContext.Tables.InvokeTablesStateChangedEvent(authentication, tables);

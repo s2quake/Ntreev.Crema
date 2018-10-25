@@ -40,14 +40,14 @@ namespace Ntreev.Crema.Presentation.Framework
             return descriptor.TypeState.HasFlag(TypeState.IsBeingEdited);
         }
 
-        public static bool IsBeingEditedClient(Authentication authentication, ITypeDescriptor descriptor)
-        {
-            if (authentication == null)
-                throw new ArgumentNullException(nameof(authentication));
-            if (descriptor == null)
-                throw new ArgumentNullException(nameof(descriptor));
-            return descriptor.TypeState.HasFlag(TypeState.IsBeingEdited | TypeState.IsMember);
-        }
+        //public static bool IsBeingEditedClient(Authentication authentication, ITypeDescriptor descriptor)
+        //{
+        //    if (authentication == null)
+        //        throw new ArgumentNullException(nameof(authentication));
+        //    if (descriptor == null)
+        //        throw new ArgumentNullException(nameof(descriptor));
+        //    return descriptor.TypeState.HasFlag(TypeState.IsBeingEdited | TypeState.IsMember);
+        //}
 
         public static bool IsFlag(Authentication authentication, ITypeDescriptor descriptor)
         {

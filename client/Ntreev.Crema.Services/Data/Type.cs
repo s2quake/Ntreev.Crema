@@ -461,7 +461,7 @@ namespace Ntreev.Crema.Services.Data
 
         public new TypeInfo TypeInfo => base.TypeInfo;
 
-        public new TypeState TypeState => base.TypeState;
+        //public new TypeState TypeState => base.TypeState;
 
         public new TagInfo Tags => base.Tags;
 

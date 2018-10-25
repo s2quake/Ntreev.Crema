@@ -41,6 +41,7 @@ namespace Ntreev.Crema.Services.Data
         private EventHandler editEnded;
         private EventHandler editCanceled;
         private EventHandler changed;
+        private EventHandler editorsChanged;
 
         public TableContent(Table table)
         {
@@ -50,15 +51,6 @@ namespace Ntreev.Crema.Services.Data
         public override string ToString()
         {
             return this.Table.ToString();
-        }
-
-        protected Task AddAsync(TableRow row)
-        {
-            return this.Dispatcher.InvokeAsync(() =>
-            {
-                this.dataTable.ExtendedProperties[row.Row] = row;
-                this.rowsToAdd.Remove(row.Row);
-            });
         }
 
         public Task<TableRow> FindAsync(Authentication authentication, params object[] keys)
@@ -259,7 +251,6 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndNewAsync));
                 });
                 await row.EndNewAsync(authentication);
-                await this.AddAsync(row);
             }
             catch (Exception e)
             {
@@ -372,6 +363,20 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
+        public event EventHandler EditorsChanged
+        {
+            add
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.editorsChanged += value;
+            }
+            remove
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.editorsChanged -= value;
+            }
+        }
+
         protected virtual void OnEditBegun(EventArgs e)
         {
             this.editBegun?.Invoke(this, e);
@@ -390,6 +395,11 @@ namespace Ntreev.Crema.Services.Data
         protected virtual void OnChanged(EventArgs e)
         {
             this.changed?.Invoke(this, e);
+        }
+
+        protected virtual void OnEditorsChanged(EventArgs e)
+        {
+            this.editorsChanged?.Invoke(this, e);
         }
 
         private void ValidateAddNew(Authentication authentication)

@@ -49,6 +49,7 @@ namespace Ntreev.Crema.Presentation.Framework
         private IDomain domain;
         private TableInfo tableInfo = TableInfo.Default;
         private bool isModified;
+        private string editor = string.Empty;
 
         public TableTemplateDescriptor(Authentication authentication, ITableTemplate table)
             : this(authentication, table, DescriptorTypes.All)
@@ -69,6 +70,7 @@ namespace Ntreev.Crema.Presentation.Framework
             this.owner = owner ?? this;
             this.template.Dispatcher.VerifyAccess();
             this.domain = this.template.Domain;
+            this.editor = this.template.Editor;
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
             {
@@ -101,6 +103,9 @@ namespace Ntreev.Crema.Presentation.Framework
         [DescriptorProperty]
         public IDomain TargetDomain => this.domain;
 
+        [DescriptorProperty]
+        public string Editor => this.editor;
+
         public event EventHandler EditBegun;
 
         public event EventHandler EditEnded;
@@ -125,6 +130,7 @@ namespace Ntreev.Crema.Presentation.Framework
         private void Template_EditBegun(object sender, EventArgs e)
         {
             this.domain = this.template.Domain;
+            this.editor = this.template.Editor;
             this.Dispatcher.InvokeAsync(async () =>
             {
                 await this.RefreshAsync();
@@ -135,6 +141,7 @@ namespace Ntreev.Crema.Presentation.Framework
         private void Template_EditEnded(object sender, EventArgs e)
         {
             this.domain = null;
+            this.editor = string.Empty;
             this.Dispatcher.InvokeAsync(async () =>
             {
                 await this.RefreshAsync();
@@ -145,6 +152,7 @@ namespace Ntreev.Crema.Presentation.Framework
         private void Template_EditCanceled(object sender, EventArgs e)
         {
             this.domain = null;
+            this.editor = string.Empty;
             this.Dispatcher.InvokeAsync(async () =>
             {
                 await this.RefreshAsync();

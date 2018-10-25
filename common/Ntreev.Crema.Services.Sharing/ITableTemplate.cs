@@ -69,7 +69,7 @@ namespace Ntreev.Crema.Services
 
         bool IsModified { get; }
 
-        //ServiceState ServiceState { get; }
+        string Editor { get; }
 
         event EventHandler EditBegun;
 

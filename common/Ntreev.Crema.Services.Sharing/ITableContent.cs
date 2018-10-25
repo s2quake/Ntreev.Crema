@@ -57,6 +57,8 @@ namespace Ntreev.Crema.Services
 
         bool IsModified { get; }
 
+        string[] Editors { get; }
+
         event EventHandler EditBegun;
 
         event EventHandler EditEnded;
@@ -64,5 +66,7 @@ namespace Ntreev.Crema.Services
         event EventHandler EditCanceled;
 
         event EventHandler Changed;
+
+        event EventHandler EditorsChanged;
     }
 }

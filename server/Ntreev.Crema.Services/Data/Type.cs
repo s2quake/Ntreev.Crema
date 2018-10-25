@@ -552,7 +552,7 @@ namespace Ntreev.Crema.Services.Data
 
         public new TypeInfo TypeInfo => base.TypeInfo;
 
-        public new TypeState TypeState => base.TypeState;
+        //public new TypeState TypeState => base.TypeState;
 
         public new TagInfo Tags => base.Tags;
 
@@ -741,7 +741,7 @@ namespace Ntreev.Crema.Services.Data
 
         public void ValidateIsNotBeingEdited()
         {
-            if (this.IsBeingEdited == true)
+            if (this.TypeState == TypeState.IsBeingEdited)
                 throw new InvalidOperationException(string.Format(Resources.Exception_TypeIsBeingEdited_Format, base.Name));
             if (this.Template.Domain != null)
                 throw new InvalidOperationException(string.Format(Resources.Exception_TypeIsBeingEdited_Format, base.Name));
@@ -749,15 +749,15 @@ namespace Ntreev.Crema.Services.Data
 
         public void ValidateIsBeingEdited()
         {
-            if (this.IsBeingEdited == false)
+            if (this.TypeState != TypeState.IsBeingEdited)
                 throw new InvalidOperationException(Resources.Exception_TypeIsNotBeingEdited);
         }
 
         private void ValidateUsingTable(IAuthentication authentication, Table table)
         {
-            if (table.TableState.HasFlag(TableState.IsBeingEdited) == true)
+            if (table.TableState == TableState.IsBeingEdited)
                 throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingEdited_Format, table.Name));
-            if (table.TableState.HasFlag(TableState.IsBeingSetup) == true)
+            if (table.TableState == TableState.IsBeingSetup)
                 throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingSetup_Format, table.Name));
             if (table.VerifyAccessType(authentication, AccessType.Master) == false)
                 throw new PermissionException();

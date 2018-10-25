@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Presentation.Types.MenuItems
             {
                 if (TypeDescriptorUtility.IsBeingEdited(this.authenticator, descriptor) == false)
                     return false;
-                return TypeDescriptorUtility.IsBeingEditedClient(this.authenticator, descriptor) || this.authenticator.Authority == Authority.Admin;
+                return descriptor.IsBeingEditedClient == true || this.authenticator.Authority == Authority.Admin;
             }
 
             return false;

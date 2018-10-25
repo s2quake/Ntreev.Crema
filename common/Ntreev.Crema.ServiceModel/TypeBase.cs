@@ -111,18 +111,18 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
-        public bool IsBeingEdited
-        {
-            get { return this.typeState.HasFlag(TypeState.IsBeingEdited); }
-            set
-            {
-                if (value == true)
-                    this.typeState |= TypeState.IsBeingEdited;
-                else
-                    this.typeState &= ~TypeState.IsBeingEdited;
-                this.OnTypeStateChanged(EventArgs.Empty);
-            }
-        }
+        //public bool IsBeingEdited
+        //{
+        //    get { return this.typeState.HasFlag(TypeState.IsBeingEdited); }
+        //    set
+        //    {
+        //        if (value == true)
+        //            this.typeState |= TypeState.IsBeingEdited;
+        //        else
+        //            this.typeState &= ~TypeState.IsBeingEdited;
+        //        this.OnTypeStateChanged(EventArgs.Empty);
+        //    }
+        //}
 
         public TypeMetaData MetaData
         {

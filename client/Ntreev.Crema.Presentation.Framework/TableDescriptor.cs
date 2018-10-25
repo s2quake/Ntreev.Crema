@@ -46,17 +46,6 @@ namespace Ntreev.Crema.Presentation.Framework
         private ITable table;
         private readonly object owner;
         private readonly ObservableCollection<TableDescriptor> childs = new ObservableCollection<TableDescriptor>();
-        private readonly ReadOnlyObservableCollection<TableDescriptor> childsReadonly;
-
-        private TableInfo tableInfo = TableInfo.Default;
-        private AccessInfo accessInfo = AccessInfo.Empty;
-        private LockInfo lockInfo = LockInfo.Empty;
-        private AccessType accessType;
-        private TableState tableState;
-        private TableAttribute tableAttribute;
-
-        private TableTemplateDescriptor templateDescriptor;
-        private TableContentDescriptor contentDescriptor;
 
         public TableDescriptor(Authentication authentication, ITableDescriptor descriptor)
             : this(authentication, descriptor, false)
@@ -75,7 +64,7 @@ namespace Ntreev.Crema.Presentation.Framework
         {
             this.table = descriptor.Target;
             this.owner = owner ?? this;
-            this.childsReadonly = new ReadOnlyObservableCollection<TableDescriptor>(this.childs);
+            this.Childs = new ReadOnlyObservableCollection<TableDescriptor>(this.childs);
         }
 
         public TableDescriptor(Authentication authentication, ITable table, DescriptorTypes descriptorTypes, object owner)
@@ -84,21 +73,21 @@ namespace Ntreev.Crema.Presentation.Framework
             this.table = table;
             this.owner = owner ?? this;
             this.table.Dispatcher.VerifyAccess();
-            this.tableInfo = table.TableInfo;
-            this.tableState = table.TableState;
-            this.tableAttribute = TableAttribute.None;
+            this.TableInfo = table.TableInfo;
+            this.TableState = table.TableState;
+            this.TableAttribute = TableAttribute.None;
             if (this.table.DerivedTables.Any() == true)
-                this.tableAttribute |= TableAttribute.BaseTable;
+                this.TableAttribute |= TableAttribute.BaseTable;
             if (this.table.TemplatedParent != null)
-                this.tableAttribute |= TableAttribute.DerivedTable;
+                this.TableAttribute |= TableAttribute.DerivedTable;
             if (this.table.Parent != null)
-                this.tableAttribute |= TableAttribute.HasParent;
-            this.lockInfo = table.LockInfo;
-            this.accessInfo = table.AccessInfo;
-            this.accessType = table.GetAccessType(this.authentication);
-            this.templateDescriptor = new TableTemplateDescriptor(authentication, table.Template, descriptorTypes, owner);
-            this.contentDescriptor = new TableContentDescriptor(authentication, table.Content, descriptorTypes, owner);
-            this.childsReadonly = new ReadOnlyObservableCollection<TableDescriptor>(this.childs);
+                this.TableAttribute |= TableAttribute.HasParent;
+            this.LockInfo = table.LockInfo;
+            this.AccessInfo = table.AccessInfo;
+            this.AccessType = table.GetAccessType(this.authentication);
+            this.TemplateDescriptor = new TableTemplateDescriptor(authentication, table.Template, descriptorTypes, owner);
+            this.ContentDescriptor = new TableContentDescriptor(authentication, table.Content, descriptorTypes, owner);
+            this.Childs = new ReadOnlyObservableCollection<TableDescriptor>(this.childs);
             this.table.ExtendedProperties[this.owner] = this;
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
@@ -127,36 +116,36 @@ namespace Ntreev.Crema.Presentation.Framework
         }
 
         [DescriptorProperty]
-        public string Name => this.tableInfo.Name;
+        public string Name => this.TableInfo.Name;
 
         [DescriptorProperty]
-        public string TableName => this.tableInfo.TableName;
+        public string TableName => this.TableInfo.TableName;
 
         [DescriptorProperty]
-        public string Path => this.tableInfo.CategoryPath + this.tableInfo.Name;
+        public string Path => this.TableInfo.CategoryPath + this.TableInfo.Name;
 
         [DescriptorProperty]
-        public string DisplayName => this.tableInfo.Name;
+        public string DisplayName => this.TableInfo.Name;
 
-        public ReadOnlyObservableCollection<TableDescriptor> Childs => this.childsReadonly;
+        public ReadOnlyObservableCollection<TableDescriptor> Childs { get; }
 
-        [DescriptorProperty(nameof(tableInfo))]
-        public TableInfo TableInfo => this.tableInfo;
+        [DescriptorProperty]
+        public TableInfo TableInfo { get; private set; } = TableInfo.Default;
 
-        [DescriptorProperty(nameof(tableState))]
-        public TableState TableState => this.tableState;
+        [DescriptorProperty]
+        public TableState TableState { get; private set; }
 
-        [DescriptorProperty(nameof(tableAttribute))]
-        public TableAttribute TableAttribute => this.tableAttribute;
+        [DescriptorProperty]
+        public TableAttribute TableAttribute { get; private set; }
 
-        [DescriptorProperty(nameof(lockInfo))]
-        public LockInfo LockInfo => this.lockInfo;
+        [DescriptorProperty]
+        public LockInfo LockInfo { get; private set; } = LockInfo.Empty;
 
-        [DescriptorProperty(nameof(accessInfo))]
-        public AccessInfo AccessInfo => this.accessInfo;
+        [DescriptorProperty]
+        public AccessInfo AccessInfo { get; private set; } = AccessInfo.Empty;
 
-        [DescriptorProperty(nameof(accessType))]
-        public AccessType AccessType => this.accessType;
+        [DescriptorProperty]
+        public AccessType AccessType { get; private set; }
 
         [DescriptorProperty]
         public bool IsLocked => LockableDescriptorUtility.IsLocked(this.authentication, this);
@@ -183,13 +172,13 @@ namespace Ntreev.Crema.Presentation.Framework
         public bool IsBeingEdited => TableDescriptorUtility.IsBeingEdited(this.authentication, this);
 
         [DescriptorProperty]
-        public bool IsBeingEditedClient => TableDescriptorUtility.IsBeingEditedClient(this.authentication, this);
+        public bool IsBeingEditedClient => TableDescriptorUtility.IsBeingEdited(this.authentication, this) && this.ContentDescriptor.Editor == this.authentication.ID;
 
         [DescriptorProperty]
         public bool IsBeingSetup => TableDescriptorUtility.IsBeingSetup(this.authentication, this);
 
         [DescriptorProperty]
-        public bool IsBeingSetupClient => TableDescriptorUtility.IsBeingSetupClient(this.authentication, this);
+        public bool IsBeingSetupClient => TableDescriptorUtility.IsBeingSetup(this.authentication, this) && this.TemplateDescriptor.Editor == this.authentication.ID;
 
         [DescriptorProperty]
         public bool IsInherited => TableDescriptorUtility.IsInherited(this.authentication, this);
@@ -198,10 +187,10 @@ namespace Ntreev.Crema.Presentation.Framework
         public bool IsBaseTemplate => TableDescriptorUtility.IsBaseTemplate(this.authentication, this);
 
         [DescriptorProperty]
-        public TableTemplateDescriptor TemplateDescriptor => this.templateDescriptor;
+        public TableTemplateDescriptor TemplateDescriptor { get; }
 
         [DescriptorProperty]
-        public TableContentDescriptor ContentDescriptor => this.contentDescriptor;
+        public TableContentDescriptor ContentDescriptor { get; }
 
         protected async override void OnDisposed(EventArgs e)
         {
@@ -242,44 +231,44 @@ namespace Ntreev.Crema.Presentation.Framework
 
         private async void Table_LockChanged(object sender, EventArgs e)
         {
-            this.lockInfo = this.table.LockInfo;
-            this.accessType = this.table.GetAccessType(this.authentication);
+            this.LockInfo = this.table.LockInfo;
+            this.AccessType = this.table.GetAccessType(this.authentication);
             await this.RefreshAsync();
         }
 
         private async void Table_AccessChanged(object sender, EventArgs e)
         {
-            this.accessInfo = this.table.AccessInfo;
-            this.accessType = this.table.GetAccessType(this.authentication);
+            this.AccessInfo = this.table.AccessInfo;
+            this.AccessType = this.table.GetAccessType(this.authentication);
             await this.RefreshAsync();
         }
 
         private async void Table_TableInfoChanged(object sender, EventArgs e)
         {
-            this.tableInfo = this.table.TableInfo;
+            this.TableInfo = this.table.TableInfo;
             if (this.table.DerivedTables.Any() == true)
-                this.tableAttribute |= TableAttribute.BaseTable;
+                this.TableAttribute |= TableAttribute.BaseTable;
             else
-                this.tableAttribute &= ~TableAttribute.BaseTable;
+                this.TableAttribute &= ~TableAttribute.BaseTable;
             if (this.table.TemplatedParent != null)
-                this.tableAttribute |= TableAttribute.DerivedTable;
+                this.TableAttribute |= TableAttribute.DerivedTable;
             else
-                this.tableAttribute &= ~TableAttribute.DerivedTable;
+                this.TableAttribute &= ~TableAttribute.DerivedTable;
             await this.RefreshAsync();
         }
 
         private async void Table_TableStateChanged(object sender, EventArgs e)
         {
-            this.tableState = this.table.TableState;
+            this.TableState = this.table.TableState;
             await this.RefreshAsync();
         }
 
         private async void DerivedTables_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (this.table.DerivedTables.Any() == true)
-                this.tableAttribute |= TableAttribute.BaseTable;
+                this.TableAttribute |= TableAttribute.BaseTable;
             else
-                this.tableAttribute &= ~TableAttribute.BaseTable;
+                this.TableAttribute &= ~TableAttribute.BaseTable;
             await this.RefreshAsync();
         }
 

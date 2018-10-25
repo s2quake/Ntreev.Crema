@@ -56,7 +56,7 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task OnBeginEditAsync(Authentication authentication)
         {
             await base.OnBeginEditAsync(authentication);
-            this.type.IsBeingEdited = true;
+            this.type.TypeState = TypeState.IsBeingEdited;
             this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
         }
 
@@ -67,7 +67,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 var typeInfo = typeInfos.First();
                 this.type.UpdateTypeInfo(typeInfo);
-                this.type.IsBeingEdited = false;
+                this.type.TypeState = TypeState.None;
                 this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
             }
             return typeInfos;
@@ -78,14 +78,14 @@ namespace Ntreev.Crema.Services.Data
             await base.OnCancelEditAsync(authentication, args);
             if (args is Guid)
             {
-                this.type.IsBeingEdited = false;
+                this.type.TypeState = TypeState.None;
                 this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
             }
         }
 
         protected override void OnAttach(Domain domain)
         {
-            this.type.IsBeingEdited = true;
+            this.type.TypeState = TypeState.IsBeingEdited;
             base.OnAttach(domain);
         }
 

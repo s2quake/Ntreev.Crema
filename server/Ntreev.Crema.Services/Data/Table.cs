@@ -462,7 +462,7 @@ namespace Ntreev.Crema.Services.Data
 
         public void ValidateIsNotBeingEdited()
         {
-            if (this.IsBeingEdited == true)
+            if (this.TableState == TableState.IsBeingEdited)
                 throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingSetup_Format, base.Name));
             if (this.Content.Domain != null)
                 throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingEdited_Format, base.Name));
@@ -477,7 +477,7 @@ namespace Ntreev.Crema.Services.Data
                 if (NameValidator.VerifyItemPath(item.DataType) == false)
                     continue;
                 var type = typeContext[item.DataType] as Type;
-                if (type.IsBeingEdited == true)
+                if (type.TypeState == TypeState.IsBeingEdited)
                     throw new InvalidOperationException(string.Format(Resources.Exception_TypeIsBeingEdited_Format, type.Name));
             }
         }
@@ -678,7 +678,7 @@ namespace Ntreev.Crema.Services.Data
 
         public new TableInfo TableInfo => base.TableInfo;
 
-        public new TableState TableState => base.TableState;
+        //public new TableState TableState => base.TableState;
 
         public new TagInfo Tags => base.Tags;
 
@@ -916,11 +916,11 @@ namespace Ntreev.Crema.Services.Data
             base.AccessInfo = accessInfo;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void SetTableState(TableState tableState)
-        {
-            base.TableState = tableState;
-        }
+        //[EditorBrowsable(EditorBrowsableState.Never)]
+        //public void SetTableState(TableState tableState)
+        //{
+        //    base.TableState = tableState;
+        //}
 
         #endregion
 

@@ -38,17 +38,17 @@ namespace Ntreev.Crema.Presentation.Framework
                 throw new ArgumentNullException(nameof(authentication));
             if (descriptor == null)
                 throw new ArgumentNullException(nameof(descriptor));
-            return descriptor.TableState.HasFlag(TableState.IsBeingEdited);
+            return descriptor.TableState == TableState.IsBeingEdited;
         }
 
-        public static bool IsBeingEditedClient(Authentication authentication, ITableDescriptor descriptor)
-        {
-            if (authentication == null)
-                throw new ArgumentNullException(nameof(authentication));
-            if (descriptor == null)
-                throw new ArgumentNullException(nameof(descriptor));
-            return descriptor.TableState.HasFlag(TableState.IsBeingEdited | TableState.IsMember);
-        }
+        //public static bool IsBeingEditedClient(Authentication authentication, ITableDescriptor descriptor)
+        //{
+        //    if (authentication == null)
+        //        throw new ArgumentNullException(nameof(authentication));
+        //    if (descriptor == null)
+        //        throw new ArgumentNullException(nameof(descriptor));
+        //    return descriptor.TableState.HasFlag(TableState.IsBeingEdited | TableState.IsMember);
+        //}
 
         public static bool IsBeingSetup(Authentication authentication, ITableDescriptor descriptor)
         {
@@ -56,17 +56,17 @@ namespace Ntreev.Crema.Presentation.Framework
                 throw new ArgumentNullException(nameof(authentication));
             if (descriptor == null)
                 throw new ArgumentNullException(nameof(descriptor));
-            return descriptor.TableState.HasFlag(TableState.IsBeingSetup);
+            return descriptor.TableState == TableState.IsBeingSetup;
         }
 
-        public static bool IsBeingSetupClient(Authentication authentication, ITableDescriptor descriptor)
-        {
-            if (authentication == null)
-                throw new ArgumentNullException(nameof(authentication));
-            if (descriptor == null)
-                throw new ArgumentNullException(nameof(descriptor));
-            return descriptor.TableState.HasFlag(TableState.IsBeingSetup | TableState.IsMember);
-        }
+        //public static bool IsBeingSetupClient(Authentication authentication, ITableDescriptor descriptor)
+        //{
+        //    if (authentication == null)
+        //        throw new ArgumentNullException(nameof(authentication));
+        //    if (descriptor == null)
+        //        throw new ArgumentNullException(nameof(descriptor));
+        //    return descriptor.TableState.HasFlag(TableState.IsBeingSetup | TableState.IsMember);
+        //}
 
         public static bool IsInherited(Authentication authentication, ITableDescriptor descriptor)
         {

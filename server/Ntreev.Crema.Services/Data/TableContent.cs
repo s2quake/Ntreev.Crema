@@ -40,6 +40,7 @@ namespace Ntreev.Crema.Services.Data
         private EventHandler editEnded;
         private EventHandler editCanceled;
         private EventHandler changed;
+        private EventHandler editorsChanged;
 
         public TableContent(Table table)
         {
@@ -368,7 +369,7 @@ namespace Ntreev.Crema.Services.Data
 
             this.Table.ValidateHasNotBeingEditedType();
 
-            if (this.Table.IsBeingEdited == true)
+            if (this.Table.TableState == TableState.IsBeingEdited)
                 throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingEdited_Format, this.Table.Name));
         }
 
@@ -552,6 +553,20 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
+        public event EventHandler EditorsChanged
+        {
+            add
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.editorsChanged += value;
+            }
+            remove
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.editorsChanged -= value;
+            }
+        }
+
         protected virtual void OnEditBegun(EventArgs e)
         {
             this.editBegun?.Invoke(this, e);
@@ -570,6 +585,11 @@ namespace Ntreev.Crema.Services.Data
         protected virtual void OnChanged(EventArgs e)
         {
             this.changed?.Invoke(this, e);
+        }
+
+        protected virtual void OnEditorsChanged(EventArgs e)
+        {
+            this.editorsChanged?.Invoke(this, e);
         }
 
         private DomainAccessType GetAccessType(Authentication authentication)

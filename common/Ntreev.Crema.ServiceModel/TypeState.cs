@@ -25,21 +25,20 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ServiceModel
 {
-    [Flags]
     [DataContract(Namespace = SchemaUtility.Namespace)]
     public enum TypeState
     {
         [EnumMember]
-        None = 0,
+        None,
 
         [EnumMember]
-        IsBeingEdited = 1,
+        IsBeingEdited,
 
-        [EnumMember]
-        [Obsolete("use IsMember")]
-        CanEdit = 4,
+        //[EnumMember]
+        //[Obsolete("use IsMember")]
+        //CanEdit = 4,
 
-        [EnumMember]
-        IsMember = 4,
+        //[EnumMember]
+        //IsMember = 4,
     }
 }

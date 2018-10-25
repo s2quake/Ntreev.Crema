@@ -53,7 +53,7 @@ namespace Ntreev.Crema.Presentation.Tables.MenuItems
             {
                 if (TableDescriptorUtility.IsBeingEdited(this.authenticator, descriptor) == false)
                     return false;
-                return descriptor.TableState.HasFlag(TableState.IsOwner) || this.authenticator.Authority == Authority.Admin;
+                return descriptor.IsBeingEditedClient == true || this.authenticator.Authority == Authority.Admin;
             }
 
             return false;

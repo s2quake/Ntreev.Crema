@@ -333,7 +333,7 @@ namespace Ntreev.Crema.Services.Data
                 var tableState = item.TableState;
                 var table = this.Tables.AddNew(Authentication.System, tableInfo.Name, tableInfo.CategoryPath);
                 table.Initialize(tableInfo);
-                table.SetTableState(tableState);
+                table.TableState = tableState;
             }
 
             foreach (var item in metaData.Tables)

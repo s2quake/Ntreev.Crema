@@ -50,6 +50,7 @@ namespace Ntreev.Crema.Presentation.Framework
         private TableInfo tableInfo = TableInfo.Default;
         private DomainAccessType accessType;
         private bool isModified;
+        private string editor = string.Empty;
 
         public TableContentDescriptor(Authentication authentication, ITableContent content, DescriptorTypes descriptorTypes, object owner)
             : base(authentication, content, descriptorTypes)
@@ -58,6 +59,10 @@ namespace Ntreev.Crema.Presentation.Framework
             this.owner = owner ?? this;
             this.content.Dispatcher.VerifyAccess();
             this.domain = this.content.Domain;
+            if (this.content.Editors.Any(item => item == this.authentication.ID) == true)
+                this.editor = this.authentication.ID;
+            else
+                this.editor = string.Empty;
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
             {
@@ -65,6 +70,7 @@ namespace Ntreev.Crema.Presentation.Framework
                 this.content.EditEnded += Content_EditEnded;
                 this.content.EditCanceled += Content_EditCanceled;
                 this.content.Changed += Content_Changed;
+                this.content.EditorsChanged += Content_EditorsChanged;
                 this.content.Table.TableInfoChanged += Table_TableInfoChanged;
             }
         }
@@ -89,6 +95,9 @@ namespace Ntreev.Crema.Presentation.Framework
 
         [DescriptorProperty]
         public IDomain TargetDomain => this.domain;
+
+        [DescriptorProperty]
+        public string Editor => this.editor;
 
         public event EventHandler EditBegun;
 
@@ -132,6 +141,7 @@ namespace Ntreev.Crema.Presentation.Framework
         private void Content_EditEnded(object sender, EventArgs e)
         {
             this.domain = null;
+            this.editor = string.Empty;
             this.Dispatcher.InvokeAsync(async () =>
             {
                 await this.RefreshAsync();
@@ -142,6 +152,7 @@ namespace Ntreev.Crema.Presentation.Framework
         private void Content_EditCanceled(object sender, EventArgs e)
         {
             this.domain = null;
+            this.editor = string.Empty;
             this.Dispatcher.InvokeAsync(async () =>
             {
                 await this.RefreshAsync();
@@ -152,6 +163,15 @@ namespace Ntreev.Crema.Presentation.Framework
         private async void Content_Changed(object sender, EventArgs e)
         {
             this.isModified = this.content.IsModified;
+            await this.RefreshAsync();
+        }
+
+        private async void Content_EditorsChanged(object sender, EventArgs e)
+        {
+            if (this.content.Editors.Any(item => item == this.authentication.ID) == true)
+                this.editor = this.authentication.ID;
+            else
+                this.editor = string.Empty;
             await this.RefreshAsync();
         }
 

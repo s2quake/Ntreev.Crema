@@ -444,7 +444,7 @@ namespace Ntreev.Crema.Services.Data
 
         public new TableInfo TableInfo => base.TableInfo;
 
-        public new TableState TableState => base.TableState;
+        //public new TableState TableState => base.TableState;
 
         public new TagInfo Tags => base.Tags;
 
@@ -566,11 +566,11 @@ namespace Ntreev.Crema.Services.Data
             this.UpdateTableInfo(tableInfo);
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void SetTableState(TableState tableState)
-        {
-            base.TableState = tableState;
-        }
+        //[EditorBrowsable(EditorBrowsableState.Never)]
+        //public void SetTableState(TableState tableState)
+        //{
+        //    base.TableState = tableState;
+        //}
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void SetAccessInfo(AccessChangeType changeType, AccessInfo accessInfo)

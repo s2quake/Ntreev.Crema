@@ -33,11 +33,14 @@ namespace Ntreev.Crema.Services.Data
     {
         private TableContentDomainHost domainHost;
 
+        public string[] Editors => this.domainHost != null ? this.domainHost.Editors : new string[] { };
+
         public class TableContentDomainHost : IDomainHost, IEnumerable<ITableContent>
         {
             private Domain domain;
 
-            private string masterUserID;
+            //private string masterUserID;
+            private string[] editors;
 
             public TableContentDomainHost(TableCollection container)
             {
@@ -65,56 +68,6 @@ namespace Ntreev.Crema.Services.Data
                 {
                     item.domainHost = this;
                 }
-            }
-
-            private void AttachDomainEvent()
-            {
-                this.domain.Dispatcher.Invoke(() =>
-                {
-                    this.domain.RowAdded += Domain_RowAdded;
-                    this.domain.RowChanged += Domain_RowChanged;
-                    this.domain.RowRemoved += Domain_RowRemoved;
-                    this.domain.PropertyChanged += Domain_PropertyChanged;
-                    this.domain.UserChanged += Domain_UserChanged;
-                });
-            }
-
-            private void DetachDomainEvent()
-            {
-                this.domain.Dispatcher.Invoke(() =>
-                {
-                    this.domain.RowAdded -= Domain_RowAdded;
-                    this.domain.RowChanged -= Domain_RowChanged;
-                    this.domain.RowRemoved -= Domain_RowRemoved;
-                    this.domain.PropertyChanged -= Domain_PropertyChanged;
-                    this.domain.UserChanged -= Domain_UserChanged;
-                });
-            }
-
-            public Task AttachDomainEventAsync()
-            {
-                return this.domain.Dispatcher.InvokeAsync(() =>
-                {
-                    //this.domain.Deleted += Domain_Deleted;
-                    //this.domain.RowAdded += Domain_RowAdded;
-                    this.domain.RowChanged += Domain_RowChanged;
-                    this.domain.RowRemoved += Domain_RowRemoved;
-                    this.domain.PropertyChanged += Domain_PropertyChanged;
-                    this.domain.UserChanged += Domain_UserChanged;
-                });
-            }
-
-            public Task DetachDomainEventAsync()
-            {
-                return this.domain.Dispatcher.InvokeAsync(() =>
-                {
-                    //this.domain.Deleted -= Domain_Deleted;
-                    this.domain.RowAdded -= Domain_RowAdded;
-                    this.domain.RowChanged -= Domain_RowChanged;
-                    this.domain.RowRemoved -= Domain_RowRemoved;
-                    this.domain.PropertyChanged -= Domain_PropertyChanged;
-                    this.domain.UserChanged -= Domain_UserChanged;
-                });
             }
 
             public void InvokeEditBegunEvent(EventArgs e)
@@ -167,9 +120,9 @@ namespace Ntreev.Crema.Services.Data
                 {
                     item.Domain = domain;
                     item.domainHost = this;
-                    item.Table.SetTableState(TableState.IsBeingEdited);
+                    item.Table.TableState = TableState.IsBeingEdited;
                 }
-                await this.AttachDomainEventAsync();
+                await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
                 await this.Dispatcher.InvokeAsync(() => this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables));
                 return result.SignatureDate;
             }
@@ -192,9 +145,9 @@ namespace Ntreev.Crema.Services.Data
                 {
                     tableInfoByName.Add(item.Name, item);
                 }
-                if (args is string)
+                if (this.domain != null)
                 {
-                    await this.DetachDomainEventAsync();
+                    await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                     await this.DomainContext.DeleteAsync(authentication, this.domain, false, tableInfos);
                 }
                 this.Container.ValidateExpired();
@@ -207,7 +160,7 @@ namespace Ntreev.Crema.Services.Data
                         item.dataTable = null;
                         if (tableInfoByName.ContainsKey(item.Table.Name))
                             item.Table.UpdateContent(tableInfoByName[item.Table.Name]);
-                        item.Table.SetTableState(TableState.None);
+                        item.Table.TableState = TableState.None;
                     }
 
                     this.Container.InvokeTablesContentChangedEvent(authentication, this.Tables);
@@ -222,9 +175,9 @@ namespace Ntreev.Crema.Services.Data
                 {
                     var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTableContentEdit(name));
                 }
-                if (args is string)
+                if (this.domain != null)
                 {
-                    await this.DetachDomainEventAsync();
+                    await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                     await this.DomainContext.DeleteAsync(authentication, this.domain, true, null);
                 }
                 await this.Container.Dispatcher.InvokeAsync(() =>
@@ -234,7 +187,7 @@ namespace Ntreev.Crema.Services.Data
                         item.Domain = null;
                         item.IsModified = false;
                         item.dataTable = null;
-                        item.Table.SetTableState(TableState.None);
+                        item.Table.TableState = TableState.None;
                     }
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
@@ -249,13 +202,13 @@ namespace Ntreev.Crema.Services.Data
                     var dataSet = domain.Source as CremaDataSet;
                     foreach (var item in this.Contents)
                     {
-                        var tableState = item.Table.TableState;
+                        //var tableState = item.Table.TableState;
                         item.DataTable = dataSet?.Tables[item.Table.Name, item.Table.Category.Path];
-                        if (dataSet != null)
-                            tableState |= TableState.IsMember;
-                        if (this.masterUserID == authentication.ID)
-                            tableState |= TableState.IsOwner;
-                        item.Table.SetTableState(tableState);
+                        //if (dataSet != null)
+                        //    tableState |= TableState.IsMember;
+                        //if (this.masterUserID == authentication.ID)
+                        //    tableState |= TableState.IsOwner;
+                        //item.Table.TableState = TableState.None;
                     }
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
@@ -270,7 +223,7 @@ namespace Ntreev.Crema.Services.Data
                     foreach (var item in this.Contents)
                     {
                         item.dataTable = null;
-                        item.Table.SetTableState(item.Table.TableState & ~TableState.IsMember);
+                        //item.Table.SetTableState(item.Table.TableState & ~TableState.IsMember);
                     }
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
@@ -281,6 +234,8 @@ namespace Ntreev.Crema.Services.Data
             public TableContent[] Contents { get; private set; }
 
             public DataBase DataBase => this.Container.DataBase;
+
+            public string[] Editors => this.editors ?? new string[] { };
 
             public CremaHost CremaHost => this.Container.CremaHost;
 
@@ -336,23 +291,89 @@ namespace Ntreev.Crema.Services.Data
 
             }
 
-            private void Domain_UserChanged(object sender, DomainUserEventArgs e)
-            {
-                if (this.masterUserID == this.domain.Users.OwnerUserID)
-                    return;
+            //private void Domain_UserChanged(object sender, DomainUserEventArgs e)
+            //{
+            //    if (this.masterUserID == this.domain.Users.OwnerUserID)
+            //        return;
 
-                this.masterUserID = this.domain.Users.OwnerUserID;
-                foreach (var item in this.Contents)
+            //    this.masterUserID = this.domain.Users.OwnerUserID;
+            //    foreach (var item in this.Contents)
+            //    {
+            //        var tableState = item.Table.TableState;
+            //        if (this.masterUserID == this.domain.CremaHost.UserID)
+            //            tableState |= TableState.IsOwner;
+            //        else
+            //            tableState &= ~TableState.IsOwner;
+            //        item.Table.SetTableState(tableState);
+            //    }
+            //    Authentication.System.Sign();
+            //    this.Container.InvokeTablesStateChangedEvent(Authentication.System, this.Tables);
+            //}
+
+            private async void Domain_UserAdded(object sender, DomainUserEventArgs e)
+            {
+                this.RefreshEditors();
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var tableState = item.Table.TableState;
-                    if (this.masterUserID == this.domain.CremaHost.UserID)
-                        tableState |= TableState.IsOwner;
-                    else
-                        tableState &= ~TableState.IsOwner;
-                    item.Table.SetTableState(tableState);
-                }
-                Authentication.System.Sign();
-                this.Container.InvokeTablesStateChangedEvent(Authentication.System, this.Tables);
+                    foreach (var item in this.Contents)
+                    {
+                        item.OnEditorsChanged(e);
+                    }
+                });
+            }
+
+            private async void Domain_UserChanged(object sender, DomainUserEventArgs e)
+            {
+                this.RefreshEditors();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    foreach (var item in this.Contents)
+                    {
+                        item.OnEditorsChanged(e);
+                    }
+                });
+            }
+
+            private async void Domain_UserRemoved(object sender, DomainUserRemovedEventArgs e)
+            {
+                this.RefreshEditors();
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    foreach (var item in this.Contents)
+                    {
+                        item.OnEditorsChanged(e);
+                    }
+                });
+            }
+
+            private void AttachDomainEvent()
+            {
+                this.domain.Dispatcher.VerifyAccess();
+                this.domain.RowAdded += Domain_RowAdded;
+                this.domain.RowChanged += Domain_RowChanged;
+                this.domain.RowRemoved += Domain_RowRemoved;
+                this.domain.PropertyChanged += Domain_PropertyChanged;
+                this.domain.UserAdded += Domain_UserAdded;
+                this.domain.UserChanged += Domain_UserChanged;
+                this.domain.UserRemoved += Domain_UserRemoved;
+            }
+
+            private void DetachDomainEvent()
+            {
+                this.domain.Dispatcher.VerifyAccess();
+                this.domain.RowAdded -= Domain_RowAdded;
+                this.domain.RowChanged -= Domain_RowChanged;
+                this.domain.RowRemoved -= Domain_RowRemoved;
+                this.domain.PropertyChanged -= Domain_PropertyChanged;
+                this.domain.UserAdded -= Domain_UserAdded;
+                this.domain.UserChanged -= Domain_UserChanged;
+                this.domain.UserRemoved -= Domain_UserRemoved;
+            }
+
+            private void RefreshEditors()
+            {
+                this.domain.Dispatcher.VerifyAccess();
+                this.editors = (from DomainUser item in this.domain.Users select item.ID).ToArray();
             }
 
             private CremaDispatcher Dispatcher => this.Container.Dispatcher;
@@ -365,7 +386,7 @@ namespace Ntreev.Crema.Services.Data
 
             void IDomainHost.Detach()
             {
-                this.DetachDomainEvent();
+                this.domain.Dispatcher.Invoke(this.DetachDomainEvent);
                 this.domain = null;
                 foreach (var item in this.Contents)
                 {
@@ -378,24 +399,24 @@ namespace Ntreev.Crema.Services.Data
             {
                 var dataSet = domain.Source as CremaDataSet;
                 this.domain = domain;
-                this.masterUserID = this.domain.Users.OwnerUserID;
+                //this.masterUserID = this.domain.Users.OwnerUserID;
                 foreach (var item in this.Contents)
                 {
-                    var tableState = TableState.IsBeingEdited;
+                    //var tableState = TableState.IsBeingEdited;
                     item.domainHost = this;
                     item.Domain = domain;
                     if (dataSet != null)
                     {
                         item.dataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
-                        if (dataSet != null)
-                            tableState |= TableState.IsMember;
-                        if (this.masterUserID == this.DataBase.CremaHost.UserID)
-                            tableState |= TableState.IsOwner;
+                        //if (dataSet != null)
+                        //    tableState |= TableState.IsMember;
+                        //if (this.masterUserID == this.DataBase.CremaHost.UserID)
+                        //    tableState |= TableState.IsOwner;
                     }
-                    item.Table.SetTableState(tableState);
+                    item.Table.TableState = TableState.IsBeingEdited;
                     item.IsModified = domain.ModifiedTables.Contains(item.Table.Name);
                 }
-                this.AttachDomainEvent();
+                this.domain.Dispatcher.Invoke(this.AttachDomainEvent);
                 //this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 //this.InvokeEditBegunEvent(EventArgs.Empty);
             }

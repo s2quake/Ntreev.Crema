@@ -399,32 +399,6 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
-        public bool IsBeingEdited
-        {
-            get { return this.tableState.HasFlag(TableState.IsBeingEdited); }
-            set
-            {
-                if (value == true)
-                    this.tableState |= TableState.IsBeingEdited;
-                else
-                    this.tableState &= ~TableState.IsBeingEdited;
-                this.OnTableStateChanged(EventArgs.Empty);
-            }
-        }
-
-        public bool IsBeingSetup
-        {
-            get { return this.tableState.HasFlag(TableState.IsBeingSetup); }
-            set
-            {
-                if (value == true)
-                    this.tableState |= TableState.IsBeingSetup;
-                else
-                    this.tableState &= ~TableState.IsBeingSetup;
-                this.OnTableStateChanged(EventArgs.Empty);
-            }
-        }
-
         public string TableName
         {
             get

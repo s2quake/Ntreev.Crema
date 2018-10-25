@@ -25,37 +25,36 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ServiceModel
 {
-    [Flags]
     [DataContract(Namespace = SchemaUtility.Namespace)]
     public enum TableState
     {
-        //[EnumMember]
-        None = 0,
+        [EnumMember]
+        None,
 
         /// <summary>
         /// 테이블의 내용을 편집중인지에 대한 여부를 표시
         /// </summary>
         [EnumMember]
-        IsBeingEdited = 1,
+        IsBeingEdited,
 
         /// <summary>
         /// 테이블의 형태를 편집중인지에 대한 여부를 표시
         /// </summary>
         [EnumMember]
-        IsBeingSetup = 2,
+        IsBeingSetup,
 
-        /// <summary>
-        /// 클라이언트 측에서 편집에 참여하고 있는지에 대한 여부를 표시
-        /// </summary>
-        [EnumMember]
-        [Obsolete]
-        IsMember = 4,
+        ///// <summary>
+        ///// 클라이언트 측에서 편집에 참여하고 있는지에 대한 여부를 표시
+        ///// </summary>
+        //[EnumMember]
+        //[Obsolete]
+        //IsMember = 4,
 
-        /// <summary>
-        /// 클라이언트 측에서 편집에 주인인지에 대한 여부를 표시
-        /// </summary>
-        [EnumMember]
-        [Obsolete]
-        IsOwner = 8,
+        ///// <summary>
+        ///// 클라이언트 측에서 편집에 주인인지에 대한 여부를 표시
+        ///// </summary>
+        //[EnumMember]
+        //[Obsolete]
+        //IsOwner = 8,
     }
 }
