@@ -104,7 +104,7 @@ namespace Ntreev.Crema.Presentation.Framework
 
         public bool IsBeingEdited => this.descriptor.IsBeingEdited;
 
-        public bool IsBeingEditedClient => this.descriptor.IsBeingEditedClient;
+        public bool IsContentEditor => this.descriptor.IsContentEditor;
 
         public bool IsFlag => this.descriptor.IsFlag;
 

@@ -43,7 +43,7 @@ namespace Ntreev.Crema.Presentation.Framework
 
         bool IsBeingEdited { get; }
 
-        bool IsBeingEditedClient { get; }
+        bool IsContentEditor { get; }
 
         bool IsFlag { get; }
 

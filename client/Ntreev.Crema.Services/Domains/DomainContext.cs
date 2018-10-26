@@ -481,12 +481,25 @@ namespace Ntreev.Crema.Services.Domains
 
         private async void Service_Faulted(object sender, EventArgs e)
         {
-            await this.Dispatcher.InvokeAsync(() =>
+            await await this.Dispatcher.InvokeAsync(async() =>
             {
                 this.service.Abort();
                 this.service = null;
                 this.timer?.Dispose();
                 this.timer = null;
+                var tasks = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var taskList = new List<Task>(this.Domains.Count);
+                    foreach (var item in this.Domains.ToArray<Domain>())
+                    {
+                        if (item.DataDispatcher != null)
+                        {
+                            taskList.Add(item.DataDispatcher.DisposeAsync());
+                        }
+                    }
+                    return taskList.ToArray();
+                });
+                await Task.WhenAll(tasks);
                 this.Dispatcher.Dispose();
                 this.Dispatcher = null;
             });
@@ -511,12 +524,25 @@ namespace Ntreev.Crema.Services.Domains
 
         void IDomainServiceCallback.OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
-            this.Dispatcher.Invoke(() =>
+            this.Dispatcher.Invoke(async () =>
             {
                 this.service.Close();
                 this.service = null;
                 this.timer?.Dispose();
                 this.timer = null;
+                var tasks = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var taskList = new List<Task>(this.Domains.Count);
+                    foreach (var item in this.Domains.ToArray<Domain>())
+                    {
+                        if (item.DataDispatcher != null)
+                        {
+                            taskList.Add(item.DataDispatcher.DisposeAsync());
+                        }
+                    }
+                    return taskList.ToArray();
+                });
+                await Task.WhenAll(tasks);
                 this.Dispatcher.Dispose();
                 this.Dispatcher = null;
             });

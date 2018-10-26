@@ -107,7 +107,7 @@ namespace Ntreev.Crema.Presentation.Framework
         public bool IsBeingEdited => TypeDescriptorUtility.IsBeingEdited(this.authentication, this);
 
         [DescriptorProperty]
-        public bool IsBeingEditedClient => TypeDescriptorUtility.IsBeingEdited(this.authentication, this) && this.templateDescriptor.Editor == this.authentication.ID;
+        public bool IsContentEditor => TypeDescriptorUtility.IsBeingEdited(this.authentication, this) && this.templateDescriptor.Editor == this.authentication.ID;
 
         [DescriptorProperty]
         public bool IsFlag => TypeDescriptorUtility.IsFlag(this.authentication, this);

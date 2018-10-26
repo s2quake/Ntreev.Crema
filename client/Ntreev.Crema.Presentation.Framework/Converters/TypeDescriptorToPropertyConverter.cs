@@ -30,7 +30,7 @@ namespace Ntreev.Crema.Presentation.Framework.Converters
     public class TypeDescriptorToPropertyConverter : IValueConverter
     {
         public readonly static string IsBeingEdited = nameof(IsBeingEdited);
-        public readonly static string IsBeingEditedClient = nameof(IsBeingEditedClient);
+        public readonly static string IsContentEditor = nameof(IsContentEditor);
         public readonly static string IsFlag = nameof(IsFlag);
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -53,9 +53,9 @@ namespace Ntreev.Crema.Presentation.Framework.Converters
                     {
                         return TypeDescriptorUtility.IsBeingEdited(Authenticator.Current, descriptor);
                     }
-                    else if (propertyName == IsBeingEditedClient)
+                    else if (propertyName == IsContentEditor)
                     {
-                        return TypeDescriptorUtility.IsBeingEditedClient(Authenticator.Current, descriptor);
+                        return TypeDescriptorUtility.IsContentEditor(Authenticator.Current, descriptor);
                     }
                     else if (propertyName == IsFlag)
                     {

@@ -50,7 +50,8 @@ namespace Ntreev.Crema.Presentation.Framework
         private TableInfo tableInfo = TableInfo.Default;
         private DomainAccessType accessType;
         private bool isModified;
-        private string editor = string.Empty;
+        private bool isEditor;
+        private bool isOwner;
 
         public TableContentDescriptor(Authentication authentication, ITableContent content, DescriptorTypes descriptorTypes, object owner)
             : base(authentication, content, descriptorTypes)
@@ -59,10 +60,8 @@ namespace Ntreev.Crema.Presentation.Framework
             this.owner = owner ?? this;
             this.content.Dispatcher.VerifyAccess();
             this.domain = this.content.Domain;
-            if (this.content.Editors.Any(item => item == this.authentication.ID) == true)
-                this.editor = this.authentication.ID;
-            else
-                this.editor = string.Empty;
+            this.isEditor = this.content.Editors.Any(item => item == this.authentication.ID);
+            this.isOwner = this.content.Owner == this.authentication.ID;
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
             {
@@ -97,13 +96,18 @@ namespace Ntreev.Crema.Presentation.Framework
         public IDomain TargetDomain => this.domain;
 
         [DescriptorProperty]
-        public string Editor => this.editor;
+        public bool IsEditor => this.isEditor;
+
+        [DescriptorProperty]
+        public bool IsOwner => this.isOwner;
 
         public event EventHandler EditBegun;
 
         public event EventHandler EditEnded;
 
         public event EventHandler EditCanceled;
+
+        public event EventHandler EditorsChanged;
 
         public event EventHandler Kicked;
 
@@ -120,6 +124,11 @@ namespace Ntreev.Crema.Presentation.Framework
         protected virtual void OnEditCanceled(EventArgs e)
         {
             this.EditCanceled?.Invoke(this, e);
+        }
+
+        protected virtual void OnEditorsChanged(EventArgs e)
+        {
+            this.EditorsChanged?.Invoke(this, e);
         }
 
         protected virtual void OnKicked(EventArgs e)
@@ -141,7 +150,8 @@ namespace Ntreev.Crema.Presentation.Framework
         private void Content_EditEnded(object sender, EventArgs e)
         {
             this.domain = null;
-            this.editor = string.Empty;
+            this.isEditor = false;
+            this.isOwner = false;
             this.Dispatcher.InvokeAsync(async () =>
             {
                 await this.RefreshAsync();
@@ -152,7 +162,8 @@ namespace Ntreev.Crema.Presentation.Framework
         private void Content_EditCanceled(object sender, EventArgs e)
         {
             this.domain = null;
-            this.editor = string.Empty;
+            this.isEditor = false;
+            this.isOwner = false;
             this.Dispatcher.InvokeAsync(async () =>
             {
                 await this.RefreshAsync();
@@ -168,11 +179,13 @@ namespace Ntreev.Crema.Presentation.Framework
 
         private async void Content_EditorsChanged(object sender, EventArgs e)
         {
-            if (this.content.Editors.Any(item => item == this.authentication.ID) == true)
-                this.editor = this.authentication.ID;
-            else
-                this.editor = string.Empty;
-            await this.RefreshAsync();
+            this.isEditor = this.content.Editors.Any(item => item == this.authentication.ID);
+            this.isOwner = this.content.Owner == this.authentication.ID;
+            await this.Dispatcher.InvokeAsync(async () =>
+            {
+                await this.RefreshAsync();
+                this.OnEditorsChanged(e);
+            });
         }
 
         private void Domain_UserRemoved(object sender, DomainUserRemovedEventArgs e)

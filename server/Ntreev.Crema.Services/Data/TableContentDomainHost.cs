@@ -33,6 +33,8 @@ namespace Ntreev.Crema.Services.Data
 
         public string[] Editors => this.domainHost != null ? this.domainHost.Editors : new string[] { };
 
+        public string Owner => this.domainHost != null ? this.domainHost.Owner : string.Empty;
+
         public class TableContentDomainHost : IDomainHost, IEnumerable<ITableContent>
         {
             private readonly string path;
@@ -41,6 +43,7 @@ namespace Ntreev.Crema.Services.Data
             private CremaDataSet dataSet;
             private string[] itemPaths;
             private string[] editors;
+            private string owner;
 
             public TableContentDomainHost(TableCollection container, Table[] tables)
             {
@@ -89,6 +92,14 @@ namespace Ntreev.Crema.Services.Data
                 foreach (var item in this.Contents)
                 {
                     item.OnEditCanceled(e);
+                }
+            }
+
+            public void Release()
+            {
+                foreach (var item in this.Contents)
+                {
+                    item.domainHost = null;
                 }
             }
 
@@ -157,9 +168,11 @@ namespace Ntreev.Crema.Services.Data
                         }
                         item.Domain = null;
                         item.IsModified = false;
-                        item.dataTable = null;
+                        item.DataTable = null;
                         item.Table.TableState = TableState.None;
                     }
+                    this.editors = null;
+                    this.owner = null;
                     if (tables.Any() == true)
                         this.Container.InvokeTablesContentChangedEvent(authentication, tables, dataSet);
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
@@ -181,9 +194,11 @@ namespace Ntreev.Crema.Services.Data
                     {
                         item.Domain = null;
                         item.IsModified = false;
-                        item.dataTable = null;
+                        item.DataTable = null;
                         item.Table.TableState = TableState.None;
                     }
+                    this.editors = null;
+                    this.owner = null;
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
             }
@@ -213,6 +228,8 @@ namespace Ntreev.Crema.Services.Data
             public DataBase DataBase => this.Container.DataBase;
 
             public string[] Editors => this.editors ?? new string[] { };
+
+            public string Owner => this.owner ?? string.Empty;
 
             public TableCollection Container { get; }
 
@@ -342,6 +359,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.domain.Dispatcher.VerifyAccess();
                 this.editors = (from DomainUser item in this.domain.Users select item.ID).ToArray();
+                this.owner = this.domain.Users.OwnerUserID;
             }
 
             private CremaDispatcher Dispatcher => this.Container.Dispatcher;
@@ -355,6 +373,7 @@ namespace Ntreev.Crema.Services.Data
             void IDomainHost.Detach()
             {
                 this.domain.Dispatcher.Invoke(this.DetachDomainEvent);
+                this.domain.Host = null;
                 this.domain = null;
                 foreach (var item in this.Contents)
                 {
@@ -367,6 +386,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.dataSet = domain.Source as CremaDataSet;
                 this.domain = domain;
+                this.domain.Host = this;
                 this.dataBaseSet = DataBaseSet.Create(this.DataBase, dataSet, false, false);
                 this.itemPaths = this.dataSet.GetItemPaths();
                 this.Repository.Dispatcher.Invoke(() => this.Repository.Lock(this.itemPaths));
@@ -380,8 +400,6 @@ namespace Ntreev.Crema.Services.Data
                     item.IsModified = domain.ModifiedTables.Contains(item.dataTable.Name);
                 }
                 this.domain.Dispatcher.Invoke(this.AttachDomainEvent);
-                //this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
-                this.InvokeEditBegunEvent(EventArgs.Empty);
             }
 
             async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)

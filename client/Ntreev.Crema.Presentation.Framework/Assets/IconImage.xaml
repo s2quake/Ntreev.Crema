@@ -101,7 +101,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <DataTrigger Binding="{Binding IsBeingEdited}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding IsBeingEditedClient}" Value="True">
+            <DataTrigger Binding="{Binding IsContentEditor}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource Accent}" />
             </DataTrigger>
         </Style.Triggers>
@@ -112,14 +112,14 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding IsSelected}" Value="True" />
-                    <Condition Binding="{Binding IsBeingEditedClient}" Value="True" />
+                    <Condition Binding="{Binding IsContentEditor}" Value="True" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Foreground" Value="{DynamicResource WindowBackground}" />
             </MultiDataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding IsSelected}" Value="True" />
-                    <Condition Binding="{Binding IsBeingEditedClient}" Value="False" />
+                    <Condition Binding="{Binding IsContentEditor}" Value="False" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Foreground" Value="{DynamicResource ItemTextDisabled}" />
             </MultiDataTrigger>
@@ -134,7 +134,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <DataTrigger Binding="{Binding IsBeingEdited}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding IsBeingEditedClient}" Value="True">
+            <DataTrigger Binding="{Binding IsContentEditor}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource Accent}" />
             </DataTrigger>
         </Style.Triggers>
@@ -145,14 +145,14 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding IsSelected}" Value="True" />
-                    <Condition Binding="{Binding IsBeingEditedClient}" Value="True" />
+                    <Condition Binding="{Binding IsContentEditor}" Value="True" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Foreground" Value="{DynamicResource WindowBackground}" />
             </MultiDataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding IsSelected}" Value="True" />
-                    <Condition Binding="{Binding IsBeingEditedClient}" Value="False" />
+                    <Condition Binding="{Binding IsContentEditor}" Value="False" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Foreground" Value="{DynamicResource ItemTextDisabled}" />
             </MultiDataTrigger>
@@ -166,7 +166,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <DataTrigger Binding="{Binding IsBeingSetup}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding IsBeingSetupClient}" Value="True">
+            <DataTrigger Binding="{Binding IsTemplateEditor}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource Accent}" />
             </DataTrigger>
         </Style.Triggers>
@@ -177,14 +177,14 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding IsSelected}" Value="True" />
-                    <Condition Binding="{Binding IsBeingSetupClient}" Value="True" />
+                    <Condition Binding="{Binding IsTemplateEditor}" Value="True" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Foreground" Value="{DynamicResource WindowBackground}" />
             </MultiDataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding IsSelected}" Value="True" />
-                    <Condition Binding="{Binding IsBeingSetupClient}" Value="False" />
+                    <Condition Binding="{Binding IsTemplateEditor}" Value="False" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Foreground" Value="{DynamicResource ItemTextDisabled}" />
             </MultiDataTrigger>

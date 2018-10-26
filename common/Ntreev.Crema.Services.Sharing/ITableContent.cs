@@ -59,6 +59,8 @@ namespace Ntreev.Crema.Services
 
         string[] Editors { get; }
 
+        string Owner { get; }
+
         event EventHandler EditBegun;
 
         event EventHandler EditEnded;

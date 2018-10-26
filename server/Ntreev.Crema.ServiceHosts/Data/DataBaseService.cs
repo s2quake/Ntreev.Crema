@@ -766,6 +766,8 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
+                if (domain == null)
+                    throw new DomainNotFoundException(domainID);
                 var template = domain.Host as ITypeTemplate;
                 await template.CancelEditAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;

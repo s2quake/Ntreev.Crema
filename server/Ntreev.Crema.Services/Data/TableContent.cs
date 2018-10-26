@@ -139,7 +139,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.Sign(authentication);
                     this.domainHost.SetServiceState(ServiceState.Closed);
                     this.domainHost.InvokeEditEndedEvent(EventArgs.Empty);
-                    this.domainHost = null;
+                    this.domainHost.Release();
                 });
             }
             catch (Exception e)
@@ -175,7 +175,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.Sign(authentication);
                     this.domainHost.SetServiceState(ServiceState.Closed);
                     this.domainHost.InvokeEditCanceledEvent(EventArgs.Empty);
-                    this.domainHost = null;
+                    this.domainHost.Release();
                 });
             }
             catch (Exception e)
@@ -439,18 +439,27 @@ namespace Ntreev.Crema.Services.Data
             get => this.dataTable;
             set
             {
-                this.dataTable = value;
-                this.internalTable = this.dataTable.DefaultView.Table;
-                this.items = new List<TableRow>(this.internalTable.Rows.Count);
-                for (var i = 0; i < this.internalTable.Rows.Count; i++)
+                if (value != null)
                 {
-                    var dataRow = this.internalTable.Rows[i];
-                    var row = new TableRow(this, dataRow);
-                    this.items.Add(row);
-                    this.internalTable.ExtendedProperties[dataRow] = row;
+                    this.dataTable = value;
+                    this.internalTable = this.dataTable.DefaultView.Table;
+                    this.items = new List<TableRow>(this.internalTable.Rows.Count);
+                    for (var i = 0; i < this.internalTable.Rows.Count; i++)
+                    {
+                        var dataRow = this.internalTable.Rows[i];
+                        var row = new TableRow(this, dataRow);
+                        this.items.Add(row);
+                        this.internalTable.ExtendedProperties[dataRow] = row;
+                    }
+                    this.internalTable.RowDeleted += InternalTable_RowDeleted;
+                    this.internalTable.RowChanged += InternalTable_RowChanged;
                 }
-                this.internalTable.RowDeleted += InternalTable_RowDeleted;
-                this.internalTable.RowChanged += InternalTable_RowChanged;
+                else
+                {
+                    this.dataTable = null;
+                    this.internalTable = null;
+                    this.items = null;
+                }
             }
         }
 

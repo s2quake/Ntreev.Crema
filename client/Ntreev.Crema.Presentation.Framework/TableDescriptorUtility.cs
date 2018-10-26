@@ -41,7 +41,7 @@ namespace Ntreev.Crema.Presentation.Framework
             return descriptor.TableState == TableState.IsBeingEdited;
         }
 
-        //public static bool IsBeingEditedClient(Authentication authentication, ITableDescriptor descriptor)
+        //public static bool IsContentEditor(Authentication authentication, ITableDescriptor descriptor)
         //{
         //    if (authentication == null)
         //        throw new ArgumentNullException(nameof(authentication));
@@ -59,7 +59,7 @@ namespace Ntreev.Crema.Presentation.Framework
             return descriptor.TableState == TableState.IsBeingSetup;
         }
 
-        //public static bool IsBeingSetupClient(Authentication authentication, ITableDescriptor descriptor)
+        //public static bool IsTemplateEditor(Authentication authentication, ITableDescriptor descriptor)
         //{
         //    if (authentication == null)
         //        throw new ArgumentNullException(nameof(authentication));

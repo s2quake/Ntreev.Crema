@@ -66,11 +66,13 @@ namespace Ntreev.Crema.Presentation.Framework
 
         bool IsBeingEdited { get; }
 
-        bool IsBeingEditedClient { get; }
+        bool IsContentEditor { get; }
+
+        bool IsContentOwner { get; }
 
         bool IsBeingSetup { get; }
 
-        bool IsBeingSetupClient { get; }
+        bool IsTemplateEditor { get; }
 
         bool IsInherited { get; }
 

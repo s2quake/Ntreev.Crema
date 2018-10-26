@@ -98,6 +98,7 @@ namespace Ntreev.Crema.Presentation.Framework
                 this.table.TableInfoChanged += Table_TableInfoChanged;
                 this.table.TableStateChanged += Table_TableStateChanged;
                 this.table.DerivedTables.CollectionChanged += DerivedTables_CollectionChanged;
+                this.ContentDescriptor.EditorsChanged += ContentDescriptor_EditorsChanged;
             }
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsRecursive) == true)
@@ -172,13 +173,16 @@ namespace Ntreev.Crema.Presentation.Framework
         public bool IsBeingEdited => TableDescriptorUtility.IsBeingEdited(this.authentication, this);
 
         [DescriptorProperty]
-        public bool IsBeingEditedClient => TableDescriptorUtility.IsBeingEdited(this.authentication, this) && this.ContentDescriptor.Editor == this.authentication.ID;
+        public bool IsContentEditor => TableDescriptorUtility.IsBeingEdited(this.authentication, this) && this.ContentDescriptor.IsEditor;
+
+        [DescriptorProperty]
+        public bool IsContentOwner => TableDescriptorUtility.IsBeingEdited(this.authentication, this) && this.ContentDescriptor.IsOwner;
 
         [DescriptorProperty]
         public bool IsBeingSetup => TableDescriptorUtility.IsBeingSetup(this.authentication, this);
 
         [DescriptorProperty]
-        public bool IsBeingSetupClient => TableDescriptorUtility.IsBeingSetup(this.authentication, this) && this.TemplateDescriptor.Editor == this.authentication.ID;
+        public bool IsTemplateEditor => TableDescriptorUtility.IsBeingSetup(this.authentication, this) && this.TemplateDescriptor.Editor == this.authentication.ID;
 
         [DescriptorProperty]
         public bool IsInherited => TableDescriptorUtility.IsInherited(this.authentication, this);
@@ -260,6 +264,11 @@ namespace Ntreev.Crema.Presentation.Framework
         private async void Table_TableStateChanged(object sender, EventArgs e)
         {
             this.TableState = this.table.TableState;
+            await this.RefreshAsync();
+        }
+
+        private async void ContentDescriptor_EditorsChanged(object sender, EventArgs e)
+        {
             await this.RefreshAsync();
         }
 

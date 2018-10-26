@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Presentation.Tables.MenuItems
                 if (TableDescriptorUtility.IsBeingSetup(this.authenticator, descriptor) == false)
                     return false;
 
-                return descriptor.IsBeingSetupClient == true || this.authenticator.Authority == Authority.Admin;
+                return descriptor.IsTemplateEditor == true || this.authenticator.Authority == Authority.Admin;
             }
 
             return false;

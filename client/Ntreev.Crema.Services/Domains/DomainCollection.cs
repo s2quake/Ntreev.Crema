@@ -248,6 +248,18 @@ namespace Ntreev.Crema.Services.Domains
                 var isLoaded = dataBase.Service != null;
                 domainList.Add(domain);
                 domain.Initialize(authentication, item);
+
+                dataBase.Dispatcher.InvokeAsync(() =>
+                {
+                    if (dataBase.DataBaseState == DataBaseState.Loaded)
+                    {
+                        var domainHost = dataBase.FindDomainHost(domain);
+                        if (domainHost != null)
+                        {
+                            domainHost.Attach(domain);
+                        }
+                    }
+                });
             }
             //if (domain.DataBaseID == dataBase.ID && isLoaded == true && dataBase.IsResetting == false)
             //{

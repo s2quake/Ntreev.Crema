@@ -30,9 +30,9 @@ namespace Ntreev.Crema.Presentation.Framework.Converters
     public class TableDescriptorToPropertyConverter : IValueConverter
     {
         public readonly static string IsBeingEdited = nameof(IsBeingEdited);
-        public readonly static string IsBeingEditedClient = nameof(IsBeingEditedClient);
+        public readonly static string IsContentEditor = nameof(IsContentEditor);
         public readonly static string IsBeingSetup = nameof(IsBeingSetup);
-        public readonly static string IsBeingSetupClient = nameof(IsBeingSetupClient);
+        public readonly static string IsTemplateEditor = nameof(IsTemplateEditor);
         public readonly static string IsInherited = nameof(IsInherited);
         public readonly static string IsBaseTemplate = nameof(IsBaseTemplate);
 
@@ -56,17 +56,17 @@ namespace Ntreev.Crema.Presentation.Framework.Converters
                     {
                         return TableDescriptorUtility.IsBeingEdited(Authenticator.Current, descriptor);
                     }
-                    else if (propertyName == IsBeingEditedClient)
+                    else if (propertyName == IsContentEditor)
                     {
-                        return TableDescriptorUtility.IsBeingEditedClient(Authenticator.Current, descriptor);
+                        return TableDescriptorUtility.IsContentEditor(Authenticator.Current, descriptor);
                     }
                     else if (propertyName == IsBeingSetup)
                     {
                         return TableDescriptorUtility.IsBeingSetup(Authenticator.Current, descriptor);
                     }
-                    else if (propertyName == IsBeingSetupClient)
+                    else if (propertyName == IsTemplateEditor)
                     {
-                        return TableDescriptorUtility.IsBeingSetupClient(Authenticator.Current, descriptor);
+                        return TableDescriptorUtility.IsTemplateEditor(Authenticator.Current, descriptor);
                     }
                     else if (propertyName == IsInherited)
                     {

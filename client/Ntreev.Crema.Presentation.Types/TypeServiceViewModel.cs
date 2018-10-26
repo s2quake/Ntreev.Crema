@@ -163,26 +163,6 @@ namespace Ntreev.Crema.Presentation.Types
             }
         }
 
-        //private async void CremaHost_Opened(object sender, EventArgs e)
-        //{
-        //    await this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        this.shell.Value.ServiceChanged += Shell_ServiceChanged;
-        //        this.configs.Update(this);
-        //        this.Refresh();
-        //    });
-        //}
-
-        //private async void CremaHost_Closing(object sender, EventArgs e)
-        //{
-        //    if (this.cremaHost.Address == null)
-        //        return;
-        //    await this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        this.configs.Commit(this);
-        //    });
-        //}
-
         private async void CremaHost_Closed(object sender, EventArgs e)
         {
             await this.Dispatcher.InvokeAsync(() =>

@@ -131,11 +131,13 @@ namespace Ntreev.Crema.Presentation.Framework
 
         public bool IsBeingEdited => this.descriptor.IsBeingEdited;
 
-        public bool IsBeingEditedClient => this.descriptor.IsBeingEditedClient;
+        public bool IsContentEditor => this.descriptor.IsContentEditor;
+
+        public bool IsContentOwner => this.descriptor.IsContentOwner;
 
         public bool IsBeingSetup => this.descriptor.IsBeingSetup;
 
-        public bool IsBeingSetupClient => this.descriptor.IsBeingSetupClient;
+        public bool IsTemplateEditor => this.descriptor.IsTemplateEditor;
 
         public bool IsInherited => this.descriptor.IsInherited;
 

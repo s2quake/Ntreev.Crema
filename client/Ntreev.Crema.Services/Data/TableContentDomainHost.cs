@@ -35,12 +35,14 @@ namespace Ntreev.Crema.Services.Data
 
         public string[] Editors => this.domainHost != null ? this.domainHost.Editors : new string[] { };
 
+        public string Owner => this.domainHost != null ? this.domainHost.Owner : string.Empty;
+
         public class TableContentDomainHost : IDomainHost, IEnumerable<ITableContent>
         {
             private Domain domain;
 
-            //private string masterUserID;
             private string[] editors;
+            private string owner;
 
             public TableContentDomainHost(TableCollection container)
             {
@@ -91,6 +93,14 @@ namespace Ntreev.Crema.Services.Data
                 foreach (var item in this.Contents)
                 {
                     item.OnEditCanceled(e);
+                }
+            }
+
+            public void Release()
+            {
+                foreach (var item in this.Contents)
+                {
+                    item.domainHost = null;
                 }
             }
 
@@ -157,12 +167,13 @@ namespace Ntreev.Crema.Services.Data
                     {
                         item.Domain = null;
                         item.IsModified = false;
-                        item.dataTable = null;
+                        item.DataTable = null;
                         if (tableInfoByName.ContainsKey(item.Table.Name))
                             item.Table.UpdateContent(tableInfoByName[item.Table.Name]);
                         item.Table.TableState = TableState.None;
                     }
-
+                    this.editors = null;
+                    this.owner = null;
                     this.Container.InvokeTablesContentChangedEvent(authentication, this.Tables);
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
@@ -186,9 +197,11 @@ namespace Ntreev.Crema.Services.Data
                     {
                         item.Domain = null;
                         item.IsModified = false;
-                        item.dataTable = null;
+                        item.DataTable = null;
                         item.Table.TableState = TableState.None;
                     }
+                    this.editors = null;
+                    this.owner = null;
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
             }
@@ -202,13 +215,7 @@ namespace Ntreev.Crema.Services.Data
                     var dataSet = domain.Source as CremaDataSet;
                     foreach (var item in this.Contents)
                     {
-                        //var tableState = item.Table.TableState;
                         item.DataTable = dataSet?.Tables[item.Table.Name, item.Table.Category.Path];
-                        //if (dataSet != null)
-                        //    tableState |= TableState.IsMember;
-                        //if (this.masterUserID == authentication.ID)
-                        //    tableState |= TableState.IsOwner;
-                        //item.Table.TableState = TableState.None;
                     }
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
@@ -222,8 +229,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     foreach (var item in this.Contents)
                     {
-                        item.dataTable = null;
-                        //item.Table.SetTableState(item.Table.TableState & ~TableState.IsMember);
+                        item.DataTable = null;
                     }
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
@@ -236,6 +242,8 @@ namespace Ntreev.Crema.Services.Data
             public DataBase DataBase => this.Container.DataBase;
 
             public string[] Editors => this.editors ?? new string[] { };
+
+            public string Owner => this.owner ?? string.Empty;
 
             public CremaHost CremaHost => this.Container.CremaHost;
 
@@ -290,25 +298,6 @@ namespace Ntreev.Crema.Services.Data
             {
 
             }
-
-            //private void Domain_UserChanged(object sender, DomainUserEventArgs e)
-            //{
-            //    if (this.masterUserID == this.domain.Users.OwnerUserID)
-            //        return;
-
-            //    this.masterUserID = this.domain.Users.OwnerUserID;
-            //    foreach (var item in this.Contents)
-            //    {
-            //        var tableState = item.Table.TableState;
-            //        if (this.masterUserID == this.domain.CremaHost.UserID)
-            //            tableState |= TableState.IsOwner;
-            //        else
-            //            tableState &= ~TableState.IsOwner;
-            //        item.Table.SetTableState(tableState);
-            //    }
-            //    Authentication.System.Sign();
-            //    this.Container.InvokeTablesStateChangedEvent(Authentication.System, this.Tables);
-            //}
 
             private async void Domain_UserAdded(object sender, DomainUserEventArgs e)
             {
@@ -374,6 +363,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.domain.Dispatcher.VerifyAccess();
                 this.editors = (from DomainUser item in this.domain.Users select item.ID).ToArray();
+                this.owner = this.domain.Users.OwnerUserID;
             }
 
             private CremaDispatcher Dispatcher => this.Container.Dispatcher;
@@ -386,39 +376,35 @@ namespace Ntreev.Crema.Services.Data
 
             void IDomainHost.Detach()
             {
+                this.Dispatcher.VerifyAccess();
                 this.domain.Dispatcher.Invoke(this.DetachDomainEvent);
+                this.domain.Host = null;
                 this.domain = null;
                 foreach (var item in this.Contents)
                 {
                     item.Domain = null;
-                    item.dataTable = null;
+                    item.DataTable = null;
                 }
             }
 
             void IDomainHost.Attach(Domain domain)
             {
+                this.Dispatcher.VerifyAccess();
                 var dataSet = domain.Source as CremaDataSet;
                 this.domain = domain;
-                //this.masterUserID = this.domain.Users.OwnerUserID;
+                this.domain.Host = this;
                 foreach (var item in this.Contents)
                 {
-                    //var tableState = TableState.IsBeingEdited;
                     item.domainHost = this;
                     item.Domain = domain;
                     if (dataSet != null)
                     {
-                        item.dataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
-                        //if (dataSet != null)
-                        //    tableState |= TableState.IsMember;
-                        //if (this.masterUserID == this.DataBase.CremaHost.UserID)
-                        //    tableState |= TableState.IsOwner;
+                        item.DataTable = dataSet?.Tables[item.Table.Name, item.Table.Category.Path];
                     }
                     item.Table.TableState = TableState.IsBeingEdited;
                     item.IsModified = domain.ModifiedTables.Contains(item.Table.Name);
                 }
                 this.domain.Dispatcher.Invoke(this.AttachDomainEvent);
-                //this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
-                //this.InvokeEditBegunEvent(EventArgs.Empty);
             }
 
             async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)

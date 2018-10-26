@@ -35,7 +35,7 @@ namespace Ntreev.Crema.Services.Data
         private CremaDataTable dataTable;
         private DataTable internalTable;
 
-        private readonly HashSet<DataRow> rowsToAdd = new HashSet<DataRow>();
+        private List<TableRow> items;
 
         private EventHandler editBegun;
         private EventHandler editEnded;
@@ -231,7 +231,6 @@ namespace Ntreev.Crema.Services.Data
                     this.ValidateAddNew(authentication);
                 });
                 var row = await this.Domain.Dispatcher.InvokeAsync(() => new TableRow(this, this.dataTable.DefaultView.Table, relationID));
-                await this.Dispatcher.InvokeAsync(() => this.rowsToAdd.Add(row.Row));
                 return row;
             }
             catch (Exception e)
@@ -278,12 +277,50 @@ namespace Ntreev.Crema.Services.Data
             get => this.dataTable;
             set
             {
-                this.dataTable = value;
-                this.internalTable = this.dataTable.DefaultView.Table;
-                foreach (DataRow item in this.internalTable.Rows)
+                if (value != null)
                 {
-                    this.dataTable.ExtendedProperties[item] = new TableRow(this, item);
+                    this.dataTable = value;
+                    this.internalTable = this.dataTable.DefaultView.Table;
+                    this.items = new List<TableRow>(this.internalTable.Rows.Count);
+                    for (var i = 0; i < this.internalTable.Rows.Count; i++)
+                    {
+                        var dataRow = this.internalTable.Rows[i];
+                        var row = new TableRow(this, dataRow);
+                        this.items.Add(row);
+                        this.internalTable.ExtendedProperties[dataRow] = row;
+                    }
+                    this.internalTable.RowDeleted += InternalTable_RowDeleted;
+                    this.internalTable.RowChanged += InternalTable_RowChanged;
                 }
+                else
+                {
+                    this.dataTable = null;
+                    this.internalTable = null;
+                    this.items = null;
+                }
+            }
+        }
+
+        private async void InternalTable_RowDeleted(object sender, DataRowChangeEventArgs e)
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                var row = this.internalTable.ExtendedProperties[e.Row] as TableRow;
+                this.items.Remove(row);
+                this.internalTable.ExtendedProperties.Remove(e.Row);
+            });
+        }
+
+        private async void InternalTable_RowChanged(object sender, DataRowChangeEventArgs e)
+        {
+            if (e.Action == DataRowAction.Add)
+            {
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var row = new TableRow(this, e.Row);
+                    this.items.Add(row);
+                    this.internalTable.ExtendedProperties[e.Row] = row;
+                });
             }
         }
 
