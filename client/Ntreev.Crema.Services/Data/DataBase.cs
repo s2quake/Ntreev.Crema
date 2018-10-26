@@ -804,10 +804,9 @@ namespace Ntreev.Crema.Services.Data
 
         private void AttachDomainHost()
         {
-            this.Dispatcher.VerifyAccess();
-            var domains = this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.GetDomains(this.ID));
-            
-                var domains = ;
+            this.DomainContext.Dispatcher.Invoke(() =>
+            {
+                var domains = this.DomainContext.GetDomains(this.ID);
                 var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
                 var domainHostByDomain = this.FindDomainHosts(domains);
                 foreach (var item in domainHostByDomain)
@@ -821,7 +820,7 @@ namespace Ntreev.Crema.Services.Data
                     }
                 }
                 this.DomainContext.AttachDomainHost(authentications, domainHostByDomain);
-            
+            });
         }
 
         private void DetachDomainHost()
