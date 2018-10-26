@@ -418,8 +418,8 @@ namespace Ntreev.Crema.Services.Data
             {
                 await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                 await this.DomainContext.RemoveAsync(authentication, this.domain, false, typeInfos);
-                this.domain = null;
             }
+            this.domain = null;
             if (this.table != null)
             {
                 this.table.RowDeleted -= Table_RowDeleted;
@@ -438,8 +438,8 @@ namespace Ntreev.Crema.Services.Data
             {
                 await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                 await this.DomainContext.RemoveAsync(authentication, this.domain, true, null);
-                this.domain = null;
             }
+            this.domain = null;
             if (this.table != null)
             {
                 this.table.RowDeleted -= Table_RowDeleted;

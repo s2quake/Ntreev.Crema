@@ -1047,7 +1047,7 @@ namespace Ntreev.Crema.Services.Data
                 var domainHost = item.Value;
                 domainHost.Attach(domain);
             }
-            this.DomainContext.AttachDomainHost(authentications, domainHostByDomain);
+            this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.AttachDomainHost(authentications, domainHostByDomain));
         }
 
         private void DetachDomainHost()
@@ -1055,7 +1055,7 @@ namespace Ntreev.Crema.Services.Data
             var domains = this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.GetDomains(this.ID));
             var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
             var domainHostByDomain = domains.ToDictionary(item => item, item => item.Host);
-            this.DomainContext.DetachDomainHost(authentications, domainHostByDomain);
+            this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.DetachDomainHost(authentications, domainHostByDomain));
             foreach (var item in domainHostByDomain)
             {
                 var domain = item.Key;

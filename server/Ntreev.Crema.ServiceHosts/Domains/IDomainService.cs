@@ -46,13 +46,13 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         ResultBase SetUserLocation(Guid domainID, DomainLocationInfo location);
 
         [OperationContract]
-        ResultBase<DomainRowInfo[]> NewRow(Guid domainID, DomainRowInfo[] rows);
+        ResultBase<DomainRowResultInfo> NewRow(Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
-        ResultBase RemoveRow(Guid domainID, DomainRowInfo[] rows);
+        ResultBase<DomainRowResultInfo> RemoveRow(Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
-        ResultBase<DomainRowInfo[]> SetRow(Guid domainID, DomainRowInfo[] rows);
+        ResultBase<DomainRowResultInfo> SetRow(Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
         ResultBase SetProperty(Guid domainID, string propertyName, object value);

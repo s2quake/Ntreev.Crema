@@ -337,12 +337,12 @@ namespace Ntreev.Crema.Services.Data
         protected virtual async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
             var typeInfos = await this.EndDomainAsync(authentication, args);
-            if (this.domain != null)
+            if (this.domain != null && this.domain.Dispatcher != null)
             {
                 await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                 await this.DomainContext.DeleteAsync(authentication, this.domain, false, typeInfos);
-                this.domain = null;
             }
+            this.domain = null;
             if (this.table != null)
             {
                 this.table.RowDeleted -= Table_RowDeleted;
@@ -359,12 +359,12 @@ namespace Ntreev.Crema.Services.Data
         {
             var result = await this.CancelDomainAsync(authentication, args);
             this.CremaHost.Sign(authentication, result);
-            if (this.domain != null)
+            if (this.domain != null && this.domain.Dispatcher != null)
             {
                 await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                 await this.DomainContext.DeleteAsync(authentication, this.domain, true, null);
-                this.domain = null;
             }
+            this.domain = null;
             if (this.table != null)
             {
                 this.table.RowDeleted -= Table_RowDeleted;

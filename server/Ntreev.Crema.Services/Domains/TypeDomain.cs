@@ -37,6 +37,7 @@ namespace Ntreev.Crema.Services.Domains
     {
         private readonly CremaDataType dataType;
         private readonly DataView view;
+        private byte[] data;
 
         public TypeDomain(DomainSerializationInfo serializationInfo, object source)
             : base(serializationInfo, source)
@@ -63,12 +64,19 @@ namespace Ntreev.Crema.Services.Domains
 
         protected override byte[] SerializeSource(object source)
         {
-            if (source is CremaDataType dataType)
+            if (this.data == null)
             {
-                var text = dataType.Path + ";" + XmlSerializerUtility.GetString(dataType.DataSet);
-                return Encoding.UTF8.GetBytes(text.Compress());
+                if (source is CremaDataType dataType)
+                {
+                    var text = dataType.Path + ";" + XmlSerializerUtility.GetString(dataType.DataSet);
+                    this.data = Encoding.UTF8.GetBytes(text.Compress());
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
             }
-            throw new NotImplementedException();
+            return this.data;
         }
 
         protected override object DerializeSource(byte[] data)
@@ -103,6 +111,7 @@ namespace Ntreev.Crema.Services.Domains
                         rows[i].Fields = CremaDomainUtility.GetFields(rowView);
                     }
                     this.dataType.AcceptChanges();
+                    this.data = null;
                     return rows;
                 }
                 catch
@@ -125,6 +134,7 @@ namespace Ntreev.Crema.Services.Domains
                         rows[i].Fields = CremaDomainUtility.SetFields(this.view, rows[i].Keys, rows[i].Fields);
                     }
                     this.dataType.AcceptChanges();
+                    this.data = null;
                     return rows;
                 }
                 catch
@@ -135,9 +145,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        protected override async Task OnRemoveRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected override async Task<DomainRowInfo[]> OnRemoveRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            await this.DataDispatcher.InvokeAsync(() =>
+            return await this.DataDispatcher.InvokeAsync(() =>
             {
                 this.dataType.SignatureDateProvider = signatureProvider;
                 try
@@ -147,6 +157,8 @@ namespace Ntreev.Crema.Services.Domains
                         CremaDomainUtility.Delete(this.view, item.Keys);
                     }
                     this.dataType.AcceptChanges();
+                    this.data = null;
+                    return rows;
                 }
                 catch
                 {
@@ -178,6 +190,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     throw new NotSupportedException();
                 }
+                this.data = null;
             });
         }
     }

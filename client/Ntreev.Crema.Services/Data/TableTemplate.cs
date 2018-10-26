@@ -97,7 +97,7 @@ namespace Ntreev.Crema.Services.Data
 
         protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
         {
-            return Task.Run(() => this.Service.BeginTableTemplateEdit(this.table.Name));
+            return this.CremaHost.InvokeServiceAsync(() => this.Service.BeginTableTemplateEdit(this.table.Name));
         }
 
         protected override async Task<TableInfo[]> EndDomainAsync(Authentication authentication, object args)
@@ -114,7 +114,7 @@ namespace Ntreev.Crema.Services.Data
         {
             if (args is Guid domainID)
             {
-                return await Task.Run(() => this.Service.CancelTableTemplateEdit(domainID));
+                return await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTableTemplateEdit(domainID));
             }
             return new ResultBase() { SignatureDate = authentication.SignatureDate };
         }

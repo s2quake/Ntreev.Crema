@@ -76,22 +76,22 @@ namespace Ntreev.Crema.Services.Domains
             this.Context.InvokeItemsDeleteEvent(authentication, domains, itemPaths);
         }
 
-        public void InvokeDomainRowAddedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows)
+        public void InvokeDomainRowAddedEvent(Authentication authentication, Domain domain, DomainRowResultInfo info)
         {
-            var args = new DomainRowEventArgs(authentication, domain, rows);
+            var args = new DomainRowEventArgs(authentication, domain, info);
             this.OnDomainRowAdded(args);
         }
 
-        public void InvokeDomainRowChangedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows)
+        public void InvokeDomainRowChangedEvent(Authentication authentication, Domain domain, DomainRowResultInfo info)
         {
-            var args = new DomainRowEventArgs(authentication, domain, rows);
+            var args = new DomainRowEventArgs(authentication, domain, info);
             this.OnDomainRowChanged(args);
         }
 
-        public void InvokeDomainRowRemovedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows)
+        public void InvokeDomainRowRemovedEvent(Authentication authentication, Domain domain, DomainRowResultInfo info)
         {
-            var args = new DomainRowEventArgs(authentication, domain, rows);
-            this.OnDomainRowChanged(args);
+            var args = new DomainRowEventArgs(authentication, domain, info);
+            this.OnDomainRowRemoved(args);
         }
 
         public void InvokeDomainPropertyChangedEvent(Authentication authentication, Domain domain, string propertyName, object value)

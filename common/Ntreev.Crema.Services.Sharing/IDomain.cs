@@ -34,11 +34,11 @@ namespace Ntreev.Crema.Services
 
         Task EndUserEditAsync(Authentication authentication);
 
-        Task<DomainRowInfo[]> NewRowAsync(Authentication authentication, DomainRowInfo[] rows);
+        Task<DomainRowResultInfo> NewRowAsync(Authentication authentication, DomainRowInfo[] rows);
 
-        Task<DomainRowInfo[]> SetRowAsync(Authentication authentication, DomainRowInfo[] rows);
+        Task<DomainRowResultInfo> SetRowAsync(Authentication authentication, DomainRowInfo[] rows);
 
-        Task RemoveRowAsync(Authentication authentication, DomainRowInfo[] rows);
+        Task<DomainRowResultInfo> RemoveRowAsync(Authentication authentication, DomainRowInfo[] rows);
 
         Task SetPropertyAsync(Authentication authentication, string propertyName, object value);
 

@@ -38,6 +38,7 @@ namespace Ntreev.Crema.Services.Domains
 
         private readonly CremaTemplate template;
         private readonly DataView view;
+        private byte[] data;
 
         public TableTemplateDomain(DomainSerializationInfo serializationInfo, object source)
             : base(serializationInfo, source)
@@ -64,8 +65,12 @@ namespace Ntreev.Crema.Services.Domains
 
         protected override byte[] SerializeSource(object source)
         {
-            var xml = XmlSerializerUtility.GetString(source);
-            return Encoding.UTF8.GetBytes(xml.Compress());
+            if (this.data == null)
+            {
+                var xml = XmlSerializerUtility.GetString(source);
+                this.data = Encoding.UTF8.GetBytes(xml.Compress());
+            }
+            return this.data;
         }
 
         protected override object DerializeSource(byte[] data)
@@ -92,6 +97,7 @@ namespace Ntreev.Crema.Services.Domains
                     rows[i].Keys = CremaDomainUtility.GetKeys(rowView);
                     rows[i].Fields = CremaDomainUtility.GetFields(rowView);
                 }
+                this.data = null;
                 return rows;
             });
         }
@@ -105,19 +111,22 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     rows[i].Fields = CremaDomainUtility.SetFields(this.view, rows[i].Keys, rows[i].Fields);
                 }
+                this.data = null;
                 return rows;
             });
         }
 
-        protected override async Task OnRemoveRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected override async Task<DomainRowInfo[]> OnRemoveRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            await this.DataDispatcher.InvokeAsync(() =>
+            return await this.DataDispatcher.InvokeAsync(() =>
             {
                 this.template.SignatureDateProvider = signatureProvider;
                 foreach (var item in rows)
                 {
                     CremaDomainUtility.Delete(this.view, item.Keys);
                 }
+                this.data = null;
+                return rows;
             });
         }
 
@@ -143,6 +152,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     throw new NotSupportedException();
                 }
+                this.data = null;
             });
         }
     }

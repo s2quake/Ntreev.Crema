@@ -76,22 +76,22 @@ namespace Ntreev.Crema.Services.Domains
             this.Context.InvokeItemsDeleteEvent(authentication, domains, itemPaths);
         }
 
-        public void InvokeDomainRowAddedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows)
+        public void InvokeDomainRowAddedEvent(Authentication authentication, Domain domain, DomainRowResultInfo info)
         {
-            var args = new DomainRowEventArgs(authentication, domain, rows);
+            var args = new DomainRowEventArgs(authentication, domain, info);
             this.OnDomainRowAdded(args);
         }
 
-        public void InvokeDomainRowChangedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows)
+        public void InvokeDomainRowChangedEvent(Authentication authentication, Domain domain, DomainRowResultInfo info)
         {
-            var args = new DomainRowEventArgs(authentication, domain, rows);
+            var args = new DomainRowEventArgs(authentication, domain, info);
             this.OnDomainRowChanged(args);
         }
 
-        public void InvokeDomainRowRemovedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows)
+        public void InvokeDomainRowRemovedEvent(Authentication authentication, Domain domain, DomainRowResultInfo info)
         {
-            var args = new DomainRowEventArgs(authentication, domain, rows);
-            this.OnDomainRowChanged(args);
+            var args = new DomainRowEventArgs(authentication, domain, info);
+            this.OnDomainRowRemoved(args);
         }
 
         public void InvokeDomainPropertyChangedEvent(Authentication authentication, Domain domain, string propertyName, object value)
@@ -138,6 +138,41 @@ namespace Ntreev.Crema.Services.Domains
         {
             var args = new DomainEventArgs(authentication, domain);
             this.OnDomainStateChanged(args);
+        }
+
+        public Domain Create(Authentication authentication, DomainMetaData metaData)
+        {
+            return this.Dispatcher.Invoke(() =>
+            {
+                var domain = this[metaData.DomainID];
+
+                if (domain == null)
+                {
+                    if (metaData.DomainInfo.DomainType == typeof(TableContentDomain).Name)
+                    {
+                        domain = new TableContentDomain(metaData.DomainInfo);
+                    }
+                    else if (metaData.DomainInfo.DomainType == typeof(TableTemplateDomain).Name)
+                    {
+                        domain = new TableTemplateDomain(metaData.DomainInfo);
+                    }
+                    else if (metaData.DomainInfo.DomainType == typeof(TypeDomain).Name)
+                    {
+                        domain = new TypeDomain(metaData.DomainInfo);
+                    }
+
+                    this.Add(domain);
+                    domain.Category = this.Context.Categories.Prepare(metaData.DomainInfo.CategoryPath);
+                    this.InvokeDomainCreatedEvent(authentication, new Domain[] { domain });
+                    domain.Initialize(authentication, metaData);
+                }
+                else
+                {
+                    domain.Initialize(authentication, metaData);
+                }
+
+                return domain;
+            });
         }
 
         public async Task<Domain> CreateAsync(Authentication authentication, DomainMetaData metaData)
@@ -237,6 +272,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public Domain[] AddDomain(Authentication authentication, DomainMetaData[] metaDatas)
         {
+            this.Dispatcher.VerifyAccess();
             var domainList = new List<Domain>(metaDatas.Length);
             foreach (var item in metaDatas)
             {
@@ -248,28 +284,19 @@ namespace Ntreev.Crema.Services.Domains
                 var isLoaded = dataBase.Service != null;
                 domainList.Add(domain);
                 domain.Initialize(authentication, item);
-
-                dataBase.Dispatcher.InvokeAsync(() =>
-                {
-                    if (dataBase.DataBaseState == DataBaseState.Loaded)
-                    {
-                        var domainHost = dataBase.FindDomainHost(domain);
-                        if (domainHost != null)
-                        {
-                            domainHost.Attach(domain);
-                        }
-                    }
-                });
             }
-            //if (domain.DataBaseID == dataBase.ID && isLoaded == true && dataBase.IsResetting == false)
-            //{
-            //    var target = dataBase.Dispatcher.Invoke(() => dataBase.FindDomainHost(domain));
-            //    if (target != null)
-            //    {
-            //        target.Attach(domain);
-            //        domain.Host = target;
-            //    }
-            //}
+
+            var query = from item in domainList
+                        let dataBase = item.Category.DataBase as DataBase
+                        where dataBase.Service != null
+                        group item by dataBase as DataBase into g
+                        select g;
+            foreach (var item in query)
+            {
+                var dataBase = item.Key;
+                dataBase.Dispatcher.InvokeAsync(() => dataBase.AttachDomainHost(item.ToArray()));
+            }
+
             var domains = domainList.ToArray();
             this.InvokeDomainCreatedEvent(authentication, domains);
             return domains;

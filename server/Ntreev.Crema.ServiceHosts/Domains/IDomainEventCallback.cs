@@ -60,13 +60,13 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         void OnUserRemoved(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, RemoveInfo removeInfo);
 
         [OperationContract(IsOneWay = true)]
-        void OnRowAdded(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows);
+        void OnRowAdded(SignatureDate signatureDate, Guid domainID, DomainRowResultInfo info);
 
         [OperationContract(IsOneWay = true)]
-        void OnRowChanged(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows);
+        void OnRowChanged(SignatureDate signatureDate, Guid domainID, DomainRowResultInfo info);
 
         [OperationContract(IsOneWay = true)]
-        void OnRowRemoved(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows);
+        void OnRowRemoved(SignatureDate signatureDate, Guid domainID, DomainRowResultInfo info);
 
         [OperationContract(IsOneWay = true)]
         void OnPropertyChanged(SignatureDate signatureDate, Guid domainID, string propertyName, object value);

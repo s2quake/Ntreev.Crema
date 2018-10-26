@@ -235,14 +235,14 @@ namespace Ntreev.Crema.Presentation.Tables
 
         public static async Task<bool> EditTemplateAsync(Authentication authentication, ITableDescriptor descriptor)
         {
-            var comment = await LockAsync(authentication, descriptor, nameof(EditTemplateAsync));
-            if (comment == null)
-                return false;
+            //var comment = await LockAsync(authentication, descriptor, nameof(EditTemplateAsync));
+            //if (comment == null)
+            //    return false;
 
             var dialog = await EditTemplateViewModel.CreateInstanceAsync(authentication, descriptor);
             dialog?.ShowDialog();
 
-            await UnlockAsync(authentication, descriptor, comment);
+            //await UnlockAsync(authentication, descriptor, comment);
             return dialog?.DialogResult == true;
         }
 

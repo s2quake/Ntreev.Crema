@@ -144,7 +144,7 @@ namespace Ntreev.Crema.Services.Data
                     var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTableContentEdit(name));
                     return result.Value;
                 }
-                return args as TableInfo[];                
+                return args as TableInfo[];
             }
 
             public async Task<TableInfo[]> EndContentAsync(Authentication authentication, object args)
@@ -155,7 +155,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     tableInfoByName.Add(item.Name, item);
                 }
-                if (this.domain != null)
+                if (this.domain != null && this.domain.Dispatcher != null)
                 {
                     await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                     await this.DomainContext.DeleteAsync(authentication, this.domain, false, tableInfos);
@@ -186,7 +186,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTableContentEdit(name));
                 }
-                if (this.domain != null)
+                if (this.domain != null && this.domain.Dispatcher != null)
                 {
                     await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                     await this.DomainContext.DeleteAsync(authentication, this.domain, true, null);

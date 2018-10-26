@@ -804,44 +804,44 @@ namespace Ntreev.Crema.Services.Data
 
         private void AttachDomainHost()
         {
-            this.DomainContext.Dispatcher.Invoke(() =>
+            var domains = this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.GetDomains(this.ID));
+            var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
+            var domainHostByDomain = this.FindDomainHosts(domains);
+            foreach (var item in domainHostByDomain)
             {
-                var domains = this.DomainContext.GetDomains(this.ID);
-                var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
-                var domainHostByDomain = this.FindDomainHosts(domains);
-                foreach (var item in domainHostByDomain)
-                {
-                    var domain = item.Key;
-                    var domainHost = item.Value;
-                    domainHost.Attach(domain);
-                    if (domain.Users.Contains(this.CremaHost.UserID) == true)
-                    {
-                        domain.Users[this.CremaHost.UserID].IsOnline = true;
-                    }
-                }
-                this.DomainContext.AttachDomainHost(authentications, domainHostByDomain);
-            });
+                var domain = item.Key;
+                var domainHost = item.Value;
+                domainHost.Attach(domain);
+            }
+            this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.AttachDomainHost(authentications, domainHostByDomain));
+        }
+
+        public  void AttachDomainHost(Domain[] domains)
+        {
+            this.Dispatcher.VerifyAccess();
+            var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
+            var domainHostByDomain = this.FindDomainHosts(domains);
+            foreach (var item in domainHostByDomain)
+            {
+                var domain = item.Key;
+                var domainHost = item.Value;
+                domainHost.Attach(domain);
+            }
+            this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.AttachDomainHost(authentications, domainHostByDomain));
         }
 
         private void DetachDomainHost()
         {
-            this.DomainContext.Dispatcher.Invoke(() =>
+            var domains = this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.GetDomains(this.ID));
+            var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
+            var domainHostByDomain = domains.ToDictionary(item => item, item => item.Host);
+            this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.DetachDomainHost(authentications, domainHostByDomain));
+            foreach (var item in domainHostByDomain)
             {
-                var domains = this.DomainContext.GetDomains(this.ID);
-                var authentications = this.authentications.Select(item => (Authentication)item).ToArray();
-                var domainHostByDomain = domains.ToDictionary(item => item, item => item.Host);
-                this.DomainContext.DetachDomainHost(authentications, domainHostByDomain);
-                foreach (var item in domainHostByDomain)
-                {
-                    var domain = item.Key;
-                    var domainHost = item.Value;
-                    domainHost.Detach();
-                    if (domain.Users.Contains(this.CremaHost.UserID) == true)
-                    {
-                        domain.Users[this.CremaHost.UserID].IsOnline = false;
-                    }
-                }
-            });
+                var domain = item.Key;
+                var domainHost = item.Value;
+                domainHost.Detach();
+            }
         }
 
         public IDictionary<Domain, IDomainHost> FindDomainHosts(Domain[] domains)

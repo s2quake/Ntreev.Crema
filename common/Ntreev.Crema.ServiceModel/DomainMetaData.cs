@@ -53,6 +53,12 @@ namespace Ntreev.Crema.ServiceModel
         [DataMember]
         public string[] ModifiedTables { get; set; }
 
+        [DataMember]
+        public long PostID { get; set; }
+
+        [DataMember]
+        public long CompetionID { get; set; }
+
         public static readonly DomainMetaData Empty = new DomainMetaData();
     }
 }

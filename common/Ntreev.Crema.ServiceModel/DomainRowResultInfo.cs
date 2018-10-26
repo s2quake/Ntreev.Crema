@@ -15,24 +15,30 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
+using System.ComponentModel;
+using System.Runtime.Serialization;
+using System.Xml.Serialization;
+using Ntreev.Crema.Data.Xml;
 using System.Collections.Generic;
+using System;
 using System.Linq;
+using Ntreev.Library;
+using System.Xml.Schema;
+using System.Xml;
+using Ntreev.Library.Serialization;
 using System.Text;
-using Ntreev.Crema.ServiceModel;
+using System.IO;
+using Ntreev.Crema.Data;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.ServiceModel
 {
-    public class DomainRowEventArgs : DomainEventArgs
+    [DataContract(Namespace = SchemaUtility.Namespace)]
+    public struct DomainRowResultInfo
     {
-        public DomainRowEventArgs(Authentication authentication, IDomain domain, DomainRowResultInfo info)
-            : base(authentication, domain)
-        {
-            this.Info = info;
-        }
+        [DataMember]
+        public long ID { get; set; }
 
-        public DomainRowResultInfo Info { get; }
-
-        public DomainRowInfo[] Rows => this.Info.Rows;
+        [DataMember]
+        public DomainRowInfo[] Rows { get; set; }
     }
 }

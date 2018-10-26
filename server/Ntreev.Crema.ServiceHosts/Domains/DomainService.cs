@@ -109,9 +109,9 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return result;
         }
 
-        public async Task<ResultBase<DomainRowInfo[]>> SetRowAsync(Guid domainID, DomainRowInfo[] rows)
+        public async Task<ResultBase<DomainRowResultInfo>> SetRowAsync(Guid domainID, DomainRowInfo[] rows)
         {
-            var result = new ResultBase<DomainRowInfo[]>();
+            var result = new ResultBase<DomainRowResultInfo>();
             try
             {
                 var domain = await this.GetDomainAsync(domainID);
@@ -221,9 +221,9 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return result;
         }
 
-        public async Task<ResultBase<DomainRowInfo[]>> NewRowAsync(Guid domainID, DomainRowInfo[] rows)
+        public async Task<ResultBase<DomainRowResultInfo>> NewRowAsync(Guid domainID, DomainRowInfo[] rows)
         {
-            var result = new ResultBase<DomainRowInfo[]>();
+            var result = new ResultBase<DomainRowResultInfo>();
             try
             {
                 var domain = await this.GetDomainAsync(domainID);
@@ -237,13 +237,13 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return result;
         }
 
-        public async Task<ResultBase> RemoveRowAsync(Guid domainID, DomainRowInfo[] rows)
+        public async Task<ResultBase<DomainRowResultInfo>> RemoveRowAsync(Guid domainID, DomainRowInfo[] rows)
         {
-            var result = new ResultBase();
+            var result = new ResultBase<DomainRowResultInfo>();
             try
             {
                 var domain = await this.GetDomainAsync(domainID);
-                await domain.RemoveRowAsync(this.authentication, rows);
+                result.Value = await domain.RemoveRowAsync(this.authentication, rows);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -459,8 +459,8 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var exceptionUserID = e.UserID;
             var signatureDate = e.SignatureDate;
             var domainID = e.DomainInfo.DomainID;
-            var rows = e.Rows;
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnRowAdded(signatureDate, domainID, rows));
+            var info = e.Info;
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnRowAdded(signatureDate, domainID, info));
         }
 
         private void Domains_DomainRowChanged(object sender, DomainRowEventArgs e)
@@ -469,8 +469,8 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var exceptionUserID = e.UserID;
             var signatureDate = e.SignatureDate;
             var domainID = e.DomainInfo.DomainID;
-            var rows = e.Rows;
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnRowChanged(signatureDate, domainID, rows));
+            var info = e.Info;
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnRowChanged(signatureDate, domainID, info));
         }
 
         private void Domains_DomainRowRemoved(object sender, DomainRowEventArgs e)
@@ -479,8 +479,8 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var exceptionUserID = e.UserID;
             var signatureDate = e.SignatureDate;
             var domainID = e.DomainInfo.DomainID;
-            var rows = e.Rows;
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnRowRemoved(signatureDate, domainID, rows));
+            var info = e.Info;
+            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnRowRemoved(signatureDate, domainID, info));
         }
 
         private void Domains_DomainPropertyChanged(object sender, DomainPropertyEventArgs e)

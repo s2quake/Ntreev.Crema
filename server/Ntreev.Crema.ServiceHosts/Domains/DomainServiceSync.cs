@@ -53,17 +53,17 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return this.InvokeTask(Task.Run(() => this.SetUserLocationAsync(domainID, location)));
         }
 
-        public ResultBase<DomainRowInfo[]> NewRow(Guid domainID, DomainRowInfo[] rows)
+        public ResultBase<DomainRowResultInfo> NewRow(Guid domainID, DomainRowInfo[] rows)
         {
             return this.InvokeTask(Task.Run(() => this.NewRowAsync(domainID, rows)));
         }
 
-        public ResultBase RemoveRow(Guid domainID, DomainRowInfo[] rows)
+        public ResultBase<DomainRowResultInfo> RemoveRow(Guid domainID, DomainRowInfo[] rows)
         {
             return this.InvokeTask(Task.Run(() => this.RemoveRowAsync(domainID, rows)));
         }
 
-        public ResultBase<DomainRowInfo[]> SetRow(Guid domainID, DomainRowInfo[] rows)
+        public ResultBase<DomainRowResultInfo> SetRow(Guid domainID, DomainRowInfo[] rows)
         {
             return this.InvokeTask(Task.Run(() => this.SetRowAsync(domainID, rows)));
         }

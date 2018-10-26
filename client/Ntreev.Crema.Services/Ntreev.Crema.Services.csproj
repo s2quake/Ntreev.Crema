@@ -83,6 +83,17 @@
     <Compile Include="Data\TypeTemplate.cs" />
     <Compile Include="Data\TypeTemplateBase.cs" />
     <Compile Include="DescriptorServiceFactory.cs" />
+    <Compile Include="Domains\Actions\DisjoinAction.cs" />
+    <Compile Include="Domains\Actions\JoinAction.cs" />
+    <Compile Include="Domains\Actions\KickAction.cs" />
+    <Compile Include="Domains\Actions\NewRowAction.cs" />
+    <Compile Include="Domains\Actions\RemoveRowAction.cs" />
+    <Compile Include="Domains\Actions\SetOwnerAction.cs" />
+    <Compile Include="Domains\Actions\SetPropertyAction.cs" />
+    <Compile Include="Domains\Actions\SetRowAction.cs" />
+    <Compile Include="Domains\DomainActionBase.cs" />
+    <Compile Include="Domains\DomainLogger.cs" />
+    <Compile Include="Domains\Serializations\DomainCompletionItemSerializationInfo.cs" />
     <Compile Include="Domains\TableTemplateDomain.cs" />
     <Compile Include="Domains\TableContentDomain.cs" />
     <Compile Include="Domains\TypeDomain.cs" />
@@ -165,6 +176,7 @@
     <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DomainContextMetaData.datasource" />
     <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DomainMetaData.datasource" />
     <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DomainRowInfo.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DomainRowResultInfo.datasource" />
     <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DomainUserInfo.datasource" />
     <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.FindResultInfo.datasource" />
     <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.LockInfo.datasource" />

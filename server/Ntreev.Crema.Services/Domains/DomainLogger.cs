@@ -211,10 +211,11 @@ namespace Ntreev.Crema.Services.Domains
 
                 var id = this.ID++;
                 var itemPath = Path.Combine(this.basePath, $"{id}");
-                this.currentPost = new DomainPostItemSerializationInfo(id, action.GetType());
+                this.currentPost = new DomainPostItemSerializationInfo(id, action.UserID, action.GetType());
                 this.postedList.Add(this.currentPost);
                 this.serializer.Serialize(itemPath, action, ObjectSerializerSettings.Empty);
                 File.AppendAllText(this.postedPath, $"{this.currentPost}{Environment.NewLine}");
+                this.PostID = id;
                 return id;
             });
         }
@@ -228,10 +229,15 @@ namespace Ntreev.Crema.Services.Domains
 
                 this.completedList.Add(new DomainCompleteItemSerializationInfo(id));
                 File.AppendAllText(this.completedPath, $"{new DomainCompleteItemSerializationInfo(id)}{Environment.NewLine}");
+                this.CompletionID = id;
             });
         }
 
         public long ID { get; set; }
+
+        public long PostID { get; set; }
+
+        public long CompletionID { get; set; }
 
         public bool IsEnabled { get; set; } = true;
 

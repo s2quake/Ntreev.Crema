@@ -349,12 +349,12 @@ namespace Ntreev.Crema.Services.Data
         protected virtual async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
             var tableInfos = await this.EndDomainAsync(authentication, args);
-            if (this.domain != null)
+            if (this.domain != null && this.domain.Dispatcher != null)
             {
                 await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                 await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false, tableInfos);
-                this.domain = null;
             }
+            this.domain = null;
             if (this.table != null)
             {
                 this.table.RowDeleted -= Table_RowDeleted;
@@ -370,12 +370,12 @@ namespace Ntreev.Crema.Services.Data
         protected virtual async Task OnCancelEditAsync(Authentication authentication, object args)
         {
             var result = await this.CancelDomainAsync(authentication, args);
-            if (this.domain != null)
+            if (this.domain != null && this.domain.Dispatcher != null)
             {
                 await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                 await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true, null);
-                this.domain = null;
             }
+            this.domain = null;
             if (this.table != null)
             {
                 this.table.RowDeleted -= Table_RowDeleted;
@@ -391,7 +391,6 @@ namespace Ntreev.Crema.Services.Data
         {
             this.TemplateSource = domain.Source as CremaTemplate;
             this.domain = domain as TableTemplateDomain;
-
             if (this.TemplateSource != null)
             {
                 this.table = this.TemplateSource.View.Table;
@@ -411,7 +410,7 @@ namespace Ntreev.Crema.Services.Data
 
         protected virtual void OnDetach()
         {
-            this.DetachDomainEvent();
+            this.domain.Dispatcher.Invoke(this.DetachDomainEvent);
             this.domain = null;
         }
 

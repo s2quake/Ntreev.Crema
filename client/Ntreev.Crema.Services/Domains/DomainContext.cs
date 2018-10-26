@@ -137,6 +137,11 @@ namespace Ntreev.Crema.Services.Domains
             this.OnItemsDeleted(new ItemsDeletedEventArgs<IDomainItem>(authentication, items, itemPaths));
         }
 
+        public Domain Create(Authentication authentication, DomainMetaData metaData)
+        {
+            return this.Domains.Create(authentication, metaData);
+        }
+
         public Task<Domain> CreateAsync(Authentication authentication, DomainMetaData metaData)
         {
             return this.Domains.CreateAsync(authentication, metaData);
@@ -173,9 +178,9 @@ namespace Ntreev.Crema.Services.Domains
                 var taskList = new List<Task>(this.Domains.Count);
                 foreach (var item in this.Domains.ToArray<Domain>())
                 {
-                    if (item.DataDispatcher != null)
+                    if (item.Logger != null)
                     {
-                        taskList.Add(item.DataDispatcher.DisposeAsync());
+                        taskList.Add(item.Logger.DisposeAsync());
                     }
                 }
                 return taskList.ToArray();
@@ -212,6 +217,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public void AttachDomainHost(Authentication[] authentications, IDictionary<Domain, IDomainHost> domainHostByDomain)
         {
+            this.Dispatcher.VerifyAccess();
             foreach (var item in domainHostByDomain)
             {
                 var domain = item.Key;
@@ -223,6 +229,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public void DetachDomainHost(Authentication[] authentications, IDictionary<Domain, IDomainHost> domainHostByDomain)
         {
+            this.Dispatcher.VerifyAccess();
             foreach (var item in domainHostByDomain)
             {
                 var domain = item.Key;
@@ -687,7 +694,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDomainServiceCallback.OnRowAdded(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows)
+        void IDomainServiceCallback.OnRowAdded(SignatureDate signatureDate, Guid domainID, DomainRowResultInfo info)
         {
             try
             {
@@ -695,7 +702,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
-                    await domain.InvokeRowAddedAsync(authentication, rows);
+                    await domain.InvokeRowAddedAsync(authentication, info);
                 });
             }
             catch (Exception e)
@@ -704,7 +711,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDomainServiceCallback.OnRowChanged(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows)
+        void IDomainServiceCallback.OnRowChanged(SignatureDate signatureDate, Guid domainID, DomainRowResultInfo info)
         {
             try
             {
@@ -712,7 +719,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
-                    await domain.InvokeRowChangedAsync(authentication, rows);
+                    await domain.InvokeRowChangedAsync(authentication, info);
                 });
             }
             catch (Exception e)
@@ -721,7 +728,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDomainServiceCallback.OnRowRemoved(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows)
+        void IDomainServiceCallback.OnRowRemoved(SignatureDate signatureDate, Guid domainID, DomainRowResultInfo info)
         {
             try
             {
@@ -729,7 +736,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
-                    await domain.InvokeRowRemovedAsync(authentication, rows);
+                    await domain.InvokeRowRemovedAsync(authentication, info);
                 });
             }
             catch (Exception e)

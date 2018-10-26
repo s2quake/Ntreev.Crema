@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.Services.Domains.Serializations
 {
     [DataContract(Namespace = SchemaUtility.Namespace)]
-    struct DomainPostItemSerializationInfo
+    struct DomainCompletionItemSerializationInfo
     {
-        public DomainPostItemSerializationInfo(long id, string userID, Type type)
+        public DomainCompletionItemSerializationInfo(long id, string userID, DateTime dateTime, Type type)
         {
             this.ID = id;
             this.UserID = userID;
+            this.DateTime = dateTime;
             this.Type = type.AssemblyQualifiedName;
-            this.DateTime = DateTime.Now;
         }
 
         public override string ToString()
@@ -24,10 +24,10 @@ namespace Ntreev.Crema.Services.Domains.Serializations
             return $"{this.ID}\t{this.UserID}\t{this.DateTime:o}\t{this.Type}";
         }
 
-        public static DomainPostItemSerializationInfo Parse(string text)
+        public static DomainCompletionItemSerializationInfo Parse(string text)
         {
             var items = StringUtility.Split(text, '\t');
-            return new DomainPostItemSerializationInfo()
+            return new DomainCompletionItemSerializationInfo()
             {
                 ID = long.Parse(items[0]),
                 UserID = items[1],

@@ -28,13 +28,13 @@ namespace Ntreev.Crema.Services.DomainService {
         Ntreev.Crema.ServiceModel.ResultBase SetUserLocation(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo location);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/NewRow", ReplyAction="http://www.ntreev.com/IDomainService/NewRowResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]> NewRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
+        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowResultInfo> NewRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/RemoveRow", ReplyAction="http://www.ntreev.com/IDomainService/RemoveRowResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase RemoveRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
+        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowResultInfo> RemoveRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/SetRow", ReplyAction="http://www.ntreev.com/IDomainService/SetRowResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]> SetRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
+        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowResultInfo> SetRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/SetProperty", ReplyAction="http://www.ntreev.com/IDomainService/SetPropertyResponse")]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(System.DBNull))]
@@ -58,7 +58,8 @@ namespace Ntreev.Crema.Services.DomainService {
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData[]>))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowInfo[]))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowInfo))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowResultInfo>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowResultInfo))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainUserInfo>))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TableInfo))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.ColumnInfo[]))]
@@ -114,7 +115,8 @@ namespace Ntreev.Crema.Services.DomainService {
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData[]>))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowInfo[]))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowInfo))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowResultInfo>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowResultInfo))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainUserInfo>))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TableInfo))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.ColumnInfo[]))]
@@ -170,7 +172,8 @@ namespace Ntreev.Crema.Services.DomainService {
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData[]>))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowInfo[]))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowInfo))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowResultInfo>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowResultInfo))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainUserInfo>))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TableInfo))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.ColumnInfo[]))]
@@ -208,13 +211,13 @@ namespace Ntreev.Crema.Services.DomainService {
         void OnUserRemoved(Ntreev.Library.SignatureDate signatureDate, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainUserInfo domainUserInfo, Ntreev.Crema.ServiceModel.RemoveInfo removeInfo);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainService/OnRowAdded")]
-        void OnRowAdded(Ntreev.Library.SignatureDate signatureDate, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
+        void OnRowAdded(Ntreev.Library.SignatureDate signatureDate, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowResultInfo info);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainService/OnRowChanged")]
-        void OnRowChanged(Ntreev.Library.SignatureDate signatureDate, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
+        void OnRowChanged(Ntreev.Library.SignatureDate signatureDate, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowResultInfo info);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainService/OnRowRemoved")]
-        void OnRowRemoved(Ntreev.Library.SignatureDate signatureDate, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
+        void OnRowRemoved(Ntreev.Library.SignatureDate signatureDate, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowResultInfo info);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainService/OnPropertyChanged")]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(System.DBNull))]
@@ -238,7 +241,8 @@ namespace Ntreev.Crema.Services.DomainService {
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData[]>))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowInfo[]))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowInfo))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowResultInfo>))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.DomainRowResultInfo))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainUserInfo>))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.TableInfo))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(Ntreev.Crema.Data.ColumnInfo[]))]
@@ -305,15 +309,15 @@ namespace Ntreev.Crema.Services.DomainService {
             return base.Channel.SetUserLocation(domainID, location);
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]> NewRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows) {
+        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowResultInfo> NewRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows) {
             return base.Channel.NewRow(domainID, rows);
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase RemoveRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows) {
+        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowResultInfo> RemoveRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows) {
             return base.Channel.RemoveRow(domainID, rows);
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowInfo[]> SetRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows) {
+        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainRowResultInfo> SetRow(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows) {
             return base.Channel.SetRow(domainID, rows);
         }
         

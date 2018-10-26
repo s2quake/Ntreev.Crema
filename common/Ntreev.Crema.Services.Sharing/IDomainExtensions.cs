@@ -37,7 +37,7 @@ namespace Ntreev.Crema.Services
             };
 
             var result = await domain.NewRowAsync(authentication, new DomainRowInfo[] { row });
-            return result.First().Keys;
+            return result.Rows.First().Keys;
         }
 
         public static Task BeginEditAsync(this IDomain domain, Authentication authentication, object item, string fieldName)

@@ -110,7 +110,10 @@ namespace Ntreev.Crema.Services.Domains
         {
             await this.DataDispatcher.InvokeAsync(() =>
             {
-                this.DataSet.BeginLoad();
+                //this.DataSet.BeginLoad();
+                var oldcount = 0;
+                var newcount = 0;
+                var id = this.Logger.CompletionID;
                 try
                 {
                     foreach (var item in rows)
@@ -118,8 +121,10 @@ namespace Ntreev.Crema.Services.Domains
                         var view = this.views[item.TableName];
                         var table = view.Table;
                         var count = table.Rows.Count;
+                        oldcount = count;
                         CremaDomainUtility.AddNew(view, item.Fields);
-                        if (table.Rows.Count == count)
+                        newcount = table.Rows.Count;
+                        if (table.Rows.Count != count + 1)
                         {
                             int qwer = 0;
                         }
@@ -128,9 +133,31 @@ namespace Ntreev.Crema.Services.Domains
                 }
                 finally
                 {
-                    this.DataSet.EndLoad();
+                    //try
+                    //{
+                    //    this.DataSet.EndLoad();
+                    //}
+                    //catch(Exception eee)
+                    //{
+                    //    this.DataSet.RejectChanges();
+                    //    foreach (var item in rows)
+                    //    {
+                    //        var view = this.views[item.TableName];
+                    //        var table = view.Table;
+                    //        var count = table.Rows.Count;
+                    //        CremaDomainUtility.AddNew(view, item.Fields);
+                    //        if (table.Rows.Count != count + 1)
+                    //        {
+                    //            int qwer = 0;
+                    //        }
+                    //        this.tables[view].ContentsInfo = signatureDate;
+
+                    //    }
+                    //    this.DataSet.EndLoad();
+                    //}
                 }
-                this.DataSet.AcceptChanges();
+                //this.DataSet.AcceptChanges();
+                this.Logger.CompletionID = id;
             });
         }
 

@@ -221,30 +221,26 @@ namespace Ntreev.Crema.Services.Domains
 
         public void AttachDomainHost(Authentication[] authentications, IDictionary<Domain, IDomainHost> domainHostByDomain)
         {
-            this.Dispatcher.Invoke(() =>
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in domainHostByDomain)
             {
-                foreach (var item in domainHostByDomain)
-                {
-                    var domain = item.Key;
-                    var domainHost = item.Value;
-                    domain.SetDomainHost(Authentication.System, domainHost);
-                    domain.Attach(authentications);
-                }
-            });
+                var domain = item.Key;
+                var domainHost = item.Value;
+                domain.SetDomainHost(Authentication.System, domainHost);
+                domain.Attach(authentications);
+            }
         }
 
         public void DetachDomainHost(Authentication[] authentications, IDictionary<Domain, IDomainHost> domainHostByDomain)
         {
-            this.Dispatcher.Invoke(() =>
+            this.Dispatcher.VerifyAccess();
+            foreach (var item in domainHostByDomain)
             {
-                foreach (var item in domainHostByDomain)
-                {
-                    var domain = item.Key;
-                    var domainHost = item.Value;
-                    domain.Detach(authentications);
-                    domain.SetDomainHost(Authentication.System, null);
-                }
-            });
+                var domain = item.Key;
+                var domainHost = item.Value;
+                domain.Detach(authentications);
+                domain.SetDomainHost(Authentication.System, null);
+            }
         }
 
         public Task BeginTransactionAsync(Authentication authentication, string sourcePath, string destPath)
