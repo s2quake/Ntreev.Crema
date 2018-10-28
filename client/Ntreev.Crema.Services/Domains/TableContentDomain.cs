@@ -106,102 +106,92 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        protected override async Task OnNewRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
+        protected override void OnNewRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
         {
-            await this.DataDispatcher.InvokeAsync(() =>
+            //this.DataSet.BeginLoad();
+            var oldcount = 0;
+            var newcount = 0;
+            var id = this.Logger.CompletionID;
+            try
             {
-                //this.DataSet.BeginLoad();
-                var oldcount = 0;
-                var newcount = 0;
-                var id = this.Logger.CompletionID;
-                try
-                {
-                    foreach (var item in rows)
-                    {
-                        var view = this.views[item.TableName];
-                        var table = view.Table;
-                        var count = table.Rows.Count;
-                        oldcount = count;
-                        CremaDomainUtility.AddNew(view, item.Fields);
-                        newcount = table.Rows.Count;
-                        if (table.Rows.Count != count + 1)
-                        {
-                            int qwer = 0;
-                        }
-                        this.tables[view].ContentsInfo = signatureDate;
-                    }
-                }
-                finally
-                {
-                    //try
-                    //{
-                    //    this.DataSet.EndLoad();
-                    //}
-                    //catch(Exception eee)
-                    //{
-                    //    this.DataSet.RejectChanges();
-                    //    foreach (var item in rows)
-                    //    {
-                    //        var view = this.views[item.TableName];
-                    //        var table = view.Table;
-                    //        var count = table.Rows.Count;
-                    //        CremaDomainUtility.AddNew(view, item.Fields);
-                    //        if (table.Rows.Count != count + 1)
-                    //        {
-                    //            int qwer = 0;
-                    //        }
-                    //        this.tables[view].ContentsInfo = signatureDate;
-
-                    //    }
-                    //    this.DataSet.EndLoad();
-                    //}
-                }
-                //this.DataSet.AcceptChanges();
-                this.Logger.CompletionID = id;
-            });
-        }
-
-        protected override async Task OnRemoveRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
-        {
-            await this.DataDispatcher.InvokeAsync(() =>
-            {
-                foreach (var item in rows.Reverse())
+                foreach (var item in rows)
                 {
                     var view = this.views[item.TableName];
-                    if (DomainRowInfo.ClearKey.SequenceEqual(item.Keys) == true)
+                    var table = view.Table;
+                    var count = table.Rows.Count;
+                    oldcount = count;
+                    CremaDomainUtility.AddNew(view, item.Fields);
+                    newcount = table.Rows.Count;
+                    if (table.Rows.Count != count + 1)
                     {
-                        view.Table.Clear();
-                    }
-                    else
-                    {
-                        CremaDomainUtility.Delete(view, item.Keys);
+                        int qwer = 0;
                     }
                     this.tables[view].ContentsInfo = signatureDate;
                 }
-                this.DataSet.AcceptChanges();
-            });
+            }
+            finally
+            {
+                //try
+                //{
+                //    this.DataSet.EndLoad();
+                //}
+                //catch(Exception eee)
+                //{
+                //    this.DataSet.RejectChanges();
+                //    foreach (var item in rows)
+                //    {
+                //        var view = this.views[item.TableName];
+                //        var table = view.Table;
+                //        var count = table.Rows.Count;
+                //        CremaDomainUtility.AddNew(view, item.Fields);
+                //        if (table.Rows.Count != count + 1)
+                //        {
+                //            int qwer = 0;
+                //        }
+                //        this.tables[view].ContentsInfo = signatureDate;
+
+                //    }
+                //    this.DataSet.EndLoad();
+                //}
+            }
+            //this.DataSet.AcceptChanges();
         }
 
-        protected override async Task OnSetRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
+        protected override void OnRemoveRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
         {
-            await this.DataDispatcher.InvokeAsync(() =>
+            foreach (var item in rows.Reverse())
             {
-                this.DataSet.BeginLoad();
-                try
+                var view = this.views[item.TableName];
+                if (DomainRowInfo.ClearKey.SequenceEqual(item.Keys) == true)
                 {
-                    foreach (var item in rows)
-                    {
-                        var view = this.views[item.TableName];
-                        CremaDomainUtility.SetFieldsForce(view, item.Keys, item.Fields);
-                        this.tables[view].ContentsInfo = signatureDate;
-                    }
+                    view.Table.Clear();
                 }
-                finally
+                else
                 {
-                    this.DataSet.EndLoad();
+                    CremaDomainUtility.Delete(view, item.Keys);
                 }
-                this.DataSet.AcceptChanges();
-            });
+                this.tables[view].ContentsInfo = signatureDate;
+            }
+            this.DataSet.AcceptChanges();
+        }
+
+        protected override void OnSetRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
+        {
+            this.DataSet.BeginLoad();
+            try
+            {
+                foreach (var item in rows)
+                {
+                    var view = this.views[item.TableName];
+                    CremaDomainUtility.SetFieldsForce(view, item.Keys, item.Fields);
+                    this.tables[view].ContentsInfo = signatureDate;
+                }
+            }
+            finally
+            {
+                this.DataSet.EndLoad();
+            }
+            this.DataSet.AcceptChanges();
         }
     }
 }

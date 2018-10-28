@@ -36,7 +36,8 @@ namespace Ntreev.Crema.ServiceModel
 {
     internal abstract class DomainUserBase
     {
-        private DomainUserInfo domainUserInfo;
+        private DomainUserInfo domainUserInfo = DomainUserInfo.Empty;
+        private DomainLocationInfo domainLocationInfo = DomainLocationInfo.Empty;
         private DomainUserState domainUserState;
         private PropertyCollection extendedProperties;
 
@@ -52,6 +53,16 @@ namespace Ntreev.Crema.ServiceModel
             {
                 this.domainUserInfo = value;
                 this.OnDomainUserInfoChanged(EventArgs.Empty);
+            }
+        }
+
+        public DomainLocationInfo DomainLocationInfo
+        {
+            get { return this.domainLocationInfo; }
+            set
+            {
+                this.domainLocationInfo = value;
+                this.OnDomainLocationInfoChanged(EventArgs.Empty);
             }
         }
 
@@ -138,6 +149,8 @@ namespace Ntreev.Crema.ServiceModel
 
         public event EventHandler DomainUserInfoChanged;
 
+        public event EventHandler DomainLocationInfoChanged;
+
         public event EventHandler DomainUserStateChanged;
 
         protected virtual void OnDomainUserInfoChanged(EventArgs e)
@@ -145,15 +158,14 @@ namespace Ntreev.Crema.ServiceModel
             this.DomainUserInfoChanged?.Invoke(this, e);
         }
 
+        protected virtual void OnDomainLocationInfoChanged(EventArgs e)
+        {
+            this.DomainLocationInfoChanged?.Invoke(this, e);
+        }
+
         protected virtual void OnDomainUserStateChanged(EventArgs e)
         {
             this.DomainUserStateChanged?.Invoke(this, e);
-        }
-
-        protected void UpdateLocation(DomainLocationInfo locationInfo)
-        {
-            this.domainUserInfo.Location = locationInfo;
-            this.OnDomainUserInfoChanged(EventArgs.Empty);
         }
     }
 }

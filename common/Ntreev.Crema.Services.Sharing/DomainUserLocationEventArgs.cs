@@ -23,17 +23,20 @@ using Ntreev.Crema.ServiceModel;
 
 namespace Ntreev.Crema.Services
 {
-    public class DomainUserRemovedEventArgs : DomainUserEventArgs
+    public class DomainUserLocationEventArgs : DomainEventArgs
     {
-        public DomainUserRemovedEventArgs(Authentication authentication, IDomain domain, IDomainUser domainUser, RemoveInfo removeInfo)
-            : base(authentication, domain, domainUser)
+        public DomainUserLocationEventArgs(Authentication authentication, IDomain domain, IDomainUser domainUser)
+            : base(authentication, domain)
         {
-            this.RemoveInfo = removeInfo;
-            this.OwnerID = this.Domain.Users.Owner.ID;
+            this.DomainUserInfo = domainUser.DomainUserInfo;
+            this.DomainLocationInfo = domainUser.DomainLocationInfo;
+            this.DomainUserState = domainUser.DomainUserState;
         }
-        
-        public RemoveInfo RemoveInfo { get; }
 
-        public string OwnerID { get; }
+        public DomainUserInfo DomainUserInfo { get; }
+
+        public DomainLocationInfo DomainLocationInfo { get; }
+
+        public DomainUserState DomainUserState { get; }
     }
 }

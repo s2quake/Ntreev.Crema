@@ -86,74 +86,62 @@ namespace Ntreev.Crema.Services.Domains
             properties.Add(nameof(this.ItemPaths), string.Join(";", this.ItemPaths));
         }
 
-        protected override async Task<DomainRowInfo[]> OnNewRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected override DomainRowInfo[] OnNewRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            return await this.DataDispatcher.InvokeAsync(() =>
+            this.template.SignatureDateProvider = signatureProvider;
+            for (var i = 0; i < rows.Length; i++)
             {
-                this.template.SignatureDateProvider = signatureProvider;
-                for (var i = 0; i < rows.Length; i++)
-                {
-                    var rowView = CremaDomainUtility.AddNew(this.view, rows[i].Fields);
-                    rows[i].Keys = CremaDomainUtility.GetKeys(rowView);
-                    rows[i].Fields = CremaDomainUtility.GetFields(rowView);
-                }
-                this.data = null;
-                return rows;
-            });
+                var rowView = CremaDomainUtility.AddNew(this.view, rows[i].Fields);
+                rows[i].Keys = CremaDomainUtility.GetKeys(rowView);
+                rows[i].Fields = CremaDomainUtility.GetFields(rowView);
+            }
+            this.data = null;
+            return rows;
         }
 
-        protected override async Task<DomainRowInfo[]> OnSetRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected override DomainRowInfo[] OnSetRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            return await this.DataDispatcher.InvokeAsync(() =>
+            this.template.SignatureDateProvider = signatureProvider;
+            for (var i = 0; i < rows.Length; i++)
             {
-                this.template.SignatureDateProvider = signatureProvider;
-                for (var i = 0; i < rows.Length; i++)
-                {
-                    rows[i].Fields = CremaDomainUtility.SetFields(this.view, rows[i].Keys, rows[i].Fields);
-                }
-                this.data = null;
-                return rows;
-            });
+                rows[i].Fields = CremaDomainUtility.SetFields(this.view, rows[i].Keys, rows[i].Fields);
+            }
+            this.data = null;
+            return rows;
         }
 
-        protected override async Task<DomainRowInfo[]> OnRemoveRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected override DomainRowInfo[] OnRemoveRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            return await this.DataDispatcher.InvokeAsync(() =>
+            this.template.SignatureDateProvider = signatureProvider;
+            foreach (var item in rows)
             {
-                this.template.SignatureDateProvider = signatureProvider;
-                foreach (var item in rows)
-                {
-                    CremaDomainUtility.Delete(this.view, item.Keys);
-                }
-                this.data = null;
-                return rows;
-            });
+                CremaDomainUtility.Delete(this.view, item.Keys);
+            }
+            this.data = null;
+            return rows;
         }
 
-        protected override async Task OnSetPropertyAsync(DomainUser domainUser, string propertyName, object value, SignatureDateProvider signatureProvider)
+        protected override void OnSetProperty(DomainUser domainUser, string propertyName, object value, SignatureDateProvider signatureProvider)
         {
-            await this.DataDispatcher.InvokeAsync(() =>
+            if (propertyName == CremaSchema.TableName)
             {
-                if (propertyName == CremaSchema.TableName)
-                {
-                    if (this.IsNew == false)
-                        throw new InvalidOperationException(Resources.Exception_CannotRename);
-                    this.template.TableName = (string)value;
-                }
-                else if (propertyName == CremaSchema.Comment)
-                {
-                    this.template.Comment = (string)value;
-                }
-                else if (propertyName == CremaSchema.Tags)
-                {
-                    this.template.Tags = (TagInfo)((string)value);
-                }
-                else
-                {
-                    throw new NotSupportedException();
-                }
-                this.data = null;
-            });
+                if (this.IsNew == false)
+                    throw new InvalidOperationException(Resources.Exception_CannotRename);
+                this.template.TableName = (string)value;
+            }
+            else if (propertyName == CremaSchema.Comment)
+            {
+                this.template.Comment = (string)value;
+            }
+            else if (propertyName == CremaSchema.Tags)
+            {
+                this.template.Tags = (TagInfo)((string)value);
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+            this.data = null;
         }
     }
 }

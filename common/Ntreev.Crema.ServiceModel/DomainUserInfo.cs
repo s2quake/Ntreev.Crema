@@ -38,10 +38,13 @@ namespace Ntreev.Crema.ServiceModel
         public string UserName { get; set; }
 
         [DataMember]
-        public DomainLocationInfo Location { get; set; }
-
-        [DataMember]
         public DomainAccessType AccessType { get; set; }
+
+        public static readonly DomainUserInfo Empty = new DomainUserInfo()
+        {
+            UserID = string.Empty,
+            UserName = string.Empty,
+        };
 
         public IDictionary<string, object> ToDictionary()
         {

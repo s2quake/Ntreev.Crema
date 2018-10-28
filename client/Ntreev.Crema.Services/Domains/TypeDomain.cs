@@ -89,95 +89,83 @@ namespace Ntreev.Crema.Services.Domains
             base.OnDeleted(e);
         }
 
-        protected override async Task OnNewRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
+        protected override void OnNewRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
         {
-            await this.DataDispatcher.InvokeAsync(() =>
+            this.dataType.BeginLoadData();
+            try
             {
-                this.dataType.BeginLoadData();
-                try
+                foreach (var item in rows)
                 {
-                    foreach (var item in rows)
-                    {
-                        CremaDomainUtility.AddNew(this.view, item.Fields);
-                    }
+                    CremaDomainUtility.AddNew(this.view, item.Fields);
                 }
-                finally
-                {
-                    this.dataType.EndLoadData();
-                }
-                this.dataType.ModificationInfo = signatureDate;
-                this.dataType.AcceptChanges();
-            });
+            }
+            finally
+            {
+                this.dataType.EndLoadData();
+            }
+            this.dataType.ModificationInfo = signatureDate;
+            this.dataType.AcceptChanges();
         }
 
-        protected override async Task OnRemoveRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
+        protected override void OnRemoveRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
         {
-            await this.DataDispatcher.InvokeAsync(() =>
+            this.dataType.BeginLoadData();
+            try
             {
-                this.dataType.BeginLoadData();
-                try
+                foreach (var item in rows)
                 {
-                    foreach (var item in rows)
-                    {
-                        CremaDomainUtility.Delete(this.view, item.Keys);
-                    }
+                    CremaDomainUtility.Delete(this.view, item.Keys);
                 }
-                finally
-                {
-                    this.dataType.EndLoadData();
-                }
-                this.dataType.ModificationInfo = signatureDate;
-                this.dataType.AcceptChanges();
-            });
+            }
+            finally
+            {
+                this.dataType.EndLoadData();
+            }
+            this.dataType.ModificationInfo = signatureDate;
+            this.dataType.AcceptChanges();
         }
 
-        protected override async Task OnSetRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
+        protected override void OnSetRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
         {
-            await this.DataDispatcher.InvokeAsync(() =>
+            this.dataType.BeginLoadData();
+            try
             {
-                this.dataType.BeginLoadData();
-                try
+                foreach (var item in rows)
                 {
-                    foreach (var item in rows)
-                    {
-                        CremaDomainUtility.SetFieldsForce(this.view, item.Keys, item.Fields);
-                    }
+                    CremaDomainUtility.SetFieldsForce(this.view, item.Keys, item.Fields);
                 }
-                finally
-                {
-                    this.dataType.EndLoadData();
-                }
-                this.dataType.ModificationInfo = signatureDate;
-                this.dataType.AcceptChanges();
-            });
+            }
+            finally
+            {
+                this.dataType.EndLoadData();
+            }
+            this.dataType.ModificationInfo = signatureDate;
+            this.dataType.AcceptChanges();
         }
 
-        protected override async Task OnSetPropertyAsync(DomainUser domainUser, string propertyName, object value, SignatureDate signatureDate)
+        protected override void OnSetProperty(DomainUser domainUser, string propertyName, object value, SignatureDate signatureDate)
         {
-            await this.DataDispatcher.InvokeAsync(() =>
+            if (propertyName == CremaSchema.TypeName)
             {
-                if (propertyName == CremaSchema.TypeName)
-                {
-                    if (this.IsNew == false)
-                        throw new InvalidOperationException(Resources.Exception_CannotRename);
-                    this.dataType.TypeName = (string)value;
-                }
-                else if (propertyName == CremaSchema.IsFlag)
-                {
-                    this.dataType.IsFlag = (bool)value;
-                }
-                else if (propertyName == CremaSchema.Comment)
-                {
-                    this.dataType.Comment = (string)value;
-                }
-                else
-                {
-                    if (propertyName == null)
-                        throw new ArgumentNullException(nameof(propertyName));
-                    throw new ArgumentException(string.Format(Resources.Exception_InvalidProperty_Format, propertyName), nameof(propertyName));
-                }
-                this.dataType.ModificationInfo = signatureDate;
-            });
+                if (this.IsNew == false)
+                    throw new InvalidOperationException(Resources.Exception_CannotRename);
+                this.dataType.TypeName = (string)value;
+            }
+            else if (propertyName == CremaSchema.IsFlag)
+            {
+                this.dataType.IsFlag = (bool)value;
+            }
+            else if (propertyName == CremaSchema.Comment)
+            {
+                this.dataType.Comment = (string)value;
+            }
+            else
+            {
+                if (propertyName == null)
+                    throw new ArgumentNullException(nameof(propertyName));
+                throw new ArgumentException(string.Format(Resources.Exception_InvalidProperty_Format, propertyName), nameof(propertyName));
+            }
+            this.dataType.ModificationInfo = signatureDate;
         }
     }
 }

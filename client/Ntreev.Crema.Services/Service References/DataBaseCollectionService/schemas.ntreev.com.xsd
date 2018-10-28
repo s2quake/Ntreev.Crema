@@ -49,6 +49,7 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
+      <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
     </xs:sequence>
   </xs:complexType>
@@ -98,6 +99,7 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
+      <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
       <xs:element minOccurs="0" name="Value" type="tns:DataBaseCollectionMetaData" />
     </xs:sequence>
@@ -412,16 +414,11 @@
   </xs:complexType>
   <xs:element name="ColumnInfo" nillable="true" type="tns:ColumnInfo" />
   <xs:simpleType name="TableState">
-    <xs:list>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="IsBeingEdited" />
-          <xs:enumeration value="IsBeingSetup" />
-          <xs:enumeration value="IsMember" />
-          <xs:enumeration value="IsOwner" />
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:list>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None" />
+      <xs:enumeration value="IsBeingEdited" />
+      <xs:enumeration value="IsBeingSetup" />
+    </xs:restriction>
   </xs:simpleType>
   <xs:element name="TableState" nillable="true" type="tns:TableState" />
   <xs:complexType name="ArrayOfTypeMetaData">
@@ -492,34 +489,10 @@
   </xs:complexType>
   <xs:element name="TypeMemberInfo" nillable="true" type="tns:TypeMemberInfo" />
   <xs:simpleType name="TypeState">
-    <xs:list>
-      <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="None">
-            <xs:annotation>
-              <xs:appinfo>
-                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">0</EnumerationValue>
-              </xs:appinfo>
-            </xs:annotation>
-          </xs:enumeration>
-          <xs:enumeration value="IsBeingEdited">
-            <xs:annotation>
-              <xs:appinfo>
-                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">1</EnumerationValue>
-              </xs:appinfo>
-            </xs:annotation>
-          </xs:enumeration>
-          <xs:enumeration value="CanEdit" />
-          <xs:enumeration value="IsMember">
-            <xs:annotation>
-              <xs:appinfo>
-                <EnumerationValue xmlns="http://schemas.microsoft.com/2003/10/Serialization/">4</EnumerationValue>
-              </xs:appinfo>
-            </xs:annotation>
-          </xs:enumeration>
-        </xs:restriction>
-      </xs:simpleType>
-    </xs:list>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None" />
+      <xs:enumeration value="IsBeingEdited" />
+    </xs:restriction>
   </xs:simpleType>
   <xs:element name="TypeState" nillable="true" type="tns:TypeState" />
   <xs:complexType name="ResultBaseOfAccessInfoq8erDhHE">
@@ -534,6 +507,7 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
+      <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
       <xs:element minOccurs="0" name="Value" type="tns:AccessInfo" />
     </xs:sequence>
@@ -551,6 +525,7 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
+      <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
       <xs:element minOccurs="0" name="Value" type="tns:AccessMemberInfo" />
     </xs:sequence>
@@ -568,6 +543,7 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
+      <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
       <xs:element minOccurs="0" name="Value" type="tns:LockInfo" />
     </xs:sequence>
@@ -585,6 +561,7 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
+      <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
       <xs:element minOccurs="0" name="Value" type="tns:DataBaseInfo" />
     </xs:sequence>
@@ -602,6 +579,7 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
+      <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
       <xs:element minOccurs="0" name="Value" nillable="true" type="tns:ArrayOfLogInfo" />
     </xs:sequence>
@@ -619,6 +597,7 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
+      <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
       <xs:element minOccurs="0" name="Value" type="ser:guid" />
     </xs:sequence>
@@ -636,6 +615,7 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
+      <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
       <xs:element minOccurs="0" name="Value" type="tns:DataBaseMetaData" />
     </xs:sequence>

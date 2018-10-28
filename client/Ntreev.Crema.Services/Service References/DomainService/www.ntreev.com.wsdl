@@ -111,11 +111,23 @@
   <wsdl:message name="IDomainService_OnUserAdded_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnUserAdded" />
   </wsdl:message>
-  <wsdl:message name="IDomainService_OnUserChanged_OutputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:OnUserChanged" />
-  </wsdl:message>
   <wsdl:message name="IDomainService_OnUserRemoved_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnUserRemoved" />
+  </wsdl:message>
+  <wsdl:message name="IDomainService_OnUserLocationChanged_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUserLocationChanged" />
+  </wsdl:message>
+  <wsdl:message name="IDomainService_OnUserStateChanged_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUserStateChanged" />
+  </wsdl:message>
+  <wsdl:message name="IDomainService_OnUserEditBegun_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUserEditBegun" />
+  </wsdl:message>
+  <wsdl:message name="IDomainService_OnUserEditEnded_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUserEditEnded" />
+  </wsdl:message>
+  <wsdl:message name="IDomainService_OnOwnerChanged_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnOwnerChanged" />
   </wsdl:message>
   <wsdl:message name="IDomainService_OnRowAdded_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnRowAdded" />
@@ -204,11 +216,23 @@
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUserAdded">
       <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnUserAdded" message="tns:IDomainService_OnUserAdded_OutputCallbackMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUserChanged">
-      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnUserChanged" message="tns:IDomainService_OnUserChanged_OutputCallbackMessage" />
-    </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUserRemoved">
       <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnUserRemoved" message="tns:IDomainService_OnUserRemoved_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUserLocationChanged">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnUserLocationChanged" message="tns:IDomainService_OnUserLocationChanged_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUserStateChanged">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnUserStateChanged" message="tns:IDomainService_OnUserStateChanged_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUserEditBegun">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnUserEditBegun" message="tns:IDomainService_OnUserEditBegun_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUserEditEnded">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnUserEditEnded" message="tns:IDomainService_OnUserEditEnded_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnOwnerChanged">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnOwnerChanged" message="tns:IDomainService_OnOwnerChanged_OutputCallbackMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnRowAdded">
       <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/OnRowAdded" message="tns:IDomainService_OnRowAdded_OutputCallbackMessage" />

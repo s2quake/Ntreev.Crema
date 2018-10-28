@@ -111,8 +111,10 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
                     await domain.Dispatcher.InvokeAsync(() =>
                     {
                         this.domain = domain;
-                        this.domain.UserChanged += Domain_UserChanged;
-                        this.domain.UserRemoved += Domain_Disjoined;
+                        this.domain.UserLocationChanged += Domain_UserLocationChanged;
+                        this.domain.UserEditBegun += Domain_UserEditBegun;
+                        this.domain.UserEditEnded += Domain_UserEditEnded;
+                        this.domain.UserRemoved += Domain_UserRemoved;
                         this.domain.Deleted += Domain_Deleted;
                         if (this.domain.GetService(typeof(ICremaHost)) is ICremaHost cremaHost)
                         {
@@ -142,6 +144,8 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
                 }
             }
         }
+
+        
 
         protected override void SetDataContext(object item)
         {
@@ -187,16 +191,17 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
         }
 
-        private async void Domain_UserChanged(object sender, DomainUserEventArgs e)
+        private async void Domain_UserLocationChanged(object sender, DomainUserLocationEventArgs e)
         {
             var domainUserInfo = e.DomainUserInfo;
+            var domainLocationInfo = e.DomainLocationInfo;
             var domainUserState = e.DomainUserState;
             await this.Dispatcher.InvokeAsync(() =>
             {
                 if (this.DataContext == null)
                     return;
 
-                if (HashUtility.Equals(this.keys, domainUserInfo.Location.Keys) == true && this.tableName == domainUserInfo.Location.TableName)
+                if (HashUtility.Equals(this.keys, domainLocationInfo.Keys) == true && this.tableName == domainLocationInfo.TableName)
                 {
                     this.userInfos.Set(domainUserInfo, domainUserState);
                 }
@@ -207,7 +212,17 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             });
         }
 
-        private async void Domain_Disjoined(object sender, DomainUserEventArgs e)
+        private void Domain_UserEditBegun(object sender, DomainUserLocationEventArgs e)
+        {
+
+        }
+
+        private void Domain_UserEditEnded(object sender, DomainUserEventArgs e)
+        {
+
+        }
+
+        private async void Domain_UserRemoved(object sender, DomainUserRemovedEventArgs e)
         {
             var domainUserInfo = e.DomainUserInfo;
             await this.Dispatcher.InvokeAsync(() =>
@@ -218,8 +233,10 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
         private void Domain_Deleted(object sender, EventArgs e)
         {
-            this.domain.UserChanged -= Domain_UserChanged;
-            this.domain.UserRemoved -= Domain_Disjoined;
+            this.domain.UserLocationChanged -= Domain_UserLocationChanged;
+            this.domain.UserEditBegun -= Domain_UserEditBegun;
+            this.domain.UserEditEnded -= Domain_UserEditEnded;
+            this.domain.UserRemoved -= Domain_UserRemoved;
             this.domain.Deleted -= Domain_Deleted;
             this.domain = null;
         }

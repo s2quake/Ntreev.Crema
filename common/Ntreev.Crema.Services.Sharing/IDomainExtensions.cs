@@ -28,7 +28,7 @@ namespace Ntreev.Crema.Services
 {
     public static class IDomainExtensions
     {
-        public static async Task<object[]> NewRowAsync(this IDomain domain, Authentication authentication, string tableName, object[] fields)
+        public static Task NewRowAsync(this IDomain domain, Authentication authentication, string tableName, object[] fields)
         {
             var row = new DomainRowInfo()
             {
@@ -36,8 +36,7 @@ namespace Ntreev.Crema.Services
                 Fields = fields,
             };
 
-            var result = await domain.NewRowAsync(authentication, new DomainRowInfo[] { row });
-            return result.Rows.First().Keys;
+            return domain.NewRowAsync(authentication, new DomainRowInfo[] { row });
         }
 
         public static Task BeginEditAsync(this IDomain domain, Authentication authentication, object item, string fieldName)

@@ -120,9 +120,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public Task<long> NewRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        public long NewRow(Authentication authentication, DomainRowInfo[] rows)
         {
-            return this.PostAsync(new NewRowAction()
+            return this.Post(new NewRowAction()
             {
                 UserID = authentication.ID,
                 Rows = rows,
@@ -130,9 +130,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public Task<long> SetRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        public long SetRow(Authentication authentication, DomainRowInfo[] rows)
         {
-            return this.PostAsync(new SetRowAction()
+            return this.Post(new SetRowAction()
             {
                 UserID = authentication.ID,
                 Rows = rows,
@@ -140,9 +140,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public Task<long> RemoveRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        public long RemoveRow(Authentication authentication, DomainRowInfo[] rows)
         {
-            return this.PostAsync(new RemoveRowAction()
+            return this.Post(new RemoveRowAction()
             {
                 UserID = authentication.ID,
                 Rows = rows,
@@ -150,9 +150,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public Task<long> SetPropertyAsync(Authentication authentication, string propertyName, object value)
+        public long SetProperty(Authentication authentication, string propertyName, object value)
         {
-            return this.PostAsync(new SetPropertyAction()
+            return this.Post(new SetPropertyAction()
             {
                 UserID = authentication.ID,
                 PropertyName = propertyName,
@@ -161,9 +161,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public Task<long> JoinAsync(Authentication authentication, DomainAccessType accessType)
+        public long Join(Authentication authentication, DomainAccessType accessType)
         {
-            return this.PostAsync(new JoinAction()
+            return this.Post(new JoinAction()
             {
                 UserID = authentication.ID,
                 AccessType = accessType,
@@ -171,9 +171,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public Task<long> DisjoinAsync(Authentication authentication, RemoveInfo removeInfo)
+        public long Disjoin(Authentication authentication, RemoveInfo removeInfo)
         {
-            return this.PostAsync(new DisjoinAction()
+            return this.Post(new DisjoinAction()
             {
                 UserID = authentication.ID,
                 RemoveInfo = removeInfo,
@@ -181,9 +181,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public Task<long> KickAsync(Authentication authentication, string userID, string comment)
+        public long Kick(Authentication authentication, string userID, string comment)
         {
-            return this.PostAsync(new KickAction()
+            return this.Post(new KickAction()
             {
                 UserID = authentication.ID,
                 TargetID = userID,
@@ -192,9 +192,9 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public Task<long> SetOwnerAsync(Authentication authentication, string userID)
+        public long SetOwner(Authentication authentication, string userID)
         {
-            return this.PostAsync(new SetOwnerAction()
+            return this.Post(new SetOwnerAction()
             {
                 UserID = authentication.ID,
                 TargetID = userID,
@@ -202,35 +202,50 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public Task<long> PostAsync(DomainActionBase action)
+        public long BeginUserEdit(Authentication authentication, DomainLocationInfo location)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            return this.Post(new BeginUserEditAction()
             {
-                if (this.IsEnabled == false)
-                    return this.ID;
-
-                var id = this.ID++;
-                var itemPath = Path.Combine(this.basePath, $"{id}");
-                this.currentPost = new DomainPostItemSerializationInfo(id, action.UserID, action.GetType());
-                this.postedList.Add(this.currentPost);
-                this.serializer.Serialize(itemPath, action, ObjectSerializerSettings.Empty);
-                File.AppendAllText(this.postedPath, $"{this.currentPost}{Environment.NewLine}");
-                this.PostID = id;
-                return id;
+                UserID = authentication.ID,
+                Location = location,
+                AcceptTime = authentication.SignatureDate.DateTime
             });
         }
 
-        public Task CompleteAsync(long id)
+        public long EndUserEdit(Authentication authentication)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            return this.Post(new EndUserEditAction()
             {
-                if (this.IsEnabled == false)
-                    return;
-
-                this.completedList.Add(new DomainCompleteItemSerializationInfo(id));
-                File.AppendAllText(this.completedPath, $"{new DomainCompleteItemSerializationInfo(id)}{Environment.NewLine}");
-                this.CompletionID = id;
+                UserID = authentication.ID,
+                AcceptTime = authentication.SignatureDate.DateTime
             });
+        }
+
+        public long Post(DomainActionBase action)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (this.IsEnabled == false)
+                return this.ID;
+
+            var id = this.ID++;
+            var itemPath = Path.Combine(this.basePath, $"{id}");
+            this.currentPost = new DomainPostItemSerializationInfo(id, action.UserID, action.GetType());
+            this.postedList.Add(this.currentPost);
+            this.serializer.Serialize(itemPath, action, ObjectSerializerSettings.Empty);
+            File.AppendAllText(this.postedPath, $"{this.currentPost}{Environment.NewLine}");
+            this.PostID = id;
+            return id;
+        }
+
+        public void Complete(long id)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (this.IsEnabled == false)
+                return;
+
+            this.completedList.Add(new DomainCompleteItemSerializationInfo(id));
+            File.AppendAllText(this.completedPath, $"{new DomainCompleteItemSerializationInfo(id)}{Environment.NewLine}");
+            this.CompletionID = id;
         }
 
         public long ID { get; set; }

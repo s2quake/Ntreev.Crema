@@ -53,17 +53,17 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return this.InvokeTask(Task.Run(() => this.SetUserLocationAsync(domainID, location)));
         }
 
-        public ResultBase<DomainRowResultInfo> NewRow(Guid domainID, DomainRowInfo[] rows)
+        public ResultBase<DomainRowInfo[]> NewRow(Guid domainID, DomainRowInfo[] rows)
         {
             return this.InvokeTask(Task.Run(() => this.NewRowAsync(domainID, rows)));
         }
 
-        public ResultBase<DomainRowResultInfo> RemoveRow(Guid domainID, DomainRowInfo[] rows)
+        public ResultBase<DomainRowInfo[]> RemoveRow(Guid domainID, DomainRowInfo[] rows)
         {
             return this.InvokeTask(Task.Run(() => this.RemoveRowAsync(domainID, rows)));
         }
 
-        public ResultBase<DomainRowResultInfo> SetRow(Guid domainID, DomainRowInfo[] rows)
+        public ResultBase<DomainRowInfo[]> SetRow(Guid domainID, DomainRowInfo[] rows)
         {
             return this.InvokeTask(Task.Run(() => this.SetRowAsync(domainID, rows)));
         }
@@ -83,7 +83,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return this.InvokeTask(Task.Run(() => this.EndUserEditAsync(domainID)));
         }
 
-        public ResultBase<DomainUserInfo> Kick(Guid domainID, string userID, string comment)
+        public ResultBase Kick(Guid domainID, string userID, string comment)
         {
             return this.InvokeTask(Task.Run(() => this.KickAsync(domainID, userID, comment)));
         }

@@ -90,10 +90,15 @@ namespace Ntreev.Crema.Services.Data
                     var name = this.table.TableName;
                     return (fields, name);
                 });
-                var keys = await this.domain.NewRowAsync(authentication, tuple.name, tuple.fields);
+                var row = new DomainRowInfo()
+                {
+                    TableName = tuple.name,
+                    Fields = tuple.fields,
+                };
+                var info = await this.domain.NewRowAsync(authentication, new DomainRowInfo[] { row });
                 await this.domain.Dispatcher.InvokeAsync(() =>
                 {
-                    this.Row = this.table.Rows.Find(keys);
+                    this.Row = this.table.Rows.Find(info.Value.First().Keys);
                     this.fields = null;
                 });
             }

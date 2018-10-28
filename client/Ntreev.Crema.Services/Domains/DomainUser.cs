@@ -72,18 +72,8 @@ namespace Ntreev.Crema.Services.Domains
 
             return metaData;
         }
-
-        public new DomainUserInfo DomainUserInfo => base.DomainUserInfo;
-
-        public new DomainUserState DomainUserState => base.DomainUserState;
-
+        
         public string ID => base.DomainUserInfo.UserID;
-
-        public DomainLocationInfo Location
-        {
-            get => base.DomainUserInfo.Location;
-            set => base.UpdateLocation(value);
-        }
 
         public CremaDispatcher Dispatcher => this.domain.Dispatcher;
 

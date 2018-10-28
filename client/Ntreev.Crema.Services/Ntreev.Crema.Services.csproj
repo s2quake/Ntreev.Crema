@@ -83,7 +83,9 @@
     <Compile Include="Data\TypeTemplate.cs" />
     <Compile Include="Data\TypeTemplateBase.cs" />
     <Compile Include="DescriptorServiceFactory.cs" />
+    <Compile Include="Domains\Actions\BeginUserEditAction.cs" />
     <Compile Include="Domains\Actions\DisjoinAction.cs" />
+    <Compile Include="Domains\Actions\EndUserEditAction.cs" />
     <Compile Include="Domains\Actions\JoinAction.cs" />
     <Compile Include="Domains\Actions\KickAction.cs" />
     <Compile Include="Domains\Actions\NewRowAction.cs" />

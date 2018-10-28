@@ -295,6 +295,12 @@ namespace Ntreev.Crema.Services.Data
                 });
             }
 
+            private void Domain_OwnerChanged(object sender, DomainUserEventArgs e)
+            {
+                this.owner = this.domain.Users.OwnerUserID;
+
+            }
+
             private async void Domain_UserChanged(object sender, DomainUserEventArgs e)
             {
                 this.RefreshEditors();
@@ -333,10 +339,12 @@ namespace Ntreev.Crema.Services.Data
                 this.domain.RowRemoved += Domain_RowRemoved;
                 this.domain.PropertyChanged += Domain_PropertyChanged;
                 this.domain.UserAdded += Domain_UserAdded;
-                this.domain.UserChanged += Domain_UserChanged;
+                this.domain.OwnerChanged += Domain_OwnerChanged;
                 this.domain.UserRemoved += Domain_UserRemoved;
                 refcount++;
             }
+
+            
 
             private void DetachDomainEvent()
             {
@@ -346,7 +354,7 @@ namespace Ntreev.Crema.Services.Data
                 this.domain.RowRemoved -= Domain_RowRemoved;
                 this.domain.PropertyChanged -= Domain_PropertyChanged;
                 this.domain.UserAdded -= Domain_UserAdded;
-                this.domain.UserChanged -= Domain_UserChanged;
+                this.domain.OwnerChanged -= Domain_OwnerChanged;
                 this.domain.UserRemoved -= Domain_UserRemoved;
                 if (refcount != 1)
                 {

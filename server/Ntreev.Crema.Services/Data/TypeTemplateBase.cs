@@ -563,7 +563,7 @@ namespace Ntreev.Crema.Services.Data
             await this.Dispatcher.InvokeAsync(() => this.OnEditorsChanged(e));
         }
 
-        private async void Domain_UserChanged(object sender, DomainUserEventArgs e)
+        private async void Domain_OwnerChanged(object sender, DomainUserEventArgs e)
         {
             this.RefreshEditors();
             await this.Dispatcher.InvokeAsync(() => this.OnEditorsChanged(e));
@@ -589,7 +589,7 @@ namespace Ntreev.Crema.Services.Data
             this.domain.RowRemoved += Domain_RowRemoved;
             this.domain.PropertyChanged += Domain_PropertyChanged;
             this.domain.UserAdded += Domain_UserAdded;
-            this.domain.UserChanged += Domain_UserChanged;
+            this.domain.OwnerChanged += Domain_OwnerChanged;
             this.domain.UserRemoved += Domain_UserRemoved;
             refcount++;
         }
@@ -602,7 +602,7 @@ namespace Ntreev.Crema.Services.Data
             this.domain.RowRemoved -= Domain_RowRemoved;
             this.domain.PropertyChanged -= Domain_PropertyChanged;
             this.domain.UserAdded -= Domain_UserAdded;
-            this.domain.UserChanged -= Domain_UserChanged;
+            this.domain.OwnerChanged -= Domain_OwnerChanged;
             this.domain.UserRemoved -= Domain_UserRemoved;
             if (refcount != 1)
             {

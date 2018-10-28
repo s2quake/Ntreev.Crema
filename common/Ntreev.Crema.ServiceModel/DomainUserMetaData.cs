@@ -39,6 +39,9 @@ namespace Ntreev.Crema.ServiceModel
         public DomainUserInfo DomainUserInfo { get; set; }
 
         [DataMember]
+        public DomainLocationInfo DomainLocationInfo { get; set; }
+
+        [DataMember]
         public DomainUserState DomainUserState { get; set; }
 
         public static readonly DomainUserMetaData Empty = new DomainUserMetaData();

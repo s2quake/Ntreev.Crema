@@ -64,7 +64,7 @@
     <Compile Include="DispatcherExpiredException.cs" />
     <Compile Include="DispatcherScopeAttribute.cs" />
     <Compile Include="DomainFieldInfo.cs" />
-    <Compile Include="DomainRowResultInfo.cs" />
+    <Compile Include="DomainResultInfo.cs" />
     <Compile Include="DomainUserBase.cs" />
     <Compile Include="DataBaseNotFoundException.cs" />
     <Compile Include="CloseReason.cs" />

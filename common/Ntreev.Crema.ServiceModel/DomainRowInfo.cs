@@ -69,6 +69,9 @@ namespace Ntreev.Crema.ServiceModel
             set { this.keys = value?.Select(item => item.ToValue()).ToArray(); }
         }
 
+        [IgnoreDataMember]
+        public object Target { get; set; }
+
         public static readonly DomainRowInfo Empty;
 
         internal static readonly string[] ClearKey = new string[] { "6B924529-8134-463D-A040-1632BCE6813A", "F1405371-7961-4A6D-9DDA-D66838617F41" };

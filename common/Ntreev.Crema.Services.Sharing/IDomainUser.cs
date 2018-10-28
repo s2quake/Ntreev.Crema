@@ -37,6 +37,8 @@ namespace Ntreev.Crema.Services
 
         DomainUserInfo DomainUserInfo { get; }
 
+        DomainLocationInfo DomainLocationInfo { get; }
+
         DomainUserState DomainUserState { get; }
 
         event EventHandler DomainUserInfoChanged;

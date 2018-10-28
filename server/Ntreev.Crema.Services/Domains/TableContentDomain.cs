@@ -91,85 +91,77 @@ namespace Ntreev.Crema.Services.Domains
             properties.Add(nameof(this.ItemPaths), string.Join(";", this.ItemPaths));
         }
 
-        protected override async Task<DomainRowInfo[]> OnNewRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected override DomainRowInfo[] OnNewRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            return await this.DataDispatcher.InvokeAsync(() =>
+            this.dataSet.SignatureDateProvider = signatureProvider;
+            try
             {
-                this.dataSet.SignatureDateProvider = signatureProvider;
-                try
+                for (var i = 0; i < rows.Length; i++)
                 {
-                    for (var i = 0; i < rows.Length; i++)
-                    {
-                        var view = this.views[rows[i].TableName];
-                        var rowView = CremaDomainUtility.AddNew(view, rows[i].Fields);
-                        rows[i].Keys = CremaDomainUtility.GetKeys(rowView);
-                        rows[i].Fields = CremaDomainUtility.GetFields(rowView);
-                    }
-                    this.dataSet.AcceptChanges();
-                    this.data = null;
-                    return rows;
+                    var view = this.views[rows[i].TableName];
+                    var rowView = CremaDomainUtility.AddNew(view, rows[i].Fields);
+                    rows[i].Keys = CremaDomainUtility.GetKeys(rowView);
+                    rows[i].Fields = CremaDomainUtility.GetFields(rowView);
+                    rows[i].Target = rowView.Row;
                 }
-                catch
-                {
-                    this.dataSet.RejectChanges();
-                    throw;
-                }
-            });
+                this.dataSet.AcceptChanges();
+                this.data = null;
+                return rows;
+            }
+            catch
+            {
+                this.dataSet.RejectChanges();
+                throw;
+            }
         }
 
-        protected override async Task<DomainRowInfo[]> OnSetRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected override DomainRowInfo[] OnSetRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            return await this.DataDispatcher.InvokeAsync(() =>
+            this.dataSet.SignatureDateProvider = signatureProvider;
+            try
             {
-                this.dataSet.SignatureDateProvider = signatureProvider;
-                try
+                for (var i = 0; i < rows.Length; i++)
                 {
-                    for (var i = 0; i < rows.Length; i++)
-                    {
-                        var view = this.views[rows[i].TableName];
-                        rows[i].Fields = CremaDomainUtility.SetFields(view, rows[i].Keys, rows[i].Fields);
-                    }
-                    this.dataSet.AcceptChanges();
-                    this.data = null;
-                    return rows;
+                    var view = this.views[rows[i].TableName];
+                    rows[i].Fields = CremaDomainUtility.SetFields(view, rows[i].Keys, rows[i].Fields);
                 }
-                catch
-                {
-                    this.dataSet.RejectChanges();
-                    throw;
-                }
-            });
+                this.dataSet.AcceptChanges();
+                this.data = null;
+                return rows;
+            }
+            catch
+            {
+                this.dataSet.RejectChanges();
+                throw;
+            }
         }
 
-        protected override async Task<DomainRowInfo[]> OnRemoveRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected override DomainRowInfo[] OnRemoveRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            return await this.DataDispatcher.InvokeAsync(() =>
+            this.dataSet.SignatureDateProvider = signatureProvider;
+            try
             {
-                this.dataSet.SignatureDateProvider = signatureProvider;
-                try
+                for (var i = 0; i < rows.Length; i++)
                 {
-                    for (var i = 0; i < rows.Length; i++)
+                    var view = this.views[rows[i].TableName];
+                    if (DomainRowInfo.ClearKey.SequenceEqual(rows[i].Keys) == true)
                     {
-                        var view = this.views[rows[i].TableName];
-                        if (DomainRowInfo.ClearKey.SequenceEqual(rows[i].Keys) == true)
-                        {
-                            view.Table.Clear();
-                        }
-                        else
-                        {
-                            CremaDomainUtility.Delete(view, rows[i].Keys);
-                        }
+                        view.Table.Clear();
                     }
-                    this.dataSet.AcceptChanges();
-                    this.data = null;
-                    return rows;
+                    else
+                    {
+                        CremaDomainUtility.Delete(view, rows[i].Keys);
+                    }
                 }
-                catch
-                {
-                    this.dataSet.RejectChanges();
-                    throw;
-                }
-            });
+                this.dataSet.AcceptChanges();
+                this.data = null;
+                return rows;
+            }
+            catch
+            {
+                this.dataSet.RejectChanges();
+                throw;
+            }
         }
     }
 }

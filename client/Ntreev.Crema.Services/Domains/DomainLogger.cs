@@ -94,91 +94,110 @@ namespace Ntreev.Crema.Services.Domains
             this.Dispatcher = null;
         }
 
-        public Task NewRowAsync(Authentication authentication, DomainRowResultInfo info)
+        public void NewRow(Authentication authentication, DomainRowInfo[] rows, long id)
         {
-            return this.CompleteAsync(info.ID, new NewRowAction()
+            this.Complete(id, new NewRowAction()
             {
                 UserID = authentication.ID,
-                Rows = info.Rows,
+                Rows = rows,
                 AcceptTime = authentication.SignatureDate.DateTime
             });
         }
 
-        public Task SetRowAsync(Authentication authentication, DomainRowResultInfo info)
+        public void SetRow(Authentication authentication, DomainRowInfo[] rows, long id)
         {
-            return this.CompleteAsync(info.ID, new SetRowAction()
+            this.Complete(id, new SetRowAction()
             {
                 UserID = authentication.ID,
-                Rows = info.Rows,
+                Rows = rows,
                 AcceptTime = authentication.SignatureDate.DateTime
             });
         }
 
-        public Task RemoveRowAsync(Authentication authentication, DomainRowResultInfo info)
+        public void RemoveRow(Authentication authentication, DomainRowInfo[] rows, long id)
         {
-            return this.CompleteAsync(info.ID, new RemoveRowAction()
+            this.Complete(id, new RemoveRowAction()
             {
                 UserID = authentication.ID,
-                Rows = info.Rows,
+                Rows = rows,
                 AcceptTime = authentication.SignatureDate.DateTime
             });
         }
 
-        //public Task SetPropertyAsync(Authentication authentication, string propertyName, object value)
-        //{
-        //    return this.CompleteAsync(new SetPropertyAction()
-        //    {
-        //        UserID = authentication.ID,
-        //        PropertyName = propertyName,
-        //        Value = value,
-        //        AcceptTime = authentication.SignatureDate.DateTime
-        //    });
-        //}
-
-        //public Task JoinAsync(Authentication authentication, DomainAccessType accessType)
-        //{
-        //    return this.CompleteAsync(new JoinAction()
-        //    {
-        //        UserID = authentication.ID,
-        //        AccessType = accessType,
-        //        AcceptTime = authentication.SignatureDate.DateTime
-        //    });
-        //}
-
-        //public Task DisjoinAsync(Authentication authentication, RemoveInfo removeInfo)
-        //{
-        //    return this.CompleteAsync(new DisjoinAction()
-        //    {
-        //        UserID = authentication.ID,
-        //        RemoveInfo = removeInfo,
-        //        AcceptTime = authentication.SignatureDate.DateTime
-        //    });
-        //}
-
-        //public Task KickAsync(Authentication authentication, string userID, string comment)
-        //{
-        //    return this.CompleteAsync(new KickAction()
-        //    {
-        //        UserID = authentication.ID,
-        //        TargetID = userID,
-        //        Comment = comment,
-        //        AcceptTime = authentication.SignatureDate.DateTime
-        //    });
-        //}
-
-        //public Task SetOwnerAsync(Authentication authentication, string userID)
-        //{
-        //    return this.CompleteAsync(new SetOwnerAction()
-        //    {
-        //        UserID = authentication.ID,
-        //        TargetID = userID,
-        //        AcceptTime = authentication.SignatureDate.DateTime
-        //    });
-        //}
-
-        public Task CompleteAsync(long id, DomainActionBase action)
+        public void SetProperty(Authentication authentication, string propertyName, object value, long id)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            this.Complete(id, new SetPropertyAction()
+            {
+                UserID = authentication.ID,
+                PropertyName = propertyName,
+                Value = value,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public void Join(Authentication authentication, DomainAccessType accessType, long id)
+        {
+            this.Complete(id, new JoinAction()
+            {
+                UserID = authentication.ID,
+                AccessType = accessType,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public void Disjoin(Authentication authentication, RemoveInfo removeInfo, long id)
+        {
+            this.Complete(id ,new DisjoinAction()
+            {
+                UserID = authentication.ID,
+                RemoveInfo = removeInfo,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public void Kick(Authentication authentication, string userID, string comment, long id)
+        {
+            this.Complete(id, new KickAction()
+            {
+                UserID = authentication.ID,
+                TargetID = userID,
+                Comment = comment,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public void SetOwner(Authentication authentication, string userID, long id)
+        {
+            this.Complete(id, new SetOwnerAction()
+            {
+                UserID = authentication.ID,
+                TargetID = userID,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public void BeginUserEdit(Authentication authentication, DomainLocationInfo location, long id)
+        {
+            this.Complete(id, new BeginUserEditAction()
+            {
+                UserID = authentication.ID,
+                Location = location,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public void EndUserEdit(Authentication authentication, long id)
+        {
+            this.Complete(id, new EndUserEditAction()
+            {
+                UserID = authentication.ID,
+                AcceptTime = authentication.SignatureDate.DateTime
+            });
+        }
+
+        public void Complete(long id, DomainActionBase action)
+        {
+            this.Dispatcher.Invoke(() =>
             {
                 var itemPath = Path.Combine(this.basePath, $"{id}");
                 this.currentCompletion = new DomainCompletionItemSerializationInfo(id, action.UserID, action.AcceptTime, action.GetType());

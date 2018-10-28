@@ -33,12 +33,19 @@ using Ntreev.Crema.Data;
 namespace Ntreev.Crema.ServiceModel
 {
     [DataContract(Namespace = SchemaUtility.Namespace)]
-    public struct DomainRowResultInfo
+    public struct DomainResultInfo
+    {
+        [DataMember]
+        public long ID { get; set; }
+    }
+
+    [DataContract(Namespace = SchemaUtility.Namespace)]
+    public struct DomainResultInfo<T>
     {
         [DataMember]
         public long ID { get; set; }
 
         [DataMember]
-        public DomainRowInfo[] Rows { get; set; }
+        public T Value { get; set; }
     }
 }

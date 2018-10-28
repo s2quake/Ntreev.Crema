@@ -34,7 +34,6 @@ namespace Ntreev.Crema.Services.Domains
                 UserID = userID,
                 UserName = name,
                 AccessType = accessType,
-                Location = DomainLocationInfo.Empty,
             };
         }
 
@@ -74,18 +73,13 @@ namespace Ntreev.Crema.Services.Domains
             var metaData = new DomainUserMetaData()
             {
                 DomainUserInfo = base.DomainUserInfo,
+                DomainLocationInfo = base.DomainLocationInfo,
                 DomainUserState = base.DomainUserState,
             };
             return metaData;
         }
 
         public string ID => base.DomainUserInfo.UserID;
-
-        public DomainLocationInfo Location
-        {
-            get => base.DomainUserInfo.Location;
-            set => base.UpdateLocation(value);
-        }
 
         public Authentication Authentication
         {
@@ -113,6 +107,20 @@ namespace Ntreev.Crema.Services.Domains
             {
                 this.Dispatcher.VerifyAccess();
                 base.DomainUserInfoChanged -= value;
+            }
+        }
+
+        public new event EventHandler DomainLocationInfoChanged
+        {
+            add
+            {
+                this.Dispatcher.VerifyAccess();
+                base.DomainLocationInfoChanged += value;
+            }
+            remove
+            {
+                this.Dispatcher.VerifyAccess();
+                base.DomainLocationInfoChanged -= value;
             }
         }
 

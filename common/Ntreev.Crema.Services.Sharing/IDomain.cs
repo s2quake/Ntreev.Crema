@@ -34,17 +34,17 @@ namespace Ntreev.Crema.Services
 
         Task EndUserEditAsync(Authentication authentication);
 
-        Task<DomainRowResultInfo> NewRowAsync(Authentication authentication, DomainRowInfo[] rows);
+        Task NewRowAsync(Authentication authentication, DomainRowInfo[] rows);
 
-        Task<DomainRowResultInfo> SetRowAsync(Authentication authentication, DomainRowInfo[] rows);
+        Task SetRowAsync(Authentication authentication, DomainRowInfo[] rows);
 
-        Task<DomainRowResultInfo> RemoveRowAsync(Authentication authentication, DomainRowInfo[] rows);
+        Task RemoveRowAsync(Authentication authentication, DomainRowInfo[] rows);
 
         Task SetPropertyAsync(Authentication authentication, string propertyName, object value);
 
         Task SetUserLocationAsync(Authentication authentication, DomainLocationInfo location);
 
-        Task<DomainUserInfo> KickAsync(Authentication authentication, string userID, string comment);
+        Task KickAsync(Authentication authentication, string userID, string comment);
 
         Task SetOwnerAsync(Authentication authentication, string userID);
 
@@ -64,9 +64,17 @@ namespace Ntreev.Crema.Services
 
         event EventHandler<DomainUserEventArgs> UserAdded;
 
-        event EventHandler<DomainUserEventArgs> UserChanged;
-
         event EventHandler<DomainUserRemovedEventArgs> UserRemoved;
+
+        event EventHandler<DomainUserLocationEventArgs> UserLocationChanged;
+
+        event EventHandler<DomainUserEventArgs> UserStateChanged;
+
+        event EventHandler<DomainUserLocationEventArgs> UserEditBegun;
+
+        event EventHandler<DomainUserEventArgs> UserEditEnded;
+
+        event EventHandler<DomainUserEventArgs> OwnerChanged;
 
         event EventHandler<DomainRowEventArgs> RowAdded;
 

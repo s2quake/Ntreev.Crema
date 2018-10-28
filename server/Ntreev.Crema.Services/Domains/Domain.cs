@@ -39,11 +39,15 @@ namespace Ntreev.Crema.Services.Domains
         private readonly HashSet<string> modifiedTableList = new HashSet<string>();
 
         private EventHandler<DomainUserEventArgs> userAdded;
-        private EventHandler<DomainUserEventArgs> userChanged;
         private EventHandler<DomainUserRemovedEventArgs> userRemoved;
+        private EventHandler<DomainUserLocationEventArgs> userLocationChanged;
+        private EventHandler<DomainUserEventArgs> userStateChanged;
+        private EventHandler<DomainUserLocationEventArgs> userEditBegun;
+        private EventHandler<DomainUserEventArgs> userEditEnded;
+        private EventHandler<DomainUserEventArgs> ownerChanged;
         private EventHandler<DomainRowEventArgs> rowAdded;
-        private EventHandler<DomainRowEventArgs> rowRemoved;
         private EventHandler<DomainRowEventArgs> rowChanged;
+        private EventHandler<DomainRowEventArgs> rowRemoved;
         private EventHandler<DomainPropertyEventArgs> propertyChanged;
         private EventHandler<DomainDeletedEventArgs> deleted;
 
@@ -112,23 +116,27 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public async Task BeginUserEditAsync(Authentication authentication, DomainLocationInfo location)
+        public async Task<long> BeginUserEditAsync(Authentication authentication, DomainLocationInfo location)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginUserEditAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateBeginUserEdit(authentication, location);
+                    return this.GetDomainUser(authentication);
                 });
-                var domainUser = await this.InvokeBeginUserEditAsync(authentication, location);
+                var result = await this.InvokeBeginUserEditAsync(authentication, domainUser, location);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    domainUser.DomainLocationInfo = location;
+                    domainUser.IsBeingEdited = true;
                     this.CremaHost.Sign(authentication);
-                    this.OnUserChanged(new DomainUserEventArgs(authentication, this, domainUser));
-                    this.Container?.InvokeDomainUserChangedEvent(authentication, this, domainUser);
+                    this.OnUserEditBegun(new DomainUserLocationEventArgs(authentication, this, domainUser));
+                    this.Container?.InvokeDomainUserEditBegunEvent(authentication, this, result, domainUser);
                 });
+                return result;
             }
             catch (Exception e)
             {
@@ -137,23 +145,26 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public async Task EndUserEditAsync(Authentication authentication)
+        public async Task<long> EndUserEditAsync(Authentication authentication)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndUserEditAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateEndUserEdit(authentication);
+                    return this.GetDomainUser(authentication);
                 });
-                var domainUser = await this.InvokeEndUserEditAsync(authentication);
+                var result = await this.InvokeEndUserEditAsync(authentication, domainUser);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    domainUser.IsBeingEdited = false;
                     this.CremaHost.Sign(authentication);
-                    this.OnUserChanged(new DomainUserEventArgs(authentication, this, domainUser));
-                    this.Container?.InvokeDomainUserChangedEvent(authentication, this, domainUser);
+                    this.OnUserEditEnded(new DomainUserEventArgs(authentication, this, domainUser));
+                    this.Container?.InvokeDomainUserEditEndedEvent(authentication, this, result, domainUser);
                 });
+                return result;
             }
             catch (Exception e)
             {
@@ -162,31 +173,32 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public async Task<DomainRowResultInfo> NewRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        public async Task<DomainResultInfo<DomainRowInfo[]>> NewRowAsync(Authentication authentication, DomainRowInfo[] rows)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(NewRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateNewRow(authentication, rows);
+                    return this.GetDomainUser(authentication);
                 });
-                var id = await this.Logger.NewRowAsync(authentication, rows);
-                var result = await this.InvokeNewRowAsync(authentication, rows);
-                await this.Logger.CompleteAsync(id);
-                var info = new DomainRowResultInfo() { ID = id, Rows = result };
+                var result = await this.InvokeNewRowAsync(authentication, domainUser, rows);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    foreach (var item in result.Rows)
+                    {
+                        this.modifiedTableList.Add(item.TableName);
+                    }
+                    domainUser.IsModified = true;
                     this.IsModified = true;
                     this.CremaHost.Sign(authentication);
                     base.UpdateModificationInfo(authentication.SignatureDate);
-                    this.OnRowAdded(new DomainRowEventArgs(authentication, this, info));
-                    this.Container?.InvokeDomainRowAddedEvent(authentication, this, info);
-                    this.Container?.InvokeDomainStateChangedEvent(authentication, this);
-                    this.Container?.InvokeDomainInfoChangedEvent(authentication, this);
+                    this.OnRowAdded(new DomainRowEventArgs(authentication, this, result.Rows));
+                    this.Container?.InvokeDomainRowAddedEvent(authentication, this, result.ID, result.Rows);
                 });
-                return info;
+                return new DomainResultInfo<DomainRowInfo[]>() { ID = result.ID, Value = result.Rows };
             }
             catch (Exception e)
             {
@@ -195,31 +207,32 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public async Task<DomainRowResultInfo> SetRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        public async Task<DomainResultInfo<DomainRowInfo[]>> SetRowAsync(Authentication authentication, DomainRowInfo[] rows)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateSetRow(authentication, rows);
+                    return this.GetDomainUser(authentication);
                 });
-                var id = await this.Logger.SetRowAsync(authentication, rows);
-                var result = await this.InvokeSetRowAsync(authentication, rows);
-                await this.Logger.CompleteAsync(id);
-                var info = new DomainRowResultInfo() { ID = id, Rows = result };
+                var result = await this.InvokeSetRowAsync(authentication, domainUser, rows);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    foreach (var item in result.Rows)
+                    {
+                        this.modifiedTableList.Add(item.TableName);
+                    }
+                    domainUser.IsModified = true;
                     this.IsModified = true;
                     this.CremaHost.Sign(authentication);
                     base.UpdateModificationInfo(authentication.SignatureDate);
-                    this.OnRowChanged(new DomainRowEventArgs(authentication, this, info));
-                    this.Container?.InvokeDomainRowChangedEvent(authentication, this, info);
-                    this.Container?.InvokeDomainStateChangedEvent(authentication, this);
-                    this.Container?.InvokeDomainInfoChangedEvent(authentication, this);
+                    this.OnRowChanged(new DomainRowEventArgs(authentication, this, result.Rows));
+                    this.Container?.InvokeDomainRowChangedEvent(authentication, this, result.ID, result.Rows);
                 });
-                return info;
+                return new DomainResultInfo<DomainRowInfo[]>() { ID = result.ID, Value = result.Rows };
             }
             catch (Exception e)
             {
@@ -228,31 +241,32 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public async Task<DomainRowResultInfo> RemoveRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        public async Task<DomainResultInfo<DomainRowInfo[]>> RemoveRowAsync(Authentication authentication, DomainRowInfo[] rows)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateRemoveRow(authentication, rows);
+                    return this.GetDomainUser(authentication);
                 });
-                var id = await this.Logger.RemoveRowAsync(authentication, rows);
-                var result = await this.InvokeRemoveRowAsync(authentication, rows);
-                await this.Logger.CompleteAsync(id);
-                var info = new DomainRowResultInfo() { ID = id, Rows = result };
+                var result = await this.InvokeRemoveRowAsync(authentication, domainUser, rows);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    foreach (var item in result.Rows)
+                    {
+                        this.modifiedTableList.Add(item.TableName);
+                    }
+                    domainUser.IsModified = true;
                     this.IsModified = true;
                     this.CremaHost.Sign(authentication);
                     base.UpdateModificationInfo(authentication.SignatureDate);
-                    this.OnRowRemoved(new DomainRowEventArgs(authentication, this, info));
-                    this.Container?.InvokeDomainRowRemovedEvent(authentication, this, info);
-                    this.Container?.InvokeDomainStateChangedEvent(authentication, this);
-                    this.Container?.InvokeDomainInfoChangedEvent(authentication, this);
+                    this.OnRowRemoved(new DomainRowEventArgs(authentication, this, result.Rows));
+                    this.Container?.InvokeDomainRowRemovedEvent(authentication, this, result.ID, result.Rows);
                 });
-                return info;
+                return new DomainResultInfo<DomainRowInfo[]>() { ID = result.ID, Value = result.Rows };
             }
             catch (Exception e)
             {
@@ -261,29 +275,28 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public async Task SetPropertyAsync(Authentication authentication, string propertyName, object value)
+        public async Task<long> SetPropertyAsync(Authentication authentication, string propertyName, object value)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPropertyAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, propertyName, value);
                     this.ValidateSetProperty(authentication, propertyName, value);
+                    return this.GetDomainUser(authentication);
                 });
-                var id = await this.Logger.SetPropertyAsync(authentication, propertyName, value);
-                await this.InvokeSetPropertyAsync(authentication, propertyName, value);
-                await this.Logger.CompleteAsync(id);
+                var result = await this.InvokeSetPropertyAsync(authentication, domainUser, propertyName, value);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    domainUser.IsModified = true;
                     this.IsModified = true;
                     this.CremaHost.Sign(authentication);
                     base.UpdateModificationInfo(authentication.SignatureDate);
                     this.OnPropertyChanged(new DomainPropertyEventArgs(authentication, this, propertyName, value));
-                    this.Container?.InvokeDomainPropertyChangedEvent(authentication, this, propertyName, value);
-                    this.Container?.InvokeDomainStateChangedEvent(authentication, this);
-                    this.Container?.InvokeDomainInfoChangedEvent(authentication, this);
+                    this.Container?.InvokeDomainPropertyChangedEvent(authentication, this, result, propertyName, value);
                 });
+                return result;
             }
             catch (Exception e)
             {
@@ -301,13 +314,11 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetUserLocationAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     this.ValidateSetLocation(authentication, location);
-                });
-                var domainUser = await this.InvokeSetUserLocationAsync(authentication, location);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
+                    var domainUser = this.GetDomainUser(authentication);
+                    domainUser.DomainLocationInfo = location;
                     this.CremaHost.Sign(authentication);
-                    this.OnUserChanged(new DomainUserEventArgs(authentication, this, domainUser));
-                    this.Container?.InvokeDomainUserChangedEvent(authentication, this, domainUser);
+                    this.OnUserLocationChanged(new DomainUserLocationEventArgs(authentication, this, domainUser));
+                    this.Container?.InvokeDomainUserLocationChangedEvent(authentication, this, domainUser);
                 });
             }
             catch (Exception e)
@@ -317,28 +328,26 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public async Task<DomainUserInfo> KickAsync(Authentication authentication, string userID, string comment)
+        public async Task<long> KickAsync(Authentication authentication, string userID, string comment)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(KickAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, userID, comment);
                     this.ValidateKick(authentication, userID, comment);
+                    return this.GetDomainUser(userID);
                 });
-                var id = await this.Logger.KickAsync(authentication, userID, comment);
-                var tuple = await this.InvokeKickAsync(authentication, userID, comment);
-                var domainUser = tuple.Item1;
-                var removeInfo = tuple.Item2;
-                await this.Logger.CompleteAsync(id);
-                return await this.Dispatcher.InvokeAsync(() =>
+                var result = await this.InvokeKickAsync(authentication, domainUser, userID, comment);
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
-                    this.OnUserRemoved(new DomainUserRemovedEventArgs(authentication, this, domainUser, removeInfo));
-                    this.Container?.InvokeDomainUserRemovedEvent(authentication, this, domainUser, removeInfo);
+                    this.OnUserRemoved(new DomainUserRemovedEventArgs(authentication, this, domainUser, result.RemoveInfo));
+                    this.Container?.InvokeDomainUserRemovedEvent(authentication, this, result.ID, domainUser, result.RemoveInfo);
                     return domainUser.DomainUserInfo;
                 });
+                return result.ID;
             }
             catch (Exception e)
             {
@@ -347,32 +356,25 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public async Task SetOwnerAsync(Authentication authentication, string userID)
+        public async Task<long> SetOwnerAsync(Authentication authentication, string userID)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetOwnerAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, userID);
                     this.ValidateSetOwner(authentication, userID);
+                    return this.GetDomainUser(userID);
                 });
-                var id = await this.Logger.SetOwnerAsync(authentication, userID);
-                var tuple = await this.InvokeSetOwnerAsync(authentication, userID);
-                var oldOwner = tuple.Item1;
-                var newOwner = tuple.Item2;
-                await this.Logger.CompleteAsync(id);
+                var result = await this.InvokeSetOwnerAsync(authentication, domainUser);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
-                    if (oldOwner != null)
-                    {
-                        this.OnUserChanged(new DomainUserEventArgs(authentication, this, oldOwner));
-                        this.Container.InvokeDomainUserChangedEvent(authentication, this, oldOwner);
-                    }
-                    this.OnUserChanged(new DomainUserEventArgs(authentication, this, newOwner));
-                    this.Container?.InvokeDomainUserChangedEvent(authentication, this, newOwner);
+                    this.OnOwnerChanged(new DomainUserEventArgs(authentication, this, domainUser));
+                    this.Container?.InvokeDomainOwnerChangedEvent(authentication, this, result, domainUser);
                 });
+                return result;
             }
             catch (Exception e)
             {
@@ -429,9 +431,9 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.Sign(item, true);
                     this.InvokeAttach(item, out var domainUser);
-                    this.OnUserChanged(new DomainUserEventArgs(item, this, domainUser));
+                    this.OnUserStateChanged(new DomainUserEventArgs(item, this, domainUser));
+                    this.Container.InvokeDomainUserStateChangedEvent(item, this, domainUser);
                     this.OnDomainStateChanged(new DomainEventArgs(item, this));
-                    this.Container.InvokeDomainUserChangedEvent(item, this, domainUser);
                     this.Container.InvokeDomainStateChangedEvent(item, this);
                 }
             }
@@ -445,56 +447,71 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.Sign(item, true);
                     this.InvokeDetach(item, out var domainUser);
-                    this.OnUserChanged(new DomainUserEventArgs(item, this, domainUser));
+                    this.OnUserStateChanged(new DomainUserEventArgs(item, this, domainUser));
                     this.OnDomainStateChanged(new DomainEventArgs(item, this));
-                    this.Container.InvokeDomainUserChangedEvent(item, this, domainUser);
+                    this.Container.InvokeDomainUserStateChangedEvent(item, this, domainUser);
                     this.Container.InvokeDomainStateChangedEvent(item, this);
                 }
             }
         }
 
-        public async Task AddUserAsync(Authentication authentication, DomainAccessType accessType)
+        public async Task<long> AddUserAsync(Authentication authentication, DomainAccessType accessType)
         {
-            await this.Dispatcher.InvokeAsync(() =>
+            try
             {
-                this.CremaHost.DebugMethod(authentication, this, nameof(AddUserAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, accessType);
-                this.ValidateAdd(authentication);
-            });
-            var id = await this.Logger.JoinAsync(authentication, accessType);
-            var domainUser = await this.InvokeAddUserAsync(authentication, accessType);
-            await this.Logger.CompleteAsync(id);
-            await this.Dispatcher.InvokeAsync(() =>
+                this.ValidateExpired();
+                var domainUser = await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.DebugMethod(authentication, this, nameof(AddUserAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, accessType);
+                    this.ValidateAdd(authentication);
+                    return new DomainUser(this, authentication.ID, authentication.Name, accessType)
+                    {
+                        DomainUserState = DomainUserState.Detached,
+                        IsOnline = authentication.Types.HasFlag(AuthenticationType.User),
+                    };
+                });
+                var result = await this.InvokeAddUserAsync(authentication, domainUser);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    domainUser.DomainUserState &= ~DomainUserState.Detached;
+                    this.CremaHost.Sign(authentication);
+                    this.OnUserAdded(new DomainUserEventArgs(authentication, this, domainUser));
+                    this.Container?.InvokeDomainUserAddedEvent(authentication, this, result, domainUser);
+                });
+                return result;
+            }
+            catch (Exception e)
             {
-                domainUser.DomainUserState &= ~DomainUserState.Detached;
-                this.CremaHost.Sign(authentication);
-                this.OnUserAdded(new DomainUserEventArgs(authentication, this, domainUser));
-                this.Container?.InvokeDomainUserAddedEvent(authentication, this, domainUser);
-            });
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
-        public async Task RemoveUserAsync(Authentication authentication)
+        public async Task<long> RemoveUserAsync(Authentication authentication)
         {
-            await this.Dispatcher.InvokeAsync(() =>
+            try
             {
-                this.CremaHost.DebugMethod(authentication, this, nameof(RemoveUserAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
-                this.ValidateRemove(authentication);
-            });
-            var id = await this.Logger.DisjoinAsync(authentication, RemoveInfo.Empty);
-            var tuple = await this.InvokeRemoveUserAsync(authentication);
-            var domainUser = tuple.Item1;
-            var isMaster = tuple.Item2;
-            await this.Logger.CompleteAsync(id);
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.CremaHost.Sign(authentication);
-                this.OnUserRemoved(new DomainUserRemovedEventArgs(authentication, this, domainUser, RemoveInfo.Empty));
-                this.Container?.InvokeDomainUserRemovedEvent(authentication, this, domainUser, RemoveInfo.Empty);
-                if (isMaster == true && this.Users.Owner != null)
+                this.ValidateExpired();
+                var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.OnUserChanged(new DomainUserEventArgs(authentication, this, this.Users.Owner));
-                    this.Container?.InvokeDomainUserChangedEvent(authentication, this, this.Users.Owner);
-                }
-            });
+                    this.CremaHost.DebugMethod(authentication, this, nameof(RemoveUserAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
+                    this.ValidateRemove(authentication);
+                    return this.GetDomainUser(authentication);
+                });
+                var result = await this.InvokeRemoveUserAsync(authentication, domainUser);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.CremaHost.Sign(authentication);
+                    this.OnUserRemoved(new DomainUserRemovedEventArgs(authentication, this, domainUser, RemoveInfo.Empty));
+                    this.Container?.InvokeDomainUserRemovedEvent(authentication, this, result, domainUser, RemoveInfo.Empty);
+                });
+                return result;
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+                throw;
+            }
         }
 
         public void SetDomainHost(Authentication authentication, IDomainHost host)
@@ -603,20 +620,6 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public event EventHandler<DomainUserEventArgs> UserChanged
-        {
-            add
-            {
-                this.Dispatcher?.VerifyAccess();
-                this.userChanged += value;
-            }
-            remove
-            {
-                this.Dispatcher?.VerifyAccess();
-                this.userChanged -= value;
-            }
-        }
-
         public event EventHandler<DomainUserRemovedEventArgs> UserRemoved
         {
             add
@@ -628,6 +631,76 @@ namespace Ntreev.Crema.Services.Domains
             {
                 this.Dispatcher?.VerifyAccess();
                 this.userRemoved -= value;
+            }
+        }
+
+        public event EventHandler<DomainUserLocationEventArgs> UserLocationChanged
+        {
+            add
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.userLocationChanged += value;
+            }
+            remove
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.userLocationChanged -= value;
+            }
+        }
+
+        public event EventHandler<DomainUserEventArgs> UserStateChanged
+        {
+            add
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.userStateChanged += value;
+            }
+            remove
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.userStateChanged -= value;
+            }
+        }
+
+        public event EventHandler<DomainUserLocationEventArgs> UserEditBegun
+        {
+            add
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.userEditBegun += value;
+            }
+            remove
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.userEditBegun -= value;
+            }
+        }
+
+        public event EventHandler<DomainUserEventArgs> UserEditEnded
+        {
+            add
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.userEditEnded += value;
+            }
+            remove
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.userEditEnded -= value;
+            }
+        }
+
+        public event EventHandler<DomainUserEventArgs> OwnerChanged
+        {
+            add
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.ownerChanged += value;
+            }
+            remove
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.ownerChanged -= value;
             }
         }
 
@@ -645,20 +718,6 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public event EventHandler<DomainRowEventArgs> RowRemoved
-        {
-            add
-            {
-                this.Dispatcher?.VerifyAccess();
-                this.rowRemoved += value;
-            }
-            remove
-            {
-                this.Dispatcher?.VerifyAccess();
-                this.rowRemoved -= value;
-            }
-        }
-
         public event EventHandler<DomainRowEventArgs> RowChanged
         {
             add
@@ -670,6 +729,20 @@ namespace Ntreev.Crema.Services.Domains
             {
                 this.Dispatcher?.VerifyAccess();
                 this.rowChanged -= value;
+            }
+        }
+
+        public event EventHandler<DomainRowEventArgs> RowRemoved
+        {
+            add
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.rowRemoved += value;
+            }
+            remove
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.rowRemoved -= value;
             }
         }
 
@@ -729,49 +802,41 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        protected virtual async Task<DomainRowInfo[]> OnNewRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected virtual DomainRowInfo[] OnNewRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            await Task.Delay(1);
             return null;
         }
 
-        protected virtual async Task<DomainRowInfo[]> OnSetRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected virtual DomainRowInfo[] OnSetRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            await Task.Delay(1);
             return null;
         }
 
-        protected virtual async Task<DomainRowInfo[]> OnRemoveRowAsync(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
+        protected virtual DomainRowInfo[] OnRemoveRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDateProvider signatureProvider)
         {
-            await Task.Delay(1);
             return null;
         }
 
-        protected virtual async Task OnSetPropertyAsync(DomainUser domainUser, string propertyName, object value, SignatureDateProvider signatureProvider)
+        protected virtual void OnSetProperty(DomainUser domainUser, string propertyName, object value, SignatureDateProvider signatureProvider)
         {
-            await Task.Delay(1);
+
         }
 
-        protected virtual async Task OnSetLocationAsync(DomainUser domainUser, DomainLocationInfo location)
+        protected virtual void OnBeginUserEdit(DomainUser domainUser, DomainLocationInfo location)
         {
-            await Task.Delay(1);
+
         }
 
-        protected virtual async Task OnBeginUserEditAsync(DomainUser domainUser, DomainLocationInfo location)
+        protected virtual void OnEndUserEdit(DomainUser domainUser)
         {
-            await Task.Delay(1);
-        }
 
-        protected virtual async Task OnEndUserEditAsync(DomainUser domainUser)
-        {
-            await Task.Delay(1);
         }
 
         protected abstract byte[] SerializeSource(object source);
 
         protected abstract object DerializeSource(byte[] data);
 
-        protected virtual void OnSerializaing(IDictionary<string, object> properties)
+           protected virtual void OnSerializaing(IDictionary<string, object> properties)
         {
 
         }
@@ -781,14 +846,34 @@ namespace Ntreev.Crema.Services.Domains
             this.userAdded?.Invoke(this, e);
         }
 
-        protected virtual void OnUserChanged(DomainUserEventArgs e)
-        {
-            this.userChanged?.Invoke(this, e);
-        }
-
         protected virtual void OnUserRemoved(DomainUserRemovedEventArgs e)
         {
             this.userRemoved?.Invoke(this, e);
+        }
+
+        protected virtual void OnUserLocationChanged(DomainUserLocationEventArgs e)
+        {
+            this.userLocationChanged(this, e);
+        }
+
+        protected virtual void OnUserStateChanged(DomainUserEventArgs e)
+        {
+            this.userStateChanged(this, e);
+        }
+
+        protected virtual void OnUserEditBegun(DomainUserLocationEventArgs e)
+        {
+            this.userEditBegun(this, e);
+        }
+
+        protected virtual void OnUserEditEnded(DomainUserEventArgs e)
+        {
+            this.userEditEnded(this, e);
+        }
+
+        protected virtual void OnOwnerChanged(DomainUserEventArgs e)
+        {
+            this.ownerChanged(this, e);
         }
 
         protected virtual void OnRowAdded(DomainRowEventArgs e)
@@ -920,113 +1005,99 @@ namespace Ntreev.Crema.Services.Domains
                 throw new UserNotFoundException(authentication.ID);
         }
 
-        private async Task<DomainUser> InvokeBeginUserEditAsync(Authentication authentication, DomainLocationInfo location)
+        private Task<long> InvokeBeginUserEditAsync(Authentication authentication, DomainUser domainUser, DomainLocationInfo location)
         {
-            var domainUser = await this.GetDomainUserAsync(authentication);
-            await this.OnBeginUserEditAsync(domainUser, location);
-            await this.Dispatcher.InvokeAsync(() =>
+            return this.DataDispatcher.InvokeAsync(() =>
             {
-                domainUser.Location = location;
-                domainUser.IsBeingEdited = true;
+                var id = this.Logger.BeginUserEdit(authentication, location);
+                this.OnBeginUserEdit(domainUser, location);
+                this.Logger.Complete(id);
+                return id;
             });
-            return domainUser;
         }
 
-        private async Task<DomainUser> InvokeEndUserEditAsync(Authentication authentication)
+        private Task<long> InvokeEndUserEditAsync(Authentication authentication, DomainUser domainUser)
         {
-            var domainUser = await this.GetDomainUserAsync(authentication);
-            await this.OnEndUserEditAsync(domainUser);
-            await this.Dispatcher.InvokeAsync(() =>
+            return this.DataDispatcher.InvokeAsync(() =>
             {
-                domainUser.IsBeingEdited = false;
+                var id = this.Logger.EndUserEdit(authentication);
+                this.OnEndUserEdit(domainUser);
+                this.Logger.Complete(id);
+                return id;
             });
-            return domainUser;
         }
 
-        private async Task<DomainRowInfo[]> InvokeNewRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        private Task<(long ID, DomainRowInfo[] Rows)> InvokeNewRowAsync(Authentication authentication, DomainUser domainUser, DomainRowInfo[] rows)
         {
-            var domainUser = await this.GetDomainUserAsync(authentication);
-            rows = await this.OnNewRowAsync(domainUser, rows, authentication.GetSignatureDateProvider());
-            await this.Dispatcher.InvokeAsync(() =>
+            return this.DataDispatcher.InvokeAsync(() =>
             {
-                foreach (var item in rows)
-                {
-                    this.modifiedTableList.Add(item.TableName);
-                }
-                domainUser.IsModified = true;
+                var id = this.Logger.NewRow(authentication, rows);
+                var resultRows = this.OnNewRow(domainUser, rows, authentication.GetSignatureDateProvider());
+                this.Logger.Complete(id);
+                return (id, resultRows);
             });
-            return rows;
         }
 
-        private async Task<DomainRowInfo[]> InvokeSetRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        private Task<(long ID, DomainRowInfo[] Rows)> InvokeSetRowAsync(Authentication authentication, DomainUser domainUser, DomainRowInfo[] rows)
         {
-            var domainUser = await this.GetDomainUserAsync(authentication);
-            rows = await this.OnSetRowAsync(domainUser, rows, authentication.GetSignatureDateProvider());
-            await this.Dispatcher.InvokeAsync(() =>
+            return this.DataDispatcher.InvokeAsync(() =>
             {
-                foreach (var item in rows)
-                {
-                    this.modifiedTableList.Add(item.TableName);
-                }
-                domainUser.IsModified = true;
+                var id = this.Logger.SetRow(authentication, rows);
+                var resultRows = this.OnSetRow(domainUser, rows, authentication.GetSignatureDateProvider());
+                this.Logger.Complete(id);
+                return (id, resultRows);
             });
-            return rows;
         }
 
-        private async Task<DomainRowInfo[]> InvokeRemoveRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        private Task<(long ID, DomainRowInfo[] Rows)> InvokeRemoveRowAsync(Authentication authentication, DomainUser domainUser, DomainRowInfo[] rows)
         {
-            var domainUser = await this.GetDomainUserAsync(authentication);
-            rows = await this.OnRemoveRowAsync(domainUser, rows, authentication.GetSignatureDateProvider());
-            await this.Dispatcher.InvokeAsync(() =>
+            return this.DataDispatcher.InvokeAsync(() =>
             {
-                foreach (var item in rows)
-                {
-                    this.modifiedTableList.Add(item.TableName);
-                }
-                domainUser.IsModified = true;
+                var id = this.Logger.RemoveRow(authentication, rows);
+                var resultRows = this.OnRemoveRow(domainUser, rows, authentication.GetSignatureDateProvider());
+                this.Logger.Complete(id);
+                return (id, resultRows);
             });
-            return rows;
         }
 
-        private async Task InvokeSetPropertyAsync(Authentication authentication, string propertyName, object value)
+        private Task<long> InvokeSetPropertyAsync(Authentication authentication, DomainUser domainUser, string propertyName, object value)
         {
-            var domainUser = await this.GetDomainUserAsync(authentication);
-            await this.OnSetPropertyAsync(domainUser, propertyName, value, authentication.GetSignatureDateProvider());
-            await this.Dispatcher.InvokeAsync(() => domainUser.IsModified = true);
-        }
-
-        private async Task<DomainUser> InvokeSetUserLocationAsync(Authentication authentication, DomainLocationInfo location)
-        {
-            var domainUser = await this.GetDomainUserAsync(authentication);
-            await this.OnSetLocationAsync(domainUser, location);
-            await this.Dispatcher.InvokeAsync(() => domainUser.Location = location);
-            return domainUser;
-        }
-
-        private async Task<(DomainUser, RemoveInfo)> InvokeKickAsync(Authentication authentication, string userID, string comment)
-        {
-            var removeInfo = new RemoveInfo(RemoveReason.Kick, comment);
-            return await this.Dispatcher.InvokeAsync(() =>
+            return this.DataDispatcher.InvokeAsync(() =>
             {
-                var domainUser = this.Users[userID];
+                var id = this.Logger.SetProperty(authentication, propertyName, value);
+                this.OnSetProperty(domainUser, propertyName, value, authentication.GetSignatureDateProvider());
+                this.Logger.Complete(id);
+                return id;
+            });
+        }
+
+        private Task<(long ID, RemoveInfo RemoveInfo)> InvokeKickAsync(Authentication authentication, DomainUser domainUser, string userID, string comment)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                var id = this.Logger.Kick(authentication, userID, comment);
                 this.Users.Remove(userID);
                 if (domainUser.Authentication != null)
                 {
                     domainUser.Authentication.Expired -= Authentication_Expired;
                     domainUser.Authentication = null;
                 }
-                return (domainUser, removeInfo);
+                this.Logger.Complete(id);
+                return (id, new RemoveInfo(RemoveReason.Kick, comment));
             });
         }
 
-        private async Task<(DomainUser, DomainUser)> InvokeSetOwnerAsync(Authentication authentication, string userID)
+        private async Task<long> InvokeSetOwnerAsync(Authentication authentication, DomainUser domainUser)
         {
-            return await this.Dispatcher.InvokeAsync(() =>
+            return await await this.DataDispatcher.InvokeAsync(async () =>
             {
-                var oldOwner = this.Users.Owner;
-                var newOwner = this.Users[userID];
-                this.Users.Owner = newOwner;
-                return (oldOwner, newOwner);
+                var id = this.Logger.SetOwner(authentication, domainUser.ID);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.Users.Owner = domainUser;
+                });
+                this.Logger.Complete(id);
+                return id;
             });
         }
 
@@ -1049,32 +1120,35 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        private Task<DomainUser> InvokeAddUserAsync(Authentication authentication, DomainAccessType accessType)
+        private async Task<long> InvokeAddUserAsync(Authentication authentication, DomainUser domainUser)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            return await await this.DataDispatcher.InvokeAsync(async () =>
             {
-                var domainUser = new DomainUser(this, authentication.ID, authentication.Name, accessType)
+                var id = this.Logger.Join(authentication, domainUser.DomainUserInfo.AccessType);
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    DomainUserState = DomainUserState.Detached,
-                    IsOnline = authentication.Types.HasFlag(AuthenticationType.User),
-                };
-                this.Users.Add(domainUser);
-                domainUser.Authentication = authentication;
-                authentication.Expired += Authentication_Expired;
-                return domainUser;
+                    this.Users.Add(domainUser);
+                    domainUser.Authentication = authentication;
+                    authentication.Expired += Authentication_Expired;
+                });
+                this.Logger.Complete(id);
+                return id;
             });
         }
 
-        private async Task<(DomainUser, bool)> InvokeRemoveUserAsync(Authentication authentication)
+        private async Task<long> InvokeRemoveUserAsync(Authentication authentication, DomainUser domainUser)
         {
-            var domainUser = await this.GetDomainUserAsync(authentication);
-            return await this.Dispatcher.InvokeAsync(() =>
+            return await await this.DataDispatcher.InvokeAsync(async () =>
             {
-                var isOwner = domainUser.IsOwner;
-                domainUser.Authentication = null;
-                authentication.Expired -= Authentication_Expired;
-                this.Users.Remove(authentication.ID);
-                return (domainUser, isOwner);
+                var id = this.Logger.Disjoin(authentication, RemoveInfo.Empty);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    domainUser.Authentication = null;
+                    authentication.Expired -= Authentication_Expired;
+                    this.Users.Remove(domainUser.ID);
+                });
+                this.Logger.Complete(id);
+                return id;
             });
         }
 
@@ -1091,10 +1165,15 @@ namespace Ntreev.Crema.Services.Domains
 
         private DomainUser GetDomainUser(Authentication authentication)
         {
+            return this.GetDomainUser(authentication.ID);
+        }
+
+        private DomainUser GetDomainUser(string userID)
+        {
             this.Dispatcher.VerifyAccess();
-            if (this.Users.ContainsKey(authentication.ID) == false)
-                throw new UserNotFoundException(authentication.ID);
-            return this.Users[authentication.ID];
+            if (this.Users.ContainsKey(userID) == false)
+                throw new UserNotFoundException(userID);
+            return this.Users[userID];
         }
 
         private DateTime GetTime()
@@ -1125,7 +1204,7 @@ namespace Ntreev.Crema.Services.Domains
                     domainUser.Authentication = null;
                     domainUser.IsOnline = false;
                     authentication.Sign();
-                    this.OnUserChanged(new DomainUserEventArgs(authentication, this, domainUser));
+                    this.OnUserStateChanged(new DomainUserEventArgs(authentication, this, domainUser));
                 });
             }
         }
@@ -1142,6 +1221,51 @@ namespace Ntreev.Crema.Services.Domains
         }
 
         #region IDomain
+
+        Task IDomain.BeginUserEditAsync(Authentication authentication, DomainLocationInfo location)
+        {
+            return this.BeginUserEditAsync(authentication, location);
+        }
+
+        Task IDomain.EndUserEditAsync(Authentication authentication)
+        {
+            return this.EndUserEditAsync(authentication);
+        }
+
+        Task IDomain.NewRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        {
+            return this.NewRowAsync(authentication, rows);
+        }
+
+        Task IDomain.SetRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        {
+            return this.SetRowAsync(authentication, rows);
+        }
+
+        Task IDomain.RemoveRowAsync(Authentication authentication, DomainRowInfo[] rows)
+        {
+            return this.RemoveRowAsync(authentication, rows);
+        }
+
+        Task IDomain.SetPropertyAsync(Authentication authentication, string propertyName, object value)
+        {
+            return this.SetPropertyAsync(authentication, propertyName, value);
+        }
+
+        Task IDomain.SetUserLocationAsync(Authentication authentication, DomainLocationInfo location)
+        {
+            return this.SetUserLocationAsync(authentication, location);
+        }
+
+        Task IDomain.KickAsync(Authentication authentication, string userID, string comment)
+        {
+            return this.KickAsync(authentication, userID, comment);
+        }
+
+        Task IDomain.SetOwnerAsync(Authentication authentication, string userID)
+        {
+            return this.SetOwnerAsync(authentication, userID);
+        }
 
         IDomainUserCollection IDomain.Users => this.Users;
 

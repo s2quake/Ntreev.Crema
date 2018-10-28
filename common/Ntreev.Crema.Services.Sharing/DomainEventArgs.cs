@@ -46,5 +46,7 @@ namespace Ntreev.Crema.Services
         public DateTime DateTime => this.SignatureDate.DateTime;
 
         public SignatureDate SignatureDate { get; }
+
+        public long TaskID { get; internal set; }
     }
 }

@@ -51,24 +51,36 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         void OnDomainStateChanged(SignatureDate signatureDate, Guid domainID, DomainState domainState);
 
         [OperationContract(IsOneWay = true)]
-        void OnUserAdded(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState);
+        void OnUserAdded(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState, long id);
 
         [OperationContract(IsOneWay = true)]
-        void OnUserChanged(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState);
+        void OnUserRemoved(SignatureDate signatureDate, Guid domainID, string userID, string ownerID, RemoveInfo removeInfo, long id);
 
         [OperationContract(IsOneWay = true)]
-        void OnUserRemoved(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, RemoveInfo removeInfo);
+        void OnUserLocationChanged(SignatureDate signatureDate, Guid domainID, DomainLocationInfo domainLocationInfo);
 
         [OperationContract(IsOneWay = true)]
-        void OnRowAdded(SignatureDate signatureDate, Guid domainID, DomainRowResultInfo info);
+        void OnUserStateChanged(SignatureDate signatureDate, Guid domainID, DomainUserState domainUserState);
 
         [OperationContract(IsOneWay = true)]
-        void OnRowChanged(SignatureDate signatureDate, Guid domainID, DomainRowResultInfo info);
+        void OnUserEditBegun(SignatureDate signatureDate, Guid domainID, DomainLocationInfo domainLocationInfo, long id);
 
         [OperationContract(IsOneWay = true)]
-        void OnRowRemoved(SignatureDate signatureDate, Guid domainID, DomainRowResultInfo info);
+        void OnUserEditEnded(SignatureDate signatureDate, Guid domainID, long id);
 
         [OperationContract(IsOneWay = true)]
-        void OnPropertyChanged(SignatureDate signatureDate, Guid domainID, string propertyName, object value);
+        void OnOwnerChanged(SignatureDate signatureDate, Guid domainID, string ownerID, long id);
+
+        [OperationContract(IsOneWay = true)]
+        void OnRowAdded(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows, long id);
+
+        [OperationContract(IsOneWay = true)]
+        void OnRowChanged(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows, long id);
+
+        [OperationContract(IsOneWay = true)]
+        void OnRowRemoved(SignatureDate signatureDate, Guid domainID, DomainRowInfo[] rows, long id);
+
+        [OperationContract(IsOneWay = true)]
+        void OnPropertyChanged(SignatureDate signatureDate, Guid domainID, string propertyName, object value, long id);
     }
 }

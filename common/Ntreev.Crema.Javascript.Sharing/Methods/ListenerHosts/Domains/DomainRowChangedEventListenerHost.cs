@@ -40,15 +40,16 @@ namespace Ntreev.Crema.Javascript.Methods.ListenerHosts.Domains
         {
             if (this.cremaHost.GetService(typeof(IDomainContext)) is IDomainContext domainContext)
             {
-                domainContext.Dispatcher.Invoke(() => domainContext.Domains.DomainRowChanged += Domains_DomainRowChanged);
+                //domainContext.Dispatcher.Invoke(() => domainContext.Domains.DomainRowChanged += Domains_DomainRowChanged);
             }
         }
 
+        // TODO: implemet
         protected override void OnUnsubscribe()
         {
             if (this.cremaHost.GetService(typeof(IDomainContext)) is IDomainContext domainContext)
             {
-                domainContext.Dispatcher.Invoke(() => domainContext.Domains.DomainRowChanged -= Domains_DomainRowChanged);
+                //domainContext.Dispatcher.Invoke(() => domainContext.Domains.DomainRowChanged -= Domains_DomainRowChanged);
             }
         }
 

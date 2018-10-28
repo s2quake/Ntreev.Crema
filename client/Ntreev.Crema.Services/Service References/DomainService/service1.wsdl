@@ -178,14 +178,38 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="OnUserChanged">
-      <soap12:operation soapAction="http://www.ntreev.com/IDomainService/OnUserChanged" style="document" />
+    <wsdl:operation name="OnUserRemoved">
+      <soap12:operation soapAction="http://www.ntreev.com/IDomainService/OnUserRemoved" style="document" />
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="OnUserRemoved">
-      <soap12:operation soapAction="http://www.ntreev.com/IDomainService/OnUserRemoved" style="document" />
+    <wsdl:operation name="OnUserLocationChanged">
+      <soap12:operation soapAction="http://www.ntreev.com/IDomainService/OnUserLocationChanged" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OnUserStateChanged">
+      <soap12:operation soapAction="http://www.ntreev.com/IDomainService/OnUserStateChanged" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OnUserEditBegun">
+      <soap12:operation soapAction="http://www.ntreev.com/IDomainService/OnUserEditBegun" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OnUserEditEnded">
+      <soap12:operation soapAction="http://www.ntreev.com/IDomainService/OnUserEditEnded" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OnOwnerChanged">
+      <soap12:operation soapAction="http://www.ntreev.com/IDomainService/OnOwnerChanged" style="document" />
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>

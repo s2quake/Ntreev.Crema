@@ -46,13 +46,13 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         ResultBase SetUserLocation(Guid domainID, DomainLocationInfo location);
 
         [OperationContract]
-        ResultBase<DomainRowResultInfo> NewRow(Guid domainID, DomainRowInfo[] rows);
+        ResultBase<DomainRowInfo[]> NewRow(Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
-        ResultBase<DomainRowResultInfo> RemoveRow(Guid domainID, DomainRowInfo[] rows);
+        ResultBase<DomainRowInfo[]> RemoveRow(Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
-        ResultBase<DomainRowResultInfo> SetRow(Guid domainID, DomainRowInfo[] rows);
+        ResultBase<DomainRowInfo[]> SetRow(Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
         ResultBase SetProperty(Guid domainID, string propertyName, object value);
@@ -64,7 +64,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         ResultBase EndUserEdit(Guid domainID);
 
         [OperationContract]
-        ResultBase<DomainUserInfo> Kick(Guid domainID, string userID, string comment);
+        ResultBase Kick(Guid domainID, string userID, string comment);
 
         [OperationContract]
         ResultBase SetOwner(Guid domainID, string userID);

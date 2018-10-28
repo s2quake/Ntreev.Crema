@@ -35,13 +35,17 @@ namespace Ntreev.Crema.Services.Domains
         private EventHandler<DomainEventArgs> domainInfoChanged;
         private EventHandler<DomainEventArgs> domainStateChanged;
         private EventHandler<DomainUserEventArgs> domainUserAdded;
-        private EventHandler<DomainUserEventArgs> domainUserChanged;
         private EventHandler<DomainUserRemovedEventArgs> domainUserRemoved;
+        private EventHandler<DomainUserLocationEventArgs> domainUserLocationChanged;
+        private EventHandler<DomainUserEventArgs> domainUserStateChanged;
+        private EventHandler<DomainUserLocationEventArgs> domainUserEditBegun;
+        private EventHandler<DomainUserEventArgs> domainUserEditEnded;
+        private EventHandler<DomainUserEventArgs> domainOwnerChanged;
         private EventHandler<DomainRowEventArgs> domainRowAdded;
         private EventHandler<DomainRowEventArgs> domainRowChanged;
         private EventHandler<DomainRowEventArgs> domainRowRemoved;
         private EventHandler<DomainPropertyEventArgs> domainPropertyChanged;
-        
+
         public void InvokeDomainCreatedEvent(Authentication authentication, Domain[] domains)
         {
             var domainInfos = domains.Select(item => (object)item.DomainInfo).ToArray();
@@ -76,33 +80,9 @@ namespace Ntreev.Crema.Services.Domains
             this.Context.InvokeItemsDeleteEvent(authentication, domains, itemPaths);
         }
 
-        public void InvokeDomainRowAddedEvent(Authentication authentication, Domain domain, DomainRowResultInfo info)
+        public void InvokeDomainUserAddedEvent(Authentication authentication, Domain domain, long id, DomainUser domainUser)
         {
-            var args = new DomainRowEventArgs(authentication, domain, info);
-            this.OnDomainRowAdded(args);
-        }
-
-        public void InvokeDomainRowChangedEvent(Authentication authentication, Domain domain, DomainRowResultInfo info)
-        {
-            var args = new DomainRowEventArgs(authentication, domain, info);
-            this.OnDomainRowChanged(args);
-        }
-
-        public void InvokeDomainRowRemovedEvent(Authentication authentication, Domain domain, DomainRowResultInfo info)
-        {
-            var args = new DomainRowEventArgs(authentication, domain, info);
-            this.OnDomainRowRemoved(args);
-        }
-
-        public void InvokeDomainPropertyChangedEvent(Authentication authentication, Domain domain, string propertyName, object value)
-        {
-            var args = new DomainPropertyEventArgs(authentication, domain, propertyName, value);
-            this.OnDomainPropertyChanged(args);
-        }
-
-        public void InvokeDomainUserAddedEvent(Authentication authentication, Domain domain, DomainUser domainUser)
-        {
-            var args = new DomainUserEventArgs(authentication, domain, domainUser);
+            var args = new DomainUserEventArgs(authentication, domain, domainUser) { TaskID = id };
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainUserAddedEvent), domain, domainUser);
             var comment = EventMessageBuilder.EnterDomainUser(authentication, domain);
             this.CremaHost.Debug(eventLog);
@@ -110,9 +90,9 @@ namespace Ntreev.Crema.Services.Domains
             this.OnDomainUserAdded(args);
         }
 
-        public void InvokeDomainUserRemovedEvent(Authentication authentication, Domain domain, DomainUser domainUser, RemoveInfo removeInfo)
+        public void InvokeDomainUserRemovedEvent(Authentication authentication, Domain domain, long id, DomainUser domainUser, RemoveInfo removeInfo)
         {
-            var args = new DomainUserRemovedEventArgs(authentication, domain, domainUser, removeInfo);
+            var args = new DomainUserRemovedEventArgs(authentication, domain, domainUser, removeInfo) { TaskID = id };
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainUserRemovedEvent), domain, domainUser, removeInfo.Reason, removeInfo.Message);
             var comment = removeInfo.Reason == RemoveReason.Kick
                 ? EventMessageBuilder.KickDomainUser(authentication, domain, domainUser)
@@ -122,10 +102,59 @@ namespace Ntreev.Crema.Services.Domains
             this.OnDomainUserRemoved(args);
         }
 
-        public void InvokeDomainUserChangedEvent(Authentication authentication, Domain domain, DomainUser domainUser)
+        public void InvokeDomainUserLocationChangedEvent(Authentication authentication, Domain domain, DomainUser domainUser)
+        {
+            var args = new DomainUserLocationEventArgs(authentication, domain, domainUser);
+            this.OnDomainUserLocationChanged(args);
+        }
+
+        public void InvokeDomainUserStateChangedEvent(Authentication authentication, Domain domain, DomainUser domainUser)
         {
             var args = new DomainUserEventArgs(authentication, domain, domainUser);
-            this.OnDomainUserChanged(args);
+            this.OnDomainUserStateChanged(args);
+        }
+
+        public void InvokeDomainUserEditBegunEvent(Authentication authentication, Domain domain, long id, DomainUser domainUser)
+        {
+            var args = new DomainUserLocationEventArgs(authentication, domain, domainUser) { TaskID = id };
+            this.OnDomainUserEditBegun(args);
+        }
+
+        public void InvokeDomainUserEditEndedEvent(Authentication authentication, Domain domain, long id, DomainUser domainUser)
+        {
+            var args = new DomainUserEventArgs(authentication, domain, domainUser) { TaskID = id };
+            this.OnDomainUserEditEnded(args);
+
+        }
+
+        public void InvokeDomainOwnerChangedEvent(Authentication authentication, Domain domain, long id, DomainUser domainUser)
+        {
+            var args = new DomainUserEventArgs(authentication, domain, domainUser) { TaskID = id };
+            this.OnDomainOwnerChanged(args);
+        }
+
+        public void InvokeDomainRowAddedEvent(Authentication authentication, Domain domain, long id, DomainRowInfo[] rows)
+        {
+            var args = new DomainRowEventArgs(authentication, domain, rows) { TaskID = id };
+            this.OnDomainRowAdded(args);
+        }
+
+        public void InvokeDomainRowChangedEvent(Authentication authentication, Domain domain, long id, DomainRowInfo[] rows)
+        {
+            var args = new DomainRowEventArgs(authentication, domain, rows) { TaskID = id };
+            this.OnDomainRowChanged(args);
+        }
+
+        public void InvokeDomainRowRemovedEvent(Authentication authentication, Domain domain, long id, DomainRowInfo[] rows)
+        {
+            var args = new DomainRowEventArgs(authentication, domain, rows) { TaskID = id };
+            this.OnDomainRowRemoved(args);
+        }
+
+        public void InvokeDomainPropertyChangedEvent(Authentication authentication, Domain domain, long id, string propertyName, object value)
+        {
+            var args = new DomainPropertyEventArgs(authentication, domain, propertyName, value) { TaskID = id };
+            this.OnDomainPropertyChanged(args);
         }
 
         public void InvokeDomainInfoChangedEvent(Authentication authentication, Domain domain)
@@ -239,20 +268,6 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public event EventHandler<DomainUserEventArgs> DomainUserChanged
-        {
-            add
-            {
-                this.Dispatcher.VerifyAccess();
-                this.domainUserChanged += value;
-            }
-            remove
-            {
-                this.Dispatcher.VerifyAccess();
-                this.domainUserChanged -= value;
-            }
-        }
-
         public event EventHandler<DomainUserRemovedEventArgs> DomainUserRemoved
         {
             add
@@ -264,6 +279,76 @@ namespace Ntreev.Crema.Services.Domains
             {
                 this.Dispatcher.VerifyAccess();
                 this.domainUserRemoved -= value;
+            }
+        }
+
+        public event EventHandler<DomainUserLocationEventArgs> DomainUserLocationChanged
+        {
+            add
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.domainUserLocationChanged += value;
+            }
+            remove
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.domainUserLocationChanged -= value;
+            }
+        }
+
+        public event EventHandler<DomainUserEventArgs> DomainUserStateChanged
+        {
+            add
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.domainUserStateChanged += value;
+            }
+            remove
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.domainUserStateChanged -= value;
+            }
+        }
+
+        public event EventHandler<DomainUserLocationEventArgs> DomainUserEditBegun
+        {
+            add
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.domainUserEditBegun += value;
+            }
+            remove
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.domainUserEditBegun -= value;
+            }
+        }
+
+        public event EventHandler<DomainUserEventArgs> DomainUserEditEnded
+        {
+            add
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.domainUserEditEnded += value;
+            }
+            remove
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.domainUserEditEnded -= value;
+            }
+        }
+
+        public event EventHandler<DomainUserEventArgs> DomainOwnerChanged
+        {
+            add
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.domainOwnerChanged += value;
+            }
+            remove
+            {
+                this.Dispatcher?.VerifyAccess();
+                this.domainOwnerChanged -= value;
             }
         }
 
@@ -362,9 +447,29 @@ namespace Ntreev.Crema.Services.Domains
             this.domainUserAdded?.Invoke(this, e);
         }
 
-        protected virtual void OnDomainUserChanged(DomainUserEventArgs e)
+        protected virtual void OnDomainUserLocationChanged(DomainUserLocationEventArgs e)
         {
-            this.domainUserChanged?.Invoke(this, e);
+            this.domainUserLocationChanged(this, e);
+        }
+
+        protected virtual void OnDomainUserStateChanged(DomainUserEventArgs e)
+        {
+            this.domainUserStateChanged(this, e);
+        }
+
+        protected virtual void OnDomainUserEditBegun(DomainUserLocationEventArgs e)
+        {
+            this.domainUserEditBegun(this, e);
+        }
+
+        protected virtual void OnDomainUserEditEnded(DomainUserEventArgs e)
+        {
+            this.domainUserEditEnded(this, e);
+        }
+
+        protected virtual void OnDomainOwnerChanged(DomainUserEventArgs e)
+        {
+            this.domainOwnerChanged(this, e);
         }
 
         protected virtual void OnDomainUserRemoved(DomainUserRemovedEventArgs e)

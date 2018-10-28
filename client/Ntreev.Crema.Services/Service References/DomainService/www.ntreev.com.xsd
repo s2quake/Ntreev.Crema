@@ -69,7 +69,7 @@
   <xs:element name="NewRowResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q11="http://schemas.ntreev.com" minOccurs="0" name="NewRowResult" type="q11:ResultBaseOfDomainRowResultInfoq8erDhHE" />
+        <xs:element xmlns:q11="http://schemas.ntreev.com" minOccurs="0" name="NewRowResult" type="q11:ResultBaseOfArrayOfDomainRowInfoq8erDhHE" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -84,7 +84,7 @@
   <xs:element name="RemoveRowResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q14="http://schemas.ntreev.com" minOccurs="0" name="RemoveRowResult" type="q14:ResultBaseOfDomainRowResultInfoq8erDhHE" />
+        <xs:element xmlns:q14="http://schemas.ntreev.com" minOccurs="0" name="RemoveRowResult" type="q14:ResultBaseOfArrayOfDomainRowInfoq8erDhHE" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -99,7 +99,7 @@
   <xs:element name="SetRowResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q17="http://schemas.ntreev.com" minOccurs="0" name="SetRowResult" type="q17:ResultBaseOfDomainRowResultInfoq8erDhHE" />
+        <xs:element xmlns:q17="http://schemas.ntreev.com" minOccurs="0" name="SetRowResult" type="q17:ResultBaseOfArrayOfDomainRowInfoq8erDhHE" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -160,7 +160,7 @@
   <xs:element name="KickResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q26="http://schemas.ntreev.com" minOccurs="0" name="KickResult" type="q26:ResultBaseOfDomainUserInfoq8erDhHE" />
+        <xs:element xmlns:q26="http://schemas.ntreev.com" minOccurs="0" name="KickResult" type="q26:ResultBase" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -257,63 +257,107 @@
         <xs:element xmlns:q46="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q46:guid" />
         <xs:element xmlns:q47="http://schemas.ntreev.com" minOccurs="0" name="domainUserInfo" type="q47:DomainUserInfo" />
         <xs:element xmlns:q48="http://schemas.ntreev.com" minOccurs="0" name="domainUserState" type="q48:DomainUserState" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="OnUserChanged">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q49="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q49:SignatureDate" />
-        <xs:element xmlns:q50="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q50:guid" />
-        <xs:element xmlns:q51="http://schemas.ntreev.com" minOccurs="0" name="domainUserInfo" type="q51:DomainUserInfo" />
-        <xs:element xmlns:q52="http://schemas.ntreev.com" minOccurs="0" name="domainUserState" type="q52:DomainUserState" />
+        <xs:element minOccurs="0" name="id" type="xs:long" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnUserRemoved">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q53="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q53:SignatureDate" />
-        <xs:element xmlns:q54="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q54:guid" />
-        <xs:element xmlns:q55="http://schemas.ntreev.com" minOccurs="0" name="domainUserInfo" type="q55:DomainUserInfo" />
-        <xs:element xmlns:q56="http://schemas.ntreev.com" minOccurs="0" name="removeInfo" type="q56:RemoveInfo" />
+        <xs:element xmlns:q49="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q49:SignatureDate" />
+        <xs:element xmlns:q50="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q50:guid" />
+        <xs:element minOccurs="0" name="userID" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="ownerID" nillable="true" type="xs:string" />
+        <xs:element xmlns:q51="http://schemas.ntreev.com" minOccurs="0" name="removeInfo" type="q51:RemoveInfo" />
+        <xs:element minOccurs="0" name="id" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnUserLocationChanged">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q52="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q52:SignatureDate" />
+        <xs:element xmlns:q53="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q53:guid" />
+        <xs:element xmlns:q54="http://schemas.ntreev.com" minOccurs="0" name="domainLocationInfo" type="q54:DomainLocationInfo" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnUserStateChanged">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q55="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q55:SignatureDate" />
+        <xs:element xmlns:q56="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q56:guid" />
+        <xs:element xmlns:q57="http://schemas.ntreev.com" minOccurs="0" name="domainUserState" type="q57:DomainUserState" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnUserEditBegun">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q58="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q58:SignatureDate" />
+        <xs:element xmlns:q59="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q59:guid" />
+        <xs:element xmlns:q60="http://schemas.ntreev.com" minOccurs="0" name="domainLocationInfo" type="q60:DomainLocationInfo" />
+        <xs:element minOccurs="0" name="id" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnUserEditEnded">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q61="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q61:SignatureDate" />
+        <xs:element xmlns:q62="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q62:guid" />
+        <xs:element minOccurs="0" name="id" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnOwnerChanged">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q63="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q63:SignatureDate" />
+        <xs:element xmlns:q64="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q64:guid" />
+        <xs:element minOccurs="0" name="ownerID" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="id" type="xs:long" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnRowAdded">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q57="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q57:SignatureDate" />
-        <xs:element xmlns:q58="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q58:guid" />
-        <xs:element xmlns:q59="http://schemas.ntreev.com" minOccurs="0" name="info" type="q59:DomainRowResultInfo" />
+        <xs:element xmlns:q65="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q65:SignatureDate" />
+        <xs:element xmlns:q66="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q66:guid" />
+        <xs:element xmlns:q67="http://schemas.ntreev.com" minOccurs="0" name="rows" nillable="true" type="q67:ArrayOfDomainRowInfo" />
+        <xs:element minOccurs="0" name="id" type="xs:long" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnRowChanged">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q60="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q60:SignatureDate" />
-        <xs:element xmlns:q61="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q61:guid" />
-        <xs:element xmlns:q62="http://schemas.ntreev.com" minOccurs="0" name="info" type="q62:DomainRowResultInfo" />
+        <xs:element xmlns:q68="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q68:SignatureDate" />
+        <xs:element xmlns:q69="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q69:guid" />
+        <xs:element xmlns:q70="http://schemas.ntreev.com" minOccurs="0" name="rows" nillable="true" type="q70:ArrayOfDomainRowInfo" />
+        <xs:element minOccurs="0" name="id" type="xs:long" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnRowRemoved">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q63="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q63:SignatureDate" />
-        <xs:element xmlns:q64="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q64:guid" />
-        <xs:element xmlns:q65="http://schemas.ntreev.com" minOccurs="0" name="info" type="q65:DomainRowResultInfo" />
+        <xs:element xmlns:q71="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q71:SignatureDate" />
+        <xs:element xmlns:q72="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q72:guid" />
+        <xs:element xmlns:q73="http://schemas.ntreev.com" minOccurs="0" name="rows" nillable="true" type="q73:ArrayOfDomainRowInfo" />
+        <xs:element minOccurs="0" name="id" type="xs:long" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnPropertyChanged">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q66="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q66:SignatureDate" />
-        <xs:element xmlns:q67="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q67:guid" />
+        <xs:element xmlns:q74="http://schemas.ntreev.com" minOccurs="0" name="signatureDate" type="q74:SignatureDate" />
+        <xs:element xmlns:q75="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="domainID" type="q75:guid" />
         <xs:element minOccurs="0" name="propertyName" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="value" nillable="true" type="xs:anyType" />
+        <xs:element minOccurs="0" name="id" type="xs:long" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
