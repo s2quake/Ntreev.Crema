@@ -51,7 +51,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         void OnDomainStateChanged(SignatureDate signatureDate, Guid domainID, DomainState domainState);
 
         [OperationContract(IsOneWay = true)]
-        void OnUserAdded(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState, long id);
+        void OnUserAdded(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState, byte[] data, long id);
 
         [OperationContract(IsOneWay = true)]
         void OnUserRemoved(SignatureDate signatureDate, Guid domainID, string userID, string ownerID, RemoveInfo removeInfo, long id);

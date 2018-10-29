@@ -114,7 +114,16 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync), this.Table);
                     return this.Table.Name;
                 });
-                await this.domainHost.EndContentAsync(authentication, name);
+                try
+                {
+                    this.Domain.Host = null;
+                    await this.domainHost.EndContentAsync(authentication, name);
+                }
+                catch
+                {
+                    this.Domain.Host = this.domainHost;
+                    throw;
+                }
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.domainHost.InvokeEditEndedEvent(EventArgs.Empty);
@@ -138,7 +147,16 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync), this.Table);
                     return this.Table.Name;
                 });
-                await this.domainHost.CancelContentAsync(authentication, name);
+                try
+                {
+                    this.Domain.Host = null;
+                    await this.domainHost.CancelContentAsync(authentication, name);
+                }
+                catch
+                {
+                    this.Domain.Host = this.domainHost;
+                    throw;
+                }
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     //this.CremaHost.Sign(authentication, result);

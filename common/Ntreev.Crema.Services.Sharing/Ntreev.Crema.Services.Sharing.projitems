@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DomainsDeletedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DomainsEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DomainUserLocationEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DomainUserAddedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableContentExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventMetaDataBuilder.cs" />

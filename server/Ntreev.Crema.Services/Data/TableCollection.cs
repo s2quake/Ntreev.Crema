@@ -80,6 +80,7 @@ namespace Ntreev.Crema.Services.Data
                 }
                 this.InvokeTablesCreatedEvent(authentication, tableList.ToArray(), dataSet);
             });
+            await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
             return tableList.ToArray();
         }
 
@@ -173,7 +174,7 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public Task<SignatureDate> InvokeTableCreateAsync(Authentication authentication, string[] tablePaths, DataBaseSet dataBaseSet)
+        public Task InvokeTableCreateAsync(Authentication authentication, string[] tablePaths, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.CreateTable(authentication, tablePaths);
             var itemPaths = tablePaths.Select(item => this.Context.GeneratePath(item)).ToArray();
@@ -181,139 +182,107 @@ namespace Ntreev.Crema.Services.Data
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
                     this.Repository.CreateTable(dataBaseSet, tablePaths);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
-                    throw;
-                }
-                finally
-                {
                     this.Repository.Unlock(dataBaseSet.ItemPaths);
+                    throw;
                 }
             });
         }
 
-        public Task<SignatureDate> InvokeTableRenameAsync(Authentication authentication, TableInfo tableInfo, string newName, DataBaseSet dataBaseSet)
+        public Task InvokeTableRenameAsync(Authentication authentication, TableInfo tableInfo, string newName, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.RenameTable(authentication, tableInfo.Name, newName);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
                     this.Repository.RenameTable(dataBaseSet, tableInfo.Path, newName);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
-                    throw;
-                }
-                finally
-                {
                     this.Repository.Unlock(dataBaseSet.ItemPaths);
+                    throw;
                 }
             });
         }
 
-        public Task<SignatureDate> InvokeTableMoveAsync(Authentication authentication, TableInfo tableInfo, string newCategoryPath, DataBaseSet dataBaseSet)
+        public Task InvokeTableMoveAsync(Authentication authentication, TableInfo tableInfo, string newCategoryPath, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.MoveTable(authentication, tableInfo.Name, newCategoryPath, tableInfo.CategoryPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
                     this.Repository.MoveTable(dataBaseSet, tableInfo.Path, newCategoryPath);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
-                    throw;
-                }
-                finally
-                {
                     this.Repository.Unlock(dataBaseSet.ItemPaths);
+                    throw;
                 }
             });
         }
 
-        public Task<SignatureDate> InvokeTableDeleteAsync(Authentication authentication, TableInfo tableInfo, DataBaseSet dataBaseSet)
+        public Task InvokeTableDeleteAsync(Authentication authentication, TableInfo tableInfo, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.DeleteTable(authentication, tableInfo.Name);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
                     this.Repository.DeleteTable(dataBaseSet, tableInfo.Path);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
-                    throw;
-                }
-                finally
-                {
                     this.Repository.Unlock(dataBaseSet.ItemPaths);
+                    throw;
                 }
             });
         }
 
-        public Task<SignatureDate> InvokeTableEndContentEditAsync(Authentication authentication, Table[] tables, DataBaseSet dataBaseSet)
+        public Task InvokeTableEndContentEditAsync(Authentication authentication, Table[] tables, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.ChangeTableContent(authentication, tables);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
                     this.Repository.ModifyTable(dataBaseSet);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
                     throw;
                 }
-                finally
-                {
-                    this.Repository.Unlock(dataBaseSet.ItemPaths);
-                }
             });
         }
 
-        public Task<SignatureDate> InvokeTableEndTemplateEditAsync(Authentication authentication, TableInfo tableInfo, DataBaseSet dataBaseSet)
+        public Task InvokeTableEndTemplateEditAsync(Authentication authentication, TableInfo tableInfo, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.ChangeTableTemplate(authentication, tableInfo.Name);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
                     this.Repository.ModifyTable(dataBaseSet);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
                     throw;
-                }
-                finally
-                {
-                    this.Repository.Unlock(dataBaseSet.ItemPaths);
                 }
             });
         }

@@ -196,7 +196,7 @@ namespace Ntreev.Crema.Services.Data
                     this.ValidateEnter(authentication);
                     return this.GetAccessType(authentication);
                 });
-                await this.Domain.AddUserAsync(authentication, accessType);
+                await this.Domain.EnterAsync(authentication, accessType);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
@@ -220,7 +220,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(LeaveEditAsync), this.Table);
                     this.ValidateLeave(authentication);
                 });
-                await this.Domain.RemoveUserAsync(authentication);
+                await this.Domain.LeaveAsync(authentication);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);

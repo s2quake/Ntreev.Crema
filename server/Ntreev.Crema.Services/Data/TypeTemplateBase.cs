@@ -407,7 +407,7 @@ namespace Ntreev.Crema.Services.Data
             this.table.RowDeleted += Table_RowDeleted;
             this.table.RowChanged += Table_RowChanged;
 
-            await this.domain.AddUserAsync(authentication, DomainAccessType.ReadWrite);
+            await this.domain.EnterAsync(authentication, DomainAccessType.ReadWrite);
             await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
             await this.domain.Dispatcher.InvokeAsync(this.RefreshEditors);
         }

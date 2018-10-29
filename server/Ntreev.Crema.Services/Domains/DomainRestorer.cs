@@ -155,13 +155,13 @@ namespace Ntreev.Crema.Services.Domains
                     {
                         await this.Domain.SetPropertyAsync(authentication, setPropertyAction.PropertyName, setPropertyAction.Value);
                     }
-                    else if (item is JoinAction joinAction)
+                    else if (item is EnterAction joinAction)
                     {
-                        await this.Domain.AddUserAsync(authentication, joinAction.AccessType);
+                        await this.Domain.EnterAsync(authentication, joinAction.AccessType);
                     }
-                    else if (item is DisjoinAction disjoinAction)
+                    else if (item is LeaveAction disjoinAction)
                     {
-                        await this.Domain.RemoveUserAsync(authentication);
+                        await this.Domain.LeaveAsync(authentication);
                     }
                     else if (item is KickAction kickAction)
                     {
@@ -170,6 +170,14 @@ namespace Ntreev.Crema.Services.Domains
                     else if (item is SetOwnerAction setOwnerAction)
                     {
                         await this.Domain.SetOwnerAsync(authentication, setOwnerAction.TargetID);
+                    }
+                    else if (item is BeginUserEditAction beginUserEditAction)
+                    {
+                        await this.Domain.BeginUserEditAsync(authentication, beginUserEditAction.Location);
+                    }
+                    else if (item is EndUserEditAction endUserEditAction)
+                    {
+                        await this.Domain.EndUserEditAsync(authentication);
                     }
                     else
                     {

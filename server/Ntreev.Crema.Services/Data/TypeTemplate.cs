@@ -80,18 +80,19 @@ namespace Ntreev.Crema.Services.Data
                 this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
                 this.Container.InvokeTypesChangedEvent(authentication, this.types, dataBaseSet.DataSet);
             });
+            await this.Repository.UnlockAsync(this.ItemPaths);
             return typeInfos;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
             await base.OnCancelEditAsync(authentication);
-            await this.Repository.UnlockAsync(this.itemPaths);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.type.TypeState = TypeState.None;
                 this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
             });
+            await this.Repository.UnlockAsync(this.itemPaths);
         }
 
         protected override void OnAttach(Domain domain)

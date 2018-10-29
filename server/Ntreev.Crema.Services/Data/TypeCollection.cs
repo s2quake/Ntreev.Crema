@@ -64,15 +64,17 @@ namespace Ntreev.Crema.Services.Data
                 var dataSet = dataType.DataSet;
                 var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, true, false);
                 var typePaths = new string[] { dataType.Path };
-                var signatureDate = await this.InvokeTypeCreateAsync(authentication, typePaths, dataBaseSet);
-                return await this.Dispatcher.InvokeAsync(() =>
+                await this.InvokeTypeCreateAsync(authentication, typePaths, dataBaseSet);
+                var newType = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, signatureDate);
+                    this.CremaHost.Sign(authentication);
                     var type = this.BaseAddNew(dataType.Name, dataType.CategoryPath, authentication);
                     type.Initialize(dataType.TypeInfo);
                     this.InvokeTypesCreatedEvent(authentication, new Type[] { type }, dataSet);
                     return type;
                 });
+                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
+                return newType;
             }
             catch (Exception e)
             {
@@ -101,15 +103,17 @@ namespace Ntreev.Crema.Services.Data
                 var newDataType = dataType.Copy(targetName);
                 var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, true, false);
                 var typePaths = new string[] { categoryPath + newTypeName };
-                var signatureDate = await this.InvokeTypeCreateAsync(authentication, typePaths, dataBaseSet);
-                return await this.Dispatcher.InvokeAsync(() =>
+                await this.InvokeTypeCreateAsync(authentication, typePaths, dataBaseSet);
+                var result = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, signatureDate);
+                    this.CremaHost.Sign(authentication);
                     var newType = this.BaseAddNew(newTypeName, categoryPath, authentication);
                     newType.Initialize(newDataType.TypeInfo);
                     this.InvokeTypesCreatedEvent(authentication, new Type[] { newType }, dataSet);
                     return newType;
                 });
+                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
+                return result;
             }
             catch (Exception e)
             {
@@ -123,7 +127,7 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public Task<SignatureDate> InvokeTypeCreateAsync(Authentication authentication, string[] typePaths, DataBaseSet dataBaseSet)
+        public Task InvokeTypeCreateAsync(Authentication authentication, string[] typePaths, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.CreateType(authentication, typePaths);
             var itemPaths = typePaths.Select(item => this.Context.GeneratePath(item)).ToArray();
@@ -131,115 +135,89 @@ namespace Ntreev.Crema.Services.Data
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
                     this.Repository.CreateType(dataBaseSet, typePaths);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
-                    throw;
-                }
-                finally
-                {
                     this.Repository.Unlock(dataBaseSet.ItemPaths);
+                    throw;
                 }
             });
         }
 
-        public Task<SignatureDate> InvokeTypeRenameAsync(Authentication authentication, TypeInfo typeInfo, string newName, DataBaseSet dataBaseSet)
+        public Task InvokeTypeRenameAsync(Authentication authentication, TypeInfo typeInfo, string newName, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.RenameType(authentication, typeInfo.Name, newName);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
                     this.Repository.RenameType(dataBaseSet, typeInfo.Path, newName);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
-                    throw;
-                }
-                finally
-                {
                     this.Repository.Unlock(dataBaseSet.ItemPaths);
+                    throw;
                 }
             });
         }
 
-        public Task<SignatureDate> InvokeTypeMoveAsync(Authentication authentication, TypeInfo typeInfo, string newCategoryPath, DataBaseSet dataBaseSet)
+        public Task InvokeTypeMoveAsync(Authentication authentication, TypeInfo typeInfo, string newCategoryPath, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.MoveType(authentication, typeInfo.Name, newCategoryPath, typeInfo.CategoryPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
                     this.Repository.MoveType(dataBaseSet, typeInfo.Path, newCategoryPath);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
-                    throw;
-                }
-                finally
-                {
                     this.Repository.Unlock(dataBaseSet.ItemPaths);
+                    throw;
                 }
             });
         }
 
-        public Task<SignatureDate> InvokeTypeDeleteAsync(Authentication authentication, TypeInfo typeInfo, DataBaseSet dataBaseSet)
+        public Task InvokeTypeDeleteAsync(Authentication authentication, TypeInfo typeInfo, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.DeleteType(authentication, typeInfo.Name);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
                     this.Repository.DeleteType(dataBaseSet, typeInfo.Path);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
-                    throw;
-                }
-                finally
-                {
                     this.Repository.Unlock(dataBaseSet.ItemPaths);
+                    throw;
                 }
             });
         }
 
-        public Task<SignatureDate> InvokeTypeEndTemplateEditAsync(Authentication authentication, string typeName, DataBaseSet dataBaseSet)
+        public Task InvokeTypeEndTemplateEditAsync(Authentication authentication, string typeName, DataBaseSet dataBaseSet)
         {
+            var message = EventMessageBuilder.ChangeTypeTemplate(authentication, typeName);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var message = EventMessageBuilder.ChangeTypeTemplate(authentication, typeName);
-                    var signatureDate = authentication.Sign();
                     this.Repository.ModifyType(dataBaseSet);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
                     throw;
-                }
-                finally
-                {
-                    this.Repository.Unlock(dataBaseSet.ItemPaths);
                 }
             });
         }

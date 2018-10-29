@@ -31,8 +31,8 @@ namespace Ntreev.Crema.Services.Domains.Serializations
             {
                 ID = long.Parse(items[0]),
                 UserID = items[1],
-                DateTime = DateTime.Parse(items[1]),
-                Type = items[2],
+                DateTime = DateTime.Parse(items[2]),
+                Type = items[3],
             };
         }
 

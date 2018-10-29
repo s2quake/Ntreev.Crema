@@ -22,7 +22,7 @@ using System.Runtime.Serialization;
 namespace Ntreev.Crema.Services.Domains.Actions
 {
     [DataContract(Namespace = SchemaUtility.Namespace)]
-    public class DisjoinAction : DomainActionBase
+    public class LeaveAction : DomainActionBase
     {
         [DataMember]
         public RemoveInfo RemoveInfo { get; set; }

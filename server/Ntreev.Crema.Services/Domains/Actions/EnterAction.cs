@@ -22,7 +22,7 @@ using System.Runtime.Serialization;
 namespace Ntreev.Crema.Services.Domains.Actions
 {
     [DataContract(Namespace = SchemaUtility.Namespace)]
-    public class JoinAction : DomainActionBase
+    public class EnterAction : DomainActionBase
     {
         [DataMember]
         public DomainAccessType AccessType { get; set; }

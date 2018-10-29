@@ -784,12 +784,13 @@ namespace Ntreev.Crema.Services.Data
         {
             if (this.Dispatcher.Owner is DataBase == false)
                 return;
-            await this.Dispatcher.DisposeAsync();
             this.service.Unsubscribe();
-            this.service.Close();
-            this.service = null;
             this.timer?.Dispose();
             this.timer = null;
+            await Task.Delay(1000);
+            await this.Dispatcher.DisposeAsync();
+            this.service.Close();
+            this.service = null;
             this.Dispatcher = null;
         }
 

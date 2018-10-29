@@ -27,6 +27,18 @@
   <wsdl:message name="IDomainService_GetMetaData_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetMetaDataResponse" />
   </wsdl:message>
+  <wsdl:message name="IDomainService_Enter_InputMessage">
+    <wsdl:part name="parameters" element="tns:Enter" />
+  </wsdl:message>
+  <wsdl:message name="IDomainService_Enter_OutputMessage">
+    <wsdl:part name="parameters" element="tns:EnterResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDomainService_Leave_InputMessage">
+    <wsdl:part name="parameters" element="tns:Leave" />
+  </wsdl:message>
+  <wsdl:message name="IDomainService_Leave_OutputMessage">
+    <wsdl:part name="parameters" element="tns:LeaveResponse" />
+  </wsdl:message>
   <wsdl:message name="IDomainService_SetUserLocation_InputMessage">
     <wsdl:part name="parameters" element="tns:SetUserLocation" />
   </wsdl:message>
@@ -153,6 +165,14 @@
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetMetaData">
       <wsdl:input wsaw:Action="http://www.ntreev.com/IDomainService/GetMetaData" message="tns:IDomainService_GetMetaData_InputMessage" />
       <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/GetMetaDataResponse" message="tns:IDomainService_GetMetaData_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Enter">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IDomainService/Enter" message="tns:IDomainService_Enter_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/EnterResponse" message="tns:IDomainService_Enter_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Leave">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IDomainService/Leave" message="tns:IDomainService_Leave_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainService/LeaveResponse" message="tns:IDomainService_Leave_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="SetUserLocation">
       <wsdl:input wsaw:Action="http://www.ntreev.com/IDomainService/SetUserLocation" message="tns:IDomainService_SetUserLocation_InputMessage" />

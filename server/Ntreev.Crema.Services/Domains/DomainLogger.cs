@@ -163,7 +163,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public long Join(Authentication authentication, DomainAccessType accessType)
         {
-            return this.Post(new JoinAction()
+            return this.Post(new EnterAction()
             {
                 UserID = authentication.ID,
                 AccessType = accessType,
@@ -173,7 +173,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public long Disjoin(Authentication authentication, RemoveInfo removeInfo)
         {
-            return this.Post(new DisjoinAction()
+            return this.Post(new LeaveAction()
             {
                 UserID = authentication.ID,
                 RemoveInfo = removeInfo,

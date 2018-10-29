@@ -24,6 +24,12 @@ namespace Ntreev.Crema.Services.DomainService {
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/GetMetaData", ReplyAction="http://www.ntreev.com/IDomainService/GetMetaDataResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData[]> GetMetaData(System.Guid dataBaseID);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/Enter", ReplyAction="http://www.ntreev.com/IDomainService/EnterResponse")]
+        Ntreev.Crema.ServiceModel.ResultBase Enter(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainAccessType accessType);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/Leave", ReplyAction="http://www.ntreev.com/IDomainService/LeaveResponse")]
+        Ntreev.Crema.ServiceModel.ResultBase Leave(System.Guid domainID);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainService/SetUserLocation", ReplyAction="http://www.ntreev.com/IDomainService/SetUserLocationResponse")]
         Ntreev.Crema.ServiceModel.ResultBase SetUserLocation(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo location);
         
@@ -196,7 +202,7 @@ namespace Ntreev.Crema.Services.DomainService {
         void OnDomainStateChanged(Ntreev.Library.SignatureDate signatureDate, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainState domainState);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainService/OnUserAdded")]
-        void OnUserAdded(Ntreev.Library.SignatureDate signatureDate, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainUserInfo domainUserInfo, Ntreev.Crema.ServiceModel.DomainUserState domainUserState, long id);
+        void OnUserAdded(Ntreev.Library.SignatureDate signatureDate, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainUserInfo domainUserInfo, Ntreev.Crema.ServiceModel.DomainUserState domainUserState, byte[] data, long id);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainService/OnUserRemoved")]
         void OnUserRemoved(Ntreev.Library.SignatureDate signatureDate, System.Guid domainID, string userID, string ownerID, Ntreev.Crema.ServiceModel.RemoveInfo removeInfo, long id);
@@ -307,6 +313,14 @@ namespace Ntreev.Crema.Services.DomainService {
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData[]> GetMetaData(System.Guid dataBaseID) {
             return base.Channel.GetMetaData(dataBaseID);
+        }
+        
+        public Ntreev.Crema.ServiceModel.ResultBase Enter(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainAccessType accessType) {
+            return base.Channel.Enter(domainID, accessType);
+        }
+        
+        public Ntreev.Crema.ServiceModel.ResultBase Leave(System.Guid domainID) {
+            return base.Channel.Leave(domainID);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase SetUserLocation(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo location) {

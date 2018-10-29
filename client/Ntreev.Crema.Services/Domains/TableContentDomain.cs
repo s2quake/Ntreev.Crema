@@ -66,11 +66,11 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        protected override void OnInitialize(DomainMetaData metaData)
+        protected override void OnInitialize(byte[] data)
         {
-            base.OnInitialize(metaData);
+            base.OnInitialize(data);
 
-            var xml = Encoding.UTF8.GetString(metaData.Data).Decompress();
+            var xml = Encoding.UTF8.GetString(data).Decompress();
             if (this.DataSet != null)
             {
                 int qwer = 0;

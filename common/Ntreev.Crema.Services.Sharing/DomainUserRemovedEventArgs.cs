@@ -29,7 +29,8 @@ namespace Ntreev.Crema.Services
             : base(authentication, domain, domainUser)
         {
             this.RemoveInfo = removeInfo;
-            this.OwnerID = this.Domain.Users.Owner.ID;
+            if (this.Domain.Users.Owner != null)
+                this.OwnerID = this.Domain.Users.Owner.ID;
         }
         
         public RemoveInfo RemoveInfo { get; }

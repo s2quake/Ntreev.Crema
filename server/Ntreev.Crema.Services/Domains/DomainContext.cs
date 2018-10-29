@@ -283,6 +283,8 @@ namespace Ntreev.Crema.Services.Domains
 
         public IObjectSerializer Serializer => this.CremaHost.Serializer;
 
+        public long TaskID { get; set; }
+
         public event ItemsCreatedEventHandler<IDomainItem> ItemsCreated
         {
             add

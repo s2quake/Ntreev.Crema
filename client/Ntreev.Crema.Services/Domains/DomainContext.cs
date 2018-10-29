@@ -42,10 +42,18 @@ namespace Ntreev.Crema.Services.Domains
         private ItemsMovedEventHandler<IDomainItem> itemsMoved;
         private ItemsDeletedEventHandler<IDomainItem> itemsDeleted;
 
+        //private Dictionary<long, ManualResetEvent> setsByID = new Dictionary<long, ManualResetEvent>();
+
+        public readonly CremaResetEvent<Guid> resetEvent;
+
+        public readonly CremaResetEvent<Guid> deletionEvent;
+
         public DomainContext(CremaHost cremaHost)
         {
             this.CremaHost = cremaHost;
             this.Dispatcher = new CremaDispatcher(this);
+            this.resetEvent = new CremaResetEvent<Guid>(this.Dispatcher);
+            this.deletionEvent = new CremaResetEvent<Guid>(this.Dispatcher);
         }
 
         public async Task InitializeAsync(string address, Guid authenticationToken, ServiceInfo serviceInfo)
@@ -137,19 +145,23 @@ namespace Ntreev.Crema.Services.Domains
             this.OnItemsDeleted(new ItemsDeletedEventArgs<IDomainItem>(authentication, items, itemPaths));
         }
 
-        public Domain Create(Authentication authentication, DomainMetaData metaData)
+        //public Domain Create(Authentication authentication, DomainMetaData metaData)
+        //{
+        //    return this.Domains.Create(authentication, metaData);
+        //}
+
+        public async Task<Domain> CreateAsync(Authentication authentication, DomainMetaData metaData)
         {
-            return this.Domains.Create(authentication, metaData);
+            await this.resetEvent.WaitAsync(metaData.DomainID);
+            var domain = await this.Dispatcher.InvokeAsync(() => this.GetDomain(metaData.DomainID));
+            return domain;
+            //return this.Domains.CreateAsync(authentication, metaData);
         }
 
-        public Task<Domain> CreateAsync(Authentication authentication, DomainMetaData metaData)
+        public async Task DeleteAsync(Authentication authentication, Domain domain)
         {
-            return this.Domains.CreateAsync(authentication, metaData);
-        }
-
-        public Task DeleteAsync(Authentication authentication, Domain domain, bool isCanceled, object result)
-        {
-            return this.Domains.DeleteAsync(authentication, domain, isCanceled, result);
+            await this.deletionEvent.WaitAsync(domain.ID);
+            //return this.Domains.DeleteAsync(authentication, domain, isCanceled, result);
         }
 
         //public async Task AddDomainsAsync(DomainMetaData[] metaDatas)
@@ -168,8 +180,9 @@ namespace Ntreev.Crema.Services.Domains
         public async Task CloseAsync(CloseInfo closeInfo)
         {
             this.service.Unsubscribe();
-            this.service.Close();
-            this.service = null;
+            
+            
+            
             this.timer?.Dispose();
             this.timer = null;
 
@@ -186,7 +199,10 @@ namespace Ntreev.Crema.Services.Domains
                 return taskList.ToArray();
             });
             await Task.WhenAll(tasks);
+            await Task.Delay(1000);
             await this.Dispatcher.DisposeAsync();
+            this.service.Close();
+            this.service = null;
             this.Dispatcher = null;
         }
 
@@ -250,6 +266,30 @@ namespace Ntreev.Crema.Services.Domains
                 }
             });
         }
+
+        //public async Task WaitEventAsync(long id)
+        //{
+        //    await await this.Dispatcher.InvokeAsync(async () =>
+        //    {
+        //        if (this.Logger.CompletionID < id)
+        //        {
+        //            this.setsByID.Add(id, new ManualResetEvent(false));
+        //            var set = this.setsByID[id];
+        //            await Task.Run(() => set.WaitOne());
+        //        }
+        //    });
+        //}
+        //private Task SetEventAsync(long id)
+        //{
+        //    return this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        if (this.setsByID.ContainsKey(id) == true)
+        //        {
+        //            this.setsByID[id].Set();
+        //            this.setsByID.Remove(id);
+        //        }
+        //    });
+        //}
 
         public Domain[] GetDomains(Guid dataBaseID)
         {
@@ -591,6 +631,7 @@ namespace Ntreev.Crema.Services.Domains
                         domain.Dispose(authentication, isCanceled, null);
                         domainHostList.Add(domainHost);
                         domainList.Add(domain);
+                        this.deletionEvent.Set(domain.ID);
                     }
                     this.Domains.InvokeDomainDeletedEvent(authentication, domainList.ToArray(), isCanceleds, results);
                     for (var i = 0; i < domainIDs.Length; i++)
@@ -643,7 +684,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        void IDomainServiceCallback.OnUserAdded(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState, long id)
+        void IDomainServiceCallback.OnUserAdded(SignatureDate signatureDate, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState, byte[] data, long id)
         {
             try
             {
@@ -651,7 +692,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
-                    await domain.InvokeUserAddedAsync(authentication, domainUserInfo, domainUserState, id);
+                    await domain.InvokeUserAddedAsync(authentication, domainUserInfo, domainUserState, data, id);
                 });
             }
             catch (Exception e)
@@ -669,7 +710,7 @@ namespace Ntreev.Crema.Services.Domains
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
                     var domainUser = domain.GetDomainUser(userID);
-                    var ownerUser = domain.GetDomainUser(ownerID);
+                    var ownerUser = ownerID != null ? domain.GetDomainUser(ownerID) : null;
                     await domain.InvokeUserRemovedAsync(authentication, domainUser, ownerUser, removeInfo, id);
                 });
             }

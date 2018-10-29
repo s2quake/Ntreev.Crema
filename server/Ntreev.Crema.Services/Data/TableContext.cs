@@ -85,6 +85,7 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
+        // TODO: 잠금 설정과 해제 처리를 외부에서 (단 예외시는 바로 해제 처리)
         public Task<AccessInfo> InvokeTableItemSetPrivateAsync(Authentication authentication, string tableItemPath)
         {
             var message = EventMessageBuilder.SetPrivateTableItem(authentication, tableItemPath);

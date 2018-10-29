@@ -115,7 +115,16 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync));
                 });
-                await this.OnEndEditAsync(authentication, this.domain.ID);
+                try
+                {
+                    this.domain.Host = null;
+                    await this.OnEndEditAsync(authentication, this.domain.ID);
+                }
+                catch
+                {
+                    this.domain.Host = this;
+                    throw;
+                }
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.OnEditEnded(EventArgs.Empty);
@@ -137,7 +146,16 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync));
                 });
-                await this.OnCancelEditAsync(authentication, this.domain.ID);
+                try
+                {
+                    this.domain.Host = null;
+                    await this.OnCancelEditAsync(authentication, this.domain.ID);
+                }
+                catch
+                {
+                    this.domain.Host = this;
+                    throw;
+                }
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.OnEditCanceled(EventArgs.Empty);
@@ -328,7 +346,10 @@ namespace Ntreev.Crema.Services.Data
             this.domain = await this.DomainContext.CreateAsync(authentication, metaData) as TableTemplateDomain;
             this.domain.IsNew = this.IsNew;
             this.domain.Host = this;
+            await this.domain.WaitUserEnterAsync(authentication);
             this.TemplateSource = this.domain.TemplateSource;
+
+            
 
             this.table = this.TemplateSource.View.Table;
             this.items = new List<TableColumn>(this.table.Rows.Count);
@@ -349,10 +370,11 @@ namespace Ntreev.Crema.Services.Data
         protected virtual async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, object args)
         {
             var tableInfos = await this.EndDomainAsync(authentication, args);
-            if (this.domain != null && this.domain.Dispatcher != null)
+            if (this.domain != null)
             {
-                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
-                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, false, tableInfos);
+                //this.domain.Host = null;
+                //await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                await this.DomainContext.DeleteAsync(authentication, this.domain);
             }
             this.domain = null;
             if (this.table != null)
@@ -370,10 +392,10 @@ namespace Ntreev.Crema.Services.Data
         protected virtual async Task OnCancelEditAsync(Authentication authentication, object args)
         {
             var result = await this.CancelDomainAsync(authentication, args);
-            if (this.domain != null && this.domain.Dispatcher != null)
+            if (this.domain != null)
             {
-                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
-                await this.DomainContext.Domains.RemoveAsync(authentication, this.domain, true, null);
+                //await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                await this.DomainContext.DeleteAsync(authentication, this.domain);
             }
             this.domain = null;
             if (this.table != null)
@@ -582,24 +604,18 @@ namespace Ntreev.Crema.Services.Data
 
         async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)
         {
+            var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, result);
+            this.domain = null;
             if (isCanceled == false)
             {
-                var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, result);
                 result = await this.OnEndEditAsync(authentication, result);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.OnEditEnded(args);
-                });
+                await this.Dispatcher.InvokeAsync(() => this.OnEditEnded(args));
                 return result;
             }
             else
             {
-                var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, null);
                 await this.OnCancelEditAsync(authentication, result);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.OnEditCanceled(args);
-                });
+                await this.Dispatcher.InvokeAsync(() => this.OnEditCanceled(args));
                 return null;
             }
         }

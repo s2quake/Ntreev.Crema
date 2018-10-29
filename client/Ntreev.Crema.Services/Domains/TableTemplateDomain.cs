@@ -58,11 +58,11 @@ namespace Ntreev.Crema.Services.Domains
             this.TemplateSource = XmlSerializerUtility.ReadString<CremaTemplate>(xml);
         }
 
-        protected override void OnInitialize(DomainMetaData metaData)
+        protected override void OnInitialize(byte[] data)
         {
-            base.OnInitialize(metaData);
+            base.OnInitialize(data);
 
-            var xml = Encoding.UTF8.GetString(metaData.Data).Decompress();
+            var xml = Encoding.UTF8.GetString(data).Decompress();
             this.TemplateSource = XmlSerializerUtility.ReadString<CremaTemplate>(xml);
             this.view = this.TemplateSource.View;
         }

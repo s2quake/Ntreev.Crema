@@ -748,7 +748,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         private void DataBase_Reset(object sender, EventArgs e)
         {
-            this.Dispatcher.InvokeAsync(() => 
+            this.Dispatcher.InvokeAsync(() =>
             {
                 this.OnReset(EventArgs.Empty);
                 this.EndProgress();
@@ -789,7 +789,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
                 await dataBase.LoadAsync(this.authenticator);
             }
             await dataBase.EnterAsync(this.authenticator);
-            await dataBase.Dispatcher.InvokeAsync(()=>
+            await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 dataBase.Unloaded += DataBase_Unloaded;
                 dataBase.Resetting += DataBase_Resetting;

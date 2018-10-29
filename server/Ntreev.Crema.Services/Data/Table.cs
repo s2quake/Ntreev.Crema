@@ -246,13 +246,14 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
                 var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
-                var result = await this.Container.InvokeTableRenameAsync(authentication, tuple.tableInfo, name, dataBaseSet);
+                await this.Container.InvokeTableRenameAsync(authentication, tuple.tableInfo, name, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, result);
+                    this.CremaHost.Sign(authentication);
                     base.Rename(authentication, name);
                     this.Container.InvokeTablesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, dataSet);
                 });
+                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
             }
             catch (Exception e)
             {
@@ -279,13 +280,14 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
                 var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
-                var result = await this.Container.InvokeTableMoveAsync(authentication, tuple.tableInfo, categoryPath, dataBaseSet);
+                await this.Container.InvokeTableMoveAsync(authentication, tuple.tableInfo, categoryPath, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, result);
+                    this.CremaHost.Sign(authentication);
                     base.Move(authentication, categoryPath);
                     this.Container.InvokeTablesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths, dataSet);
                 });
+                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
             }
             catch (Exception e)
             {
@@ -311,13 +313,14 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var dataSet = await this.ReadDataForPathAsync(authentication, new ItemName(tuple.tableInfo.Path));
                 var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
-                var result = await container.InvokeTableDeleteAsync(authentication, tuple.tableInfo, dataBaseSet);
+                await container.InvokeTableDeleteAsync(authentication, tuple.tableInfo, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, result);
+                    this.CremaHost.Sign(authentication);
                     base.Delete(authentication);
                     container.InvokeTablesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
                 });
+                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
             }
             catch (Exception e)
             {
@@ -677,8 +680,6 @@ namespace Ntreev.Crema.Services.Data
         public new LockInfo LockInfo => base.LockInfo;
 
         public new TableInfo TableInfo => base.TableInfo;
-
-        //public new TableState TableState => base.TableState;
 
         public new TagInfo Tags => base.Tags;
 

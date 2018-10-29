@@ -146,10 +146,6 @@ namespace Ntreev.Crema.Services.Data
                 {
                     await this.Container.InvokeTableEndContentEditAsync(authentication, this.Tables, this.dataBaseSet);
                 }
-                else
-                {
-                    await this.Repository.UnlockAsync(this.dataBaseSet.ItemPaths);
-                }
                 tableInfos = this.Contents.Where(item => item.IsModified).Select(item => item.DataTable.TableInfo).ToArray();
                 if (this.domain != null)
                 {
@@ -177,6 +173,7 @@ namespace Ntreev.Crema.Services.Data
                         this.Container.InvokeTablesContentChangedEvent(authentication, tables, dataSet);
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
+                await this.Repository.UnlockAsync(this.dataBaseSet.ItemPaths);
                 return tableInfos;
             }
 
@@ -344,7 +341,7 @@ namespace Ntreev.Crema.Services.Data
                 refcount++;
             }
 
-            
+
 
             private void DetachDomainEvent()
             {

@@ -73,21 +73,28 @@ namespace Ntreev.Crema.Services.Data
             tableInfos = new TableInfo[] { tableInfo };
             await this.Container.InvokeTableEndTemplateEditAsync(authentication, tableInfo, dataBaseSet);
             await base.OnEndEditAsync(authentication, tableInfos);
-            this.table.UpdateTemplate(template.TableInfo);
-            this.table.UpdateTags(template.Tags);
-            this.table.UpdateComment(template.Comment);
-            this.table.TableState = TableState.None;
-            this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
-            this.Container.InvokeTablesTemplateChangedEvent(authentication, this.tables, dataSet);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.table.UpdateTemplate(template.TableInfo);
+                this.table.UpdateTags(template.Tags);
+                this.table.UpdateComment(template.Comment);
+                this.table.TableState = TableState.None;
+                this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
+                this.Container.InvokeTablesTemplateChangedEvent(authentication, this.tables, dataSet);
+            });
+            await this.Repository.UnlockAsync(this.ItemPaths);
             return tableInfos;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
             await base.OnCancelEditAsync(authentication);
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.table.TableState = TableState.None;
+                this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
+            });
             await this.Repository.UnlockAsync(this.ItemPaths);
-            this.table.TableState = TableState.None;
-            this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
         }
 
         protected override void OnAttach(Domain domain)
@@ -99,7 +106,7 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task<CremaTemplate> CreateSourceAsync(Authentication authentication)
         {
             var tablePath = this.table.Path;
-            var dataSet = await this.table.ReadDataForTemplateAsync(authentication, true);
+            var dataSet = await this.table.ReadDataForTemplateAsync(authentication, false);
             var dataTable = dataSet.Tables[this.table.Name, this.table.Category.Path];
             if (dataTable == null)
                 throw new TableNotFoundException(tablePath);

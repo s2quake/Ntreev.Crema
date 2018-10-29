@@ -19,40 +19,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using Ntreev.Crema.Services;
-using System.Collections.ObjectModel;
 using Ntreev.Crema.ServiceModel;
 
-namespace Ntreev.Crema.Presentation.Framework.Controls
+namespace Ntreev.Crema.Services
 {
-    class DomainDataUserCollection : ObservableCollection<DomainDataUser>
+    public class DomainUserAddedEventArgs : DomainUserEventArgs
     {
-        public void Set(DomainUserInfo item, DomainUserState domainUserState, DomainLocationInfo domainLocationInfo)
+        public DomainUserAddedEventArgs(Authentication authentication, IDomain domain, IDomainUser domainUser, byte[] data)
+            : base(authentication, domain, domainUser)
         {
-            for (var i = 0; i < this.Count; i++)
-            {
-                if (this[i].UserID == item.UserID)
-                {
-                    this[i] = new DomainDataUser(item, domainUserState, domainLocationInfo);
-                    return;
-                }
-            }
-
-            this.Add(new DomainDataUser(item, domainUserState, domainLocationInfo));
+            this.Data = data;
         }
 
-        public void Remove(string userID)
+        public byte[] GetData(Authentication authentication)
         {
-            for (var i = 0; i < this.Count; i++)
+            if (this.UserID == authentication.ID)
             {
-                if (this[i].UserID == userID)
-                {
-                    this.RemoveAt(i);
-                    break;
-                }
+                return this.Data;
             }
+            return null;
         }
+
+        private byte[] Data { get; }
+
+
     }
 }

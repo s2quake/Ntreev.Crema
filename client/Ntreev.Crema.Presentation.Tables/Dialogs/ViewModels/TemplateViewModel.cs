@@ -306,13 +306,13 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 
             if (this.Template != null)
             {
-                await this.Template.CancelEditAsync(this.authentication);
                 await this.Template.Dispatcher.InvokeAsync(() =>
                 {
                     this.Template.EditEnded -= Template_EditEnded;
                     this.Template.EditCanceled -= Template_EditCanceled;
                     this.Template.Changed -= Template_Changed;
                 });
+                await this.Template.CancelEditAsync(this.authentication);
             }
             this.Template = null;
         }
@@ -330,10 +330,10 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
                 this.Template.EditEnded -= Template_EditEnded;
                 this.Template.EditCanceled -= Template_EditCanceled;
                 this.Template.Changed -= Template_Changed;
-                this.Template = null;
 
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.Template = null;
                     this.flashService?.Flash();
                     AppMessageBox.ShowInfo(Resources.Message_ExitEditByUser_Format, ex.UserID);
                     this.TryClose();
@@ -348,10 +348,10 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
                 this.Template.EditEnded -= Template_EditEnded;
                 this.Template.EditCanceled -= Template_EditCanceled;
                 this.Template.Changed -= Template_Changed;
-                this.Template = null;
 
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.Template = null;
                     this.flashService?.Flash();
                     AppMessageBox.ShowInfo(Resources.Message_ExitEditByUser_Format, ex.UserID);
                     this.TryClose();

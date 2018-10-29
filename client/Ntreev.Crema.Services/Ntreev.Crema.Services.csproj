@@ -65,6 +65,7 @@
     <Compile Include="CremaConfiguration.cs" />
     <Compile Include="CremaBootstrapper.cs" />
     <Compile Include="Authentication.cs" />
+    <Compile Include="CremaResetEvent.cs" />
     <Compile Include="CremaSettings.cs" />
     <Compile Include="Data\DataBaseCollectionServiceFactory.cs" />
     <Compile Include="Data\DataBaseCollection.cs" />

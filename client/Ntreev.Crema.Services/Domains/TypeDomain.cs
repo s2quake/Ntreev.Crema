@@ -63,11 +63,11 @@ namespace Ntreev.Crema.Services.Domains
             this.dataType = dataSet.Types[itemName.Name];
         }
 
-        protected override void OnInitialize(DomainMetaData metaData)
+        protected override void OnInitialize(byte[] data)
         {
-            base.OnInitialize(metaData);
+            base.OnInitialize(data);
 
-            var text = Encoding.UTF8.GetString(metaData.Data).Decompress();
+            var text = Encoding.UTF8.GetString(data).Decompress();
             var index = text.IndexOf(";");
             var path = text.Remove(index);
             var itemName = new ItemName(path);

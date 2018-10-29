@@ -48,6 +48,16 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return this.InvokeTask(Task.Run(() => this.GetMetaDataAsync(dataBaseID)));
         }
 
+        public ResultBase Enter(Guid domainID, DomainAccessType accessType)
+        {
+            return this.InvokeTask(Task.Run(() => this.EnterAsync(domainID, accessType)));
+        }
+
+        public ResultBase Leave(Guid domainID)
+        {
+            return this.InvokeTask(Task.Run(() => this.LeaveAsync(domainID)));
+        }
+
         public ResultBase SetUserLocation(Guid domainID, DomainLocationInfo location)
         {
             return this.InvokeTask(Task.Run(() => this.SetUserLocationAsync(domainID, location)));

@@ -30,6 +30,10 @@ namespace Ntreev.Crema.Services
     {
         Task<object> DeleteAsync(Authentication authentication, bool isCancel);
 
+        Task EnterAsync(Authentication authentication, DomainAccessType accessType);
+
+        Task LeaveAsync(Authentication authentication);
+
         Task BeginUserEditAsync(Authentication authentication, DomainLocationInfo location);
 
         Task EndUserEditAsync(Authentication authentication);

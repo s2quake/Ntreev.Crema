@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Services
 
         event EventHandler<DomainEventArgs> DomainStateChanged;
 
-        event EventHandler<DomainUserEventArgs> DomainUserAdded;
+        event EventHandler<DomainUserAddedEventArgs> DomainUserAdded;
 
         event EventHandler<DomainUserRemovedEventArgs> DomainUserRemoved;
 
@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Services
 
         event EventHandler<DomainRowEventArgs> DomainRowAdded;
 
-        //event EventHandler<DomainRowEventArgs> DomainRowChanged;
+        event EventHandler<DomainRowEventArgs> DomainRowChanged;
 
         event EventHandler<DomainRowEventArgs> DomainRowRemoved;
 

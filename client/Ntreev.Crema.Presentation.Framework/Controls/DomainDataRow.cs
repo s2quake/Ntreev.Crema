@@ -137,9 +137,9 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
                 foreach (var i in infos)
                 {
-                    if (HashUtility.Equals(this.keys, i.DomainUserInfo.Location.Keys) == true && this.tableName == i.DomainUserInfo.Location.TableName)
+                    if (HashUtility.Equals(this.keys, i.DomainLocationInfo.Keys) == true && this.tableName == i.DomainLocationInfo.TableName)
                     {
-                        this.userInfos.Set(i.DomainUserInfo, i.DomainUserState);
+                        this.userInfos.Set(i.DomainUserInfo, i.DomainUserState, i.DomainLocationInfo);
                     }
                 }
             }
@@ -203,7 +203,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
                 if (HashUtility.Equals(this.keys, domainLocationInfo.Keys) == true && this.tableName == domainLocationInfo.TableName)
                 {
-                    this.userInfos.Set(domainUserInfo, domainUserState);
+                    this.userInfos.Set(domainUserInfo, domainUserState, domainLocationInfo);
                 }
                 else
                 {

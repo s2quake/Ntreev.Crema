@@ -28,11 +28,11 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 {
     struct DomainDataUser
     {
-        public DomainDataUser(DomainUserInfo domainUserInfo, DomainUserState domainUserState)
+        public DomainDataUser(DomainUserInfo domainUserInfo, DomainUserState domainUserState, DomainLocationInfo domainLocationInfo)
         {
             this.UserID = domainUserInfo.UserID;
             this.UserName = domainUserInfo.UserName;
-            this.Location = domainUserInfo.Location;
+            this.Location = domainLocationInfo;
             this.IsBeingEdited = domainUserState.HasFlag(DomainUserState.IsBeingEdited);
             this.Background = new SolidColorBrush(domainUserInfo.GetColor());
         }

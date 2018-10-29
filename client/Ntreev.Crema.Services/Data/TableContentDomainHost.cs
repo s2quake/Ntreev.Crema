@@ -132,7 +132,7 @@ namespace Ntreev.Crema.Services.Data
                     item.domainHost = this;
                     item.Table.TableState = TableState.IsBeingEdited;
                 }
-                await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
+                
                 await this.Dispatcher.InvokeAsync(() => this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables));
                 return result.SignatureDate;
             }
@@ -155,10 +155,10 @@ namespace Ntreev.Crema.Services.Data
                 {
                     tableInfoByName.Add(item.Name, item);
                 }
-                if (this.domain != null && this.domain.Dispatcher != null)
+                if (this.domain != null)
                 {
-                    await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
-                    await this.DomainContext.DeleteAsync(authentication, this.domain, false, tableInfos);
+                    //await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                    await this.DomainContext.DeleteAsync(authentication, this.domain);
                 }
                 this.Container.ValidateExpired();
                 await this.Container.Dispatcher.InvokeAsync(() =>
@@ -188,8 +188,8 @@ namespace Ntreev.Crema.Services.Data
                 }
                 if (this.domain != null && this.domain.Dispatcher != null)
                 {
-                    await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
-                    await this.DomainContext.DeleteAsync(authentication, this.domain, true, null);
+                    //await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                    await this.DomainContext.DeleteAsync(authentication, this.domain);
                 }
                 await this.Container.Dispatcher.InvokeAsync(() =>
                 {
@@ -209,14 +209,18 @@ namespace Ntreev.Crema.Services.Data
             public async Task EnterContentAsync(Authentication authentication, string name)
             {
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EnterTableContentEdit(name));
-                await this.domain.InitializeAsync(authentication, result.Value);
-                await this.Dispatcher.InvokeAsync(() =>
+                await this.domain.WaitUserEnterAsync(authentication);
+                await this.domain.DataDispatcher.InvokeAsync(() =>
                 {
                     var dataSet = domain.Source as CremaDataSet;
                     foreach (var item in this.Contents)
                     {
                         item.DataTable = dataSet?.Tables[item.Table.Name, item.Table.Category.Path];
                     }
+                });
+                await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
             }
@@ -224,7 +228,8 @@ namespace Ntreev.Crema.Services.Data
             public async Task LeaveContentAsync(Authentication authentication, string name)
             {
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.LeaveTableContentEdit(name));
-                await this.domain.ReleaseAsync(authentication, result.Value);
+                await this.domain.WaitUserLeaveAsync(authentication);
+                await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     foreach (var item in this.Contents)
@@ -254,7 +259,7 @@ namespace Ntreev.Crema.Services.Data
                 this.Dispatcher.InvokeAsync(() =>
                 {
                     var query = from row in e.Rows
-                                join content in this.Contents on row.TableName equals content.dataTable.Name
+                                join content in this.Contents on row.TableName equals content.Table.Name
                                 select content;
                     foreach (var item in query)
                     {
@@ -269,7 +274,7 @@ namespace Ntreev.Crema.Services.Data
                 this.Dispatcher.InvokeAsync(() =>
                 {
                     var query = from row in e.Rows
-                                join content in this.Contents on row.TableName equals content.dataTable.Name
+                                join content in this.Contents on row.TableName equals content.Table.Name
                                 select content;
                     foreach (var item in query)
                     {
@@ -409,21 +414,18 @@ namespace Ntreev.Crema.Services.Data
 
             async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)
             {
+                var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, result);
+                this.domain = null;
                 if (isCanceled == false)
                 {
-                    var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, result);
                     result = await this.EndContentAsync(authentication, result as TableInfo[]);
                     await this.Dispatcher.InvokeAsync(() => this.InvokeEditEndedEvent(args));
                     return result;
                 }
                 else
                 {
-                    var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, null);
                     await this.CancelContentAsync(authentication, null);
-                    await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        this.InvokeEditCanceledEvent(args);
-                    });
+                    await this.Dispatcher.InvokeAsync(() => this.InvokeEditCanceledEvent(args));
                     return null;
                 }
             }
