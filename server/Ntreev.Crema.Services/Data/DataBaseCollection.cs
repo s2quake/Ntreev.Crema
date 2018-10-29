@@ -67,7 +67,7 @@ namespace Ntreev.Crema.Services.Data
             this.repositoryProvider = cremaHost.RepositoryProvider;
             this.RemotePath = cremaHost.GetPath(CremaPath.RepositoryDataBases);
             this.basePath = cremaHost.GetPath(CremaPath.DataBases);
-            this.repositoryDispatcher = new CremaDispatcher(this);
+            this.repositoryDispatcher = new CremaDispatcher($"Repository: {this.GetType().Name}");
         }
 
         public async Task RestoreStateAsync(CremaSettings settings)

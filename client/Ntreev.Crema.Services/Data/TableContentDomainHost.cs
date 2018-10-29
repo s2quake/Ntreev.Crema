@@ -382,7 +382,8 @@ namespace Ntreev.Crema.Services.Data
             void IDomainHost.Detach()
             {
                 this.Dispatcher.VerifyAccess();
-                this.domain.Dispatcher.Invoke(this.DetachDomainEvent);
+                if (this.domain.Source != null)
+                    this.domain.Dispatcher.Invoke(this.DetachDomainEvent);
                 this.domain.Host = null;
                 this.domain = null;
                 foreach (var item in this.Contents)
@@ -402,14 +403,12 @@ namespace Ntreev.Crema.Services.Data
                 {
                     item.domainHost = this;
                     item.Domain = domain;
-                    if (dataSet != null)
-                    {
-                        item.DataTable = dataSet?.Tables[item.Table.Name, item.Table.Category.Path];
-                    }
+                    item.DataTable = dataSet?.Tables[item.Table.Name, item.Table.Category.Path];
                     item.Table.TableState = TableState.IsBeingEdited;
                     item.IsModified = domain.ModifiedTables.Contains(item.Table.Name);
                 }
-                this.domain.Dispatcher.Invoke(this.AttachDomainEvent);
+                if (this.domain.Source != null)
+                    this.domain.Dispatcher.Invoke(this.AttachDomainEvent);
             }
 
             async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)

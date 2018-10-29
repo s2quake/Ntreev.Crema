@@ -399,7 +399,6 @@ namespace Ntreev.Crema.Services.Data
         {
             this.TypeSource = domain.Source as CremaDataType;
             this.domain = domain as TypeDomain;
-
             if (this.TypeSource != null)
             {
                 this.table = this.TypeSource.View.Table;
@@ -411,16 +410,18 @@ namespace Ntreev.Crema.Services.Data
                 }
                 this.table.RowDeleted += Table_RowDeleted;
                 this.table.RowChanged += Table_RowChanged;
+                this.IsModified = this.domain.IsModified;
+                this.domain.Dispatcher.Invoke(this.AttachDomainEvent);
+                this.domain.Dispatcher.Invoke(this.RefreshEditors);
             }
-
-            this.IsModified = this.domain.IsModified;
-            this.domain.Dispatcher.Invoke(this.AttachDomainEvent);
-            this.domain.Dispatcher.Invoke(this.RefreshEditors);
         }
 
         protected virtual void OnDetached()
         {
-            this.domain.Dispatcher.Invoke(this.DetachDomainEvent);
+            if (this.TypeSource != null)
+            {
+                this.domain.Dispatcher.Invoke(this.DetachDomainEvent);
+            }
             this.domain = null;
         }
 
@@ -579,7 +580,6 @@ namespace Ntreev.Crema.Services.Data
         void IDomainHost.Attach(Domain domain)
         {
             this.OnAttach(domain);
-            this.OnEditBegun(EventArgs.Empty);
         }
 
         void IDomainHost.Detach()

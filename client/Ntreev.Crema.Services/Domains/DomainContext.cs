@@ -688,12 +688,13 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
-                this.Dispatcher.Invoke(async () =>
+                var task = this.Dispatcher.Invoke(() =>
                 {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
-                    await domain.InvokeUserAddedAsync(authentication, domainUserInfo, domainUserState, data, id);
+                    return domain.InvokeUserAddedAsync(authentication, domainUserInfo, domainUserState, data, id);
                 });
+                this.Dispatcher.InvokeAsync(task);
             }
             catch (Exception e)
             {
@@ -705,14 +706,15 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
-                this.Dispatcher.Invoke(async () =>
+                var task = this.Dispatcher.Invoke(() =>
                 {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
                     var domainUser = domain.GetDomainUser(userID);
                     var ownerUser = ownerID != null ? domain.GetDomainUser(ownerID) : null;
-                    await domain.InvokeUserRemovedAsync(authentication, domainUser, ownerUser, removeInfo, id);
+                    return domain.InvokeUserRemovedAsync(authentication, domainUser, ownerUser, removeInfo, id);
                 });
+                this.Dispatcher.InvokeAsync(task);
             }
             catch (Exception e)
             {
@@ -760,13 +762,14 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
-                this.Dispatcher.Invoke(async () =>
+                var task = this.Dispatcher.Invoke(() =>
                 {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
                     var domainUser = domain.GetDomainUser(authentication);
-                    await domain.InvokeUserEditBegunAsync(authentication, domainUser, domainLocationInfo, id);
+                    return domain.InvokeUserEditBegunAsync(authentication, domainUser, domainLocationInfo, id);
                 });
+                this.Dispatcher.InvokeAsync(task);
             }
             catch (Exception e)
             {
@@ -778,13 +781,14 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
-                this.Dispatcher.Invoke(async () =>
+                var task = this.Dispatcher.Invoke(() =>
                 {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
                     var domainUser = domain.GetDomainUser(authentication);
-                    await domain.InvokeUserEditEndedAsync(authentication, domainUser, id);
+                    return domain.InvokeUserEditEndedAsync(authentication, domainUser, id);
                 });
+                this.Dispatcher.InvokeAsync(task);
             }
             catch (Exception e)
             {
@@ -796,13 +800,14 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
-                this.Dispatcher.Invoke(async () =>
+                var task = this.Dispatcher.Invoke(() =>
                 {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
                     var domainUser = domain.GetDomainUser(authentication);
-                    await domain.InvokeOwnerChangedAsync(authentication, domainUser, id);
+                    return domain.InvokeOwnerChangedAsync(authentication, domainUser, id);
                 });
+                this.Dispatcher.InvokeAsync(task);
             }
             catch (Exception e)
             {
@@ -831,13 +836,14 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
-                this.Dispatcher.Invoke(async () =>
+                var task = this.Dispatcher.Invoke(() =>
                 {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
                     var domainUser = domain.GetDomainUser(authentication);
-                    await domain.InvokeRowAddedAsync(authentication, domainUser, rows, id);
+                    return domain.InvokeRowAddedAsync(authentication, domainUser, rows, id);
                 });
+                this.Dispatcher.InvokeAsync(task);
             }
             catch (Exception e)
             {
@@ -849,13 +855,14 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
-                this.Dispatcher.Invoke(async () =>
+                var task = this.Dispatcher.Invoke(() =>
                 {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
                     var domainUser = domain.GetDomainUser(authentication);
-                    await domain.InvokeRowChangedAsync(authentication, domainUser, rows, id);
+                    return domain.InvokeRowChangedAsync(authentication, domainUser, rows, id);
                 });
+                this.Dispatcher.InvokeAsync(task);
             }
             catch (Exception e)
             {
@@ -867,13 +874,14 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
-                this.Dispatcher.Invoke(async () =>
+                var task = this.Dispatcher.Invoke(() =>
                 {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
                     var domainUser = domain.GetDomainUser(authentication);
-                    await domain.InvokeRowRemovedAsync(authentication, domainUser, rows, id);
+                    return domain.InvokeRowRemovedAsync(authentication, domainUser, rows, id);
                 });
+                this.Dispatcher.InvokeAsync(task);
             }
             catch (Exception e)
             {
@@ -885,13 +893,14 @@ namespace Ntreev.Crema.Services.Domains
         {
             try
             {
-                this.Dispatcher.Invoke(async () =>
+                var task = this.Dispatcher.Invoke(() =>
                 {
                     var authentication = this.UserContext.Authenticate(signatureDate);
                     var domain = this.GetDomain(domainID);
                     var domainUser = domain.GetDomainUser(authentication);
-                    await domain.InvokePropertyChangedAsync(authentication, domainUser, propertyName, value, id);
+                    return domain.InvokePropertyChangedAsync(authentication, domainUser, propertyName, value, id);
                 });
+                this.Dispatcher.InvokeAsync(task);
             }
             catch (Exception e)
             {
