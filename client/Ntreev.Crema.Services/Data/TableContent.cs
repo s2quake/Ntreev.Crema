@@ -55,7 +55,7 @@ namespace Ntreev.Crema.Services.Data
 
         public Task<TableRow> FindAsync(Authentication authentication, params object[] keys)
         {
-            return this.Domain.Dispatcher.InvokeAsync(() =>
+            return this.Domain.DataDispatcher.InvokeAsync(() =>
             {
                 var row = this.internalTable.Rows.Find(keys);
                 if (row == null)
@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Services.Data
 
         public Task<TableRow[]> SelectAsync(Authentication authentication, string filterExpression)
         {
-            return this.Domain.Dispatcher.InvokeAsync(() =>
+            return this.Domain.DataDispatcher.InvokeAsync(() =>
             {
                 var rows = this.internalTable.Select(filterExpression);
                 var rowList = new List<TableRow>(rows.Length);
@@ -248,7 +248,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync));
                     this.ValidateAddNew(authentication);
                 });
-                var row = await this.Domain.Dispatcher.InvokeAsync(() => new TableRow(this, this.dataTable.DefaultView.Table, relationID));
+                var row = await this.Domain.DataDispatcher.InvokeAsync(() => new TableRow(this, this.dataTable.DefaultView.Table, relationID));
                 return row;
             }
             catch (Exception e)
@@ -505,21 +505,14 @@ namespace Ntreev.Crema.Services.Data
 
         #region IEnumerable
 
-        // TODO: this.items 로 변경이 가능한지 확인(서버랑 코드가 다름)
         IEnumerator<ITableRow> IEnumerable<ITableRow>.GetEnumerator()
         {
-            foreach (DataRow item in this.internalTable.Rows)
-            {
-                yield return this.dataTable.ExtendedProperties[item] as TableRow;
-            }
+            return (this.items ?? Enumerable.Empty<ITableRow>()).GetEnumerator();
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            foreach (DataRow item in this.internalTable.Rows)
-            {
-                yield return this.dataTable.ExtendedProperties[item] as TableRow;
-            }
+            return (this.items ?? Enumerable.Empty<ITableRow>()).GetEnumerator();
         }
 
         #endregion

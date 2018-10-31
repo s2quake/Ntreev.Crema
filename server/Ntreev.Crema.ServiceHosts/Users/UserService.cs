@@ -40,7 +40,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
         private Authentication authentication;
 
         public UserService(ICremaHost cremaHost)
-            : base(cremaHost.GetService(typeof(ILogService)) as ILogService)
+            : base(cremaHost)
         {
             this.CremaHost = cremaHost;
             this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;

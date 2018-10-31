@@ -248,11 +248,16 @@ namespace Ntreev.Crema.Services.Domains
             this.CompletionID = id;
         }
 
+        public Task CompleteAsync(long id)
+        {
+            return this.Dispatcher.InvokeAsync(() => this.Complete(id));
+        }
+
         public long ID { get; set; }
 
-        public long PostID { get; set; }
+        public long PostID { get; set; } = -1;
 
-        public long CompletionID { get; set; }
+        public long CompletionID { get; set; } = -1;
 
         public bool IsEnabled { get; set; } = true;
 

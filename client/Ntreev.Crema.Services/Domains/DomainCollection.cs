@@ -331,7 +331,7 @@ namespace Ntreev.Crema.Services.Domains
 
             foreach(var item in domains)
             {
-                this.Context.resetEvent.Set(item.ID);
+                this.Context.creationEvent.Set(item.ID);
             }
             return domains;
         }

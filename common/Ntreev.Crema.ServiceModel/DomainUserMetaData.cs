@@ -45,5 +45,10 @@ namespace Ntreev.Crema.ServiceModel
         public DomainUserState DomainUserState { get; set; }
 
         public static readonly DomainUserMetaData Empty = new DomainUserMetaData();
+
+        public override string ToString()
+        {
+            return $"{this.DomainUserInfo.UserID}";
+        }
     }
 }

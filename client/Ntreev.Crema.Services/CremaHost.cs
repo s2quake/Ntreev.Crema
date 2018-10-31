@@ -456,8 +456,9 @@ namespace Ntreev.Crema.Services
             {
                 this.OnClosing(EventArgs.Empty);
             });
-            if (this.services.Contains(this.DomainContext) == true)
-                await this.DomainContext.CloseAsync(closeInfo);
+            await this.DomainContext.CloseAsync(closeInfo);
+            //if (this.services.Contains(this.DomainContext) == true)
+            //    await this.DomainContext.CloseAsync(closeInfo);
             foreach (var item in this.services.Reverse<ICremaService>())
             {
                 if (item is DataBase)

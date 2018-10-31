@@ -38,7 +38,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         private readonly Dictionary<Guid, ITransaction> transactionByID = new Dictionary<Guid, ITransaction>();
 
         public DataBaseCollectionService(ICremaHost cremaHost)
-            : base(cremaHost.GetService(typeof(ILogService)) as ILogService)
+            : base(cremaHost)
         {
             this.CremaHost = cremaHost;
             this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;

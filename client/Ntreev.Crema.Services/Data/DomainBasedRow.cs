@@ -43,7 +43,7 @@ namespace Ntreev.Crema.Services.Data
         protected DomainBasedRow(Domain domain, DataTable table)
         {
             this.domain = domain ?? throw new ArgumentNullException(nameof(domain));
-            this.domain.Dispatcher.VerifyAccess();
+            this.domain.DataDispatcher.VerifyAccess();
             this.table = table;
             this.Backup(this.table.NewRow());
         }
@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                var tuple = await this.domain.Dispatcher.InvokeAsync(() =>
+                var tuple = await this.domain.DataDispatcher.InvokeAsync(() =>
                 {
                     if (this.Row == null)
                         throw new InvalidOperationException();
@@ -83,7 +83,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.ValidateExpired();
                 int count = 0;
-                var tuple = await this.domain.Dispatcher.InvokeAsync(() =>
+                var tuple = await this.domain.DataDispatcher.InvokeAsync(() =>
                 {
                     if (this.Row != null)
                         throw new InvalidOperationException();
@@ -98,7 +98,7 @@ namespace Ntreev.Crema.Services.Data
                     Fields = tuple.fields,
                 };
                 var info = await this.domain.NewRowAsync(authentication, new DomainRowInfo[] { row });
-                await this.domain.Dispatcher.InvokeAsync(() =>
+                await this.domain.DataDispatcher.InvokeAsync(() =>
                 {
                     this.Row = this.table.Rows.Find(info.Value.First().Keys);
                     this.fields = null;
@@ -135,7 +135,7 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                var tuple = await this.domain.Dispatcher.InvokeAsync(() =>
+                var tuple = await this.domain.DataDispatcher.InvokeAsync(() =>
                 {
                     if (this.fields != null)
                     {

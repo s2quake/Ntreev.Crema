@@ -34,11 +34,11 @@ namespace Ntreev.Crema.Data.Xml.Schema
     public sealed class CremaSchemaWriter
     {
         private CremaDataSet dataSet;
-        private CremaDataTable dataTable;
-        private CremaDataType dataType;
-        private ItemName itemName;
+        private readonly CremaDataTable dataTable;
+        private readonly CremaDataType dataType;
+        private readonly ItemName itemName;
 
-        private static XmlWriterSettings settings = new XmlWriterSettings()
+        private static readonly XmlWriterSettings settings = new XmlWriterSettings()
         {
             Encoding = Encoding.UTF8,
             Indent = true,
@@ -142,7 +142,6 @@ namespace Ntreev.Crema.Data.Xml.Schema
                             SchemaLocation = UriUtility.MakeRelative(tableNamespace, item.Namespace) + CremaSchema.SchemaExtension
                         };
                         schema.Includes.Add(import);
-                        //schema.Namespaces.Add("d" + index, item.Namespace);
                         index++;
                     }
                 }

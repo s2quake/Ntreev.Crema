@@ -15,55 +15,30 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Library;
+using Ntreev.Library.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Xml.Serialization;
-using Ntreev.Crema.Data.Xml;
 using System.Runtime.Serialization;
-using System.IO;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library.IO;
-using Ntreev.Library;
-using System.Xml.Schema;
+using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
-using Ntreev.Library.Serialization;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace Ntreev.Crema.ServiceModel
 {
     [DataContract(Namespace = SchemaUtility.Namespace)]
-    public struct DomainMetaData
+    public struct CallbackInfo
     {
         [DataMember]
-        public Guid DomainID { get; set; }
+        public long Index { get; set; }
 
         [DataMember]
-        public DomainInfo DomainInfo { get; set; }
+        public long TaskID { get; set; }
 
         [DataMember]
-        public byte[] Data { get; set; }
-
-        [DataMember]
-        public DomainUserMetaData[] Users { get; set; }
-
-        [DataMember]
-        public DomainState DomainState { get; set; }
-
-        [DataMember]
-        public string[] ModifiedTables { get; set; }
-
-        [DataMember]
-        public long PostID { get; set; }
-
-        [DataMember]
-        public long CompetionID { get; set; }
-
-        public static readonly DomainMetaData Empty = new DomainMetaData();
-
-        public override string ToString()
-        {
-            return $"{this.DomainID}";
-        }
+        public SignatureDate SignatureDate { get; set; }
     }
 }

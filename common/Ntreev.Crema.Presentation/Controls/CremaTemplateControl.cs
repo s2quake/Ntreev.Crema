@@ -131,7 +131,7 @@ namespace Ntreev.Crema.Presentation.Controls
                 try
                 {
 #if DEBUG
-                    //this.dataGridControl.Columns.Add(new Column() { FieldName = CremaSchema.Index, Title = CremaSchema.Index, });
+                    this.dataGridControl.Columns.Add(new Column() { FieldName = CremaSchema.Index, Title = CremaSchema.Index, });
 #endif
                     //this.dataGridControl.Columns.Add(new Column() { FieldName = CremaSchema.ID, Title = CremaSchema.ID, });
                 }

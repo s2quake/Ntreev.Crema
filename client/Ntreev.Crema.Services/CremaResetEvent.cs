@@ -10,7 +10,7 @@ namespace Ntreev.Crema.Services
 {
     sealed class CremaResetEvent<T>
     {
-        private readonly Dictionary<T, ManualResetEvent> setsByID = new Dictionary<T, ManualResetEvent>();
+        private readonly Dictionary<T, Task> setsByID = new Dictionary<T, Task>();
 
         public CremaResetEvent(CremaDispatcher dispatcher)
         {
@@ -19,32 +19,28 @@ namespace Ntreev.Crema.Services
 
         public async Task WaitAsync(T id)
         {
-            await await this.Dispatcher.InvokeAsync(async () =>
+            var task = await this.Dispatcher.InvokeAsync(() =>
             {
                 if (this.setsByID.ContainsKey(id) == false)
                 {
-                    this.setsByID.Add(id, new ManualResetEvent(false));
+                    this.setsByID.Add(id, new Task(() => { }));
                 }
-                else
-                {
-                    //this.setsByID[id].Reset();
-                }
-                var set = this.setsByID[id];
-                await Task.Run(() => set.WaitOne());
+                return this.setsByID[id];
             });
+            await task;
         }
 
-        public Task SetAsync(T id)
+        public async void SetAsync(T id)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 if (this.setsByID.ContainsKey(id) == true)
                 {
-                    this.setsByID[id].Set();
+                    this.setsByID[id].Start();
                 }
                 else
                 {
-                    this.setsByID.Add(id, new ManualResetEvent(true));
+                    this.setsByID.Add(id, Task.Run(() => { }));
                 }
             });
         }
@@ -54,23 +50,21 @@ namespace Ntreev.Crema.Services
             this.Dispatcher.VerifyAccess();
             if (this.setsByID.ContainsKey(id) == true)
             {
-                this.setsByID[id].Set();
+                this.setsByID[id].Start();
             }
             else
             {
-                this.setsByID.Add(id, new ManualResetEvent(true));
+                this.setsByID.Add(id, Task.Run(() => { }));
             }
         }
 
-        public Task ResetAsync(T id)
+        public void Reset(T id)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            this.Dispatcher.VerifyAccess();
+            if (this.setsByID.ContainsKey(id) == true)
             {
-                if (this.setsByID.ContainsKey(id) == true)
-                {
-                    this.setsByID[id].Reset();
-                }
-            });
+                this.setsByID.Remove(id);
+            }
         }
 
         private CremaDispatcher Dispatcher { get; }

@@ -488,6 +488,19 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ResultBaseOfanyType" nillable="true" type="tns:ResultBaseOfanyType" />
+  <xs:complexType name="CallbackInfo">
+    <xs:annotation>
+      <xs:appinfo>
+        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Index" type="xs:long" />
+      <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
+      <xs:element minOccurs="0" name="TaskID" type="xs:long" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CallbackInfo" nillable="true" type="tns:CallbackInfo" />
   <xs:complexType name="CloseInfo">
     <xs:annotation>
       <xs:appinfo>

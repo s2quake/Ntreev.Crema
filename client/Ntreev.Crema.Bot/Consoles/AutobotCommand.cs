@@ -54,7 +54,11 @@ namespace Ntreev.Crema.Bot.Consoles
         }
 
         [CommandProperty]
+#if DEBUG
+        [DefaultValue(10)]
+#else
         [DefaultValue(0)]
+#endif
         public int Count
         {
             get; set;

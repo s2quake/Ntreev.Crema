@@ -18,7 +18,9 @@
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.Library;
+using Ntreev.Library.IO;
 using System;
+using System.IO;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
@@ -26,13 +28,15 @@ namespace Ntreev.Crema.ServiceHosts
 {
     public abstract class CremaServiceItemBase<T> : ICremaServiceItem
     {
+        private readonly ICremaHost cremaHost;
         private readonly ILogService logService;
         private readonly string sessionID;
         private ServiceHostBase host;
 
-        protected CremaServiceItemBase(ILogService logService)
+        protected CremaServiceItemBase(ICremaHost cremaHost)
         {
-            this.logService = logService;
+            this.cremaHost = cremaHost;
+            this.logService = cremaHost.GetService(typeof(ILogService)) as ILogService;
             OperationContext.Current.Host.Closing += Host_Closing;
             OperationContext.Current.Channel.Faulted += Channel_Faulted;
             OperationContext.Current.Channel.Closed += Channel_Closed;
@@ -51,24 +55,54 @@ namespace Ntreev.Crema.ServiceHosts
             this.logService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(ICremaServiceItem.CloseAsync)}");
         }
 
-        protected void InvokeEvent(string userID, string exceptionUserID, Action action, string name = null)
+        protected void InvokeEvent(string userID, string exceptionUserID, Action action)
         {
             if (userID != null && userID == exceptionUserID)
                 return;
-                
-            CremaService.Dispatcher.InvokeAsync(() =>
+
+            //CremaService.Dispatcher.InvokeAsync(() =>
+            //{
+            try
             {
-                try
+                action();
+            }
+            catch (Exception e)
+            {
+                this.logService.Error(e);
+            }
+            //});
+        }
+
+        protected void InvokeEvent(string userID, string exceptionUserID, Action action, long id, string name)
+        {
+            if (userID != null && userID == exceptionUserID)
+                return;
+
+            //CremaService.Dispatcher.InvokeAsync(() =>
+            //{
+            try
+            {
+                action();
+                if (name != null)
                 {
-                    action();
-                    if (name != null)
-                        System.Diagnostics.Trace.WriteLine(name);
+                    if (userID != null)
+                    {
+                        var path = System.IO.Path.Combine(@"E:\Crema\repo\debug", userID, "ServerServiceLog.txt");
+                        FileUtility.Prepare(path);
+                        File.AppendAllText(path, $"{id}\t{name}{Environment.NewLine}");
+                    }
+                    else
+                    {
+                        //System.Diagnostics.Trace.WriteLine(name);
+                    }
+
                 }
-                catch (Exception e)
-                {
-                    this.logService.Error(e);
-                }
-            });
+            }
+            catch (Exception e)
+            {
+                this.logService.Error(e);
+            }
+            //});
         }
 
         protected T Callback { get; private set; }

@@ -47,7 +47,7 @@ namespace Ntreev.Crema.Services.Data
         public static async Task<TypeMember> CreateAsync(Authentication authentication, TypeTemplateBase template, DataTable table)
         {
             var domain = template.Domain;
-            var tuple = await domain.Dispatcher.InvokeAsync(() =>
+            var tuple = await domain.DataDispatcher.InvokeAsync(() =>
             {
                 var member = new TypeMember(template, table);
                 var query = from DataRow item in table.Rows

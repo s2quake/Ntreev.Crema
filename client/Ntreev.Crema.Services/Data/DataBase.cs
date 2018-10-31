@@ -713,24 +713,40 @@ namespace Ntreev.Crema.Services.Data
 
         public void SetAuthenticationEntered(Authentication authentication)
         {
-            this.ValidateExpired();
-            this.Dispatcher.Invoke(() =>
+            if (this.Dispatcher != null && this.Dispatcher.CheckAccess() == false)
+            {
+                this.Dispatcher.Invoke(Action);
+            }
+            else
+            {
+                Action();
+            }
+
+            void Action()
             {
                 this.authentications.Add(authentication);
                 this.authenticationEntered?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
                 this.DataBases.InvokeItemsAuthenticationEnteredEvent(authentication, new IDataBase[] { this });
-            });
+            }
         }
 
         public void SetAuthenticationLeft(Authentication authentication)
         {
-            this.ValidateExpired();
-            this.Dispatcher.Invoke(() =>
+            if (this.Dispatcher != null && this.Dispatcher.CheckAccess() == false)
+            {
+                this.Dispatcher.Invoke(Action);
+            }
+            else
+            {
+                Action();
+            }
+
+            void Action()
             {
                 this.authentications.Remove(authentication);
                 this.authenticationLeft?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
                 this.DataBases.InvokeItemsAuthenticationLeftEvent(authentication, new IDataBase[] { this });
-            });
+            }
         }
 
         public void SetDataBaseInfo(DataBaseInfo dataBaseInfo)
@@ -817,7 +833,7 @@ namespace Ntreev.Crema.Services.Data
             this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.AttachDomainHost(authentications, domainHostByDomain));
         }
 
-        public  void AttachDomainHost(Domain[] domains)
+        public void AttachDomainHost(Domain[] domains)
         {
             this.Dispatcher.VerifyAccess();
             var authentications = this.authentications.Select(item => (Authentication)item).ToArray();

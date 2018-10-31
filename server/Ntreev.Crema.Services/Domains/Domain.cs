@@ -50,6 +50,8 @@ namespace Ntreev.Crema.Services.Domains
         private EventHandler<DomainRowEventArgs> rowRemoved;
         private EventHandler<DomainPropertyEventArgs> propertyChanged;
         private EventHandler<DomainDeletedEventArgs> deleted;
+        private long postID;
+        private long completionID;
 
         protected Domain(DomainSerializationInfo serializationInfo, object source)
         {
@@ -106,6 +108,7 @@ namespace Ntreev.Crema.Services.Domains
                     this.OnUserAdded(new DomainUserEventArgs(authentication, this, domainUser));
                     this.Container?.InvokeDomainUserAddedEvent(authentication, this, domainUser, result.ID, result.Data);
                 });
+                await this.Logger.CompleteAsync(result.ID);
                 return result.ID;
             }
             catch (Exception e)
@@ -136,6 +139,7 @@ namespace Ntreev.Crema.Services.Domains
                     this.OnUserRemoved(new DomainUserRemovedEventArgs(authentication, this, domainUser, RemoveInfo.Empty));
                     this.Container?.InvokeDomainUserRemovedEvent(authentication, this, domainUser, RemoveInfo.Empty, result);
                 });
+                await this.Logger.CompleteAsync(result);
                 return result;
             }
             catch (Exception e)
@@ -201,6 +205,7 @@ namespace Ntreev.Crema.Services.Domains
                     this.OnUserEditBegun(new DomainUserLocationEventArgs(authentication, this, domainUser));
                     this.Container?.InvokeDomainUserEditBegunEvent(authentication, this, domainUser, result);
                 });
+                await this.Logger.CompleteAsync(result);
                 return result;
             }
             catch (Exception e)
@@ -229,6 +234,7 @@ namespace Ntreev.Crema.Services.Domains
                     this.OnUserEditEnded(new DomainUserEventArgs(authentication, this, domainUser));
                     this.Container?.InvokeDomainUserEditEndedEvent(authentication, this, domainUser, result);
                 });
+                await this.Logger.CompleteAsync(result);
                 return result;
             }
             catch (Exception e)
@@ -263,6 +269,7 @@ namespace Ntreev.Crema.Services.Domains
                     this.OnRowAdded(new DomainRowEventArgs(authentication, this, result.Rows));
                     this.Container?.InvokeDomainRowAddedEvent(authentication, this, result.Rows, result.ID);
                 });
+                await this.Logger.CompleteAsync(result.ID);
                 return new DomainResultInfo<DomainRowInfo[]>() { ID = result.ID, Value = result.Rows };
             }
             catch (Exception e)
@@ -297,6 +304,7 @@ namespace Ntreev.Crema.Services.Domains
                     this.OnRowChanged(new DomainRowEventArgs(authentication, this, result.Rows));
                     this.Container?.InvokeDomainRowChangedEvent(authentication, this, result.Rows, result.ID);
                 });
+                await this.Logger.CompleteAsync(result.ID);
                 return new DomainResultInfo<DomainRowInfo[]>() { ID = result.ID, Value = result.Rows };
             }
             catch (Exception e)
@@ -331,6 +339,7 @@ namespace Ntreev.Crema.Services.Domains
                     this.OnRowRemoved(new DomainRowEventArgs(authentication, this, result.Rows));
                     this.Container?.InvokeDomainRowRemovedEvent(authentication, this, result.Rows, result.ID);
                 });
+                await this.Logger.CompleteAsync(result.ID);
                 return new DomainResultInfo<DomainRowInfo[]>() { ID = result.ID, Value = result.Rows };
             }
             catch (Exception e)
@@ -361,6 +370,7 @@ namespace Ntreev.Crema.Services.Domains
                     this.OnPropertyChanged(new DomainPropertyEventArgs(authentication, this, propertyName, value));
                     this.Container?.InvokeDomainPropertyChangedEvent(authentication, this, propertyName, value, result);
                 });
+                await this.Logger.CompleteAsync(result);
                 return result;
             }
             catch (Exception e)
@@ -407,11 +417,18 @@ namespace Ntreev.Crema.Services.Domains
                 var result = await this.InvokeKickAsync(authentication, domainUser, userID, comment);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    this.Users.Remove(userID);
+                    if (domainUser.Authentication != null)
+                    {
+                        domainUser.Authentication.Expired -= Authentication_Expired;
+                        domainUser.Authentication = null;
+                    }
                     this.CremaHost.Sign(authentication);
                     this.OnUserRemoved(new DomainUserRemovedEventArgs(authentication, this, domainUser, result.RemoveInfo));
                     this.Container?.InvokeDomainUserRemovedEvent(authentication, this, domainUser, result.RemoveInfo, result.ID);
                     return domainUser.DomainUserInfo;
                 });
+                await this.Logger.CompleteAsync(result.ID);
                 return result.ID;
             }
             catch (Exception e)
@@ -440,6 +457,7 @@ namespace Ntreev.Crema.Services.Domains
                     this.OnOwnerChanged(new DomainUserEventArgs(authentication, this, domainUser));
                     this.Container?.InvokeDomainOwnerChangedEvent(authentication, this, domainUser, result);
                 });
+                await this.Logger.CompleteAsync(result);
                 return result;
             }
             catch (Exception e)
@@ -461,13 +479,16 @@ namespace Ntreev.Crema.Services.Domains
                 Users = this.Users.Select<DomainUser, DomainUserMetaData>(item => item.GetMetaData(authentication)).ToArray(),
                 DomainState = base.DomainState,
                 ModifiedTables = this.modifiedTableList.ToArray(),
-                PostID = this.Logger.ID,
-                CompetionID = this.Logger.CompletionID,
             };
-            if (this.Users.ContainsKey(authentication.ID) == true || authentication.IsSystem == true)
+            this.DataDispatcher.Invoke(() =>
             {
-                metaData.Data = this.DataDispatcher.Invoke(() => this.SerializeSource(this.Source));
-            }
+                if (this.Users.ContainsKey(authentication.ID) == true || authentication.IsSystem == true)
+                {
+                    metaData.Data = this.SerializeSource(this.Source);
+                }
+                metaData.PostID = this.Logger.ID;
+                metaData.CompetionID = this.Logger.CompletionID;
+            });
             return metaData;
         }
 
@@ -1020,7 +1041,6 @@ namespace Ntreev.Crema.Services.Domains
             {
                 var id = this.Logger.BeginUserEdit(authentication, location);
                 this.OnBeginUserEdit(domainUser, location);
-                this.Logger.Complete(id);
                 return id;
             });
         }
@@ -1031,7 +1051,6 @@ namespace Ntreev.Crema.Services.Domains
             {
                 var id = this.Logger.EndUserEdit(authentication);
                 this.OnEndUserEdit(domainUser);
-                this.Logger.Complete(id);
                 return id;
             });
         }
@@ -1042,7 +1061,6 @@ namespace Ntreev.Crema.Services.Domains
             {
                 var id = this.Logger.NewRow(authentication, rows);
                 var resultRows = this.OnNewRow(domainUser, rows, authentication.GetSignatureDateProvider());
-                this.Logger.Complete(id);
                 return (id, resultRows);
             });
         }
@@ -1053,7 +1071,6 @@ namespace Ntreev.Crema.Services.Domains
             {
                 var id = this.Logger.SetRow(authentication, rows);
                 var resultRows = this.OnSetRow(domainUser, rows, authentication.GetSignatureDateProvider());
-                this.Logger.Complete(id);
                 return (id, resultRows);
             });
         }
@@ -1064,7 +1081,6 @@ namespace Ntreev.Crema.Services.Domains
             {
                 var id = this.Logger.RemoveRow(authentication, rows);
                 var resultRows = this.OnRemoveRow(domainUser, rows, authentication.GetSignatureDateProvider());
-                this.Logger.Complete(id);
                 return (id, resultRows);
             });
         }
@@ -1075,23 +1091,15 @@ namespace Ntreev.Crema.Services.Domains
             {
                 var id = this.Logger.SetProperty(authentication, propertyName, value);
                 this.OnSetProperty(domainUser, propertyName, value, authentication.GetSignatureDateProvider());
-                this.Logger.Complete(id);
                 return id;
             });
         }
 
         private Task<(long ID, RemoveInfo RemoveInfo)> InvokeKickAsync(Authentication authentication, DomainUser domainUser, string userID, string comment)
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            return this.DataDispatcher.InvokeAsync(() =>
             {
                 var id = this.Logger.Kick(authentication, userID, comment);
-                this.Users.Remove(userID);
-                if (domainUser.Authentication != null)
-                {
-                    domainUser.Authentication.Expired -= Authentication_Expired;
-                    domainUser.Authentication = null;
-                }
-                this.Logger.Complete(id);
                 return (id, new RemoveInfo(RemoveReason.Kick, comment));
             });
         }
@@ -1101,11 +1109,6 @@ namespace Ntreev.Crema.Services.Domains
             return await this.DataDispatcher.InvokeAsync(() =>
             {
                 var id = this.Logger.SetOwner(authentication, domainUser.ID);
-                //await this.Dispatcher.InvokeAsync(() =>
-                //{
-                //    this.Users.Owner = domainUser;
-                //});
-                this.Logger.Complete(id);
                 return id;
             });
         }
@@ -1133,14 +1136,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             return await this.DataDispatcher.InvokeAsync(() =>
             {
-                var id = this.Logger.Join(authentication, domainUser.DomainUserInfo.AccessType);
-                //await this.Dispatcher.InvokeAsync(() =>
-                //{
-                //    this.Users.Add(domainUser);
-                //    domainUser.Authentication = authentication;
-                //    authentication.Expired += Authentication_Expired;
-                //});
-                this.Logger.Complete(id);
+                var id  = this.Logger.Join(authentication, domainUser.DomainUserInfo.AccessType);
                 return (id, this.SerializeSource(this.Source));
             });
         }
@@ -1149,15 +1145,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             return await this.DataDispatcher.InvokeAsync(() =>
             {
-                var id = this.Logger.Disjoin(authentication, RemoveInfo.Empty);
-                //await this.Dispatcher.InvokeAsync(() =>
-                //{
-                //    domainUser.Authentication = null;
-                //    authentication.Expired -= Authentication_Expired;
-                //    this.Users.Remove(domainUser.ID);
-                //});
-                this.Logger.Complete(id);
-                return id;
+                return this.Logger.Disjoin(authentication, RemoveInfo.Empty);
             });
         }
 

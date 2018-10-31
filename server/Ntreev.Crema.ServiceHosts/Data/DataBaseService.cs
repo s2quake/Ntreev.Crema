@@ -41,7 +41,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         private string dataBaseName;
 
         public DataBaseService(ICremaHost cremaHost)
-            : base(cremaHost.GetService(typeof(ILogService)) as ILogService)
+            : base(cremaHost)
         {
             this.CremaHost = cremaHost;
             this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;

@@ -16,9 +16,11 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data.Properties;
+using Ntreev.Crema.Data.Xml;
 using Ntreev.Library;
 using Ntreev.Library.Serialization;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
@@ -228,6 +230,8 @@ namespace Ntreev.Crema.Data
             get => (CremaDataTable)this.InternalObject.TargetTable;
             internal set => this.InternalObject.TargetTable = (InternalDataTable)value;
         }
+
+        public CremaDataSet DataSet => this.TargetTable?.DataSet;
 
         public bool IsModified { get; private set; }
 
@@ -460,26 +464,57 @@ namespace Ntreev.Crema.Data
         {
             var dataSet = new CremaDataSet();
 
-            var name = reader.GetAttribute("Name");
-            var categoryPath = reader.GetAttribute(nameof(CategoryPath));
-            var baseNamespace = reader.GetAttribute("BaseNamespace");
+            var name = reader.GetAttribute(nameof(this.TargetTable.Name));
+            var categoryPath = reader.GetAttribute(nameof(this.TargetTable.CategoryPath));
 
-            dataSet.Namespace = baseNamespace;
+           
 
             reader.ReadStartElement();
             reader.MoveToContent();
-            this.InternalObject.TargetTable = null;
-            this.InternalObject.OmitSignatureDate = true;
-            this.InternalObject.ReadXml(reader);
-            this.InternalObject.OmitSignatureDate = false;
-            reader.MoveToContent();
+
             dataSet.ReadXmlSchema(reader);
             reader.MoveToContent();
             dataSet.ReadXml(reader);
             reader.MoveToContent();
-            this.InternalObject.InternalTypes = XmlSerializerUtility.Read<string[]>(reader);
+
+            reader.ReadStartElement(nameof(this.Columns));
             reader.MoveToContent();
+
+            this.InternalObject.OmitSignatureDate = true;
+            while (reader.NodeType == XmlNodeType.Element)
+            {
+                var column = this.NewColumn();
+                this.ReadAttribute(reader, column);
+                this.Read(reader, column);
+                this.Columns.Add(column);
+            }
             reader.ReadEndElement();
+            reader.MoveToContent();
+
+            //reader.ReadStartElement(nameof(this.Types));
+            //reader.MoveToContent();
+            //var typeList = new List<string>();
+            //while (reader.NodeType == XmlNodeType.Element)
+            //{
+            //    reader.ReadStartElement("Item");
+            //    reader.MoveToContent();
+            //     var value = reader.ReadContentAsString();
+            //    typeList.Add(value);
+            //    reader.MoveToContent();
+            //    reader.ReadEndElement();
+            //    reader.MoveToContent();
+            //}
+            //reader.ReadEndElement();
+            //reader.MoveToContent();
+
+            //this.InternalObject.TargetTable = null;
+            //this.InternalObject.ReadXml(reader);
+            this.InternalObject.OmitSignatureDate = false;
+            //reader.MoveToContent();
+            
+            //this.InternalObject.InternalTypes = XmlSerializerUtility.Read<string[]>(reader);
+            //reader.MoveToContent();
+            //reader.ReadEndElement();
 
             this.InternalObject.InternalTargetTable = (InternalDataTable)dataSet.Tables[name, categoryPath];
 
@@ -494,15 +529,118 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        void IXmlSerializable.WriteXml(XmlWriter writer)
+        private void ReadAttribute(XmlReader reader, CremaTemplateColumn column)
         {
-            writer.WriteAttributeString("Name", this.TargetTable.Name);
-            writer.WriteAttributeString("CategoryPath", this.TargetTable.CategoryPath);
-            writer.WriteAttributeString("BaseNamespace", this.TargetTable.DataSet.Namespace);
-            this.InternalObject.WriteXml(writer, XmlWriteMode.DiffGram);
-            this.TargetTable.DataSet.WriteXmlSchema(writer);
-            this.TargetTable.DataSet.WriteXml(writer);
-            XmlSerializerUtility.Write(writer, this.Types);
+            for (var i = 0; i < reader.AttributeCount; i++)
+            {
+                reader.MoveToAttribute(i);
+                var attribute = this.Attributes[reader.Name].InternalAttribute;
+                var value = CremaXmlConvert.ToValue(reader.Value, attribute.DataType);
+                column.InternalObject[attribute] = value;
+            }
+            reader.MoveToContent();
+        }
+
+        private void Read(XmlReader reader, CremaTemplateColumn column)
+        {
+            reader.ReadStartElement("Item");
+            reader.MoveToContent();
+            while (reader.NodeType == XmlNodeType.Element)
+            {
+                
+                var dataColumn = this.InternalObject.Columns[reader.Name];
+                reader.ReadStartElement();
+                reader.MoveToContent();
+                var value = CremaXmlConvert.ToValue(reader.ReadContentAsString(), dataColumn.DataType);
+                reader.MoveToContent();
+                reader.ReadEndElement();
+                column.InternalObject[dataColumn] = value;
+                reader.MoveToContent();
+            }
+            reader.ReadEndElement();
+            reader.MoveToContent();
+        }
+
+        private void Read(CremaTemplateColumn column, DataColumn dataColumn, string textValue)
+        {
+            var value = CremaXmlConvert.ToValue(textValue, dataColumn.DataType);
+            column.InternalObject[dataColumn] = value;
+        }
+
+            void IXmlSerializable.WriteXml(XmlWriter writer)
+        {
+            writer.WriteAttributeString(nameof(this.TargetTable.Name), this.TargetTable.Name);
+            writer.WriteAttributeString(nameof(this.TargetTable.CategoryPath), this.TargetTable.CategoryPath);
+
+            this.DataSet.WriteXmlSchema(writer);
+            this.DataSet.WriteXml(writer);
+
+            var columns = this.Columns.OrderBy(item => item.Index);
+            writer.WriteStartElement(nameof(this.Columns));
+            foreach (var item in columns)
+            {
+                writer.WriteStartElement("Item");
+                foreach (var attr in this.Attributes)
+                {
+                    if (attr.IsVisible == false)
+                        continue;
+                    this.WriteAttribute(writer, item.InternalObject, attr.InternalAttribute);
+                }
+                this.WriteField(writer, item.InternalObject, this.InternalObject.columnIsKey);
+                this.WriteField(writer, item.InternalObject, this.InternalObject.columnColumnName);
+                this.WriteField(writer, item.InternalObject, this.InternalObject.columnDataType);
+                this.WriteField(writer, item.InternalObject, this.InternalObject.columnComment);
+                this.WriteField(writer, item.InternalObject, this.InternalObject.columnDefaultValue);
+                this.WriteField(writer, item.InternalObject, this.InternalObject.columnAllowNull);
+                this.WriteField(writer, item.InternalObject, this.InternalObject.columnReadOnly);
+                this.WriteField(writer, item.InternalObject, this.InternalObject.columnIsUnique);
+                writer.WriteEndElement();
+            }
+            writer.WriteEndElement();
+
+            //writer.WriteStartElement(nameof(this.Types));
+            //foreach (var item in this.Types)
+            //{
+            //    writer.WriteElementString("Item", item);
+            //}
+            //writer.WriteEndElement();
+            
+        }
+
+        private void WriteAttribute(XmlWriter writer, InternalRowBase dataRow, InternalAttribute dataColumn)
+        {
+            var field = dataRow[dataColumn];
+
+            if (field == DBNull.Value || object.Equals(field, dataColumn.DefaultValue) == true)
+                return;
+
+            var textValue = CremaXmlConvert.ToString(field, dataColumn.DataType);
+
+            if (string.IsNullOrEmpty(textValue) == false)
+            {
+                writer.WriteStartAttribute(dataColumn.AttributeName);
+                writer.WriteValue(textValue);
+                writer.WriteEndAttribute();
+            }
+        }
+
+        private void WriteField(XmlWriter writer, InternalTemplateColumn dataRow, DataColumn dataColumn)
+        {
+            var dataType = dataColumn.DataType;
+            var value = dataRow[dataColumn];
+
+            if (value == DBNull.Value)
+                return;
+
+            var converter = TypeDescriptor.GetConverter(dataColumn.DataType);
+            var textValue = CremaXmlConvert.ToString(value, dataType);
+
+            if (object.Equals(value, dataColumn.DefaultValue) == false)
+            {
+                writer.WriteStartElement(dataColumn.ColumnName);
+                writer.WriteValue(textValue);
+                writer.WriteEndElement();
+            }
         }
 
         #endregion
