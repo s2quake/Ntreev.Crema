@@ -110,6 +110,7 @@ namespace Ntreev.Crema.Services
             }
         }
 
+        // bootstrap가 여러개 생기고 닫힐때 CremaLog.Release(); 에서 예외 발생
         public void Dispose()
         {
             this.container.Dispose();

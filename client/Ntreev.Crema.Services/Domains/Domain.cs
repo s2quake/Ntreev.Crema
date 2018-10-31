@@ -512,7 +512,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             //this.Dispatcher.Invoke(() =>
             //{
-            var path = System.IO.Path.Combine(@"E:\Crema\repo\debug", this.CremaHost.UserID, "ClientDomainLog.txt");
+            var path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "debug", this.CremaHost.UserID, "ClientDomainLog.txt");
             Ntreev.Library.IO.FileUtility.Prepare(path);
             System.IO.File.AppendAllText(path, $"{id}\t{DateTime.Now}\t{name}{Environment.NewLine}");
             //});

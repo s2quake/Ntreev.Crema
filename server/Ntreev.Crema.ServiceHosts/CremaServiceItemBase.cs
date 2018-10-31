@@ -87,7 +87,7 @@ namespace Ntreev.Crema.ServiceHosts
                 {
                     if (userID != null)
                     {
-                        var path = System.IO.Path.Combine(@"E:\Crema\repo\debug", userID, "ServerServiceLog.txt");
+                        var path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "debug", userID, "ServerServiceLog.txt");
                         FileUtility.Prepare(path);
                         File.AppendAllText(path, $"{id}\t{name}{Environment.NewLine}");
                     }

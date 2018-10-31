@@ -572,7 +572,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             lock (logobj)
             {
-                var path = System.IO.Path.Combine(@"E:\Crema\repo\debug", this.CremaHost.UserID, "ClientServiceLog.txt");
+                var path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "debug", this.CremaHost.UserID, "ClientServiceLog.txt");
                 FileUtility.Prepare(path);
                 File.AppendAllText(path, $"{id}\t{DateTime.Now}\t{name}{Environment.NewLine}");
             }
