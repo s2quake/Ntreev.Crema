@@ -237,9 +237,9 @@ namespace Ntreev.Crema.Services.Domains
             return id;
         }
 
-        public void Complete(long id)
+        public void Complete(long id, Domain domain)
         {
-            this.Dispatcher.VerifyAccess();
+            domain.Dispatcher.VerifyAccess();
             if (this.IsEnabled == false)
                 return;
 
@@ -248,10 +248,10 @@ namespace Ntreev.Crema.Services.Domains
             this.CompletionID = id;
         }
 
-        public Task CompleteAsync(long id)
-        {
-            return this.Dispatcher.InvokeAsync(() => this.Complete(id));
-        }
+        //public Task CompleteAsync(long id)
+        //{
+        //    return this.Dispatcher.InvokeAsync(() => this.Complete(id));
+        //}
 
         public long ID { get; set; }
 

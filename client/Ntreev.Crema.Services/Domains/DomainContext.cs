@@ -190,6 +190,11 @@ namespace Ntreev.Crema.Services.Domains
                 this.service.Unsubscribe();
             this.timer?.Dispose();
             this.timer = null;
+            await Task.Delay(100);
+            if (closeInfo.Reason != CloseReason.Faulted)
+                this.service.Close();
+            else
+                this.service.Abort();
             var tasks = await this.Dispatcher.InvokeAsync(() =>
             {
                 var taskList = new List<Task>(this.Domains.Count);
@@ -203,13 +208,8 @@ namespace Ntreev.Crema.Services.Domains
                 return taskList.ToArray();
             });
             await Task.WhenAll(tasks);
-            if (closeInfo.Reason != CloseReason.Faulted)
-                this.service.Close();
-            else
-                this.service.Abort();
-            await Task.Delay(100);
-            await this.callbackEvent.DisposeAsync();
             await this.Dispatcher.DisposeAsync();
+            await this.callbackEvent.DisposeAsync();
             this.service = null;
             this.Dispatcher = null;
         }
