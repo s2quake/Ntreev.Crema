@@ -20,6 +20,7 @@ using Ntreev.Crema.Services.Properties;
 using Ntreev.Crema.Services.Users.Serializations;
 using Ntreev.Library;
 using Ntreev.Library.Linq;
+using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -54,16 +55,19 @@ namespace Ntreev.Crema.Services.Users
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldCategoryPaths = items.Select(item => item.Category.Path).ToArray();
-                    var userInfo = this.SerializationInfo;
-                    return (items, oldPaths, oldCategoryPaths, userInfo);
+                    var userInfo = this.UserInfo;
+                    var targetName = new ItemName(categoryPath, base.Name);
+                    return (items, oldPaths, oldCategoryPaths, userInfo, targetName);
                 });
-                var signatureDate = await this.Container.InvokeUserMoveAsync(authentication, tuple.userInfo, categoryPath);
+                var dataSet = this.ReadDataForPathAsync(authentication, tuple.targetName);
+                await this.Container.InvokeUserMoveAsync(authentication, tuple.userInfo, categoryPath);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, signatureDate);
                     base.Move(authentication, categoryPath);
                     this.Container.InvokeUsersMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths);
                 });
+                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
             }
             catch (Exception e)
             {
@@ -314,6 +318,33 @@ namespace Ntreev.Crema.Services.Users
             return UserContext.SecureStringToString(this.Password) == UserContext.SecureStringToString(password).Encrypt();
         }
 
+        public async Task<UserDataSet> ReadDataForPathAsync(Authentication authentication, ItemName targetName)
+        {
+            var tuple = await this.Dispatcher.InvokeAsync(() =>
+            {
+                var itemPaths = new string[]
+                {
+                    this.Context.GenerateCategoryPath(targetName.CategoryPath),
+                    this.Context.GeneratePath(targetName),
+                    this.ItemPath
+                };
+                var itemPath = this.ItemPath;
+                return (itemPaths, itemPath);
+            });
+            return await this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                this.Repository.Lock(tuple.itemPaths);
+                var userInfo = (UserSerializationInfo)this.Serializer.Deserialize(tuple.itemPath, typeof(UserSerializationInfo), ObjectSerializerSettings.Empty);
+                var dataSet = new UserDataSet()
+                {
+                    ItemPaths = tuple.itemPaths,
+                    Infos = new UserSerializationInfo[] { userInfo },
+                    SignatureDateProvider = new SignatureDateProvider(authentication.ID),
+                };
+                return dataSet;
+            });
+        }
+
         public Authentication Authentication { get; set; }
 
         public string ID => base.Name;
@@ -348,6 +379,10 @@ namespace Ntreev.Crema.Services.Users
         public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
 
         public CremaHost CremaHost => this.Context.CremaHost;
+
+        public UserRepositoryHost Repository => this.Context.Repository;
+
+        public IObjectSerializer Serializer => this.Context.Serializer;
 
         public string ItemPath => this.Context.GenerateUserPath(this.Category.Path, base.Name);
 

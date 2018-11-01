@@ -34,7 +34,6 @@ namespace Ntreev.Crema.Services.Data
     class DataBaseSet
     {
         private readonly DataBase dataBase;
-        private readonly CremaDataSet dataSet;
         private readonly List<CremaDataType> types = new List<CremaDataType>();
         private readonly List<CremaDataTable> tables = new List<CremaDataTable>();
         private readonly List<string> itemPathList;
@@ -42,7 +41,7 @@ namespace Ntreev.Crema.Services.Data
         private DataBaseSet(DataBase dataBase, CremaDataSet dataSet, bool typeCreation, bool tableCreation)
         {
             this.dataBase = dataBase ?? throw new ArgumentNullException(nameof(dataBase));
-            this.dataSet = dataSet ?? throw new ArgumentNullException(nameof(dataSet));
+            this.DataSet = dataSet ?? throw new ArgumentNullException(nameof(dataSet));
             this.dataBase.Dispatcher.VerifyAccess();
             this.itemPathList = new List<string>(dataSet.Types.Count + dataSet.Tables.Count);
 
@@ -98,7 +97,7 @@ namespace Ntreev.Crema.Services.Data
             if (Directory.Exists(itemPath2) == true)
                 throw new IOException();
 
-            var typeNames = dataSet.ExtendedProperties["TypeNames"] as string[];
+            var typeNames = DataSet.ExtendedProperties["TypeNames"] as string[];
             var typeNameList = typeNames.ToList();
             var files = DirectoryUtility.GetAllFiles(itemPath1, "*.xsd");
             var sss = files.Select(item => Path.GetFileNameWithoutExtension(item)).ToList();
@@ -199,7 +198,7 @@ namespace Ntreev.Crema.Services.Data
             if (Directory.Exists(itemPath2) == true)
                 throw new IOException();
 
-            var tableNames = dataSet.ExtendedProperties["TableNames"] as string[];
+            var tableNames = DataSet.ExtendedProperties["TableNames"] as string[];
             var tableNameList = tableNames.ToList();
             var files = DirectoryUtility.GetAllFiles(itemPath1, "*.xml");
             var sss = files.Select(item => Path.GetFileNameWithoutExtension(item)).ToList();
@@ -250,10 +249,8 @@ namespace Ntreev.Crema.Services.Data
         {
             this.Serialize();
             this.AddTablesRepositoryPath();
-
-
+            
             var status = this.Repository.Status();
-
             var typesDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);
             foreach (var item in status)
             {
@@ -301,7 +298,6 @@ namespace Ntreev.Crema.Services.Data
             this.Serialize();
 
             var status = this.Repository.Status();
-
             var typesDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);
             foreach (var item in status)
             {
@@ -317,8 +313,6 @@ namespace Ntreev.Crema.Services.Data
             var dataBaseSet = new DataBaseSet(dataBase, dataSet, false, false);
             dataBaseSet.Serialize();
         }
-
-        public IEnumerable<CremaDataType> Types => this.types;
 
         public DataBaseItemState GetTypeState(CremaDataType dataType)
         {
@@ -347,9 +341,11 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public CremaDataSet DataSet => this.dataSet;
+        public IEnumerable<CremaDataType> Types => this.types;
 
-        public string[] ItemPaths => this.dataSet.GetItemPaths();
+        public CremaDataSet DataSet { get; }
+
+        public string[] ItemPaths => this.DataSet.GetItemPaths();
 
         private void Serialize()
         {
@@ -412,22 +408,7 @@ namespace Ntreev.Crema.Services.Data
                     {
                         parentItemPath = this.TableContext.GeneratePath(parentInfo.Path);
                     }
-                    //var parentInfo = item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] is TableInfo info ? info : TableInfo.Empty;
-
-                    //var tablePath = tableInfo.CategoryPath + tableInfo.Name;
-                    //var itemPath = this.TableContext.GeneratePath(tablePath);
-                    //if (item.ExtendedProperties.ContainsKey(nameof(TableInfo.TemplatedParent)) == true && item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] != null)
-                    //{
-                    //    var templateInfo = (TableInfo)item.ExtendedProperties[nameof(TableInfo.TemplatedParent)];
-                    //    var templatedItemPath = this.TableContext.GeneratePath(templateInfo.CategoryPath + templateInfo.Name);
-                    //}
-                    //else
-                    //{
-
-                    //}
-
-
-
+                    
                     var props = new CremaDataTableSerializerSettings(itemPath2, parentItemPath);
                     this.Serializer.Serialize(itemPath2, item, props);
                 }

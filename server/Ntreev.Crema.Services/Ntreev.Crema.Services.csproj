@@ -165,6 +165,7 @@
     <Compile Include="Users\Serializations\UserCategorySerializationInfoList.cs" />
     <Compile Include="Users\Serializations\UserContextSerializationInfo.cs" />
     <Compile Include="Users\Serializations\UserSerializationInfo.cs" />
+    <Compile Include="Users\UserDataSet.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Users\UserAuthenticationProvider.cs" />
     <Compile Include="Users\UserCategory.cs" />

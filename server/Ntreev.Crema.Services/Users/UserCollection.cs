@@ -113,25 +113,20 @@ namespace Ntreev.Crema.Services.Users
             });
         }
 
-        public Task<SignatureDate> InvokeUserMoveAsync(Authentication authentication, UserSerializationInfo userInfo, string categoryPath)
+        public Task InvokeUserMoveAsync(Authentication authentication, UserInfo userInfo, string newCategoryPath, UserDataSet dataSet)
         {
-            var message = EventMessageBuilder.MoveUser(authentication, userInfo.ID, userInfo.Name, userInfo.CategoryPath, categoryPath);
-            var itemPath = this.Context.GeneratePath(userInfo.Path);
-            var categoryItemPath = this.Context.GenerateCategoryPath(categoryPath);
+            var message = EventMessageBuilder.MoveUser(authentication, userInfo.ID, userInfo.Name, userInfo.CategoryPath, newCategoryPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
-                    userInfo.CategoryPath = categoryPath;
-                    userInfo.ModificationInfo = signatureDate;
-                    this.Repository.MoveUser(signatureDate, itemPath, userInfo, categoryItemPath);
+                    this.Repository.MoveUser(dataSet, userInfo.Path, newCategoryPath);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
+                    this.Repository.Unlock(dataSet.ItemPaths);
                     throw;
                 }
             });
