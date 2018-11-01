@@ -73,66 +73,51 @@ namespace Ntreev.Crema.Services.Data
         public override IPermission Permission { get; }
 
         public override IDispatcherObject DispatcherObject { get; }
-		
-		public IDataBaseService Service { get; }
+
+        public IDataBaseService Service { get; }
 
         protected override async Task OnBeginEditAsync(Authentication authentication)
         {
             await base.OnBeginEditAsync(authentication);
         }
 
-        protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, object args)
+        protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            var tableInfos = await base.OnEndEditAsync(authentication, args);
+            var domain = this.Domain;
+            await base.OnEndEditAsync(authentication);
+            var tableInfos = domain.Result as TableInfo[];
             if (this.parent is TableCategory category)
             {
                 var tables = category.GetService(typeof(TableCollection)) as TableCollection;
-                if (args is Guid)
-                {
-                    this.tables = await tables.AddNewAsync(authentication, tableInfos);
-                }
+                this.tables = await tables.AddNewAsync(authentication, tableInfos);
             }
             else if (this.parent is Table table)
             {
                 var tables = table.GetService(typeof(TableCollection)) as TableCollection;
-                if (args is Guid)
-                {
-                    this.tables = await tables.AddNewAsync(authentication, tableInfos);
-                }
+                this.tables = await tables.AddNewAsync(authentication, tableInfos);
             }
             this.parent = null;
-            return tableInfos;
         }
 
-        protected override async Task OnCancelEditAsync(Authentication authentication, object args)
+        protected override async Task OnCancelEditAsync(Authentication authentication)
         {
-            await base.OnCancelEditAsync(authentication, args);
+            await base.OnCancelEditAsync(authentication);
             this.parent = null;
         }
 
-        protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
+        protected override Task<ResultBase<DomainMetaData>> OnBeginDomainAsync(Authentication authentication)
         {
             return this.CremaHost.InvokeServiceAsync(() => this.Service.BeginNewTable(this.ItemPath));
         }
 
-        protected override async Task<TableInfo[]> EndDomainAsync(Authentication authentication, object args)
+        protected override async Task<ResultBase<TableInfo[]>> OnEndDomainAsync(Authentication authentication)
         {
-            if (args is Guid domainID)
-            {
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTableTemplateEdit(domainID));
-                var value = result.Value;
-                return value;
-            }
-            return args as TableInfo[];
+            return await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTableTemplateEdit(this.Domain.ID));
         }
 
-        protected override async Task<ResultBase> CancelDomainAsync(Authentication authentication, object args)
+        protected override async Task<ResultBase> OnCancelDomainAsync(Authentication authentication)
         {
-            if (args is Guid domainID)
-            {
-                return await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTableTemplateEdit(domainID));
-            }
-            return new ResultBase() { SignatureDate = authentication.SignatureDate };
+            return await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTableTemplateEdit(this.Domain.ID));
         }
     }
 }

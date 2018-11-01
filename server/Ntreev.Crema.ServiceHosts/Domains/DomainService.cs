@@ -300,7 +300,8 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             try
             {
                 var domain = await this.GetDomainAsync(domainID);
-                result.Value = await domain.DeleteAsync(this.authentication, force);
+                result.ID = await (Task<long>)domain.DeleteAsync(this.authentication, force);
+                result.Value = domain.Result;
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -439,7 +440,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var domainIDs = e.DomainInfos.Select(item => item.DomainID).ToArray();
             var isCanceleds = e.IsCanceleds;
             var results = e.Results;

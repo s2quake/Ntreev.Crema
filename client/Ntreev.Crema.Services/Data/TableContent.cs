@@ -104,115 +104,27 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task EndEditAsync(Authentication authentication)
+        public Task EndEditAsync(Authentication authentication)
         {
-            try
-            {
-                this.ValidateExpired();
-                var name = await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync), this.Table);
-                    return this.Table.Name;
-                });
-                try
-                {
-                    this.Domain.Host = null;
-                    await this.domainHost.EndContentAsync(authentication, name);
-                }
-                catch
-                {
-                    this.Domain.Host = this.domainHost;
-                    throw;
-                }
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.domainHost.InvokeEditEndedEvent(EventArgs.Empty);
-                    this.domainHost = null;
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domainHost.EndEditAsync(authentication);
         }
 
-        public async Task CancelEditAsync(Authentication authentication)
+        public Task CancelEditAsync(Authentication authentication)
         {
-            try
-            {
-                this.ValidateExpired();
-                var name = await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync), this.Table);
-                    return this.Table.Name;
-                });
-                try
-                {
-                    this.Domain.Host = null;
-                    await this.domainHost.CancelContentAsync(authentication, name);
-                }
-                catch
-                {
-                    this.Domain.Host = this.domainHost;
-                    throw;
-                }
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    //this.CremaHost.Sign(authentication, result);
-                    this.domainHost.InvokeEditCanceledEvent(EventArgs.Empty);
-                    this.domainHost = null;
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domainHost.CancelEditAsync(authentication);
         }
 
-        public async Task EnterEditAsync(Authentication authentication)
+        public Task EnterEditAsync(Authentication authentication)
         {
-            try
-            {
-                this.ValidateExpired();
-                var name = await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(EnterEditAsync), this.Table);
-                    return this.Table.Name;
-                });
-                await this.domainHost.EnterContentAsync(authentication, name);
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domainHost.EnterEditAsync(authentication);
         }
 
-        public async Task LeaveEditAsync(Authentication authentication)
+        public Task LeaveEditAsync(Authentication authentication)
         {
-            try
-            {
-                this.ValidateExpired();
-                var name = await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(LeaveEditAsync), this.Table);
-                    return this.Table.Name;
-                });
-                await this.domainHost.LeaveContentAsync(authentication, name);
-                //    var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.LeaveTableContentEdit(this.Table.Name));
-                //    this.CremaHost.Sign(authentication, result);
-                //    this.domain.Dispatcher.Invoke(() => this.domain.Release(authentication, result.Value));
-                //    this.domainHost.LeaveContent(authentication);
-                //});
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domainHost.LeaveEditAsync(authentication);
         }
+
+        
 
         public async Task ClearAsync(Authentication authentication)
         {

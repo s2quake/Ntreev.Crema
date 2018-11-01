@@ -34,7 +34,7 @@ namespace Ntreev.Crema.Services.Users
         private readonly UserContext userContext;
 
         public UserRepositoryHost(UserContext userContext, IRepository repository)
-            : base(repository, null)
+            : base(repository)
         {
             this.userContext = userContext;
         }
@@ -141,6 +141,8 @@ namespace Ntreev.Crema.Services.Users
                 throw new FileNotFoundException();
             this.Serializer.Serialize(itemPath, serializationInfo, ObjectSerializerSettings.Empty);
         }
+
+        public override CremaHost CremaHost => this.userContext.CremaHost;
 
         private void MoveRepositoryPath(UserSerializationInfo userSerializationInfo, string itemPath)
         {

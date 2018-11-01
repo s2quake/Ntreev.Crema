@@ -44,7 +44,7 @@ namespace Ntreev.Crema.Data.Test
             var dataSet = CremaDataSetExtensions.CreateRandomSet();
             this.template = new CremaTemplate(dataSet.Tables.Random(item => item.TemplateNamespace == string.Empty));
             this.column = this.template.Columns.Random();
-            this.targetColumn = this.template.TargetTable.Columns[this.column.Name];
+            this.targetColumn = this.template.DataTable.Columns[this.column.Name];
         }
 
         [TestMethod]

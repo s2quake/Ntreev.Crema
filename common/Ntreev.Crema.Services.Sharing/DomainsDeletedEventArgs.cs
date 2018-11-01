@@ -27,17 +27,23 @@ namespace Ntreev.Crema.Services
 {
     public class DomainsDeletedEventArgs : DomainsEventArgs
     {
-        public DomainsDeletedEventArgs(Authentication authentication, IDomain[] domains, bool[] isCanceleds, object[] results)
+        public DomainsDeletedEventArgs(Authentication authentication, IDomain[] domains, bool[] isCanceleds)
             : base(authentication, domains)
         {
             this.IsCanceleds = isCanceleds;
-            this.Results = results;
+            this.Results = new object[domains.Length];
+            for (var i = 0; i < domains.Length; i++)
+            {
+                this.Results[i] = isCanceleds[i] == true ? null : domains[i].Result;
+            }
             this.Authentication = authentication;
         }
 
         public bool[] IsCanceleds { get; }
 
         public object[] Results { get; }
+
+        public long TaskID { get; internal set; }
 
         internal Authentication Authentication { get; }
     }

@@ -21,17 +21,21 @@ using Ntreev.Library;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
-    class RepositoryHost
+    abstract class RepositoryHost
     {
-        public RepositoryHost(IRepository repository, CremaDispatcher dispatcher)
+        private readonly HashSet<string> itemPaths = new HashSet<string>();
+
+        public RepositoryHost(IRepository repository)
         {
             this.Repository = repository;
-            this.Dispatcher = dispatcher ?? new CremaDispatcher(this);
+            this.Dispatcher = new CremaDispatcher(this);
             this.RepositoryPath = repository.BasePath;
         }
 
@@ -112,6 +116,7 @@ namespace Ntreev.Crema.Services
         {
             this.Dispatcher.VerifyAccess();
             this.Repository.CancelTransaction();
+            this.itemPaths.Clear();
         }
 
         public Uri GetUri(string path, string revision)
@@ -166,11 +171,83 @@ namespace Ntreev.Crema.Services
                 this.Dispatcher.Dispose();
         }
 
+        public void Lock(params string[] itemPaths)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (itemPaths.Distinct().Count() != itemPaths.Length)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+            foreach (var item in itemPaths)
+            {
+                if (this.itemPaths.Contains(item) == true)
+                    throw new ItemAlreadyExistsException(item);
+            }
+            foreach (var item in itemPaths)
+            {
+                this.itemPaths.Add(item);
+            }
+
+            this.CremaHost.Debug($"Lock{Environment.NewLine}{string.Join(Environment.NewLine, itemPaths)}");
+        }
+
+        public void Unlock(params string[] itemPaths)
+        {
+            this.Dispatcher.VerifyAccess();
+            if (itemPaths.Distinct().Count() != itemPaths.Length)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
+            foreach (var item in itemPaths)
+            {
+                if (this.itemPaths.Contains(item) == false)
+                {
+                    System.Diagnostics.Debugger.Break();
+                    throw new ItemNotFoundException(item);
+                }
+            }
+            foreach (var item in itemPaths)
+            {
+                this.itemPaths.Remove(item);
+            }
+            this.CremaHost.Debug($"Unlock{Environment.NewLine}{string.Join(Environment.NewLine, itemPaths)}");
+        }
+
+        public Task LockAsync(params string[] itemPaths)
+        {
+            return this.Dispatcher.InvokeAsync(() => this.Lock(itemPaths));
+        }
+
+        public Task UnlockAsync(params string[] itemPaths)
+        {
+            return this.Dispatcher.InvokeAsync(() => this.Unlock(itemPaths));
+        }
+
+        public Task BeginTransactionAsync(string author, string name)
+        {
+            return this.Dispatcher.InvokeAsync(() =>
+            {
+                this.BeginTransaction(author, name);
+            });
+        }
+
+        public Task EndTransactionAsync()
+        {
+            return this.Dispatcher.InvokeAsync(this.EndTransaction);
+        }
+
+        public Task CancelTransactionAsync()
+        {
+            return this.Dispatcher.InvokeAsync(this.CancelTransaction);
+        }
+
         public RepositoryInfo RepositoryInfo => this.Repository.RepositoryInfo;
 
-        public event EventHandler Changed;
-
         public CremaDispatcher Dispatcher { get; }
+
+        public abstract CremaHost CremaHost { get; }
+
+        public event EventHandler Changed;
 
         protected IRepository Repository { get; }
 

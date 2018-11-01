@@ -113,125 +113,24 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task EndEditAsync(Authentication authentication)
+        public Task EndEditAsync(Authentication authentication)
         {
-            try
-            {
-                this.ValidateExpired();
-                var name = await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync), this.Table);
-                    this.ValidateEndEdit(authentication);
-                    this.domainHost.SetServiceState(ServiceState.Closing);
-                    return this.Table.Name;
-                });
-                try
-                {
-                    await this.domainHost.EndContentAsync(authentication, null);
-                }
-                catch
-                {
-                    this.domainHost.SetServiceState(ServiceState.Opened);
-                    throw;
-                }
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.Sign(authentication);
-                    this.domainHost.SetServiceState(ServiceState.Closed);
-                    this.domainHost.InvokeEditEndedEvent(EventArgs.Empty);
-                    this.domainHost.Release();
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domainHost.EndEditAsync(authentication);
         }
 
-        public async Task CancelEditAsync(Authentication authentication)
+        public Task CancelEditAsync(Authentication authentication)
         {
-            try
-            {
-                this.ValidateExpired();
-                var name = await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync), this.Table);
-                    this.ValidateCancelEdit(authentication);
-                    this.domainHost.SetServiceState(ServiceState.Closing);
-                    return this.Table.Name;
-                });
-                try
-                {
-                    await this.domainHost.CancelContentAsync(authentication);
-                }
-                catch
-                {
-                    this.domainHost.SetServiceState(ServiceState.Opened);
-                    throw;
-                }
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.Sign(authentication);
-                    this.domainHost.SetServiceState(ServiceState.Closed);
-                    this.domainHost.InvokeEditCanceledEvent(EventArgs.Empty);
-                    this.domainHost.Release();
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domainHost.CancelEditAsync(authentication);
         }
 
-        public async Task EnterEditAsync(Authentication authentication)
+        public Task EnterEditAsync(Authentication authentication)
         {
-            try
-            {
-                this.ValidateExpired();
-                var accessType = await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(EnterEditAsync), this.Table);
-                    this.ValidateEnter(authentication);
-                    return this.GetAccessType(authentication);
-                });
-                await this.Domain.EnterAsync(authentication, accessType);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.Sign(authentication);
-                    this.domainHost.EnterContent(authentication);
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domainHost.EnterEditAsync(authentication);
         }
 
-        public async Task LeaveEditAsync(Authentication authentication)
+        public Task LeaveEditAsync(Authentication authentication)
         {
-            try
-            {
-                this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(LeaveEditAsync), this.Table);
-                    this.ValidateLeave(authentication);
-                });
-                await this.Domain.LeaveAsync(authentication);
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.Sign(authentication);
-                    this.domainHost.LeaveContent(authentication);
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
+            return this.domainHost.LeaveEditAsync(authentication);
         }
 
         public async Task ClearAsync(Authentication authentication)
@@ -305,54 +204,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void ValidateEndEdit(Authentication authentication)
-        {
-            var isAdmin = authentication.Types.HasFlag(AuthenticationType.Administrator);
-            foreach (var item in this.Relations)
-            {
-                item.OnValidateEndEdit(authentication, this);
-            }
-            this.Domain.Dispatcher?.Invoke(() =>
-            {
-                var isOwner = this.Domain.Users.OwnerUserID == authentication.ID;
-                if (isAdmin == false && isOwner == false)
-                    throw new NotImplementedException();
-            });
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void ValidateEnter(Authentication authentication)
-        {
-            foreach (var item in this.Relations)
-            {
-                item.OnValidateEnter(authentication, this);
-            }
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void ValidateLeave(Authentication authentication)
-        {
-            foreach (var item in this.Relations)
-            {
-                item.OnValidateLeave(authentication, this);
-            }
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public void ValidateCancelEdit(Authentication authentication)
-        {
-            var isAdmin = authentication.Types.HasFlag(AuthenticationType.Administrator);
-            foreach (var item in this.Relations)
-            {
-                item.OnValidateCancelEdit(authentication, this);
-            }
-            this.Domain.Dispatcher.Invoke(() =>
-            {
-                if (isAdmin == false && this.Domain.Users.Owner.ID != authentication.ID)
-                    throw new NotImplementedException();
-            });
-        }
+        
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void OnValidateBeginEdit(Authentication authentication, object target)

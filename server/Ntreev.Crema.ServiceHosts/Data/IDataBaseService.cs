@@ -101,19 +101,19 @@ namespace Ntreev.Crema.ServiceHosts.Data
         ResultBase<TableInfo[]> InheritTable(string tableName, string newTableName, string categoryPath, bool copyXml);
 
         [OperationContract]
-        ResultBase<DomainMetaData> EnterTableContentEdit(string tableName);
+        ResultBase<DomainMetaData> EnterTableContentEdit(Guid domainID);
 
         [OperationContract]
-        ResultBase<DomainMetaData> LeaveTableContentEdit(string tableName);
+        ResultBase<DomainMetaData> LeaveTableContentEdit(Guid domainID);
 
         [OperationContract]
         ResultBase<DomainMetaData> BeginTableContentEdit(string tableName);
 
         [OperationContract]
-        ResultBase<TableInfo[]> EndTableContentEdit(string tableName);
+        ResultBase<TableInfo[]> EndTableContentEdit(Guid domainID);
 
         [OperationContract]
-        ResultBase CancelTableContentEdit(string tableName);
+        ResultBase CancelTableContentEdit(Guid domainID);
 
         [OperationContract]
         ResultBase<DomainMetaData> BeginTableTemplateEdit(string tableName);

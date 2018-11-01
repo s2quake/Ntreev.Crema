@@ -89,7 +89,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.ValidateExpired();
                 var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(EnterAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, accessType);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(EnterAsync), this, accessType);
                     this.ValidateAdd(authentication);
                     return new DomainUser(this, authentication.ID, authentication.Name, accessType)
                     {
@@ -107,7 +107,7 @@ namespace Ntreev.Crema.Services.Domains
                     this.Logger.Complete(result.ID, this);
                     this.CremaHost.Sign(authentication);
                     this.OnUserAdded(new DomainUserEventArgs(authentication, this, domainUser));
-                    this.Container?.InvokeDomainUserAddedEvent(authentication, this, domainUser, result.ID, result.Data);
+                    this.Container?.InvokeDomainUserAddedEvent(authentication, this, domainUser, result.Data, result.ID);
                 });
                 return result.ID;
             }
@@ -125,7 +125,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.ValidateExpired();
                 var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(LeaveAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(LeaveAsync), this);
                     this.ValidateRemove(authentication);
                     return this.GetDomainUser(authentication);
                 });
@@ -149,34 +149,41 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public async Task<object> DeleteAsync(Authentication authentication, bool isCanceled)
+        public async Task<long> DeleteAsync(Authentication authentication, bool isCanceled)
         {
             try
             {
                 this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, isCanceled);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this, isCanceled);
                     this.ValidateDelete(authentication, isCanceled);
                 });
-                if (this.Host != null)
+                var id = await this.Logger.Dispatcher.InvokeAsync(() => this.Logger.Delete(authentication));
+                if (this.Host is IDomainHost host)
                 {
-                    return await this.Host.DeleteAsync(authentication, isCanceled, null);
-                }
-                else
-                {
-                    await this.Logger?.DisposeAsync(true);
-                    await this.Dispatcher.InvokeAsync(() =>
+                    this.Host = null;
+                    try
                     {
-                        var container = this.Container;
-                        this.Sign(authentication, true);
-                        this.Logger = null;
-                        this.Dispose();
-                        this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled, null));
-                        container.InvokeDomainDeletedEvent(authentication, new Domain[] { this }, new bool[] { isCanceled }, new object[] { null });
-                    });
-                    return null;
+                        await host.DeleteAsync(authentication, isCanceled);
+                    }
+                    catch
+                    {
+                        this.Host = host;
+                        throw;
+                    }
                 }
+                await this.Logger?.DisposeAsync(true);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var container = this.Container;
+                    this.Sign(authentication, true);
+                    this.Logger = null;
+                    this.Dispose();
+                    this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
+                    container.InvokeDomainDeletedEvent(authentication, new Domain[] { this }, new bool[] { isCanceled }, id);
+                });
+                return id;
             }
             catch (Exception e)
             {
@@ -192,7 +199,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.ValidateExpired();
                 var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(BeginUserEditAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(BeginUserEditAsync), this);
                     this.ValidateBeginUserEdit(authentication, location);
                     return this.GetDomainUser(authentication);
                 });
@@ -222,7 +229,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.ValidateExpired();
                 var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(EndUserEditAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(EndUserEditAsync), this);
                     this.ValidateEndUserEdit(authentication);
                     return this.GetDomainUser(authentication);
                 });
@@ -251,7 +258,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.ValidateExpired();
                 var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(NewRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(NewRowAsync), this);
                     this.ValidateNewRow(authentication, rows);
                     return this.GetDomainUser(authentication);
                 });
@@ -286,7 +293,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.ValidateExpired();
                 var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(SetRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetRowAsync), this);
                     this.ValidateSetRow(authentication, rows);
                     return this.GetDomainUser(authentication);
                 });
@@ -321,7 +328,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.ValidateExpired();
                 var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(RemoveRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(RemoveRowAsync), this);
                     this.ValidateRemoveRow(authentication, rows);
                     return this.GetDomainUser(authentication);
                 });
@@ -356,7 +363,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.ValidateExpired();
                 var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(SetPropertyAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, propertyName, value);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetPropertyAsync), this, propertyName, value);
                     this.ValidateSetProperty(authentication, propertyName, value);
                     return this.GetDomainUser(authentication);
                 });
@@ -387,7 +394,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(SetUserLocationAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetUserLocationAsync), this);
                     this.ValidateSetLocation(authentication, location);
                     var domainUser = this.GetDomainUser(authentication);
                     domainUser.DomainLocationInfo = location;
@@ -410,7 +417,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.ValidateExpired();
                 var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(KickAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, userID, comment);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(KickAsync), this, userID, comment);
                     this.ValidateKick(authentication, userID, comment);
                     return this.GetDomainUser(userID);
                 });
@@ -445,7 +452,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.ValidateExpired();
                 var domainUser = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(SetOwnerAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, userID);
+                    this.CremaHost.DebugMethod(authentication, this, nameof(SetOwnerAsync), this, userID);
                     this.ValidateSetOwner(authentication, userID);
                     return this.GetDomainUser(userID);
                 });
@@ -503,10 +510,10 @@ namespace Ntreev.Crema.Services.Domains
             base.Dispose();
         }
 
-        public void Dispose(Authentication authentication, bool isCanceled, object result)
+        public void Dispose(Authentication authentication, bool isCanceled)
         {
             base.Dispose();
-            this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled, result));
+            this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
         }
 
         public void Attach(params Authentication[] authentications)
@@ -541,8 +548,6 @@ namespace Ntreev.Crema.Services.Domains
                 }
             }
         }
-
-
 
         public void SetDomainHost(Authentication authentication, IDomainHost host)
         {
@@ -615,6 +620,8 @@ namespace Ntreev.Crema.Services.Domains
         public Guid DataBaseID => base.DomainInfo.DataBaseID;
 
         public object Source { get; }
+
+        public object Result { get; set; }
 
         public new DomainContext Context { get; set; }
 
@@ -1218,6 +1225,11 @@ namespace Ntreev.Crema.Services.Domains
         }
 
         #region IDomain
+
+        Task IDomain.DeleteAsync(Authentication authentication, bool isCanceled)
+        {
+            return this.DeleteAsync(authentication, isCanceled);
+        }
 
         Task IDomain.EnterAsync(Authentication authentication, DomainAccessType accessType)
         {

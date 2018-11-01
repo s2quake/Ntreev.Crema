@@ -37,7 +37,7 @@ namespace Ntreev.Crema.Services.Data
 
         public string Owner => this.domainHost != null ? this.domainHost.Owner : string.Empty;
 
-        public class TableContentDomainHost : IDomainHost, IEnumerable<ITableContent>
+        public class TableContentDomainHost : IDomainHost, ITableContentGroup
         {
             private Domain domain;
 
@@ -69,6 +69,86 @@ namespace Ntreev.Crema.Services.Data
                 foreach (var item in this.Contents)
                 {
                     item.domainHost = this;
+                }
+            }
+
+            public async Task EndEditAsync(Authentication authentication)
+            {
+                try
+                {
+                    this.ValidateExpired();
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.CremaHost.DebugMethod(authentication, this, nameof(EndEditAsync), this.Tables.Select(item => item.Name).ToArray());
+                    });
+                    await this.EndContentAsync(authentication);
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.InvokeEditEndedEvent(EventArgs.Empty);
+                    });
+                }
+                catch (Exception e)
+                {
+                    this.CremaHost.Error(e);
+                    throw;
+                }
+            }
+
+            public async Task CancelEditAsync(Authentication authentication)
+            {
+                try
+                {
+                    this.ValidateExpired();
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync), this.Tables.Select(item => item.Name).ToArray());
+                    });
+                    await this.CancelContentAsync(authentication);
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.InvokeEditCanceledEvent(EventArgs.Empty);
+                    });
+                }
+                catch (Exception e)
+                {
+                    this.CremaHost.Error(e);
+                    throw;
+                }
+            }
+
+            public async Task EnterEditAsync(Authentication authentication)
+            {
+                try
+                {
+                    this.ValidateExpired();
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.CremaHost.DebugMethod(authentication, this, nameof(EnterEditAsync), this.Tables.Select(item => item.Name).ToArray());
+                    });
+                    await this.EnterContentAsync(authentication);
+                }
+                catch (Exception e)
+                {
+                    this.CremaHost.Error(e);
+                    throw;
+                }
+            }
+
+            public async Task LeaveEditAsync(Authentication authentication)
+            {
+                try
+                {
+                    this.ValidateExpired();
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.CremaHost.DebugMethod(authentication, this, nameof(LeaveEditAsync), this.Tables.Select(item => item.Name).ToArray());
+                    });
+                    await this.LeaveContentAsync(authentication);
+                }
+                catch (Exception e)
+                {
+                    this.CremaHost.Error(e);
+                    throw;
                 }
             }
 
@@ -132,35 +212,50 @@ namespace Ntreev.Crema.Services.Data
                     item.domainHost = this;
                     item.Table.TableState = TableState.IsBeingEdited;
                 }
-                
+
                 await this.Dispatcher.InvokeAsync(() => this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables));
                 return result.SignatureDate;
             }
 
-            private async Task<TableInfo[]> EndDomainAsync(object args)
+            private async Task EndDomainAsync()
             {
-                if (args is string name)
+                try
                 {
-                    var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTableContentEdit(name));
-                    return result.Value;
+                    this.domain.Host = null;
+                    await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTableContentEdit(this.domain.ID));
+                    await this.DomainContext.WaitDeleteAsync(this.domain);
                 }
-                return args as TableInfo[];
+                catch
+                {
+                    this.domain.Host = this;
+                    throw;
+                }
             }
 
-            public async Task<TableInfo[]> EndContentAsync(Authentication authentication, object args)
+            private async Task CancelDomainAsync()
             {
-                var tableInfos = await this.EndDomainAsync(args);
-                var tableInfoByName = new Dictionary<string, TableInfo>();
-                foreach (var item in tableInfos)
+                try
                 {
-                    tableInfoByName.Add(item.Name, item);
+                    this.domain.Host = null;
+                    await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTableContentEdit(this.domain.ID));
+                    await this.DomainContext.WaitDeleteAsync(this.domain);
                 }
-                if (this.domain != null)
+                catch
                 {
-                    //await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
-                    await this.DomainContext.DeleteAsync(authentication, this.domain);
+                    this.domain.Host = this;
+                    throw;
                 }
-                this.Container.ValidateExpired();
+            }
+
+            public async Task EndContentAsync(Authentication authentication)
+            {
+                if (this.domain.Host != null)
+                {
+                    await this.EndDomainAsync();
+                }
+                var tableInfos = this.domain.Result as TableInfo[];
+                var tableInfoByName = tableInfos.ToDictionary(item => item.Name);
+
                 await this.Container.Dispatcher.InvokeAsync(() =>
                 {
                     foreach (var item in this.Contents)
@@ -177,19 +272,13 @@ namespace Ntreev.Crema.Services.Data
                     this.Container.InvokeTablesContentChangedEvent(authentication, this.Tables);
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
-                return tableInfos;
             }
 
-            public async Task CancelContentAsync(Authentication authentication, object args)
+            public async Task CancelContentAsync(Authentication authentication)
             {
-                if (args is string name)
+                if (this.domain.Host != null)
                 {
-                    var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTableContentEdit(name));
-                }
-                if (this.domain != null && this.domain.Dispatcher != null)
-                {
-                    //await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
-                    await this.DomainContext.DeleteAsync(authentication, this.domain);
+                    await this.CancelDomainAsync();
                 }
                 await this.Container.Dispatcher.InvokeAsync(() =>
                 {
@@ -206,9 +295,9 @@ namespace Ntreev.Crema.Services.Data
                 });
             }
 
-            public async Task EnterContentAsync(Authentication authentication, string name)
+            public async Task EnterContentAsync(Authentication authentication)
             {
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EnterTableContentEdit(name));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EnterTableContentEdit(this.domain.ID));
                 await this.domain.WaitUserEnterAsync(authentication);
                 await this.domain.DataDispatcher.InvokeAsync(() =>
                 {
@@ -225,9 +314,9 @@ namespace Ntreev.Crema.Services.Data
                 });
             }
 
-            public async Task LeaveContentAsync(Authentication authentication, string name)
+            public async Task LeaveContentAsync(Authentication authentication)
             {
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.LeaveTableContentEdit(name));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.LeaveTableContentEdit(this.domain.ID));
                 await this.domain.WaitUserLeaveAsync(authentication);
                 await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                 await this.Dispatcher.InvokeAsync(() =>
@@ -253,6 +342,8 @@ namespace Ntreev.Crema.Services.Data
             public CremaHost CremaHost => this.Container.CremaHost;
 
             public TableCollection Container { get; }
+
+            public CremaDispatcher Dispatcher => this.Container.Dispatcher;
 
             private void Domain_RowAdded(object sender, DomainRowEventArgs e)
             {
@@ -371,11 +462,17 @@ namespace Ntreev.Crema.Services.Data
                 this.owner = this.domain.Users.OwnerUserID;
             }
 
-            private CremaDispatcher Dispatcher => this.Container.Dispatcher;
-
             private DomainContext DomainContext => this.Container.GetService(typeof(DomainContext)) as DomainContext;
 
             public IDataBaseService Service => this.Container.Service;
+
+            #region ITableContentGroup
+
+            IDomain ITableContentGroup.Domain => this.domain;
+
+            ITable[] ITableContentGroup.Tables => this.Tables;
+
+            #endregion
 
             #region IDomainHost
 
@@ -411,21 +508,24 @@ namespace Ntreev.Crema.Services.Data
                     this.domain.Dispatcher.Invoke(this.AttachDomainEvent);
             }
 
-            async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)
+            async Task IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled)
             {
-                var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, result);
-                this.domain = null;
+                var domain = this.domain;
                 if (isCanceled == false)
                 {
-                    result = await this.EndContentAsync(authentication, result as TableInfo[]);
-                    await this.Dispatcher.InvokeAsync(() => this.InvokeEditEndedEvent(args));
-                    return result;
+                    await this.EndContentAsync(authentication);
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.InvokeEditEndedEvent(new DomainDeletedEventArgs(authentication, domain, isCanceled));
+                    });
                 }
                 else
                 {
-                    await this.CancelContentAsync(authentication, null);
-                    await this.Dispatcher.InvokeAsync(() => this.InvokeEditCanceledEvent(args));
-                    return null;
+                    await this.CancelContentAsync(authentication);
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.InvokeEditCanceledEvent(new DomainDeletedEventArgs(authentication, domain, isCanceled));
+                    });
                 }
             }
 

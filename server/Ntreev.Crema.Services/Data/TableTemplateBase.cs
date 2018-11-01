@@ -131,7 +131,7 @@ namespace Ntreev.Crema.Services.Data
                 });
                 try
                 {
-                    await this.OnEndEditAsync(authentication, null);
+                    await this.OnEndEditAsync(authentication);
                 }
                 catch
                 {
@@ -385,39 +385,32 @@ namespace Ntreev.Crema.Services.Data
             await this.domain.Dispatcher.InvokeAsync(this.RefreshEditors);
         }
 
-        protected virtual async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, TableInfo[] tableInfos)
+        protected virtual async Task OnEndEditAsync(Authentication authentication)
         {
-            if (this.domain != null)
+            if (this.domain.Host != null)
             {
                 await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
-                await this.DomainContext.RemoveAsync(authentication, this.domain, false, tableInfos);
+                await this.DomainContext.RemoveAsync(authentication, this.domain, false);
             }
             this.domain = null;
-            if (this.table != null)
-            {
-                this.table.RowDeleted -= Table_RowDeleted;
-                this.table.RowChanged -= Table_RowChanged;
-            }
+            this.table.RowDeleted -= Table_RowDeleted;
+            this.table.RowChanged -= Table_RowChanged;
             this.IsModified = false;
             this.table = null;
             this.items = null;
             this.editor = null;
-            return tableInfos;
         }
 
         protected virtual async Task OnCancelEditAsync(Authentication authentication)
         {
-            if (this.domain != null)
+            if (this.domain.Host != null)
             {
                 await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
-                await this.DomainContext.RemoveAsync(authentication, this.domain, true, null);
+                await this.DomainContext.RemoveAsync(authentication, this.domain, true);
             }
             this.domain = null;
-            if (this.table != null)
-            {
-                this.table.RowDeleted -= Table_RowDeleted;
-                this.table.RowChanged -= Table_RowChanged;
-            }
+            this.table.RowDeleted -= Table_RowDeleted;
+            this.table.RowChanged -= Table_RowChanged;
             this.IsModified = false;
             this.table = null;
             this.items = null;
@@ -514,7 +507,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (this.TemplateSource.Columns.Any() == false)
                     throw new InvalidOperationException(Resources.Exception_AtLeastOneColumnInTable);
-                if (this.TemplateSource.TargetTable.PrimaryKey.Any() == false)
+                if (this.TemplateSource.DataTable.PrimaryKey.Any() == false)
                     throw new InvalidOperationException(Resources.Exception_AtLeastOneKeyInTable);
             }
         }
@@ -677,31 +670,28 @@ namespace Ntreev.Crema.Services.Data
             this.OnDetach();
         }
 
-        async Task<object> IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled, object result)
+        async Task IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled)
         {
+            var domain = this.domain;
             if (isCanceled == false)
             {
-                var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, result);
                 await this.Dispatcher.InvokeAsync(() => this.ValidateEndEdit(authentication));
-                result = await this.OnEndEditAsync(authentication, result as TableInfo[]);
+                await this.OnEndEditAsync(authentication);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ServiceState = ServiceState.Closed;
-                    this.OnEditEnded(args);
+                    this.OnEditEnded(new DomainDeletedEventArgs(authentication, domain, isCanceled));
                 });
-                return result;
             }
             else
             {
-                var args = new DomainDeletedEventArgs(authentication, this.domain, isCanceled, null);
                 await this.Dispatcher.InvokeAsync(() => this.ValidateCancelEdit(authentication));
                 await this.OnCancelEditAsync(authentication);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ServiceState = ServiceState.Closed;
-                    this.OnEditCanceled(args);
+                    this.OnEditCanceled(new DomainDeletedEventArgs(authentication, domain, isCanceled));
                 });
-                return null;
             }
         }
 

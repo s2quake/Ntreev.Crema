@@ -414,15 +414,14 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return result;
         }
 
-        public async Task<ResultBase<DomainMetaData>> EnterTableContentEditAsync(string tableName)
+        public async Task<ResultBase<DomainMetaData>> EnterTableContentEditAsync(Guid domainID)
         {
             var result = new ResultBase<DomainMetaData>();
             try
             {
-                var table = await this.GetTableAsync(tableName);
-                var content = table.Content;
+                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
+                var content = domain.Host as ITableContentGroup;
                 await content.EnterEditAsync(this.authentication);
-                var domain = content.Domain;
                 result.Value = await domain.GetMetaDataAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -433,15 +432,14 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return result;
         }
 
-        public async Task<ResultBase<DomainMetaData>> LeaveTableContentEditAsync(string tableName)
+        public async Task<ResultBase<DomainMetaData>> LeaveTableContentEditAsync(Guid domainID)
         {
             var result = new ResultBase<DomainMetaData>();
             try
             {
-                var table = await this.GetTableAsync(tableName);
-                var content = table.Content;
+                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
+                var content = domain.Host as ITableContentGroup;
                 await content.LeaveEditAsync(this.authentication);
-                var domain = content.Domain;
                 result.Value = await domain.GetMetaDataAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -471,16 +469,16 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return result;
         }
 
-        public async Task<ResultBase<TableInfo[]>> EndTableContentEditAsync(string tableName)
+        public async Task<ResultBase<TableInfo[]>> EndTableContentEditAsync(Guid domainID)
         {
             var result = new ResultBase<TableInfo[]>();
             try
             {
-                var table = await this.GetTableAsync(tableName);
-                var content = table.Content;
+                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
+                var content = domain.Host as ITableContentGroup;
                 var tables = content.Tables;
                 await content.EndEditAsync(this.authentication);
-                result.Value = await table.Dispatcher.InvokeAsync(() => tables.Select(item => item.TableInfo).ToArray());
+                result.Value = domain.Result as TableInfo[];
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -490,13 +488,13 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return result;
         }
 
-        public async Task<ResultBase> CancelTableContentEditAsync(string tableName)
+        public async Task<ResultBase> CancelTableContentEditAsync(Guid domainID)
         {
             var result = new ResultBase();
             try
             {
-                var table = await this.GetTableAsync(tableName);
-                var content = table.Content;
+                var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
+                var content = domain.Host as ITableContentGroup;
                 await content.CancelEditAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -568,7 +566,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 await template.EndEditAsync(this.authentication);
                 if (template.Target is ITable table)
                 {
-                    result.Value = await template.Dispatcher.InvokeAsync(() => new TableInfo[] { table.TableInfo });
+                    result.Value = domain.Result as TableInfo[];
                     result.SignatureDate = this.authentication.SignatureDate;
                 }
                 else if (template.Target is ITable[] tables)
@@ -750,7 +748,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
                 var template = domain.Host as ITypeTemplate;
                 await template.EndEditAsync(this.authentication);
-                result.Value = await template.Dispatcher.InvokeAsync(() => new TypeInfo[] { template.Type.TypeInfo });
+                result.Value = domain.Result as TypeInfo[];
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)

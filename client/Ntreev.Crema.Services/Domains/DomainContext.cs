@@ -22,6 +22,7 @@ using Ntreev.Crema.Services.Users;
 using Ntreev.Library;
 using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
+using Ntreev.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -44,20 +45,19 @@ namespace Ntreev.Crema.Services.Domains
         private ItemsMovedEventHandler<IDomainItem> itemsMoved;
         private ItemsDeletedEventHandler<IDomainItem> itemsDeleted;
 
-        //private Dictionary<long, ManualResetEvent> setsByID = new Dictionary<long, ManualResetEvent>();
         private DomainContextMetaData metaData;
 
-        public readonly CremaResetEvent<Guid> creationEvent;
-        public readonly CremaResetEvent<Guid> deletionEvent;
-        public readonly CallbackDispatcher callbackEvent;
+        public readonly TaskResetEvent<Guid> creationEvent;
+        public readonly TaskResetEvent<Guid> deletionEvent;
+        public readonly IndexedDispatcher callbackEvent;
 
         public DomainContext(CremaHost cremaHost)
         {
             this.CremaHost = cremaHost;
             this.Dispatcher = new CremaDispatcher(this);
-            this.creationEvent = new CremaResetEvent<Guid>(this.Dispatcher);
-            this.deletionEvent = new CremaResetEvent<Guid>(this.Dispatcher);
-            this.callbackEvent = new CallbackDispatcher(this);
+            this.creationEvent = new TaskResetEvent<Guid>(this.Dispatcher);
+            this.deletionEvent = new TaskResetEvent<Guid>(this.Dispatcher);
+            this.callbackEvent = new IndexedDispatcher(this);
         }
 
         public async Task InitializeAsync(string address, Guid authenticationToken, ServiceInfo serviceInfo)
@@ -93,43 +93,6 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        //public Task DeleteDomainsAsync(Authentication authentication, Guid dataBaseID)
-        //{
-        //    return this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        var domains = this.GetDomains(dataBaseID);
-        //        var itemPaths = domains.Select(item => item.Path).ToArray();
-        //        foreach (var item in domains)
-        //        {
-        //            item.Dispose(authentication, true, null);
-        //        }
-        //        this.InvokeItemsDeleteEvent(authentication, domains, itemPaths);
-        //    });
-        //}
-
-        //public async Task RestoreAsync(Authentication authentication, Guid dataBaseID)
-        //{
-        //    var result = await this.CremaHost.InvokeServiceAsync(() => this.service.GetMetaData(dataBaseID));
-        //    await this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        this.CremaHost.Sign(authentication, result);
-        //        this.Restore(authentication, result.Value);
-        //    });
-
-
-        //    //var metaData = result.Value;
-        //    //var metaDataList = new List<DomainMetaData>(metaData.Domains.Length);
-        //    //foreach (var item in metaData.Domains)
-        //    //{
-        //    //    if (item.DomainInfo.DataBaseID == dataBase.ID)
-        //    //    {
-        //    //        metaDataList.Add(item);
-        //    //    }
-        //    //}
-        //    //return metaDataList.ToArray();
-        //    //return null;
-        //}
-
         public void InvokeItemsCreatedEvent(Authentication authentication, IDomainItem[] items, object[] args)
         {
             this.OnItemsCreated(new ItemsCreatedEventArgs<IDomainItem>(authentication, items, args));
@@ -150,37 +113,36 @@ namespace Ntreev.Crema.Services.Domains
             this.OnItemsDeleted(new ItemsDeletedEventArgs<IDomainItem>(authentication, items, itemPaths));
         }
 
-        //public Domain Create(Authentication authentication, DomainMetaData metaData)
-        //{
-        //    return this.Domains.Create(authentication, metaData);
-        //}
-
         public async Task<Domain> CreateAsync(Authentication authentication, DomainMetaData metaData)
         {
             await this.creationEvent.WaitAsync(metaData.DomainID);
-            var domain = await this.Dispatcher.InvokeAsync(() => this.GetDomain(metaData.DomainID));
-            return domain;
-            //return this.Domains.CreateAsync(authentication, metaData);
+            return await this.Dispatcher.InvokeAsync(() => this.GetDomain(metaData.DomainID));
         }
 
-        public async Task DeleteAsync(Authentication authentication, Domain domain)
+        public async Task WaitDeleteAsync(Domain domain)
         {
             await this.deletionEvent.WaitAsync(domain.ID);
-            //return this.Domains.DeleteAsync(authentication, domain, isCanceled, result);
+
         }
 
-        //public async Task AddDomainsAsync(DomainMetaData[] metaDatas)
-        //{
-        //    foreach (var item in metaDatas)
-        //    {
-        //        var authentication = await this.UserContext.AuthenticateAsync(item.DomainInfo.CreationInfo);
-        //        var domain = await this.Domains.AddDomainAsync(authentication, item.DomainInfo);
-        //        if (domain == null)
-        //            continue;
-
-        //        await this.Dispatcher.InvokeAsync(() => domain.Initialize(Authentication.System, item));
-        //    }
-        //}
+            public async Task DeleteAsync(Authentication authentication, Domain domain)
+        {
+            await this.deletionEvent.WaitAsync(domain.ID);
+            //if (domain.Host == null)
+            //{
+                
+            //}
+            //else
+            //{
+            //    await this.Dispatcher.InvokeAsync(() =>
+            //    {
+            //        this.Domains.Remove(domain);
+            //        domain.Dispose(authentication, isCanceled);
+            //        this.Domains.InvokeDomainDeletedEvent(authentication, new Domain[] { domain }, new bool[] { isCanceled });
+            //        this.deletionEvent.Set(domain.ID);
+            //    });
+            //}
+        }
 
         public async Task CloseAsync(CloseInfo closeInfo)
         {
@@ -272,7 +234,7 @@ namespace Ntreev.Crema.Services.Domains
                 var domains = this.GetDomains(dataBaseID);
                 foreach (var item in domains)
                 {
-                    item.Dispose(authentication, true, null);
+                    item.Dispose(authentication, true);
                 }
             });
         }
@@ -609,28 +571,70 @@ namespace Ntreev.Crema.Services.Domains
                     {
                         var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
                         var domainHostList = new List<IDomainHost>(domainIDs.Length);
+                        var domainHostCanceledList = new List<bool>(domainIDs.Length);
+                        var domainHostResultList = new List<object>(domainIDs.Length);
+
                         var domainList = new List<Domain>(domainIDs.Length);
+                        var domainCanceledList = new List<bool>(domainIDs.Length);
+                        var domainResultList = new List<object>(domainIDs.Length);
+
                         for (var i = 0; i < domainIDs.Length; i++)
                         {
                             var domainID = domainIDs[i];
                             var isCanceled = isCanceleds[i];
                             var result = results[i];
                             var domain = this.GetDomain(domainID);
-                            var domainHost = domain.Host;
-                            domain.Dispose(authentication, isCanceled, null);
-                            domainHostList.Add(domainHost);
-                            domainList.Add(domain);
-                            this.deletionEvent.Set(domain.ID);
+                            domain.InvokeDeleteAsync(authentication, isCanceled, result, callbackInfo.TaskID);
+                            //var domainHost = domain.Host;
+                            //if (domainHost != null)
+                            //{
+                            //    domainHostList.Add(domainHost);
+                            //    domainHostCanceledList.Add(isCanceled);
+                            //    domainHostResultList.Add(result);
+                            //}
+                            //else
+                            //{
+                            //    domainList.Add(domain);
+                            //    domainCanceledList.Add(isCanceled);
+                            //    domainResultList.Add(result);
+                            //}
+                            //domain.Dispose(authentication, isCanceled, null);
+                            //domainHostList.Add(domainHost);
+
+                            //this.deletionEvent.Set(domain.ID);
                         }
-                        this.Domains.InvokeDomainDeletedEvent(authentication, domainList.ToArray(), isCanceleds, results);
-                        for (var i = 0; i < domainIDs.Length; i++)
-                        {
-                            var domainHost = domainHostList[i];
-                            var isCanceled = isCanceleds[i];
-                            var result = results[i];
-                            if (domainHost != null)
-                                domainHost.DeleteAsync(authentication, isCanceled, result);
-                        }
+                        //if (domainList.Any() == true)
+                        //{
+                        //    for (var i = 0; i < domainList.Count; i++)
+                        //    {
+                        //        var domain = domainList[i];
+                        //        var domainIsCanceled = domainCanceledList[i];
+                        //        var domainResult = domainResultList[i];
+                        //        domain.Dispose(authentication, domainIsCanceled, domainResult);
+                        //        this.deletionEvent.Set(domain.ID);
+                        //    }
+                        //    this.Domains.InvokeDomainDeletedEvent(authentication, domainList.ToArray(), domainCanceledList.ToArray(), domainResultList.ToArray());
+                        //}
+
+                        //if (domainHostList.Any() == true)
+                        //{
+                        //    for (var i = 0; i < domainHostList.Count; i++)
+                        //    {
+                        //        var domainHost = domainHostList[i];
+                        //        var domainIsCanceled = domainHostCanceledList[i];
+                        //        var domainResult = domainHostResultList[i];
+                        //        domainHost.DeleteAsync(authentication, domainIsCanceled, domainResult);
+                        //    }
+                        //}
+
+                        //for (var i = 0; i < domainIDs.Length; i++)
+                        //{
+                        //    var domainHost = domainHostList[i];
+                        //    var isCanceled = isCanceleds[i];
+                        //    var result = results[i];
+                        //    if (domainHost != null)
+                        //        domainHost.DeleteAsync(authentication, isCanceled, result);
+                        //}
                     });
                 });
             }

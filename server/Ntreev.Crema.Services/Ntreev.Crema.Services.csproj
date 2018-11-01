@@ -69,6 +69,7 @@
     <Compile Include="Data\TableContentDomainHost.cs" />
     <Compile Include="Domains\Actions\EndUserEditAction.cs" />
     <Compile Include="Domains\Actions\BeginUserEditAction.cs" />
+    <Compile Include="Domains\Actions\DeleteAction.cs" />
     <Compile Include="Domains\Serializations\DomainCompleteSerializationInfo.cs" />
     <Compile Include="Domains\Serializations\DomainCompleteItemSerializationInfo.cs" />
     <Compile Include="Domains\Serializations\DomainPostSerializationInfo.cs" />

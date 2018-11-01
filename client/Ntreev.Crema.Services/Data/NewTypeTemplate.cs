@@ -63,44 +63,33 @@ namespace Ntreev.Crema.Services.Data
             await base.OnBeginEditAsync(authentication);
         }
 
-        protected override async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, object args)
+        protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            var typeInfos = await base.OnEndEditAsync(authentication, args);
+            var domain = this.Domain;
+            await base.OnEndEditAsync(authentication);
+            var typeInfos = domain.Result as TypeInfo[];
             var typeInfo = typeInfos.First();
-            if (args is Guid)
-            {
-                this.type = await this.Types.AddNewAsync(authentication, typeInfo);
-            }
-            return typeInfos;
+            this.type = await this.Types.AddNewAsync(authentication, typeInfo);
         }
 
-        protected override async Task OnCancelEditAsync(Authentication authentication, object args)
+        protected override async Task OnCancelEditAsync(Authentication authentication)
         {
-            await base.OnCancelEditAsync(authentication, args);
+            await base.OnCancelEditAsync(authentication);
         }
 
-        protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
+        protected override Task<ResultBase<DomainMetaData>> OnBeginDomainAsync(Authentication authentication)
         {
             return this.CremaHost.InvokeServiceAsync(() => this.Service.BeginNewType(this.category.Path));
         }
 
-        protected override async Task<TypeInfo[]> EndDomainAsync(Authentication authentication, object args)
+        protected override async Task<ResultBase<TypeInfo[]>> OnEndDomainAsync(Authentication authentication)
         {
-            if (args is Guid domainID)
-            {
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTypeTemplateEdit(domainID));
-                return result.Value;
-            }
-            return args as TypeInfo[];
+            return await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTypeTemplateEdit(this.Domain.ID));
         }
 
-        protected override async Task<ResultBase> CancelDomainAsync(Authentication authentication, object args)
+        protected override async Task<ResultBase> OnCancelDomainAsync(Authentication authentication)
         {
-            if (args is Guid domainID)
-            {
-                return await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTypeTemplateEdit(domainID));
-            }
-            return new ResultBase() { SignatureDate = authentication.SignatureDate };
+            return await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTypeTemplateEdit(this.Domain.ID));
         }
 
         public IDataBaseService Service => this.category.Service;

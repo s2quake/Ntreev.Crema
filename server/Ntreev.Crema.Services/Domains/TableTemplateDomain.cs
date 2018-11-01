@@ -47,7 +47,7 @@ namespace Ntreev.Crema.Services.Domains
             this.template = source as CremaTemplate;
             this.view = this.template.View;
 
-            var dataSet = this.template.TargetTable.DataSet;
+            var dataSet = this.template.DataTable.DataSet;
             var itemPaths = (string)serializationInfo.GetProperty(nameof(ItemPaths));
             dataSet.SetItemPaths(StringUtility.Split(itemPaths, ';'));
         }
@@ -61,7 +61,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public bool IsNew { get; set; }
 
-        public string[] ItemPaths => this.template.TargetTable.DataSet.GetItemPaths();
+        public string[] ItemPaths => this.template.DataTable.DataSet.GetItemPaths();
 
         protected override byte[] SerializeSource(object source)
         {

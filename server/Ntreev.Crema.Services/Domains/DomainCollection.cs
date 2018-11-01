@@ -62,14 +62,13 @@ namespace Ntreev.Crema.Services.Domains
             this.Context.InvokeItemsCreatedEvent(authentication, domains, domainInfos);
         }
 
-        public void InvokeDomainDeletedEvent(Authentication authentication, Domain[] domains, bool[] isCanceleds, object[] results)
+        public void InvokeDomainDeletedEvent(Authentication authentication, Domain[] domains, bool[] isCanceleds, long taskID)
         {
             var itemPaths = domains.Select(item => item.Path).ToArray();
-            var args = new DomainsDeletedEventArgs(authentication, domains, isCanceleds, results);
+            var args = new DomainsDeletedEventArgs(authentication, domains, isCanceleds) { TaskID = taskID };
             for (var i = 0; i < domains.Length; i++)
             {
                 var item = domains[i];
-                var result = results[i];
                 var isCanceled = isCanceleds[i];
                 var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainDeletedEvent), item, isCanceled);
                 var comment = isCanceled == false ? EventMessageBuilder.EndDomain(authentication, item) : EventMessageBuilder.CancelDomain(authentication, item);
@@ -80,7 +79,7 @@ namespace Ntreev.Crema.Services.Domains
             this.Context.InvokeItemsDeleteEvent(authentication, domains, itemPaths);
         }
 
-        public void InvokeDomainUserAddedEvent(Authentication authentication, Domain domain, DomainUser domainUser, long id, byte[] data)
+        public void InvokeDomainUserAddedEvent(Authentication authentication, Domain domain, DomainUser domainUser, byte[] data, long id)
         {
             var args = new DomainUserAddedEventArgs(authentication, domain, domainUser, data) { TaskID = id };
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainUserAddedEvent), domain, domainUser);

@@ -107,19 +107,16 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public async Task RemoveAsync(Authentication authentication, Domain domain, bool isCanceled, object result)
+        public async Task RemoveAsync(Authentication authentication, Domain domain, bool isCanceled)
         {
-            await domain.Logger?.DisposeAsync(true);
+            var taskID = await domain.Logger.Dispatcher.InvokeAsync(() => domain.Logger.Delete(authentication));
+            await domain.Logger.DisposeAsync(true);
             domain.Logger = null;
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.Domains.Remove(domain);
-                //var dispatcher = domain.Dispatcher;
-                //domain.Dispatcher = null;
-
-                domain.Dispose(authentication, isCanceled, result);
-                //dispatcher.Dispose();
-                this.Domains.InvokeDomainDeletedEvent(authentication, new Domain[] { domain }, new bool[] { isCanceled }, new object[] { result });
+                domain.Dispose(authentication, isCanceled);
+                this.Domains.InvokeDomainDeletedEvent(authentication, new Domain[] { domain }, new bool[] { isCanceled }, taskID);
             });
         }
 
@@ -189,9 +186,9 @@ namespace Ntreev.Crema.Services.Domains
                 foreach (var item in domains)
                 {
                     item.Logger.Dispatcher.Dispose();
-                    item.Dispose(authentication, true, null);
+                    item.Dispose(authentication, true);
                 }
-                this.Domains.InvokeDomainDeletedEvent(authentication, domains, isCanceleds, results);
+                this.Domains.InvokeDomainDeletedEvent(authentication, domains, isCanceleds, -1);
             });
         }
 

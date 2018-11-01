@@ -58,8 +58,6 @@ namespace Ntreev.Crema.Services
             return task;
         }
 
-
-
         public Task<TResult> InvokeAsync<TResult>(long index, Func<TResult> callback)
         {
             if (this.cancellationQueue.IsCancellationRequested == true)

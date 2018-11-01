@@ -28,7 +28,7 @@ namespace Ntreev.Crema.Services
 {
     public interface IDomain : IServiceProvider, IDispatcherObject, IExtendedProperties
     {
-        Task<object> DeleteAsync(Authentication authentication, bool isCancel);
+        Task DeleteAsync(Authentication authentication, bool isCancel);
 
         Task EnterAsync(Authentication authentication, DomainAccessType accessType);
 
@@ -57,6 +57,8 @@ namespace Ntreev.Crema.Services
         Guid DataBaseID { get; }
 
         object Source { get; }
+
+        object Result { get; }
 
         object Host { get; }
 

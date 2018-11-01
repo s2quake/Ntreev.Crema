@@ -82,19 +82,19 @@ namespace Ntreev.Crema.Services.DataBaseService {
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.TableInfo[]> InheritTable(string tableName, string newTableName, string categoryPath, bool copyXml);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseService/EnterTableContentEdit", ReplyAction="http://www.ntreev.com/IDataBaseService/EnterTableContentEditResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData> EnterTableContentEdit(string tableName);
+        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData> EnterTableContentEdit(System.Guid domainID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseService/LeaveTableContentEdit", ReplyAction="http://www.ntreev.com/IDataBaseService/LeaveTableContentEditResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData> LeaveTableContentEdit(string tableName);
+        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData> LeaveTableContentEdit(System.Guid domainID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseService/BeginTableContentEdit", ReplyAction="http://www.ntreev.com/IDataBaseService/BeginTableContentEditResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData> BeginTableContentEdit(string tableName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseService/EndTableContentEdit", ReplyAction="http://www.ntreev.com/IDataBaseService/EndTableContentEditResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.TableInfo[]> EndTableContentEdit(string tableName);
+        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.TableInfo[]> EndTableContentEdit(System.Guid domainID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseService/CancelTableContentEdit", ReplyAction="http://www.ntreev.com/IDataBaseService/CancelTableContentEditResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase CancelTableContentEdit(string tableName);
+        Ntreev.Crema.ServiceModel.ResultBase CancelTableContentEdit(System.Guid domainID);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseService/BeginTableTemplateEdit", ReplyAction="http://www.ntreev.com/IDataBaseService/BeginTableTemplateEditResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData> BeginTableTemplateEdit(string tableName);
@@ -340,24 +340,24 @@ namespace Ntreev.Crema.Services.DataBaseService {
             return base.Channel.InheritTable(tableName, newTableName, categoryPath, copyXml);
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData> EnterTableContentEdit(string tableName) {
-            return base.Channel.EnterTableContentEdit(tableName);
+        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData> EnterTableContentEdit(System.Guid domainID) {
+            return base.Channel.EnterTableContentEdit(domainID);
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData> LeaveTableContentEdit(string tableName) {
-            return base.Channel.LeaveTableContentEdit(tableName);
+        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData> LeaveTableContentEdit(System.Guid domainID) {
+            return base.Channel.LeaveTableContentEdit(domainID);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData> BeginTableContentEdit(string tableName) {
             return base.Channel.BeginTableContentEdit(tableName);
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.TableInfo[]> EndTableContentEdit(string tableName) {
-            return base.Channel.EndTableContentEdit(tableName);
+        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.TableInfo[]> EndTableContentEdit(System.Guid domainID) {
+            return base.Channel.EndTableContentEdit(domainID);
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase CancelTableContentEdit(string tableName) {
-            return base.Channel.CancelTableContentEdit(tableName);
+        public Ntreev.Crema.ServiceModel.ResultBase CancelTableContentEdit(System.Guid domainID) {
+            return base.Channel.CancelTableContentEdit(domainID);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData> BeginTableTemplateEdit(string tableName) {

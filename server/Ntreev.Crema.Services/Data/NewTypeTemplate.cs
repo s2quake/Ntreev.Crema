@@ -87,7 +87,7 @@ namespace Ntreev.Crema.Services.Data
             await base.OnBeginEditAsync(authentication);
         }
 
-        protected override async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, TypeInfo[] typeInfos)
+        protected override async Task OnEndEditAsync(Authentication authentication)
         {
             var dataType = this.TypeSource;
             var dataSet = dataType.DataSet;
@@ -95,9 +95,8 @@ namespace Ntreev.Crema.Services.Data
             await this.Repository.LockAsync(itemPath);
             dataSet.AddItemPaths(itemPath);
             this.type = await this.Types.AddNewAsync(authentication, dataType);
-            typeInfos = new TypeInfo[] { dataType.TypeInfo };
-            await base.OnEndEditAsync(authentication, typeInfos);
-            return typeInfos;
+            this.Domain.Result = new TypeInfo[] { dataType.TypeInfo };
+            await base.OnEndEditAsync(authentication);
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)

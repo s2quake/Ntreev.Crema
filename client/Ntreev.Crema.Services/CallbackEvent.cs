@@ -15,13 +15,10 @@ namespace Ntreev.Crema.Services
 
         private object owner;
 
-
-        
-
         public CallbackEvent(object owner)
         {
             this.owner = owner;
-            this.Dispatcher = new CremaDispatcher(this);
+            this.Dispatcher = new CremaDispatcher(owner);
             this.setsByID.Add(-1, new ManualResetEvent(true));
         }
 
@@ -55,44 +52,6 @@ namespace Ntreev.Crema.Services
                 }
             });
         }
-
-        //public void Set(long id)
-        //{
-        //    this.Dispatcher.VerifyAccess();
-        //    if (this.setsByID.ContainsKey(id) == true)
-        //    {
-        //        this.setsByID[id].Set();
-        //    }
-        //    else
-        //    {
-        //        this.setsByID.Add(id, new ManualResetEvent(true));
-        //    }
-        //}
-
-        //public Task ResetAsync(long id)
-        //{
-        //    return this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        if (this.setsByID.ContainsKey(id) == true)
-        //        {
-        //            this.setsByID[id].Reset();
-        //        }
-        //    });
-        //}
-
-        //public void Reset(long id)
-        //{
-        //    this.Dispatcher.VerifyAccess();
-        //    if (this.setsByID.ContainsKey(id) == true)
-        //    {
-        //        this.setsByID[id].Reset();
-        //    }
-        //}
-
-        //public void Dispose()
-        //{
-        //    this.Dispatcher.Dispose();
-        //}
 
         public async Task DisposeAsync()
         {

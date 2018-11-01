@@ -35,92 +35,16 @@ namespace Ntreev.Crema.Services.Data
         private readonly DataBase dataBase;
         private readonly CremaSettings settings;
         private Version version;
+
         private readonly HashSet<string> types = new HashSet<string>();
         private readonly HashSet<string> tables = new HashSet<string>();
-        private readonly HashSet<string> itemPaths = new HashSet<string>();
 
         public DataBaseRepositoryHost(DataBase dataBase, IRepository repository)
-            : base(repository, null)
+            : base(repository)
         {
             this.dataBase = dataBase;
             this.settings = this.dataBase.GetService(typeof(CremaSettings)) as CremaSettings;
             this.RefreshItems();
-        }
-
-        public void Lock(params string[] itemPaths)
-        {
-            this.Dispatcher.VerifyAccess();
-            if (itemPaths.Distinct().Count() != itemPaths.Length)
-            {
-                System.Diagnostics.Debugger.Break();
-            }
-            foreach (var item in itemPaths)
-            {
-                if (this.itemPaths.Contains(item) == true)
-                    throw new ItemAlreadyExistsException(item);
-            }
-            foreach (var item in itemPaths)
-            {
-                this.itemPaths.Add(item);
-            }
-
-            this.dataBase.CremaHost.Debug($"Lock{Environment.NewLine}{string.Join(Environment.NewLine, itemPaths)}");
-        }
-
-        public void Unlock(params string[] itemPaths)
-        {
-            this.Dispatcher.VerifyAccess();
-            if (itemPaths.Distinct().Count() != itemPaths.Length)
-            {
-                System.Diagnostics.Debugger.Break();
-            }
-            foreach (var item in itemPaths)
-            {
-                if (this.itemPaths.Contains(item) == false)
-                {
-                    System.Diagnostics.Debugger.Break();
-                    throw new ItemNotFoundException(item);
-                }
-            }
-            foreach (var item in itemPaths)
-            {
-                this.itemPaths.Remove(item);
-            }
-            this.dataBase.CremaHost.Debug($"Unlock{Environment.NewLine}{string.Join(Environment.NewLine, itemPaths)}");
-        }
-
-        public Task LockAsync(params string[] itemPaths)
-        {
-            return this.Dispatcher.InvokeAsync(() => this.Lock(itemPaths));
-        }
-
-        public Task UnlockAsync(params string[] itemPaths)
-        {
-            return this.Dispatcher.InvokeAsync(() => this.Unlock(itemPaths));
-        }
-
-        public Task BeginTransactionAsync(string author, string name)
-        {
-            return this.Dispatcher.InvokeAsync(() =>
-            {
-                this.BeginTransaction(author, name);
-            });
-        }
-
-        public Task EndTransactionAsync()
-        {
-            return this.Dispatcher.InvokeAsync(this.EndTransaction);
-        }
-
-        public Task CancelTransactionAsync()
-        {
-            return this.Dispatcher.InvokeAsync(this.CancelTransaction);
-        }
-
-        public override void CancelTransaction()
-        {
-            base.CancelTransaction();
-            this.itemPaths.Clear();
         }
 
         public void RefreshItems()
@@ -468,5 +392,7 @@ namespace Ntreev.Crema.Services.Data
                 return this.version;
             }
         }
+
+        public override CremaHost CremaHost => this.dataBase.CremaHost;
     }
 }

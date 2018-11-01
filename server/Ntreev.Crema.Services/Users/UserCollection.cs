@@ -64,8 +64,6 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
                     this.ValidateUserCreate(authentication, userID, categoryPath, password);
-                    this.CremaHost.Sign(authentication);
-                    var category = this.GetCategory(categoryPath);
                     return new UserSerializationInfo()
                     {
                         ID = userID,
@@ -78,7 +76,7 @@ namespace Ntreev.Crema.Services.Users
                 var result = await this.InvokeUserCreateAsync(authentication, userInfo);
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, result.CreationInfo);
+                    this.CremaHost.Sign(authentication);
                     var user = this.BaseAddNew(userID, categoryPath, null);
                     user.Initialize((UserInfo)result, BanInfo.Empty);
                     user.Password = UserContext.StringToSecureString(result.Password);

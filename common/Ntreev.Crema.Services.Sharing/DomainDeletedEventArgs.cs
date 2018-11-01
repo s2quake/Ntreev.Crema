@@ -27,11 +27,11 @@ namespace Ntreev.Crema.Services
 {
     public class DomainDeletedEventArgs : DomainEventArgs
     {
-        public DomainDeletedEventArgs(Authentication authentication, IDomain domain, bool isCanceled, object result)
+        public DomainDeletedEventArgs(Authentication authentication, IDomain domain, bool isCanceled)
             : base(authentication, domain)
         {
             this.IsCanceled = isCanceled;
-            this.Result = result;
+            this.Result = isCanceled == true ? null : domain.Result;
             this.Authentication = authentication;
         }
 

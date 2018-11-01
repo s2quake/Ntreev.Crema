@@ -43,7 +43,7 @@ namespace Ntreev.Crema.Data.Diff
         {
             template.BeginLoadData();
             var column = template.NewColumn();
-            column.TargetColumn = template.TargetTable.Columns.Add();
+            column.TargetColumn = template.DataTable.Columns.Add();
             column.EmptyFields();
             column.SetAttribute(DiffUtility.DiffEnabledKey, false);
             column.SetAttribute(DiffUtility.DiffStateKey, DiffState.Imaginary);

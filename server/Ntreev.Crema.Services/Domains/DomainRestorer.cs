@@ -238,7 +238,7 @@ namespace Ntreev.Crema.Services.Domains
                 throw new NotImplementedException();
             }
 
-            public Task<object> DeleteAsync(Authentication authentication, bool isCanceled, object result)
+            public Task DeleteAsync(Authentication authentication, bool isCanceled)
             {
                 throw new NotImplementedException();
             }

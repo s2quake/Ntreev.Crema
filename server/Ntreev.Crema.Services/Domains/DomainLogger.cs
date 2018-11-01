@@ -221,6 +221,15 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
+        public long Delete(Authentication authentication)
+        {
+            return this.Post(new DeleteAction()
+            {
+                UserID = authentication.ID,
+                AcceptTime = authentication.SignatureDate.DateTime
+            }); 
+        }
+
         public long Post(DomainActionBase action)
         {
             this.Dispatcher.VerifyAccess();

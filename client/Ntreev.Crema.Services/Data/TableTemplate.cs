@@ -61,32 +61,27 @@ namespace Ntreev.Crema.Services.Data
             this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table, });
         }
 
-        protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, object args)
+        protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            var tableInfos = await base.OnEndEditAsync(authentication, args);
-            if (args is Guid)
-            {
-                var tableInfo = tableInfos.First();
-                this.table.UpdateTemplate(tableInfo);
-                this.table.UpdateTags(tableInfo.Tags);
-                this.table.UpdateComment(tableInfo.Comment);
-                this.table.TableState = TableState.None;
+            var domain = this.Domain;
+            await base.OnEndEditAsync(authentication);
+            var tableInfos = domain.Result as TableInfo[];
+            var tableInfo = tableInfos.First();
+            this.table.UpdateTemplate(tableInfo);
+            this.table.UpdateTags(tableInfo.Tags);
+            this.table.UpdateComment(tableInfo.Comment);
+            this.table.TableState = TableState.None;
 
-                var items = EnumerableUtility.One(this.table).ToArray();
-                this.Container.InvokeTablesStateChangedEvent(authentication, items);
-                this.Container.InvokeTablesTemplateChangedEvent(authentication, items);
-            }
-            return tableInfos;
+            var items = EnumerableUtility.One(this.table).ToArray();
+            this.Container.InvokeTablesStateChangedEvent(authentication, items);
+            this.Container.InvokeTablesTemplateChangedEvent(authentication, items);
         }
 
-        protected override async Task OnCancelEditAsync(Authentication authentication, object args)
+        protected override async Task OnCancelEditAsync(Authentication authentication)
         {
-            await base.OnCancelEditAsync(authentication, args);
-            if (args is Guid)
-            {
-                this.table.TableState = TableState.None;
-                this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table });
-            }
+            await base.OnCancelEditAsync(authentication);
+            this.table.TableState = TableState.None;
+            this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table });
         }
 
         protected override void OnAttach(Domain domain)
@@ -95,28 +90,19 @@ namespace Ntreev.Crema.Services.Data
             base.OnAttach(domain);
         }
 
-        protected override Task<ResultBase<DomainMetaData>> BeginDomainAsync(Authentication authentication)
+        protected override Task<ResultBase<DomainMetaData>> OnBeginDomainAsync(Authentication authentication)
         {
             return this.CremaHost.InvokeServiceAsync(() => this.Service.BeginTableTemplateEdit(this.table.Name));
         }
 
-        protected override async Task<TableInfo[]> EndDomainAsync(Authentication authentication, object args)
+        protected override async Task<ResultBase<TableInfo[]>> OnEndDomainAsync(Authentication authentication)
         {
-            if (args is Guid domainID)
-            {
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTableTemplateEdit(domainID));
-                return result.Value;
-            }
-            return args as TableInfo[];
+            return await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTableTemplateEdit(this.Domain.ID));
         }
 
-        protected override async Task<ResultBase> CancelDomainAsync(Authentication authentication, object args)
+        protected override async Task<ResultBase> OnCancelDomainAsync(Authentication authentication)
         {
-            if (args is Guid domainID)
-            {
-                return await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTableTemplateEdit(domainID));
-            }
-            return new ResultBase() { SignatureDate = authentication.SignatureDate };
+            return await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTableTemplateEdit(this.Domain.ID));
         }
 
         private TableCollection Container => this.table.Container;

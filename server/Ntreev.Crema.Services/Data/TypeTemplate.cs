@@ -29,7 +29,6 @@ namespace Ntreev.Crema.Services.Data
     {
         private readonly Type type;
         private readonly Type[] types;
-        private string[] itemPaths;
 
         public TypeTemplate(Type type)
         {
@@ -66,13 +65,13 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        protected override async Task<TypeInfo[]> OnEndEditAsync(Authentication authentication, TypeInfo[] typeInfos)
+        protected override async Task OnEndEditAsync(Authentication authentication)
         {
             var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, this.TypeSource.DataSet, false, false);
             var typeInfo = this.TypeSource.TypeInfo;
-            typeInfos = new TypeInfo[] { typeInfo };
+            this.Domain.Result = new TypeInfo[] { typeInfo };
             await this.Container.InvokeTypeEndTemplateEditAsync(authentication, this.type.Name, dataBaseSet);
-            await base.OnEndEditAsync(authentication, typeInfos);
+            await base.OnEndEditAsync(authentication);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.type.UpdateTypeInfo(typeInfo);
@@ -81,7 +80,6 @@ namespace Ntreev.Crema.Services.Data
                 this.Container.InvokeTypesChangedEvent(authentication, this.types, dataBaseSet.DataSet);
             });
             await this.Repository.UnlockAsync(this.ItemPaths);
-            return typeInfos;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
@@ -92,7 +90,7 @@ namespace Ntreev.Crema.Services.Data
                 this.type.TypeState = TypeState.None;
                 this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
             });
-            await this.Repository.UnlockAsync(this.itemPaths);
+            await this.Repository.UnlockAsync(this.ItemPaths);
         }
 
         protected override void OnAttach(Domain domain)
@@ -108,7 +106,6 @@ namespace Ntreev.Crema.Services.Data
             var dataType = dataSet.Types[this.type.Name, this.type.Category.Path];
             if (dataType == null)
                 throw new TypeNotFoundException(typePath);
-            this.itemPaths = dataSet.ExtendedProperties[nameof(DataBaseSet.ItemPaths)] as string[] ?? new string[] { };
             return dataType;
         }
 

@@ -1,4 +1,5 @@
 ﻿using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace Ntreev.Crema.Services
     {
         private readonly Dictionary<T, Task> setsByID = new Dictionary<T, Task>();
 
-        public CremaResetEvent(CremaDispatcher dispatcher)
+        public CremaResetEvent(Dispatcher dispatcher)
         {
             this.Dispatcher = dispatcher;
         }
@@ -67,6 +68,6 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        private CremaDispatcher Dispatcher { get; }
+        private Dispatcher Dispatcher { get; }
     }
 }

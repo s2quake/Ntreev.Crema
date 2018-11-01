@@ -132,9 +132,9 @@ namespace Ntreev.Crema.Services.Data
             await base.OnBeginEditAsync(authentication);
         }
 
-        protected override async Task<TableInfo[]> OnEndEditAsync(Authentication authentication, TableInfo[] tableInfos)
+        protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            var dataSet = this.TemplateSource.TargetTable.DataSet;
+            var dataSet = this.TemplateSource.DataTable.DataSet;
             var tableNames = dataSet.Tables.Select(item => item.Name).ToArray();
             var query = from item in tableNames.Except(this.tableNames)
                         let dataTable = dataSet.Tables[item]
@@ -147,11 +147,10 @@ namespace Ntreev.Crema.Services.Data
             await this.Repository.LockAsync(itemPaths);
             dataSet.AddItemPaths(itemPaths);
             this.tables = await this.Container.AddNewAsync(authentication, dataSet, dataTables);
-            tableInfos = dataTables.Select(item => item.TableInfo).ToArray();
-            await base.OnEndEditAsync(authentication, tableInfos);
+            this.Domain.Result = dataTables.Select(item => item.TableInfo).ToArray();
+            await base.OnEndEditAsync(authentication);
             this.parent = null;
             this.permission = null;
-            return tableInfos;
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
@@ -181,6 +180,20 @@ namespace Ntreev.Crema.Services.Data
                 return CremaTemplate.Create(dataTable);
             }
             throw new NotImplementedException();
+        }
+
+        protected override void OnAttach(Domain domain)
+        {
+            base.OnAttach(domain);
+            if (this.parent is TableCategory category)
+            {
+                this.tableNames = new string[] { };
+            }
+            else if (this.parent is Table table)
+            {
+                var dataSet = this.TemplateSource.DataSet;
+                this.tableNames = dataSet.Tables.Select(item => item.Name).ToArray();
+            }
         }
 
         private TableCollection Container { get; }

@@ -62,14 +62,13 @@ namespace Ntreev.Crema.Services.Domains
             this.Context.InvokeItemsCreatedEvent(authentication, domains, domainInfos);
         }
 
-        public void InvokeDomainDeletedEvent(Authentication authentication, Domain[] domains, bool[] isCanceleds, object[] results)
+        public void InvokeDomainDeletedEvent(Authentication authentication, Domain[] domains, bool[] isCanceleds, long taksID)
         {
             var itemPaths = domains.Select(item => item.Path).ToArray();
-            var args = new DomainsDeletedEventArgs(authentication, domains, isCanceleds, results);
+            var args = new DomainsDeletedEventArgs(authentication, domains, isCanceleds) { TaskID = taksID };
             for (var i = 0; i < domains.Length; i++)
             {
                 var item = domains[i];
-                var result = results[i];
                 var isCanceled = isCanceleds[i];
                 var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainDeletedEvent), item, isCanceled);
                 var comment = isCanceled == false ? EventMessageBuilder.EndDomain(authentication, item) : EventMessageBuilder.CancelDomain(authentication, item);
@@ -239,27 +238,27 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        public async Task DeleteAsync(Authentication authentication, Domain domain, bool isCanceled, object result)
-        {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.Remove(domain);
-                domain.Dispose(authentication, isCanceled, result);
-                this.InvokeDomainDeletedEvent(authentication, new Domain[] { domain }, new bool[] { isCanceled }, new object[] { result });
-            });
+        //public async Task DeleteAsync(Authentication authentication, Domain domain, bool isCanceled, object result)
+        //{
+        //    await this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        this.Remove(domain);
+        //        domain.Dispose(authentication, isCanceled);
+        //        this.InvokeDomainDeletedEvent(authentication, new Domain[] { domain }, new bool[] { isCanceled });
+        //    });
 
-            //return this.Dispatcher.InvokeAsync(() =>
-            //{
-            //    foreach (var item in this.ToArray<Domain>())
-            //    {
-            //        if (item.DomainInfo.DataBaseID == dataBaseID && item.DomainInfo.ItemPath == itemPath && item.DomainInfo.ItemType == itemType)
-            //        {
-            //            item.Dispose(authentication, isCanceled);
-            //            return;
-            //        }
-            //    }
-            //});
-        }
+        //    //return this.Dispatcher.InvokeAsync(() =>
+        //    //{
+        //    //    foreach (var item in this.ToArray<Domain>())
+        //    //    {
+        //    //        if (item.DomainInfo.DataBaseID == dataBaseID && item.DomainInfo.ItemPath == itemPath && item.DomainInfo.ItemType == itemType)
+        //    //        {
+        //    //            item.Dispose(authentication, isCanceled);
+        //    //            return;
+        //    //        }
+        //    //    }
+        //    //});
+        //}
 
         private Domain CreateDomain(DomainInfo domainInfo)
         {

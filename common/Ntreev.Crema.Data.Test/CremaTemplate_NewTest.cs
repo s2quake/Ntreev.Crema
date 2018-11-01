@@ -48,7 +48,7 @@ namespace Ntreev.Crema.Data.Test
             Assert.AreEqual(string.Empty, template.Comment);
             Assert.AreEqual(TagInfo.All, template.Tags);
             Assert.AreEqual(TagInfo.All, template.DerivedTags);
-            Assert.AreEqual(table, template.TargetTable);
+            Assert.AreEqual(table, template.DataTable);
             Assert.AreEqual(0, template.Columns.Count);
             Assert.AreEqual(table.SignatureDateProvider, template.SignatureDateProvider);
             Assert.IsFalse(template.IsModified);
@@ -72,7 +72,7 @@ namespace Ntreev.Crema.Data.Test
             Assert.AreEqual(string.Empty, template.Comment);
             Assert.AreEqual(TagInfo.All, template.Tags);
             Assert.AreEqual(TagInfo.All, template.DerivedTags);
-            Assert.AreEqual(child, template.TargetTable);
+            Assert.AreEqual(child, template.DataTable);
             Assert.AreEqual(0, template.Columns.Count);
             Assert.AreEqual(child.SignatureDateProvider, template.SignatureDateProvider);
             Assert.IsFalse(template.IsModified);

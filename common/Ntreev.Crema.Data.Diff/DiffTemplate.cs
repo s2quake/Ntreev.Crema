@@ -58,8 +58,8 @@ namespace Ntreev.Crema.Data.Diff
         {
             this.diffTable1 = table1;
             this.diffTable2 = table2;
-            this.diffSource1 = new CremaTemplate() { TargetTable = table1 };
-            this.diffSource2 = new CremaTemplate() { TargetTable = table2 };
+            this.diffSource1 = new CremaTemplate() { DataTable = table1 };
+            this.diffSource2 = new CremaTemplate() { DataTable = table2 };
             this.mergeType = mergeType;
         }
 
@@ -869,7 +869,7 @@ namespace Ntreev.Crema.Data.Diff
 
         private static CremaTemplate Create(CremaDataTable dataTable)
         {
-            var template = new CremaTemplate() { TargetTable = dataTable };
+            var template = new CremaTemplate() { DataTable = dataTable };
 
             template.Attributes.Add(DiffUtility.DiffStateKey, typeof(string), DBNull.Value);
             template.Attributes.Add(DiffUtility.DiffFieldsKey, typeof(string), DBNull.Value);

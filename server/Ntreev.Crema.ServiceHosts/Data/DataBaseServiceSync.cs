@@ -145,14 +145,14 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return this.InvokeTask(Task.Run(() => this.InheritTableAsync(tableName, newTableName, categoryPath, copyXml)));
         }
 
-        public ResultBase<DomainMetaData> EnterTableContentEdit(string tableName)
+        public ResultBase<DomainMetaData> EnterTableContentEdit(Guid domainID)
         {
-            return this.InvokeTask(Task.Run(() => this.EnterTableContentEditAsync(tableName)));
+            return this.InvokeTask(Task.Run(() => this.EnterTableContentEditAsync(domainID)));
         }
 
-        public ResultBase<DomainMetaData> LeaveTableContentEdit(string tableName)
+        public ResultBase<DomainMetaData> LeaveTableContentEdit(Guid domainID)
         {
-            return this.InvokeTask(Task.Run(() => this.LeaveTableContentEditAsync(tableName)));
+            return this.InvokeTask(Task.Run(() => this.LeaveTableContentEditAsync(domainID)));
         }
 
         public ResultBase<DomainMetaData> BeginTableContentEdit(string tableName)
@@ -160,14 +160,14 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return this.InvokeTask(Task.Run(() => this.BeginTableContentEditAsync(tableName)));
         }
 
-        public ResultBase<TableInfo[]> EndTableContentEdit(string tableName)
+        public ResultBase<TableInfo[]> EndTableContentEdit(Guid domainID)
         {
-            return this.InvokeTask(Task.Run(() => this.EndTableContentEditAsync(tableName)));
+            return this.InvokeTask(Task.Run(() => this.EndTableContentEditAsync(domainID)));
         }
 
-        public ResultBase CancelTableContentEdit(string tableName)
+        public ResultBase CancelTableContentEdit(Guid domainID)
         {
-            return this.InvokeTask(Task.Run(() => this.CancelTableContentEditAsync(tableName)));
+            return this.InvokeTask(Task.Run(() => this.CancelTableContentEditAsync(domainID)));
         }
 
         public ResultBase<DomainMetaData> BeginTableTemplateEdit(string tableName)
