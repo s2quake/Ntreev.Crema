@@ -35,18 +35,14 @@ namespace Ntreev.Crema.Bot
     {
         private const string masterBotID = "Smith";
         private readonly ICremaHost cremaHost;
-        private readonly IEnumerable<ITaskProvider> taskProviders;
         private readonly Dictionary<string, AutobotBase> botByID = new Dictionary<string, AutobotBase>();
 
         protected AutobotServiceBase(ICremaHost cremaHost, IEnumerable<ITaskProvider> taskProviders)
         {
             this.cremaHost = cremaHost;
             this.cremaHost.CloseRequested += CremaHost_CloseRequested;
-            this.cremaHost.Closing += CremaHost_Closing;
-            this.taskProviders = taskProviders;
+            this.TaskProviders = taskProviders.ToArray();
         }
-
-        
 
         public async Task CreateAutobotAsync(Authentication authentication, string autobotID)
         {
@@ -62,7 +58,7 @@ namespace Ntreev.Crema.Bot
                 autobot.AllowException = this.AllowException;
                 this.botByID.Add(autobotID, autobot);
                 autobot.Disposed += Autobot_Disposed;
-                autobot.ExecuteAsync(this.taskProviders);
+                autobot.ExecuteAsync(this.TaskProviders);
             });
         }
 
@@ -136,15 +132,9 @@ namespace Ntreev.Crema.Bot
 
         public bool IsClosing { get; private set; }
 
-        public ITaskProvider[] TaskProviders
-        {
-            get { return this.taskProviders.ToArray(); }
-        }
+        public ITaskProvider[] TaskProviders { get; }
 
-        public bool AllowException
-        {
-            get; set;
-        }
+        public bool AllowException { get; set; }
 
         public CremaDispatcher Dispatcher { get; private set; }
 
@@ -154,10 +144,7 @@ namespace Ntreev.Crema.Bot
         {
             if (sender is AutobotBase autobot)
             {
-                //this.Dispatcher.InvokeAsync(() =>
-                //{
-                    this.botByID.Remove(autobot.AutobotID);
-                //});
+                this.botByID.Remove(autobot.AutobotID);
             }
         }
 
@@ -167,12 +154,6 @@ namespace Ntreev.Crema.Bot
             {
                 e.AddTask(this.StopAsync());
             }
-        }
-
-        private void CremaHost_Closing(object sender, EventArgs e)
-        {
-            //if (this.IsPlaying == true)
-            //    this.StopAsync().Wait();
         }
     }
 }

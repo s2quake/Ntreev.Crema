@@ -2,6 +2,7 @@
 using Ntreev.Crema.Services.Users.Serializations;
 using Ntreev.Library;
 using Ntreev.Library.IO;
+using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,20 +19,19 @@ namespace Ntreev.Crema.Services.Users
         private readonly Dictionary<string, UserSerializationInfo> users = new Dictionary<string, UserSerializationInfo>();
         private readonly Dictionary<string, UserSerializationInfo> usersToCreate = new Dictionary<string, UserSerializationInfo>();
         private readonly Dictionary<string, UserSerializationInfo> usersToDelete = new Dictionary<string, UserSerializationInfo>();
-        private readonly string[] itemPaths;
         private readonly SignatureDateProvider signatureDateProvider;
 
-        private UserBaseSet(UserContext userContext, UserSet userSet, bool typeCreation)
+        private UserBaseSet(UserContext userContext, UserSet userSet, bool userCreation)
         {
             this.UserContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
             this.UserContext.Dispatcher.VerifyAccess();
-            this.itemPaths = userSet.ItemPaths;
+            this.ItemPaths = userSet.ItemPaths;
             foreach (var item in userSet.Infos)
             {
                 var user = userContext.Users[item.ID, item.CategoryPath];
                 if (user == null)
                 {
-                    if (typeCreation == false)
+                    if (userCreation == false)
                     {
                         throw new UserNotFoundException(item.ID);
                     }
@@ -53,11 +53,6 @@ namespace Ntreev.Crema.Services.Users
             return userContext.Dispatcher.InvokeAsync(() => new UserBaseSet(userContext, userSet, userCreation));
         }
 
-        //public static UserBaseSet Create(UserContext dataBase, CremaDataSet dataSet, bool typeCreation, bool tableCreation)
-        //{
-        //    return new UserBaseSet(dataBase, dataSet, typeCreation, tableCreation);
-        //}
-
         public void SetUserCategoryPath(string categoryPath, string newCategoryPath)
         {
             var itemPath1 = this.UserContext.GenerateCategoryPath(categoryPath);
@@ -68,11 +63,7 @@ namespace Ntreev.Crema.Services.Users
             if (Directory.Exists(itemPath2) == true)
                 throw new IOException();
 
-            //var typeNames = DataSet.ExtendedProperties["TypeNames"] as string[];
-            //var typeNameList = typeNames.ToList();
-            //var files = DirectoryUtility.GetAllFiles(itemPath1, "*.xml");
-            //var sss = files.Select(item => Path.GetFileNameWithoutExtension(item)).ToList();
-
+            var signatureDate = this.signatureDateProvider.Provide();
             foreach (var item in this.users.ToArray())
             {
                 var path = item.Key;
@@ -82,8 +73,9 @@ namespace Ntreev.Crema.Services.Users
 
                 this.ValidateUserExists(path);
                 userInfo.CategoryPath = Regex.Replace(userInfo.CategoryPath, "^" + categoryPath, newCategoryPath);
+                userInfo.ModificationInfo = signatureDate;
                 this.ValidateUserNotExists(path);
-                //typeNameList.Remove(userInfo.ID);
+                this.users[path] = userInfo;
             }
 
             this.Serialize();
@@ -111,12 +103,6 @@ namespace Ntreev.Crema.Services.Users
 
         public void RenameUser(string typePath, string typeName)
         {
-            //var dataType = this.types.First(item => item.Path == typePath);
-            //this.ValidateTypeExists(dataType.Path);
-            //dataType.TypeName = typeName;
-            //this.ValidateTypeNotExists(dataType.Path);
-            //this.Serialize();
-            //this.MoveUsersRepositoryPath();
             throw new NotImplementedException();
         }
 
@@ -177,41 +163,6 @@ namespace Ntreev.Crema.Services.Users
             this.Serialize();
         }
 
-        //public static void Modify(CremaDataSet dataSet, UserContext dataBase)
-        //{
-        //    var dataBaseSet = new UserBaseSet(dataBase, dataSet, false, false);
-        //    dataBaseSet.Serialize();
-        //}
-
-        //public DataBaseItemState GetTypeState(CremaDataType dataType)
-        //{
-        //    if (dataType.ExtendedProperties.ContainsKey(typeof(TypeInfo)) == true)
-        //    {
-        //        var typeInfo = (TypeInfo)dataType.ExtendedProperties[typeof(TypeInfo)];
-        //        var itemPath1 = this.UserContext.GeneratePath(dataType.Path);
-        //        var itemPath2 = this.UserContext.GeneratePath(typeInfo.Path);
-
-        //        if (dataType.Name != typeInfo.Name)
-        //        {
-        //            return DataBaseItemState.Rename;
-        //        }
-        //        else if (itemPath1 != itemPath2)
-        //        {
-        //            return DataBaseItemState.Move;
-        //        }
-        //        else
-        //        {
-        //            return DataBaseItemState.None;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return DataBaseItemState.Create;
-        //    }
-        //}
-
-        //public IReadOnlyDictionary<string, UserSerializationInfo> Users => this.users;
-
         public UserSerializationInfo GetUserInfo(string path)
         {
             if (this.users.ContainsKey(path) == true)
@@ -221,9 +172,7 @@ namespace Ntreev.Crema.Services.Users
             throw new NotImplementedException();
         }
 
-        //public CremaDataSet DataSet { get; }
-
-        public string[] ItemPaths => this.itemPaths;
+        public string[] ItemPaths { get; }
 
         private void Serialize()
         {
@@ -252,16 +201,7 @@ namespace Ntreev.Crema.Services.Users
                 var path = item.Key;
                 var userInfo = item.Value;
                 var itemPath = this.UserContext.GenerateUserPath(userInfo.CategoryPath, userInfo.ID);
-
                 this.ValidateUserNotExists(path);
-
-                var sss = Path.GetFileName(itemPath);
-                var files = DirectoryUtility.GetAllFiles(this.UserContext.BasePath, sss + ".*");
-                if (files.Any())
-                {
-                    System.Diagnostics.Debugger.Launch();
-                }
-
                 this.Serializer.Serialize(itemPath, userInfo, ObjectSerializerSettings.Empty);
             }
         }
@@ -358,6 +298,41 @@ namespace Ntreev.Crema.Services.Users
                 if (File.Exists(item) == true)
                     throw new FileNotFoundException();
             }
+        }
+
+        private string GenerateCategoryPath(string parentPath, string name)
+        {
+            var value = new CategoryName(parentPath, name);
+            return this.GenerateCategoryPath(value.Path);
+        }
+
+        private string GenerateCategoryPath(string categoryPath)
+        {
+            NameValidator.ValidateCategoryPath(categoryPath);
+            var baseUri = new Uri(this.UserContext.BasePath);
+            var uri = new Uri(baseUri + categoryPath);
+            return uri.LocalPath;
+        }
+
+        private string GenerateUserPath(string categoryPath, string userID)
+        {
+            return Path.Combine(this.GenerateCategoryPath(categoryPath), userID);
+        }
+
+        private string GeneratePath(string path)
+        {
+            if (NameValidator.VerifyCategoryPath(path) == true)
+                return this.GenerateCategoryPath(path);
+            var itemName = new ItemName(path);
+            return this.GenerateUserPath(itemName.CategoryPath, itemName.Name);
+        }
+
+        private string[] GetFiles(string itemPath)
+        {
+            var directoryName = Path.GetDirectoryName(itemPath);
+            var name = Path.GetFileNameWithoutExtension(itemPath);
+            var files = Directory.GetFiles(directoryName, $"{name}.*").Where(item => Path.GetFileNameWithoutExtension(item) == name).ToArray();
+            return files;
         }
 
         private UserRepositoryHost Repository => this.UserContext.Repository;

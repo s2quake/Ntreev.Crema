@@ -51,6 +51,12 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
+        public UserSerializationInfo Read(string path)
+        {
+            var repositoryItemPath = new RepositoryPath(this.UserContext.BasePath, path);
+            return (UserSerializationInfo)this.Serializer.Deserialize(repositoryItemPath, typeof(UserSerializationInfo), ObjectSerializerSettings.Empty);
+        }
+
         public void Commit(Authentication authentication, string comment)
         {
             this.Dispatcher.VerifyAccess();
@@ -72,6 +78,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void CreateUserCategory(string itemPath)
         {
+            this.Dispatcher.VerifyAccess();
             var directoryName = PathUtility.GetDirectoryName(itemPath);
             if (Directory.Exists(directoryName) == false)
                 throw new DirectoryNotFoundException();
@@ -83,16 +90,19 @@ namespace Ntreev.Crema.Services.Users
 
         public void RenameUserCategory(UserBaseSet userBaseSet, string categoryPath, string newCategoryPath)
         {
+            this.Dispatcher.VerifyAccess();
             userBaseSet.SetUserCategoryPath(categoryPath, newCategoryPath);
         }
 
         public void MoveUserCategory(UserBaseSet userBaseSet, string categoryPath, string newCategoryPath)
         {
+            this.Dispatcher.VerifyAccess();
             userBaseSet.SetUserCategoryPath(categoryPath, newCategoryPath);
         }
 
         public void DeleteUserCategory(UserBaseSet userBaseSet, string categoryPath)
         {
+            this.Dispatcher.VerifyAccess();
             userBaseSet.DeleteUserCategory(categoryPath);
         }
 

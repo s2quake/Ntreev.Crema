@@ -331,17 +331,17 @@ namespace Ntreev.Crema.Services.Users
         {
             var tuple = await this.Dispatcher.InvokeAsync(() =>
             {
-                var itemPaths = new string[]
+                var paths = new string[]
                 {
                     this.ItemPath
                 };
-                var itemPath = this.ItemPath;
-                return (itemPaths, itemPath);
+                var path = this.Path;
+                return (paths, path);
             });
             return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Lock(tuple.itemPaths);
-                var userInfo = (UserSerializationInfo)this.Serializer.Deserialize(tuple.itemPath, typeof(UserSerializationInfo), ObjectSerializerSettings.Empty);
+                this.Repository.Lock(tuple.paths);
+                var userInfo = this.Repository.Read(tuple.path);
                 var dataSet = new UserSet()
                 {
                     ItemPaths = tuple.itemPaths,
