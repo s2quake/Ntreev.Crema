@@ -33,7 +33,9 @@ namespace Ntreev.Crema.Bot.Consoles
     {
         private readonly ICremaHost cremaHost;
         [Import]
+#pragma warning disable IDE0044 // 읽기 전용 한정자 추가
         private Lazy<AutobotService> autobotService = null;
+#pragma warning restore IDE0044 // 읽기 전용 한정자 추가
 
         [ImportingConstructor]
         public AutobotCommand(ICremaHost cremaHost)
@@ -67,10 +69,14 @@ namespace Ntreev.Crema.Bot.Consoles
         }
 
         [CommandProperty]
+#if DEBUG
+        [DefaultValue(10)]
+#else
         [DefaultValue(0)]
+#endif
         public int Count
         {
-            get;set;
+            get; set;
         }
 
         protected override bool IsMethodEnabled(CommandMethodDescriptor descriptor)

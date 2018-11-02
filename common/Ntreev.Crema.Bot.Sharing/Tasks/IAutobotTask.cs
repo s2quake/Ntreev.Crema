@@ -48,11 +48,11 @@ namespace Ntreev.Crema.Bot.Tasks
                 {
                     if (RandomUtility.Within(75) == true)
                     {
-                        if (autobot.GetService(typeof(ICremaHost)) is ICremaHost cremaHost && cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
-                        {
-                            var dataBase = await dataBases.Dispatcher.InvokeAsync(() => dataBases.Random());
-                            context.Push(dataBase);
-                        }
+                        //if (autobot.GetService(typeof(ICremaHost)) is ICremaHost cremaHost && cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
+                        //{
+                        //    var dataBase = await dataBases.Dispatcher.InvokeAsync(() => dataBases.Random());
+                        //    context.Push(dataBase);
+                        //}
                     }
                     else if (RandomUtility.Within(75) == true)
                     {

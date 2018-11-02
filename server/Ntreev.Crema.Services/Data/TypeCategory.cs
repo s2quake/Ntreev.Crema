@@ -300,6 +300,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.ValidateExpired();
                 var container = this.Container;
+                var repository = this.Repository;
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
@@ -320,7 +321,7 @@ namespace Ntreev.Crema.Services.Data
                     base.Delete(authentication);
                     container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths, dataSet);
                 });
-                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
+                await repository.UnlockAsync(dataBaseSet.ItemPaths);
             }
             catch (Exception e)
             {

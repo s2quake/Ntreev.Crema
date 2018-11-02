@@ -59,15 +59,16 @@ namespace Ntreev.Crema.Services.Users
                     var targetName = new ItemName(categoryPath, base.Name);
                     return (items, oldPaths, oldCategoryPaths, userInfo, targetName);
                 });
-                var dataSet = this.ReadDataForPathAsync(authentication, tuple.targetName);
-                await this.Container.InvokeUserMoveAsync(authentication, tuple.userInfo, categoryPath);
+                var userSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
+                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeUserMoveAsync(authentication, tuple.userInfo, categoryPath, userBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, signatureDate);
+                    this.CremaHost.Sign(authentication);
                     base.Move(authentication, categoryPath);
                     this.Container.InvokeUsersMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths);
                 });
-                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
+                await this.Repository.UnlockAsync(userBaseSet.ItemPaths);
             }
             catch (Exception e)
             {
@@ -81,6 +82,8 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
+                var container = this.Container;
+                var repository = this.Repository;
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
@@ -88,17 +91,19 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.Sign(authentication);
                     var items = EnumerableUtility.One(this).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
-                    var userInfo = this.SerializationInfo;
+                    var userInfo = base.UserInfo;
                     return (items, oldPaths, userInfo);
                 });
-                var signatureDate = await this.Container.InvokeUserDeleteAsync(authentication, tuple.userInfo);
+                var userSet = await this.ReadDataForPathAsync(authentication, new ItemName(tuple.userInfo.Path));
+                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeUserDeleteAsync(authentication, tuple.userInfo, userBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var container = this.Container;
-                    this.CremaHost.Sign(authentication, signatureDate);
+                    this.CremaHost.Sign(authentication);
                     base.Delete(authentication);
                     container.InvokeUsersDeletedEvent(authentication, tuple.items, tuple.oldPaths);
                 });
+                await repository.UnlockAsync(userBaseSet.ItemPaths);
             }
             catch (Exception e)
             {
@@ -116,11 +121,8 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(Authentication.System, this, nameof(LoginAsync), this);
                     this.ValidateLogin(password);
-
                     var users = new User[] { this };
                     var authentication = new Authentication(new UserAuthenticationProvider(this), Guid.NewGuid());
-                    this.CremaHost.Sign(authentication);
-
                     if (this.Authentication != null)
                     {
                         var message = "다른 기기에서 동일한 아이디로 접속하였습니다.";
@@ -128,9 +130,9 @@ namespace Ntreev.Crema.Services.Users
                         this.Authentication.InvokeExpiredEvent(this.ID, message);
                         this.Container.InvokeUsersLoggedOutEvent(this.Authentication, users, closeInfo);
                     }
-
                     this.Authentication = authentication;
                     this.IsOnline = true;
+                    this.CremaHost.Sign(authentication);
                     this.Container.InvokeUsersStateChangedEvent(this.Authentication, users);
                     this.Container.InvokeUsersLoggedInEvent(this.Authentication, users);
                     return this.Authentication;
@@ -152,11 +154,11 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(LogoutAsync), this);
                     this.ValidateLogout(authentication);
-                    this.CremaHost.Sign(authentication);
                     var users = new User[] { this };
                     this.Authentication.InvokeExpiredEvent(authentication.ID, string.Empty);
                     this.Authentication = null;
                     this.IsOnline = false;
+                    this.CremaHost.Sign(authentication);
                     this.Container.InvokeUsersStateChangedEvent(authentication, users);
                     this.Container.InvokeUsersLoggedOutEvent(authentication, users, CloseInfo.Empty);
 
@@ -180,21 +182,23 @@ namespace Ntreev.Crema.Services.Users
                     this.ValidateBan(authentication, comment);
                     var items = EnumerableUtility.One(this).ToArray();
                     var comments = Enumerable.Repeat(comment, items.Length).ToArray();
-                    var isOnline = this.IsOnline;
-                    var userInfo = this.SerializationInfo;
-                    return (items, comments, isOnline, userInfo);
+                    var userInfo = base.UserInfo;
+                    return (items, comments, userInfo);
                 });
-                var banInfo = await this.Container.InvokeUserBanAsync(authentication, tuple.userInfo, comment);
+                var userSet = await this.ReadDataForChangeAsync(authentication);
+                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeUserBanAsync(authentication, tuple.userInfo, userBaseSet, comment);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, banInfo.SignatureDate);
-                    base.Ban(authentication, banInfo);
-                    this.IsOnline = false;
+                    var userInfo = userBaseSet.GetUserInfo(this.Path);
+                    base.Ban(authentication, (BanInfo)userInfo.BanInfo);
+                    this.CremaHost.Sign(authentication);
                     this.Container.InvokeUsersBannedEvent(authentication, tuple.items, tuple.comments);
-                    if (tuple.isOnline == true)
+                    if (this.IsOnline == true)
                     {
                         this.Authentication.InvokeExpiredEvent(authentication.ID, comment);
                         this.Authentication = null;
+                        this.IsOnline = false;
                         this.Container.InvokeUsersStateChangedEvent(authentication, tuple.items);
                         this.Container.InvokeUsersLoggedOutEvent(authentication, tuple.items, new CloseInfo(CloseReason.Banned, comment));
                     }
@@ -217,13 +221,15 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnbanAsync), this);
                     this.ValidateUnban(authentication);
                     var items = EnumerableUtility.One(this).ToArray();
-                    var userInfo = this.SerializationInfo;
+                    var userInfo = base.UserInfo;
                     return (items, userInfo);
                 });
-                var signatureDate = await this.Container.InvokeUserUnbanAsync(authentication, tuple.userInfo);
+                var userSet = await this.ReadDataForChangeAsync(authentication);
+                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeUserUnbanAsync(authentication, tuple.userInfo, userBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, signatureDate);
+                    this.CremaHost.Sign(authentication);
                     base.Unban(authentication);
                     this.Container.InvokeUsersUnbannedEvent(authentication, tuple.items);
                 });
@@ -273,18 +279,21 @@ namespace Ntreev.Crema.Services.Users
                     this.ValidateUserInfoChange(authentication, password, newPassword, userName, authority);
                     this.CremaHost.Sign(authentication);
                     var items = EnumerableUtility.One(this).ToArray();
-                    var userInfo = this.SerializationInfo;
+                    var userInfo = base.UserInfo;
                     return (items, userInfo);
                 });
-                var serializationInfo = await this.Container.InvokeUserChangeAsync(authentication, tuple.userInfo, password, newPassword, userName, authority);
+                var userSet = await this.ReadDataForChangeAsync(authentication);
+                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeUserChangeAsync(authentication, tuple.userInfo, userBaseSet, password, newPassword, userName, authority);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, serializationInfo.ModificationInfo);
-                    if (newPassword != null)
-                        this.Password = UserContext.StringToSecureString(serializationInfo.Password);
-                    base.UpdateUserInfo((UserInfo)serializationInfo);
+                    var userInfo = userBaseSet.GetUserInfo(this.Path);
+                    this.CremaHost.Sign(authentication);
+                    this.Password = UserContext.StringToSecureString(userInfo.Password);
+                    base.UpdateUserInfo((UserInfo)userInfo);
                     this.Container.InvokeUsersChangedEvent(authentication, tuple.items);
                 });
+                await this.Repository.UnlockAsync(userBaseSet.ItemPaths);
             }
             catch (Exception e)
             {
@@ -318,14 +327,12 @@ namespace Ntreev.Crema.Services.Users
             return UserContext.SecureStringToString(this.Password) == UserContext.SecureStringToString(password).Encrypt();
         }
 
-        public async Task<UserDataSet> ReadDataForPathAsync(Authentication authentication, ItemName targetName)
+        public async Task<UserSet> ReadDataForChangeAsync(Authentication authentication)
         {
             var tuple = await this.Dispatcher.InvokeAsync(() =>
             {
                 var itemPaths = new string[]
                 {
-                    this.Context.GenerateCategoryPath(targetName.CategoryPath),
-                    this.Context.GeneratePath(targetName),
                     this.ItemPath
                 };
                 var itemPath = this.ItemPath;
@@ -335,7 +342,35 @@ namespace Ntreev.Crema.Services.Users
             {
                 this.Repository.Lock(tuple.itemPaths);
                 var userInfo = (UserSerializationInfo)this.Serializer.Deserialize(tuple.itemPath, typeof(UserSerializationInfo), ObjectSerializerSettings.Empty);
-                var dataSet = new UserDataSet()
+                var dataSet = new UserSet()
+                {
+                    ItemPaths = tuple.itemPaths,
+                    Infos = new UserSerializationInfo[] { userInfo },
+                    SignatureDateProvider = new SignatureDateProvider(authentication.ID),
+                };
+                return dataSet;
+            });
+        }
+
+        public async Task<UserSet> ReadDataForPathAsync(Authentication authentication, ItemName targetName)
+        {
+            var tuple = await this.Dispatcher.InvokeAsync(() =>
+            {
+                var items = new string[]
+                {
+                    this.Context.GenerateCategoryPath(targetName.CategoryPath),
+                    this.Context.GeneratePath(targetName),
+                    this.ItemPath
+                };
+                var itemPaths = items.Distinct().ToArray();
+                var itemPath = this.ItemPath;
+                return (itemPaths, itemPath);
+            });
+            return await this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                this.Repository.Lock(tuple.itemPaths);
+                var userInfo = (UserSerializationInfo)this.Serializer.Deserialize(tuple.itemPath, typeof(UserSerializationInfo), ObjectSerializerSettings.Empty);
+                var dataSet = new UserSet()
                 {
                     ItemPaths = tuple.itemPaths,
                     Infos = new UserSerializationInfo[] { userInfo },

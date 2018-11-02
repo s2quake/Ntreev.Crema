@@ -17,6 +17,8 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Properties;
+using Ntreev.Crema.Services.Users.Serializations;
+using Ntreev.Library;
 using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 using System;
@@ -44,19 +46,19 @@ namespace Ntreev.Crema.Services.Users
                     var oldNames = items.Select(item => item.Name).ToArray();
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var path = base.Path;
-                    var query = from User item in this.Context.Users
-                                where item.Category.Path.StartsWith(this.Path)
-                                select item.SerializationInfo;
-                    var userInfos = query.ToArray();
-                    return (items, oldNames, oldPaths, path, userInfos);
+                    var targetName = new CategoryName(base.Path) { Name = name };
+                    return (items, oldNames, oldPaths, path, targetName);
                 });
-                var result = await this.Container.InvokeCategoryRenameAsync(authentication, tuple.path, name, tuple.userInfos);
+                var userSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
+                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeCategoryRenameAsync(authentication, tuple.path, name, userBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, result); ;
                     base.Name = name;
+                    this.CremaHost.Sign(authentication);
                     this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths);
                 });
+                await this.Repository.UnlockAsync(userBaseSet.ItemPaths);
             }
             catch (Exception e)
             {
@@ -78,19 +80,19 @@ namespace Ntreev.Crema.Services.Users
                     var oldPaths = items.Select(item => item.Path).ToArray();
                     var oldParentPaths = items.Select(item => item.Parent.Path).ToArray();
                     var path = base.Path;
-                    var query = from User item in this.Context.Users
-                                where item.Category.Path.StartsWith(this.Path)
-                                select item.SerializationInfo;
-                    var userInfos = query.ToArray();
-                    return (items, oldPaths, oldParentPaths, path, userInfos);
+                    var targetName = new CategoryName(parentPath, base.Name);
+                    return (items, oldPaths, oldParentPaths, path, targetName);
                 });
-                var result = await this.Container.InvokeCategoryMoveAsync(authentication, tuple.path, parentPath, tuple.userInfos);
+                var userSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
+                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeCategoryMoveAsync(authentication, tuple.path, parentPath, userBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, result);
                     this.Parent = this.Container[parentPath];
+                    this.CremaHost.Sign(authentication);
                     this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths);
                 });
+                await this.Repository.UnlockAsync(userBaseSet.ItemPaths);
             }
             catch (Exception e)
             {
@@ -104,6 +106,8 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
+                var container = this.Container;
+                var repository = this.Repository;
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
@@ -113,14 +117,16 @@ namespace Ntreev.Crema.Services.Users
                     var path = base.Path;
                     return (items, oldPaths, path);
                 });
-                var result = await this.Container.InvokeCategoryDeleteAsync(authentication, tuple.path);
+                var userSet = await this.ReadDataForPathAsync(authentication, new CategoryName(tuple.path));
+                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeCategoryDeleteAsync(authentication, tuple.path, userBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var container = this.Container;
-                    this.CremaHost.Sign(authentication, result);
                     this.Dispose();
+                    this.CremaHost.Sign(authentication);
                     container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
                 });
+                await repository.UnlockAsync(userBaseSet.ItemPaths);
             }
             catch (Exception e)
             {
@@ -174,9 +180,47 @@ namespace Ntreev.Crema.Services.Users
                 throw new InvalidOperationException(Resources.Exception_CannotDeletePathWithItems);
         }
 
+        public async Task<UserSet> ReadDataForPathAsync(Authentication authentication, CategoryName targetName)
+        {
+            var tuple = await this.Dispatcher.InvokeAsync(() =>
+            {
+                var targetItemPaths = new string[]
+                {
+                    this.Context.GenerateCategoryPath(targetName.ParentPath),
+                    this.Context.GeneratePath(targetName),
+                };
+                var items = EnumerableUtility.FamilyTree(this as IUserItem, item => item.Childs);
+                var users = items.Where(item => item is User).Select(item => item as User).ToArray();
+                var userPaths = users.Select(item => item.ItemPath).ToArray();
+                var itemPaths = userPaths.Concat(targetItemPaths).Distinct().OrderBy(item => item).ToArray();
+                return (userPaths, itemPaths);
+            });
+            return await this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                this.Repository.Lock(tuple.itemPaths);
+                var userInfoList = new List<UserSerializationInfo>(tuple.userPaths.Length);
+                foreach (var item in tuple.userPaths)
+                {
+                    var userInfo = (UserSerializationInfo)this.Serializer.Deserialize(item, typeof(UserSerializationInfo), ObjectSerializerSettings.Empty);
+                    userInfoList.Add(userInfo);
+                }
+                var dataSet = new UserSet()
+                {
+                    ItemPaths = tuple.itemPaths,
+                    Infos = userInfoList.ToArray(),
+                    SignatureDateProvider = new SignatureDateProvider(authentication.ID),
+                };
+                return dataSet;
+            });
+        }
+
         public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
 
         public CremaHost CremaHost => this.Context.CremaHost;
+
+        public UserRepositoryHost Repository => this.Context.Repository;
+
+        public IObjectSerializer Serializer => this.Context.Serializer;
 
         public string ItemPath => this.Context.GenerateCategoryPath(base.Path);
 

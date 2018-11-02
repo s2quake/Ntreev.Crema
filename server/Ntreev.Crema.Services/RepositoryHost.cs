@@ -188,7 +188,7 @@ namespace Ntreev.Crema.Services
                 this.itemPaths.Add(item);
             }
 
-            this.CremaHost.Debug($"Lock{Environment.NewLine}{string.Join(Environment.NewLine, itemPaths)}");
+            this.CremaHost.Debug($"{this.GetType().Name} Lock{Environment.NewLine}{string.Join(Environment.NewLine, itemPaths)}");
         }
 
         public void Unlock(params string[] itemPaths)
@@ -210,7 +210,7 @@ namespace Ntreev.Crema.Services
             {
                 this.itemPaths.Remove(item);
             }
-            this.CremaHost.Debug($"Unlock{Environment.NewLine}{string.Join(Environment.NewLine, itemPaths)}");
+            this.CremaHost.Debug($"{this.GetType().Name} Unlock{Environment.NewLine}{string.Join(Environment.NewLine, itemPaths)}");
         }
 
         public Task LockAsync(params string[] itemPaths)

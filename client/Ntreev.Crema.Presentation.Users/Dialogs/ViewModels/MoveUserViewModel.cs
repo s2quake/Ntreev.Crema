@@ -34,7 +34,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
         private readonly IUser user;
 
         private MoveUserViewModel(Authentication authentication, IUser user, string[] targetPaths)
-            : base(user.Category.Path, targetPaths)
+            : base(user.Path, targetPaths)
         {
             this.authentication = authentication;
             this.authentication.Expired += Authentication_Expired;

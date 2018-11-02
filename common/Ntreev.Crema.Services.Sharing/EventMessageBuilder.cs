@@ -859,6 +859,17 @@ namespace Ntreev.Crema.Services
             return string.Format(EventResources.CreateUser, authentication.ID, authentication.Name, userID, userName);
         }
 
+        public static string CreateUser(Authentication authentication, string[] userIDs, string[] userNames)
+        {
+            var messageList = new List<string>(userIDs.Length);
+            for (var i = 0; i < userIDs.Length; i++)
+            {
+                var message = CreateUser(authentication, userIDs[i], userNames[i]);
+                messageList.Add(message);
+            }
+            return string.Join(Environment.NewLine, messageList);
+        }
+
         public static string CreateUser(Authentication authentication, IUser[] items)
         {
             var messageList = new List<string>(items.Length);

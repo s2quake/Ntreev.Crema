@@ -117,5 +117,15 @@ namespace Ntreev.Crema.Services.Users.Serializations
 
             return obj;
         }
+
+        public static readonly UserSerializationInfo Empty = new UserSerializationInfo()
+        {
+            ID = string.Empty,
+            Password = string.Empty,
+            Name = string.Empty,
+            CreationInfo = SignatureDate.Empty,
+            ModificationInfo = SignatureDate.Empty,
+            BanInfo = BanSerializationInfo.Empty,
+        };
     }
 }

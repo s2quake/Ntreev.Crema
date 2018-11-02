@@ -248,8 +248,8 @@ namespace Ntreev.Crema.Services.Data
                 await this.Container.InvokeCategoryRenameAsync(authentication, tuple.path, name, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication);
                     base.Rename(authentication, name);
+                    this.CremaHost.Sign(authentication);
                     this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, dataSet);
                 });
                 await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
@@ -282,8 +282,8 @@ namespace Ntreev.Crema.Services.Data
                 await this.Container.InvokeCategoryMoveAsync(authentication, tuple.path, parentPath, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication);
                     base.Move(authentication, parentPath);
+                    this.CremaHost.Sign(authentication);
                     this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths, dataSet);
                 });
                 await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
@@ -301,6 +301,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 this.ValidateExpired();
                 var container = this.Container;
+                var repository = this.Repository;
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
@@ -316,11 +317,11 @@ namespace Ntreev.Crema.Services.Data
                 await this.Container.InvokeCategoryDeleteAsync(authentication, tuple.path, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication);
                     base.Delete(authentication);
+                    this.CremaHost.Sign(authentication);
                     container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
                 });
-                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
+                await repository.UnlockAsync(dataBaseSet.ItemPaths);
             }
             catch (Exception e)
             {

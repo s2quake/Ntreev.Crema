@@ -45,7 +45,7 @@ namespace Ntreev.Crema.Services.Users.Serializations
 
             if (obj.SignatureDate.ID == null)
                 obj.SignatureDate = new SignatureDate(string.Empty, obj.SignatureDate.DateTime);
-            
+
             return obj;
         }
 
@@ -65,5 +65,12 @@ namespace Ntreev.Crema.Services.Users.Serializations
                 obj.SignatureDate = new SignatureDate();
             return obj;
         }
+
+        public static readonly BanSerializationInfo Empty = new BanSerializationInfo()
+        {
+            Path = string.Empty,
+            Comment = string.Empty,
+            SignatureDate = SignatureDate.Empty,
+        };
     }
 }

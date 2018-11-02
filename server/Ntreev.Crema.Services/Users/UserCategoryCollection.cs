@@ -55,14 +55,16 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);
                     this.ValidateAddNew(authentication, name, parentPath);
                 });
-                await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
-                return await this.Dispatcher.InvokeAsync(() =>
+                var itemPath = await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
+                var result = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
                     var category = this.BaseAddNew(name, parentPath, authentication);
                     this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
                     return category;
                 });
+                await this.Repository.UnlockAsync(itemPath);
+                return result;
             }
             catch (Exception e)
             {
@@ -71,94 +73,84 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public Task InvokeCategoryCreateAsync(Authentication authentication, string name, string parentPath)
+        public Task<string> InvokeCategoryCreateAsync(Authentication authentication, string name, string parentPath)
         {
             var categoryName = new CategoryName(parentPath, name);
-            var itemPath = this.Context.GenerateCategoryPath(parentPath, name);
             var message = EventMessageBuilder.CreateUserCategory(authentication, categoryName);
+            var itemPath = this.Context.GenerateCategoryPath(parentPath, name);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    this.Repository.CreateCategory(authentication, itemPath);
+                    this.Repository.Lock(itemPath);
+                    this.Repository.CreateUserCategory(itemPath);
                     this.Repository.Commit(authentication, message);
+                    return itemPath;
                 }
                 catch
                 {
-                    DirectoryUtility.Delete(itemPath);
                     this.Repository.Revert();
+                    this.Repository.Unlock(itemPath);
                     throw;
                 }
             });
         }
 
-        public Task<SignatureDate> InvokeCategoryRenameAsync(Authentication authentication, string categoryPath, string name, UserSerializationInfo[] userInfos)
+        public Task InvokeCategoryRenameAsync(Authentication authentication, string categoryPath, string name, UserBaseSet userBaseSet)
         {
-            var newCategoryName = new CategoryName(categoryPath) { Name = name, };
+            var newCategoryPath = new CategoryName(categoryPath) { Name = name, };
             var message = EventMessageBuilder.RenameUserCategory(authentication, categoryPath, name);
-            var query = from User item in this.Context.Users
-                        where item.Category.Path.StartsWith(categoryPath)
-                        select item.SerializationInfo;
-            var users = query.ToArray();
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
-                    this.Repository.RenameCategory(authentication, users, categoryPath, newCategoryName);
+                    this.Repository.RenameUserCategory(userBaseSet, categoryPath, newCategoryPath);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
+                    this.Repository.Unlock(userBaseSet.ItemPaths);
                     throw;
                 }
             });
         }
 
-        public Task<SignatureDate> InvokeCategoryMoveAsync(Authentication authentication, string categoryPath, string parentPath, UserSerializationInfo[] userInfos)
+        public Task InvokeCategoryMoveAsync(Authentication authentication, string categoryPath, string parentPath, UserBaseSet userBaseSet)
         {
             var categoryName = new CategoryName(categoryPath);
-            var newCategoryName = new CategoryName(parentPath, categoryName.Name);
+            var newCategoryPath = new CategoryName(parentPath, categoryName.Name);
             var message = EventMessageBuilder.MoveUserCategory(authentication, categoryPath, categoryName.ParentPath, parentPath);
-            var query = from User item in this.Context.Users
-                        where item.Category.Path.StartsWith(categoryPath)
-                        select item.SerializationInfo;
-            var users = query.ToArray();
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
-                    this.Repository.MoveCategory(authentication, users, categoryPath, newCategoryName);
+                    this.Repository.MoveUserCategory(userBaseSet, categoryPath, newCategoryPath);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
+                    this.Repository.Unlock(userBaseSet.ItemPaths);
                     throw;
                 }
             });
         }
 
-        public Task<SignatureDate> InvokeCategoryDeleteAsync(Authentication authentication, string categoryPath)
+        public Task InvokeCategoryDeleteAsync(Authentication authentication, string categoryPath, UserBaseSet userBaseSet)
         {
             var message = EventMessageBuilder.DeleteUserCategory(authentication, categoryPath);
-            var itemPath = this.Context.GeneratePath(categoryPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
-                    this.Repository.Delete(itemPath);
+                    this.Repository.DeleteUserCategory(userBaseSet, categoryPath);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
+                    this.Repository.Unlock(userBaseSet.ItemPaths);
                     throw;
                 }
             });

@@ -60,29 +60,28 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
-                var userInfo = await this.Dispatcher.InvokeAsync(() =>
+                await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
                     this.ValidateUserCreate(authentication, userID, categoryPath, password);
-                    return new UserSerializationInfo()
-                    {
-                        ID = userID,
-                        Password = UserContext.SecureStringToString(password).Encrypt(),
-                        Name = userName,
-                        Authority = authority,
-                        CategoryPath = categoryPath,
-                    };
                 });
-                var result = await this.InvokeUserCreateAsync(authentication, userInfo);
-                return await this.Dispatcher.InvokeAsync(() =>
+                var userSet = await this.CreateDataForCreateAsync(authentication, userID, categoryPath, password, userName, authority);
+                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, true);
+                var userPaths = new string[] { categoryPath + userID };
+                var userNames = new string[] { userName };
+                await this.InvokeUserCreateAsync(authentication, userPaths, userNames, userBaseSet);
+                var newUser = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication);
                     var user = this.BaseAddNew(userID, categoryPath, null);
-                    user.Initialize((UserInfo)result, BanInfo.Empty);
-                    user.Password = UserContext.StringToSecureString(result.Password);
+                    var userInfo = userBaseSet.GetUserInfo(categoryPath + userID);
+                    user.Initialize((UserInfo)userInfo, (BanInfo)userInfo.BanInfo);
+                    user.Password = UserContext.StringToSecureString(userInfo.Password);
+                    this.CremaHost.Sign(authentication);
                     this.InvokeUsersCreatedEvent(authentication, new User[] { user });
                     return user;
                 });
+                await this.Repository.UnlockAsync(userBaseSet.ItemPaths);
+                return newUser;
             }
             catch (Exception e)
             {
@@ -91,137 +90,116 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public Task<UserSerializationInfo> InvokeUserCreateAsync(Authentication authentication, UserSerializationInfo userInfo)
+        public Task InvokeUserCreateAsync(Authentication authentication, string[] userPaths, string[] userNames, UserBaseSet userBaseSet)
         {
-            var message = EventMessageBuilder.CreateUser(authentication, userInfo.ID, userInfo.Name);
+            var message = EventMessageBuilder.CreateUser(authentication, userPaths, userNames);
+            var itemPaths = userPaths.Select(item => this.Context.GeneratePath(item)).ToArray();
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
-                    userInfo.CreationInfo = signatureDate;
-                    userInfo.ModificationInfo = signatureDate;
-                    this.Repository.CreateUser(userInfo);
+                    this.Repository.CreateUser(userBaseSet, userPaths);
                     this.Repository.Commit(authentication, message);
-                    return userInfo;
                 }
                 catch
                 {
                     this.Repository.Revert();
+                    this.Repository.Unlock(userBaseSet.ItemPaths);
                     throw;
                 }
             });
         }
 
-        public Task InvokeUserMoveAsync(Authentication authentication, UserInfo userInfo, string newCategoryPath, UserDataSet dataSet)
+        public Task InvokeUserMoveAsync(Authentication authentication, UserInfo userInfo, string newCategoryPath, UserBaseSet userBaseSet)
         {
             var message = EventMessageBuilder.MoveUser(authentication, userInfo.ID, userInfo.Name, userInfo.CategoryPath, newCategoryPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    this.Repository.MoveUser(dataSet, userInfo.Path, newCategoryPath);
+                    this.Repository.MoveUser(userBaseSet, userInfo.Path, newCategoryPath);
                     this.Repository.Commit(authentication, message);
                 }
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(dataSet.ItemPaths);
+                    this.Repository.Unlock(userBaseSet.ItemPaths);
                     throw;
                 }
             });
         }
 
-        public Task<SignatureDate> InvokeUserDeleteAsync(Authentication authentication, UserSerializationInfo userInfo)
+        public Task InvokeUserDeleteAsync(Authentication authentication, UserInfo userInfo, UserBaseSet userBaseSet)
         {
             var message = EventMessageBuilder.DeleteUser(authentication, userInfo.ID);
-            var itemPath = this.Context.GeneratePath(userInfo.Path);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
-                    this.Repository.DeleteUser(itemPath);
+                    this.Repository.DeleteUser(userBaseSet, userInfo.Path);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
+                    this.Repository.Unlock(userBaseSet.ItemPaths);
                     throw;
                 }
             });
         }
 
-        public Task<UserSerializationInfo> InvokeUserChangeAsync(Authentication authentication, UserSerializationInfo userInfo, SecureString password, SecureString newPassword, string userName, Authority? authority)
+        public Task InvokeUserChangeAsync(Authentication authentication, UserInfo userInfo, UserBaseSet userBaseSet, SecureString password, SecureString newPassword, string userName, Authority? authority)
         {
             var message = EventMessageBuilder.ChangeUserInfo(authentication, userInfo.ID, userInfo.Name);
-            var itemPath = this.Context.GeneratePath(userInfo.Path);
-            if (newPassword != null)
-                userInfo.Password = UserContext.SecureStringToString(newPassword).Encrypt();
-            if (userName != null)
-                userInfo.Name = userName;
-            if (authority.HasValue)
-                userInfo.Authority = authority.Value;
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
-                    userInfo.ModificationInfo = signatureDate;
-                    this.Repository.ModifyUser(itemPath, userInfo);
+                    this.Repository.ModifyUser(userBaseSet, userInfo.Path, password, newPassword, userName, authority);
                     this.Repository.Commit(authentication, message);
-                    return userInfo;
                 }
                 catch
                 {
                     this.Repository.Revert();
+                    this.Repository.Unlock(userBaseSet.ItemPaths);
                     throw;
                 }
             });
         }
 
-        public Task<BanInfo> InvokeUserBanAsync(Authentication authentication, UserSerializationInfo userInfo, string comment)
+        public Task InvokeUserBanAsync(Authentication authentication, UserInfo userInfo, UserBaseSet userBaseSet, string comment)
         {
             var message = EventMessageBuilder.BanUser(authentication, userInfo.ID, userInfo.Name, comment);
-            var itemPath = this.Context.GeneratePath(userInfo.Path);
-            var banInfo = new BanInfo() { Path = userInfo.Path, Comment = comment };
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
-                    banInfo.SignatureDate = signatureDate;
-                    userInfo.BanInfo = (BanSerializationInfo)banInfo;
-                    this.Repository.ModifyUser(itemPath, userInfo);
+                    this.Repository.BanUser(userBaseSet, userInfo.Path, comment);
                     this.Repository.Commit(authentication, message);
-                    return banInfo;
                 }
                 catch
                 {
                     this.Repository.Revert();
+                    this.Repository.Unlock(userBaseSet.ItemPaths);
                     throw;
                 }
             });
         }
 
-        public Task<SignatureDate> InvokeUserUnbanAsync(Authentication authentication, UserSerializationInfo userInfo)
+        public Task InvokeUserUnbanAsync(Authentication authentication, UserInfo userInfo, UserBaseSet userBaseSet)
         {
             var message = EventMessageBuilder.UnbanUser(authentication, userInfo.ID, userInfo.Name);
-            var itemPath = this.Context.GeneratePath(userInfo.Path);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    var signatureDate = authentication.Sign();
-                    userInfo.BanInfo = (BanSerializationInfo)BanInfo.Empty;
-                    this.Repository.ModifyUser(itemPath, userInfo);
+                    this.Repository.UnbanUser(userBaseSet, userInfo.Path);
                     this.Repository.Commit(authentication, message);
-                    return signatureDate;
                 }
                 catch
                 {
                     this.Repository.Revert();
+                    this.Repository.Unlock(userBaseSet.ItemPaths);
                     throw;
                 }
             });
@@ -338,6 +316,34 @@ namespace Ntreev.Crema.Services.Users
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(comment);
             this.OnMessageReceived(new MessageEventArgs(authentication, users, message, MessageType.Notification));
+        }
+
+        public async Task<UserSet> CreateDataForCreateAsync(Authentication authentication, string userID, string categoryPath, SecureString password, string userName, Authority authority)
+        {
+            return await this.Repository.Dispatcher.InvokeAsync(() =>
+            {
+                var itemPaths = new string[]
+                {
+                     this.Context.GenerateCategoryPath(categoryPath),
+                     this.Context.GenerateUserPath(categoryPath, userID),
+                };
+                this.Repository.Lock(itemPaths);
+                var userInfo = new UserSerializationInfo()
+                {
+                    ID = userID,
+                    Password = UserContext.SecureStringToString(password).Encrypt(),
+                    Name = userName,
+                    Authority = authority,
+                    CategoryPath = categoryPath,
+                };
+                var dataSet = new UserSet()
+                {
+                    ItemPaths = itemPaths,
+                    Infos = new UserSerializationInfo[] { userInfo },
+                    SignatureDateProvider = new SignatureDateProvider(authentication.ID),
+                };
+                return dataSet;
+            });
         }
 
         public UserRepositoryHost Repository => this.Context.Repository;
