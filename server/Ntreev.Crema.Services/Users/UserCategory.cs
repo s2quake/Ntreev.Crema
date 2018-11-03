@@ -58,7 +58,7 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.Sign(authentication);
                     this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths);
                 });
-                await this.Repository.UnlockAsync(userBaseSet.ItemPaths);
+                await this.Repository.UnlockAsync(userBaseSet.Paths);
             }
             catch (Exception e)
             {
@@ -92,7 +92,7 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.Sign(authentication);
                     this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths);
                 });
-                await this.Repository.UnlockAsync(userBaseSet.ItemPaths);
+                await this.Repository.UnlockAsync(userBaseSet.Paths);
             }
             catch (Exception e)
             {
@@ -126,7 +126,7 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.Sign(authentication);
                     container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
                 });
-                await repository.UnlockAsync(userBaseSet.ItemPaths);
+                await repository.UnlockAsync(userBaseSet.Paths);
             }
             catch (Exception e)
             {
@@ -184,20 +184,20 @@ namespace Ntreev.Crema.Services.Users
         {
             var tuple = await this.Dispatcher.InvokeAsync(() =>
             {
-                var targetItemPaths = new string[]
+                var targetPaths = new string[]
                 {
-                    this.Context.GenerateCategoryPath(targetName.ParentPath),
-                    this.Context.GeneratePath(targetName),
+                    targetName.ParentPath,
+                    targetName,
                 };
                 var items = EnumerableUtility.FamilyTree(this as IUserItem, item => item.Childs);
                 var users = items.Where(item => item is User).Select(item => item as User).ToArray();
-                var userPaths = users.Select(item => item.ItemPath).ToArray();
-                var itemPaths = userPaths.Concat(targetItemPaths).Distinct().OrderBy(item => item).ToArray();
-                return (userPaths, itemPaths);
+                var userPaths = users.Select(item => item.Path).ToArray();
+                var paths = userPaths.Concat(targetPaths).Distinct().OrderBy(item => item).ToArray();
+                return (userPaths, paths);
             });
-            return await this.Repository.Dispatcher.InvokeAsync(() =>
+            return await this.Repository.Dispatcher.InvokeAsync((Func<UserSet>)(() =>
             {
-                this.Repository.Lock(tuple.itemPaths);
+                this.Repository.Lock(tuple.paths);
                 var userInfoList = new List<UserSerializationInfo>(tuple.userPaths.Length);
                 foreach (var item in tuple.userPaths)
                 {
@@ -206,12 +206,12 @@ namespace Ntreev.Crema.Services.Users
                 }
                 var dataSet = new UserSet()
                 {
-                    ItemPaths = tuple.itemPaths,
+                    ItemPaths = tuple.paths,
                     Infos = userInfoList.ToArray(),
                     SignatureDateProvider = new SignatureDateProvider(authentication.ID),
                 };
                 return dataSet;
-            });
+            }));
         }
 
         public CremaDispatcher Dispatcher => this.Context?.Dispatcher;
@@ -222,7 +222,7 @@ namespace Ntreev.Crema.Services.Users
 
         public IObjectSerializer Serializer => this.Context.Serializer;
 
-        public string ItemPath => this.Context.GenerateCategoryPath(base.Path);
+        //public string ItemPath => this.Context.GenerateCategoryPath(base.Path);
 
         public new string Name => base.Name;
 

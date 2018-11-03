@@ -18,6 +18,7 @@
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Users;
 using Ntreev.Library;
+using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,7 +31,7 @@ namespace Ntreev.Crema.Services
 {
     abstract class RepositoryHost
     {
-        private readonly HashSet<string> itemPaths = new HashSet<string>();
+        private readonly HashSet<string> paths = new HashSet<string>();
 
         public RepositoryHost(IRepository repository)
         {
@@ -116,7 +117,7 @@ namespace Ntreev.Crema.Services
         {
             this.Dispatcher.VerifyAccess();
             this.Repository.CancelTransaction();
-            this.itemPaths.Clear();
+            this.paths.Clear();
         }
 
         public Uri GetUri(string path, string revision)
@@ -171,56 +172,58 @@ namespace Ntreev.Crema.Services
                 this.Dispatcher.Dispose();
         }
 
-        public void Lock(params string[] itemPaths)
+        public void Lock(params string[] paths)
         {
             this.Dispatcher.VerifyAccess();
-            if (itemPaths.Distinct().Count() != itemPaths.Length)
+            if (paths.Distinct().Count() != paths.Length)
             {
                 System.Diagnostics.Debugger.Break();
             }
-            foreach (var item in itemPaths)
+            foreach (var item in paths)
             {
-                if (this.itemPaths.Contains(item) == true)
+                NameValidator.ValidatePath(item);
+                if (this.paths.Contains(item) == true)
                     throw new ItemAlreadyExistsException(item);
             }
-            foreach (var item in itemPaths)
+            foreach (var item in paths)
             {
-                this.itemPaths.Add(item);
+                this.paths.Add(item);
             }
 
-            this.CremaHost.Debug($"{this.GetType().Name} Lock{Environment.NewLine}{string.Join(Environment.NewLine, itemPaths)}");
+            this.CremaHost.Debug($"{this.GetType().Name} Lock{Environment.NewLine}{string.Join(Environment.NewLine, paths)}");
         }
 
-        public void Unlock(params string[] itemPaths)
+        public void Unlock(params string[] paths)
         {
             this.Dispatcher.VerifyAccess();
-            if (itemPaths.Distinct().Count() != itemPaths.Length)
+            if (paths.Distinct().Count() != paths.Length)
             {
                 System.Diagnostics.Debugger.Break();
             }
-            foreach (var item in itemPaths)
+            foreach (var item in paths)
             {
-                if (this.itemPaths.Contains(item) == false)
+                NameValidator.ValidatePath(item);
+                if (this.paths.Contains(item) == false)
                 {
                     System.Diagnostics.Debugger.Break();
                     throw new ItemNotFoundException(item);
                 }
             }
-            foreach (var item in itemPaths)
+            foreach (var item in paths)
             {
-                this.itemPaths.Remove(item);
+                this.paths.Remove(item);
             }
-            this.CremaHost.Debug($"{this.GetType().Name} Unlock{Environment.NewLine}{string.Join(Environment.NewLine, itemPaths)}");
+            this.CremaHost.Debug($"{this.GetType().Name} Unlock{Environment.NewLine}{string.Join(Environment.NewLine, paths)}");
         }
 
-        public Task LockAsync(params string[] itemPaths)
+        public Task LockAsync(params string[] paths)
         {
-            return this.Dispatcher.InvokeAsync(() => this.Lock(itemPaths));
+            return this.Dispatcher.InvokeAsync(() => this.Lock(paths));
         }
 
-        public Task UnlockAsync(params string[] itemPaths)
+        public Task UnlockAsync(params string[] paths)
         {
-            return this.Dispatcher.InvokeAsync(() => this.Unlock(itemPaths));
+            return this.Dispatcher.InvokeAsync(() => this.Unlock(paths));
         }
 
         public Task BeginTransactionAsync(string author, string name)

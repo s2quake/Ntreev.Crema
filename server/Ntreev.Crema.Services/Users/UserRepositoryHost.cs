@@ -53,8 +53,14 @@ namespace Ntreev.Crema.Services.Users
 
         public UserSerializationInfo Read(string path)
         {
+            var repositoryPath = new RepositoryPath(this.UserContext.BasePath, path);
+            return this.Serializer.Deserialize<UserSerializationInfo>(repositoryPath, ObjectSerializerSettings.Empty);
+        }
+
+        public void Write(string path, UserSerializationInfo userInfo)
+        {
             var repositoryItemPath = new RepositoryPath(this.UserContext.BasePath, path);
-            return (UserSerializationInfo)this.Serializer.Deserialize(repositoryItemPath, typeof(UserSerializationInfo), ObjectSerializerSettings.Empty);
+            this.Serializer.Serialize(repositoryItemPath, userInfo, ObjectSerializerSettings.Empty);
         }
 
         public void Commit(Authentication authentication, string comment)
@@ -76,16 +82,17 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public void CreateUserCategory(string itemPath)
+        public void CreateUserCategory(string categoryPath)
         {
             this.Dispatcher.VerifyAccess();
-            var directoryName = PathUtility.GetDirectoryName(itemPath);
-            if (Directory.Exists(directoryName) == false)
+            var repositoryPath = new RepositoryPath(this.UserContext.BasePath, categoryPath);
+            var parentPath = repositoryPath.ParentPath;
+            if (parentPath.IsExists == false)
                 throw new DirectoryNotFoundException();
-            if (Directory.Exists(itemPath) == true)
+            if (repositoryPath.IsExists == true)
                 throw new IOException();
-            Directory.CreateDirectory(itemPath);
-            this.Add(itemPath);
+            Directory.CreateDirectory(repositoryPath.Path);
+            this.Add(repositoryPath.Path);
         }
 
         public void RenameUserCategory(UserBaseSet userBaseSet, string categoryPath, string newCategoryPath)

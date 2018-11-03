@@ -68,7 +68,7 @@ namespace Ntreev.Crema.Services.Users
                     base.Move(authentication, categoryPath);
                     this.Container.InvokeUsersMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths);
                 });
-                await this.Repository.UnlockAsync(userBaseSet.ItemPaths);
+                await this.Repository.UnlockAsync(userBaseSet.Paths);
             }
             catch (Exception e)
             {
@@ -103,7 +103,7 @@ namespace Ntreev.Crema.Services.Users
                     base.Delete(authentication);
                     container.InvokeUsersDeletedEvent(authentication, tuple.items, tuple.oldPaths);
                 });
-                await repository.UnlockAsync(userBaseSet.ItemPaths);
+                await repository.UnlockAsync(userBaseSet.Paths);
             }
             catch (Exception e)
             {
@@ -293,7 +293,7 @@ namespace Ntreev.Crema.Services.Users
                     base.UpdateUserInfo((UserInfo)userInfo);
                     this.Container.InvokeUsersChangedEvent(authentication, tuple.items);
                 });
-                await this.Repository.UnlockAsync(userBaseSet.ItemPaths);
+                await this.Repository.UnlockAsync(userBaseSet.Paths);
             }
             catch (Exception e)
             {
@@ -333,7 +333,7 @@ namespace Ntreev.Crema.Services.Users
             {
                 var paths = new string[]
                 {
-                    this.ItemPath
+                    this.Path
                 };
                 var path = this.Path;
                 return (paths, path);
@@ -344,7 +344,7 @@ namespace Ntreev.Crema.Services.Users
                 var userInfo = this.Repository.Read(tuple.path);
                 var dataSet = new UserSet()
                 {
-                    ItemPaths = tuple.itemPaths,
+                    ItemPaths = tuple.paths,
                     Infos = new UserSerializationInfo[] { userInfo },
                     SignatureDateProvider = new SignatureDateProvider(authentication.ID),
                 };
@@ -358,21 +358,21 @@ namespace Ntreev.Crema.Services.Users
             {
                 var items = new string[]
                 {
-                    this.Context.GenerateCategoryPath(targetName.CategoryPath),
-                    this.Context.GeneratePath(targetName),
-                    this.ItemPath
+                    targetName.CategoryPath,
+                    targetName,
+                    this.Path
                 };
-                var itemPaths = items.Distinct().ToArray();
-                var itemPath = this.ItemPath;
-                return (itemPaths, itemPath);
+                var paths = items.Distinct().ToArray();
+                var path = this.Path;
+                return (paths, path);
             });
             return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Lock(tuple.itemPaths);
-                var userInfo = (UserSerializationInfo)this.Serializer.Deserialize(tuple.itemPath, typeof(UserSerializationInfo), ObjectSerializerSettings.Empty);
+                this.Repository.Lock(tuple.paths);
+                var userInfo = (UserSerializationInfo)this.Serializer.Deserialize(tuple.path, typeof(UserSerializationInfo), ObjectSerializerSettings.Empty);
                 var dataSet = new UserSet()
                 {
-                    ItemPaths = tuple.itemPaths,
+                    ItemPaths = tuple.paths,
                     Infos = new UserSerializationInfo[] { userInfo },
                     SignatureDateProvider = new SignatureDateProvider(authentication.ID),
                 };
@@ -419,7 +419,7 @@ namespace Ntreev.Crema.Services.Users
 
         public IObjectSerializer Serializer => this.Context.Serializer;
 
-        public string ItemPath => this.Context.GenerateUserPath(this.Category.Path, base.Name);
+        //public string ItemPath => this.Context.GenerateUserPath(this.Category.Path, base.Name);
 
         public new event EventHandler Renamed
         {

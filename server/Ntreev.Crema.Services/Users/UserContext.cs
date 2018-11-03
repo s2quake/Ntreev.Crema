@@ -396,40 +396,40 @@ namespace Ntreev.Crema.Services.Users
             return secureString;
         }
 
-        public string GenerateCategoryPath(string parentPath, string name)
-        {
-            var value = new CategoryName(parentPath, name);
-            return this.GenerateCategoryPath(value.Path);
-        }
+        //public string GenerateCategoryPath(string parentPath, string name)
+        //{
+        //    var value = new CategoryName(parentPath, name);
+        //    return this.GenerateCategoryPath(value.Path);
+        //}
 
-        public string GenerateCategoryPath(string categoryPath)
-        {
-            NameValidator.ValidateCategoryPath(categoryPath);
-            var baseUri = new Uri(this.BasePath);
-            var uri = new Uri(baseUri + categoryPath);
-            return uri.LocalPath;
-        }
+        //public string GenerateCategoryPath(string categoryPath)
+        //{
+        //    NameValidator.ValidateCategoryPath(categoryPath);
+        //    var baseUri = new Uri(this.BasePath);
+        //    var uri = new Uri(baseUri + categoryPath);
+        //    return uri.LocalPath;
+        //}
 
-        public string GenerateUserPath(string categoryPath, string userID)
-        {
-            return Path.Combine(this.GenerateCategoryPath(categoryPath), userID);
-        }
+        //public string GenerateUserPath(string categoryPath, string userID)
+        //{
+        //    return Path.Combine(this.GenerateCategoryPath(categoryPath), userID);
+        //}
 
-        public string GeneratePath(string path)
-        {
-            if (NameValidator.VerifyCategoryPath(path) == true)
-                return this.GenerateCategoryPath(path);
-            var itemName = new ItemName(path);
-            return this.GenerateUserPath(itemName.CategoryPath, itemName.Name);
-        }
+        //public string GeneratePath(string path)
+        //{
+        //    if (NameValidator.VerifyCategoryPath(path) == true)
+        //        return this.GenerateCategoryPath(path);
+        //    var itemName = new ItemName(path);
+        //    return this.GenerateUserPath(itemName.CategoryPath, itemName.Name);
+        //}
 
-        public string[] GetFiles(string itemPath)
-        {
-            var directoryName = Path.GetDirectoryName(itemPath);
-            var name = Path.GetFileNameWithoutExtension(itemPath);
-            var files = Directory.GetFiles(directoryName, $"{name}.*").Where(item => Path.GetFileNameWithoutExtension(item) == name).ToArray();
-            return files;
-        }
+        //public string[] GetFiles(string itemPath)
+        //{
+        //    var directoryName = Path.GetDirectoryName(itemPath);
+        //    var name = Path.GetFileNameWithoutExtension(itemPath);
+        //    var files = Directory.GetFiles(directoryName, $"{name}.*").Where(item => Path.GetFileNameWithoutExtension(item) == name).ToArray();
+        //    return files;
+        //}
 
         public async Task InitializeAsync()
         {

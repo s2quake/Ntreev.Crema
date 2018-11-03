@@ -379,7 +379,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public TableState TableState
         {
-            get { return this.tableState; }
+            get => this.tableState;
             set
             {
                 if (this.tableState == value)
@@ -418,7 +418,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public _I Parent
         {
-            get { return this.parent; }
+            get => this.parent;
             internal set
             {
                 if (this.parent != null)
@@ -441,7 +441,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public _I TemplatedParent
         {
-            get { return this.templatedParent; }
+            get => this.templatedParent;
             internal set
             {
                 if (this.templatedParent == value)
@@ -472,30 +472,17 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
-        public bool IsBaseTemplate
-        {
-            get { return this.derivedTables.Count > 0; }
-        }
+        public bool IsBaseTemplate => this.derivedTables.Count > 0;
 
-        public bool IsInherited
-        {
-            get { return string.IsNullOrEmpty(this.tableInfo.TemplatedParent) == false; }
-        }
+        public bool IsInherited => string.IsNullOrEmpty(this.tableInfo.TemplatedParent) == false;
 
-        public IContainer<_I> DerivedTables
-        {
-            get { return this.derivedTables; }
-        }
+        public IContainer<_I> DerivedTables => this.derivedTables;
 
-        public InternalTableCollection<_I, _C, _IC, _CC, _CT> Childs
-        {
-            get { return this.childs; }
-        }
+        public InternalTableCollection<_I, _C, _IC, _CC, _CT> Childs => this.childs;
 
-        public TableMetaData MetaData
-        {
-            get { return this.metaData; }
-        }
+        public TableMetaData MetaData => this.metaData;
+
+        public string FullPath => PathUtility.Separator + CremaSchema.TableDirectory + this.Path;
 
         public event EventHandler TableInfoChanged;
 

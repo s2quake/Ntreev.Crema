@@ -55,7 +55,7 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);
                     this.ValidateAddNew(authentication, name, parentPath);
                 });
-                var itemPath = await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
+                await this.InvokeCategoryCreateAsync(authentication, name, parentPath);
                 var result = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
@@ -63,7 +63,7 @@ namespace Ntreev.Crema.Services.Users
                     this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
                     return category;
                 });
-                await this.Repository.UnlockAsync(itemPath);
+                await this.Repository.UnlockAsync(parentPath + name);
                 return result;
             }
             catch (Exception e)
@@ -73,24 +73,22 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public Task<string> InvokeCategoryCreateAsync(Authentication authentication, string name, string parentPath)
+        public Task InvokeCategoryCreateAsync(Authentication authentication, string name, string parentPath)
         {
             var categoryName = new CategoryName(parentPath, name);
             var message = EventMessageBuilder.CreateUserCategory(authentication, categoryName);
-            var itemPath = this.Context.GenerateCategoryPath(parentPath, name);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    this.Repository.Lock(itemPath);
-                    this.Repository.CreateUserCategory(itemPath);
+                    this.Repository.Lock(categoryName);
+                    this.Repository.CreateUserCategory(categoryName);
                     this.Repository.Commit(authentication, message);
-                    return itemPath;
                 }
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(itemPath);
+                    this.Repository.Unlock(categoryName);
                     throw;
                 }
             });
@@ -110,7 +108,7 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(userBaseSet.ItemPaths);
+                    this.Repository.Unlock(userBaseSet.Paths);
                     throw;
                 }
             });
@@ -131,7 +129,7 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(userBaseSet.ItemPaths);
+                    this.Repository.Unlock(userBaseSet.Paths);
                     throw;
                 }
             });
@@ -150,7 +148,7 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(userBaseSet.ItemPaths);
+                    this.Repository.Unlock(userBaseSet.Paths);
                     throw;
                 }
             });

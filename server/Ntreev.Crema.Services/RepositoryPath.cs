@@ -19,61 +19,146 @@ using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace Ntreev.Crema.Services
 {
-    class RepositoryPath
+    struct RepositoryPath
     {
-        private readonly string basePath;
-        private readonly string path;
-
         public RepositoryPath(string basePath, string path)
         {
-            this.basePath = basePath;
-            this.path = this.GeneratePath(path);
+            this.Path = GeneratePath(basePath, path);
         }
 
         public RepositoryPath(string basePath, string kind, string path)
         {
-            this.basePath = Path.Combine(basePath, kind);
-            this.path = this.GeneratePath(path);
+            this.Path = GeneratePath(basePath, PathUtility.Separator + kind + path);
         }
 
         public override string ToString()
         {
-            return $"\"{this.path}\"";
+            return this.Path;
         }
 
-        public static implicit operator string(RepositoryPath path)
+        public override int GetHashCode()
         {
-            return path.ToString();
+            if (this.Path == null)
+                return 0;
+            return this.Path.GetHashCode();
         }
 
-        private string GenerateCategoryPath(string parentPath, string name)
+        public override bool Equals(object obj)
+        {
+            if (obj is RepositoryPath path)
+            {
+                return this.Path == path.Path;
+            }
+            return false;
+        }
+
+        public string[] GetFiles()
+        {
+            if (this.IsDirectory == true)
+                throw new InvalidOperationException();
+            var directoryName = System.IO.Path.GetDirectoryName(this.Path);
+            var name = System.IO.Path.GetFileNameWithoutExtension(this.Path);
+            var files = Directory.GetFiles(directoryName, $"{name}.*").Where(item => System.IO.Path.GetFileNameWithoutExtension(item) == name).ToArray();
+            return files;
+        }
+
+        public void ValidateExists(IObjectSerializer serializer, Type type)
+        {
+            this.ValidateExists(serializer, type, ObjectSerializerSettings.Empty);
+        }
+
+            public void ValidateExists(IObjectSerializer serializer, Type type, ObjectSerializerSettings settings)
+        {
+            var files = serializer.GetPath(this.Path, type, settings);
+            foreach (var item in files)
+            {
+                if (File.Exists(item) == false)
+                    throw new FileNotFoundException();
+            }
+        }
+
+        public void ValidateNotExists(IObjectSerializer serializer, Type type)
+        {
+            this.ValidateNotExists(serializer, type, ObjectSerializerSettings.Empty);
+        }
+
+        public void ValidateNotExists(IObjectSerializer serializer, Type type, ObjectSerializerSettings settings)
+        {
+            var files = serializer.GetPath(this.Path, type, settings);
+            foreach (var item in files)
+            {
+                if (File.Exists(item) == true)
+                    throw new FileNotFoundException();
+            }
+        }
+
+        public string Path { get; set; }
+
+        public bool IsDirectory => this.Path.EndsWith($"{System.IO.Path.DirectorySeparatorChar}");
+
+        public bool IsExists
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public RepositoryPath ParentPath
+        {
+            get
+            {
+                var directoryName = System.IO.Path.GetDirectoryName(this.Path);
+                return new RepositoryPath() { Path = directoryName + System.IO.Path.DirectorySeparatorChar };
+            }
+        }
+
+        //public static implicit operator string(RepositoryPath path)
+        //{
+        //    return path.ToString();
+        //}
+
+        public static bool operator ==(RepositoryPath t1, RepositoryPath t2)
+        {
+            return t1.Path == t2.Path;
+        }
+
+        public static bool operator !=(RepositoryPath t1, RepositoryPath t2)
+        {
+            return t1.Path != t2.Path;
+        }
+
+        public static readonly RepositoryPath Empty = new RepositoryPath() { Path = string.Empty };
+
+        private static string GenerateCategoryPath(string basePath, string parentPath, string name)
         {
             var value = new CategoryName(parentPath, name);
-            return this.GenerateCategoryPath(value.Path);
+            return GenerateCategoryPath(basePath, value.Path);
         }
 
-        private string GenerateCategoryPath(string categoryPath)
+        private static string GenerateCategoryPath(string basePath, string categoryPath)
         {
             NameValidator.ValidateCategoryPath(categoryPath);
-            var baseUri = new Uri(this.basePath);
+            var baseUri = new Uri(basePath);
             var uri = new Uri(baseUri + categoryPath);
             return uri.LocalPath;
         }
 
-        private string GenerateUserPath(string categoryPath, string userID)
+        private static string GenerateUserPath(string basePath, string categoryPath, string userID)
         {
-            return Path.Combine(this.GenerateCategoryPath(categoryPath), userID);
+            return System.IO.Path.Combine(GenerateCategoryPath(basePath, categoryPath), userID);
         }
 
-        private string GeneratePath(string path)
+        private static string GeneratePath(string basePath, string path)
         {
             if (NameValidator.VerifyCategoryPath(path) == true)
-                return this.GenerateCategoryPath(path);
+                return GenerateCategoryPath(basePath, path);
             var itemName = new ItemName(path);
-            return this.GenerateUserPath(itemName.CategoryPath, itemName.Name);
+            return GenerateUserPath(basePath, itemName.CategoryPath, itemName.Name);
         }
     }
 }

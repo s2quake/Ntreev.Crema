@@ -26,6 +26,8 @@ using System.Collections.Generic;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.ServiceModel.Properties;
+using Ntreev.Library.IO;
+using Ntreev.Crema.Data.Xml.Schema;
 
 namespace Ntreev.Crema.ServiceModel
 {
@@ -43,15 +45,11 @@ namespace Ntreev.Crema.ServiceModel
 
         }
 
-        public IContainer<_I> Tables
-        {
-            get { return this.Items; }
-        }
+        public IContainer<_I> Tables => this.Items;
 
-        public CategoryMetaData MetaData
-        {
-            get { return this.metaData; }
-        }
+        public CategoryMetaData MetaData => this.metaData;
+
+        public string FullPath => PathUtility.Separator + CremaSchema.TableDirectory + this.Path;
 
         protected override void OnRenamed(EventArgs e)
         {

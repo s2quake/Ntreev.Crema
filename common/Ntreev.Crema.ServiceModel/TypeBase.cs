@@ -86,14 +86,11 @@ namespace Ntreev.Crema.ServiceModel
             this.OnTypeInfoChanged(EventArgs.Empty);
         }
 
-        public TypeInfo TypeInfo
-        {
-            get { return this.typeInfo; }
-        }
+        public TypeInfo TypeInfo => this.typeInfo;
 
         public TypeState TypeState
         {
-            get { return this.typeState; }
+            get => this.typeState;
             set
             {
                 if (this.typeState == value)
@@ -103,13 +100,7 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
-        public TagInfo Tags
-        {
-            get
-            {
-                return this.typeInfo.Tags;
-            }
-        }
+        public TagInfo Tags => this.typeInfo.Tags;
 
         //public bool IsBeingEdited
         //{
@@ -124,10 +115,9 @@ namespace Ntreev.Crema.ServiceModel
         //    }
         //}
 
-        public TypeMetaData MetaData
-        {
-            get { return this.metaData; }
-        }
+        public TypeMetaData MetaData => this.metaData;
+
+        public string FullPath => PathUtility.Separator + CremaSchema.TypeDirectory + this.Path;
 
         public event EventHandler TypeInfoChanged;
 

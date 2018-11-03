@@ -51,4 +51,17 @@ namespace Ntreev.Crema.Services
 
         string Name { get; }
     }
+
+    static class IObjectSerializerExtensions
+    {
+        public static string[] Serialize(this IObjectSerializer serializer, RepositoryPath repositoryPath, object obj, ObjectSerializerSettings settings)
+        {
+            return serializer.Serialize(repositoryPath.Path, obj, settings);
+        }
+
+        public static T Deserialize<T>(this IObjectSerializer serializer, RepositoryPath repositoryPath, ObjectSerializerSettings settings)
+        {
+            return (T)serializer.Deserialize(repositoryPath.Path, typeof(T), settings);
+        }
+    }
 }

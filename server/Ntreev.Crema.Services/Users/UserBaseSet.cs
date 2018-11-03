@@ -25,7 +25,7 @@ namespace Ntreev.Crema.Services.Users
         {
             this.UserContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
             this.UserContext.Dispatcher.VerifyAccess();
-            this.ItemPaths = userSet.ItemPaths;
+            this.Paths = userSet.ItemPaths;
             foreach (var item in userSet.Infos)
             {
                 var user = userContext.Users[item.ID, item.CategoryPath];
@@ -55,12 +55,12 @@ namespace Ntreev.Crema.Services.Users
 
         public void SetUserCategoryPath(string categoryPath, string newCategoryPath)
         {
-            var itemPath1 = this.UserContext.GenerateCategoryPath(categoryPath);
-            var itemPath2 = this.UserContext.GenerateCategoryPath(newCategoryPath);
+            var itemPath1 = new RepositoryPath(this.UserContext.BasePath, categoryPath);
+            var itemPath2 = new RepositoryPath(this.UserContext.BasePath, newCategoryPath);
 
-            if (Directory.Exists(itemPath1) == false)
+            if (itemPath1.IsExists == false)
                 throw new DirectoryNotFoundException();
-            if (Directory.Exists(itemPath2) == true)
+            if (itemPath2.IsExists == true)
                 throw new IOException();
 
             var signatureDate = this.signatureDateProvider.Provide();
@@ -71,10 +71,13 @@ namespace Ntreev.Crema.Services.Users
                 if (userInfo.CategoryPath.StartsWith(categoryPath) == false)
                     continue;
 
-                this.ValidateUserExists(path);
-                userInfo.CategoryPath = Regex.Replace(userInfo.CategoryPath, "^" + categoryPath, newCategoryPath);
+                var userInfoCategoryPath = Regex.Replace(userInfo.CategoryPath, "^" + categoryPath, newCategoryPath);
+                var repositoryPath1 = new RepositoryPath(this.UserContext.BasePath, path);
+                var repositoryPath2 = new RepositoryPath(this.UserContext.BasePath, userInfoCategoryPath + userInfo.ID);
+                repositoryPath1.ValidateExists(this.Serializer, typeof(UserSerializationInfo));
+                repositoryPath2.ValidateNotExists(this.Serializer, typeof(UserSerializationInfo));
+                userInfo.CategoryPath = userInfoCategoryPath;
                 userInfo.ModificationInfo = signatureDate;
-                this.ValidateUserNotExists(path);
                 this.users[path] = userInfo;
             }
 
@@ -84,7 +87,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void DeleteUserCategory(string categoryPath)
         {
-            var itemPath = this.UserContext.GenerateCategoryPath(categoryPath);
+            var itemPath = new RepositoryPath(this.UserContext.BasePath, categoryPath);
             this.Repository.Delete(itemPath);
         }
 
@@ -98,7 +101,11 @@ namespace Ntreev.Crema.Services.Users
                 this.usersToCreate[path] = userInfo;
             }
             this.Serialize();
-            this.AddUsersRepositoryPath();
+            foreach (var item in this.usersToCreate)
+            {
+                var repositoryPath = new RepositoryPath(this.UserContext.BasePath, item.Key);
+                this.Repository.Add(repositoryPath);
+            }
         }
 
         public void RenameUser(string typePath, string typeName)
@@ -109,13 +116,15 @@ namespace Ntreev.Crema.Services.Users
         public void MoveUser(string userPath, string categoryPath)
         {
             var userInfo = this.users[userPath];
-            this.ValidateUserExists(userInfo.Path);
+            var repositoryPath1 = new RepositoryPath(this.UserContext.BasePath, userInfo.Path);
+            var repositoryPath2 = new RepositoryPath(this.UserContext.BasePath, categoryPath + userInfo.ID);
+            repositoryPath1.ValidateExists(this.Serializer, typeof(UserSerializationInfo));
+            repositoryPath2.ValidateNotExists(this.Serializer, typeof(UserSerializationInfo));
             userInfo.CategoryPath = categoryPath;
             userInfo.ModificationInfo = this.signatureDateProvider.Provide();
             this.users[userPath] = userInfo;
-            this.ValidateUserNotExists(userInfo.Path);
             this.Serialize();
-            this.MoveUsersRepositoryPath();
+            this.Repository.Move(repositoryPath1, repositoryPath2);
         }
 
         public void DeleteUser(string userPath)
@@ -123,8 +132,8 @@ namespace Ntreev.Crema.Services.Users
             var userInfo = this.users[userPath];
             this.users.Remove(userPath);
             this.usersToDelete.Add(userPath, userInfo);
-            this.ValidateUserExists(userPath);
-            this.DeleteUsersRepositoryPath();
+            var repositoryPaths = this.usersToDelete.Keys.Select(item => new RepositoryPath(this.UserContext.BasePath, item)).ToArray();
+            this.Repository.DeleteRange(repositoryPaths);
         }
 
         public void ModifyUser(string userPath, SecureString password, SecureString newPassword, string userName, Authority? authority)
@@ -172,7 +181,7 @@ namespace Ntreev.Crema.Services.Users
             throw new NotImplementedException();
         }
 
-        public string[] ItemPaths { get; }
+        public string[] Paths { get; }
 
         private void Serialize()
         {
@@ -180,17 +189,17 @@ namespace Ntreev.Crema.Services.Users
             {
                 var path = item.Key;
                 var userInfo = item.Value;
-                var itemPath1 = this.UserContext.GeneratePath(path);
-                var itemPath2 = this.UserContext.GeneratePath(userInfo.Path);
+                var itemPath1 = new RepositoryPath(this.UserContext.BasePath, path);
+                var itemPath2 = new RepositoryPath(this.UserContext.BasePath, userInfo.Path);
 
                 if (itemPath1 != itemPath2)
                 {
-                    this.ValidateUserNotExists(userInfo.Path);
-                    this.ValidateUserExists(path);
+                    itemPath1.ValidateExists(this.Serializer, typeof(UserSerializationInfo));
+                    itemPath2.ValidateNotExists(this.Serializer, typeof(UserSerializationInfo));
                 }
                 else
                 {
-                    this.ValidateUserExists(path);
+                    itemPath1.ValidateExists(this.Serializer, typeof(UserSerializationInfo));
                 }
 
                 this.Serializer.Serialize(itemPath1, userInfo, ObjectSerializerSettings.Empty);
@@ -200,139 +209,10 @@ namespace Ntreev.Crema.Services.Users
             {
                 var path = item.Key;
                 var userInfo = item.Value;
-                var itemPath = this.UserContext.GenerateUserPath(userInfo.CategoryPath, userInfo.ID);
-                this.ValidateUserNotExists(path);
+                var itemPath = new RepositoryPath(this.UserContext.BasePath, userInfo.CategoryPath + userInfo.ID);
+                itemPath.ValidateNotExists(this.Serializer, typeof(UserSerializationInfo));
                 this.Serializer.Serialize(itemPath, userInfo, ObjectSerializerSettings.Empty);
             }
-        }
-
-        private void AddUsersRepositoryPath()
-        {
-            foreach (var item in this.usersToCreate)
-            {
-                this.AddRepositoryPath(item.Value);
-            }
-        }
-
-        private void MoveUsersRepositoryPath()
-        {
-            foreach (var item in this.users)
-            {
-                var path = item.Key;
-                var userInfo = item.Value;
-                if (userInfo.Path == path)
-                    continue;
-
-                this.MoveRepositoryPath(userInfo, path);
-            }
-        }
-
-        private void DeleteUsersRepositoryPath()
-        {
-            foreach (var item in this.usersToDelete)
-            {
-                var path = item.Key;
-                var userInfo = item.Value;
-                this.DeleteRepositoryPath(userInfo, path);
-            }
-        }
-
-        private void AddRepositoryPath(UserSerializationInfo userInfo)
-        {
-            var itemPath = this.UserContext.GenerateUserPath(userInfo.CategoryPath, userInfo.ID);
-            var files = this.UserContext.GetFiles(itemPath);
-            var status = this.Repository.Status(files);
-
-            foreach (var item in status)
-            {
-                if (item.Status == RepositoryItemStatus.Untracked)
-                {
-                    this.Repository.Add(item.Path);
-                }
-            }
-        }
-
-        private void MoveRepositoryPath(UserSerializationInfo userInfo, string userPath)
-        {
-            var itemPath = this.UserContext.GeneratePath(userPath);
-            var files = this.UserContext.GetFiles(itemPath);
-
-            for (var i = 0; i < files.Length; i++)
-            {
-                var path1 = files[i];
-                var extension = Path.GetExtension(path1);
-                var path2 = this.UserContext.GeneratePath(userInfo.Path) + extension;
-                this.Repository.Move(path1, path2);
-            }
-        }
-
-        private void DeleteRepositoryPath(UserSerializationInfo dataType, string typePath)
-        {
-            var itemPath = this.UserContext.GeneratePath(typePath);
-            var files = this.UserContext.GetFiles(itemPath);
-            foreach (var item in files)
-            {
-                if (File.Exists(item) == false)
-                    throw new FileNotFoundException();
-            }
-            this.Repository.DeleteRange(files);
-        }
-
-        private void ValidateUserExists(string typePath)
-        {
-            var itemPath = this.UserContext.GeneratePath(typePath);
-            var files = this.Serializer.GetPath(itemPath, typeof(UserSerializationInfo), ObjectSerializerSettings.Empty);
-            foreach (var item in files)
-            {
-                if (File.Exists(item) == false)
-                    throw new FileNotFoundException();
-            }
-        }
-
-        private void ValidateUserNotExists(string typePath)
-        {
-            var itemPath = this.UserContext.GeneratePath(typePath);
-            var files = this.Serializer.GetPath(itemPath, typeof(UserSerializationInfo), ObjectSerializerSettings.Empty);
-            foreach (var item in files)
-            {
-                if (File.Exists(item) == true)
-                    throw new FileNotFoundException();
-            }
-        }
-
-        private string GenerateCategoryPath(string parentPath, string name)
-        {
-            var value = new CategoryName(parentPath, name);
-            return this.GenerateCategoryPath(value.Path);
-        }
-
-        private string GenerateCategoryPath(string categoryPath)
-        {
-            NameValidator.ValidateCategoryPath(categoryPath);
-            var baseUri = new Uri(this.UserContext.BasePath);
-            var uri = new Uri(baseUri + categoryPath);
-            return uri.LocalPath;
-        }
-
-        private string GenerateUserPath(string categoryPath, string userID)
-        {
-            return Path.Combine(this.GenerateCategoryPath(categoryPath), userID);
-        }
-
-        private string GeneratePath(string path)
-        {
-            if (NameValidator.VerifyCategoryPath(path) == true)
-                return this.GenerateCategoryPath(path);
-            var itemName = new ItemName(path);
-            return this.GenerateUserPath(itemName.CategoryPath, itemName.Name);
-        }
-
-        private string[] GetFiles(string itemPath)
-        {
-            var directoryName = Path.GetDirectoryName(itemPath);
-            var name = Path.GetFileNameWithoutExtension(itemPath);
-            var files = Directory.GetFiles(directoryName, $"{name}.*").Where(item => Path.GetFileNameWithoutExtension(item) == name).ToArray();
-            return files;
         }
 
         private UserRepositoryHost Repository => this.UserContext.Repository;
