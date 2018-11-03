@@ -49,15 +49,15 @@ namespace Ntreev.Crema.Services
             repositoryHost.AddRange(paths.Select(item => item.Path).ToArray());
         }
 
-        public static void Add(this RepositoryHost repositoryHost, RepositoryPath path, string contents)
-        {
-            repositoryHost.Add(path.Path);
-        }
+        //public static void Add(this RepositoryHost repositoryHost, RepositoryPath path, string contents)
+        //{
+        //    repositoryHost.Add(path.Path);
+        //}
 
-        public static void Modify(this RepositoryHost repositoryHost, RepositoryPath path, string contents)
-        {
-            repositoryHost.Modify(path.Path, contents);
-        }
+        //public static void Modify(this RepositoryHost repositoryHost, RepositoryPath path, string contents)
+        //{
+        //    repositoryHost.Modify(path.Path, contents);
+        //}
 
         public static void Move(this RepositoryHost repositoryHost, RepositoryPath srcPath, RepositoryPath toPath)
         {
@@ -81,13 +81,20 @@ namespace Ntreev.Crema.Services
 
         public static void Delete(this RepositoryHost repositoryHost, RepositoryPath path)
         {
-            var files = path.GetFiles();
-            foreach (var item in files)
+            if (path.IsDirectory == true)
             {
-                if (File.Exists(item) == false)
-                    throw new FileNotFoundException();
+                repositoryHost.Delete(path.Path);
             }
-            repositoryHost.DeleteRange(files);
+            else
+            {
+                var files = path.GetFiles();
+                foreach (var item in files)
+                {
+                    if (File.Exists(item) == false)
+                        throw new FileNotFoundException();
+                }
+                repositoryHost.DeleteRange(files);
+            }
         }
 
         public static void DeleteRange(this RepositoryHost repositoryHost, RepositoryPath[] paths)

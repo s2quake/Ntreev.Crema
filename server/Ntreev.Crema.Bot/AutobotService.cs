@@ -56,15 +56,9 @@ namespace Ntreev.Crema.Bot
 
         }
 
-        public string Name
-        {
-            get { return "bot"; }
-        }
+        public string Name => "bot";
 
-        public Guid ID
-        {
-            get { return Guid.Parse(ServiceID); }
-        }
+        public Guid ID => Guid.Parse(ServiceID);
 
         protected override AutobotBase CreateInstance(string autobotID)
         {

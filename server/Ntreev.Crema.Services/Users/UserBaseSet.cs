@@ -192,26 +192,19 @@ namespace Ntreev.Crema.Services.Users
                 var itemPath1 = new RepositoryPath(this.UserContext.BasePath, path);
                 var itemPath2 = new RepositoryPath(this.UserContext.BasePath, userInfo.Path);
 
+                itemPath1.ValidateExists(this.Serializer, typeof(UserSerializationInfo));
                 if (itemPath1 != itemPath2)
                 {
-                    itemPath1.ValidateExists(this.Serializer, typeof(UserSerializationInfo));
                     itemPath2.ValidateNotExists(this.Serializer, typeof(UserSerializationInfo));
                 }
-                else
-                {
-                    itemPath1.ValidateExists(this.Serializer, typeof(UserSerializationInfo));
-                }
-
-                this.Serializer.Serialize(itemPath1, userInfo, ObjectSerializerSettings.Empty);
+                this.Repository.Write(path, userInfo, false);
             }
 
             foreach (var item in this.usersToCreate)
             {
                 var path = item.Key;
                 var userInfo = item.Value;
-                var itemPath = new RepositoryPath(this.UserContext.BasePath, userInfo.CategoryPath + userInfo.ID);
-                itemPath.ValidateNotExists(this.Serializer, typeof(UserSerializationInfo));
-                this.Serializer.Serialize(itemPath, userInfo, ObjectSerializerSettings.Empty);
+                this.Repository.Write(path, userInfo, true);
             }
         }
 

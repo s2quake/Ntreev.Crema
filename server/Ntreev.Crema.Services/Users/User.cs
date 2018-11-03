@@ -369,7 +369,7 @@ namespace Ntreev.Crema.Services.Users
             return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 this.Repository.Lock(tuple.paths);
-                var userInfo = (UserSerializationInfo)this.Serializer.Deserialize(tuple.path, typeof(UserSerializationInfo), ObjectSerializerSettings.Empty);
+                var userInfo = (UserSerializationInfo)this.Repository.Read(tuple.path);
                 var dataSet = new UserSet()
                 {
                     ItemPaths = tuple.paths,
@@ -418,8 +418,6 @@ namespace Ntreev.Crema.Services.Users
         public UserRepositoryHost Repository => this.Context.Repository;
 
         public IObjectSerializer Serializer => this.Context.Serializer;
-
-        //public string ItemPath => this.Context.GenerateUserPath(this.Category.Path, base.Name);
 
         public new event EventHandler Renamed
         {

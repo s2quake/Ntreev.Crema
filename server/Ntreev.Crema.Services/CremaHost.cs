@@ -58,7 +58,6 @@ namespace Ntreev.Crema.Services
             [ImportMany]IEnumerable<IRepositoryProvider> repositoryProviders,
             [ImportMany]IEnumerable<IObjectSerializer> serializers)
         {
-            var path = new RepositoryPath(settings.BasePath, "/wow/eee/ewrwrwer/");
             CremaLog.Debug("crema instance created.");
             this.settings = settings;
             this.BasePath = settings.BasePath;

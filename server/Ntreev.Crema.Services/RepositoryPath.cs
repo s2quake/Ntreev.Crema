@@ -104,7 +104,14 @@ namespace Ntreev.Crema.Services
         {
             get
             {
-                return false;
+                if (this.IsDirectory == true)
+                {
+                    return DirectoryUtility.Exists(this.Path);
+                }
+                else
+                {
+                    return this.GetFiles().Any();
+                }
             }
         }
 

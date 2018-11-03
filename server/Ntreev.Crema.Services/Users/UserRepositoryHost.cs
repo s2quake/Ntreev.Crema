@@ -57,9 +57,13 @@ namespace Ntreev.Crema.Services.Users
             return this.Serializer.Deserialize<UserSerializationInfo>(repositoryPath, ObjectSerializerSettings.Empty);
         }
 
-        public void Write(string path, UserSerializationInfo userInfo)
+        public void Write(string path, UserSerializationInfo userInfo, bool isNew)
         {
             var repositoryItemPath = new RepositoryPath(this.UserContext.BasePath, path);
+            if (isNew == true)
+            {
+                repositoryItemPath.ValidateNotExists(this.Serializer, typeof(UserSerializationInfo));
+            }
             this.Serializer.Serialize(repositoryItemPath, userInfo, ObjectSerializerSettings.Empty);
         }
 

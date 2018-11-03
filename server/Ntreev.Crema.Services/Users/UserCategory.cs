@@ -201,7 +201,7 @@ namespace Ntreev.Crema.Services.Users
                 var userInfoList = new List<UserSerializationInfo>(tuple.userPaths.Length);
                 foreach (var item in tuple.userPaths)
                 {
-                    var userInfo = (UserSerializationInfo)this.Serializer.Deserialize(item, typeof(UserSerializationInfo), ObjectSerializerSettings.Empty);
+                    var userInfo = this.Repository.Read(item);
                     userInfoList.Add(userInfo);
                 }
                 var dataSet = new UserSet()
@@ -221,8 +221,6 @@ namespace Ntreev.Crema.Services.Users
         public UserRepositoryHost Repository => this.Context.Repository;
 
         public IObjectSerializer Serializer => this.Context.Serializer;
-
-        //public string ItemPath => this.Context.GenerateCategoryPath(base.Path);
 
         public new string Name => base.Name;
 

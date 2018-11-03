@@ -34,7 +34,6 @@ namespace Ntreev.Crema.Bot
     public abstract class AutobotBase : IServiceProvider
     {
         private readonly static object error = new object();
-        private readonly string autobotID;
         private readonly TaskContext taskContext = new TaskContext();
         private readonly CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
         private IEnumerable<ITaskProvider> taskProviders;
@@ -42,7 +41,7 @@ namespace Ntreev.Crema.Bot
 
         public AutobotBase(string autobotID)
         {
-            this.autobotID = autobotID;
+            this.AutobotID = autobotID;
             this.dispatcher = new CremaDispatcher(this);
             this.MinSleepTime = 1;
             this.MaxSleepTime = 10;
@@ -50,7 +49,7 @@ namespace Ntreev.Crema.Bot
 
         public override string ToString()
         {
-            return $"Autobot: {this.autobotID}";
+            return $"Autobot: {this.AutobotID}";
         }
 
         public void Cancel()
@@ -80,35 +79,20 @@ namespace Ntreev.Crema.Bot
             this.taskContext.Authentication = null;
         }
 
-        public int MinSleepTime
-        {
-            get; set;
-        }
+        public int MinSleepTime { get; set; }
 
-        public int MaxSleepTime
-        {
-            get; set;
-        }
+        public int MaxSleepTime { get; set; }
 
-        public bool IsOnline
-        {
-            get { return this.taskContext.Authentication != null; }
-        }
+        public bool IsOnline => this.taskContext.Authentication != null;
 
-        public string AutobotID
-        {
-            get { return this.autobotID; }
-        }
+        public string AutobotID { get; }
 
-        public abstract AutobotServiceBase Service
-        {
-            get;
-        }
+        public abstract AutobotServiceBase Service { get; }
 
         public bool AllowException
         {
-            get { return this.taskContext.AllowException; }
-            set { this.taskContext.AllowException = value; }
+            get => this.taskContext.AllowException;
+            set => this.taskContext.AllowException = value;
         }
 
         public abstract object GetService(Type serviceType);
@@ -246,8 +230,7 @@ namespace Ntreev.Crema.Bot
 
             int SelectWeight(ITaskProvider predicate)
             {
-                var attr = Attribute.GetCustomAttribute(predicate.GetType(), typeof(TaskClassAttribute)) as TaskClassAttribute;
-                if (attr == null)
+                if (!(Attribute.GetCustomAttribute(predicate.GetType(), typeof(TaskClassAttribute)) is TaskClassAttribute attr))
                     return 100;
                 return attr.Weight;
             }

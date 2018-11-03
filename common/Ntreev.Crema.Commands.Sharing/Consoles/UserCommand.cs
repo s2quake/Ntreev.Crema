@@ -114,7 +114,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task MoveAsync([CommandCompletion(nameof(GetUserIDs))]string userID, string categoryPath)
+        public async Task MoveAsync([CommandCompletion(nameof(GetUserIDs))]string userID, [CommandCompletion(nameof(GetCategoryPaths))]string categoryPath)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -292,7 +292,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         class TerminalUserItem : TerminalTextItem
         {
-            private string userID;
+            private readonly string userID;
             private readonly BanInfo banInfo;
             private readonly UserState userState;
 
@@ -327,7 +327,6 @@ namespace Ntreev.Crema.Commands.Consoles
                         base.OnDraw(writer, text);
                     }
                 }
-
             }
         }
 

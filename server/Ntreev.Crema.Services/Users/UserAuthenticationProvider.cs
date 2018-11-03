@@ -22,7 +22,7 @@ namespace Ntreev.Crema.Services.Users
 {
     class UserAuthenticationProvider : IAuthenticationProvider
     {
-        private bool dummy;
+        private readonly bool dummy;
 
         public UserAuthenticationProvider(User user)
             : this(user, false)
