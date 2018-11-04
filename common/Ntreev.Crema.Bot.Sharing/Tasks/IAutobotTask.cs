@@ -56,8 +56,7 @@ namespace Ntreev.Crema.Bot.Tasks
                     }
                     else if (RandomUtility.Within(75) == true)
                     {
-
-                        if (autobot.AutobotID == "Smith" && autobot.GetService(typeof(IUserContext)) is IUserContext userContext)
+                        if (autobot.GetService(typeof(IUserContext)) is IUserContext userContext)
                         {
                             var userItem = await userContext.Dispatcher.InvokeAsync(() => userContext.Random());
                             context.Push(userItem);
@@ -106,6 +105,7 @@ namespace Ntreev.Crema.Bot.Tasks
         public async Task CreateAutobotAsync(Autobot autobot, TaskContext context)
         {
             var authentication = context.Authentication;
+            var autobotService = autobot.Service;
             if (context.AllowException == false)
             {
                 if (autobot.IsOnline == false)
@@ -113,16 +113,15 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (authentication.Authority != Authority.Admin)
                     return;
             }
-            var autobotID = $"Autobot{RandomUtility.Next(1000)}";
-            var authority = RandomUtility.NextEnum<Authority>();
+            var info = autobotService.GetRandomUserInfo();
             if (autobot.GetService(typeof(IUserContext)) is IUserContext userContext)
             {
                 if (await userContext.Users.ContainsAsync(autobotID) == false)
                 {
-                    var category = userContext.Categories["/autobots/"];
+                    var category = userContext.Categories.Random();
                     await category.AddNewUserAsync(authentication, autobotID, StringUtility.ToSecureString("1111"), autobotID, authority);
                 }
-                await autobot.Service.CreateAutobotAsync(authentication, autobotID);
+                await autobotService.CreateAutobotAsync(authentication, autobotID);
             }
         }
     }

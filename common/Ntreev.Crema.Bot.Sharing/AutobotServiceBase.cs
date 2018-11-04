@@ -74,29 +74,22 @@ namespace Ntreev.Crema.Bot
 
             this.IsPlaying = true;
             var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            if (await userContext.Categories.ContainsAsync("/autobots/") == false)
-            {
-                await userContext.Root.AddNewCategoryAsync(authentication, "autobots");
-            }
             if (await userContext.Users.ContainsAsync(masterBotID) == false)
             {
-                var category = userContext.Categories["/autobots/"];
+                var category = userContext.Categories.Random();
                 await category.AddNewUserAsync(authentication, masterBotID, StringUtility.ToSecureString("1111"), masterBotID, Authority.Admin);
             }
 
             var autobotIDList = new List<string>();
             for (var i = 0; i < count; i++)
             {
-                var autobotID = $"Autobot{RandomUtility.Next(1000)}";
-                var authority = RandomUtility.NextEnum<Authority>();
-                if (authority == Authority.Guest)
-                    authority = Authority.Member;
-                if (await userContext.Users.ContainsAsync(autobotID) == false)
+                var info = this.GetRandomUserInfo(); ;
+                if (await userContext.Users.ContainsAsync(info.ID) == false)
                 {
-                    var category = userContext.Categories["/autobots/"];
-                    await category.AddNewUserAsync(authentication, autobotID, StringUtility.ToSecureString("1111"), autobotID, authority);
+                    var category = userContext.Categories.Random();
+                    await category.AddNewUserAsync(authentication, info.ID, StringUtility.ToSecureString(info.Password), info.Name, info.Authority);
                 }
-                autobotIDList.Add(autobotID);
+                autobotIDList.Add(info.ID);
             }
 
             this.Dispatcher = new CremaDispatcher(this);
@@ -127,6 +120,19 @@ namespace Ntreev.Crema.Bot
             this.Dispatcher = null;
             this.IsClosing = false;
         }
+
+        public (string ID, string Name, string Password, Authority Authority) GetRandomUserInfo()
+        {
+            var number = RandomUtility.Next(1000);
+            var value = RandomUtility.Next(3);
+            if (value == 0)
+                return ($"admin{number}", $"Admin{number}", "admin", Authority.Admin);
+            else if (value == 1)
+                return ($"member{number}", $"Member{number}", "member", Authority.Member);
+            return ($"guest{number}", $"Guest{number}", "guest", Authority.Guest);
+        }
+
+        public ServiceState ServiceState { get; set; }
 
         public bool IsPlaying { get; private set; }
 
