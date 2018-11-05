@@ -65,29 +65,29 @@ namespace Ntreev.Crema.Services.Users
             this.CremaHost.Debug(Resources.Message_UserContextIsCreated);
         }
 
-        public void InvokeItemsCreatedEvent(Authentication authentication, IUserItem[] items, object[] args)
+        public void InvokeItemsCreatedEvent(Authentication authentication, IUserItem[] items, object[] args, Guid taskID)
         {
-            this.OnItemsCreated(new ItemsCreatedEventArgs<IUserItem>(authentication, items, args));
+            this.OnItemsCreated(new ItemsCreatedEventArgs<IUserItem>(authentication, items, args) { TaskID = taskID });
         }
 
-        public void InvokeItemsRenamedEvent(Authentication authentication, IUserItem[] items, string[] oldNames, string[] oldPaths)
+        public void InvokeItemsRenamedEvent(Authentication authentication, IUserItem[] items, string[] oldNames, string[] oldPaths, Guid taskID)
         {
-            this.OnItemsRenamed(new ItemsRenamedEventArgs<IUserItem>(authentication, items, oldNames, oldPaths));
+            this.OnItemsRenamed(new ItemsRenamedEventArgs<IUserItem>(authentication, items, oldNames, oldPaths) { TaskID = taskID });
         }
 
-        public void InvokeItemsMovedEvent(Authentication authentication, IUserItem[] items, string[] oldPaths, string[] oldParentPaths)
+        public void InvokeItemsMovedEvent(Authentication authentication, IUserItem[] items, string[] oldPaths, string[] oldParentPaths, Guid taskID)
         {
-            this.OnItemsMoved(new ItemsMovedEventArgs<IUserItem>(authentication, items, oldPaths, oldParentPaths));
+            this.OnItemsMoved(new ItemsMovedEventArgs<IUserItem>(authentication, items, oldPaths, oldParentPaths) { TaskID = taskID });
         }
 
-        public void InvokeItemsDeleteEvent(Authentication authentication, IUserItem[] items, string[] itemPaths)
+        public void InvokeItemsDeleteEvent(Authentication authentication, IUserItem[] items, string[] itemPaths, Guid taskID)
         {
-            this.OnItemsDeleted(new ItemsDeletedEventArgs<IUserItem>(authentication, items, itemPaths));
+            this.OnItemsDeleted(new ItemsDeletedEventArgs<IUserItem>(authentication, items, itemPaths) { TaskID = taskID });
         }
 
-        public void InvokeItemsChangedEvent(Authentication authentication, IUserItem[] items)
+        public void InvokeItemsChangedEvent(Authentication authentication, IUserItem[] items, Guid taskID)
         {
-            this.OnItemsChanged(new ItemsEventArgs<IUserItem>(authentication, items));
+            this.OnItemsChanged(new ItemsEventArgs<IUserItem>(authentication, items) { TaskID = taskID });
         }
 
         public async Task<Authentication> LoginAsync(string userID, SecureString password)
@@ -129,18 +129,20 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public async Task NotifyMessageAsync(Authentication authentication, string[] userIDs, string message)
+        public async Task<Guid> NotifyMessageAsync(Authentication authentication, string[] userIDs, string message)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(NotifyMessageAsync), this, userIDs, message);
                     this.ValidateSendMessage(authentication, userIDs, message);
+                    var taskID = Guid.NewGuid();
                     var users = userIDs == null ? new User[] { } : userIDs.Select(item => this.Users[item]).ToArray();
                     authentication.Sign();
-                    this.Users.InvokeNotifyMessageEvent(authentication, users, message);
+                    this.Users.InvokeNotifyMessageEvent(authentication, users, message, taskID);
+                    return taskID;
                 });
             }
             catch (Exception e)
@@ -430,7 +432,7 @@ namespace Ntreev.Crema.Services.Users
                 }
 
                 this.Users.InvokeUsersStateChangedEvent(Authentication.System, users);
-                this.Users.InvokeUsersLoggedOutEvent(Authentication.System, users, CloseInfo.Empty);
+                this.Users.InvokeUsersLoggedOutEvent(Authentication.System, users, CloseInfo.Empty, Guid.NewGuid());
 
                 base.Clear();
             });
@@ -588,6 +590,11 @@ namespace Ntreev.Crema.Services.Users
         }
 
         #region IUserContext
+
+        Task IUserContext.NotifyMessageAsync(Authentication authentication, string[] userIDs, string message)
+        {
+            return this.NotifyMessageAsync(authentication, userIDs, message);
+        }
 
         bool IUserContext.Contains(string itemPath)
         {

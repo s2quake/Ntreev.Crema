@@ -119,15 +119,19 @@ namespace Ntreev.Crema.Services
         {
             get
             {
-                var directoryName = System.IO.Path.GetDirectoryName(this.Path);
-                return new RepositoryPath() { Path = directoryName + System.IO.Path.DirectorySeparatorChar };
+                if (this.IsDirectory == true)
+                {
+                    var path = this.Path.TrimEnd(System.IO.Path.DirectorySeparatorChar);
+                    var directoryName = System.IO.Path.GetDirectoryName(path);
+                    return new RepositoryPath() { Path = directoryName + System.IO.Path.DirectorySeparatorChar };
+                }
+                else
+                {
+                    var directoryName = System.IO.Path.GetDirectoryName(this.Path);
+                    return new RepositoryPath() { Path = directoryName + System.IO.Path.DirectorySeparatorChar };
+                }
             }
         }
-
-        //public static implicit operator string(RepositoryPath path)
-        //{
-        //    return path.ToString();
-        //}
 
         public static bool operator ==(RepositoryPath t1, RepositoryPath t2)
         {

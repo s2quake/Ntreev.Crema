@@ -45,7 +45,7 @@ namespace Ntreev.Crema.ServiceModel
     public struct ResultBase
     {
         [DataMember]
-        public long ID { get; set; }
+        public Guid TaskID { get; set; }
 
         [DataMember]
         public SignatureDate SignatureDate { get; set; }
@@ -67,7 +67,7 @@ namespace Ntreev.Crema.ServiceModel
     public struct ResultBase<T>
     {
         [DataMember]
-        public long ID { get; set; }
+        public Guid TaskID { get; set; }
 
         [DataMember]
         public SignatureDate SignatureDate { get; set; }
@@ -94,7 +94,7 @@ namespace Ntreev.Crema.ServiceModel
     public struct ResultBase<T1, T2>
     {
         [DataMember]
-        public long ID { get; set; }
+        public Guid TaskID { get; set; }
 
         [DataMember]
         public SignatureDate SignatureDate { get; set; }

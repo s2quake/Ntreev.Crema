@@ -78,11 +78,11 @@ namespace Ntreev.Crema.Bot.Consoles
         {
             if (descriptor.DescriptorName == nameof(StartAsync))
             {
-                return this.AutobotService.IsPlaying == false;
+                return this.AutobotService.ServiceState == Services.ServiceState.None;
             }
             else if (descriptor.DescriptorName == nameof(StopAsync))
             {
-                return this.AutobotService.IsPlaying == true;
+                return this.AutobotService.ServiceState == Services.ServiceState.Opened;
             }
             return base.IsMethodEnabled(descriptor);
         }

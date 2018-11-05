@@ -109,7 +109,8 @@ namespace Ntreev.Crema.Services.Domains
 
         public async Task RemoveAsync(Authentication authentication, Domain domain, bool isCanceled)
         {
-            var taskID = await domain.Logger.Dispatcher.InvokeAsync(() => domain.Logger.Delete(authentication));
+            var taskID = Guid.NewGuid();
+            await domain.Logger.Dispatcher.InvokeAsync(() => domain.Logger.Delete(authentication));
             await domain.Logger.DisposeAsync(true);
             domain.Logger = null;
             await this.Dispatcher.InvokeAsync(() =>
@@ -188,7 +189,7 @@ namespace Ntreev.Crema.Services.Domains
                     item.Logger.Dispatcher.Dispose();
                     item.Dispose(authentication, true);
                 }
-                this.Domains.InvokeDomainDeletedEvent(authentication, domains, isCanceleds, -1);
+                this.Domains.InvokeDomainDeletedEvent(authentication, domains, isCanceleds, Guid.Empty);
             });
         }
 

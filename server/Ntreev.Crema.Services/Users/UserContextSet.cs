@@ -14,14 +14,14 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users
 {
-    class UserBaseSet
+    class UserContextSet
     {
         private readonly Dictionary<string, UserSerializationInfo> users = new Dictionary<string, UserSerializationInfo>();
         private readonly Dictionary<string, UserSerializationInfo> usersToCreate = new Dictionary<string, UserSerializationInfo>();
         private readonly Dictionary<string, UserSerializationInfo> usersToDelete = new Dictionary<string, UserSerializationInfo>();
         private readonly SignatureDateProvider signatureDateProvider;
 
-        private UserBaseSet(UserContext userContext, UserSet userSet, bool userCreation)
+        private UserContextSet(UserContext userContext, UserSet userSet, bool userCreation)
         {
             this.UserContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
             this.UserContext.Dispatcher.VerifyAccess();
@@ -48,9 +48,9 @@ namespace Ntreev.Crema.Services.Users
             this.signatureDateProvider = userSet.SignatureDateProvider;
         }
 
-        public static Task<UserBaseSet> CreateAsync(UserContext userContext, UserSet userSet, bool userCreation)
+        public static Task<UserContextSet> CreateAsync(UserContext userContext, UserSet userSet, bool userCreation)
         {
-            return userContext.Dispatcher.InvokeAsync(() => new UserBaseSet(userContext, userSet, userCreation));
+            return userContext.Dispatcher.InvokeAsync(() => new UserContextSet(userContext, userSet, userCreation));
         }
 
         public void SetUserCategoryPath(string categoryPath, string newCategoryPath)

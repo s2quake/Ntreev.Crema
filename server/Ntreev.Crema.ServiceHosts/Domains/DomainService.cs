@@ -117,7 +117,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             {
                 var domain = await this.GetDomainAsync(domainID);
                 var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.EnterAsync(this.authentication, accessType);
-                result.ID = info.ID;
+                result.TaskID = info.ID;
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -134,7 +134,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             {
                 var domain = await this.GetDomainAsync(domainID);
                 var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.LeaveAsync(this.authentication);
-                result.ID = info.ID;
+                result.TaskID = info.ID;
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -151,7 +151,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             {
                 var domain = await this.GetDomainAsync(domainID);
                 var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.SetRowAsync(this.authentication, rows);
-                result.ID = info.ID;
+                result.TaskID = info.ID;
                 result.Value = info.Value;
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -216,7 +216,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             try
             {
                 var domain = await this.GetDomainAsync(domainID);
-                result.ID = await (Task<long>)domain.KickAsync(this.authentication, userID, comment);
+                result.TaskID = await (Task<Guid>)domain.KickAsync(this.authentication, userID, comment);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -265,7 +265,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             {
                 var domain = await this.GetDomainAsync(domainID);
                 var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.NewRowAsync(this.authentication, rows);
-                result.ID = info.ID;
+                result.TaskID = info.ID;
                 result.Value = info.Value;
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -283,7 +283,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             {
                 var domain = await this.GetDomainAsync(domainID);
                 var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.RemoveRowAsync(this.authentication, rows);
-                result.ID = info.ID;
+                result.TaskID = info.ID;
                 result.Value = info.Value;
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -300,7 +300,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             try
             {
                 var domain = await this.GetDomainAsync(domainID);
-                result.ID = await (Task<long>)domain.DeleteAsync(this.authentication, force);
+                result.TaskID = await (Task<Guid>)domain.DeleteAsync(this.authentication, force);
                 result.Value = domain.Result;
                 result.SignatureDate = this.authentication.SignatureDate;
             }

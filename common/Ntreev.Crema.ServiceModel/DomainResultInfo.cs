@@ -36,14 +36,14 @@ namespace Ntreev.Crema.ServiceModel
     public struct DomainResultInfo
     {
         [DataMember]
-        public long ID { get; set; }
+        public Guid ID { get; set; }
     }
 
     [DataContract(Namespace = SchemaUtility.Namespace)]
     public struct DomainResultInfo<T>
     {
         [DataMember]
-        public long ID { get; set; }
+        public Guid ID { get; set; }
 
         [DataMember]
         public T Value { get; set; }

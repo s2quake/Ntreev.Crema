@@ -36,7 +36,7 @@ namespace Ntreev.Crema.ServiceModel
         public long Index { get; set; }
 
         [DataMember]
-        public long TaskID { get; set; }
+        public Guid TaskID { get; set; }
 
         [DataMember]
         public SignatureDate SignatureDate { get; set; }

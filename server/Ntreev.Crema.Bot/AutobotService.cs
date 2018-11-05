@@ -60,9 +60,9 @@ namespace Ntreev.Crema.Bot
 
         public Guid ID => Guid.Parse(ServiceID);
 
-        protected override AutobotBase CreateInstance(string autobotID)
+        protected override AutobotBase CreateInstance(string autobotID, SecureString password)
         {
-            return new Autobot(this.cremaHost, this, autobotID, StringUtility.ToSecureString("1111"));
+            return new Autobot(this.cremaHost, this, autobotID, password);
         }
     }
 }

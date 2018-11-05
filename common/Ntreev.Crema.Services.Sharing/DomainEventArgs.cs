@@ -47,6 +47,6 @@ namespace Ntreev.Crema.Services
 
         public SignatureDate SignatureDate { get; }
 
-        public long TaskID { get; internal set; }
+        public Guid TaskID { get; internal set; }
     }
 }

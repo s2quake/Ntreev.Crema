@@ -14,8 +14,8 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
-      <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
+      <xs:element minOccurs="0" name="TaskID" type="ser:guid" />
       <xs:element minOccurs="0" name="Value" type="tns:UserContextMetaData" />
     </xs:sequence>
   </xs:complexType>
@@ -155,8 +155,8 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
-      <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
+      <xs:element minOccurs="0" name="TaskID" type="ser:guid" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ResultBase" nillable="true" type="tns:ResultBase" />
@@ -202,8 +202,8 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
-      <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
+      <xs:element minOccurs="0" name="TaskID" type="ser:guid" />
       <xs:element minOccurs="0" name="Value" type="tns:UserInfo" />
     </xs:sequence>
   </xs:complexType>
@@ -220,12 +220,25 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
-      <xs:element minOccurs="0" name="ID" type="xs:long" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
+      <xs:element minOccurs="0" name="TaskID" type="ser:guid" />
       <xs:element minOccurs="0" name="Value" type="tns:BanInfo" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ResultBaseOfBanInfoq8erDhHE" nillable="true" type="tns:ResultBaseOfBanInfoq8erDhHE" />
+  <xs:complexType name="CallbackInfo">
+    <xs:annotation>
+      <xs:appinfo>
+        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Index" type="xs:long" />
+      <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
+      <xs:element minOccurs="0" name="TaskID" type="ser:guid" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="CallbackInfo" nillable="true" type="tns:CallbackInfo" />
   <xs:complexType name="CloseInfo">
     <xs:annotation>
       <xs:appinfo>

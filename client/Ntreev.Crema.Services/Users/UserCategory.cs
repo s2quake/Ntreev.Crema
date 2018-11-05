@@ -30,7 +30,7 @@ namespace Ntreev.Crema.Services.Users
     class UserCategory : UserCategoryBase<User, UserCategory, UserCollection, UserCategoryCollection, UserContext>,
         IUserCategory, IUserItem
     {
-        public async Task RenameAsync(Authentication authentication, string name)
+        public async Task<Guid> RenameAsync(Authentication authentication, string name)
         {
             try
             {
@@ -45,12 +45,8 @@ namespace Ntreev.Crema.Services.Users
                     return (items, oldNames, oldPaths, path);
                 });
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.RenameUserItem(tuple.path, name));
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.Sign(authentication, result);
-                    base.Name = name;
-                    this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths);
-                });
+                await this.Context.WaitAsync(result.TaskID);
+                return result.TaskID;
             }
             catch (Exception e)
             {
@@ -59,7 +55,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public async Task MoveAsync(Authentication authentication, string parentPath)
+        public async Task<Guid> MoveAsync(Authentication authentication, string parentPath)
         {
             try
             {
@@ -74,12 +70,8 @@ namespace Ntreev.Crema.Services.Users
                     return (items, oldPaths, oldParentPaths, path);
                 });
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.MoveUserItem(tuple.path, parentPath));
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.Sign(authentication, result);
-                    this.Parent = this.Container[parentPath];
-                    this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths);
-                });
+                await this.Context.WaitAsync(result.TaskID);
+                return result.TaskID;
             }
             catch (Exception e)
             {
@@ -88,7 +80,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public async Task DeleteAsync(Authentication authentication)
+        public async Task<Guid> DeleteAsync(Authentication authentication)
         {
             try
             {
@@ -102,13 +94,8 @@ namespace Ntreev.Crema.Services.Users
                     return (items, oldPaths, path);
                 });
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.DeleteUserItem(tuple.path));
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    var container = this.Container;
-                    this.CremaHost.Sign(authentication, result);
-                    this.Dispose();
-                    container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
-                });
+                await this.Context.WaitAsync(result.TaskID);
+                return result.TaskID;
             }
             catch (Exception e)
             {
@@ -186,6 +173,21 @@ namespace Ntreev.Crema.Services.Users
 
         #region IUserCategory
 
+        Task IUserCategory.RenameAsync(Authentication authentication, string newName)
+        {
+            return this.RenameAsync(authentication, newName);
+        }
+
+        Task IUserCategory.MoveAsync(Authentication authentication, string parentPath)
+        {
+            return this.MoveAsync(authentication, parentPath);
+        }
+
+        Task IUserCategory.DeleteAsync(Authentication authentication)
+        {
+            return this.DeleteAsync(authentication);
+        }
+
         async Task<IUserCategory> IUserCategory.AddNewCategoryAsync(Authentication authentication, string name)
         {
             return await this.AddNewCategoryAsync(authentication, name);
@@ -205,6 +207,21 @@ namespace Ntreev.Crema.Services.Users
         #endregion
 
         #region IUserItem
+
+        Task IUserItem.RenameAsync(Authentication authentication, string newName)
+        {
+            return this.RenameAsync(authentication, newName);
+        }
+
+        Task IUserItem.MoveAsync(Authentication authentication, string parentPath)
+        {
+            return this.MoveAsync(authentication, parentPath);
+        }
+
+        Task IUserItem.DeleteAsync(Authentication authentication)
+        {
+            return this.DeleteAsync(authentication);
+        }
 
         IUserItem IUserItem.Parent => this.Parent;
 

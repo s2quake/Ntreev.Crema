@@ -62,7 +62,7 @@ namespace Ntreev.Crema.Services.Domains
             this.Context.InvokeItemsCreatedEvent(authentication, domains, domainInfos);
         }
 
-        public void InvokeDomainDeletedEvent(Authentication authentication, Domain[] domains, bool[] isCanceleds, long taskID)
+        public void InvokeDomainDeletedEvent(Authentication authentication, Domain[] domains, bool[] isCanceleds, Guid taskID)
         {
             var itemPaths = domains.Select(item => item.Path).ToArray();
             var args = new DomainsDeletedEventArgs(authentication, domains, isCanceleds) { TaskID = taskID };
@@ -79,9 +79,9 @@ namespace Ntreev.Crema.Services.Domains
             this.Context.InvokeItemsDeleteEvent(authentication, domains, itemPaths);
         }
 
-        public void InvokeDomainUserAddedEvent(Authentication authentication, Domain domain, DomainUser domainUser, byte[] data, long id)
+        public void InvokeDomainUserAddedEvent(Authentication authentication, Domain domain, DomainUser domainUser, byte[] data, Guid taskID)
         {
-            var args = new DomainUserAddedEventArgs(authentication, domain, domainUser, data) { TaskID = id };
+            var args = new DomainUserAddedEventArgs(authentication, domain, domainUser, data) { TaskID = taskID };
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainUserAddedEvent), domain, domainUser);
             var comment = EventMessageBuilder.EnterDomainUser(authentication, domain);
             this.CremaHost.Debug(eventLog);
@@ -89,9 +89,9 @@ namespace Ntreev.Crema.Services.Domains
             this.OnDomainUserAdded(args);
         }
 
-        public void InvokeDomainUserRemovedEvent(Authentication authentication, Domain domain, DomainUser domainUser, RemoveInfo removeInfo, long id)
+        public void InvokeDomainUserRemovedEvent(Authentication authentication, Domain domain, DomainUser domainUser, RemoveInfo removeInfo, Guid taskID)
         {
-            var args = new DomainUserRemovedEventArgs(authentication, domain, domainUser, removeInfo) { TaskID = id };
+            var args = new DomainUserRemovedEventArgs(authentication, domain, domainUser, removeInfo) { TaskID = taskID };
             var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeDomainUserRemovedEvent), domain, domainUser, removeInfo.Reason, removeInfo.Message);
             var comment = removeInfo.Reason == RemoveReason.Kick
                 ? EventMessageBuilder.KickDomainUser(authentication, domain, domainUser)
@@ -113,46 +113,46 @@ namespace Ntreev.Crema.Services.Domains
             this.OnDomainUserStateChanged(args);
         }
 
-        public void InvokeDomainUserEditBegunEvent(Authentication authentication, Domain domain, DomainUser domainUser, long id)
+        public void InvokeDomainUserEditBegunEvent(Authentication authentication, Domain domain, DomainUser domainUser, Guid taskID)
         {
-            var args = new DomainUserLocationEventArgs(authentication, domain, domainUser) { TaskID = id };
+            var args = new DomainUserLocationEventArgs(authentication, domain, domainUser) { TaskID = taskID };
             this.OnDomainUserEditBegun(args);
         }
 
-        public void InvokeDomainUserEditEndedEvent(Authentication authentication, Domain domain, DomainUser domainUser, long id)
+        public void InvokeDomainUserEditEndedEvent(Authentication authentication, Domain domain, DomainUser domainUser, Guid taskID)
         {
-            var args = new DomainUserEventArgs(authentication, domain, domainUser) { TaskID = id };
+            var args = new DomainUserEventArgs(authentication, domain, domainUser) { TaskID = taskID };
             this.OnDomainUserEditEnded(args);
 
         }
 
-        public void InvokeDomainOwnerChangedEvent(Authentication authentication, Domain domain, DomainUser domainUser, long id)
+        public void InvokeDomainOwnerChangedEvent(Authentication authentication, Domain domain, DomainUser domainUser, Guid taskID)
         {
-            var args = new DomainUserEventArgs(authentication, domain, domainUser) { TaskID = id };
+            var args = new DomainUserEventArgs(authentication, domain, domainUser) { TaskID = taskID };
             this.OnDomainOwnerChanged(args);
         }
 
-        public void InvokeDomainRowAddedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows, long id)
+        public void InvokeDomainRowAddedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows, Guid taskID)
         {
-            var args = new DomainRowEventArgs(authentication, domain, rows) { TaskID = id };
+            var args = new DomainRowEventArgs(authentication, domain, rows) { TaskID = taskID };
             this.OnDomainRowAdded(args);
         }
 
-        public void InvokeDomainRowChangedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows, long id)
+        public void InvokeDomainRowChangedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows, Guid taskID)
         {
-            var args = new DomainRowEventArgs(authentication, domain, rows) { TaskID = id };
+            var args = new DomainRowEventArgs(authentication, domain, rows) { TaskID = taskID };
             this.OnDomainRowChanged(args);
         }
 
-        public void InvokeDomainRowRemovedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows, long id)
+        public void InvokeDomainRowRemovedEvent(Authentication authentication, Domain domain, DomainRowInfo[] rows, Guid taskID)
         {
-            var args = new DomainRowEventArgs(authentication, domain, rows) { TaskID = id };
+            var args = new DomainRowEventArgs(authentication, domain, rows) { TaskID = taskID };
             this.OnDomainRowRemoved(args);
         }
 
-        public void InvokeDomainPropertyChangedEvent(Authentication authentication, Domain domain, string propertyName, object value, long id)
+        public void InvokeDomainPropertyChangedEvent(Authentication authentication, Domain domain, string propertyName, object value, Guid taskID)
         {
-            var args = new DomainPropertyEventArgs(authentication, domain, propertyName, value) { TaskID = id };
+            var args = new DomainPropertyEventArgs(authentication, domain, propertyName, value) { TaskID = taskID };
             this.OnDomainPropertyChanged(args);
         }
 

@@ -43,7 +43,7 @@ namespace Ntreev.Crema.Services
 
         public object[] Results { get; }
 
-        public long TaskID { get; internal set; }
+        public Guid TaskID { get; internal set; }
 
         internal Authentication Authentication { get; }
     }

@@ -48,62 +48,62 @@ namespace Ntreev.Crema.Services.Users
 
         #region IUserServiceCallback
 
-        void IUserServiceCallback.OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
+        void IUserServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUsersChanged(SignatureDate signatureDate, UserInfo[] userInfos)
+        void IUserServiceCallback.OnUsersChanged(CallbackInfo callbackInfo, UserInfo[] userInfos)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUsersStateChanged(SignatureDate signatureDate, string[] userIDs, UserState[] states)
+        void IUserServiceCallback.OnUsersStateChanged(CallbackInfo callbackInfo, string[] userIDs, UserState[] states)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUserItemsCreated(SignatureDate signatureDate, string[] itemPaths, UserInfo?[] args)
+        void IUserServiceCallback.OnUserItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, UserInfo?[] args)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUserItemsRenamed(SignatureDate signatureDate, string[] itemPaths, string[] newNames)
+        void IUserServiceCallback.OnUserItemsRenamed(CallbackInfo callbackInfo, string[] itemPaths, string[] newNames)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUserItemsMoved(SignatureDate signatureDate, string[] itemPaths, string[] parentPaths)
+        void IUserServiceCallback.OnUserItemsMoved(CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUserItemsDeleted(SignatureDate signatureDate, string[] itemPaths)
+        void IUserServiceCallback.OnUserItemsDeleted(CallbackInfo callbackInfo, string[] itemPaths)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUsersLoggedIn(SignatureDate signatureDate, string[] userIDs)
+        void IUserServiceCallback.OnUsersLoggedIn(CallbackInfo callbackInfo, string[] userIDs)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUsersLoggedOut(SignatureDate signatureDate, string[] userIDs, CloseInfo closeInfo)
+        void IUserServiceCallback.OnUsersLoggedOut(CallbackInfo callbackInfo, string[] userIDs, CloseInfo closeInfo)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUsersKicked(SignatureDate signatureDate, string[] userIDs, string[] comments)
+        void IUserServiceCallback.OnUsersKicked(CallbackInfo callbackInfo, string[] userIDs, string[] comments)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUsersBanChanged(SignatureDate signatureDate, BanInfo[] banInfos, BanChangeType changeType, string[] comments)
+        void IUserServiceCallback.OnUsersBanChanged(CallbackInfo callbackInfo, BanInfo[] banInfos, BanChangeType changeType, string[] comments)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnMessageReceived(SignatureDate signatureDate, string[] userIDs, string message, MessageType messageType)
+        void IUserServiceCallback.OnMessageReceived(CallbackInfo callbackInfo, string[] userIDs, string message, MessageType messageType)
         {
             throw new NotImplementedException();
         }

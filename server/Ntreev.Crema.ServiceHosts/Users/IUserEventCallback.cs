@@ -30,39 +30,39 @@ namespace Ntreev.Crema.ServiceHosts.Users
     public interface IUserEventCallback
     {
         [OperationContract(IsOneWay = true)]
-        void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo);
+        void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo);
 
         [OperationContract(IsOneWay = true)]
-        void OnUsersChanged(SignatureDate signatureDate, UserInfo[] userInfos);
+        void OnUsersChanged(CallbackInfo callbackInfo, UserInfo[] userInfos);
 
         [OperationContract(IsOneWay = true)]
-        void OnUsersStateChanged(SignatureDate signatureDate, string[] userIDs, UserState[] states);
+        void OnUsersStateChanged(CallbackInfo callbackInfo, string[] userIDs, UserState[] states);
 
         [OperationContract(IsOneWay = true)]
-        void OnUserItemsCreated(SignatureDate signatureDate, string[] itemPaths, UserInfo?[] args);
+        void OnUserItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, UserInfo?[] args);
 
         [OperationContract(IsOneWay = true)]
-        void OnUserItemsRenamed(SignatureDate signatureDate, string[] itemPaths, string[] newNames);
+        void OnUserItemsRenamed(CallbackInfo callbackInfo, string[] itemPaths, string[] newNames);
 
         [OperationContract(IsOneWay = true)]
-        void OnUserItemsMoved(SignatureDate signatureDate, string[] itemPaths, string[] parentPaths);
+        void OnUserItemsMoved(CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths);
 
         [OperationContract(IsOneWay = true)]
-        void OnUserItemsDeleted(SignatureDate signatureDate, string[] itemPaths);
+        void OnUserItemsDeleted(CallbackInfo callbackInfo, string[] itemPaths);
 
         [OperationContract(IsOneWay = true)]
-        void OnUsersLoggedIn(SignatureDate signatureDate, string[] userIDs);
+        void OnUsersLoggedIn(CallbackInfo callbackInfo, string[] userIDs);
 
         [OperationContract(IsOneWay = true)]
-        void OnUsersLoggedOut(SignatureDate signatureDate, string[] userIDs, CloseInfo closeInfo);
+        void OnUsersLoggedOut(CallbackInfo callbackInfo, string[] userIDs, CloseInfo closeInfo);
 
         [OperationContract(IsOneWay = true)]
-        void OnUsersKicked(SignatureDate signatureDate, string[] userIDs, string[] comments);
+        void OnUsersKicked(CallbackInfo callbackInfo, string[] userIDs, string[] comments);
 
         [OperationContract(IsOneWay = true)]
-        void OnUsersBanChanged(SignatureDate signatureDate, BanInfo[] banInfos, BanChangeType changeType, string[] comments);
+        void OnUsersBanChanged(CallbackInfo callbackInfo, BanInfo[] banInfos, BanChangeType changeType, string[] comments);
 
         [OperationContract(IsOneWay = true)]
-        void OnMessageReceived(SignatureDate signatureDate, string[] userIDs, string message, MessageType messageType);
+        void OnMessageReceived(CallbackInfo callbackInfo, string[] userIDs, string message, MessageType messageType);
     }
 }

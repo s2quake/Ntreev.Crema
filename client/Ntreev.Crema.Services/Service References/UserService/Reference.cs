@@ -68,40 +68,40 @@ namespace Ntreev.Crema.Services.UserService {
     internal interface IUserServiceCallback {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnServiceClosed")]
-        void OnServiceClosed(Ntreev.Library.SignatureDate signatureDate, Ntreev.Crema.ServiceModel.CloseInfo closeInfo);
+        void OnServiceClosed(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, Ntreev.Crema.ServiceModel.CloseInfo closeInfo);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnUsersChanged")]
-        void OnUsersChanged(Ntreev.Library.SignatureDate signatureDate, Ntreev.Crema.ServiceModel.UserInfo[] userInfos);
+        void OnUsersChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, Ntreev.Crema.ServiceModel.UserInfo[] userInfos);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnUsersStateChanged")]
-        void OnUsersStateChanged(Ntreev.Library.SignatureDate signatureDate, string[] userIDs, Ntreev.Crema.ServiceModel.UserState[] states);
+        void OnUsersStateChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] userIDs, Ntreev.Crema.ServiceModel.UserState[] states);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnUserItemsCreated")]
-        void OnUserItemsCreated(Ntreev.Library.SignatureDate signatureDate, string[] itemPaths, System.Nullable<Ntreev.Crema.ServiceModel.UserInfo>[] args);
+        void OnUserItemsCreated(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] itemPaths, System.Nullable<Ntreev.Crema.ServiceModel.UserInfo>[] args);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnUserItemsRenamed")]
-        void OnUserItemsRenamed(Ntreev.Library.SignatureDate signatureDate, string[] itemPaths, string[] newNames);
+        void OnUserItemsRenamed(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] itemPaths, string[] newNames);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnUserItemsMoved")]
-        void OnUserItemsMoved(Ntreev.Library.SignatureDate signatureDate, string[] itemPaths, string[] parentPaths);
+        void OnUserItemsMoved(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnUserItemsDeleted")]
-        void OnUserItemsDeleted(Ntreev.Library.SignatureDate signatureDate, string[] itemPaths);
+        void OnUserItemsDeleted(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] itemPaths);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnUsersLoggedIn")]
-        void OnUsersLoggedIn(Ntreev.Library.SignatureDate signatureDate, string[] userIDs);
+        void OnUsersLoggedIn(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] userIDs);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnUsersLoggedOut")]
-        void OnUsersLoggedOut(Ntreev.Library.SignatureDate signatureDate, string[] userIDs, Ntreev.Crema.ServiceModel.CloseInfo closeInfo);
+        void OnUsersLoggedOut(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] userIDs, Ntreev.Crema.ServiceModel.CloseInfo closeInfo);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnUsersKicked")]
-        void OnUsersKicked(Ntreev.Library.SignatureDate signatureDate, string[] userIDs, string[] comments);
+        void OnUsersKicked(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] userIDs, string[] comments);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnUsersBanChanged")]
-        void OnUsersBanChanged(Ntreev.Library.SignatureDate signatureDate, Ntreev.Crema.ServiceModel.BanInfo[] banInfos, Ntreev.Crema.ServiceModel.BanChangeType changeType, string[] comments);
+        void OnUsersBanChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, Ntreev.Crema.ServiceModel.BanInfo[] banInfos, Ntreev.Crema.ServiceModel.BanChangeType changeType, string[] comments);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserService/OnMessageReceived")]
-        void OnMessageReceived(Ntreev.Library.SignatureDate signatureDate, string[] userIDs, string message, Ntreev.Crema.ServiceModel.MessageType messageType);
+        void OnMessageReceived(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] userIDs, string message, Ntreev.Crema.ServiceModel.MessageType messageType);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]

@@ -116,12 +116,12 @@ namespace Ntreev.Crema.Bot.Tasks
             var info = autobotService.GetRandomUserInfo();
             if (autobot.GetService(typeof(IUserContext)) is IUserContext userContext)
             {
-                if (await userContext.Users.ContainsAsync(autobotID) == false)
+                if (await userContext.Users.ContainsAsync(info.ID) == false)
                 {
                     var category = userContext.Categories.Random();
-                    await category.AddNewUserAsync(authentication, autobotID, StringUtility.ToSecureString("1111"), autobotID, authority);
+                    await category.AddNewUserAsync(authentication, info.ID, info.Password, info.Name, info.Authority);
                 }
-                await autobotService.CreateAutobotAsync(authentication, autobotID);
+                await autobotService.CreateAutobotAsync(authentication, info.ID, info.Password);
             }
         }
     }

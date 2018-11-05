@@ -125,12 +125,12 @@ namespace Ntreev.Crema.Services.Domains
 
         }
 
-            public async Task DeleteAsync(Authentication authentication, Domain domain)
+        public async Task DeleteAsync(Authentication authentication, Domain domain)
         {
             await this.deletionEvent.WaitAsync(domain.ID);
             //if (domain.Host == null)
             //{
-                
+
             //}
             //else
             //{

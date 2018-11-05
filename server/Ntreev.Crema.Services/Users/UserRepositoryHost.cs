@@ -70,10 +70,7 @@ namespace Ntreev.Crema.Services.Users
         public void Commit(Authentication authentication, string comment)
         {
             this.Dispatcher.VerifyAccess();
-            var props = new List<LogPropertyInfo>
-            {
-                //new LogPropertyInfo() { Key = LogPropertyInfo.BranchRevisionKey, Value = $"{this.RepositoryInfo.BranchRevision}"},
-            };
+            var props = new List<LogPropertyInfo> { };
 
             try
             {
@@ -99,25 +96,25 @@ namespace Ntreev.Crema.Services.Users
             this.Add(repositoryPath.Path);
         }
 
-        public void RenameUserCategory(UserBaseSet userBaseSet, string categoryPath, string newCategoryPath)
+        public void RenameUserCategory(UserContextSet userContextSet, string categoryPath, string newCategoryPath)
         {
             this.Dispatcher.VerifyAccess();
-            userBaseSet.SetUserCategoryPath(categoryPath, newCategoryPath);
+            userContextSet.SetUserCategoryPath(categoryPath, newCategoryPath);
         }
 
-        public void MoveUserCategory(UserBaseSet userBaseSet, string categoryPath, string newCategoryPath)
+        public void MoveUserCategory(UserContextSet userContextSet, string categoryPath, string newCategoryPath)
         {
             this.Dispatcher.VerifyAccess();
-            userBaseSet.SetUserCategoryPath(categoryPath, newCategoryPath);
+            userContextSet.SetUserCategoryPath(categoryPath, newCategoryPath);
         }
 
-        public void DeleteUserCategory(UserBaseSet userBaseSet, string categoryPath)
+        public void DeleteUserCategory(UserContextSet userContextSet, string categoryPath)
         {
             this.Dispatcher.VerifyAccess();
-            userBaseSet.DeleteUserCategory(categoryPath);
+            userContextSet.DeleteUserCategory(categoryPath);
         }
 
-        public void CreateUser(UserBaseSet userBaseSet, string[] userPaths)
+        public void CreateUser(UserContextSet userContextSet, string[] userPaths)
         {
             this.Dispatcher.VerifyAccess();
             foreach (var item in userPaths)
@@ -126,37 +123,37 @@ namespace Ntreev.Crema.Services.Users
                 if (this.users.Contains(name) == true)
                     throw new ItemAlreadyExistsException(item);
             }
-            userBaseSet.CreateUser();
+            userContextSet.CreateUser();
         }
 
-        public void MoveUser(UserBaseSet userBaseSet, string userPath, string categoryPath)
+        public void MoveUser(UserContextSet userContextSet, string userPath, string categoryPath)
         {
             this.Dispatcher.VerifyAccess();
-            userBaseSet.MoveUser(userPath, categoryPath);
+            userContextSet.MoveUser(userPath, categoryPath);
         }
 
-        public void DeleteUser(UserBaseSet userBaseSet, string userPath)
+        public void DeleteUser(UserContextSet userContextSet, string userPath)
         {
             this.Dispatcher.VerifyAccess();
-            userBaseSet.DeleteUser(userPath);
+            userContextSet.DeleteUser(userPath);
         }
 
-        public void ModifyUser(UserBaseSet userBaseSet, string userPath, SecureString password, SecureString newPassword, string userName, Authority? authority)
+        public void ModifyUser(UserContextSet userContextSet, string userPath, SecureString password, SecureString newPassword, string userName, Authority? authority)
         {
             this.Dispatcher.VerifyAccess();
-            userBaseSet.ModifyUser(userPath, password, newPassword, userName, authority);
+            userContextSet.ModifyUser(userPath, password, newPassword, userName, authority);
         }
 
-        public void BanUser(UserBaseSet userBaseSet, string userPath, string comment)
+        public void BanUser(UserContextSet userContextSet, string userPath, string comment)
         {
             this.Dispatcher.VerifyAccess();
-            userBaseSet.BanUser(userPath, comment);
+            userContextSet.BanUser(userPath, comment);
         }
 
-        public void UnbanUser(UserBaseSet userBaseSet, string userPath)
+        public void UnbanUser(UserContextSet userContextSet, string userPath)
         {
             this.Dispatcher.VerifyAccess();
-            userBaseSet.UnbanUser(userPath);
+            userContextSet.UnbanUser(userPath);
         }
 
         public override CremaHost CremaHost => this.UserContext.CremaHost;

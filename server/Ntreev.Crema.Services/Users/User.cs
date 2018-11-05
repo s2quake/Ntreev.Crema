@@ -43,7 +43,7 @@ namespace Ntreev.Crema.Services.Users
             throw new NotSupportedException();
         }
 
-        public async Task MoveAsync(Authentication authentication, string categoryPath)
+        public async Task<Guid> MoveAsync(Authentication authentication, string categoryPath)
         {
             try
             {
@@ -59,16 +59,18 @@ namespace Ntreev.Crema.Services.Users
                     var targetName = new ItemName(categoryPath, base.Name);
                     return (items, oldPaths, oldCategoryPaths, userInfo, targetName);
                 });
+                var taskID = Guid.NewGuid();
                 var userSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
-                await this.Container.InvokeUserMoveAsync(authentication, tuple.userInfo, categoryPath, userBaseSet);
+                var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeUserMoveAsync(authentication, tuple.userInfo, categoryPath, userContextSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
                     base.Move(authentication, categoryPath);
-                    this.Container.InvokeUsersMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths);
+                    this.Container.InvokeUsersMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths, taskID);
                 });
-                await this.Repository.UnlockAsync(userBaseSet.Paths);
+                await this.Repository.UnlockAsync(userContextSet.Paths);
+                return taskID;
             }
             catch (Exception e)
             {
@@ -77,7 +79,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public async Task DeleteAsync(Authentication authentication)
+        public async Task<Guid> DeleteAsync(Authentication authentication)
         {
             try
             {
@@ -94,16 +96,18 @@ namespace Ntreev.Crema.Services.Users
                     var userInfo = base.UserInfo;
                     return (items, oldPaths, userInfo);
                 });
+                var taskID = Guid.NewGuid();
                 var userSet = await this.ReadDataForPathAsync(authentication, new ItemName(tuple.userInfo.Path));
-                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
-                await this.Container.InvokeUserDeleteAsync(authentication, tuple.userInfo, userBaseSet);
+                var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeUserDeleteAsync(authentication, tuple.userInfo, userContextSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
                     base.Delete(authentication);
-                    container.InvokeUsersDeletedEvent(authentication, tuple.items, tuple.oldPaths);
+                    container.InvokeUsersDeletedEvent(authentication, tuple.items, tuple.oldPaths, taskID);
                 });
-                await repository.UnlockAsync(userBaseSet.Paths);
+                await repository.UnlockAsync(userContextSet.Paths);
+                return taskID;
             }
             catch (Exception e)
             {
@@ -123,18 +127,19 @@ namespace Ntreev.Crema.Services.Users
                     this.ValidateLogin(password);
                     var users = new User[] { this };
                     var authentication = new Authentication(new UserAuthenticationProvider(this), Guid.NewGuid());
+                    var taskID = GuidUtility.FromName(this.ID);
                     if (this.Authentication != null)
                     {
                         var message = "다른 기기에서 동일한 아이디로 접속하였습니다.";
                         var closeInfo = new CloseInfo(CloseReason.Reconnected, message);
                         this.Authentication.InvokeExpiredEvent(this.ID, message);
-                        this.Container.InvokeUsersLoggedOutEvent(this.Authentication, users, closeInfo);
+                        this.Container.InvokeUsersLoggedOutEvent(this.Authentication, users, closeInfo, taskID);
                     }
                     this.Authentication = authentication;
                     this.IsOnline = true;
                     this.CremaHost.Sign(authentication);
                     this.Container.InvokeUsersStateChangedEvent(this.Authentication, users);
-                    this.Container.InvokeUsersLoggedInEvent(this.Authentication, users);
+                    this.Container.InvokeUsersLoggedInEvent(this.Authentication, users, taskID);
                     return this.Authentication;
                 });
             }
@@ -145,23 +150,24 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public async Task LogoutAsync(Authentication authentication)
+        public async Task<Guid> LogoutAsync(Authentication authentication)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(LogoutAsync), this);
                     this.ValidateLogout(authentication);
                     var users = new User[] { this };
+                    var taskID = Guid.NewGuid();
                     this.Authentication.InvokeExpiredEvent(authentication.ID, string.Empty);
                     this.Authentication = null;
                     this.IsOnline = false;
                     this.CremaHost.Sign(authentication);
                     this.Container.InvokeUsersStateChangedEvent(authentication, users);
-                    this.Container.InvokeUsersLoggedOutEvent(authentication, users, CloseInfo.Empty);
-
+                    this.Container.InvokeUsersLoggedOutEvent(authentication, users, CloseInfo.Empty, taskID);
+                    return taskID;
                 });
             }
             catch (Exception e)
@@ -171,7 +177,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public async Task BanAsync(Authentication authentication, string comment)
+        public async Task<Guid> BanAsync(Authentication authentication, string comment)
         {
             try
             {
@@ -185,24 +191,27 @@ namespace Ntreev.Crema.Services.Users
                     var userInfo = base.UserInfo;
                     return (items, comments, userInfo);
                 });
+                var taskID = Guid.NewGuid();
                 var userSet = await this.ReadDataForChangeAsync(authentication);
-                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
-                await this.Container.InvokeUserBanAsync(authentication, tuple.userInfo, userBaseSet, comment);
+                var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeUserBanAsync(authentication, tuple.userInfo, userContextSet, comment);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var userInfo = userBaseSet.GetUserInfo(this.Path);
+                    var userInfo = userContextSet.GetUserInfo(this.Path);
                     base.Ban(authentication, (BanInfo)userInfo.BanInfo);
                     this.CremaHost.Sign(authentication);
-                    this.Container.InvokeUsersBannedEvent(authentication, tuple.items, tuple.comments);
+                    this.Container.InvokeUsersBannedEvent(authentication, tuple.items, tuple.comments, taskID);
                     if (this.IsOnline == true)
                     {
                         this.Authentication.InvokeExpiredEvent(authentication.ID, comment);
                         this.Authentication = null;
                         this.IsOnline = false;
                         this.Container.InvokeUsersStateChangedEvent(authentication, tuple.items);
-                        this.Container.InvokeUsersLoggedOutEvent(authentication, tuple.items, new CloseInfo(CloseReason.Banned, comment));
+                        this.Container.InvokeUsersLoggedOutEvent(authentication, tuple.items, new CloseInfo(CloseReason.Banned, comment), taskID);
                     }
                 });
+                await this.Repository.UnlockAsync(userContextSet.Paths);
+                return taskID;
             }
             catch (Exception e)
             {
@@ -211,7 +220,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public async Task UnbanAsync(Authentication authentication)
+        public async Task<Guid> UnbanAsync(Authentication authentication)
         {
             try
             {
@@ -224,15 +233,18 @@ namespace Ntreev.Crema.Services.Users
                     var userInfo = base.UserInfo;
                     return (items, userInfo);
                 });
+                var taskID = Guid.NewGuid();
                 var userSet = await this.ReadDataForChangeAsync(authentication);
-                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
-                await this.Container.InvokeUserUnbanAsync(authentication, tuple.userInfo, userBaseSet);
+                var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeUserUnbanAsync(authentication, tuple.userInfo, userContextSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
                     base.Unban(authentication);
-                    this.Container.InvokeUsersUnbannedEvent(authentication, tuple.items);
+                    this.Container.InvokeUsersUnbannedEvent(authentication, tuple.items, taskID);
                 });
+                await this.Repository.UnlockAsync(userContextSet.Paths);
+                return taskID;
             }
             catch (Exception e)
             {
@@ -241,24 +253,26 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public async Task KickAsync(Authentication authentication, string comment)
+        public async Task<Guid> KickAsync(Authentication authentication, string comment)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(KickAsync), this, comment);
                     this.ValidateKick(authentication, comment);
                     this.CremaHost.Sign(authentication);
+                    var taskID = Guid.NewGuid();
                     var items = new User[] { this };
                     var comments = Enumerable.Repeat(comment, items.Length).ToArray();
                     this.IsOnline = false;
                     this.Authentication.InvokeExpiredEvent(authentication.ID, comment);
                     this.Authentication = null;
-                    this.Container.InvokeUsersKickedEvent(authentication, items, comments);
+                    this.Container.InvokeUsersKickedEvent(authentication, items, comments, taskID);
                     this.Container.InvokeUsersStateChangedEvent(authentication, items);
-                    this.Container.InvokeUsersLoggedOutEvent(authentication, items, new CloseInfo(CloseReason.Kicked, comment));
+                    this.Container.InvokeUsersLoggedOutEvent(authentication, items, new CloseInfo(CloseReason.Kicked, comment), Guid.Empty);
+                    return taskID;
                 });
             }
             catch (Exception e)
@@ -268,7 +282,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public async Task ChangeUserInfoAsync(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority)
+        public async Task<Guid> ChangeUserInfoAsync(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority)
         {
             try
             {
@@ -282,18 +296,20 @@ namespace Ntreev.Crema.Services.Users
                     var userInfo = base.UserInfo;
                     return (items, userInfo);
                 });
+                var taskID = Guid.NewGuid();
                 var userSet = await this.ReadDataForChangeAsync(authentication);
-                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
-                await this.Container.InvokeUserChangeAsync(authentication, tuple.userInfo, userBaseSet, password, newPassword, userName, authority);
+                var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeUserChangeAsync(authentication, tuple.userInfo, userContextSet, password, newPassword, userName, authority);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var userInfo = userBaseSet.GetUserInfo(this.Path);
+                    var userInfo = userContextSet.GetUserInfo(this.Path);
                     this.CremaHost.Sign(authentication);
                     this.Password = UserContext.StringToSecureString(userInfo.Password);
                     base.UpdateUserInfo((UserInfo)userInfo);
-                    this.Container.InvokeUsersChangedEvent(authentication, tuple.items);
+                    this.Container.InvokeUsersChangedEvent(authentication, tuple.items, taskID);
                 });
-                await this.Repository.UnlockAsync(userBaseSet.Paths);
+                await this.Repository.UnlockAsync(userContextSet.Paths);
+                return taskID;
             }
             catch (Exception e)
             {
@@ -302,18 +318,21 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public async Task SendMessageAsync(Authentication authentication, string message)
+        public async Task<Guid> SendMessageAsync(Authentication authentication, string message)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SendMessageAsync), this, message);
                     this.ValidateSendMessage(authentication, message);
+                    var taskID = Guid.NewGuid();
                     this.CremaHost.Sign(authentication);
-                    this.Container.InvokeSendMessageEvent(authentication, this, message);
+                    this.Container.InvokeSendMessageEvent(authentication, this, message, taskID);
+                    return taskID;
                 });
+
             }
             catch (Exception e)
             {
@@ -660,6 +679,41 @@ namespace Ntreev.Crema.Services.Users
 
         #region IUser
 
+        Task IUser.MoveAsync(Authentication authentication, string categoryPath)
+        {
+            return this.MoveAsync(authentication, categoryPath);
+        }
+
+        Task IUser.DeleteAsync(Authentication authentication)
+        {
+            return this.DeleteAsync(authentication);
+        }
+
+        Task IUser.ChangeUserInfoAsync(Authentication authentication, SecureString password, SecureString newPassword, string userName, Authority? authority)
+        {
+            return this.ChangeUserInfoAsync(authentication, password, newPassword, userName, authority);
+        }
+
+        Task IUser.KickAsync(Authentication authentication, string comment)
+        {
+            return this.KickAsync(authentication, comment);
+        }
+
+        Task IUser.BanAsync(Authentication authentication, string comment)
+        {
+            return this.BanAsync(authentication, comment);
+        }
+
+        Task IUser.UnbanAsync(Authentication authentication)
+        {
+            return this.UnbanAsync(authentication);
+        }
+
+        Task IUser.SendMessageAsync(Authentication authentication, string message)
+        {
+            return this.SendMessageAsync(authentication, message);
+        }
+
         string IUser.ID => this.ID;
 
         IUserCategory IUser.Category => this.Category;
@@ -667,6 +721,16 @@ namespace Ntreev.Crema.Services.Users
         #endregion
 
         #region IUserItem
+
+        Task IUserItem.MoveAsync(Authentication authentication, string parentPath)
+        {
+            return this.MoveAsync(authentication, parentPath);
+        }
+
+        Task IUserItem.DeleteAsync(Authentication authentication)
+        {
+            return this.DeleteAsync(authentication);
+        }
 
         string IUserItem.Name => this.ID;
 

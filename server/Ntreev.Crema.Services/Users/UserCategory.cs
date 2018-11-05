@@ -33,7 +33,7 @@ namespace Ntreev.Crema.Services.Users
     class UserCategory : UserCategoryBase<User, UserCategory, UserCollection, UserCategoryCollection, UserContext>,
         IUserCategory, IUserItem
     {
-        public async Task RenameAsync(Authentication authentication, string name)
+        public async Task<Guid> RenameAsync(Authentication authentication, string name)
         {
             try
             {
@@ -49,16 +49,18 @@ namespace Ntreev.Crema.Services.Users
                     var targetName = new CategoryName(base.Path) { Name = name };
                     return (items, oldNames, oldPaths, path, targetName);
                 });
+                var taskID = Guid.NewGuid();
                 var userSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
-                await this.Container.InvokeCategoryRenameAsync(authentication, tuple.path, name, userBaseSet);
+                var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeCategoryRenameAsync(authentication, tuple.path, name, userContextSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     base.Name = name;
                     this.CremaHost.Sign(authentication);
-                    this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths);
+                    this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, taskID);
                 });
-                await this.Repository.UnlockAsync(userBaseSet.Paths);
+                await this.Repository.UnlockAsync(userContextSet.Paths);
+                return taskID;
             }
             catch (Exception e)
             {
@@ -67,7 +69,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public async Task MoveAsync(Authentication authentication, string parentPath)
+        public async Task<Guid> MoveAsync(Authentication authentication, string parentPath)
         {
             try
             {
@@ -83,16 +85,18 @@ namespace Ntreev.Crema.Services.Users
                     var targetName = new CategoryName(parentPath, base.Name);
                     return (items, oldPaths, oldParentPaths, path, targetName);
                 });
+                var taskID = Guid.NewGuid();
                 var userSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
-                await this.Container.InvokeCategoryMoveAsync(authentication, tuple.path, parentPath, userBaseSet);
+                var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeCategoryMoveAsync(authentication, tuple.path, parentPath, userContextSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Parent = this.Container[parentPath];
                     this.CremaHost.Sign(authentication);
-                    this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths);
+                    this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths, taskID);
                 });
-                await this.Repository.UnlockAsync(userBaseSet.Paths);
+                await this.Repository.UnlockAsync(userContextSet.Paths);
+                return taskID;
             }
             catch (Exception e)
             {
@@ -101,7 +105,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public async Task DeleteAsync(Authentication authentication)
+        public async Task<Guid> DeleteAsync(Authentication authentication)
         {
             try
             {
@@ -117,16 +121,18 @@ namespace Ntreev.Crema.Services.Users
                     var path = base.Path;
                     return (items, oldPaths, path);
                 });
+                var taskID = Guid.NewGuid();
                 var userSet = await this.ReadDataForPathAsync(authentication, new CategoryName(tuple.path));
-                var userBaseSet = await UserBaseSet.CreateAsync(this.Context, userSet, false);
-                await this.Container.InvokeCategoryDeleteAsync(authentication, tuple.path, userBaseSet);
+                var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeCategoryDeleteAsync(authentication, tuple.path, userContextSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Dispose();
                     this.CremaHost.Sign(authentication);
-                    container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
+                    container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths, taskID);
                 });
-                await repository.UnlockAsync(userBaseSet.Paths);
+                await repository.UnlockAsync(userContextSet.Paths);
+                return taskID;
             }
             catch (Exception e)
             {
@@ -270,6 +276,21 @@ namespace Ntreev.Crema.Services.Users
 
         #region IUserCategory
 
+        Task IUserCategory.RenameAsync(Authentication authentication, string newName)
+        {
+            return this.RenameAsync(authentication, newName);
+        }
+
+        Task IUserCategory.MoveAsync(Authentication authentication, string parentPath)
+        {
+            return this.MoveAsync(authentication, parentPath);
+        }
+
+        Task IUserCategory.DeleteAsync(Authentication authentication)
+        {
+            return this.DeleteAsync(authentication);
+        }
+
         async Task<IUserCategory> IUserCategory.AddNewCategoryAsync(Authentication authentication, string name)
         {
             return await this.AddNewCategoryAsync(authentication, name);
@@ -289,6 +310,21 @@ namespace Ntreev.Crema.Services.Users
         #endregion
 
         #region IUserItem
+
+        Task IUserItem.RenameAsync(Authentication authentication, string newName)
+        {
+            return this.RenameAsync(authentication, newName);
+        }
+
+        Task IUserItem.MoveAsync(Authentication authentication, string parentPath)
+        {
+            return this.MoveAsync(authentication, parentPath);
+        }
+
+        Task IUserItem.DeleteAsync(Authentication authentication)
+        {
+            return this.DeleteAsync(authentication);
+        }
 
         IUserItem IUserItem.Parent => this.Parent;
 

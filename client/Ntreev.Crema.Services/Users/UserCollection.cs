@@ -62,14 +62,16 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, userID, categoryPath, userName, authority);
                 });
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.NewUser(userID, categoryPath, UserContext.Encrypt(userID, password), userName, authority));
-                return await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.Sign(authentication, result);
-                    var user = this.BaseAddNew(userID, categoryPath);
-                    user.Initialize(result.Value, BanInfo.Empty);
-                    this.InvokeUsersCreatedEvent(authentication, new User[] { user });
-                    return user;
-                });
+                //return await this.Dispatcher.InvokeAsync(() =>
+                //{
+                //    this.CremaHost.Sign(authentication, result);
+                //    var user = this.BaseAddNew(userID, categoryPath);
+                //    user.Initialize(result.Value, BanInfo.Empty);
+                //    this.InvokeUsersCreatedEvent(authentication, new User[] { user });
+                //    return user;
+                //});
+                await this.Context.WaitAsync(result.TaskID);
+                return this[userID];
             }
             catch (Exception e)
             {
@@ -78,49 +80,49 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public void InvokeUsersCreatedEvent(Authentication authentication, User[] users)
+        public void InvokeUsersCreatedEvent(Authentication authentication, User[] users, Guid taskID)
         {
             var args = users.Select(item => (object)item.UserInfo).ToArray();
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersCreatedEvent), users);
             var message = EventMessageBuilder.CreateUser(authentication, users);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnUsersCreated(new ItemsCreatedEventArgs<IUser>(authentication, users, args));
-            this.Context.InvokeItemsCreatedEvent(authentication, users, args);
+            this.OnUsersCreated(new ItemsCreatedEventArgs<IUser>(authentication, users, args) { TaskID = taskID });
+            this.Context.InvokeItemsCreatedEvent(authentication, users, args, taskID);
         }
 
-        public void InvokeUsersRenamedEvent(Authentication authentication, User[] users, string[] oldNames, string[] oldPaths)
+        public void InvokeUsersRenamedEvent(Authentication authentication, User[] users, string[] oldNames, string[] oldPaths, Guid taskID)
         {
 
         }
 
-        public void InvokeUsersMovedEvent(Authentication authentication, User[] users, string[] oldPaths, string[] oldCategoryPaths)
+        public void InvokeUsersMovedEvent(Authentication authentication, User[] users, string[] oldPaths, string[] oldCategoryPaths, Guid taskID)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersMovedEvent), users, oldPaths, oldCategoryPaths);
             var message = EventMessageBuilder.MoveUser(authentication, users, oldCategoryPaths);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnUsersMoved(new ItemsMovedEventArgs<IUser>(authentication, users, oldPaths, oldCategoryPaths));
-            this.Context.InvokeItemsMovedEvent(authentication, users, oldPaths, oldCategoryPaths);
+            this.OnUsersMoved(new ItemsMovedEventArgs<IUser>(authentication, users, oldPaths, oldCategoryPaths) { TaskID = taskID });
+            this.Context.InvokeItemsMovedEvent(authentication, users, oldPaths, oldCategoryPaths, taskID);
         }
 
-        public void InvokeUsersDeletedEvent(Authentication authentication, User[] users, string[] itemPaths)
+        public void InvokeUsersDeletedEvent(Authentication authentication, User[] users, string[] itemPaths, Guid taskID)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersDeletedEvent), itemPaths);
             var message = EventMessageBuilder.DeleteUser(authentication, users);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnUsersDeleted(new ItemsDeletedEventArgs<IUser>(authentication, users, itemPaths));
-            this.Context.InvokeItemsDeleteEvent(authentication, users, itemPaths);
+            this.OnUsersDeleted(new ItemsDeletedEventArgs<IUser>(authentication, users, itemPaths) { TaskID = taskID });
+            this.Context.InvokeItemsDeleteEvent(authentication, users, itemPaths, taskID);
         }
 
-        public void InvokeUsersChangedEvent(Authentication authentication, User[] users)
+        public void InvokeUsersChangedEvent(Authentication authentication, User[] users, Guid taskID)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersChangedEvent), users);
             var message = EventMessageBuilder.ChangeUserInfo(authentication, users);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnUsersChanged(new ItemsEventArgs<IUser>(authentication, users));
+            this.OnUsersChanged(new ItemsEventArgs<IUser>(authentication, users) { TaskID = taskID });
         }
 
         public void InvokeUsersStateChangedEvent(Authentication authentication, User[] users)
@@ -129,51 +131,51 @@ namespace Ntreev.Crema.Services.Users
             this.OnUsersStateChanged(new ItemsEventArgs<IUser>(authentication, users));
         }
 
-        public void InvokeUsersLoggedInEvent(Authentication authentication, User[] users)
+        public void InvokeUsersLoggedInEvent(Authentication authentication, User[] users, Guid taskID)
         {
             this.CremaHost.DebugMethodMany(authentication, this, nameof(InvokeUsersLoggedInEvent), users);
             this.CremaHost.Info(EventMessageBuilder.LoginUser(authentication, users));
-            this.OnUsersLoggedIn(new ItemsEventArgs<IUser>(authentication, users));
+            this.OnUsersLoggedIn(new ItemsEventArgs<IUser>(authentication, users) { TaskID = taskID });
         }
 
-        public void InvokeUsersLoggedOutEvent(Authentication authentication, User[] users, CloseInfo closeInfo)
+        public void InvokeUsersLoggedOutEvent(Authentication authentication, User[] users, CloseInfo closeInfo, Guid taskID)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersLoggedOutEvent), users, closeInfo.Reason, closeInfo.Message);
             var message = EventMessageBuilder.LogoutUser(authentication, users);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnUsersLoggedOut(new ItemsEventArgs<IUser>(authentication, users));
+            this.OnUsersLoggedOut(new ItemsEventArgs<IUser>(authentication, users) { TaskID = taskID });
         }
 
-        public void InvokeUsersKickedEvent(Authentication authentication, User[] users, string[] comments)
+        public void InvokeUsersKickedEvent(Authentication authentication, User[] users, string[] comments, Guid taskID)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersKickedEvent), users, comments);
             var message = EventMessageBuilder.KickUser(authentication, users, comments);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnUsersKicked(new ItemsEventArgs<IUser>(authentication, users, comments));
+            this.OnUsersKicked(new ItemsEventArgs<IUser>(authentication, users, comments) { TaskID = taskID });
         }
 
-        public void InvokeUsersBannedEvent(Authentication authentication, User[] users, string[] comments)
+        public void InvokeUsersBannedEvent(Authentication authentication, User[] users, string[] comments, Guid taskID)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersBannedEvent), users, comments);
             var message = EventMessageBuilder.BanUser(authentication, users, comments);
             var metaData = EventMetaDataBuilder.Build(users, BanChangeType.Ban, comments);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnUsersBanChanged(new ItemsEventArgs<IUser>(authentication, users, metaData));
-            this.Context.InvokeItemsChangedEvent(authentication, users);
+            this.OnUsersBanChanged(new ItemsEventArgs<IUser>(authentication, users, metaData) { TaskID = taskID });
+            this.Context.InvokeItemsChangedEvent(authentication, users, taskID);
         }
 
-        public void InvokeUsersUnbannedEvent(Authentication authentication, User[] users)
+        public void InvokeUsersUnbannedEvent(Authentication authentication, User[] users, Guid taskID)
         {
             var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersUnbannedEvent), users);
             var message = EventMessageBuilder.UnbanUser(authentication, users);
             var metaData = EventMetaDataBuilder.Build(users, BanChangeType.Unban);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnUsersBanChanged(new ItemsEventArgs<IUser>(authentication, users, metaData));
-            this.Context.InvokeItemsChangedEvent(authentication, users);
+            this.OnUsersBanChanged(new ItemsEventArgs<IUser>(authentication, users, metaData) { TaskID = taskID });
+            this.Context.InvokeItemsChangedEvent(authentication, users, taskID);
         }
 
         public void InvokeSendMessageEvent(Authentication authentication, User user, string message)

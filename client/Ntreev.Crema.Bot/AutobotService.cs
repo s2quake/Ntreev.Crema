@@ -24,6 +24,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ntreev.Library;
+using System.Security;
 
 namespace Ntreev.Crema.Bot
 {
@@ -51,7 +52,7 @@ namespace Ntreev.Crema.Bot
 
         }
 
-        protected override AutobotBase CreateInstance(string autobotID)
+        protected override AutobotBase CreateInstance(string autobotID, SecureString passowrd)
         {
             return new Autobot(this, this.cremaHost.Address, autobotID);
         }

@@ -55,5 +55,7 @@ namespace Ntreev.Crema.Services
         public T[] Items { get; }
 
         public object MetaData { get; }
+
+        public Guid TaskID { get; internal set; }
     }
 }
