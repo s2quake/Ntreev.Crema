@@ -132,6 +132,8 @@ namespace Ntreev.Crema.Services
             yield return new Tuple<System.Type, object>(typeof(IServiceProvider), this);
         }
 
+        private static readonly Dictionary<string, Assembly> assembliesByPath = new Dictionary<string, Assembly>();
+
         public virtual IEnumerable<Assembly> GetAssemblies()
         {
             var assemblyList = new List<Assembly>();
@@ -150,9 +152,17 @@ namespace Ntreev.Crema.Services
             {
                 try
                 {
-                    var assembly = Assembly.LoadFrom(item);
-                    assemblyList.Add(assembly);
-                    CremaLog.Debug(assembly.Location);
+                    if (assembliesByPath.ContainsKey(item) == false)
+                    {
+                        var assembly = Assembly.LoadFrom(item);
+                        assemblyList.Add(assembly);
+                        assembliesByPath.Add(item, assembly);
+                        CremaLog.Debug(assembly.Location);
+                    }
+                    else
+                    {
+                        assemblyList.Add(assembliesByPath[item]);
+                    }
                 }
                 catch
                 {
