@@ -1600,6 +1600,11 @@ namespace Ntreev.Crema.Services.Data
 
         #region IDataBase
 
+        Task IDataBase.ImportAsync(Authentication authentication, CremaDataSet dataSet, string comment)
+        {
+            return this.ImportAsync(authentication, dataSet, comment);
+        }
+
         async Task<IDataBase> IDataBase.CopyAsync(Authentication authentication, string newDataBaseName, string comment, bool force)
         {
             return await this.DataBases.CopyDataBaseAsync(authentication, this, newDataBaseName, comment, force);

@@ -69,6 +69,7 @@ namespace Ntreev.Crema.Services.Data
         {
             var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, this.TypeSource.DataSet, false, false);
             var typeInfo = this.TypeSource.TypeInfo;
+            var taskID = this.Domain.ID;
             this.Domain.Result = new TypeInfo[] { typeInfo };
             await this.Container.InvokeTypeEndTemplateEditAsync(authentication, this.type.Name, dataBaseSet);
             await base.OnEndEditAsync(authentication);
@@ -77,7 +78,7 @@ namespace Ntreev.Crema.Services.Data
                 this.type.UpdateTypeInfo(typeInfo);
                 this.type.TypeState = TypeState.None;
                 this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
-                this.Container.InvokeTypesChangedEvent(authentication, this.types, dataBaseSet.DataSet);
+                this.Container.InvokeTypesChangedEvent(authentication, this.types, dataBaseSet.DataSet, taskID);
             });
             await this.Repository.UnlockAsync(this.ItemPaths);
         }

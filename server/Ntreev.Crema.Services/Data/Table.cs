@@ -50,24 +50,28 @@ namespace Ntreev.Crema.Services.Data
             return base.GetAccessType(authentication);
         }
 
-        public async Task SetPublicAsync(Authentication authentication)
+        public async Task<Guid> SetPublicAsync(Authentication authentication)
         {
             try
             {
                 this.ValidateExpired();
-                var path = await this.Dispatcher.InvokeAsync(() =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPublicAsync), this);
                     base.ValidateSetPublic(authentication);
-                    return base.Path;
+                    var path = base.Path;
+                    var accessInfo = base.AccessInfo;
+                    return (path, accessInfo);
                 });
-                var result = await this.Context.InvokeTableItemSetPublicAsync(authentication, path);
+                var taskID = Guid.NewGuid();
+                var result = await this.Context.InvokeTableItemSetPublicAsync(authentication, tuple.path, tuple.accessInfo);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, result);
-                    base.SetPublic(authentication);
-                    this.Context.InvokeItemsSetPublicEvent(authentication, new ITableItem[] { this });
+                    base.AccessInfo = result;
+                    this.CremaHost.Sign(authentication);
+                    this.Context.InvokeItemsSetPublicEvent(authentication, new ITableItem[] { this }, taskID);
                 });
+                return taskID;
             }
             catch (Exception e)
             {
@@ -76,24 +80,28 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task SetPrivateAsync(Authentication authentication)
+        public async Task<Guid> SetPrivateAsync(Authentication authentication)
         {
             try
             {
                 this.ValidateExpired();
-                var path = await this.Dispatcher.InvokeAsync(() =>
+                var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPrivateAsync), this);
                     base.ValidateSetPrivate(authentication);
-                    return base.Path;
+                    var path = base.Path;
+                    var accessInfo = base.AccessInfo;
+                    return (path, accessInfo);
                 });
-                var result = await this.Context.InvokeTableItemSetPrivateAsync(authentication, path);
+                var taskID = Guid.NewGuid();
+                var result = await this.Context.InvokeTableItemSetPrivateAsync(authentication, tuple.path, tuple.accessInfo);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, result.SignatureDate);
-                    base.SetPrivate(authentication);
-                    this.Context.InvokeItemsSetPrivateEvent(authentication, new ITableItem[] { this });
+                    base.AccessInfo = result;
+                    this.CremaHost.Sign(authentication);
+                    this.Context.InvokeItemsSetPrivateEvent(authentication, new ITableItem[] { this }, taskID);
                 });
+                return taskID;
             }
             catch (Exception e)
             {
@@ -102,7 +110,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task AddAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType)
+        public async Task<Guid> AddAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType)
         {
             try
             {
@@ -115,13 +123,15 @@ namespace Ntreev.Crema.Services.Data
                     var accessInfo = base.AccessInfo;
                     return (path, accessInfo);
                 });
+                var taskID = Guid.NewGuid();
                 var result = await this.Context.InvokeTableItemAddAccessMemberAsync(authentication, tuple.path, tuple.accessInfo, memberID, accessType);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, result.SignatureDate);
-                    base.AddAccessMember(authentication, memberID, accessType);
-                    this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
+                    base.AccessInfo = result;
+                    this.CremaHost.Sign(authentication);
+                    this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID }, new AccessType[] { accessType }, taskID);
                 });
+                return taskID;
             }
             catch (Exception e)
             {
@@ -130,7 +140,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task SetAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType)
+        public async Task<Guid> SetAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType)
         {
             try
             {
@@ -143,13 +153,15 @@ namespace Ntreev.Crema.Services.Data
                     var accessInfo = base.AccessInfo;
                     return (path, accessInfo);
                 });
+                var taskID = Guid.NewGuid();
                 var result = await this.Context.InvokeTableItemSetAccessMemberAsync(authentication, tuple.path, tuple.accessInfo, memberID, accessType);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, result.SignatureDate);
-                    base.SetAccessMember(authentication, memberID, accessType);
-                    this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
+                    base.AccessInfo = result;
+                    this.CremaHost.Sign(authentication);
+                    this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID }, new AccessType[] { accessType }, taskID);
                 });
+                return taskID;
             }
             catch (Exception e)
             {
@@ -158,7 +170,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task RemoveAccessMemberAsync(Authentication authentication, string memberID)
+        public async Task<Guid> RemoveAccessMemberAsync(Authentication authentication, string memberID)
         {
             try
             {
@@ -171,13 +183,15 @@ namespace Ntreev.Crema.Services.Data
                     var accessInfo = base.AccessInfo;
                     return (path, accessInfo);
                 });
+                var taskID = Guid.NewGuid();
                 var result = await this.Context.InvokeTableItemRemoveAccessMemberAsync(authentication, tuple.path, tuple.accessInfo, memberID);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication, result.SignatureDate);
-                    base.RemoveAccessMember(authentication, memberID);
-                    this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID });
+                    base.AccessInfo = result;
+                    this.CremaHost.Sign(authentication);
+                    this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITableItem[] { this }, new string[] { memberID }, taskID);
                 });
+                return taskID;
             }
             catch (Exception e)
             {
@@ -186,18 +200,27 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task LockAsync(Authentication authentication, string comment)
+        public async Task<Guid> LockAsync(Authentication authentication, string comment)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(LockAsync), this, comment);
                     base.ValidateLock(authentication);
+                    var taskID = Guid.NewGuid();
+                    var lockInfo = new LockInfo()
+                    {
+                        Path = this.Path,
+                        ParentPath = string.Empty,
+                        SignatureDate = new SignatureDate(authentication.ID),
+                        Comment = comment
+                    };
+                    base.LockInfo = lockInfo;
                     this.CremaHost.Sign(authentication);
-                    base.Lock(authentication, comment);
-                    this.Context.InvokeItemsLockedEvent(authentication, new ITableItem[] { this }, new string[] { comment });
+                    this.Context.InvokeItemsLockedEvent(authentication, new ITableItem[] { this }, new string[] { comment }, taskID);
+                    return taskID;
                 });
             }
             catch (Exception e)
@@ -207,18 +230,21 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task UnlockAsync(Authentication authentication)
+        public async Task<Guid> UnlockAsync(Authentication authentication)
         {
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(UnlockAsync), this);
                     base.ValidateUnlock(authentication);
+                    var taskID = Guid.NewGuid();
+                    var lockInfo = LockInfo.Empty;
+                    base.LockInfo = lockInfo;
                     this.CremaHost.Sign(authentication);
-                    base.Unlock(authentication);
-                    this.Context.InvokeItemsUnlockedEvent(authentication, new ITableItem[] { this });
+                    this.Context.InvokeItemsUnlockedEvent(authentication, new ITableItem[] { this }, taskID);
+                    return taskID;
                 });
             }
             catch (Exception e)
@@ -228,7 +254,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task RenameAsync(Authentication authentication, string name)
+        public async Task<Guid> RenameAsync(Authentication authentication, string name)
         {
             try
             {
@@ -244,6 +270,7 @@ namespace Ntreev.Crema.Services.Data
                     var targetName = new ItemName(base.Path) { Name = name };
                     return (items, oldNames, oldPaths, tableInfo, targetName);
                 });
+                var taskID = Guid.NewGuid();
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
                 var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
                 await this.Container.InvokeTableRenameAsync(authentication, tuple.tableInfo, name, dataBaseSet);
@@ -251,9 +278,10 @@ namespace Ntreev.Crema.Services.Data
                 {
                     base.Rename(authentication, name);
                     this.CremaHost.Sign(authentication);
-                    this.Container.InvokeTablesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, dataSet);
+                    this.Container.InvokeTablesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, dataSet, taskID);
                 });
                 await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
+                return taskID;
             }
             catch (Exception e)
             {
@@ -262,7 +290,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task MoveAsync(Authentication authentication, string categoryPath)
+        public async Task<Guid> MoveAsync(Authentication authentication, string categoryPath)
         {
             try
             {
@@ -278,6 +306,7 @@ namespace Ntreev.Crema.Services.Data
                     var targetName = new ItemName(categoryPath, base.Name);
                     return (items, oldPaths, oldCategoryPaths, tableInfo, targetName);
                 });
+                var taskID = Guid.NewGuid();
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
                 var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
                 await this.Container.InvokeTableMoveAsync(authentication, tuple.tableInfo, categoryPath, dataBaseSet);
@@ -285,9 +314,10 @@ namespace Ntreev.Crema.Services.Data
                 {
                     base.Move(authentication, categoryPath);
                     this.CremaHost.Sign(authentication);
-                    this.Container.InvokeTablesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths, dataSet);
+                    this.Container.InvokeTablesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths, dataSet, taskID);
                 });
                 await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
+                return taskID;
             }
             catch (Exception e)
             {
@@ -296,13 +326,14 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task DeleteAsync(Authentication authentication)
+        public async Task<Guid> DeleteAsync(Authentication authentication)
         {
             try
             {
                 this.ValidateExpired();
                 var container = this.Container;
                 var repository = this.Repository;
+                var cremaHost = this.CremaHost;
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
@@ -312,16 +343,18 @@ namespace Ntreev.Crema.Services.Data
                     var tableInfo = base.TableInfo;
                     return (items, oldPaths, tableInfo);
                 });
+                var taskID = Guid.NewGuid();
                 var dataSet = await this.ReadDataForPathAsync(authentication, new ItemName(tuple.tableInfo.Path));
                 var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
                 await container.InvokeTableDeleteAsync(authentication, tuple.tableInfo, dataBaseSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     base.Delete(authentication);
-                    this.CremaHost.Sign(authentication);
-                    container.InvokeTablesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
+                    cremaHost.Sign(authentication);
+                    container.InvokeTablesDeletedEvent(authentication, tuple.items, tuple.oldPaths, taskID);
                 });
                 await repository.UnlockAsync(dataBaseSet.ItemPaths);
+                return taskID;
             }
             catch (Exception e)
             {
@@ -485,33 +518,6 @@ namespace Ntreev.Crema.Services.Data
                     throw new InvalidOperationException(string.Format(Resources.Exception_TypeIsBeingEdited_Format, type.Name));
             }
         }
-
-        //public async Task<CremaDataSet> ReadDataForContentAsync(Authentication authentication, ItemName targetName)
-        //{
-        //    var tuple = await this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        var targetItemPaths = new string[]
-        //        {
-        //            this.Context.GenerateCategoryPath(targetName.CategoryPath),
-        //            this.Context.GeneratePath(targetName),
-        //        };
-        //        var tables = this.GetRelations().Distinct().OrderBy(item => item.Name).ToArray();
-        //        var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
-        //        var typeItemPaths = types.Select(item => item.ItemPath).ToArray();
-        //        var tableItemPaths = tables.Select(item => item.ItemPath).ToArray();
-        //        var itemPaths = typeItemPaths.Concat(tableItemPaths).Concat(targetItemPaths).Distinct().ToArray();
-        //        var props = new CremaDataSetSerializerSettings(authentication, typeItemPaths, tableItemPaths);
-        //        var itemPath = this.ItemPath;
-        //        return (itemPaths, props, itemPath);
-        //    });
-        //    return await this.Repository.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        this.Repository.Lock(tuple.itemPaths);
-        //        var dataSet = this.Serializer.Deserialize(tuple.itemPath, typeof(CremaDataSet), tuple.props) as CremaDataSet;
-        //        dataSet.SetItemPaths(tuple.itemPaths);
-        //        return dataSet;
-        //    });
-        //}
 
         public async Task<CremaDataSet> ReadDataForCopyAsync(Authentication authentication, ItemName targetName)
         {
@@ -918,15 +924,30 @@ namespace Ntreev.Crema.Services.Data
             base.AccessInfo = accessInfo;
         }
 
-        //[EditorBrowsable(EditorBrowsableState.Never)]
-        //public void SetTableState(TableState tableState)
-        //{
-        //    base.TableState = tableState;
-        //}
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void SetTableState(TableState tableState)
+        {
+            base.TableState = tableState;
+        }
 
         #endregion
 
         #region ITable
+
+        Task ITable.RenameAsync(Authentication authentication, string newName)
+        {
+            return this.RenameAsync(authentication, newName);
+        }
+
+        Task ITable.MoveAsync(Authentication authentication, string categoryPath)
+        {
+            return this.MoveAsync(authentication, categoryPath);
+        }
+
+        Task ITable.DeleteAsync(Authentication authentication)
+        {
+            return this.DeleteAsync(authentication);
+        }
 
         async Task<ITable> ITable.CopyAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent)
         {
@@ -961,6 +982,21 @@ namespace Ntreev.Crema.Services.Data
 
         #region ITableItem
 
+        Task ITableItem.RenameAsync(Authentication authentication, string newName)
+        {
+            return this.RenameAsync(authentication, newName);
+        }
+
+        Task ITableItem.MoveAsync(Authentication authentication, string categoryPath)
+        {
+            return this.MoveAsync(authentication, categoryPath);
+        }
+
+        Task ITableItem.DeleteAsync(Authentication authentication)
+        {
+            return this.DeleteAsync(authentication);
+        }
+
         ITableItem ITableItem.Parent
         {
             get
@@ -972,6 +1008,49 @@ namespace Ntreev.Crema.Services.Data
         }
 
         IEnumerable<ITableItem> ITableItem.Childs => this.Childs;
+
+        #endregion
+
+        #region IAccessible
+
+        Task IAccessible.SetPublicAsync(Authentication authentication)
+        {
+            return this.SetPublicAsync(authentication);
+        }
+
+        Task IAccessible.SetPrivateAsync(Authentication authentication)
+        {
+            return this.SetPrivateAsync(authentication);
+        }
+
+        Task IAccessible.AddAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType)
+        {
+            return this.AddAccessMemberAsync(authentication, memberID, accessType);
+        }
+
+        Task IAccessible.SetAccessMemberAsync(Authentication authentication, string memberID, AccessType accessType)
+        {
+            return this.SetAccessMemberAsync(authentication, memberID, accessType);
+        }
+
+        Task IAccessible.RemoveAccessMemberAsync(Authentication authentication, string memberID)
+        {
+            return this.RemoveAccessMemberAsync(authentication, memberID);
+        }
+
+        #endregion
+
+        #region ILockable
+
+        Task ILockable.LockAsync(Authentication authentication, string comment)
+        {
+            return this.LockAsync(authentication, comment);
+        }
+
+        Task ILockable.UnlockAsync(Authentication authentication)
+        {
+            return this.UnlockAsync(authentication);
+        }
 
         #endregion
 

@@ -163,6 +163,7 @@ namespace Ntreev.Crema.Services.Data
                 }
                 var tableInfos = this.Contents.Where(item => item.IsModified).Select(item => item.DataTable.TableInfo).ToArray();
                 var tableInfoByName = tableInfos.ToDictionary(item => item.Name);
+                var taskID = this.domain.ID;
                 this.domain.Result = tableInfos;
                 if (this.domain.Host != null)
                 {
@@ -183,8 +184,7 @@ namespace Ntreev.Crema.Services.Data
                     }
                     this.editors = null;
                     this.owner = null;
-                    if (tables.Any() == true)
-                        this.Container.InvokeTablesContentChangedEvent(authentication, tables, dataSet);
+                    this.Container.InvokeTablesContentChangedEvent(authentication, tables, dataSet, taskID);
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
                 await this.Repository.UnlockAsync(this.dataBaseSet.ItemPaths);

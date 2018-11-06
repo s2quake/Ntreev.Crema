@@ -173,55 +173,55 @@ namespace Ntreev.Crema.Services.DataBaseService {
     internal interface IDataBaseServiceCallback {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnServiceClosed")]
-        void OnServiceClosed(Ntreev.Library.SignatureDate signatureDate, Ntreev.Crema.ServiceModel.CloseInfo closeInfo);
+        void OnServiceClosed(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, Ntreev.Crema.ServiceModel.CloseInfo closeInfo);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTablesChanged")]
-        void OnTablesChanged(Ntreev.Library.SignatureDate signatureDate, Ntreev.Crema.Data.TableInfo[] tableInfos);
+        void OnTablesChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, Ntreev.Crema.Data.TableInfo[] tableInfos);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTablesStateChanged")]
-        void OnTablesStateChanged(Ntreev.Library.SignatureDate signatureDate, string[] tableNames, Ntreev.Crema.ServiceModel.TableState[] states);
+        void OnTablesStateChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] tableNames, Ntreev.Crema.ServiceModel.TableState[] states);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTableItemsCreated")]
-        void OnTableItemsCreated(Ntreev.Library.SignatureDate signatureDate, string[] itemPaths, System.Nullable<Ntreev.Crema.Data.TableInfo>[] args);
+        void OnTableItemsCreated(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] itemPaths, System.Nullable<Ntreev.Crema.Data.TableInfo>[] args);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTableItemsRenamed")]
-        void OnTableItemsRenamed(Ntreev.Library.SignatureDate signatureDate, string[] itemPaths, string[] newNames);
+        void OnTableItemsRenamed(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] itemPaths, string[] newNames);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTableItemsMoved")]
-        void OnTableItemsMoved(Ntreev.Library.SignatureDate signatureDate, string[] itemPaths, string[] parentPaths);
+        void OnTableItemsMoved(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTableItemsDeleted")]
-        void OnTableItemsDeleted(Ntreev.Library.SignatureDate signatureDate, string[] itemPaths);
+        void OnTableItemsDeleted(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] itemPaths);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTableItemsAccessChanged")]
-        void OnTableItemsAccessChanged(Ntreev.Library.SignatureDate signatureDate, Ntreev.Crema.ServiceModel.AccessChangeType changeType, Ntreev.Crema.ServiceModel.AccessInfo[] accessInfos, string[] memberIDs, Ntreev.Crema.ServiceModel.AccessType[] accessTypes);
+        void OnTableItemsAccessChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, Ntreev.Crema.ServiceModel.AccessChangeType changeType, Ntreev.Crema.ServiceModel.AccessInfo[] accessInfos, string[] memberIDs, Ntreev.Crema.ServiceModel.AccessType[] accessTypes);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTableItemsLockChanged")]
-        void OnTableItemsLockChanged(Ntreev.Library.SignatureDate signatureDate, Ntreev.Crema.ServiceModel.LockChangeType changeType, Ntreev.Crema.ServiceModel.LockInfo[] lockInfos, string[] comments);
+        void OnTableItemsLockChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, Ntreev.Crema.ServiceModel.LockChangeType changeType, Ntreev.Crema.ServiceModel.LockInfo[] lockInfos, string[] comments);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTypesChanged")]
-        void OnTypesChanged(Ntreev.Library.SignatureDate signatureDate, Ntreev.Crema.Data.TypeInfo[] typeInfos);
+        void OnTypesChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, Ntreev.Crema.Data.TypeInfo[] typeInfos);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTypesStateChanged")]
-        void OnTypesStateChanged(Ntreev.Library.SignatureDate signatureDate, string[] typeNames, Ntreev.Crema.ServiceModel.TypeState[] states);
+        void OnTypesStateChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] typeNames, Ntreev.Crema.ServiceModel.TypeState[] states);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTypeItemsCreated")]
-        void OnTypeItemsCreated(Ntreev.Library.SignatureDate signatureDate, string[] itemPaths, System.Nullable<Ntreev.Crema.Data.TypeInfo>[] args);
+        void OnTypeItemsCreated(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] itemPaths, System.Nullable<Ntreev.Crema.Data.TypeInfo>[] args);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTypeItemsRenamed")]
-        void OnTypeItemsRenamed(Ntreev.Library.SignatureDate signatureDate, string[] itemPaths, string[] newNames);
+        void OnTypeItemsRenamed(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] itemPaths, string[] newNames);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTypeItemsMoved")]
-        void OnTypeItemsMoved(Ntreev.Library.SignatureDate signatureDate, string[] itemPaths, string[] parentPaths);
+        void OnTypeItemsMoved(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTypeItemsDeleted")]
-        void OnTypeItemsDeleted(Ntreev.Library.SignatureDate signatureDate, string[] itemPaths);
+        void OnTypeItemsDeleted(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] itemPaths);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTypeItemsAccessChanged")]
-        void OnTypeItemsAccessChanged(Ntreev.Library.SignatureDate signatureDate, Ntreev.Crema.ServiceModel.AccessChangeType changeType, Ntreev.Crema.ServiceModel.AccessInfo[] accessInfos, string[] memberIDs, Ntreev.Crema.ServiceModel.AccessType[] accessTypes);
+        void OnTypeItemsAccessChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, Ntreev.Crema.ServiceModel.AccessChangeType changeType, Ntreev.Crema.ServiceModel.AccessInfo[] accessInfos, string[] memberIDs, Ntreev.Crema.ServiceModel.AccessType[] accessTypes);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTypeItemsLockChanged")]
-        void OnTypeItemsLockChanged(Ntreev.Library.SignatureDate signatureDate, Ntreev.Crema.ServiceModel.LockChangeType changeType, Ntreev.Crema.ServiceModel.LockInfo[] lockInfos, string[] comments);
+        void OnTypeItemsLockChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, Ntreev.Crema.ServiceModel.LockChangeType changeType, Ntreev.Crema.ServiceModel.LockInfo[] lockInfos, string[] comments);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]

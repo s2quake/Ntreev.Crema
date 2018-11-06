@@ -23,6 +23,7 @@ using Ntreev.Crema.Services.Properties;
 using Ntreev.Crema.Services.Users;
 using Ntreev.Library;
 using Ntreev.Library.ObjectModel;
+using Ntreev.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -45,6 +46,8 @@ namespace Ntreev.Crema.Services.Data
         private EventHandler<AuthenticationEventArgs> authenticationLeft;
 
         private readonly HashSet<AuthenticationToken> authentications = new HashSet<AuthenticationToken>();
+        private TaskResetEvent<Guid> taskEvent;
+        private IndexedDispatcher callbackEvent;
 
         public DataBase(DataBaseCollection dataBases, DataBaseInfo dataBaseInfo)
         {
@@ -76,6 +79,11 @@ namespace Ntreev.Crema.Services.Data
         public override string ToString()
         {
             return base.Name;
+        }
+
+        public Task WaitAsync(Guid taskID)
+        {
+            return this.taskEvent.WaitAsync(taskID);
         }
 
         public AccessType GetAccessType(Authentication authentication)
@@ -341,6 +349,8 @@ namespace Ntreev.Crema.Services.Data
                 if (value == true)
                 {
                     this.Dispatcher = new CremaDispatcher(this);
+                    this.taskEvent = new TaskResetEvent<Guid>(this.Dispatcher);
+                    this.callbackEvent = new IndexedDispatcher(this);
                     await this.Dispatcher.InvokeAsync(() =>
                     {
                         this.service = DataServiceFactory.CreateServiceClient(this.CremaHost.IPAddress, this.CremaHost.ServiceInfos[nameof(DataBaseService)], this);
@@ -516,7 +526,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task ImportAsync(Authentication authentication, CremaDataSet dataSet, string comment)
+        public async Task<Guid> ImportAsync(Authentication authentication, CremaDataSet dataSet, string comment)
         {
             try
             {
@@ -526,10 +536,8 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(ImportAsync), this, comment);
                 });
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.ImportDataSet(dataSet, comment));
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.Sign(authentication, result);
-                });
+                await this.WaitAsync(result.TaskID);
+                return result.TaskID;
             }
             catch (Exception e)
             {
@@ -1210,113 +1218,32 @@ namespace Ntreev.Crema.Services.Data
 
         #region IDataBaseServiceCallback
 
-        void IDataBaseServiceCallback.OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
+        async void IDataBaseServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
-            this.Dispatcher.Invoke(() =>
-            {
-                this.service.Close();
-                this.service = null;
-                this.timer?.Dispose();
-                this.timer = null;
-                this.Dispatcher.Dispose();
-                this.Dispatcher = null;
-            });
+            await this.CloseAsync(closeInfo);
             this.CremaHost.RemoveServiceAsync(this);
         }
 
-        void IDataBaseServiceCallback.OnTablesChanged(SignatureDate signatureDate, TableInfo[] tableInfos)
+        async void IDataBaseServiceCallback.OnTablesChanged(CallbackInfo callbackInfo, TableInfo[] tableInfos)
         {
             try
             {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() =>
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
                 {
-                    var tables = new Table[tableInfos.Length];
-                    for (var i = 0; i < tableInfos.Length; i++)
+                    this.Dispatcher.Invoke(() =>
                     {
-                        var tableInfo = tableInfos[i];
-                        var table = this.TableContext.Tables[tableInfo.Name];
-                        table.SetTableInfo(tableInfo);
-                        tables[i] = table;
-                    }
-                    this.TableContext.Tables.InvokeTablesTemplateChangedEvent(authentication, tables);
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-            }
-        }
-
-        void IDataBaseServiceCallback.OnTablesStateChanged(SignatureDate signatureDate, string[] tableNames, TableState[] states)
-        {
-            try
-            {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.ValidateExpired();
-                this.Dispatcher.Invoke(() =>
-                {
-                    var tables = new Table[tableNames.Length];
-                    for (var i = 0; i < tableNames.Length; i++)
-                    {
-                        var table = this.TableContext.Tables[tableNames[i]];
-                        var state = states[i];
-                        table.TableState = state;
-                        tables[i] = table;
-                    }
-                    this.TableContext.Tables.InvokeTablesStateChangedEvent(authentication, tables);
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-            }
-        }
-
-        void IDataBaseServiceCallback.OnTableItemsCreated(SignatureDate signatureDate, string[] itemPaths, TableInfo?[] args)
-        {
-            try
-            {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                if (authentication.ID == this.CremaHost.UserID)
-                {
-                    int er = 0;
-                }
-                this.Dispatcher.Invoke(() =>
-                {
-                    var tableItems = new ITableItem[itemPaths.Length];
-                    var categories = new List<TableCategory>();
-                    var tables = new List<Table>();
-
-                    for (var i = 0; i < itemPaths.Length; i++)
-                    {
-                        var itemPath = itemPaths[i];
-                        if (NameValidator.VerifyCategoryPath(itemPath) == true)
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
+                        var tables = new Table[tableInfos.Length];
+                        for (var i = 0; i < tableInfos.Length; i++)
                         {
-                            var categoryName = new CategoryName(itemPath);
-                            var category = this.TableContext.Categories.Prepare(itemPath);
-                            categories.Add(category);
-                            tableItems[i] = category;
+                            var tableInfo = tableInfos[i];
+                            var table = this.TableContext.Tables[tableInfo.Name];
+                            table.SetTableInfo(tableInfo);
+                            tables[i] = table;
                         }
-                        else
-                        {
-                            var tableInfo = (TableInfo)args[i];
-                            var table = this.TableContext.Tables.AddNew(authentication, tableInfo.Name, tableInfo.CategoryPath);
-                            table.Initialize(tableInfo);
-                            tables.Add(table);
-                            tableItems[i] = table;
-                        }
-                    }
-
-                    if (categories.Any() == true)
-                    {
-                        this.TableContext.Categories.InvokeCategoriesCreatedEvent(authentication, categories.ToArray());
-                    }
-
-                    if (tables.Any() == true)
-                    {
-                        this.TableContext.Tables.InvokeTablesCreatedEvent(authentication, tables.ToArray());
-                    }
+                        this.TableContext.Tables.InvokeTablesTemplateChangedEvent(authentication, tables);
+                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
                 });
             }
             catch (Exception e)
@@ -1325,32 +1252,99 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        void IDataBaseServiceCallback.OnTableItemsRenamed(SignatureDate signatureDate, string[] itemPaths, string[] newNames)
+        async void IDataBaseServiceCallback.OnTablesStateChanged(CallbackInfo callbackInfo, string[] tableNames, TableState[] states)
         {
             try
             {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() =>
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
                 {
+                    this.Dispatcher.Invoke(() =>
                     {
-                        var items = new List<TableCategory>(itemPaths.Length);
-                        var oldNames = new List<string>(itemPaths.Length);
-                        var oldPaths = new List<string>(itemPaths.Length);
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
+                        var tables = new Table[tableNames.Length];
+                        for (var i = 0; i < tableNames.Length; i++)
+                        {
+                            var table = this.TableContext.Tables[tableNames[i]];
+                            var state = states[i];
+                            table.TableState = state;
+                            tables[i] = table;
+                        }
+                        this.TableContext.Tables.InvokeTablesStateChangedEvent(authentication, tables);
+                    });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IDataBaseServiceCallback.OnTableItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, TableInfo?[] args)
+        {
+            try
+            {
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
+                        var tableItems = new ITableItem[itemPaths.Length];
+                        var categories = new List<TableCategory>();
+                        var tables = new List<Table>();
 
                         for (var i = 0; i < itemPaths.Length; i++)
                         {
-                            var tableItem = this.TableContext[itemPaths[i]];
-                            if (tableItem is TableCategory == false)
-                                continue;
-
-                            var category = tableItem as TableCategory;
-                            items.Add(category);
-                            oldNames.Add(category.Name);
-                            oldPaths.Add(category.Path);
+                            var itemPath = itemPaths[i];
+                            if (NameValidator.VerifyCategoryPath(itemPath) == true)
+                            {
+                                var categoryName = new CategoryName(itemPath);
+                                var category = this.TableContext.Categories.Prepare(itemPath);
+                                categories.Add(category);
+                                tableItems[i] = category;
+                            }
+                            else
+                            {
+                                var tableInfo = (TableInfo)args[i];
+                                var table = this.TableContext.Tables.AddNew(authentication, tableInfo.Name, tableInfo.CategoryPath);
+                                table.Initialize(tableInfo);
+                                tables.Add(table);
+                                tableItems[i] = table;
+                            }
                         }
 
-                        if (items.Any() == true)
+                        if (categories.Any() == true)
                         {
+                            this.TableContext.Categories.InvokeCategoriesCreatedEvent(authentication, categories.ToArray());
+                        }
+
+                        if (tables.Any() == true)
+                        {
+                            this.TableContext.Tables.InvokeTablesCreatedEvent(authentication, tables.ToArray());
+                        }
+                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IDataBaseServiceCallback.OnTableItemsRenamed(CallbackInfo callbackInfo, string[] itemPaths, string[] newNames)
+        {
+            try
+            {
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
+                        {
+                            var items = new List<TableCategory>(itemPaths.Length);
+                            var oldNames = new List<string>(itemPaths.Length);
+                            var oldPaths = new List<string>(itemPaths.Length);
+
                             for (var i = 0; i < itemPaths.Length; i++)
                             {
                                 var tableItem = this.TableContext[itemPaths[i]];
@@ -1358,33 +1352,33 @@ namespace Ntreev.Crema.Services.Data
                                     continue;
 
                                 var category = tableItem as TableCategory;
-                                var categoryName = newNames[i];
-                                category.SetName(categoryName);
+                                items.Add(category);
+                                oldNames.Add(category.Name);
+                                oldPaths.Add(category.Path);
                             }
 
-                            this.TableContext.Categories.InvokeCategoriesRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
-                        }
-                    }
+                            if (items.Any() == true)
+                            {
+                                for (var i = 0; i < itemPaths.Length; i++)
+                                {
+                                    var tableItem = this.TableContext[itemPaths[i]];
+                                    if (tableItem is TableCategory == false)
+                                        continue;
 
-                    {
-                        var items = new List<Table>(itemPaths.Length);
-                        var oldNames = new List<string>(itemPaths.Length);
-                        var oldPaths = new List<string>(itemPaths.Length);
+                                    var category = tableItem as TableCategory;
+                                    var categoryName = newNames[i];
+                                    category.SetName(categoryName);
+                                }
 
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var tableItem = this.TableContext[itemPaths[i]];
-                            if (tableItem is Table == false)
-                                continue;
-
-                            var table = tableItem as Table;
-                            items.Add(table);
-                            oldNames.Add(table.Name);
-                            oldPaths.Add(table.Path);
+                                this.TableContext.Categories.InvokeCategoriesRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
+                            }
                         }
 
-                        if (items.Any() == true)
                         {
+                            var items = new List<Table>(itemPaths.Length);
+                            var oldNames = new List<string>(itemPaths.Length);
+                            var oldPaths = new List<string>(itemPaths.Length);
+
                             for (var i = 0; i < itemPaths.Length; i++)
                             {
                                 var tableItem = this.TableContext[itemPaths[i]];
@@ -1392,13 +1386,29 @@ namespace Ntreev.Crema.Services.Data
                                     continue;
 
                                 var table = tableItem as Table;
-                                var tableName = newNames[i];
-                                table.SetName(tableName);
+                                items.Add(table);
+                                oldNames.Add(table.Name);
+                                oldPaths.Add(table.Path);
                             }
 
-                            this.TableContext.Tables.InvokeTablesRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
+                            if (items.Any() == true)
+                            {
+                                for (var i = 0; i < itemPaths.Length; i++)
+                                {
+                                    var tableItem = this.TableContext[itemPaths[i]];
+                                    if (tableItem is Table == false)
+                                        continue;
+
+                                    var table = tableItem as Table;
+                                    var tableName = newNames[i];
+                                    table.SetName(tableName);
+                                }
+
+                                this.TableContext.Tables.InvokeTablesRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
+                            }
                         }
-                    }
+                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
                 });
             }
             catch (Exception e)
@@ -1407,32 +1417,20 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        void IDataBaseServiceCallback.OnTableItemsMoved(SignatureDate signatureDate, string[] itemPaths, string[] parentPaths)
+        async void IDataBaseServiceCallback.OnTableItemsMoved(CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths)
         {
             try
             {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() =>
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
                 {
+                    this.Dispatcher.Invoke(() =>
                     {
-                        var items = new List<TableCategory>(itemPaths.Length);
-                        var oldPaths = new List<string>(itemPaths.Length);
-                        var oldParentPaths = new List<string>(itemPaths.Length);
-
-                        for (var i = 0; i < itemPaths.Length; i++)
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
                         {
-                            var tableItem = this.TableContext[itemPaths[i]];
-                            if (tableItem is TableCategory == false)
-                                continue;
+                            var items = new List<TableCategory>(itemPaths.Length);
+                            var oldPaths = new List<string>(itemPaths.Length);
+                            var oldParentPaths = new List<string>(itemPaths.Length);
 
-                            var category = tableItem as TableCategory;
-                            items.Add(category);
-                            oldPaths.Add(category.Path);
-                            oldParentPaths.Add(category.Parent.Path);
-                        }
-
-                        if (items.Any() == true)
-                        {
                             for (var i = 0; i < itemPaths.Length; i++)
                             {
                                 var tableItem = this.TableContext[itemPaths[i]];
@@ -1440,47 +1438,505 @@ namespace Ntreev.Crema.Services.Data
                                     continue;
 
                                 var category = tableItem as TableCategory;
-                                var parent = this.TableContext.Categories[parentPaths[i]];
+                                items.Add(category);
+                                oldPaths.Add(category.Path);
+                                oldParentPaths.Add(category.Parent.Path);
+                            }
+
+                            if (items.Any() == true)
+                            {
+                                for (var i = 0; i < itemPaths.Length; i++)
+                                {
+                                    var tableItem = this.TableContext[itemPaths[i]];
+                                    if (tableItem is TableCategory == false)
+                                        continue;
+
+                                    var category = tableItem as TableCategory;
+                                    var parent = this.TableContext.Categories[parentPaths[i]];
+                                    category.SetParent(parent);
+                                }
+
+                                this.TableContext.Categories.InvokeCategoriesMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
+                            }
+                        }
+
+                        {
+                            var items = new List<Table>(itemPaths.Length);
+                            var oldPaths = new List<string>(itemPaths.Length);
+                            var oldParentPaths = new List<string>(itemPaths.Length);
+
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var tableItem = this.TableContext[itemPaths[i]];
+                                if (tableItem is Table == false)
+                                    continue;
+
+                                var table = tableItem as Table;
+                                items.Add(table);
+                                oldPaths.Add(table.Path);
+                                oldParentPaths.Add(table.Category.Path);
+                            }
+
+                            if (items.Any() == true)
+                            {
+                                for (var i = 0; i < itemPaths.Length; i++)
+                                {
+                                    var tableItem = this.TableContext[itemPaths[i]];
+                                    if (tableItem is Table == false)
+                                        continue;
+
+                                    var table = tableItem as Table;
+                                    var parent = this.TableContext.Categories[parentPaths[i]];
+                                    table.SetParent(parent);
+                                }
+
+                                this.TableContext.Tables.InvokeTablesMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
+                            }
+                        }
+                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IDataBaseServiceCallback.OnTableItemsDeleted(CallbackInfo callbackInfo, string[] itemPaths)
+        {
+            try
+            {
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
+                        {
+                            var items = new List<TableCategory>(itemPaths.Length);
+                            var oldPaths = new List<string>(itemPaths.Length);
+
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var tableItem = this.TableContext[itemPaths[i]];
+                                if (tableItem is TableCategory == false)
+                                    continue;
+
+                                var category = tableItem as TableCategory;
+                                items.Add(category);
+                                oldPaths.Add(category.Path);
+                            }
+
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var tableItem = this.TableContext[itemPaths[i]];
+                                if (tableItem is TableCategory == false)
+                                    continue;
+
+                                var category = tableItem as TableCategory;
+                                category.Dispose();
+                            }
+
+                            this.TableContext.Categories.InvokeCategoriesDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
+                        }
+
+                        {
+                            var items = new List<Table>(itemPaths.Length);
+                            var oldPaths = new List<string>(itemPaths.Length);
+
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var tableItem = this.TableContext[itemPaths[i]];
+                                if (tableItem is Table == false)
+                                    continue;
+
+                                var table = tableItem as Table;
+                                items.Add(table);
+                                oldPaths.Add(table.Path);
+                            }
+
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var tableItem = this.TableContext[itemPaths[i]];
+                                if (tableItem is Table == false)
+                                    continue;
+
+                                var table = tableItem as Table;
+                                table.Dispose();
+                            }
+
+                            this.TableContext.Tables.InvokeTablesDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
+                        }
+                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IDataBaseServiceCallback.OnTableItemsAccessChanged(CallbackInfo callbackInfo, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes)
+        {
+            try
+            {
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
+                        var tableItems = new ITableItem[accessInfos.Length];
+                        for (var i = 0; i < accessInfos.Length; i++)
+                        {
+                            var accessInfo = accessInfos[i];
+                            var tableItem = this.TableContext[accessInfo.Path];
+                            if (tableItem is Table table)
+                            {
+                                table.SetAccessInfo(changeType, accessInfo);
+                            }
+                            else if (tableItem is TableCategory category)
+                            {
+                                category.SetAccessInfo(changeType, accessInfo);
+                            }
+                            else
+                            {
+                                throw new NotImplementedException(accessInfo.Path);
+                            }
+                            tableItems[i] = tableItem as ITableItem;
+                        }
+                        switch (changeType)
+                        {
+                            case AccessChangeType.Public:
+                                this.TableContext.InvokeItemsSetPublicEvent(authentication, tableItems);
+                                break;
+                            case AccessChangeType.Private:
+                                this.TableContext.InvokeItemsSetPrivateEvent(authentication, tableItems);
+                                break;
+                            case AccessChangeType.Add:
+                                this.TableContext.InvokeItemsAddAccessMemberEvent(authentication, tableItems, memberIDs, accessTypes);
+                                break;
+                            case AccessChangeType.Set:
+                                this.TableContext.InvokeItemsSetAccessMemberEvent(authentication, tableItems, memberIDs, accessTypes);
+                                break;
+                            case AccessChangeType.Remove:
+                                this.TableContext.InvokeItemsRemoveAccessMemberEvent(authentication, tableItems, memberIDs);
+                                break;
+                        }
+                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IDataBaseServiceCallback.OnTableItemsLockChanged(CallbackInfo callbackInfo, LockChangeType changeType, LockInfo[] lockInfos, string[] comments)
+        {
+            try
+            {
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
+                        var tableItems = new ITableItem[lockInfos.Length];
+                        for (var i = 0; i < lockInfos.Length; i++)
+                        {
+                            var lockInfo = lockInfos[i];
+                            var tableItem = this.TableContext[lockInfo.Path];
+                            if (tableItem is Table table)
+                            {
+                                table.SetLockInfo(changeType, lockInfo);
+                            }
+                            else if (tableItem is TableCategory category)
+                            {
+                                category.SetLockInfo(changeType, lockInfo);
+                            }
+                            else
+                            {
+                                throw new NotImplementedException(lockInfo.Path);
+                            }
+                            tableItems[i] = tableItem as ITableItem;
+                        }
+                        switch (changeType)
+                        {
+                            case LockChangeType.Lock:
+                                this.TableContext.InvokeItemsLockedEvent(authentication, tableItems, comments);
+                                break;
+                            case LockChangeType.Unlock:
+                                this.TableContext.InvokeItemsUnlockedEvent(authentication, tableItems);
+                                break;
+                        }
+                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IDataBaseServiceCallback.OnTypesChanged(CallbackInfo callbackInfo, TypeInfo[] typeInfos)
+        {
+            try
+            {
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
+                        var types = new Type[typeInfos.Length];
+                        for (var i = 0; i < typeInfos.Length; i++)
+                        {
+                            var typeInfo = typeInfos[i];
+                            var type = this.TypeContext.Types[typeInfo.Name];
+                            type.SetTypeInfo(typeInfo);
+                            types[i] = type;
+                        }
+                        this.TypeContext.Types.InvokeTypesChangedEvent(authentication, types);
+                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IDataBaseServiceCallback.OnTypesStateChanged(CallbackInfo callbackInfo, string[] typeNames, TypeState[] states)
+        {
+            try
+            {
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
+                        var types = new Type[typeNames.Length];
+                        for (var i = 0; i < typeNames.Length; i++)
+                        {
+                            var type = this.TypeContext.Types[typeNames[i]];
+                            var state = states[i];
+                            type.SetTypeState(state);
+                            types[i] = type;
+                        }
+                        this.TypeContext.Types.InvokeTypesStateChangedEvent(authentication, types);
+                    });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IDataBaseServiceCallback.OnTypeItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, TypeInfo?[] args)
+        {
+            try
+            {
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
+                        var typeItems = new ITypeItem[itemPaths.Length];
+                        var categories = new List<TypeCategory>();
+                        var types = new List<Type>();
+
+                        for (var i = 0; i < itemPaths.Length; i++)
+                        {
+                            var itemPath = itemPaths[i];
+                            if (NameValidator.VerifyCategoryPath(itemPath) == true)
+                            {
+                                var categoryName = new CategoryName(itemPath);
+                                var category = this.TypeContext.Categories.Prepare(itemPath);
+                                categories.Add(category);
+                                typeItems[i] = category;
+                            }
+                            else
+                            {
+                                var typeInfo = (TypeInfo)args[i];
+                                var type = this.TypeContext.Types.AddNew(authentication, typeInfo.Name, typeInfo.CategoryPath);
+                                type.Initialize(typeInfo);
+                                types.Add(type);
+                                typeItems[i] = type;
+                            }
+                        }
+
+                        if (categories.Any() == true)
+                        {
+                            this.TypeContext.Categories.InvokeCategoriesCreatedEvent(authentication, categories.ToArray());
+                        }
+
+                        if (types.Any() == true)
+                        {
+                            this.TypeContext.Types.InvokeTypesCreatedEvent(authentication, types.ToArray());
+                        }
+                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IDataBaseServiceCallback.OnTypeItemsRenamed(CallbackInfo callbackInfo, string[] itemPaths, string[] newNames)
+        {
+            try
+            {
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
+                        {
+                            var items = new List<TypeCategory>(itemPaths.Length);
+                            var oldNames = new List<string>(itemPaths.Length);
+                            var oldPaths = new List<string>(itemPaths.Length);
+
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var typeItem = this.TypeContext[itemPaths[i]];
+                                if (typeItem is TypeCategory == false)
+                                    continue;
+
+                                var category = typeItem as TypeCategory;
+                                items.Add(category);
+                                oldNames.Add(category.Name);
+                                oldPaths.Add(category.Path);
+                            }
+
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var typeItem = this.TypeContext[itemPaths[i]];
+                                if (typeItem is TypeCategory == false)
+                                    continue;
+
+                                var category = typeItem as TypeCategory;
+                                category.SetName(newNames[i]);
+                            }
+
+                            this.TypeContext.Categories.InvokeCategoriesRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
+                        }
+
+                        {
+                            var items = new List<Type>(itemPaths.Length);
+                            var oldNames = new List<string>(itemPaths.Length);
+                            var oldPaths = new List<string>(itemPaths.Length);
+
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var typeItem = this.TypeContext[itemPaths[i]];
+                                if (typeItem is Type == false)
+                                    continue;
+
+                                var type = typeItem as Type;
+                                items.Add(type);
+                                oldNames.Add(type.Name);
+                                oldPaths.Add(type.Path);
+                            }
+
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var typeItem = this.TypeContext[itemPaths[i]];
+                                if (typeItem is Type == false)
+                                    continue;
+
+                                var type = typeItem as Type;
+                                type.SetName(newNames[i]);
+                            }
+
+                            this.TypeContext.Types.InvokeTypesRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
+                        }
+                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IDataBaseServiceCallback.OnTypeItemsMoved(CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths)
+        {
+            try
+            {
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
+                        {
+                            var items = new List<TypeCategory>(itemPaths.Length);
+                            var oldPaths = new List<string>(itemPaths.Length);
+                            var oldParentPaths = new List<string>(itemPaths.Length);
+
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var typeItem = this.TypeContext[itemPaths[i]];
+                                if (typeItem is TypeCategory == false)
+                                    continue;
+
+                                var category = typeItem as TypeCategory;
+                                items.Add(category);
+                                oldPaths.Add(category.Path);
+                                oldParentPaths.Add(category.Parent.Path);
+                            }
+
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var typeItem = this.TypeContext[itemPaths[i]];
+                                if (typeItem is TypeCategory == false)
+                                    continue;
+
+                                var category = typeItem as TypeCategory;
+                                var parent = this.TypeContext.Categories[parentPaths[i]];
                                 category.SetParent(parent);
                             }
 
-                            this.TableContext.Categories.InvokeCategoriesMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
-                        }
-                    }
-
-                    {
-                        var items = new List<Table>(itemPaths.Length);
-                        var oldPaths = new List<string>(itemPaths.Length);
-                        var oldParentPaths = new List<string>(itemPaths.Length);
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var tableItem = this.TableContext[itemPaths[i]];
-                            if (tableItem is Table == false)
-                                continue;
-
-                            var table = tableItem as Table;
-                            items.Add(table);
-                            oldPaths.Add(table.Path);
-                            oldParentPaths.Add(table.Category.Path);
+                            this.TypeContext.Categories.InvokeCategoriesMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
                         }
 
-                        if (items.Any() == true)
                         {
+                            var items = new List<Type>(itemPaths.Length);
+                            var oldPaths = new List<string>(itemPaths.Length);
+                            var oldParentPaths = new List<string>(itemPaths.Length);
+
                             for (var i = 0; i < itemPaths.Length; i++)
                             {
-                                var tableItem = this.TableContext[itemPaths[i]];
-                                if (tableItem is Table == false)
+                                var typeItem = this.TypeContext[itemPaths[i]];
+                                if (typeItem is Type == false)
                                     continue;
 
-                                var table = tableItem as Table;
-                                var parent = this.TableContext.Categories[parentPaths[i]];
-                                table.SetParent(parent);
+                                var type = typeItem as Type;
+                                items.Add(type);
+                                oldPaths.Add(type.Path);
+                                oldParentPaths.Add(type.Category.Path);
                             }
 
-                            this.TableContext.Tables.InvokeTablesMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var typeItem = this.TypeContext[itemPaths[i]];
+                                if (typeItem is Type == false)
+                                    continue;
+
+                                var type = typeItem as Type;
+                                var parent = this.TypeContext.Categories[parentPaths[i]];
+                                type.SetParent(parent);
+                            }
+
+                            this.TypeContext.Types.InvokeTypesMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
                         }
-                    }
+                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
                 });
             }
             catch (Exception e)
@@ -1489,68 +1945,72 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        void IDataBaseServiceCallback.OnTableItemsDeleted(SignatureDate signatureDate, string[] itemPaths)
+        async void IDataBaseServiceCallback.OnTypeItemsDeleted(CallbackInfo callbackInfo, string[] itemPaths)
         {
             try
             {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() =>
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
                 {
+                    this.Dispatcher.Invoke(() =>
                     {
-                        var items = new List<TableCategory>(itemPaths.Length);
-                        var oldPaths = new List<string>(itemPaths.Length);
-
-                        for (var i = 0; i < itemPaths.Length; i++)
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
                         {
-                            var tableItem = this.TableContext[itemPaths[i]];
-                            if (tableItem is TableCategory == false)
-                                continue;
+                            var items = new List<TypeCategory>(itemPaths.Length);
+                            var oldPaths = new List<string>(itemPaths.Length);
 
-                            var category = tableItem as TableCategory;
-                            items.Add(category);
-                            oldPaths.Add(category.Path);
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var typeItem = this.TypeContext[itemPaths[i]];
+                                if (typeItem is TypeCategory == false)
+                                    continue;
+
+                                var category = typeItem as TypeCategory;
+                                items.Add(category);
+                                oldPaths.Add(category.Path);
+                            }
+
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var typeItem = this.TypeContext[itemPaths[i]];
+                                if (typeItem is TypeCategory == false)
+                                    continue;
+
+                                var category = typeItem as TypeCategory;
+                                category.Dispose();
+                            }
+
+                            this.TypeContext.Categories.InvokeCategoriesDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
                         }
 
-                        for (var i = 0; i < itemPaths.Length; i++)
                         {
-                            var tableItem = this.TableContext[itemPaths[i]];
-                            if (tableItem is TableCategory == false)
-                                continue;
+                            var items = new List<Type>(itemPaths.Length);
+                            var oldPaths = new List<string>(itemPaths.Length);
 
-                            var category = tableItem as TableCategory;
-                            category.Dispose();
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var typeItem = this.TypeContext[itemPaths[i]];
+                                if (typeItem is Type == false)
+                                    continue;
+
+                                var type = typeItem as Type;
+                                items.Add(type);
+                                oldPaths.Add(type.Path);
+                            }
+
+                            for (var i = 0; i < itemPaths.Length; i++)
+                            {
+                                var typeItem = this.TypeContext[itemPaths[i]];
+                                if (typeItem is Type == false)
+                                    continue;
+
+                                var type = typeItem as Type;
+                                type.Dispose();
+                            }
+
+                            this.TypeContext.Types.InvokeTypesDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
                         }
-
-                        this.TableContext.Categories.InvokeCategoriesDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
-                    }
-
-                    {
-                        var items = new List<Table>(itemPaths.Length);
-                        var oldPaths = new List<string>(itemPaths.Length);
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var tableItem = this.TableContext[itemPaths[i]];
-                            if (tableItem is Table == false)
-                                continue;
-
-                            var table = tableItem as Table;
-                            items.Add(table);
-                            oldPaths.Add(table.Path);
-                        }
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var tableItem = this.TableContext[itemPaths[i]];
-                            if (tableItem is Table == false)
-                                continue;
-
-                            var table = tableItem as Table;
-                            table.Dispose();
-                        }
-
-                        this.TableContext.Tables.InvokeTablesDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
-                    }
+                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
                 });
             }
             catch (Exception e)
@@ -1559,50 +2019,54 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        void IDataBaseServiceCallback.OnTableItemsAccessChanged(SignatureDate signatureDate, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes)
+        async void IDataBaseServiceCallback.OnTypeItemsAccessChanged(CallbackInfo callbackInfo, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes)
         {
             try
             {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() =>
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
                 {
-                    var tableItems = new ITableItem[accessInfos.Length];
-                    for (var i = 0; i < accessInfos.Length; i++)
+                    this.Dispatcher.Invoke(() =>
                     {
-                        var accessInfo = accessInfos[i];
-                        var tableItem = this.TableContext[accessInfo.Path];
-                        if (tableItem is Table table)
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
+                        var typeItems = new ITypeItem[accessInfos.Length];
+                        for (var i = 0; i < accessInfos.Length; i++)
                         {
-                            table.SetAccessInfo(changeType, accessInfo);
+                            var accessInfo = accessInfos[i];
+                            var typeItem = this.TypeContext[accessInfo.Path];
+                            if (typeItem is Type type)
+                            {
+                                type.SetAccessInfo(changeType, accessInfo);
+                            }
+                            else if (typeItem is TypeCategory category)
+                            {
+                                category.SetAccessInfo(changeType, accessInfo);
+                            }
+                            else
+                            {
+                                throw new NotImplementedException(accessInfo.Path);
+                            }
+                            typeItems[i] = typeItem as ITypeItem;
                         }
-                        else if (tableItem is TableCategory category)
+                        switch (changeType)
                         {
-                            category.SetAccessInfo(changeType, accessInfo);
+                            case AccessChangeType.Public:
+                                this.TypeContext.InvokeItemsSetPublicEvent(authentication, typeItems);
+                                break;
+                            case AccessChangeType.Private:
+                                this.TypeContext.InvokeItemsSetPrivateEvent(authentication, typeItems);
+                                break;
+                            case AccessChangeType.Add:
+                                this.TypeContext.InvokeItemsAddAccessMemberEvent(authentication, typeItems, memberIDs, accessTypes);
+                                break;
+                            case AccessChangeType.Set:
+                                this.TypeContext.InvokeItemsSetAccessMemberEvent(authentication, typeItems, memberIDs, accessTypes);
+                                break;
+                            case AccessChangeType.Remove:
+                                this.TypeContext.InvokeItemsRemoveAccessMemberEvent(authentication, typeItems, memberIDs);
+                                break;
                         }
-                        else
-                        {
-                            throw new NotImplementedException(accessInfo.Path);
-                        }
-                        tableItems[i] = tableItem as ITableItem;
-                    }
-                    switch (changeType)
-                    {
-                        case AccessChangeType.Public:
-                            this.TableContext.InvokeItemsSetPublicEvent(authentication, tableItems);
-                            break;
-                        case AccessChangeType.Private:
-                            this.TableContext.InvokeItemsSetPrivateEvent(authentication, tableItems);
-                            break;
-                        case AccessChangeType.Add:
-                            this.TableContext.InvokeItemsAddAccessMemberEvent(authentication, tableItems, memberIDs, accessTypes);
-                            break;
-                        case AccessChangeType.Set:
-                            this.TableContext.InvokeItemsSetAccessMemberEvent(authentication, tableItems, memberIDs, accessTypes);
-                            break;
-                        case AccessChangeType.Remove:
-                            this.TableContext.InvokeItemsRemoveAccessMemberEvent(authentication, tableItems, memberIDs);
-                            break;
-                    }
+                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
                 });
             }
             catch (Exception e)
@@ -1611,456 +2075,45 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        void IDataBaseServiceCallback.OnTableItemsLockChanged(SignatureDate signatureDate, LockChangeType changeType, LockInfo[] lockInfos, string[] comments)
+        async void IDataBaseServiceCallback.OnTypeItemsLockChanged(CallbackInfo callbackInfo, LockChangeType changeType, LockInfo[] lockInfos, string[] comments)
         {
             try
             {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() =>
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
                 {
-                    var tableItems = new ITableItem[lockInfos.Length];
-                    for (var i = 0; i < lockInfos.Length; i++)
+                    this.Dispatcher.Invoke(() =>
                     {
-                        var lockInfo = lockInfos[i];
-                        var tableItem = this.TableContext[lockInfo.Path];
-                        if (tableItem is Table table)
+                        var authentication = this.UserContext.Authenticate(callbackInfo.SignatureDate);
+                        var typeItems = new ITypeItem[lockInfos.Length];
+                        for (var i = 0; i < lockInfos.Length; i++)
                         {
-                            table.SetLockInfo(changeType, lockInfo);
+                            var lockInfo = lockInfos[i];
+                            var typeItem = this.TypeContext[lockInfo.Path];
+                            if (typeItem is Type type)
+                            {
+                                type.SetLockInfo(changeType, lockInfo);
+                            }
+                            else if (typeItem is TypeCategory category)
+                            {
+                                category.SetLockInfo(changeType, lockInfo);
+                            }
+                            else
+                            {
+                                throw new NotImplementedException(lockInfo.Path);
+                            }
+                            typeItems[i] = typeItem as ITypeItem;
                         }
-                        else if (tableItem is TableCategory category)
+                        switch (changeType)
                         {
-                            category.SetLockInfo(changeType, lockInfo);
+                            case LockChangeType.Lock:
+                                this.TypeContext.InvokeItemsLockedEvent(authentication, typeItems, comments);
+                                break;
+                            case LockChangeType.Unlock:
+                                this.TypeContext.InvokeItemsUnlockedEvent(authentication, typeItems);
+                                break;
                         }
-                        else
-                        {
-                            throw new NotImplementedException(lockInfo.Path);
-                        }
-                        tableItems[i] = tableItem as ITableItem;
-                    }
-                    switch (changeType)
-                    {
-                        case LockChangeType.Lock:
-                            this.TableContext.InvokeItemsLockedEvent(authentication, tableItems, comments);
-                            break;
-                        case LockChangeType.Unlock:
-                            this.TableContext.InvokeItemsUnlockedEvent(authentication, tableItems);
-                            break;
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-            }
-        }
-
-        void IDataBaseServiceCallback.OnTypesChanged(SignatureDate signatureDate, TypeInfo[] typeInfos)
-        {
-            try
-            {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() =>
-                {
-                    var types = new Type[typeInfos.Length];
-                    for (var i = 0; i < typeInfos.Length; i++)
-                    {
-                        var typeInfo = typeInfos[i];
-                        var type = this.TypeContext.Types[typeInfo.Name];
-                        type.SetTypeInfo(typeInfo);
-                        types[i] = type;
-                    }
-                    this.TypeContext.Types.InvokeTypesChangedEvent(authentication, types);
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-            }
-        }
-
-        void IDataBaseServiceCallback.OnTypesStateChanged(SignatureDate signatureDate, string[] typeNames, TypeState[] states)
-        {
-            try
-            {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() =>
-                {
-                    var types = new Type[typeNames.Length];
-                    for (var i = 0; i < typeNames.Length; i++)
-                    {
-                        var type = this.TypeContext.Types[typeNames[i]];
-                        var state = states[i];
-                        type.SetTypeState(state);
-                        types[i] = type;
-                    }
-                    this.TypeContext.Types.InvokeTypesStateChangedEvent(authentication, types);
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-            }
-        }
-
-        void IDataBaseServiceCallback.OnTypeItemsCreated(SignatureDate signatureDate, string[] itemPaths, TypeInfo?[] args)
-        {
-            try
-            {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                if (authentication.ID == this.CremaHost.UserID)
-                {
-                    int er = 0;
-                }
-                this.Dispatcher.Invoke(() =>
-                {
-                    var typeItems = new ITypeItem[itemPaths.Length];
-                    var categories = new List<TypeCategory>();
-                    var types = new List<Type>();
-
-                    for (var i = 0; i < itemPaths.Length; i++)
-                    {
-                        var itemPath = itemPaths[i];
-                        if (NameValidator.VerifyCategoryPath(itemPath) == true)
-                        {
-                            var categoryName = new CategoryName(itemPath);
-                            var category = this.TypeContext.Categories.Prepare(itemPath);
-                            categories.Add(category);
-                            typeItems[i] = category;
-                        }
-                        else
-                        {
-                            var typeInfo = (TypeInfo)args[i];
-                            var type = this.TypeContext.Types.AddNew(authentication, typeInfo.Name, typeInfo.CategoryPath);
-                            type.Initialize(typeInfo);
-                            types.Add(type);
-                            typeItems[i] = type;
-                        }
-                    }
-
-                    if (categories.Any() == true)
-                    {
-                        this.TypeContext.Categories.InvokeCategoriesCreatedEvent(authentication, categories.ToArray());
-                    }
-
-                    if (types.Any() == true)
-                    {
-                        this.TypeContext.Types.InvokeTypesCreatedEvent(authentication, types.ToArray());
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-            }
-        }
-
-        void IDataBaseServiceCallback.OnTypeItemsRenamed(SignatureDate signatureDate, string[] itemPaths, string[] newNames)
-        {
-            try
-            {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() =>
-                {
-                    {
-                        var items = new List<TypeCategory>(itemPaths.Length);
-                        var oldNames = new List<string>(itemPaths.Length);
-                        var oldPaths = new List<string>(itemPaths.Length);
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var typeItem = this.TypeContext[itemPaths[i]];
-                            if (typeItem is TypeCategory == false)
-                                continue;
-
-                            var category = typeItem as TypeCategory;
-                            items.Add(category);
-                            oldNames.Add(category.Name);
-                            oldPaths.Add(category.Path);
-                        }
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var typeItem = this.TypeContext[itemPaths[i]];
-                            if (typeItem is TypeCategory == false)
-                                continue;
-
-                            var category = typeItem as TypeCategory;
-                            category.SetName(newNames[i]);
-                        }
-
-                        this.TypeContext.Categories.InvokeCategoriesRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
-                    }
-
-                    {
-                        var items = new List<Type>(itemPaths.Length);
-                        var oldNames = new List<string>(itemPaths.Length);
-                        var oldPaths = new List<string>(itemPaths.Length);
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var typeItem = this.TypeContext[itemPaths[i]];
-                            if (typeItem is Type == false)
-                                continue;
-
-                            var type = typeItem as Type;
-                            items.Add(type);
-                            oldNames.Add(type.Name);
-                            oldPaths.Add(type.Path);
-                        }
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var typeItem = this.TypeContext[itemPaths[i]];
-                            if (typeItem is Type == false)
-                                continue;
-
-                            var type = typeItem as Type;
-                            type.SetName(newNames[i]);
-                        }
-
-                        this.TypeContext.Types.InvokeTypesRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-            }
-        }
-
-        void IDataBaseServiceCallback.OnTypeItemsMoved(SignatureDate signatureDate, string[] itemPaths, string[] parentPaths)
-        {
-            try
-            {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() =>
-                {
-                    {
-                        var items = new List<TypeCategory>(itemPaths.Length);
-                        var oldPaths = new List<string>(itemPaths.Length);
-                        var oldParentPaths = new List<string>(itemPaths.Length);
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var typeItem = this.TypeContext[itemPaths[i]];
-                            if (typeItem is TypeCategory == false)
-                                continue;
-
-                            var category = typeItem as TypeCategory;
-                            items.Add(category);
-                            oldPaths.Add(category.Path);
-                            oldParentPaths.Add(category.Parent.Path);
-                        }
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var typeItem = this.TypeContext[itemPaths[i]];
-                            if (typeItem is TypeCategory == false)
-                                continue;
-
-                            var category = typeItem as TypeCategory;
-                            var parent = this.TypeContext.Categories[parentPaths[i]];
-                            category.SetParent(parent);
-                        }
-
-                        this.TypeContext.Categories.InvokeCategoriesMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
-                    }
-
-                    {
-                        var items = new List<Type>(itemPaths.Length);
-                        var oldPaths = new List<string>(itemPaths.Length);
-                        var oldParentPaths = new List<string>(itemPaths.Length);
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var typeItem = this.TypeContext[itemPaths[i]];
-                            if (typeItem is Type == false)
-                                continue;
-
-                            var type = typeItem as Type;
-                            items.Add(type);
-                            oldPaths.Add(type.Path);
-                            oldParentPaths.Add(type.Category.Path);
-                        }
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var typeItem = this.TypeContext[itemPaths[i]];
-                            if (typeItem is Type == false)
-                                continue;
-
-                            var type = typeItem as Type;
-                            var parent = this.TypeContext.Categories[parentPaths[i]];
-                            type.SetParent(parent);
-                        }
-
-                        this.TypeContext.Types.InvokeTypesMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-            }
-        }
-
-        void IDataBaseServiceCallback.OnTypeItemsDeleted(SignatureDate signatureDate, string[] itemPaths)
-        {
-            try
-            {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() =>
-                {
-                    {
-                        var items = new List<TypeCategory>(itemPaths.Length);
-                        var oldPaths = new List<string>(itemPaths.Length);
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var typeItem = this.TypeContext[itemPaths[i]];
-                            if (typeItem is TypeCategory == false)
-                                continue;
-
-                            var category = typeItem as TypeCategory;
-                            items.Add(category);
-                            oldPaths.Add(category.Path);
-                        }
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var typeItem = this.TypeContext[itemPaths[i]];
-                            if (typeItem is TypeCategory == false)
-                                continue;
-
-                            var category = typeItem as TypeCategory;
-                            category.Dispose();
-                        }
-
-                        this.TypeContext.Categories.InvokeCategoriesDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
-                    }
-
-                    {
-                        var items = new List<Type>(itemPaths.Length);
-                        var oldPaths = new List<string>(itemPaths.Length);
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var typeItem = this.TypeContext[itemPaths[i]];
-                            if (typeItem is Type == false)
-                                continue;
-
-                            var type = typeItem as Type;
-                            items.Add(type);
-                            oldPaths.Add(type.Path);
-                        }
-
-                        for (var i = 0; i < itemPaths.Length; i++)
-                        {
-                            var typeItem = this.TypeContext[itemPaths[i]];
-                            if (typeItem is Type == false)
-                                continue;
-
-                            var type = typeItem as Type;
-                            type.Dispose();
-                        }
-
-                        this.TypeContext.Types.InvokeTypesDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-            }
-        }
-
-        void IDataBaseServiceCallback.OnTypeItemsAccessChanged(SignatureDate signatureDate, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes)
-        {
-            try
-            {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() =>
-                {
-                    var typeItems = new ITypeItem[accessInfos.Length];
-                    for (var i = 0; i < accessInfos.Length; i++)
-                    {
-                        var accessInfo = accessInfos[i];
-                        var typeItem = this.TypeContext[accessInfo.Path];
-                        if (typeItem is Type type)
-                        {
-                            type.SetAccessInfo(changeType, accessInfo);
-                        }
-                        else if (typeItem is TypeCategory category)
-                        {
-                            category.SetAccessInfo(changeType, accessInfo);
-                        }
-                        else
-                        {
-                            throw new NotImplementedException(accessInfo.Path);
-                        }
-                        typeItems[i] = typeItem as ITypeItem;
-                    }
-                    switch (changeType)
-                    {
-                        case AccessChangeType.Public:
-                            this.TypeContext.InvokeItemsSetPublicEvent(authentication, typeItems);
-                            break;
-                        case AccessChangeType.Private:
-                            this.TypeContext.InvokeItemsSetPrivateEvent(authentication, typeItems);
-                            break;
-                        case AccessChangeType.Add:
-                            this.TypeContext.InvokeItemsAddAccessMemberEvent(authentication, typeItems, memberIDs, accessTypes);
-                            break;
-                        case AccessChangeType.Set:
-                            this.TypeContext.InvokeItemsSetAccessMemberEvent(authentication, typeItems, memberIDs, accessTypes);
-                            break;
-                        case AccessChangeType.Remove:
-                            this.TypeContext.InvokeItemsRemoveAccessMemberEvent(authentication, typeItems, memberIDs);
-                            break;
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-            }
-        }
-
-        void IDataBaseServiceCallback.OnTypeItemsLockChanged(SignatureDate signatureDate, LockChangeType changeType, LockInfo[] lockInfos, string[] comments)
-        {
-            try
-            {
-                var authentication = this.UserContext.Authenticate(signatureDate);
-                this.Dispatcher.Invoke(() =>
-                {
-                    var typeItems = new ITypeItem[lockInfos.Length];
-                    for (var i = 0; i < lockInfos.Length; i++)
-                    {
-                        var lockInfo = lockInfos[i];
-                        var typeItem = this.TypeContext[lockInfo.Path];
-                        if (typeItem is Type type)
-                        {
-                            type.SetLockInfo(changeType, lockInfo);
-                        }
-                        else if (typeItem is TypeCategory category)
-                        {
-                            category.SetLockInfo(changeType, lockInfo);
-                        }
-                        else
-                        {
-                            throw new NotImplementedException(lockInfo.Path);
-                        }
-                        typeItems[i] = typeItem as ITypeItem;
-                    }
-                    switch (changeType)
-                    {
-                        case LockChangeType.Lock:
-                            this.TypeContext.InvokeItemsLockedEvent(authentication, typeItems, comments);
-                            break;
-                        case LockChangeType.Unlock:
-                            this.TypeContext.InvokeItemsUnlockedEvent(authentication, typeItems);
-                            break;
-                    }
+                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
                 });
             }
             catch (Exception e)
@@ -2072,6 +2125,11 @@ namespace Ntreev.Crema.Services.Data
         #endregion
 
         #region IDataBase
+
+        Task IDataBase.ImportAsync(Authentication authentication, CremaDataSet dataSet, string comment)
+        {
+            return this.ImportAsync(authentication, dataSet, comment);
+        }
 
         async Task<IDataBase> IDataBase.CopyAsync(Authentication authentication, string newDataBaseName, string comment, bool force)
         {

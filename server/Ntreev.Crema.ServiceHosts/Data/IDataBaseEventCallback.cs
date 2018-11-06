@@ -31,54 +31,54 @@ namespace Ntreev.Crema.ServiceHosts.Data
     public interface IDataBaseEventCallback
     {
         [OperationContract(IsOneWay = true)]
-        void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo);
+        void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo);
 
         [OperationContract(IsOneWay = true)]
-        void OnTablesChanged(SignatureDate signatureDate, TableInfo[] tableInfos);
+        void OnTablesChanged(CallbackInfo callbackInfo, TableInfo[] tableInfos);
 
         [OperationContract(IsOneWay = true)]
-        void OnTablesStateChanged(SignatureDate signatureDate, string[] tableNames, TableState[] states);
+        void OnTablesStateChanged(CallbackInfo callbackInfo, string[] tableNames, TableState[] states);
 
         [OperationContract(IsOneWay = true)]
-        void OnTableItemsCreated(SignatureDate signatureDate, string[] itemPaths, TableInfo?[] args);
+        void OnTableItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, TableInfo?[] args);
 
         [OperationContract(IsOneWay = true)]
-        void OnTableItemsRenamed(SignatureDate signatureDate, string[] itemPaths, string[] newNames);
+        void OnTableItemsRenamed(CallbackInfo callbackInfo, string[] itemPaths, string[] newNames);
 
         [OperationContract(IsOneWay = true)]
-        void OnTableItemsMoved(SignatureDate signatureDate, string[] itemPaths, string[] parentPaths);
+        void OnTableItemsMoved(CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths);
 
         [OperationContract(IsOneWay = true)]
-        void OnTableItemsDeleted(SignatureDate signatureDate, string[] itemPaths);
+        void OnTableItemsDeleted(CallbackInfo callbackInfo, string[] itemPaths);
 
         [OperationContract(IsOneWay = true)]
-        void OnTableItemsAccessChanged(SignatureDate signatureDate, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes);
+        void OnTableItemsAccessChanged(CallbackInfo callbackInfo, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes);
 
         [OperationContract(IsOneWay = true)]
-        void OnTableItemsLockChanged(SignatureDate signatureDate, LockChangeType changeType, LockInfo[] lockInfos, string[] comments);
+        void OnTableItemsLockChanged(CallbackInfo callbackInfo, LockChangeType changeType, LockInfo[] lockInfos, string[] comments);
 
         [OperationContract(IsOneWay = true)]
-        void OnTypesChanged(SignatureDate signatureDate, TypeInfo[] typeInfos);
+        void OnTypesChanged(CallbackInfo callbackInfo, TypeInfo[] typeInfos);
 
         [OperationContract(IsOneWay = true)]
-        void OnTypesStateChanged(SignatureDate signatureDate, string[] typeNames, TypeState[] states);
+        void OnTypesStateChanged(CallbackInfo callbackInfo, string[] typeNames, TypeState[] states);
 
         [OperationContract(IsOneWay = true)]
-        void OnTypeItemsCreated(SignatureDate signatureDate, string[] itemPaths, TypeInfo?[] args);
+        void OnTypeItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, TypeInfo?[] args);
 
         [OperationContract(IsOneWay = true)]
-        void OnTypeItemsRenamed(SignatureDate signatureDate, string[] itemPaths, string[] newNames);
+        void OnTypeItemsRenamed(CallbackInfo callbackInfo, string[] itemPaths, string[] newNames);
 
         [OperationContract(IsOneWay = true)]
-        void OnTypeItemsMoved(SignatureDate signatureDate, string[] itemPaths, string[] parentPaths);
+        void OnTypeItemsMoved(CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths);
 
         [OperationContract(IsOneWay = true)]
-        void OnTypeItemsDeleted(SignatureDate signatureDate, string[] itemPaths);
+        void OnTypeItemsDeleted(CallbackInfo callbackInfo, string[] itemPaths);
 
         [OperationContract(IsOneWay = true)]
-        void OnTypeItemsAccessChanged(SignatureDate signatureDate, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes);
+        void OnTypeItemsAccessChanged(CallbackInfo callbackInfo, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes);
 
         [OperationContract(IsOneWay = true)]
-        void OnTypeItemsLockChanged(SignatureDate signatureDate, LockChangeType changeType, LockInfo[] lockInfos, string[] comments);
+        void OnTypeItemsLockChanged(CallbackInfo callbackInfo, LockChangeType changeType, LockInfo[] lockInfos, string[] comments);
     }
 }

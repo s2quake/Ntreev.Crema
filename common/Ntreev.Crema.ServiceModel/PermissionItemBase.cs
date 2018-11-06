@@ -73,6 +73,13 @@ namespace Ntreev.Crema.ServiceModel
             return this.GetAccessType(authentication).HasFlag(accessType);
         }
 
+        //protected void SetAccessInfo(AccessInfo accessInfo)
+        //{
+        //    this.accessInfo = accessInfo;
+        //    this.UpdateAccessParent(this.accessParent);
+        //    this.OnAccessChanged(EventArgs.Empty);
+        //}
+
         protected void SetPublic(IAuthentication authentication)
         {
             this.accessInfo.SetPublic();
@@ -80,35 +87,35 @@ namespace Ntreev.Crema.ServiceModel
             this.OnAccessChanged(EventArgs.Empty);
         }
 
-        protected void SetPrivate(IAuthentication authentication)
+        protected void SetPrivate(IAuthentication authentication, SignatureDate signatureDate)
         {
             this.accessInfo.SetPrivate(this.Path, authentication.SignatureDate);
             this.UpdateAccessParent(this);
             this.OnAccessChanged(EventArgs.Empty);
         }
 
-        protected void AddAccessMember(IAuthentication authentication, string memberID, AccessType accessType)
-        {
-            this.accessInfo.Add(authentication.SignatureDate, memberID, accessType);
-            this.UpdateAccessParent(this);
-            this.OnAccessChanged(EventArgs.Empty);
-        }
+        //protected void AddAccessMember(IAuthentication authentication, string memberID, AccessType accessType)
+        //{
+        //    this.accessInfo.Add(authentication.SignatureDate, memberID, accessType);
+        //    this.UpdateAccessParent(this);
+        //    this.OnAccessChanged(EventArgs.Empty);
+        //}
 
-        protected void SetAccessMember(IAuthentication authentication, string memberID, AccessType accessType)
-        {
-            this.accessInfo.Set(authentication.SignatureDate, memberID, accessType);
-            this.UpdateAccessParent(this);
-            this.OnAccessChanged(EventArgs.Empty);
-        }
+        //protected void SetAccessMember(IAuthentication authentication, string memberID, AccessType accessType)
+        //{
+        //    this.accessInfo.Set(authentication.SignatureDate, memberID, accessType);
+        //    this.UpdateAccessParent(this);
+        //    this.OnAccessChanged(EventArgs.Empty);
+        //}
 
-        protected void RemoveAccessMember(IAuthentication authentication, string memberID)
-        {
-            this.accessInfo.Remove(authentication.SignatureDate, memberID);
-            this.UpdateAccessParent(this);
-            this.OnAccessChanged(EventArgs.Empty);
-        }
+        //protected void RemoveAccessMember(IAuthentication authentication, string memberID)
+        //{
+        //    this.accessInfo.Remove(authentication.SignatureDate, memberID);
+        //    this.UpdateAccessParent(this);
+        //    this.OnAccessChanged(EventArgs.Empty);
+        //}
 
-        protected void Lock(IAuthentication authentication, string comment)
+        protected void Lock(IAuthentication authentication,  string comment)
         {
             this.lockInfo = new LockInfo()
             {

@@ -36,44 +36,48 @@ namespace Ntreev.Crema.Services.Data
         private readonly DataBase dataBase;
         private readonly List<CremaDataType> types = new List<CremaDataType>();
         private readonly List<CremaDataTable> tables = new List<CremaDataTable>();
-        private readonly List<string> itemPathList;
 
         private DataBaseSet(DataBase dataBase, CremaDataSet dataSet, bool typeCreation, bool tableCreation)
         {
             this.dataBase = dataBase ?? throw new ArgumentNullException(nameof(dataBase));
             this.DataSet = dataSet ?? throw new ArgumentNullException(nameof(dataSet));
             this.dataBase.Dispatcher.VerifyAccess();
-            this.itemPathList = new List<string>(dataSet.Types.Count + dataSet.Tables.Count);
 
-            foreach (var item in dataSet.Types)
+            try
             {
-                var type = dataBase.TypeContext.Types[item.Name, item.CategoryPath];
-                if (type == null && typeCreation == false)
+                foreach (var item in dataSet.Types)
                 {
-                    throw new TypeNotFoundException(item.Name);
+                    var type = dataBase.TypeContext.Types[item.Name, item.CategoryPath];
+                    if (type == null && typeCreation == false)
+                    {
+                        throw new TypeNotFoundException(item.Name);
+                    }
+                    if (type != null)
+                    {
+                        item.ExtendedProperties[typeof(TypeInfo)] = type.TypeInfo;
+                    }
+                    this.types.Add(item);
                 }
-                if (type != null)
+
+                foreach (var item in dataSet.Tables)
                 {
-                    item.ExtendedProperties[typeof(TypeInfo)] = type.TypeInfo;
+                    var table = dataBase.TableContext.Tables[item.Name, item.CategoryPath];
+                    if (table == null && tableCreation == false)
+                    {
+                        throw new TableNotFoundException(item.Name);
+                    }
+                    if (table != null)
+                    {
+                        item.ExtendedProperties[typeof(TableInfo)] = table.TableInfo;
+                        item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] = table.TemplatedParent?.TableInfo;
+                    }
+                    this.tables.Add(item);
                 }
-                this.types.Add(item);
-                this.itemPathList.Add(this.dataBase.TypeContext.GeneratePath(item.Path));
             }
-
-            foreach (var item in dataSet.Tables)
+            catch
             {
-                var table = dataBase.TableContext.Tables[item.Name, item.CategoryPath];
-                if (table == null && tableCreation == false)
-                {
-                    throw new TableNotFoundException(item.Name);
-                }
-                if (table != null)
-                {
-                    item.ExtendedProperties[typeof(TableInfo)] = table.TableInfo;
-                    item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] = table.TemplatedParent?.TableInfo;
-                }
-                this.tables.Add(item);
-                this.itemPathList.Add(this.dataBase.TableContext.GeneratePath(item.Path));
+                this.Repository.Dispatcher.Invoke(() => this.Repository.Unlock(dataSet.GetItemPaths()));
+                throw;
             }
         }
 
@@ -249,7 +253,7 @@ namespace Ntreev.Crema.Services.Data
         {
             this.Serialize();
             this.AddTablesRepositoryPath();
-            
+
             var status = this.Repository.Status();
             var typesDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);
             foreach (var item in status)
@@ -408,7 +412,7 @@ namespace Ntreev.Crema.Services.Data
                     {
                         parentItemPath = this.TableContext.GeneratePath(parentInfo.Path);
                     }
-                    
+
                     var props = new CremaDataTableSerializerSettings(itemPath2, parentItemPath);
                     this.Serializer.Serialize(itemPath2, item, props);
                 }

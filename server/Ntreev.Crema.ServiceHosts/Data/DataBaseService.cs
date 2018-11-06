@@ -39,6 +39,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         private IDataBase dataBase;
         private Authentication authentication;
         private string dataBaseName;
+        private long index = 0;
 
         public DataBaseService(ICremaHost cremaHost)
             : base(cremaHost)
@@ -139,7 +140,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var result = new ResultBase();
             try
             {
-                await this.dataBase.ImportAsync(this.authentication, dataSet, comment);
+                result.TaskID = await (Task<Guid>)this.dataBase.ImportAsync(this.authentication, dataSet, comment);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -157,6 +158,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 var categoryName = new Ntreev.Library.ObjectModel.CategoryName(categoryPath);
                 var category = await this.GetTableCategoryAsync(categoryName.ParentPath);
                 await category.AddNewCategoryAsync(this.authentication, categoryName.Name);
+                result.TaskID = GuidUtility.FromName(categoryPath);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -188,7 +190,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var tableItem = await this.GetTableItemAsync(itemPath);
-                await tableItem.RenameAsync(this.authentication, newName);
+                result.TaskID = await (Task<Guid>)tableItem.RenameAsync(this.authentication, newName);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -204,7 +206,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var tableItem = await this.GetTableItemAsync(itemPath);
-                await tableItem.MoveAsync(this.authentication, parentPath);
+                result.TaskID = await (Task<Guid>)tableItem.MoveAsync(this.authentication, parentPath);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -220,7 +222,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var tableItem = await this.GetTableItemAsync(itemPath);
-                await tableItem.DeleteAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)tableItem.DeleteAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -236,7 +238,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var tableItem = await this.GetTableItemAsync(itemPath);
-                await tableItem.SetPublicAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)tableItem.SetPublicAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -252,7 +254,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var tableItem = await this.GetTableItemAsync(itemPath);
-                await tableItem.SetPrivateAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)tableItem.SetPrivateAsync(this.authentication);
                 result.Value = await tableItem.Dispatcher.InvokeAsync(() => tableItem.AccessInfo);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -269,7 +271,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var tableItem = await this.GetTableItemAsync(itemPath);
-                await tableItem.AddAccessMemberAsync(this.authentication, memberID, accessType);
+                result.TaskID = await (Task<Guid>)tableItem.AddAccessMemberAsync(this.authentication, memberID, accessType);
                 var accessInfo = await tableItem.Dispatcher.InvokeAsync(() => tableItem.AccessInfo);
                 result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
                 result.SignatureDate = this.authentication.SignatureDate;
@@ -287,7 +289,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var tableItem = await this.GetTableItemAsync(itemPath);
-                await tableItem.SetAccessMemberAsync(this.authentication, memberID, accessType);
+                result.TaskID = await (Task<Guid>)tableItem.SetAccessMemberAsync(this.authentication, memberID, accessType);
                 var accessInfo = await tableItem.Dispatcher.InvokeAsync(() => tableItem.AccessInfo);
                 result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
                 result.SignatureDate = this.authentication.SignatureDate;
@@ -305,7 +307,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var tableItem = await this.GetTableItemAsync(itemPath);
-                await tableItem.RemoveAccessMemberAsync(this.authentication, memberID);
+                result.TaskID = await (Task<Guid>)tableItem.RemoveAccessMemberAsync(this.authentication, memberID);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -321,7 +323,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var tableItem = await this.GetTableItemAsync(itemPath);
-                await tableItem.LockAsync(this.authentication, comment);
+                result.TaskID = await (Task<Guid>)tableItem.LockAsync(this.authentication, comment);
                 result.Value = await tableItem.Dispatcher.InvokeAsync(() => tableItem.LockInfo);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -338,7 +340,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var tableItem = await this.GetTableItemAsync(itemPath);
-                await tableItem.UnlockAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)tableItem.UnlockAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -387,6 +389,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             {
                 var table = await this.GetTableAsync(tableName);
                 var newTable = await table.CopyAsync(this.authentication, newTableName, categoryPath, copyXml);
+                result.TaskID = GuidUtility.FromName(categoryPath + newTableName);
                 result.Value = await table.Dispatcher.InvokeAsync(() => EnumerableUtility.FamilyTree(newTable, item => item.Childs).Select(item => item.TableInfo).ToArray());
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -404,6 +407,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             {
                 var table = await this.GetTableAsync(tableName);
                 var newTable = await table.InheritAsync(this.authentication, newTableName, categoryPath, copyXml);
+                result.TaskID = GuidUtility.FromName(categoryPath + newTableName);
                 result.Value = await table.Dispatcher.InvokeAsync(() => EnumerableUtility.FamilyTree(newTable, item => item.Childs).Select(item => item.TableInfo).ToArray());
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -644,7 +648,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var typeItem = await this.GetTypeItemAsync(itemPath);
-                await typeItem.RenameAsync(this.authentication, newName);
+                result.TaskID = await (Task<Guid>)typeItem.RenameAsync(this.authentication, newName);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -660,7 +664,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var typeItem = await this.GetTypeItemAsync(itemPath);
-                await typeItem.MoveAsync(this.authentication, parentPath);
+                result.TaskID = await (Task<Guid>)typeItem.MoveAsync(this.authentication, parentPath);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -676,7 +680,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var typeItem = await this.GetTypeItemAsync(itemPath);
-                await typeItem.DeleteAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)typeItem.DeleteAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -693,6 +697,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             {
                 var type = await this.GetTypeAsync(typeName);
                 var newType = await type.CopyAsync(this.authentication, newTypeName, categoryPath);
+                result.TaskID = GuidUtility.FromName(categoryPath + newTypeName);
                 result.Value = await type.Dispatcher.InvokeAsync(() => newType.TypeInfo);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -783,7 +788,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var typeItem = await this.GetTypeItemAsync(itemPath);
-                await typeItem.SetPublicAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)typeItem.SetPublicAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -799,7 +804,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var typeItem = await this.GetTypeItemAsync(itemPath);
-                await typeItem.SetPrivateAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)typeItem.SetPrivateAsync(this.authentication);
                 result.Value = await typeItem.Dispatcher.InvokeAsync(() => typeItem.AccessInfo);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -816,7 +821,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var typeItem = await this.GetTypeItemAsync(itemPath);
-                await typeItem.AddAccessMemberAsync(this.authentication, memberID, accessType);
+                result.TaskID = await (Task<Guid>)typeItem.AddAccessMemberAsync(this.authentication, memberID, accessType);
                 var accessInfo = await typeItem.Dispatcher.InvokeAsync(() => typeItem.AccessInfo);
                 result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
                 result.SignatureDate = this.authentication.SignatureDate;
@@ -834,7 +839,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var typeItem = await this.GetTypeItemAsync(itemPath);
-                await typeItem.SetAccessMemberAsync(this.authentication, memberID, accessType);
+                result.TaskID = await (Task<Guid>)typeItem.SetAccessMemberAsync(this.authentication, memberID, accessType);
                 var accessInfo = await typeItem.Dispatcher.InvokeAsync(() => typeItem.AccessInfo);
                 result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
                 result.SignatureDate = this.authentication.SignatureDate;
@@ -852,7 +857,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var typeItem = await this.GetTypeItemAsync(itemPath);
-                await typeItem.RemoveAccessMemberAsync(this.authentication, memberID);
+                result.TaskID = await (Task<Guid>)typeItem.RemoveAccessMemberAsync(this.authentication, memberID);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -868,7 +873,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var typeItem = await this.GetTypeItemAsync(itemPath);
-                await typeItem.LockAsync(this.authentication, comment);
+                result.TaskID = await (Task<Guid>)typeItem.LockAsync(this.authentication, comment);
                 result.Value = await typeItem.Dispatcher.InvokeAsync(() => typeItem.LockInfo);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -885,7 +890,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var typeItem = await this.GetTypeItemAsync(itemPath);
-                await typeItem.UnlockAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)typeItem.UnlockAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -948,7 +953,8 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
-            this.Callback?.OnServiceClosed(signatureDate, closeInfo);
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = signatureDate };
+            this.Callback?.OnServiceClosed(callbackInfo, closeInfo);
         }
 
         private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
@@ -968,65 +974,65 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var tableNames = e.Items.Select(item => item.Name).ToArray();
             var states = e.Items.Select(item => item.TableState).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTablesStateChanged(signatureDate, tableNames, states));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTablesStateChanged(callbackInfo, tableNames, states));
         }
 
         private void Tables_TablesChanged(object sender, ItemsEventArgs<ITable> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var values = e.Items.Select(item => item.TableInfo).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTablesChanged(signatureDate, values));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTablesChanged(callbackInfo, values));
         }
 
         private void TableContext_ItemCreated(object sender, ItemsCreatedEventArgs<ITableItem> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var paths = e.Items.Select(item => item.Path).ToArray();
             var arguments = e.Arguments.Select(item => item is TableInfo tableInfo ? (TableInfo?)tableInfo : null).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTableItemsCreated(signatureDate, paths, arguments));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTableItemsCreated(callbackInfo, paths, arguments));
         }
 
         private void TableContext_ItemRenamed(object sender, ItemsRenamedEventArgs<ITableItem> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var oldPaths = e.OldPaths;
             var itemNames = e.Items.Select(item => item.Name).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTableItemsRenamed(signatureDate, oldPaths, itemNames));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTableItemsRenamed(callbackInfo, oldPaths, itemNames));
         }
 
         private void TableContext_ItemMoved(object sender, ItemsMovedEventArgs<ITableItem> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var oldPaths = e.OldPaths;
             var parentPaths = e.Items.Select(item => item.Parent.Path).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTableItemsMoved(signatureDate, oldPaths, parentPaths));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTableItemsMoved(callbackInfo, oldPaths, parentPaths));
         }
 
         private void TableContext_ItemDeleted(object sender, ItemsDeletedEventArgs<ITableItem> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var itemPaths = e.ItemPaths;
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTableItemsDeleted(signatureDate, itemPaths));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTableItemsDeleted(callbackInfo, itemPaths));
         }
 
         private void TableContext_ItemsAccessChanged(object sender, ItemsEventArgs<ITableItem> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var values = new AccessInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
             {
@@ -1044,14 +1050,14 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var memberIDs = metaData[1] as string[];
             var accessTypes = metaData[2] as AccessType[];
 
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTableItemsAccessChanged(signatureDate, changeType, values, memberIDs, accessTypes));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTableItemsAccessChanged(callbackInfo, changeType, values, memberIDs, accessTypes));
         }
 
         private void TableContext_ItemsLockChanged(object sender, ItemsEventArgs<ITableItem> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var values = new LockInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
             {
@@ -1068,72 +1074,72 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var changeType = (LockChangeType)metaData[0];
             var comments = metaData[1] as string[];
 
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTableItemsLockChanged(signatureDate, changeType, values, comments));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTableItemsLockChanged(callbackInfo, changeType, values, comments));
         }
 
         private void Types_TypesStateChanged(object sender, ItemsEventArgs<IType> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var typeNames = e.Items.Select(item => item.Name).ToArray();
             var states = e.Items.Select(item => item.TypeState).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypesStateChanged(signatureDate, typeNames, states));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypesStateChanged(callbackInfo, typeNames, states));
         }
 
         private void Types_TypesChanged(object sender, ItemsEventArgs<IType> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var values = e.Items.Select(item => item.TypeInfo).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypesChanged(signatureDate, values));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypesChanged(callbackInfo, values));
         }
 
         private void TypeContext_ItemCreated(object sender, ItemsCreatedEventArgs<ITypeItem> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var itemPaths = e.Items.Select(item => item.Path).ToArray();
             var arguments = e.Arguments.Select(item => item is TypeInfo typeInfo ? (TypeInfo?)typeInfo : null).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypeItemsCreated(signatureDate, itemPaths, arguments));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypeItemsCreated(callbackInfo, itemPaths, arguments));
         }
 
         private void TypeContext_ItemRenamed(object sender, ItemsRenamedEventArgs<ITypeItem> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var oldPaths = e.OldPaths;
             var itemNames = e.Items.Select(item => item.Name).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypeItemsRenamed(signatureDate, oldPaths, itemNames));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypeItemsRenamed(callbackInfo, oldPaths, itemNames));
         }
 
         private void TypeContext_ItemMoved(object sender, ItemsMovedEventArgs<ITypeItem> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var oldPaths = e.OldPaths;
             var parentPaths = e.Items.Select(item => item.Parent.Path).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypeItemsMoved(signatureDate, oldPaths, parentPaths));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypeItemsMoved(callbackInfo, oldPaths, parentPaths));
         }
 
         private void TypeContext_ItemDeleted(object sender, ItemsDeletedEventArgs<ITypeItem> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var itemPaths = e.ItemPaths;
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypeItemsDeleted(signatureDate, itemPaths));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypeItemsDeleted(callbackInfo, itemPaths));
         }
 
         private void TypeContext_ItemsAccessChanged(object sender, ItemsEventArgs<ITypeItem> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var values = new AccessInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
             {
@@ -1151,14 +1157,14 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var memberIDs = metaData[1] as string[];
             var accessTypes = metaData[2] as AccessType[];
 
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypeItemsAccessChanged(signatureDate, changeType, values, memberIDs, accessTypes));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypeItemsAccessChanged(callbackInfo, changeType, values, memberIDs, accessTypes));
         }
 
         private void TypeContext_ItemsLockChanged(object sender, ItemsEventArgs<ITypeItem> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var values = new LockInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
             {
@@ -1174,7 +1180,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var metaData = e.MetaData as object[];
             var changeType = (LockChangeType)metaData[0];
             var comments = metaData[1] as string[];
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnTypeItemsLockChanged(signatureDate, changeType, values, comments));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypeItemsLockChanged(callbackInfo, changeType, values, comments));
         }
 
         private void DataBase_Unloaded(object sender, EventArgs e)
@@ -1319,7 +1325,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         protected override async Task OnCloseAsync(bool disconnect)
         {
             if (this.authentication != null)
-            { 
+            {
                 await this.DetachEventHandlersAsync();
                 this.authentication = null;
             }

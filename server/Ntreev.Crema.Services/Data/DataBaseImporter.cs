@@ -13,7 +13,7 @@ namespace Ntreev.Crema.Services.Data
 {
     partial class DataBase
     {
-        public async Task ImportAsync(Authentication authentication, CremaDataSet dataSet, string comment)
+        public async Task<Guid> ImportAsync(Authentication authentication, CremaDataSet dataSet, string comment)
         {
             try
             {
@@ -25,7 +25,7 @@ namespace Ntreev.Crema.Services.Data
                     
                 });
 
-
+                var taskID = Guid.NewGuid();
                 var filterExpression = string.Join(";", dataSet.Tables);
                 var targetSet = await this.GetDataSetAsync(authentication, null, filterExpression, ReadTypes.OmitContent);
                 await this.Dispatcher.InvokeAsync(() =>
@@ -65,7 +65,8 @@ namespace Ntreev.Crema.Services.Data
                         throw;
                     }
 
-                    this.UpdateTables(authentication, targetSet);
+                    this.UpdateTables(authentication, targetSet, taskID);
+                    return taskID;
                 }
                 finally
                 {
@@ -136,7 +137,7 @@ namespace Ntreev.Crema.Services.Data
                 item.LockInternal(Authentication.System, comment);
                 dataSet.Types[item.Name].ExtendedProperties[this] = true;
             }
-            this.TypeContext.InvokeItemsLockedEvent(authentication, items, comments);
+            this.TypeContext.InvokeItemsLockedEvent(authentication, items, comments, Guid.NewGuid());
         }
 
         private void LockTables(Authentication authentication, CremaDataSet dataSet, string comment)
@@ -154,7 +155,7 @@ namespace Ntreev.Crema.Services.Data
                 item.LockInternal(Authentication.System, comment);
                 dataSet.Tables[item.Name].ExtendedProperties[this] = true;
             }
-            this.TableContext.InvokeItemsLockedEvent(Authentication.System, items, comments);
+            this.TableContext.InvokeItemsLockedEvent(Authentication.System, items, comments, Guid.NewGuid());
         }
 
         private void UnlockTypes(Authentication authentication, CremaDataSet dataSet)
@@ -169,7 +170,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 item.UnlockInternal(Authentication.System);
             }
-            this.TypeContext.InvokeItemsUnlockedEvent(Authentication.System, items);
+            this.TypeContext.InvokeItemsUnlockedEvent(Authentication.System, items, Guid.NewGuid());
         }
 
         private void UnlockTables(Authentication authentication, CremaDataSet dataSet)
@@ -184,10 +185,10 @@ namespace Ntreev.Crema.Services.Data
             {
                 item.UnlockInternal(Authentication.System);
             }
-            this.TableContext.InvokeItemsUnlockedEvent(Authentication.System, items);
+            this.TableContext.InvokeItemsUnlockedEvent(Authentication.System, items, Guid.NewGuid());
         }
 
-        private void UpdateTables(Authentication authentication, CremaDataSet dataSet)
+        private void UpdateTables(Authentication authentication, CremaDataSet dataSet, Guid taskID)
         {
             var tableList = new List<Table>(dataSet.Tables.Count);
             foreach (var item in dataSet.Tables)
@@ -196,7 +197,7 @@ namespace Ntreev.Crema.Services.Data
                 tableList.Add(table);
                 table.UpdateContent(item.TableInfo);
             }
-            this.TableContext.InvokeItemsChangedEvent(authentication, tableList.ToArray(), dataSet);
+            this.TableContext.InvokeItemsChangedEvent(authentication, tableList.ToArray(), dataSet, taskID);
         }
     }
 }

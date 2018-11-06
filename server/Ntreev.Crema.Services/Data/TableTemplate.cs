@@ -70,6 +70,7 @@ namespace Ntreev.Crema.Services.Data
             var dataSet = template.DataTable.DataSet;
             var dataBaseSet = await DataBaseSet.CreateAsync(this.table.DataBase, dataSet, false, false);
             var tableInfo = template.TableInfo;
+            var taskID = this.Domain.ID;
             this.Domain.Result = new TableInfo[] { tableInfo };
             await this.Container.InvokeTableEndTemplateEditAsync(authentication, tableInfo, dataBaseSet);
             await base.OnEndEditAsync(authentication);
@@ -80,7 +81,7 @@ namespace Ntreev.Crema.Services.Data
                 this.table.UpdateComment(template.Comment);
                 this.table.TableState = TableState.None;
                 this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
-                this.Container.InvokeTablesTemplateChangedEvent(authentication, this.tables, dataSet);
+                this.Container.InvokeTablesTemplateChangedEvent(authentication, this.tables, dataSet, taskID);
             });
             await this.Repository.UnlockAsync(this.ItemPaths);
         }
