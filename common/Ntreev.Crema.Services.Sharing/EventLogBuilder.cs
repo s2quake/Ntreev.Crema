@@ -87,5 +87,68 @@ namespace Ntreev.Crema.Services
                 }
             }
         }
+
+        public static string Build(Guid taskID, Authentication authentication, object target, string methodName, params object[] args)
+        {
+            if (args.Any() == true)
+                return $"[{taskID}][{authentication}] {target.GetType().Name}.{methodName} : {string.Join(", ", args.Select(i => i ?? "null"))}";
+            else
+                return $"[{taskID}][{authentication}] {target.GetType().Name}.{methodName}";
+        }
+
+        public static string BuildMany(Guid taskID, Authentication authentication, object target, string methodName, object[] items, params object[] args)
+        {
+            try
+            {
+                var sb = new StringBuilder();
+                for (var i = 0; i < items.Length; i++)
+                {
+                    if (i > 0)
+                        sb.AppendLine();
+                    sb.Append($"[{taskID}][{authentication}] {target.GetType().Name}.{methodName} : {string.Join(", ", Select(i))}");
+                }
+                return $"{sb}";
+            }
+            catch (Exception e)
+            {
+                return $"{e}";
+            }
+
+            IEnumerable<string> Select(int index)
+            {
+                yield return $"{items[index]}";
+                foreach (var item in args)
+                {
+                    yield return $"{item}";
+                }
+            }
+        }
+
+        public static string BuildMany(Guid taskID, Authentication authentication, object target, string methodName, params object[][] items)
+        {
+            try
+            {
+                var sb = new StringBuilder();
+                for (var i = 0; i < items[0].Length; i++)
+                {
+                    if (i > 0)
+                        sb.AppendLine();
+                    sb.Append($"[{taskID}][{authentication}] {target.GetType().Name}.{methodName} : {string.Join(", ", Select(i))}");
+                }
+                return $"{sb}";
+            }
+            catch (Exception e)
+            {
+                return $"{e}";
+            }
+
+            IEnumerable<string> Select(int index)
+            {
+                for (var i = 0; i < items.Length; i++)
+                {
+                    yield return $"{items[i][index]}";
+                }
+            }
+        }
     }
 }

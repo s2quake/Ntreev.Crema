@@ -48,7 +48,7 @@ namespace Ntreev.Crema.Services
 
         [Import]
         private IServiceProvider container = null;
-        private CremaSettings settings;
+        private readonly CremaSettings settings;
         private LogService log;
         private Guid token;
 
@@ -58,6 +58,7 @@ namespace Ntreev.Crema.Services
         [ImportingConstructor]
         public CremaHost(CremaSettings settings)
         {
+            CremaLog.Attach(this);
             this.settings = settings;
             this.Dispatcher = new CremaDispatcher(this);
             CremaLog.Debug($"available tags : {string.Join(",", TagInfoUtility.Names)}");
@@ -187,11 +188,14 @@ namespace Ntreev.Crema.Services
             }
             catch (Exception e)
             {
-                await this.UserContext?.CloseAsync(CloseInfo.Empty);
-                this.UserContext = null;
-                this.log?.Dispose();
-                this.log = null;
-                this.Address = null;
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    this.ServiceState = ServiceState.None;
+                    this.UserContext = null;
+                    this.log?.Dispose();
+                    this.log = null;
+                    this.Address = null;
+                });
                 CremaLog.Error(e);
                 throw;
             }
@@ -283,6 +287,7 @@ namespace Ntreev.Crema.Services
             this.Dispatcher = null;
             this.OnDisposed(EventArgs.Empty);
             CremaLog.Debug("Crema disposed.");
+            CremaLog.Detach(this);
         }
 
         public void Debug(object message)
@@ -335,6 +340,20 @@ namespace Ntreev.Crema.Services
         public async Task<ResultBase> InvokeServiceAsync(Func<ResultBase> func)
         {
             var result = await Task.Run(func);
+            result.Validate();
+            return result;
+        }
+
+        public ResultBase<TResult> InvokeService<TResult>(Func<ResultBase<TResult>> func)
+        {
+            var result = func();
+            result.Validate();
+            return result;
+        }
+
+        public ResultBase InvokeService(Func<ResultBase> func)
+        {
+            var result = func();
             result.Validate();
             return result;
         }

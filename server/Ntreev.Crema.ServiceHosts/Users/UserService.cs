@@ -480,7 +480,6 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var userIDs = e.Items.Select(item => item.ID).ToArray();
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUsersLoggedOut(callbackInfo, userIDs, closeInfo));
             if (actionUserID != this.authentication.ID && contains == true)
             {
                 this.UserContext.Users.UsersStateChanged -= Users_UsersStateChanged;
@@ -496,6 +495,10 @@ namespace Ntreev.Crema.ServiceHosts.Users
                 this.UserContext.Users.MessageReceived -= UserContext_MessageReceived;
                 this.authentication = null;
                 this.Channel.Abort();
+            }
+            else
+            {
+                this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUsersLoggedOut(callbackInfo, userIDs, closeInfo));
             }
         }
 

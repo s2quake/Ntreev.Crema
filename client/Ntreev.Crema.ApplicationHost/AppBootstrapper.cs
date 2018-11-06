@@ -71,7 +71,6 @@ namespace Ntreev.Crema.ApplicationHost
         protected override void OnExit(object sender, EventArgs e)
         {
             base.OnExit(sender, e);
-            CremaLog.Release();
         }
 
         protected override IEnumerable<string> SelectPath()

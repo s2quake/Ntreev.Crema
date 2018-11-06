@@ -58,8 +58,21 @@ namespace Ntreev.Crema.Bot.Tasks
                     {
                         if (autobot.GetService(typeof(IUserContext)) is IUserContext userContext)
                         {
-                            var userItem = await userContext.Dispatcher.InvokeAsync(() => userContext.Random());
-                            context.Push(userItem);
+                            if (RandomUtility.Within(50) == true)
+                            {
+                                var user = await userContext.Dispatcher.InvokeAsync(() => userContext.Users.Random());
+                                context.Push(user);
+                            }
+                            else if (RandomUtility.Within(50) == true)
+                            {
+                                var category = await userContext.Dispatcher.InvokeAsync(() => userContext.Categories.Random());
+                                context.Push(category);
+                            }
+                            else 
+                            {
+                                var userItem = await userContext.Dispatcher.InvokeAsync(() => userContext.Random());
+                                context.Push(userItem);
+                            }
                         }
                     }
                     //else if (RandomUtility.Within(10) == true)
@@ -89,7 +102,15 @@ namespace Ntreev.Crema.Bot.Tasks
                         return;
                 }
             }
-            await autobot.LoginAsync();
+            try
+            {
+                await autobot.LoginAsync();
+            }
+            catch
+            {
+                autobot.Cancel();
+                context.Pop(autobot);
+            }
         }
 
         [TaskMethod]

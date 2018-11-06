@@ -20,6 +20,7 @@ using log4net.Appender;
 using log4net.Core;
 using log4net.Layout;
 using log4net.Repository.Hierarchy;
+using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.Library;
 using System;
@@ -42,16 +43,11 @@ namespace Ntreev.Crema.Services
     public static class CremaLog
     {
         private static LogService log;
+        private static readonly List<CremaHost> references = new List<CremaHost>();
 
         static CremaLog()
         {
-
-        }
-
-        public static void Release()
-        {
-            log?.Dispose();
-            log4net.LogManager.Shutdown();
+            AppDomain.CurrentDomain.ProcessExit += (s, e) => Release();
         }
 
         public static void Debug(object message)
@@ -121,6 +117,12 @@ namespace Ntreev.Crema.Services
             set => LogService.Verbose = value;
         }
 
+        private static void Release()
+        {
+            log?.Dispose();
+            log4net.LogManager.Shutdown();
+        }
+
         internal static LogService LogService
         {
             get
@@ -130,5 +132,32 @@ namespace Ntreev.Crema.Services
                 return log;
             }
         }
+
+        internal static void Attach(CremaHost cremaHost)
+        {
+            lock (references)
+            {
+                if (references.Any() == false)
+                {
+                    //Dispatcher = new CremaDispatcher(typeof(CremaLog));
+                }
+                references.Add(cremaHost);
+            }
+        }
+
+        internal static void Detach(CremaHost cremaHost)
+        {
+            lock (references)
+            {
+                references.Remove(cremaHost);
+                if (references.Any() == false)
+                {
+                    //Dispatcher.Dispose();
+                    //Dispatcher = null;
+                }
+            }
+        }
+
+        internal static CremaDispatcher Dispatcher { get; private set; }
     }
 }

@@ -42,6 +42,11 @@ namespace Ntreev.Crema.Bot
             this.cremaHost = cremaHost;
         }
 
+        public override string ToString()
+        {
+            return $"{nameof(AutobotService)}: {this.cremaHost.UserID}";
+        }
+
         public void Initialize(Authentication authentication)
         {
             this.authentication = authentication;
@@ -52,9 +57,9 @@ namespace Ntreev.Crema.Bot
 
         }
 
-        protected override AutobotBase CreateInstance(string autobotID, SecureString passowrd)
+        protected override AutobotBase CreateInstance(string autobotID, SecureString password)
         {
-            return new Autobot(this, this.cremaHost.Address, autobotID);
+            return new Autobot(this, this.cremaHost.Address, autobotID, password);
         }
 
         public string Name

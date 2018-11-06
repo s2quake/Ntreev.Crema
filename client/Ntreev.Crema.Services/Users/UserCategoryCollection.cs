@@ -73,7 +73,7 @@ namespace Ntreev.Crema.Services.Users
         public void InvokeCategoriesCreatedEvent(Authentication authentication, UserCategory[] categories, Guid taskID)
         {
             var args = categories.Select(item => (object)null).ToArray();
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesCreatedEvent), categories);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeCategoriesCreatedEvent), categories);
             var message = EventMessageBuilder.CreateUserCategory(authentication, categories);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
@@ -83,7 +83,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void InvokeCategoriesRenamedEvent(Authentication authentication, UserCategory[] categories, string[] oldNames, string[] oldPaths, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesRenamedEvent), categories, oldNames, oldPaths);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeCategoriesRenamedEvent), categories, oldNames, oldPaths);
             var message = EventMessageBuilder.RenameUserCategory(authentication, categories, oldPaths);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
@@ -93,7 +93,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void InvokeCategoriesMovedEvent(Authentication authentication, UserCategory[] categories, string[] oldPaths, string[] oldParentPaths, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesMovedEvent), categories, oldPaths, oldParentPaths);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeCategoriesMovedEvent), categories, oldPaths, oldParentPaths);
             var message = EventMessageBuilder.MoveUserCategory(authentication, categories, oldPaths, oldParentPaths);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
@@ -103,7 +103,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void InvokeCategoriesDeletedEvent(Authentication authentication, UserCategory[] categories, string[] categoryPaths, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesDeletedEvent), categoryPaths);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeCategoriesDeletedEvent), categoryPaths);
             var message = EventMessageBuilder.DeleteUserCategory(authentication, categories);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);

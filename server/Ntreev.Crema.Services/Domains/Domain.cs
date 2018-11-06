@@ -50,8 +50,6 @@ namespace Ntreev.Crema.Services.Domains
         private EventHandler<DomainRowEventArgs> rowRemoved;
         private EventHandler<DomainPropertyEventArgs> propertyChanged;
         private EventHandler<DomainDeletedEventArgs> deleted;
-        private long postID;
-        private long completionID;
 
         protected Domain(DomainSerializationInfo serializationInfo, object source)
         {
@@ -498,7 +496,7 @@ namespace Ntreev.Crema.Services.Domains
                 DomainState = base.DomainState,
                 ModifiedTables = this.modifiedTableList.ToArray(),
                 CompetionID = this.Logger.CompletionID,
-        };
+            };
             this.DataDispatcher.Invoke(() =>
             {
                 if (this.Users.ContainsKey(authentication.ID) == true || authentication.IsSystem == true)
@@ -1154,7 +1152,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             return await this.DataDispatcher.InvokeAsync(() =>
             {
-                var id  = this.Logger.Join(authentication, domainUser.DomainUserInfo.AccessType);
+                var id = this.Logger.Join(authentication, domainUser.DomainUserInfo.AccessType);
                 return (id, this.SerializeSource(this.Source));
             });
         }

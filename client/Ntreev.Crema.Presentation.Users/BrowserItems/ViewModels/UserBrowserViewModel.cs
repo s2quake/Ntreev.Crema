@@ -140,12 +140,15 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
             }
             else if (messageType == MessageType.None)
             {
-                await this.Dispatcher.InvokeAsync(async () =>
+                if (e.UserID != this.authenticator.ID)
                 {
-                    var userContext = this.cremaAppHost.GetService(typeof(IUserContext)) as IUserContext;
-                    var dialog = await ViewMessageViewModel.CreateInstanceAsync(this.authenticator, userContext, message, sendUserID);
-                    dialog?.ShowDialog();
-                });
+                    await this.Dispatcher.InvokeAsync(async () =>
+                    {
+                        var userContext = this.cremaAppHost.GetService(typeof(IUserContext)) as IUserContext;
+                        var dialog = await ViewMessageViewModel.CreateInstanceAsync(this.authenticator, userContext, message, sendUserID);
+                        dialog?.ShowDialog();
+                    });
+                }
             }
         }
 

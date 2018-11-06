@@ -72,6 +72,7 @@ namespace Ntreev.Crema.Services.Users
             try
             {
                 this.ValidateExpired();
+                var context = this.Context;
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
@@ -81,7 +82,7 @@ namespace Ntreev.Crema.Services.Users
                     return (items, oldPaths, path);
                 });
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.DeleteUserItem(tuple.path));
-                await this.Context.WaitAsync(result.TaskID);
+                await context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
             catch (Exception e)
@@ -189,7 +190,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public async Task SendMessageAsync(Authentication authentication, string message)
+        public async Task<Guid> SendMessageAsync(Authentication authentication, string message)
         {
             try
             {
@@ -200,11 +201,8 @@ namespace Ntreev.Crema.Services.Users
                     return base.UserInfo;
                 });
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.SendMessage(userInfo.ID, message));
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.Sign(authentication, result);
-                    this.Container.InvokeSendMessageEvent(authentication, this, message);
-                });
+                await this.Context.WaitAsync(result.TaskID);
+                return result.TaskID;
             }
             catch (Exception e)
             {
@@ -378,6 +376,11 @@ namespace Ntreev.Crema.Services.Users
         Task IUser.UnbanAsync(Authentication authentication)
         {
             return this.UnbanAsync(authentication);
+        }
+
+        Task IUser.SendMessageAsync(Authentication authentication, string message)
+        {
+            return this.SendMessageAsync(authentication, message);
         }
 
         string IUser.ID => this.ID;

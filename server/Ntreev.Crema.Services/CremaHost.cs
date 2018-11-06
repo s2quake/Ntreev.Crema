@@ -58,6 +58,7 @@ namespace Ntreev.Crema.Services
             [ImportMany]IEnumerable<IRepositoryProvider> repositoryProviders,
             [ImportMany]IEnumerable<IObjectSerializer> serializers)
         {
+            CremaLog.Attach(this);
             CremaLog.Debug("crema instance created.");
             this.settings = settings;
             this.BasePath = settings.BasePath;
@@ -333,6 +334,7 @@ namespace Ntreev.Crema.Services
             this.Dispatcher.Dispose();
             this.Dispatcher = null;
             this.OnDisposed(EventArgs.Empty);
+            CremaLog.Detach(this);
         }
 
         public void Sign(Authentication authentication)

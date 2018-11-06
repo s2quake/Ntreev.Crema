@@ -31,18 +31,18 @@ namespace Ntreev.Crema.Bot
     {
         private readonly AutobotService service;
         private readonly string address;
-        private AutobotCremaBootstrapper app = new AutobotCremaBootstrapper();
+        private readonly SecureString password;
+        private AutobotCremaBootstrapper app = new AutobotCremaBootstrapper() { Verbose = LogVerbose.None };
         private ICremaHost cremaHost;
         private Guid token;
 
-        public Autobot(AutobotService service, string address, string autobotID)
+        public Autobot(AutobotService service, string address, string autobotID, SecureString password)
             : base(autobotID)
         {
             this.service = service;
             this.address = address;
+            this.password = password;
         }
-
-        //public override ICremaHost CremaHost => this.cremaHost;
 
         public override object GetService(Type serviceType)
         {
@@ -58,14 +58,21 @@ namespace Ntreev.Crema.Bot
         protected override async Task<Authentication> OnLoginAsync()
         {
             this.cremaHost = this.app.GetService(typeof(ICremaHost)) as ICremaHost;
-            this.token = await this.cremaHost.OpenAsync(this.address, this.AutobotID, StringUtility.ToSecureString("1111"));
+            this.token = await this.cremaHost.OpenAsync(this.address, this.AutobotID, this.password);
             var autheticator = this.app.GetService(typeof(Authenticator)) as Authenticator;
+            await this.cremaHost.Dispatcher.InvokeAsync(() => this.cremaHost.Closed += CremaHost_Closed);
             return autheticator;
         }
 
-        protected override Task OnLogoutAsync(Authentication authentication)
+        private void CremaHost_Closed(object sender, ClosedEventArgs e)
         {
-            return this.cremaHost.CloseAsync(this.token);
+            
+        }
+
+        protected override async Task OnLogoutAsync(Authentication authentication)
+        {
+            await this.cremaHost.Dispatcher.InvokeAsync(() => this.cremaHost.Closed -= CremaHost_Closed);
+            await this.cremaHost.CloseAsync(this.token);
         }
 
         protected override void OnDisposed(EventArgs e)

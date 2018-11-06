@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Services
         private const string pluginsString = "plugins";
         private const string serializersString = "serializers";
         private const string repoModulesString = "repo-modules";
-        private CremaSettings settings = new CremaSettings();
+        private readonly CremaSettings settings = new CremaSettings();
         private CompositionContainer container;
 
         public CremaBootstrapper()
@@ -216,7 +216,6 @@ namespace Ntreev.Crema.Services
             this.container?.Dispose();
             this.container = null;
             this.OnDisposed(EventArgs.Empty);
-            CremaLog.Release();
         }
 
         public virtual IEnumerable<Tuple<System.Type, object>> GetParts()

@@ -86,6 +86,7 @@ namespace Ntreev.Crema.Services.Users
                 this.ValidateExpired();
                 var container = this.Container;
                 var repository = this.Repository;
+                var cremaHost = this.CremaHost;
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
@@ -102,8 +103,8 @@ namespace Ntreev.Crema.Services.Users
                 await this.Container.InvokeUserDeleteAsync(authentication, tuple.userInfo, userContextSet);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.Sign(authentication);
                     base.Delete(authentication);
+                    cremaHost.Sign(authentication);
                     container.InvokeUsersDeletedEvent(authentication, tuple.items, tuple.oldPaths, taskID);
                 });
                 await repository.UnlockAsync(userContextSet.Paths);
@@ -133,7 +134,7 @@ namespace Ntreev.Crema.Services.Users
                         var message = "다른 기기에서 동일한 아이디로 접속하였습니다.";
                         var closeInfo = new CloseInfo(CloseReason.Reconnected, message);
                         this.Authentication.InvokeExpiredEvent(this.ID, message);
-                        this.Container.InvokeUsersLoggedOutEvent(this.Authentication, users, closeInfo, taskID);
+                        this.Container.InvokeUsersLoggedOutEvent(this.Authentication, users, closeInfo, Guid.Empty);
                     }
                     this.Authentication = authentication;
                     this.IsOnline = true;

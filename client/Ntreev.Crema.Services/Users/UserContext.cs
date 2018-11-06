@@ -72,7 +72,7 @@ namespace Ntreev.Crema.Services.Users
 
                 try
                 {
-                    var result = this.service.Subscribe(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}");
+                    var result = this.CremaHost.InvokeService(() => this.service.Subscribe(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}"));
 #if !DEBUG
                     this.timer = new Timer(30000);
                     this.timer.Elapsed += Timer_Elapsed;
@@ -104,6 +104,7 @@ namespace Ntreev.Crema.Services.Users
                         this.service.Close();
                     else
                         this.service.Abort();
+                    this.callbackEvent.Dispose();
                     this.Dispatcher.Dispose();
                     throw;
                 }
@@ -238,7 +239,7 @@ namespace Ntreev.Crema.Services.Users
             return metaData;
         }
 
-        public async Task NotifyMessageAsync(Authentication authentication, string[] userIDs, string message)
+        public async Task<Guid> NotifyMessageAsync(Authentication authentication, string[] userIDs, string message)
         {
             try
             {
@@ -246,11 +247,11 @@ namespace Ntreev.Crema.Services.Users
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(NotifyMessageAsync), this, userIDs, message);
-                    var result = this.service.NotifyMessage(userIDs, message);
-                    result.Validate(authentication);
-                    var users = userIDs == null ? new User[] { } : userIDs.Select(item => this.Users[item]).ToArray();
-                    this.Users.InvokeNotifyMessageEvent(authentication, users, message);
                 });
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.NotifyMessage(userIDs, message));
+                await this.WaitAsync(result.TaskID);
+                return result.TaskID;
+
             }
             catch (Exception e)
             {
@@ -261,12 +262,19 @@ namespace Ntreev.Crema.Services.Users
 
         public async Task CloseAsync(CloseInfo closeInfo)
         {
-            this.service.Unsubscribe();
+            if (this.service == null)
+                return;
+            if (closeInfo.Reason != CloseReason.Faulted)
+                this.service.Unsubscribe();
             this.timer?.Dispose();
             this.timer = null;
-            await Task.Delay(1000);
+            await Task.Delay(100);
+            if (closeInfo.Reason != CloseReason.Faulted)
+                this.service.Close();
+            else
+                this.service.Abort();
+            await this.callbackEvent.DisposeAsync();
             await this.Dispatcher.DisposeAsync();
-            this.service.Close();
             this.service = null;
             this.Dispatcher = null;
         }
@@ -875,7 +883,7 @@ namespace Ntreev.Crema.Services.Users
                             foreach (var item in userIDs)
                             {
                                 var user = this.Users[item];
-                                this.Users.InvokeSendMessageEvent(authentication, user, message);
+                                this.Users.InvokeSendMessageEvent(authentication, user, message, callbackInfo.TaskID);
                             }
                         }
                         else if (messageType == MessageType.Notification)
@@ -886,8 +894,9 @@ namespace Ntreev.Crema.Services.Users
                                 var user = this.Users[userIDs[i]];
                                 users[i] = user;
                             }
-                            this.Users.InvokeNotifyMessageEvent(authentication, users, message);
+                            this.Users.InvokeNotifyMessageEvent(authentication, users, message, callbackInfo.TaskID);
                         }
+                        this.taskEvent.Set(callbackInfo.TaskID);
                     });
                 });
             }
@@ -900,6 +909,11 @@ namespace Ntreev.Crema.Services.Users
         #endregion
 
         #region IUserContext
+
+        Task IUserContext.NotifyMessageAsync(Authentication authentication, string[] userIDs, string message)
+        {
+            return this.NotifyMessageAsync(authentication, userIDs, message);
+        }
 
         bool IUserContext.Contains(string itemPath)
         {

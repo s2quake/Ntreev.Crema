@@ -112,6 +112,7 @@ namespace Ntreev.Crema.Services.Users
                 this.ValidateExpired();
                 var container = this.Container;
                 var repository = this.Repository;
+                var cremaHost = this.CremaHost;
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
@@ -128,7 +129,7 @@ namespace Ntreev.Crema.Services.Users
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Dispose();
-                    this.CremaHost.Sign(authentication);
+                    cremaHost.Sign(authentication);
                     container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths, taskID);
                 });
                 await repository.UnlockAsync(userContextSet.Paths);
@@ -198,7 +199,8 @@ namespace Ntreev.Crema.Services.Users
                 var items = EnumerableUtility.FamilyTree(this as IUserItem, item => item.Childs);
                 var users = items.Where(item => item is User).Select(item => item as User).ToArray();
                 var userPaths = users.Select(item => item.Path).ToArray();
-                var paths = userPaths.Concat(targetPaths).Distinct().OrderBy(item => item).ToArray();
+                var itemPaths = items.Select(item => item.Path).ToArray();
+                var paths = itemPaths.Concat(targetPaths).Distinct().OrderBy(item => item).ToArray();
                 return (userPaths, paths);
             });
             return await this.Repository.Dispatcher.InvokeAsync((Func<UserSet>)(() =>

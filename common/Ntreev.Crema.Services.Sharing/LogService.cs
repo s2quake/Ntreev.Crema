@@ -97,7 +97,6 @@ namespace Ntreev.Crema.Services
 
             this.log = log4net.LogManager.GetLogger(repositoryName, name);
             this.name = name;
-            this.Dispatcher = new CremaDispatcher(this);
         }
 
         public LogService(string name, string path, bool isSingle)
@@ -114,7 +113,7 @@ namespace Ntreev.Crema.Services
             {
                 AppendToFile = true,
                 File = Path.Combine(path, name),
-                DatePattern= "-yyyy-MM-dd'.log'",
+                DatePattern = "-yyyy-MM-dd'.log'",
                 Layout = xmlLayout,
                 Encoding = Encoding.UTF8,
                 MaxSizeRollBackups = 5,
@@ -147,11 +146,11 @@ namespace Ntreev.Crema.Services
 
             this.log = log4net.LogManager.GetLogger(name);
             this.name = name;
-            this.Dispatcher = new CremaDispatcher(this);
         }
 
-        public LogService(string repositoryName, string name, string path)
+        public LogService(string address, string userID, string path)
         {
+            var repositoryName = $"{address}_{userID}";
             var repository = LogManager.GetAllRepositories().Where(item => item.Name == repositoryName).FirstOrDefault();
             if (repository != null)
             {
@@ -172,7 +171,7 @@ namespace Ntreev.Crema.Services
             this.rollingAppender = new RollingFileAppender()
             {
                 AppendToFile = true,
-                File = Path.Combine(path, @"logs", $"{repositoryName}_{name}"),
+                File = Path.Combine(path, @"logs", $"{repositoryName}"),
                 DatePattern = "_yyyy-MM-dd'.xml'",
                 Layout = xmlLayout,
                 Encoding = Encoding.UTF8,
@@ -202,9 +201,8 @@ namespace Ntreev.Crema.Services
             this.hierarchy.Root.Level = Level.All;
             this.hierarchy.Configured = true;
 
-            this.log = log4net.LogManager.GetLogger(repositoryName, name);
-            this.name = name;
-            this.Dispatcher = new CremaDispatcher(this);
+            this.log = log4net.LogManager.GetLogger(repositoryName, userID);
+            this.name = userID;
         }
 
         public override string ToString()
@@ -214,17 +212,45 @@ namespace Ntreev.Crema.Services
 
         public void Debug(object message)
         {
-            this.Dispatcher.InvokeAsync(() => this.log.Debug(message));
+            if (CremaLog.Dispatcher != null)
+            {
+                CremaLog.Dispatcher.InvokeAsync(() => this.log.Debug(message));
+            }
+            else
+            {
+                this.log.Debug(message);
+            }
         }
 
         public void Info(object message)
         {
-            this.Dispatcher.InvokeAsync(() => this.log.Info(message));
+            if (CremaLog.Dispatcher != null)
+            {
+                CremaLog.Dispatcher.InvokeAsync(() => this.log.Info(message));
+            }
+            else
+            {
+                this.log.Info(message);
+            }
         }
 
         public void Error(object message)
         {
-            this.Dispatcher?.InvokeAsync(() =>
+            if (CremaLog.Dispatcher != null)
+            {
+                CremaLog.Dispatcher?.InvokeAsync(() =>
+                {
+                    if (message is Exception e)
+                    {
+                        this.log.Error(e.Message, e);
+                    }
+                    else
+                    {
+                        this.log.Error(message);
+                    }
+                });
+            }
+            else
             {
                 if (message is Exception e)
                 {
@@ -234,23 +260,35 @@ namespace Ntreev.Crema.Services
                 {
                     this.log.Error(message);
                 }
-            });
+            }
         }
 
         public void Warn(object message)
         {
-            this.Dispatcher.InvokeAsync(() => this.log.Warn(message));
+            if (CremaLog.Dispatcher != null)
+            {
+                CremaLog.Dispatcher.InvokeAsync(() => this.log.Warn(message));
+            }
+            else
+            {
+                this.log.Warn(message);
+            }
         }
 
         public void Fatal(object message)
         {
-            this.Dispatcher.InvokeAsync(() => this.log.Fatal(message));
+            if (CremaLog.Dispatcher != null)
+            {
+                CremaLog.Dispatcher.InvokeAsync(() => this.log.Fatal(message));
+            }
+            else
+            {
+                this.log.Fatal(message);
+            }
         }
 
         public void Dispose()
         {
-            this.Dispatcher.Dispose();
-            this.Dispatcher = null;
             this.consoleAppender = null;
             this.redirectionWriter = null;
             this.hierarchy?.Shutdown();
@@ -328,8 +366,6 @@ namespace Ntreev.Crema.Services
         {
 
         }
-
-        private CremaDispatcher Dispatcher { get; set; }
     }
 
     static class LogServiceExtensions

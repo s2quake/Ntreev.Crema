@@ -26,26 +26,34 @@ namespace Ntreev.Crema.Services.Users
             this.UserContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
             this.UserContext.Dispatcher.VerifyAccess();
             this.Paths = userSet.ItemPaths;
-            foreach (var item in userSet.Infos)
+            try
             {
-                var user = userContext.Users[item.ID, item.CategoryPath];
-                if (user == null)
+                foreach (var item in userSet.Infos)
                 {
-                    if (userCreation == false)
+                    var user = userContext.Users[item.ID, item.CategoryPath];
+                    if (user == null)
                     {
-                        throw new UserNotFoundException(item.ID);
+                        if (userCreation == false)
+                        {
+                            throw new UserNotFoundException(item.ID);
+                        }
+                        else
+                        {
+                            this.usersToCreate.Add(item.Path, item);
+                        }
                     }
                     else
                     {
-                        this.usersToCreate.Add(item.Path, item);
+                        this.users.Add(item.Path, item);
                     }
                 }
-                else
-                {
-                    this.users.Add(item.Path, item);
-                }
+                this.signatureDateProvider = userSet.SignatureDateProvider;
             }
-            this.signatureDateProvider = userSet.SignatureDateProvider;
+            catch
+            {
+                this.Repository.Dispatcher.Invoke(() => this.Repository.Unlock(userSet.ItemPaths));
+                throw;
+            }
         }
 
         public static Task<UserContextSet> CreateAsync(UserContext userContext, UserSet userSet, bool userCreation)

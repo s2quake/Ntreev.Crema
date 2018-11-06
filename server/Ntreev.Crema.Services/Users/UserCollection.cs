@@ -208,7 +208,7 @@ namespace Ntreev.Crema.Services.Users
         public void InvokeUsersCreatedEvent(Authentication authentication, User[] users, Guid taskID)
         {
             var args = users.Select(item => (object)item.UserInfo).ToArray();
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersCreatedEvent), users);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeUsersCreatedEvent), users);
             var message = EventMessageBuilder.CreateUser(authentication, users);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
@@ -218,7 +218,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void InvokeUsersMovedEvent(Authentication authentication, User[] users, string[] oldPaths, string[] oldCategoryPaths, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersMovedEvent), users, oldPaths, oldCategoryPaths);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeUsersMovedEvent), users, oldPaths, oldCategoryPaths);
             var message = EventMessageBuilder.MoveUser(authentication, users, oldCategoryPaths);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
@@ -228,7 +228,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void InvokeUsersDeletedEvent(Authentication authentication, User[] users, string[] itemPaths, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersDeletedEvent), itemPaths);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeUsersDeletedEvent), itemPaths);
             var message = EventMessageBuilder.DeleteUser(authentication, users);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
@@ -238,7 +238,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void InvokeUsersChangedEvent(Authentication authentication, User[] users, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersChangedEvent), users);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeUsersChangedEvent), users);
             var message = EventMessageBuilder.ChangeUserInfo(authentication, users);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
@@ -254,14 +254,16 @@ namespace Ntreev.Crema.Services.Users
 
         public void InvokeUsersLoggedInEvent(Authentication authentication, User[] users, Guid taskID)
         {
-            this.CremaHost.DebugMethodMany(authentication, this, nameof(InvokeUsersLoggedInEvent), users);
-            this.CremaHost.Info(EventMessageBuilder.LoginUser(authentication, users));
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeUsersLoggedInEvent), users);
+            var comment = EventMessageBuilder.LoginUser(authentication, users);
+            this.CremaHost.Debug(eventLog);
+            this.CremaHost.Info(comment);
             this.OnUsersLoggedIn(new ItemsEventArgs<IUser>(authentication, users) { TaskID = taskID });
         }
 
         public void InvokeUsersLoggedOutEvent(Authentication authentication, User[] users, CloseInfo closeInfo, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersLoggedOutEvent), users, closeInfo.Reason, closeInfo.Message);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeUsersLoggedOutEvent), users, closeInfo.Reason, closeInfo.Message);
             var comment = EventMessageBuilder.LogoutUser(authentication, users);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(comment);
@@ -270,7 +272,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void InvokeUsersKickedEvent(Authentication authentication, User[] users, string[] comments, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersKickedEvent), users, comments);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeUsersKickedEvent), users, comments);
             var comment = EventMessageBuilder.KickUser(authentication, users, comments);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(comment);
@@ -279,7 +281,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void InvokeUsersBannedEvent(Authentication authentication, User[] users, string[] comments, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersBannedEvent), users, comments);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeUsersBannedEvent), users, comments);
             var message = EventMessageBuilder.BanUser(authentication, users, comments);
             var metaData = EventMetaDataBuilder.Build(users, BanChangeType.Ban, comments);
             this.CremaHost.Debug(eventLog);
@@ -290,7 +292,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void InvokeUsersUnbannedEvent(Authentication authentication, User[] users, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeUsersUnbannedEvent), users);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeUsersUnbannedEvent), users);
             var message = EventMessageBuilder.UnbanUser(authentication, users);
             var metaData = EventMetaDataBuilder.Build(users, BanChangeType.Unban);
             this.CremaHost.Debug(eventLog);
@@ -301,7 +303,7 @@ namespace Ntreev.Crema.Services.Users
 
         public void InvokeSendMessageEvent(Authentication authentication, User user, string message, Guid taskID)
         {
-            var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeSendMessageEvent), user, message);
+            var eventLog = EventLogBuilder.Build(taskID, authentication, this, nameof(InvokeSendMessageEvent), user, message);
             var comment = EventMessageBuilder.SendMessage(authentication, user, message);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(comment);
@@ -311,7 +313,7 @@ namespace Ntreev.Crema.Services.Users
         public void InvokeNotifyMessageEvent(Authentication authentication, User[] users, string message, Guid taskID)
         {
             var target = users.Any() == false ? "all users" : string.Join(",", users.Select(item => item.ID).ToArray());
-            var eventLog = EventLogBuilder.Build(authentication, this, nameof(InvokeNotifyMessageEvent), target, message);
+            var eventLog = EventLogBuilder.Build(taskID, authentication, this, nameof(InvokeNotifyMessageEvent), target, message);
             var comment = EventMessageBuilder.NotifyMessage(authentication, users, message);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(comment);
