@@ -153,21 +153,18 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task<CremaDataSet> ReadDataForContentAsync(Authentication authentication, Table[] tables)
         {
-            var tuple = await this.Dispatcher.InvokeAsync(() =>
+            var fullPaths = await this.Dispatcher.InvokeAsync(() =>
             {
                 var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
-                var typePaths = types.Select(item => item.ItemPath).ToArray();
-                var tablePaths = tables.Select(item => item.ItemPath).ToArray();
+                var typePaths = types.Select(item => item.FullPath).ToArray();
+                var tablePaths = tables.Select(item => item.FullPath).ToArray();
                 var itemPaths = typePaths.Concat(tablePaths).ToArray();
-                var props = new CremaDataSetSerializerSettings(authentication, typePaths, tablePaths);
-                return (itemPaths, props);
+                return itemPaths;
             });
             return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Lock(tuple.itemPaths);
-                var dataSet = this.Serializer.Deserialize(this.DataBase.BasePath, typeof(CremaDataSet), tuple.props) as CremaDataSet;
-                dataSet.SetItemPaths(tuple.itemPaths);
-                return dataSet;
+                this.Repository.Lock(fullPaths);
+                return this.Repository.ReadDataSet(authentication, fullPaths);
             });
         }
 
@@ -179,7 +176,7 @@ namespace Ntreev.Crema.Services.Data
         public Task InvokeTableCreateAsync(Authentication authentication, string[] tablePaths, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.CreateTable(authentication, tablePaths);
-            var itemPaths = tablePaths.Select(item => this.Context.GeneratePath(item)).ToArray();
+            var itemPaths = tablePaths.Select(item => new RepositoryPath(this.Context, item).Path).ToArray();
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try

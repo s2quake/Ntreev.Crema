@@ -66,6 +66,21 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
+        public CremaDataSet ReadDataSet(Authentication authentication, string[] fullPaths)
+        {
+            return this.ReadDataSet(authentication, fullPaths, false);
+        }
+
+        public CremaDataSet ReadDataSet(Authentication authentication, string[] fullPaths, bool schemaOnly)
+        {
+            var typeFiles = this.GetTypeFiles(fullPaths);
+            var tableFiles = this.GetTableFiles(fullPaths);
+            var props = new CremaDataSetSerializerSettings(authentication, typeFiles, tableFiles) { SchemaOnly = schemaOnly };
+            var dataSet = this.Serializer.Deserialize(this.dataBase.BasePath, typeof(CremaDataSet), props) as CremaDataSet;
+            dataSet.SetItemPaths(fullPaths);
+            return dataSet;
+        }
+
         public void Commit(Authentication authentication, string comment)
         {
             this.Dispatcher.VerifyAccess();
@@ -102,20 +117,21 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public CremaDataSet GetTypeData(IObjectSerializer serializer, string itemPath, string revision)
+        public CremaDataSet GetTypeData(IObjectSerializer serializer, string path, string revision)
         {
+            var repositoryPath = new RepositoryPath(this.TypeContext, path);
             var tempPath = PathUtility.GetTempPath(true);
             try
             {
                 var itemList = new List<string>();
-                var files = serializer.GetPath(itemPath, typeof(CremaDataType), ObjectSerializerSettings.Empty);
+                var files = serializer.GetPath(repositoryPath.Path, typeof(CremaDataType), ObjectSerializerSettings.Empty);
                 foreach (var item in files)
                 {
                     var exportPath = this.ExportItem(item, tempPath, revision);
                     itemList.Add(FileUtility.RemoveExtension(exportPath));
                 }
 
-                var referencedFiles = serializer.GetReferencedPath(itemPath, typeof(CremaDataType), ObjectSerializerSettings.Empty);
+                var referencedFiles = serializer.GetReferencedPath(repositoryPath.Path, typeof(CremaDataType), ObjectSerializerSettings.Empty);
                 foreach (var item in referencedFiles)
                 {
                     this.ExportItem(item, tempPath, revision);
@@ -130,14 +146,15 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public CremaDataSet GetTypeCategoryData(IObjectSerializer serializer, string itemPath, string revision)
+        public CremaDataSet GetTypeCategoryData(IObjectSerializer serializer, string path, string revision)
         {
+            var repositoryPath = new RepositoryPath(this.TypeContext, path);
             var tempPath = PathUtility.GetTempPath(true);
             try
             {
                 var revisionValue = revision ?? this.RepositoryInfo.Revision;
                 var repoUri = this.GetUri(this.RepositoryPath, revisionValue);
-                var categoryUri = this.GetUri(itemPath, revisionValue);
+                var categoryUri = this.GetUri(repositoryPath.Path, revisionValue);
                 var categoryPath = this.Export(categoryUri, tempPath);
                 var baseUri = this.GetDataBaseUri($"{repoUri}", $"{categoryUri}");
                 var items = serializer.GetItemPaths(categoryPath, typeof(CremaDataType), ObjectSerializerSettings.Empty);
@@ -150,19 +167,21 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public CremaDataSet GetTableData(IObjectSerializer serializer, string itemPath, string templateItemPath, string revision)
+        public CremaDataSet GetTableData(IObjectSerializer serializer, string path, string templatedPath, string revision)
         {
+            var repositoryPath = new RepositoryPath(this.TableContext, path);
+            var templatedItemPath = templatedPath ?? new RepositoryPath(this.TableContext, templatedPath).Path;
             var tempPath = PathUtility.GetTempPath(true);
             try
             {
-                var props = new CremaDataTableSerializerSettings(itemPath, templateItemPath);
-                var files = serializer.GetPath(itemPath, typeof(CremaDataTable), props);
+                var props = new CremaDataTableSerializerSettings(repositoryPath.Path, templatedItemPath);
+                var files = repositoryPath.GetFiles();
                 foreach (var item in files)
                 {
                     this.ExportItem(item, tempPath, revision);
                 }
 
-                var referencedFiles = serializer.GetReferencedPath(itemPath, typeof(CremaDataTable), props);
+                var referencedFiles = serializer.GetReferencedPath(repositoryPath.Path, typeof(CremaDataTable), props);
                 foreach (var item in referencedFiles)
                 {
                     this.ExportItem(item, tempPath, revision);
@@ -176,14 +195,15 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public CremaDataSet GetTableCategoryData(IObjectSerializer serializer, string itemPath, string revision)
+        public CremaDataSet GetTableCategoryData(IObjectSerializer serializer, string path, string revision)
         {
+            var repositoryPath = new RepositoryPath(this.TableContext, path);
             var tempPath = PathUtility.GetTempPath(true);
             try
             {
                 var revisionValue = revision ?? this.RepositoryInfo.Revision;
                 var repoUri = this.GetUri(this.RepositoryPath, revisionValue);
-                var categoryUri = this.GetUri(itemPath, revisionValue);
+                var categoryUri = this.GetUri(repositoryPath.Path, revisionValue);
                 var categoryPath = this.Export(categoryUri, tempPath);
                 var baseUri = this.GetDataBaseUri($"{repoUri}", $"{categoryUri}");
 
@@ -394,5 +414,31 @@ namespace Ntreev.Crema.Services.Data
         }
 
         public override CremaHost CremaHost => this.dataBase.CremaHost;
+
+        private string[] GetTypeFiles(string[] fullPath)
+        {
+            var query = from item in fullPath
+                        where item.StartsWith(DataBase.TypePathPrefix) && item.EndsWith(PathUtility.Separator) == false
+                        let repositoryPath = new RepositoryPath(this.dataBase.BasePath, item)
+                        where repositoryPath.IsExists
+                        select repositoryPath.Path;
+            return query.ToArray();
+        }
+
+        private string[] GetTableFiles(string[] fullPath)
+        {
+            var query = from item in fullPath
+                        where item.StartsWith(DataBase.TablePathPrefix) && item.EndsWith(PathUtility.Separator) == false
+                        let repositoryPath = new RepositoryPath(this.dataBase.BasePath, item)
+                        where repositoryPath.IsExists
+                        select repositoryPath.Path;
+            return query.ToArray();
+        }
+
+        private IObjectSerializer Serializer => this.dataBase.Serializer;
+
+        private TypeContext TypeContext => this.dataBase.TypeContext;
+
+        private TableContext TableContext => this.dataBase.TableContext;
     }
 }

@@ -40,6 +40,9 @@ namespace Ntreev.Crema.Services.Data
     partial class DataBase : DataBaseBase<Type, TypeCategory, TypeCollection, TypeCategoryCollection, TypeContext, Table, TableCategory, TableCollection, TableCategoryCollection, TableContext>,
         IDataBase, IInfoProvider, IStateProvider
     {
+        public static readonly string TypePathPrefix = PathUtility.Separator + CremaSchema.TypeDirectory;
+        public static readonly string TablePathPrefix = PathUtility.Separator + CremaSchema.TableDirectory;
+
         private readonly IRepositoryProvider repositoryProvider;
         private readonly string cachePath;
         private CremaDataSet dataSet;
@@ -704,25 +707,21 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task<CremaDataSet> GetDataSet(Authentication authentication, IEnumerable<Table> tables, bool schemaOnly)
         {
-            var props = await this.Dispatcher.InvokeAsync(() =>
+            var fullPaths = await this.Dispatcher.InvokeAsync(() =>
             {
                 var typePaths = tables.SelectMany(item => item.GetTypes())
-                                  .Select(item => item.ItemPath)
+                                  .Select(item => item.FullPath)
                                   .Distinct()
                                   .ToArray();
                 var tablePaths = tables.SelectMany(item => EnumerableUtility.Friends(item, item.DerivedTables))
                                        .Select(item => item.Parent ?? item)
-                                       .Select(item => item.ItemPath)
+                                       .Select(item => item.FullPath)
                                        .Distinct()
                                        .ToArray();
-
-                return new CremaDataSetSerializerSettings(authentication, typePaths, tablePaths)
-                {
-                    SchemaOnly = schemaOnly,
-                };
+                return typePaths.Concat(tablePaths).ToArray();
             });
 
-            return await this.Repository.Dispatcher.InvokeAsync(() => this.Serializer.Deserialize(this.BasePath, typeof(CremaDataSet), props) as CremaDataSet);
+            return await this.Repository.Dispatcher.InvokeAsync(() => this.Repository.ReadDataSet(authentication, fullPaths, schemaOnly));
         }
 
         public string BasePath => this.CremaHost.GetPath(CremaPath.DataBases, $"{base.DataBaseInfo.ID}");

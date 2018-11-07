@@ -411,7 +411,7 @@ namespace Ntreev.Crema.Services.Users
                     user.Password = UserContext.StringToSecureString(userInfo.Password);
                 }
 
-                this.CremaHost.Debug("Loading complete!");
+                this.CremaHost.Info("UserContext Initialized");
             });
         }
 

@@ -774,6 +774,8 @@ namespace Ntreev.Crema.Data
 
         public string TemplateNamespace => this.InternalObject.TemplateNamespace;
 
+        public string FullPath => PathUtility.Separator + CremaSchema.TableDirectory + Path;
+
         public CremaDataTable TemplatedParent
         {
             get

@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
+using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
@@ -57,7 +58,8 @@ namespace Ntreev.Crema.Services.Data
                     return new CategoryName(parentPath, name);
                 });
                 var taskID = GuidUtility.FromName(categoryName);
-                var itemPath = await this.InvokeCategoryCreateAsync(authentication, categoryName);
+                var fullPath = PathUtility.Separator + CremaSchema.TableDirectory + categoryName;
+                await this.InvokeCategoryCreateAsync(authentication, categoryName, fullPath);
                 var result = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
@@ -66,7 +68,7 @@ namespace Ntreev.Crema.Services.Data
                     this.InvokeCategoriesCreatedEvent(authentication, items, taskID);
                     return category;
                 });
-                await this.Repository.UnlockAsync(itemPath);
+                await this.Repository.UnlockAsync(fullPath);
                 return result;
             }
             catch (Exception e)
@@ -81,23 +83,21 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public Task<string> InvokeCategoryCreateAsync(Authentication authentication, string categoryPath)
+        public Task InvokeCategoryCreateAsync(Authentication authentication, string categoryPath, string fullPath)
         {
-            var itemPath = this.Context.GenerateCategoryPath(categoryPath);
             var message = EventMessageBuilder.CreateTableCategory(authentication, categoryPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    this.Repository.Lock(itemPath);
-                    this.Repository.CreateTableCategory(itemPath);
+                    this.Repository.Lock(fullPath);
+                    this.Repository.CreateTableCategory(categoryPath);
                     this.Repository.Commit(authentication, message);
-                    return itemPath;
                 }
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(itemPath);
+                    this.Repository.Unlock(fullPath);
                     throw;
                 }
             });
@@ -320,8 +320,8 @@ namespace Ntreev.Crema.Services.Data
             var parent = this[parentPath];
             parent.ValidateAccessType(authentication, AccessType.Master);
 
-            var path = this.Context.GenerateCategoryPath(parentPath, name);
-            if (Directory.Exists(path) == true)
+            var repositoryPath = new RepositoryPath(this.Context, parentPath + name);
+            if (repositoryPath.IsExists == true)
                 throw new InvalidOperationException(Resources.Exception_SameNamePathExists);
         }
 

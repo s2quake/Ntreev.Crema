@@ -91,7 +91,7 @@ namespace Ntreev.Crema.Services.Data
         {
             var dataType = this.TypeSource;
             var dataSet = dataType.DataSet;
-            var itemPath = this.Context.GeneratePath(dataType.Path);
+            var itemPath = dataType.FullPath;
             await this.Repository.LockAsync(itemPath);
             dataSet.AddItemPaths(itemPath);
             this.type = await this.Types.AddNewAsync(authentication, dataType);

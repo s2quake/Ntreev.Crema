@@ -15,6 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
 using System;
@@ -30,10 +31,39 @@ namespace Ntreev.Crema.Services
             this.Path = GeneratePath(basePath, path);
         }
 
-        public RepositoryPath(string basePath, string kind, string path)
+        internal RepositoryPath(Ntreev.Crema.Services.Users.UserContext userContext, string path)
         {
-            this.Path = GeneratePath(basePath, PathUtility.Separator + kind + path);
+            this.Path = GeneratePath(userContext.BasePath, path);
         }
+
+        internal RepositoryPath(Ntreev.Crema.Services.Data.DataBase dataBase, string path)
+        {
+            if (path.StartsWith(PathUtility.Separator + CremaSchema.TypeDirectory) == false && 
+                path.StartsWith(PathUtility.Separator + CremaSchema.TableDirectory) == false)
+                throw new ArgumentException(nameof(path));
+            this.Path = GeneratePath(dataBase.BasePath, path);
+        }
+
+        internal RepositoryPath(Ntreev.Crema.Services.Data.TypeContext typeContext, string path)
+        {
+            if (path.StartsWith(PathUtility.Separator + CremaSchema.TypeDirectory) == true ||
+                path.StartsWith(PathUtility.Separator + CremaSchema.TableDirectory) == true)
+                throw new ArgumentException(nameof(path));
+            this.Path = GeneratePath(typeContext.BasePath, path);
+        }
+
+        internal RepositoryPath(Ntreev.Crema.Services.Data.TableContext tableContext, string path)
+        {
+            if (path.StartsWith(PathUtility.Separator + CremaSchema.TypeDirectory) == true ||
+                path.StartsWith(PathUtility.Separator + CremaSchema.TableDirectory) == true)
+                throw new ArgumentException(nameof(path));
+            this.Path = GeneratePath(tableContext.BasePath, path);
+        }
+
+        //public RepositoryPath(string basePath, string kind, string path)
+        //{
+        //    this.Path = GeneratePath(basePath, PathUtility.Separator + kind + path);
+        //}
 
         public override string ToString()
         {

@@ -132,7 +132,7 @@ namespace Ntreev.Crema.Services.Data
         public Task InvokeTypeCreateAsync(Authentication authentication, string[] typePaths, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.CreateType(authentication, typePaths);
-            var itemPaths = typePaths.Select(item => this.Context.GeneratePath(item)).ToArray();
+            var itemPaths = typePaths.Select(item => new RepositoryPath(this.Context, item).Path).ToArray();
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try

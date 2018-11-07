@@ -520,6 +520,8 @@ namespace Ntreev.Crema.Data
 
         public string Namespace => this.InternalObject.Namespace;
 
+        public string FullPath => PathUtility.Separator + CremaSchema.TypeDirectory + Path;
+
         [DefaultValue(50)]
         public int MinimumCapacity
         {

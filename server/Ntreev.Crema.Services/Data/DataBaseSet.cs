@@ -93,17 +93,17 @@ namespace Ntreev.Crema.Services.Data
 
         public void SetTypeCategoryPath(string categoryPath, string newCategoryPath)
         {
-            var itemPath1 = this.TypeContext.GenerateCategoryPath(categoryPath);
-            var itemPath2 = this.TypeContext.GenerateCategoryPath(newCategoryPath);
+            var itemPath1 = new RepositoryPath(this.TypeContext, categoryPath);
+            var itemPath2 = new RepositoryPath(this.TypeContext, newCategoryPath);
 
-            if (Directory.Exists(itemPath1) == false)
+            if (itemPath1.IsExists == false)
                 throw new DirectoryNotFoundException();
-            if (Directory.Exists(itemPath2) == true)
+            if (itemPath2.IsExists == true)
                 throw new IOException();
 
             var typeNames = DataSet.ExtendedProperties["TypeNames"] as string[];
             var typeNameList = typeNames.ToList();
-            var files = DirectoryUtility.GetAllFiles(itemPath1, "*.xsd");
+            var files = DirectoryUtility.GetAllFiles(itemPath1.Path, "*.xsd");
             var sss = files.Select(item => Path.GetFileNameWithoutExtension(item)).ToList();
 
             foreach (var item in this.types)
@@ -144,7 +144,7 @@ namespace Ntreev.Crema.Services.Data
 
         public void DeleteTypeCategory(string categoryPath)
         {
-            var itemPath = this.TypeContext.GenerateCategoryPath(categoryPath);
+            var itemPath = new RepositoryPath(this.TypeContext, categoryPath);
             this.Repository.Delete(itemPath);
         }
 
@@ -194,17 +194,17 @@ namespace Ntreev.Crema.Services.Data
 
         public void SetTableCategoryPath(string categoryPath, string newCategoryPath)
         {
-            var itemPath1 = this.TableContext.GenerateCategoryPath(categoryPath);
-            var itemPath2 = this.TableContext.GenerateCategoryPath(newCategoryPath);
+            var itemPath1 = new RepositoryPath(this.TableContext, categoryPath);
+            var itemPath2 = new RepositoryPath(this.TableContext, newCategoryPath);
 
-            if (Directory.Exists(itemPath1) == false)
+            if (itemPath1.IsExists == false)
                 throw new DirectoryNotFoundException();
-            if (Directory.Exists(itemPath2) == true)
+            if (itemPath2.IsExists == true)
                 throw new IOException();
 
             var tableNames = DataSet.ExtendedProperties["TableNames"] as string[];
             var tableNameList = tableNames.ToList();
-            var files = DirectoryUtility.GetAllFiles(itemPath1, "*.xml");
+            var files = DirectoryUtility.GetAllFiles(itemPath1.Path, "*.xml");
             var sss = files.Select(item => Path.GetFileNameWithoutExtension(item)).ToList();
 
             foreach (var item in this.tables)
@@ -245,7 +245,7 @@ namespace Ntreev.Crema.Services.Data
 
         public void DeleteTableCategory(string categoryPath)
         {
-            var itemPath = this.TableContext.GenerateCategoryPath(categoryPath);
+            var itemPath = new RepositoryPath(this.TableContext, categoryPath);
             this.Repository.Delete(itemPath);
         }
 
@@ -323,8 +323,8 @@ namespace Ntreev.Crema.Services.Data
             if (dataType.ExtendedProperties.ContainsKey(typeof(TypeInfo)) == true)
             {
                 var typeInfo = (TypeInfo)dataType.ExtendedProperties[typeof(TypeInfo)];
-                var itemPath1 = this.TypeContext.GeneratePath(dataType.Path);
-                var itemPath2 = this.TypeContext.GeneratePath(typeInfo.Path);
+                var itemPath1 = new RepositoryPath(this.TypeContext, dataType.Path);
+                var itemPath2 = new RepositoryPath(this.TypeContext, typeInfo.Path);
 
                 if (dataType.Name != typeInfo.Name)
                 {
@@ -358,8 +358,8 @@ namespace Ntreev.Crema.Services.Data
                 if (item.ExtendedProperties.ContainsKey(typeof(TypeInfo)) == true)
                 {
                     var typeInfo = (TypeInfo)item.ExtendedProperties[typeof(TypeInfo)];
-                    var itemPath1 = this.TypeContext.GeneratePath(item.Path);
-                    var itemPath2 = this.TypeContext.GeneratePath(typeInfo.Path);
+                    var itemPath1 = new RepositoryPath(this.TypeContext, item.Path);
+                    var itemPath2 = new RepositoryPath(this.TypeContext, typeInfo.Path);
 
                     if (itemPath1 != itemPath2)
                     {
@@ -376,8 +376,8 @@ namespace Ntreev.Crema.Services.Data
                 else
                 {
                     this.ValidateTypeNotExists(item.Path);
-                    var itemPath = this.TypeContext.GenerateTypePath(item.CategoryPath, item.Name);
-                    var sss = Path.GetFileName(itemPath);
+                    var itemPath = new RepositoryPath(this.TypeContext, item.Path);
+                    var sss = Path.GetFileName(itemPath.Path);
 
                     var files = DirectoryUtility.GetAllFiles(this.dataBase.BasePath, sss + ".*");
                     if (files.Any())
@@ -394,8 +394,8 @@ namespace Ntreev.Crema.Services.Data
                 if (item.ExtendedProperties.ContainsKey(typeof(TableInfo)) == true)
                 {
                     var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
-                    var itemPath1 = this.TableContext.GeneratePath(item.Path);
-                    var itemPath2 = this.TableContext.GeneratePath(tableInfo.Path);
+                    var itemPath1 = new RepositoryPath(this.TableContext, item.Path);
+                    var itemPath2 = new RepositoryPath(this.TableContext, tableInfo.Path);
 
                     if (itemPath1 != itemPath2)
                     {
@@ -410,17 +410,17 @@ namespace Ntreev.Crema.Services.Data
                     var parentItemPath = string.Empty;
                     if (item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] is TableInfo parentInfo)
                     {
-                        parentItemPath = this.TableContext.GeneratePath(parentInfo.Path);
+                        parentItemPath = new RepositoryPath(this.TableContext, parentInfo.Path).Path;
                     }
 
-                    var props = new CremaDataTableSerializerSettings(itemPath2, parentItemPath);
+                    var props = new CremaDataTableSerializerSettings(itemPath2.Path, parentItemPath);
                     this.Serializer.Serialize(itemPath2, item, props);
                 }
                 else
                 {
                     this.ValidateTableNotExists(item.Path);
-                    var itemPath = this.TableContext.GenerateTablePath(item.CategoryPath, item.Name);
-                    var sss = Path.GetFileName(itemPath);
+                    var itemPath = new RepositoryPath(this.TableContext, item.Path);
+                    var sss = Path.GetFileName(itemPath.Path);
 
                     var files = DirectoryUtility.GetAllFiles(this.dataBase.BasePath, sss + ".*");
                     if (files.Any())
@@ -506,8 +506,8 @@ namespace Ntreev.Crema.Services.Data
 
         private void AddRepositoryPath(CremaDataType dataType)
         {
-            var itemPath = this.TypeContext.GenerateTypePath(dataType.CategoryPath, dataType.Name);
-            var files = this.TypeContext.GetFiles(itemPath);
+            var itemPath = new RepositoryPath(this.TypeContext, dataType.Path);
+            var files = itemPath.GetFiles();
             var status = this.Repository.Status(files);
 
             foreach (var item in status)
@@ -522,7 +522,7 @@ namespace Ntreev.Crema.Services.Data
                     {
                         var extension = Path.GetExtension(item.Path);
                         var sourceType = dataType.SourceType;
-                        var sourcePath = this.TypeContext.GenerateTypePath(sourceType.CategoryPath, sourceType.Name) + extension;
+                        var sourcePath = new RepositoryPath(this.TypeContext, sourceType.Path) + extension;
                         FileUtility.Backup(item.Path);
                         try
                         {
@@ -539,22 +539,23 @@ namespace Ntreev.Crema.Services.Data
 
         private void MoveRepositoryPath(CremaDataType dataType, string typePath)
         {
-            var itemPath = this.TypeContext.GeneratePath(typePath);
-            var files = this.TypeContext.GetFiles(itemPath);
+            var itemPath = new RepositoryPath(this.TypeContext, typePath);
+            var files = itemPath.GetFiles();
 
             for (var i = 0; i < files.Length; i++)
             {
                 var path1 = files[i];
                 var extension = Path.GetExtension(path1);
-                var path2 = this.TypeContext.GeneratePath(dataType.CategoryPath + dataType.Name) + extension;
+                var repositoryPath2 = new RepositoryPath(this.TypeContext, dataType.Path);
+                var path2 = repositoryPath2.Path + extension;
                 this.Repository.Move(path1, path2);
             }
         }
 
         private void DeleteRepositoryPath(CremaDataType dataType, string typePath)
         {
-            var itemPath = this.TypeContext.GeneratePath(typePath);
-            var files = this.TypeContext.GetFiles(itemPath);
+            var repositoryPath = new RepositoryPath(this.TypeContext, typePath);
+            var files = repositoryPath.GetFiles();
             foreach (var item in files)
             {
                 if (File.Exists(item) == false)
@@ -565,9 +566,8 @@ namespace Ntreev.Crema.Services.Data
 
         private void AddRepositoryPath(CremaDataTable dataTable)
         {
-            var context = this.dataBase.TableContext;
-            var itemPath = context.GenerateTablePath(dataTable.CategoryPath, dataTable.Name);
-            var files = context.GetFiles(itemPath);
+            var repositoryPath = new RepositoryPath(this.TableContext, dataTable.Path);
+            var files = repositoryPath.GetFiles();
             var status = this.Repository.Status(files);
 
             foreach (var item in status)
@@ -582,7 +582,8 @@ namespace Ntreev.Crema.Services.Data
                     {
                         var extension = Path.GetExtension(item.Path);
                         var sourceTable = dataTable.SourceTable;
-                        var sourcePath = context.GenerateTablePath(sourceTable.CategoryPath, sourceTable.Name) + extension;
+                        var sourceRepositoryPath = new RepositoryPath(this.TableContext, sourceTable.Path);
+                        var sourcePath = sourceRepositoryPath.Path + extension;
                         FileUtility.Backup(item.Path);
                         try
                         {
@@ -599,22 +600,23 @@ namespace Ntreev.Crema.Services.Data
 
         private void MoveRepositoryPath(CremaDataTable dataTable, string tablePath)
         {
-            var itemPath = this.TableContext.GeneratePath(tablePath);
-            var files = this.TableContext.GetFiles(itemPath);
+            var repositoryPath = new RepositoryPath(this.TableContext, tablePath);
+            var files = repositoryPath.GetFiles();
 
             for (var i = 0; i < files.Length; i++)
             {
                 var path1 = files[i];
                 var extension = Path.GetExtension(path1);
-                var path2 = this.TableContext.GeneratePath(dataTable.CategoryPath + dataTable.Name) + extension;
+                var repositoryPath2 = new RepositoryPath(this.TableContext, dataTable.Path);
+                var path2 = repositoryPath2.Path + extension;
                 this.Repository.Move(path1, path2);
             }
         }
 
         private void DeleteRepositoryPath(CremaDataTable dataTable, string tablePath)
         {
-            var itemPath = this.TableContext.GeneratePath(tablePath);
-            var files = this.TableContext.GetFiles(itemPath);
+            var repositoryPath = new RepositoryPath(this.TableContext, tablePath);
+            var files = repositoryPath.GetFiles();
             foreach (var item in files)
             {
                 if (File.Exists(item) == false)
@@ -625,8 +627,8 @@ namespace Ntreev.Crema.Services.Data
 
         private void ValidateTypeExists(string typePath)
         {
-            var itemPath = this.TypeContext.GeneratePath(typePath);
-            var files = this.Serializer.GetPath(itemPath, typeof(CremaDataType), ObjectSerializerSettings.Empty);
+            var repositoryPath = new RepositoryPath(this.TypeContext, typePath);
+            var files = this.Serializer.GetPath(repositoryPath.Path, typeof(CremaDataType), ObjectSerializerSettings.Empty);
             foreach (var item in files)
             {
                 if (File.Exists(item) == false)
@@ -636,8 +638,8 @@ namespace Ntreev.Crema.Services.Data
 
         private void ValidateTypeNotExists(string typePath)
         {
-            var itemPath = this.TypeContext.GeneratePath(typePath);
-            var files = this.Serializer.GetPath(itemPath, typeof(CremaDataType), ObjectSerializerSettings.Empty);
+            var repositoryPath = new RepositoryPath(this.TypeContext, typePath);
+            var files = this.Serializer.GetPath(repositoryPath.Path, typeof(CremaDataType), ObjectSerializerSettings.Empty);
             foreach (var item in files)
             {
                 if (File.Exists(item) == true)
@@ -647,8 +649,8 @@ namespace Ntreev.Crema.Services.Data
 
         private void ValidateTableExists(string tablePath)
         {
-            var itemPath = this.TableContext.GeneratePath(tablePath);
-            var files = this.Serializer.GetPath(itemPath, typeof(CremaDataTable), ObjectSerializerSettings.Empty);
+            var repositoryPath = new RepositoryPath(this.TableContext, tablePath);
+            var files = this.Serializer.GetPath(repositoryPath.Path, typeof(CremaDataTable), ObjectSerializerSettings.Empty);
             foreach (var item in files)
             {
                 if (File.Exists(item) == false)
@@ -658,8 +660,8 @@ namespace Ntreev.Crema.Services.Data
 
         private void ValidateTableNotExists(string tablePath)
         {
-            var itemPath = this.TableContext.GeneratePath(tablePath);
-            var files = this.Serializer.GetPath(itemPath, typeof(CremaDataTable), ObjectSerializerSettings.Empty);
+            var repositoryPath = new RepositoryPath(this.TableContext, tablePath);
+            var files = this.Serializer.GetPath(repositoryPath.Path, typeof(CremaDataTable), ObjectSerializerSettings.Empty);
             foreach (var item in files)
             {
                 if (File.Exists(item) == true)

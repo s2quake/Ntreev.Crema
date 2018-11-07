@@ -143,7 +143,7 @@ namespace Ntreev.Crema.Services.Data
                         select dataTable;
 
             var dataTables = query.ToArray();
-            var itemPaths = dataTables.Select(item => this.Context.GeneratePath(item.Path)).ToArray();
+            var itemPaths = dataTables.Select(item => item.FullPath).ToArray();
             var taskID = this.Domain.ID;
             await this.Repository.LockAsync(itemPaths);
             dataSet.AddItemPaths(itemPaths);

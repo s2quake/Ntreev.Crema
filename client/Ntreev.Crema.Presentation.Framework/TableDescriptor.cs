@@ -41,6 +41,7 @@ using System.ComponentModel;
 
 namespace Ntreev.Crema.Presentation.Framework
 {
+    // TODO: 필드를 없애고 속성으로 바꾸는 바람에 변수 갱신이 되지 않음.
     public class TableDescriptor : DescriptorBase, ITableDescriptor, ITableItemDescriptor, ILockableDescriptor, IPermissionDescriptor, IAccessibleDescriptor
     {
         private ITable table;
