@@ -9,7 +9,7 @@
     <Import_RootNamespace>Ntreev.Crema.Services.Extensions</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)DataBaseCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBaseContextExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaHostExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DataBaseExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DomainCollectionExtensions.cs" />

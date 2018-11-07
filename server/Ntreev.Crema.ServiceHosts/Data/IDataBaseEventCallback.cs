@@ -34,7 +34,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo);
 
         [OperationContract(IsOneWay = true)]
-        void OnTablesChanged(CallbackInfo callbackInfo, TableInfo[] tableInfos);
+        void OnTablesChanged(CallbackInfo callbackInfo, TableInfo[] tableInfos, string itemType);
 
         [OperationContract(IsOneWay = true)]
         void OnTablesStateChanged(CallbackInfo callbackInfo, string[] tableNames, TableState[] states);

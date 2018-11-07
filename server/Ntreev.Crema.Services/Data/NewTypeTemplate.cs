@@ -92,9 +92,10 @@ namespace Ntreev.Crema.Services.Data
             var dataType = this.TypeSource;
             var dataSet = dataType.DataSet;
             var itemPath = dataType.FullPath;
+            var taskID = this.Domain.ID;
             await this.Repository.LockAsync(itemPath);
             dataSet.AddItemPaths(itemPath);
-            this.type = await this.Types.AddNewAsync(authentication, dataType);
+            this.type = await this.Types.AddNewAsync(authentication, dataType, taskID);
             this.Domain.Result = new TypeInfo[] { dataType.TypeInfo };
             await base.OnEndEditAsync(authentication);
         }

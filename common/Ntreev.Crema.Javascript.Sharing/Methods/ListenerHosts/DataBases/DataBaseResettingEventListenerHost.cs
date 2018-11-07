@@ -38,21 +38,21 @@ namespace Ntreev.Crema.Javascript.Methods.ListenerHosts.DataBases
 
         protected override void OnSubscribe()
         {
-            if (this.cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
+            if (this.cremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
             {
-                dataBases.Dispatcher.Invoke(() => dataBases.ItemsResetting += DataBases_ItemsResetting);
+                dataBaseContext.Dispatcher.Invoke(() => dataBaseContext.ItemsResetting += DataBaseContext_ItemsResetting);
             }
         }
 
         protected override void OnUnsubscribe()
         {
-            if (this.cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
+            if (this.cremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
             {
-                dataBases.Dispatcher.Invoke(() => dataBases.ItemsResetting -= DataBases_ItemsResetting);
+                dataBaseContext.Dispatcher.Invoke(() => dataBaseContext.ItemsResetting -= DataBaseContext_ItemsResetting);
             }
         }
 
-        private void DataBases_ItemsResetting(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsResetting(object sender, ItemsEventArgs<IDataBase> e)
         {
             this.Invoke(null);
         }

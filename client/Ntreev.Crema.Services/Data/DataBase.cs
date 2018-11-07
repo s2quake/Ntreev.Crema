@@ -1224,7 +1224,7 @@ namespace Ntreev.Crema.Services.Data
             this.CremaHost.RemoveServiceAsync(this);
         }
 
-        async void IDataBaseServiceCallback.OnTablesChanged(CallbackInfo callbackInfo, TableInfo[] tableInfos)
+        async void IDataBaseServiceCallback.OnTablesChanged(CallbackInfo callbackInfo, TableInfo[] tableInfos, string itemType)
         {
             try
             {
@@ -1241,7 +1241,14 @@ namespace Ntreev.Crema.Services.Data
                             table.SetTableInfo(tableInfo);
                             tables[i] = table;
                         }
-                        this.TableContext.Tables.InvokeTablesTemplateChangedEvent(authentication, tables);
+                        if (itemType == DomainItemType.TableTemplate)
+                        {
+                            this.TableContext.Tables.InvokeTablesTemplateChangedEvent(authentication, tables);
+                        }
+                        else
+                        {
+                            this.TableContext.Tables.InvokeTablesContentChangedEvent(authentication, tables);
+                        }
                         this.taskEvent.Set(callbackInfo.TaskID);
                     });
                 });

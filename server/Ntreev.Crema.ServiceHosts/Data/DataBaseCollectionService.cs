@@ -36,13 +36,14 @@ namespace Ntreev.Crema.ServiceHosts.Data
     {
         private Authentication authentication;
         private readonly Dictionary<Guid, ITransaction> transactionByID = new Dictionary<Guid, ITransaction>();
+        private long index = 0;
 
         public DataBaseCollectionService(ICremaHost cremaHost)
             : base(cremaHost)
         {
             this.CremaHost = cremaHost;
             this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;
-            this.DataBases = cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
+            this.DataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
             this.UserContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
 
             this.LogService.Debug($"{nameof(DataBaseCollectionService)} Constructor");
@@ -101,7 +102,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                await dataBase.SetPublicAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)dataBase.SetPublicAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -117,7 +118,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                await dataBase.SetPrivateAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)dataBase.SetPrivateAsync(this.authentication);
                 result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.AccessInfo);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -134,7 +135,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                await dataBase.AddAccessMemberAsync(this.authentication, memberID, accessType);
+                result.TaskID = await (Task<Guid>)dataBase.AddAccessMemberAsync(this.authentication, memberID, accessType);
                 var accessInfo = await dataBase.Dispatcher.InvokeAsync(() => dataBase.AccessInfo);
                 result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
                 result.SignatureDate = this.authentication.SignatureDate;
@@ -152,7 +153,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                await dataBase.SetAccessMemberAsync(this.authentication, memberID, accessType);
+                result.TaskID = await (Task<Guid>)dataBase.SetAccessMemberAsync(this.authentication, memberID, accessType);
                 var accessInfo = await dataBase.Dispatcher.InvokeAsync(() => dataBase.AccessInfo);
                 result.Value = accessInfo.Members.Where(item => item.UserID == memberID).First();
                 result.SignatureDate = this.authentication.SignatureDate;
@@ -170,7 +171,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                await dataBase.RemoveAccessMemberAsync(this.authentication, memberID);
+                result.TaskID = await (Task<Guid>)dataBase.RemoveAccessMemberAsync(this.authentication, memberID);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -186,7 +187,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                await dataBase.LockAsync(this.authentication, comment);
+                result.TaskID = await (Task<Guid>)dataBase.LockAsync(this.authentication, comment);
                 result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.LockInfo);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -203,7 +204,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                await dataBase.UnlockAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)dataBase.UnlockAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -219,7 +220,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                await dataBase.LoadAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)dataBase.LoadAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -235,7 +236,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                await dataBase.UnloadAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)dataBase.UnloadAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -250,7 +251,8 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var result = new ResultBase<DataBaseInfo>();
             try
             {
-                var dataBase = await this.DataBases.AddNewDataBaseAsync(this.authentication, dataBaseName, comment);
+                var dataBase = await this.DataBaseContext.AddNewDataBaseAsync(this.authentication, dataBaseName, comment);
+                result.TaskID = GuidUtility.FromName(dataBaseName + comment);
                 result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -267,7 +269,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                await dataBase.RenameAsync(this.authentication, newDataBaseName);
+                result.TaskID = await (Task<Guid>)dataBase.RenameAsync(this.authentication, newDataBaseName);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -283,7 +285,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                await dataBase.DeleteAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)dataBase.DeleteAsync(this.authentication);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)
@@ -300,6 +302,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             {
                 var dataBase = await this.GetDataBaseAsync(dataBaseName);
                 var newDataBase = await dataBase.CopyAsync(this.authentication, newDataBaseName, comment, force);
+                result.TaskID = GuidUtility.FromName(newDataBaseName + comment);
                 result.Value = await newDataBase.Dispatcher.InvokeAsync(() => newDataBase.DataBaseInfo);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -332,7 +335,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 var dataBase = await this.GetDataBaseAsync(dataBaseName);
-                await dataBase.RevertAsync(this.authentication, revision);
+                result.TaskID = await (Task<Guid>)dataBase.RevertAsync(this.authentication, revision);
                 result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
@@ -408,13 +411,14 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         public ILogService LogService { get; }
 
-        public IDataBaseCollection DataBases { get; }
+        public IDataBaseContext DataBaseContext { get; }
 
         public IUserContext UserContext { get; }
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
-            this.Callback?.OnServiceClosed(signatureDate, closeInfo);
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = signatureDate };
+            this.Callback?.OnServiceClosed(callbackInfo, closeInfo);
         }
 
         private async void Users_UsersLoggedOut(object sender, ItemsEventArgs<IUser> e)
@@ -422,7 +426,6 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var actionUserID = e.UserID;
             var contains = e.Items.Any(item => item.ID == this.authentication.ID);
             var closeInfo = (CloseInfo)e.MetaData;
-            var signatureDate = e.SignatureDate;
             if (actionUserID != this.authentication.ID && contains == true)
             {
                 await this.DetachEventHandlersAsync();
@@ -431,118 +434,118 @@ namespace Ntreev.Crema.ServiceHosts.Data
             }
         }
 
-        private void DataBases_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var dataBaseNames = e.Items.Select(item => item.Name).ToArray();
             var dataBaseInfos = e.Arguments.Select(item => (DataBaseInfo)item).ToArray();
             var comment = e.MetaData as string;
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnDataBasesCreated(signatureDate, dataBaseNames, dataBaseInfos, comment));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesCreated(callbackInfo, dataBaseNames, dataBaseInfos, comment));
         }
 
-        private void DataBases_ItemsRenamed(object sender, ItemsRenamedEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsRenamed(object sender, ItemsRenamedEventArgs<IDataBase> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var oldNames = e.OldNames;
             var itemNames = e.Items.Select(item => item.Name).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnDataBasesRenamed(signatureDate, oldNames, itemNames));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesRenamed(callbackInfo, oldNames, itemNames));
         }
 
-        private void DataBases_ItemsDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var itemPaths = e.ItemPaths;
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnDataBasesDeleted(signatureDate, itemPaths));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesDeleted(callbackInfo, itemPaths));
         }
 
-        private void DataBases_ItemsLoaded(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsLoaded(object sender, ItemsEventArgs<IDataBase> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var itemNames = e.Items.Select(item => item.Name).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnDataBasesLoaded(signatureDate, itemNames));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesLoaded(callbackInfo, itemNames));
         }
 
-        private void DataBases_ItemsUnloaded(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsUnloaded(object sender, ItemsEventArgs<IDataBase> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var itemNames = e.Items.Select(item => item.Name).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnDataBasesUnloaded(signatureDate, itemNames));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesUnloaded(callbackInfo, itemNames));
         }
 
-        private void DataBases_ItemsResetting(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsResetting(object sender, ItemsEventArgs<IDataBase> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var itemNames = e.Items.Select(item => item.Name).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnDataBasesResetting(signatureDate, itemNames));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesResetting(callbackInfo, itemNames));
         }
 
-        private void DataBases_ItemsReset(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsReset(object sender, ItemsEventArgs<IDataBase> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var itemNames = e.Items.Select(item => item.Name).ToArray();
             var metaDatas = e.MetaData as DataBaseMetaData[];
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnDataBasesReset(signatureDate, itemNames, metaDatas));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesReset(callbackInfo, itemNames, metaDatas));
         }
 
-        private void DataBases_ItemsAuthenticationEntered(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsAuthenticationEntered(object sender, ItemsEventArgs<IDataBase> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var itemNames = e.Items.Select(item => item.Name).ToArray();
             var authenticationInfo = (AuthenticationInfo)e.MetaData;
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnDataBasesAuthenticationEntered(signatureDate, itemNames, authenticationInfo));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesAuthenticationEntered(callbackInfo, itemNames, authenticationInfo));
         }
 
-        private void DataBases_ItemsAuthenticationLeft(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsAuthenticationLeft(object sender, ItemsEventArgs<IDataBase> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var itemNames = e.Items.Select(item => item.Name).ToArray();
             var authenticationInfo = (AuthenticationInfo)e.MetaData;
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnDataBasesAuthenticationLeft(signatureDate, itemNames, authenticationInfo));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesAuthenticationLeft(callbackInfo, itemNames, authenticationInfo));
         }
 
-        private void DataBases_ItemsInfoChanged(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsInfoChanged(object sender, ItemsEventArgs<IDataBase> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var dataBaseInfos = e.Items.Select(item => item.DataBaseInfo).ToArray();
 
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnDataBasesInfoChanged(signatureDate, dataBaseInfos));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesInfoChanged(callbackInfo, dataBaseInfos));
         }
 
-        private void DataBases_ItemsStateChanged(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsStateChanged(object sender, ItemsEventArgs<IDataBase> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var itemNames = e.Items.Select(item => item.Name).ToArray();
             var dataBaseStates = e.Items.Select(item => item.DataBaseState).ToArray();
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnDataBasesStateChanged(signatureDate, itemNames, dataBaseStates));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesStateChanged(callbackInfo, itemNames, dataBaseStates));
         }
 
-        private void DataBases_ItemsAccessChanged(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsAccessChanged(object sender, ItemsEventArgs<IDataBase> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var values = new AccessInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
             {
@@ -560,14 +563,14 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var memberIDs = metaData[1] as string[];
             var accessTypes = metaData[2] as AccessType[];
 
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnDataBasesAccessChanged(signatureDate, changeType, values, memberIDs, accessTypes));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesAccessChanged(callbackInfo, changeType, values, memberIDs, accessTypes));
         }
 
-        private void DataBases_ItemsLockChanged(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsLockChanged(object sender, ItemsEventArgs<IDataBase> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var signatureDate = e.SignatureDate;
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var values = new LockInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
             {
@@ -584,7 +587,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var changeType = (LockChangeType)metaData[0];
             var comments = metaData[1] as string[];
 
-            this.InvokeEvent(userID, exceptionUserID, () => this.Callback?.OnDataBasesLockChanged(signatureDate, changeType, values, comments));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesLockChanged(callbackInfo, changeType, values, comments));
         }
 
         private async Task<DataBaseCollectionMetaData> AttachEventHandlersAsync()
@@ -593,22 +596,22 @@ namespace Ntreev.Crema.ServiceHosts.Data
             {
                 this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
             });
-            var metaData = await this.DataBases.Dispatcher.InvokeAsync(() =>
+            var metaData = await this.DataBaseContext.Dispatcher.InvokeAsync(() =>
             {
-                this.DataBases.ItemsCreated += DataBases_ItemsCreated;
-                this.DataBases.ItemsRenamed += DataBases_ItemsRenamed;
-                this.DataBases.ItemsDeleted += DataBases_ItemsDeleted;
-                this.DataBases.ItemsLoaded += DataBases_ItemsLoaded;
-                this.DataBases.ItemsUnloaded += DataBases_ItemsUnloaded;
-                this.DataBases.ItemsResetting += DataBases_ItemsResetting;
-                this.DataBases.ItemsReset += DataBases_ItemsReset;
-                this.DataBases.ItemsAuthenticationEntered += DataBases_ItemsAuthenticationEntered;
-                this.DataBases.ItemsAuthenticationLeft += DataBases_ItemsAuthenticationLeft;
-                this.DataBases.ItemsInfoChanged += DataBases_ItemsInfoChanged;
-                this.DataBases.ItemsStateChanged += DataBases_ItemsStateChanged;
-                this.DataBases.ItemsAccessChanged += DataBases_ItemsAccessChanged;
-                this.DataBases.ItemsLockChanged += DataBases_ItemsLockChanged;
-                return this.DataBases.GetMetaData(this.authentication);
+                this.DataBaseContext.ItemsCreated += DataBaseContext_ItemsCreated;
+                this.DataBaseContext.ItemsRenamed += DataBaseContext_ItemsRenamed;
+                this.DataBaseContext.ItemsDeleted += DataBaseContext_ItemsDeleted;
+                this.DataBaseContext.ItemsLoaded += DataBaseContext_ItemsLoaded;
+                this.DataBaseContext.ItemsUnloaded += DataBaseContext_ItemsUnloaded;
+                this.DataBaseContext.ItemsResetting += DataBaseContext_ItemsResetting;
+                this.DataBaseContext.ItemsReset += DataBaseContext_ItemsReset;
+                this.DataBaseContext.ItemsAuthenticationEntered += DataBaseContext_ItemsAuthenticationEntered;
+                this.DataBaseContext.ItemsAuthenticationLeft += DataBaseContext_ItemsAuthenticationLeft;
+                this.DataBaseContext.ItemsInfoChanged += DataBaseContext_ItemsInfoChanged;
+                this.DataBaseContext.ItemsStateChanged += DataBaseContext_ItemsStateChanged;
+                this.DataBaseContext.ItemsAccessChanged += DataBaseContext_ItemsAccessChanged;
+                this.DataBaseContext.ItemsLockChanged += DataBaseContext_ItemsLockChanged;
+                return this.DataBaseContext.GetMetaData(this.authentication);
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseCollectionService)} {nameof(AttachEventHandlersAsync)}");
             return metaData;
@@ -616,21 +619,21 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private async Task DetachEventHandlersAsync()
         {
-            await this.DataBases.Dispatcher.InvokeAsync(() =>
+            await this.DataBaseContext.Dispatcher.InvokeAsync(() =>
             {
-                this.DataBases.ItemsCreated -= DataBases_ItemsCreated;
-                this.DataBases.ItemsRenamed -= DataBases_ItemsRenamed;
-                this.DataBases.ItemsDeleted -= DataBases_ItemsDeleted;
-                this.DataBases.ItemsLoaded -= DataBases_ItemsLoaded;
-                this.DataBases.ItemsUnloaded -= DataBases_ItemsUnloaded;
-                this.DataBases.ItemsResetting -= DataBases_ItemsResetting;
-                this.DataBases.ItemsReset -= DataBases_ItemsReset;
-                this.DataBases.ItemsAuthenticationEntered -= DataBases_ItemsAuthenticationEntered;
-                this.DataBases.ItemsAuthenticationLeft -= DataBases_ItemsAuthenticationLeft;
-                this.DataBases.ItemsInfoChanged -= DataBases_ItemsInfoChanged;
-                this.DataBases.ItemsStateChanged -= DataBases_ItemsStateChanged;
-                this.DataBases.ItemsAccessChanged -= DataBases_ItemsAccessChanged;
-                this.DataBases.ItemsLockChanged -= DataBases_ItemsLockChanged;
+                this.DataBaseContext.ItemsCreated -= DataBaseContext_ItemsCreated;
+                this.DataBaseContext.ItemsRenamed -= DataBaseContext_ItemsRenamed;
+                this.DataBaseContext.ItemsDeleted -= DataBaseContext_ItemsDeleted;
+                this.DataBaseContext.ItemsLoaded -= DataBaseContext_ItemsLoaded;
+                this.DataBaseContext.ItemsUnloaded -= DataBaseContext_ItemsUnloaded;
+                this.DataBaseContext.ItemsResetting -= DataBaseContext_ItemsResetting;
+                this.DataBaseContext.ItemsReset -= DataBaseContext_ItemsReset;
+                this.DataBaseContext.ItemsAuthenticationEntered -= DataBaseContext_ItemsAuthenticationEntered;
+                this.DataBaseContext.ItemsAuthenticationLeft -= DataBaseContext_ItemsAuthenticationLeft;
+                this.DataBaseContext.ItemsInfoChanged -= DataBaseContext_ItemsInfoChanged;
+                this.DataBaseContext.ItemsStateChanged -= DataBaseContext_ItemsStateChanged;
+                this.DataBaseContext.ItemsAccessChanged -= DataBaseContext_ItemsAccessChanged;
+                this.DataBaseContext.ItemsLockChanged -= DataBaseContext_ItemsLockChanged;
             });
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
@@ -641,7 +644,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private async Task<IDataBase> GetDataBaseAsync(string dataBaseName)
         {
-            var dataBase = await this.CremaHost.Dispatcher.InvokeAsync(() => this.DataBases[dataBaseName]);
+            var dataBase = await this.CremaHost.Dispatcher.InvokeAsync(() => this.DataBaseContext[dataBaseName]);
             if (dataBase == null)
                 throw new DataBaseNotFoundException(dataBaseName);
             return dataBase;

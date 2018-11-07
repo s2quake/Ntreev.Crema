@@ -37,13 +37,13 @@ namespace Ntreev.Crema.Services
 
         Task DeleteAsync(Authentication authentication);
 
-        bool Contains(Authentication authentication);
-
-        Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision);
-
         Task RevertAsync(Authentication authentication, string revision);
 
         Task ImportAsync(Authentication authentication, CremaDataSet dataSet, string comment);
+
+        bool Contains(Authentication authentication);
+
+        Task<LogInfo[]> GetLogAsync(Authentication authentication, string revision);
 
         Task<CremaDataSet> GetDataSetAsync(Authentication authentication, DataSetType dataSetType, string filterExpression, string revision);
 

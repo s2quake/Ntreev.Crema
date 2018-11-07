@@ -21,6 +21,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)DomainUserAddedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableContentGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableContentExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ItemsChangedEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ItemsChangedEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EventMetaDataBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IStateProvider.cs" />
@@ -41,7 +43,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)ICremaConfiguration.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICremaHost.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IDataBase.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IDataBaseCollection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IDataBaseContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IDomainItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IDomain.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IDomainCategory.cs" />

@@ -44,7 +44,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;
             this.UserContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
             this.DomainContext = cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
-            this.DataBases = cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
+            this.DataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
             this.LogService.Debug($"{nameof(DomainService)} Constructor");
         }
 
@@ -326,7 +326,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
 
         public IDomainContext DomainContext { get; }
 
-        public IDataBaseCollection DataBases { get; }
+        public IDataBaseContext DataBaseContext { get; }
 
         public IUserContext UserContext { get; }
 
@@ -350,10 +350,10 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             {
                 this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
             });
-            await this.DataBases.Dispatcher.InvokeAsync(() =>
+            await this.DataBaseContext.Dispatcher.InvokeAsync(() =>
             {
-                this.DataBases.ItemsResetting += DataBases_ItemsResetting;
-                this.DataBases.ItemsReset += DataBases_ItemsReset;
+                this.DataBaseContext.ItemsResetting += DataBaseContext_ItemsResetting;
+                this.DataBaseContext.ItemsReset += DataBaseContext_ItemsReset;
             });
             var metaData = await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
@@ -400,10 +400,10 @@ namespace Ntreev.Crema.ServiceHosts.Domains
                 this.DomainContext.Domains.DomainRowRemoved -= Domains_DomainRowRemoved;
                 this.DomainContext.Domains.DomainPropertyChanged -= Domains_DomainPropertyChanged;
             });
-            await this.DataBases.Dispatcher.InvokeAsync(() =>
+            await this.DataBaseContext.Dispatcher.InvokeAsync(() =>
             {
-                this.DataBases.ItemsResetting -= DataBases_ItemsResetting;
-                this.DataBases.ItemsReset -= DataBases_ItemsReset;
+                this.DataBaseContext.ItemsResetting -= DataBaseContext_ItemsResetting;
+                this.DataBaseContext.ItemsReset -= DataBaseContext_ItemsReset;
             });
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
@@ -598,7 +598,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
                 callbackInfo.Index, $"{nameof(Domains_DomainPropertyChanged)}\t{e.SignatureDate.ID}");
         }
 
-        private void DataBases_ItemsResetting(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsResetting(object sender, ItemsEventArgs<IDataBase> e)
         {
             //foreach (var item in e.Items)
             //{
@@ -606,7 +606,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             //}
         }
 
-        private void DataBases_ItemsReset(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsReset(object sender, ItemsEventArgs<IDataBase> e)
         {
             //foreach (var item in e.Items)
             //{

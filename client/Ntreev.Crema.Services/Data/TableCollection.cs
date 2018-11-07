@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Services.Data
         private ItemsRenamedEventHandler<ITable> tablesRenamed;
         private ItemsMovedEventHandler<ITable> tablesMoved;
         private ItemsDeletedEventHandler<ITable> tablesDeleted;
-        private ItemsEventHandler<ITable> tablesChanged;
+        private ItemsChangedEventHandler<ITable> tablesChanged;
         private ItemsEventHandler<ITable> tablesStateChanged;
 
         public TableCollection()
@@ -178,7 +178,7 @@ namespace Ntreev.Crema.Services.Data
             var message = EventMessageBuilder.ChangeTableTemplate(authentication, tables);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnTablesChanged(new ItemsEventArgs<ITable>(authentication, tables));
+            this.OnTablesChanged(new ItemsChangedEventArgs<ITable>(authentication, tables, null, DomainItemType.TableTemplate));
             this.Context.InvokeItemsChangedEvent(authentication, tables);
         }
 
@@ -188,7 +188,7 @@ namespace Ntreev.Crema.Services.Data
             var message = EventMessageBuilder.ChangeTableContent(authentication, tables);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnTablesChanged(new ItemsEventArgs<ITable>(authentication, tables));
+            this.OnTablesChanged(new ItemsChangedEventArgs<ITable>(authentication, tables, null, DomainItemType.TableContent));
             this.Context.InvokeItemsChangedEvent(authentication, tables);
         }
 
@@ -258,7 +258,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public event ItemsEventHandler<ITable> TablesChanged
+        public event ItemsChangedEventHandler<ITable> TablesChanged
         {
             add
             {
@@ -325,7 +325,7 @@ namespace Ntreev.Crema.Services.Data
             this.tablesStateChanged?.Invoke(this, e);
         }
 
-        protected virtual void OnTablesChanged(ItemsEventArgs<ITable> e)
+        protected virtual void OnTablesChanged(ItemsChangedEventArgs<ITable> e)
         {
             this.tablesChanged?.Invoke(this, e);
         }

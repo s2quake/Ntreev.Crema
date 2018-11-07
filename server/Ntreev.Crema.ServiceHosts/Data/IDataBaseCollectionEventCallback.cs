@@ -30,45 +30,45 @@ namespace Ntreev.Crema.ServiceHosts.Data
     public interface IDataBaseCollectionEventCallback
     {
         [OperationContract(IsOneWay = true)]
-        void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo);
+        void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo);
 
         [OperationContract(IsOneWay = true)]
-        void OnDataBasesCreated(SignatureDate signatureDate, string[] dataBaseNames, DataBaseInfo[] dataBaseInfos, string comment);
+        void OnDataBasesCreated(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseInfo[] dataBaseInfos, string comment);
 
         [OperationContract(IsOneWay = true)]
-        void OnDataBasesRenamed(SignatureDate signatureDate, string[] dataBaseNames, string[] newDataBaseNames);
+        void OnDataBasesRenamed(CallbackInfo callbackInfo, string[] dataBaseNames, string[] newDataBaseNames);
 
         [OperationContract(IsOneWay = true)]
-        void OnDataBasesDeleted(SignatureDate signatureDate, string[] dataBaseNames);
+        void OnDataBasesDeleted(CallbackInfo callbackInfo, string[] dataBaseNames);
 
         [OperationContract(IsOneWay = true)]
-        void OnDataBasesLoaded(SignatureDate signatureDate, string[] dataBaseNames);
+        void OnDataBasesLoaded(CallbackInfo callbackInfo, string[] dataBaseNames);
 
         [OperationContract(IsOneWay = true)]
-        void OnDataBasesUnloaded(SignatureDate signatureDate, string[] dataBaseNames);
+        void OnDataBasesUnloaded(CallbackInfo callbackInfo, string[] dataBaseNames);
 
         [OperationContract(IsOneWay = true)]
-        void OnDataBasesResetting(SignatureDate signatureDate, string[] dataBaseNames);
+        void OnDataBasesResetting(CallbackInfo callbackInfo, string[] dataBaseNames);
 
         [OperationContract(IsOneWay = true)]
-        void OnDataBasesReset(SignatureDate signatureDate, string[] dataBaseNames, DataBaseMetaData[] metaDatas);
+        void OnDataBasesReset(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseMetaData[] metaDatas);
 
         [OperationContract(IsOneWay = true)]
-        void OnDataBasesAuthenticationEntered(SignatureDate signatureDate, string[] dataBaseNames, AuthenticationInfo authenticationInfo);
+        void OnDataBasesAuthenticationEntered(CallbackInfo callbackInfo, string[] dataBaseNames, AuthenticationInfo authenticationInfo);
 
         [OperationContract(IsOneWay = true)]
-        void OnDataBasesAuthenticationLeft(SignatureDate signatureDate, string[] dataBaseNames, AuthenticationInfo authenticationInfo);
+        void OnDataBasesAuthenticationLeft(CallbackInfo callbackInfo, string[] dataBaseNames, AuthenticationInfo authenticationInfo);
 
         [OperationContract(IsOneWay = true)]
-        void OnDataBasesInfoChanged(SignatureDate signatureDate, DataBaseInfo[] dataBaseInfos);
+        void OnDataBasesInfoChanged(CallbackInfo callbackInfo, DataBaseInfo[] dataBaseInfos);
 
         [OperationContract(IsOneWay = true)]
-        void OnDataBasesStateChanged(SignatureDate signatureDate, string[] dataBaseNames, DataBaseState[] dataBaseStates);
+        void OnDataBasesStateChanged(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseState[] dataBaseStates);
 
         [OperationContract(IsOneWay = true)]
-        void OnDataBasesAccessChanged(SignatureDate signatureDate, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes);
+        void OnDataBasesAccessChanged(CallbackInfo callbackInfo, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes);
 
         [OperationContract(IsOneWay = true)]
-        void OnDataBasesLockChanged(SignatureDate signatureDate, LockChangeType changeType, LockInfo[] lockInfos, string[] comments);
+        void OnDataBasesLockChanged(CallbackInfo callbackInfo, LockChangeType changeType, LockInfo[] lockInfos, string[] comments);
     }
 }

@@ -64,24 +64,14 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
             var domain = this.Domain;
+            var taskID = domain.ID;
             await base.OnEndEditAsync(authentication);
-            var tableInfos = domain.Result as TableInfo[];
-            var tableInfo = tableInfos.First();
-            this.table.UpdateTemplate(tableInfo);
-            this.table.UpdateTags(tableInfo.Tags);
-            this.table.UpdateComment(tableInfo.Comment);
-            this.table.TableState = TableState.None;
-
-            var items = EnumerableUtility.One(this.table).ToArray();
-            this.Container.InvokeTablesStateChangedEvent(authentication, items);
-            this.Container.InvokeTablesTemplateChangedEvent(authentication, items);
+            await this.DataBase.WaitAsync(taskID);
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
             await base.OnCancelEditAsync(authentication);
-            this.table.TableState = TableState.None;
-            this.Container.InvokeTablesStateChangedEvent(authentication, new Table[] { this.table });
         }
 
         protected override void OnAttach(Domain domain)

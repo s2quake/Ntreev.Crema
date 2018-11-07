@@ -83,8 +83,8 @@ namespace Ntreev.Crema.Services
         {
             if (serviceType == typeof(ICremaHost))
                 return this;
-            if (serviceType == typeof(IDataBaseCollection))
-                return this.DataBases;
+            if (serviceType == typeof(IDataBaseContext))
+                return this.DataBaseContext;
             if (serviceType == typeof(IUserContext))
                 return this.UserContext;
             if (serviceType == typeof(IUserCollection))
@@ -135,11 +135,11 @@ namespace Ntreev.Crema.Services
                     this.Info(Resources.Message_ServiceStart);
                     this.configs = new CremaConfiguration(Path.Combine(this.BasePath, "configs"), this.propertiesProviders);
                     this.UserContext = new UserContext(this);
-                    this.DataBases = new DataBaseCollection(this);
+                    this.DataBaseContext = new DataBaseContext(this);
                     this.DomainContext = new DomainContext(this);
                 });
                 await this.UserContext.InitializeAsync();
-                await this.DataBases.InitializeAsync();
+                await this.DataBaseContext.InitializeAsync();
                 await this.DomainContext.InitializeAsync();
                 await this.DomainContext.RestoreAsync(settings);
                 await this.Dispatcher.InvokeAsync(() =>
@@ -155,13 +155,13 @@ namespace Ntreev.Crema.Services
                     this.ServiceState = ServiceState.Opened;
                     this.OnOpened(EventArgs.Empty);
                 });
-                await this.DataBases.RestoreStateAsync(this.settings);
+                await this.DataBaseContext.RestoreStateAsync(this.settings);
             }
             catch (Exception e)
             {
                 this.UserContext = null;
                 this.DomainContext = null;
-                this.DataBases = null;
+                this.DataBaseContext = null;
                 this.log.Error(e);
                 throw;
             }
@@ -203,11 +203,11 @@ namespace Ntreev.Crema.Services
                     }
                 });
                 await this.DomainContext.DisposeAsync();
-                await this.DataBases.DisposeAsync();
+                await this.DataBaseContext.DisposeAsync();
                 await this.UserContext.DisposeAsync();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.DataBases = null;
+                    this.DataBaseContext = null;
                     this.DomainContext = null;
                     this.UserContext = null;
                     this.Info("Crema module has been stopped.");
@@ -324,7 +324,7 @@ namespace Ntreev.Crema.Services
 
         public void Dispose()
         {
-            if (this.DataBases != null)
+            if (this.DataBaseContext != null)
             {
                 throw new InvalidOperationException(Resources.Exception_NotClosed);
             }
@@ -389,7 +389,7 @@ namespace Ntreev.Crema.Services
             set => this.log.Verbose = value;
         }
 
-        public DataBaseCollection DataBases { get; private set; }
+        public DataBaseContext DataBaseContext { get; private set; }
 
         public DomainContext DomainContext { get; private set; }
 

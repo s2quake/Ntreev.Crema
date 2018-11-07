@@ -57,7 +57,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public async Task InitializeAsync()
         {
-            var dataBases = await this.CremaHost.DataBases.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases.ToArray<DataBase>());
+            var dataBases = await this.CremaHost.DataBaseContext.Dispatcher.InvokeAsync(() => this.CremaHost.DataBaseContext.ToArray<DataBase>());
             await this.Dispatcher.InvokeAsync(() =>
             {
                 foreach (var item in dataBases)
@@ -343,7 +343,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             if (settings.NoCache == false)
             {
-                var dataBases = await this.Dispatcher.InvokeAsync(() => this.CremaHost.DataBases.ToArray<DataBase>());
+                var dataBases = await this.Dispatcher.InvokeAsync(() => this.CremaHost.DataBaseContext.ToArray<DataBase>());
                 foreach (var item in dataBases)
                 {
                     await this.RestoreAsync(item);
@@ -434,15 +434,15 @@ namespace Ntreev.Crema.Services.Domains
 
         private async void CremaHost_Opened(object sender, EventArgs e)
         {
-            await this.CremaHost.DataBases.Dispatcher.InvokeAsync(() =>
+            await this.CremaHost.DataBaseContext.Dispatcher.InvokeAsync(() =>
             {
-                this.CremaHost.DataBases.ItemsCreated += DataBases_ItemsCreated;
-                this.CremaHost.DataBases.ItemsRenamed += DataBases_ItemsRenamed;
-                this.CremaHost.DataBases.ItemsDeleted += DataBases_ItemDeleted;
+                this.CremaHost.DataBaseContext.ItemsCreated += DataBaseContext_ItemsCreated;
+                this.CremaHost.DataBaseContext.ItemsRenamed += DataBaseContext_ItemsRenamed;
+                this.CremaHost.DataBaseContext.ItemsDeleted += DataBaseContext_ItemDeleted;
             });
         }
 
-        private async void DataBases_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
+        private async void DataBaseContext_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
@@ -462,7 +462,7 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        private async void DataBases_ItemsRenamed(object sender, ItemsRenamedEventArgs<IDataBase> e)
+        private async void DataBaseContext_ItemsRenamed(object sender, ItemsRenamedEventArgs<IDataBase> e)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
@@ -486,7 +486,7 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        private async void DataBases_ItemDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
+        private async void DataBaseContext_ItemDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {

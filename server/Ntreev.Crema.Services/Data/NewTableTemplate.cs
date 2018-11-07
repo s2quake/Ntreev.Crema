@@ -167,8 +167,10 @@ namespace Ntreev.Crema.Services.Data
             if (this.parent is TableCategory category)
             {
                 var typeContext = category.GetService(typeof(TypeContext)) as TypeContext;
+                var tableContext = category.GetService(typeof(TableContext)) as TableContext;
                 var dataSet = await category.ReadDataForNewTemplateAsync(authentication);
-                var newName = NameUtility.GenerateNewName(nameof(Table), category.Context.Tables.Select((Table item) => item.Name));
+                var tableNames = tableContext.Tables.Select((Table item) => item.Name).ToArray();
+                var newName = NameUtility.GenerateNewName(nameof(Table), tableContext.Tables.Select((Table item) => item.Name));
                 var templateSource = CremaTemplate.Create(dataSet, newName, category.Path);
                 this.tableNames = new string[] { };
                 return templateSource;

@@ -89,7 +89,7 @@ namespace Ntreev.Crema.Services.Data
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.type.TypeState = TypeState.None;
-                this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type });
+                this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
             });
             await this.Repository.UnlockAsync(this.ItemPaths);
         }

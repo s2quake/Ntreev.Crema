@@ -20,6 +20,7 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.DataBaseService;
 using Ntreev.Crema.Services.Domains;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
@@ -39,6 +40,7 @@ namespace Ntreev.Crema.Services.Data
             this.DataBase = category.DataBase;
             this.Permission = category;
             this.IsNew = true;
+            this.Container = category.GetService(typeof(TableCollection)) as TableCollection;
             this.Service = category.Service;
         }
 
@@ -52,6 +54,7 @@ namespace Ntreev.Crema.Services.Data
             this.DataBase = parent.DataBase;
             this.Permission = parent;
             this.IsNew = true;
+            this.Container = parent.GetService(typeof(TableCollection)) as TableCollection;
             this.Service = parent.Service;
         }
 
@@ -84,18 +87,11 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
             var domain = this.Domain;
+            var taskID = domain.ID;
             await base.OnEndEditAsync(authentication);
+            await this.DataBase.WaitAsync(taskID);
             var tableInfos = domain.Result as TableInfo[];
-            if (this.parent is TableCategory category)
-            {
-                var tables = category.GetService(typeof(TableCollection)) as TableCollection;
-                this.tables = await tables.AddNewAsync(authentication, tableInfos);
-            }
-            else if (this.parent is Table table)
-            {
-                var tables = table.GetService(typeof(TableCollection)) as TableCollection;
-                this.tables = await tables.AddNewAsync(authentication, tableInfos);
-            }
+            this.tables = await this.Dispatcher.InvokeAsync(() => tableInfos.Select(item => this.Container[item.Name]).ToArray());
             this.parent = null;
         }
 
@@ -119,5 +115,7 @@ namespace Ntreev.Crema.Services.Data
         {
             return await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTableTemplateEdit(this.Domain.ID));
         }
+
+        private TableCollection Container { get; }
     }
 }

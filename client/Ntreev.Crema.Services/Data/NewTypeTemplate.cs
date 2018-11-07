@@ -69,7 +69,7 @@ namespace Ntreev.Crema.Services.Data
             await base.OnEndEditAsync(authentication);
             var typeInfos = domain.Result as TypeInfo[];
             var typeInfo = typeInfos.First();
-            this.type = await this.Types.AddNewAsync(authentication, typeInfo);
+            this.type = await this.Dispatcher.InvokeAsync(() => this.Types[typeInfo.Name]);
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)

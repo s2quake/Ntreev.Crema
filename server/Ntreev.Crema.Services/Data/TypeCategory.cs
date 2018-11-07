@@ -485,7 +485,7 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task<CremaDataSet> ReadDataForNewTemplateAsync(Authentication authentication)
         {
-            var fullPaths = new string[] { };
+            var fullPaths = new string[] { this.FullPath };
             return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 this.Repository.Lock(fullPaths);

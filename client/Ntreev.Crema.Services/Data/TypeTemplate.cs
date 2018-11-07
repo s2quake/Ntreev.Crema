@@ -63,19 +63,14 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
             var domain = this.Domain;
+            var taskID = domain.ID;
             await base.OnEndEditAsync(authentication);
-            var typeInfos = domain.Result as TypeInfo[];
-            var typeInfo = typeInfos.First();
-            this.type.UpdateTypeInfo(typeInfo);
-            this.type.TypeState = TypeState.None;
-            this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
+            await this.DataBase.WaitAsync(taskID);
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
             await base.OnCancelEditAsync(authentication);
-            this.type.TypeState = TypeState.None;
-            this.Container.InvokeTypesStateChangedEvent(authentication, new Type[] { this.type, });
         }
 
         protected override void OnAttach(Domain domain)

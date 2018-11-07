@@ -280,8 +280,7 @@ namespace Ntreev.Crema.Services.Data
         public LogInfo[] GetCategoryLog(string path, string revision)
         {
             var repositoryPath = new RepositoryPath(this, path);
-            var files = repositoryPath.GetFiles();
-            return this.Repository.GetLog(files, revision);
+            return this.Repository.GetLog(new string[] { repositoryPath.Path }, revision);
         }
 
         public CategoryMetaData[] GetCategoryMetaDatas()

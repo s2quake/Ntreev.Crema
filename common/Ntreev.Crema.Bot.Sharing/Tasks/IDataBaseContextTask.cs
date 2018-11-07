@@ -30,40 +30,40 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.Bot.Tasks
 {
     [Export(typeof(ITaskProvider))]
-    [Export(typeof(IDataBaseCollectionTask))]
+    [Export(typeof(IDataBaseContextTask))]
     [Export(typeof(IConfigurationPropertyProvider))]
     [TaskClass(Weight = 10)]
-    public class IDataBaseCollectionTask : ITaskProvider, IConfigurationPropertyProvider
+    public class IDataBaseContextTask : ITaskProvider, IConfigurationPropertyProvider
     {
         [ImportingConstructor]
-        public IDataBaseCollectionTask()
+        public IDataBaseContextTask()
         {
 
         }
 
         public Task InvokeAsync(TaskContext context)
         {
-            var dataBases = context.Target as IDataBaseCollection;
-            if (context.IsCompleted(dataBases) == true)
+            var dataBaseContext = context.Target as IDataBaseContext;
+            if (context.IsCompleted(dataBaseContext) == true)
             {
-                context.Pop(dataBases);
+                context.Pop(dataBaseContext);
             }
             else
             {
-                context.Complete(dataBases);
+                context.Complete(dataBaseContext);
             }
             return Task.Delay(0);
         }
 
-        public Type TargetType => typeof(IDataBaseCollection);
+        public Type TargetType => typeof(IDataBaseContext);
 
         [TaskMethod(Weight = 10)]
-        public async Task AddNewDataBaseAsync(IDataBaseCollection dataBases, TaskContext context)
+        public async Task AddNewDataBaseAsync(IDataBaseContext dataBaseContext, TaskContext context)
         {
             var authentication = context.Authentication;
             var dataBaseName = RandomUtility.NextIdentifier();
             var comment = RandomUtility.NextString();
-            await dataBases.AddNewDataBaseAsync(authentication, dataBaseName, comment);
+            await dataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, comment);
         }
 
         [ConfigurationProperty(ScopeType = typeof(ICremaConfiguration))]

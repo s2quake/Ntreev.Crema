@@ -128,7 +128,7 @@
     <Compile Include="Domains\Actions\SetRowAction.cs" />
     <Compile Include="Domains\TableContentDomain.cs" />
     <Compile Include="Authentication.cs" />
-    <Compile Include="Data\DataBaseCollection.cs" />
+    <Compile Include="Data\DataBaseContext.cs" />
     <Compile Include="CremaHost.cs" />
     <Compile Include="Data\DataBase.cs" />
     <Compile Include="Data\Type.cs" />

@@ -78,6 +78,6 @@ namespace Ntreev.Crema.RuntimeService.Consoles
 
         private ICremaHost CremaHost => this.cremaHost.Value;
 
-        private IDataBaseCollection DataBases => this.CremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
+        private IDataBaseContext DataBases => this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }
 }

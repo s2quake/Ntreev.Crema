@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Services
 
         internal RepositoryPath(Ntreev.Crema.Services.Data.DataBase dataBase, string path)
         {
-            if (path.StartsWith(PathUtility.Separator + CremaSchema.TypeDirectory) == false && 
+            if (path.StartsWith(PathUtility.Separator + CremaSchema.TypeDirectory) == false &&
                 path.StartsWith(PathUtility.Separator + CremaSchema.TableDirectory) == false)
                 throw new ArgumentException(nameof(path));
             this.Path = GeneratePath(dataBase.BasePath, path);
@@ -96,12 +96,40 @@ namespace Ntreev.Crema.Services
             return files;
         }
 
+        public void ValidateExists()
+        {
+            if (this.IsDirectory == true)
+            {
+                if (this.IsExists == false)
+                    throw new DirectoryNotFoundException();
+            }
+            else
+            {
+                if (this.IsExists == false)
+                    throw new FileNotFoundException();
+            }
+        }
+
+        public void ValidateNotExists()
+        {
+            if (this.IsDirectory == true)
+            {
+                if (this.IsExists == true)
+                    throw new IOException();
+            }
+            else
+            {
+                if (this.IsExists == true)
+                    throw new IOException();
+            }
+        }
+
         public void ValidateExists(IObjectSerializer serializer, Type type)
         {
             this.ValidateExists(serializer, type, ObjectSerializerSettings.Empty);
         }
 
-            public void ValidateExists(IObjectSerializer serializer, Type type, ObjectSerializerSettings settings)
+        public void ValidateExists(IObjectSerializer serializer, Type type, ObjectSerializerSettings settings)
         {
             var files = serializer.GetPath(this.Path, type, settings);
             foreach (var item in files)

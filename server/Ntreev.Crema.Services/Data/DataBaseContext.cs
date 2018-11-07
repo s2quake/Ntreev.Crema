@@ -36,7 +36,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
-    class DataBaseCollection : ContainerBase<DataBase>, IDataBaseCollection
+    class DataBaseContext : ContainerBase<DataBase>, IDataBaseContext
     {
         internal const string DataBasesString = "databases";
 
@@ -59,7 +59,7 @@ namespace Ntreev.Crema.Services.Data
         private ItemsEventHandler<IDataBase> itemsAccessChanged;
         private ItemsEventHandler<IDataBase> itemsLockChanged;
 
-        public DataBaseCollection(CremaHost cremaHost)
+        public DataBaseContext(CremaHost cremaHost)
         {
             this.CremaHost = cremaHost;
             this.Dispatcher = new CremaDispatcher(this);
@@ -109,6 +109,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewDataBaseAsync), dataBaseName, comment);
                     this.ValidateCreateDataBase(authentication, dataBaseName);
                 });
+                var taskID = GuidUtility.FromName(dataBaseName + comment);
                 var dataSet = new CremaDataSet();
                 var tempPath = PathUtility.GetTempPath(true);
                 var dataBasePath = Path.Combine(tempPath, dataBaseName);
@@ -131,7 +132,7 @@ namespace Ntreev.Crema.Services.Data
                     var dataBase = new DataBase(this, dataBaseName);
                     this.CremaHost.Sign(authentication);
                     this.AddBase(dataBase.Name, dataBase);
-                    this.InvokeItemsCreateEvent(authentication, new DataBase[] { dataBase }, comment);
+                    this.InvokeItemsCreateEvent(authentication, new DataBase[] { dataBase }, comment, taskID);
                     return dataBase;
                 });
             }
@@ -153,6 +154,7 @@ namespace Ntreev.Crema.Services.Data
                     this.ValidateCopyDataBase(authentication, dataBase, newDataBaseName, force);
                     this.CremaHost.Sign(authentication);
                 });
+                var taskID = GuidUtility.FromName(newDataBaseName + comment);
                 await this.RepositoryDispatcher.InvokeAsync(() =>
                 {
                     var dataBaseName = dataBase.Name;
@@ -163,7 +165,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     var newDataBase = new DataBase(this, newDataBaseName);
                     this.AddBase(newDataBase.Name, newDataBase);
-                    this.InvokeItemsCreateEvent(authentication, new DataBase[] { newDataBase }, comment);
+                    this.InvokeItemsCreateEvent(authentication, new DataBase[] { newDataBase }, comment, taskID);
                     return newDataBase;
                 });
             }
@@ -174,33 +176,32 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task<SignatureDate> InvokeDataBaseRenameAsync(Authentication authentication, DataBaseInfo dataBaseInfo, string newDataBaseName)
+        public async Task InvokeDataBaseRenameAsync(Authentication authentication, DataBaseInfo dataBaseInfo, string newDataBaseName)
         {
             var message = EventMessageBuilder.RenameDataBase(authentication, dataBaseInfo.Name, newDataBaseName);
             var remotesPath = this.RemotePath;
-            var result = await this.repositoryDispatcher.InvokeAsync(() =>
+            await this.repositoryDispatcher.InvokeAsync(() =>
             {
-                var signatureDate = authentication.Sign();
                 this.repositoryProvider.RenameRepository(authentication, remotesPath, dataBaseInfo.Name, newDataBaseName, message);
-                return signatureDate;
             });
-            this.ReplaceKeyBase(dataBaseInfo.Name, newDataBaseName);
-            return result;
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.ReplaceKeyBase(dataBaseInfo.Name, newDataBaseName);
+            });
         }
 
-        public async Task<SignatureDate> InvokeDataBaseDeleteAsync(Authentication authentication, DataBaseInfo dataBaseInfo)
+        public async Task InvokeDataBaseDeleteAsync(Authentication authentication, DataBaseInfo dataBaseInfo)
         {
             var message = EventMessageBuilder.DeleteDataBase(authentication, dataBaseInfo.Name);
-            var result = await this.repositoryDispatcher.InvokeAsync(() =>
+            await this.repositoryDispatcher.InvokeAsync(() =>
             {
-                var signatureDate = authentication.Sign();
                 this.repositoryProvider.DeleteRepository(authentication, this.RemotePath, dataBaseInfo.Name, message);
-                return signatureDate;
             });
-            this.DeleteCaches(dataBaseInfo);
-            this.RemoveBase(dataBaseInfo.Name);
-            return result;
-
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                this.DeleteCaches(dataBaseInfo);
+                this.RemoveBase(dataBaseInfo.Name);
+            });
         }
 
         public Task<RepositoryInfo> InvokeDataBaseRevertAsync(Authentication authentication, string dataBaseName, string revision)
@@ -250,55 +251,55 @@ namespace Ntreev.Crema.Services.Data
             };
         }
 
-        public void InvokeItemsCreateEvent(Authentication authentication, DataBase[] items, string comment)
+        public void InvokeItemsCreateEvent(Authentication authentication, DataBase[] items, string comment, Guid taskID)
         {
             var args = items.Select(item => (object)item.DataBaseInfo).ToArray();
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsCreateEvent), items);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsCreateEvent), items);
             var message = EventMessageBuilder.CreateDataBase(authentication, items) + ": " + comment;
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsCreated(new ItemsCreatedEventArgs<IDataBase>(authentication, items, args, null));
+            this.OnItemsCreated(new ItemsCreatedEventArgs<IDataBase>(authentication, items, args, null) { TaskID = taskID });
         }
 
-        public void InvokeItemsRenamedEvent(Authentication authentication, DataBase[] items, string[] oldNames)
+        public void InvokeItemsRenamedEvent(Authentication authentication, DataBase[] items, string[] oldNames, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsRenamedEvent), items, oldNames);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsRenamedEvent), items, oldNames);
             var message = EventMessageBuilder.RenameDataBase(authentication, items, oldNames);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsRenamed(new ItemsRenamedEventArgs<IDataBase>(authentication, items, oldNames, oldNames));
+            this.OnItemsRenamed(new ItemsRenamedEventArgs<IDataBase>(authentication, items, oldNames, oldNames) { TaskID = taskID });
         }
 
-        public void InvokeItemsDeletedEvent(Authentication authentication, IDataBase[] items, string[] paths)
+        public void InvokeItemsDeletedEvent(Authentication authentication, IDataBase[] items, string[] paths, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsDeletedEvent), paths);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsDeletedEvent), paths);
             var message = EventMessageBuilder.DeleteDataBase(authentication, items);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsDeleted(new ItemsDeletedEventArgs<IDataBase>(authentication, items, paths));
+            this.OnItemsDeleted(new ItemsDeletedEventArgs<IDataBase>(authentication, items, paths) { TaskID = taskID });
         }
 
-        public void InvokeItemsRevertedEvent(Authentication authentication, IDataBase[] items, string[] revisions)
+        public void InvokeItemsRevertedEvent(Authentication authentication, IDataBase[] items, string[] revisions, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsRevertedEvent), items, revisions);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsRevertedEvent), items, revisions);
             var message = EventMessageBuilder.RevertDataBase(authentication, items, revisions);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsInfoChanged(new ItemsEventArgs<IDataBase>(authentication, items));
+            this.OnItemsInfoChanged(new ItemsEventArgs<IDataBase>(authentication, items) { TaskID = taskID });
         }
 
-        public void InvokeItemsLoadedEvent(Authentication authentication, IDataBase[] items)
+        public void InvokeItemsLoadedEvent(Authentication authentication, IDataBase[] items, Guid taskID)
         {
             this.CremaHost.DebugMethodMany(authentication, this, nameof(InvokeItemsLoadedEvent), items);
             this.CremaHost.Info(EventMessageBuilder.LoadDataBase(authentication, items));
-            this.OnItemsLoaded(new ItemsEventArgs<IDataBase>(authentication, items));
+            this.OnItemsLoaded(new ItemsEventArgs<IDataBase>(authentication, items) { TaskID = taskID });
         }
 
-        public void InvokeItemsUnloadedEvent(Authentication authentication, IDataBase[] items)
+        public void InvokeItemsUnloadedEvent(Authentication authentication, IDataBase[] items, Guid taskID)
         {
             this.CremaHost.DebugMethodMany(authentication, this, nameof(InvokeItemsUnloadedEvent), items);
             this.CremaHost.Info(EventMessageBuilder.UnloadDataBase(authentication, items));
-            this.OnItemsUnloaded(new ItemsEventArgs<IDataBase>(authentication, items));
+            this.OnItemsUnloaded(new ItemsEventArgs<IDataBase>(authentication, items) { TaskID = taskID });
         }
 
         public void InvokeItemsResettingEvent(Authentication authentication, IDataBase[] items)
@@ -315,18 +316,18 @@ namespace Ntreev.Crema.Services.Data
             this.OnItemsReset(new ItemsEventArgs<IDataBase>(authentication, items, metaDatas));
         }
 
-        public void InvokeItemsAuthenticationEnteredEvent(Authentication authentication, IDataBase[] items)
+        public void InvokeItemsAuthenticationEnteredEvent(Authentication authentication, IDataBase[] items, Guid taskID)
         {
             this.CremaHost.DebugMethodMany(authentication, this, nameof(InvokeItemsAuthenticationEnteredEvent), items);
             this.CremaHost.Info(EventMessageBuilder.EnterDataBase(authentication, items));
-            this.OnItemsAuthenticationEntered(new ItemsEventArgs<IDataBase>(authentication, items, authentication.AuthenticationInfo));
+            this.OnItemsAuthenticationEntered(new ItemsEventArgs<IDataBase>(authentication, items, authentication.AuthenticationInfo) { TaskID = taskID });
         }
 
-        public void InvokeItemsAuthenticationLeftEvent(Authentication authentication, IDataBase[] items)
+        public void InvokeItemsAuthenticationLeftEvent(Authentication authentication, IDataBase[] items, Guid taskID)
         {
             this.CremaHost.DebugMethodMany(authentication, this, nameof(InvokeItemsAuthenticationLeftEvent), items);
             this.CremaHost.Info(EventMessageBuilder.LeaveDataBase(authentication, items));
-            this.OnItemsAuthenticationLeft(new ItemsEventArgs<IDataBase>(authentication, items, authentication.AuthenticationInfo));
+            this.OnItemsAuthenticationLeft(new ItemsEventArgs<IDataBase>(authentication, items, authentication.AuthenticationInfo) { TaskID = taskID });
         }
 
         public void InvokeItemsChangedEvent(Authentication authentication, IDataBase[] items)
@@ -341,74 +342,74 @@ namespace Ntreev.Crema.Services.Data
             this.OnItemsStateChanged(new ItemsEventArgs<IDataBase>(authentication, items));
         }
 
-        public void InvokeItemsSetPublicEvent(Authentication authentication, string basePath, IDataBase[] items)
+        public void InvokeItemsSetPublicEvent(Authentication authentication, string basePath, IDataBase[] items, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetPublicEvent), items);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsSetPublicEvent), items);
             var message = EventMessageBuilder.SetPublicDataBase(authentication, items);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Public);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsAccessChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData));
+            this.OnItemsAccessChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData) { TaskID = taskID });
         }
 
-        public void InvokeItemsSetPrivateEvent(Authentication authentication, string basePath, IDataBase[] items)
+        public void InvokeItemsSetPrivateEvent(Authentication authentication, string basePath, IDataBase[] items, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetPrivateEvent), items);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsSetPrivateEvent), items);
             var message = EventMessageBuilder.SetPrivateDataBase(authentication, items);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Private);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsAccessChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData));
+            this.OnItemsAccessChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData) { TaskID = taskID });
         }
 
-        public void InvokeItemsAddAccessMemberEvent(Authentication authentication, string basePath, IDataBase[] items, string[] memberIDs, AccessType[] accessTypes)
+        public void InvokeItemsAddAccessMemberEvent(Authentication authentication, string basePath, IDataBase[] items, string[] memberIDs, AccessType[] accessTypes, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsAddAccessMemberEvent), items, memberIDs, accessTypes);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsAddAccessMemberEvent), items, memberIDs, accessTypes);
             var message = EventMessageBuilder.AddAccessMemberToDataBase(authentication, items, memberIDs, accessTypes);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Add, memberIDs, accessTypes);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsAccessChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData));
+            this.OnItemsAccessChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData) { TaskID = taskID });
         }
 
-        public void InvokeItemsSetAccessMemberEvent(Authentication authentication, string basePath, IDataBase[] items, string[] memberIDs, AccessType[] accessTypes)
+        public void InvokeItemsSetAccessMemberEvent(Authentication authentication, string basePath, IDataBase[] items, string[] memberIDs, AccessType[] accessTypes, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetAccessMemberEvent), items, memberIDs, accessTypes);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsSetAccessMemberEvent), items, memberIDs, accessTypes);
             var message = EventMessageBuilder.SetAccessMemberOfDataBase(authentication, items, memberIDs, accessTypes);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Set, memberIDs, accessTypes);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsAccessChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData));
+            this.OnItemsAccessChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData) { TaskID = taskID });
         }
 
-        public void InvokeItemsRemoveAccessMemberEvent(Authentication authentication, string basePath, IDataBase[] items, string[] memberIDs)
+        public void InvokeItemsRemoveAccessMemberEvent(Authentication authentication, string basePath, IDataBase[] items, string[] memberIDs, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsRemoveAccessMemberEvent), items, memberIDs);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsRemoveAccessMemberEvent), items, memberIDs);
             var message = EventMessageBuilder.RemoveAccessMemberFromDataBase(authentication, items, memberIDs);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Remove, memberIDs);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsAccessChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData));
+            this.OnItemsAccessChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData) { TaskID = taskID });
         }
 
-        public void InvokeItemsLockedEvent(Authentication authentication, IDataBase[] items, string[] comments)
+        public void InvokeItemsLockedEvent(Authentication authentication, IDataBase[] items, string[] comments, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsLockedEvent), items, comments);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsLockedEvent), items, comments);
             var message = EventMessageBuilder.LockDataBase(authentication, items, comments);
             var metaData = EventMetaDataBuilder.Build(items, LockChangeType.Lock, comments);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsLockChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData));
+            this.OnItemsLockChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData) { TaskID = taskID });
         }
 
-        public void InvokeItemsUnlockedEvent(Authentication authentication, IDataBase[] items)
+        public void InvokeItemsUnlockedEvent(Authentication authentication, IDataBase[] items, Guid taskID)
         {
-            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsUnlockedEvent), items);
+            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsUnlockedEvent), items);
             var message = EventMessageBuilder.UnlockDataBase(authentication, items);
             var metaData = EventMetaDataBuilder.Build(items, LockChangeType.Unlock);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsLockChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData));
+            this.OnItemsLockChanged(new ItemsEventArgs<IDataBase>(authentication, items, metaData) { TaskID = taskID });
         }
 
         public async Task DisposeAsync()
@@ -787,19 +788,19 @@ namespace Ntreev.Crema.Services.Data
 
         #region IDataBaseCollection
 
-        async Task<IDataBase> IDataBaseCollection.AddNewDataBaseAsync(Authentication authentication, string dataBaseName, string comment)
+        async Task<IDataBase> IDataBaseContext.AddNewDataBaseAsync(Authentication authentication, string dataBaseName, string comment)
         {
             return await this.AddNewDataBaseAsync(authentication, dataBaseName, comment);
         }
 
-        bool IDataBaseCollection.Contains(string dataBaseName)
+        bool IDataBaseContext.Contains(string dataBaseName)
         {
             return this.ContainsKey(dataBaseName);
         }
 
-        IDataBase IDataBaseCollection.this[string dataBaseName] => this[dataBaseName];
+        IDataBase IDataBaseContext.this[string dataBaseName] => this[dataBaseName];
 
-        IDataBase IDataBaseCollection.this[Guid dataBaseID] => this[dataBaseID];
+        IDataBase IDataBaseContext.this[Guid dataBaseID] => this[dataBaseID];
 
         #endregion
 

@@ -176,7 +176,7 @@ namespace Ntreev.Crema.Services.DataBaseService {
         void OnServiceClosed(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, Ntreev.Crema.ServiceModel.CloseInfo closeInfo);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTablesChanged")]
-        void OnTablesChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, Ntreev.Crema.Data.TableInfo[] tableInfos);
+        void OnTablesChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, Ntreev.Crema.Data.TableInfo[] tableInfos, string itemType);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTablesStateChanged")]
         void OnTablesStateChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] tableNames, Ntreev.Crema.ServiceModel.TableState[] states);

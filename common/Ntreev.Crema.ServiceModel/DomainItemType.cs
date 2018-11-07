@@ -15,26 +15,35 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services;
-using Ntreev.Library.Random;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Serialization;
+using Ntreev.Crema.Data.Xml;
+using System.Runtime.Serialization;
+using System.IO;
+using Ntreev.Library.ObjectModel;
+using Ntreev.Library.IO;
+using Ntreev.Library;
+using System.Xml;
+using System.Xml.Schema;
+using Ntreev.Library.Serialization;
+using Ntreev.Crema.Data.Xml.Schema;
 
-namespace Ntreev.Crema.Services.Random
+namespace Ntreev.Crema.ServiceModel
 {
-    public static class CremaHostExtensions
+    public static class DomainItemType
     {
-        public static Task<IDataBase> CreateRandomAsync(this ICremaHost cremaHost, Authentication authentication)
-        {
-            var dataBaseName = RandomUtility.NextIdentifier();
-            var comment = RandomUtility.NextString();
-            if (cremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
-            {
-                return dataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, comment);
-            }
-            throw new NotImplementedException();
-        }
+        public static readonly string TypeTemplate = nameof(TypeTemplate);
+
+        public static readonly string NewTypeTemplate = nameof(NewTypeTemplate);
+
+        public static readonly string TableTemplate = nameof(TableTemplate);
+
+        public static readonly string NewTableTemplate = nameof(NewTableTemplate);
+
+        public static readonly string TableContent = nameof(TableContent);
+
     }
 }

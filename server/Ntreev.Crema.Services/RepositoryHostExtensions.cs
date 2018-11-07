@@ -33,13 +33,20 @@ namespace Ntreev.Crema.Services
     {
         public static void Add(this RepositoryHost repositoryHost, RepositoryPath path)
         {
-            var files = path.GetFiles();
-            var status = repositoryHost.Status(files);
-            foreach (var item in status)
+            if (path.IsDirectory)
             {
-                if (item.Status == RepositoryItemStatus.Untracked)
+                repositoryHost.Add(path.Path);
+            }
+            else
+            {
+                var files = path.GetFiles();
+                var status = repositoryHost.Status(files);
+                foreach (var item in status)
                 {
-                    repositoryHost.Add(item.Path);
+                    if (item.Status == RepositoryItemStatus.Untracked)
+                    {
+                        repositoryHost.Add(item.Path);
+                    }
                 }
             }
         }

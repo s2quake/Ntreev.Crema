@@ -46,6 +46,6 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
             });
         }
 
-        private IDataBaseCollection DataBases => this.CremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
+        private IDataBaseContext DataBases => this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }
 }

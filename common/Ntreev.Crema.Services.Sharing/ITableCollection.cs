@@ -33,7 +33,7 @@ namespace Ntreev.Crema.Services
 
         event ItemsEventHandler<ITable> TablesStateChanged;
 
-        event ItemsEventHandler<ITable> TablesChanged;
+        event ItemsChangedEventHandler<ITable> TablesChanged;
 
         event ItemsCreatedEventHandler<ITable> TablesCreated;
 

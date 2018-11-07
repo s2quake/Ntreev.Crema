@@ -38,17 +38,17 @@ namespace Ntreev.Crema.Services.Data
         public async void Initialize(Authentication authentication)
         {
             this.Authentication = authentication;
-            if (this.CremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
+            if (this.CremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
             {
-                await dataBases.Dispatcher.InvokeAsync(() =>
+                await dataBaseContext.Dispatcher.InvokeAsync(() =>
                 {
-                    foreach (var item in dataBases)
+                    foreach (var item in dataBaseContext)
                     {
                         var serviceItem = this.CreateItem(item, this.Dispatcher, authentication);
                         this.items.Add(item, serviceItem);
                     }
-                    dataBases.ItemsCreated += DataBases_ItemCreated;
-                    dataBases.ItemsDeleted += DataBases_ItemsDeleted;
+                    dataBaseContext.ItemsCreated += DataBaseContext_ItemCreated;
+                    dataBaseContext.ItemsDeleted += DataBaseContext_ItemsDeleted;
                 });
             }
         }
@@ -75,7 +75,7 @@ namespace Ntreev.Crema.Services.Data
             this.Dispatcher.Invoke(() => this.Dispatcher.Dispose());
         }
 
-        private void DataBases_ItemCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
         {
             foreach (var item in e.Items)
             {
@@ -84,7 +84,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        private void DataBases_ItemsDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
         {
             foreach (var item in e.Items)
             {

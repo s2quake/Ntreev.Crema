@@ -763,6 +763,7 @@
       <xs:sequence>
         <xs:element xmlns:q72="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q72:CallbackInfo" />
         <xs:element xmlns:q73="http://schemas.ntreev.com" minOccurs="0" name="tableInfos" nillable="true" type="q73:ArrayOfTableInfo" />
+        <xs:element minOccurs="0" name="itemType" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

@@ -51,7 +51,7 @@ namespace Ntreev.Crema.Services.Data
             return this.BaseAddNew(name, categoryPath, authentication);
         }
 
-        public async Task<Type> AddNewAsync(Authentication authentication, CremaDataType dataType)
+        public async Task<Type> AddNewAsync(Authentication authentication, CremaDataType dataType, Guid taskID)
         {
             try
             {
@@ -61,7 +61,6 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), dataType.Name, dataType.CategoryPath);
                     this.ValidateAddNew(dataType.Name, dataType.CategoryPath, authentication);
                 });
-                var taskID = GuidUtility.FromName(dataType.Path);
                 var dataSet = dataType.DataSet;
                 var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, true, false);
                 var typePaths = new string[] { dataType.Path };

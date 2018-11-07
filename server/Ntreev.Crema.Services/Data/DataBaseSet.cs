@@ -93,53 +93,28 @@ namespace Ntreev.Crema.Services.Data
 
         public void SetTypeCategoryPath(string categoryPath, string newCategoryPath)
         {
-            var itemPath1 = new RepositoryPath(this.TypeContext, categoryPath);
-            var itemPath2 = new RepositoryPath(this.TypeContext, newCategoryPath);
+            var repositoryPath1 = new RepositoryPath(this.TypeContext, categoryPath);
+            var repositoryPath2 = new RepositoryPath(this.TypeContext, newCategoryPath);
 
-            if (itemPath1.IsExists == false)
-                throw new DirectoryNotFoundException();
-            if (itemPath2.IsExists == true)
-                throw new IOException();
-
-            var typeNames = DataSet.ExtendedProperties["TypeNames"] as string[];
-            var typeNameList = typeNames.ToList();
-            var files = DirectoryUtility.GetAllFiles(itemPath1.Path, "*.xsd");
-            var sss = files.Select(item => Path.GetFileNameWithoutExtension(item)).ToList();
+            repositoryPath1.ValidateExists();
+            repositoryPath2.ValidateNotExists();
 
             foreach (var item in this.types)
             {
                 var typeInfo = (TypeInfo)item.ExtendedProperties[typeof(TypeInfo)];
-                if (typeInfo.Path != item.Path)
-                {
-                    System.Diagnostics.Debugger.Launch();
-                }
                 if (typeInfo.CategoryPath.StartsWith(categoryPath) == false)
                     continue;
 
-                this.ValidateTypeExists(item.Path);
-                var cc = item.CategoryPath;
-                item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
-                if (item.CategoryPath == cc)
-                {
-                    System.Diagnostics.Debugger.Launch();
-                }
-                this.ValidateTypeNotExists(item.Path);
-                typeNameList.Remove(item.Name);
-                sss.Remove(item.Name);
-            }
-
-            if (typeNameList.Any() == true)
-            {
-                System.Diagnostics.Debugger.Launch();
-            }
-
-            if (sss.Any() == true)
-            {
-                System.Diagnostics.Debugger.Launch();
+                var newItemCategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
+                var itemPath1 = new RepositoryPath(this.TypeContext, item.Path);
+                var itemPath2 = new RepositoryPath(this.TypeContext, newItemCategoryPath + item.Name);
+                itemPath1.ValidateExists();
+                itemPath2.ValidateNotExists();
+                item.CategoryPath = newItemCategoryPath;
             }
 
             this.Serialize();
-            this.Repository.Move(itemPath1, itemPath2);
+            this.Repository.Move(repositoryPath1, repositoryPath2);
         }
 
         public void DeleteTypeCategory(string categoryPath)
@@ -151,96 +126,86 @@ namespace Ntreev.Crema.Services.Data
         public void CreateType()
         {
             this.Serialize();
-            this.AddTypesRepositoryPath();
+            foreach (var item in this.types)
+            {
+                if (item.ExtendedProperties.ContainsKey(typeof(TypeInfo)) == true)
+                    continue;
+
+                this.AddRepositoryPath(item);
+            }
         }
 
         public void RenameType(string typePath, string typeName)
         {
             var dataType = this.types.First(item => item.Path == typePath);
-            this.ValidateTypeExists(dataType.Path);
+            var repositoryPath1 = new RepositoryPath(this.TypeContext, typePath);
+            var repositoryPath2 = new RepositoryPath(this.TypeContext, dataType.CategoryPath + typeName);
+
+            repositoryPath1.ValidateExists();
+            repositoryPath1.ValidateNotExists();
             dataType.TypeName = typeName;
-            this.ValidateTypeNotExists(dataType.Path);
             this.Serialize();
-            this.MoveTypesRepositoryPath();
+            this.Repository.Move(repositoryPath1, repositoryPath2);
         }
 
         public void MoveType(string typePath, string categoryPath)
         {
             var dataType = this.types.First(item => item.Path == typePath);
-            this.ValidateTypeExists(dataType.Path);
+            var repositoryPath1 = new RepositoryPath(this.TypeContext, typePath);
+            var repositoryPath2 = new RepositoryPath(this.TypeContext, categoryPath + dataType.Name);
+
+            repositoryPath1.ValidateExists();
+            repositoryPath1.ValidateNotExists();
             dataType.CategoryPath = categoryPath;
-            this.ValidateTypeNotExists(dataType.Path);
             this.Serialize();
-            this.MoveTypesRepositoryPath();
+            this.Repository.Move(repositoryPath1, repositoryPath2);
         }
 
         public void DeleteType(string typePath)
         {
             var dataType = this.types.First(item => item.Path == typePath);
+            var repositoryPath = new RepositoryPath(this.TypeContext, typePath);
             var dataSet = dataType.DataSet;
+
+            repositoryPath.ValidateExists();
             dataSet.Types.Remove(dataType);
-            this.ValidateTypeExists(dataType.Path);
-            this.DeleteTypesRepositoryPath();
+            this.Repository.Delete(repositoryPath);
         }
 
         public void ModifyType()
         {
             foreach (var item in this.types)
             {
-                this.ValidateTypeExists(item.Path);
+                var repositoryPath = new RepositoryPath(this.TypeContext, item.Path);
+                repositoryPath.ValidateExists();
             }
             this.Serialize();
         }
 
         public void SetTableCategoryPath(string categoryPath, string newCategoryPath)
         {
-            var itemPath1 = new RepositoryPath(this.TableContext, categoryPath);
-            var itemPath2 = new RepositoryPath(this.TableContext, newCategoryPath);
+            var repositoryPath1 = new RepositoryPath(this.TableContext, categoryPath);
+            var repositoryPath2 = new RepositoryPath(this.TableContext, newCategoryPath);
 
-            if (itemPath1.IsExists == false)
-                throw new DirectoryNotFoundException();
-            if (itemPath2.IsExists == true)
-                throw new IOException();
-
-            var tableNames = DataSet.ExtendedProperties["TableNames"] as string[];
-            var tableNameList = tableNames.ToList();
-            var files = DirectoryUtility.GetAllFiles(itemPath1.Path, "*.xml");
-            var sss = files.Select(item => Path.GetFileNameWithoutExtension(item)).ToList();
+            repositoryPath1.ValidateExists();
+            repositoryPath2.ValidateNotExists();
 
             foreach (var item in this.tables)
             {
                 var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
                 if (tableInfo.CategoryPath.StartsWith(categoryPath) == false)
                     continue;
-                if (tableInfo.ParentName == string.Empty)
-                {
-                    if (tableInfo.Path != item.Path)
-                    {
-                        System.Diagnostics.Debugger.Launch();
-                    }
 
-                    var cc = item.CategoryPath;
-                    item.CategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
-                    if (item.CategoryPath == cc)
-                    {
-                        System.Diagnostics.Debugger.Launch();
-                    }
-                }
-
-                tableNameList.Remove(item.Name);
-                sss.Remove(item.Name);
+                var newItemCategoryPath = Regex.Replace(item.CategoryPath, "^" + categoryPath, newCategoryPath);
+                var itemPath1 = new RepositoryPath(this.TableContext, item.Path);
+                var itemPath2 = new RepositoryPath(this.TableContext, newItemCategoryPath + tableInfo.Name);
+                itemPath1.ValidateExists();
+                itemPath2.ValidateNotExists();
+                item.CategoryPath = newItemCategoryPath;
             }
 
-            if (tableNameList.Any() == true)
-            {
-                System.Diagnostics.Debugger.Launch();
-            }
-            if (sss.Any() == true)
-            {
-                System.Diagnostics.Debugger.Launch();
-            }
             this.Serialize();
-            this.Repository.Move(itemPath1, itemPath2);
+            this.Repository.Move(repositoryPath1, repositoryPath2);
         }
 
         public void DeleteTableCategory(string categoryPath)
@@ -251,63 +216,99 @@ namespace Ntreev.Crema.Services.Data
 
         public void CreateTable()
         {
-            this.Serialize();
-            this.AddTablesRepositoryPath();
+            var query = from table in this.tables
+                        from column in table.Columns
+                        where column.CremaType != null
+                        select column.CremaType;
+            var types = query.Distinct();
 
-            var status = this.Repository.Status();
-            var typesDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);
-            foreach (var item in status)
+            this.Serialize();
+            foreach (var item in this.tables)
             {
-                if (item.Path.StartsWith(typesDirectory) == true)
+                if (item.ExtendedProperties.ContainsKey(typeof(TableInfo)) == true)
+                    continue;
+
+                this.AddRepositoryPath(item);
+            }
+
+            foreach (var item in types)
+            {
+                var repositoryPath = new RepositoryPath(this.TypeContext, item.Path);
+                repositoryPath.ValidateExists();
+                var status = this.Repository.Status(repositoryPath.GetFiles());
+                foreach (var file in status)
                 {
-                    throw new Exception("타입이 변경되었습니다.");
+                    if (file.Status != RepositoryItemStatus.None)
+                    {
+                        throw new CremaException("타입이 변경되었습니다.");
+                    }
                 }
             }
         }
 
+        // TODO: 자식 테이블 이름 변경 해결 해야됨
         public void RenameTable(string tablePath, string tableName)
         {
             var dataTable = this.tables.First(item => item.Path == tablePath);
-            this.ValidateTableExists(dataTable.Path);
+            var repositoryPath1 = new RepositoryPath(this.TableContext, tablePath);
+            var repositoryPath2 = new RepositoryPath(this.TableContext, dataTable.CategoryPath + tableName);
+            repositoryPath1.ValidateExists();
+            repositoryPath1.ValidateNotExists();
             dataTable.TableName = tableName;
-            this.ValidateTableNotExists(dataTable.Path);
             this.Serialize();
-            this.MoveTablesRepositoryPath();
+            this.Repository.Move(repositoryPath1, repositoryPath2);
         }
 
         public void MoveTable(string tablePath, string categoryPath)
         {
             var dataTable = this.tables.First(item => item.Path == tablePath);
-            this.ValidateTableExists(dataTable.Path);
+            var repositoryPath1 = new RepositoryPath(this.TableContext, tablePath);
+            var repositoryPath2 = new RepositoryPath(this.TableContext, categoryPath + dataTable.Name);
+
+            repositoryPath1.ValidateExists();
+            repositoryPath1.ValidateNotExists();
             dataTable.CategoryPath = categoryPath;
-            this.ValidateTableNotExists(dataTable.Path);
             this.Serialize();
-            this.MoveTablesRepositoryPath();
+            this.Repository.Move(repositoryPath1, repositoryPath2);
         }
 
         public void DeleteTable(string tablePath)
         {
             var dataTable = this.tables.First(item => item.Path == tablePath);
+            var repositoryPath = new RepositoryPath(this.TableContext, tablePath);
             var dataSet = dataTable.DataSet;
+
+            repositoryPath.ValidateExists();
             dataSet.Tables.Remove(dataTable);
-            this.DeleteTablesRepositoryPath();
+            this.Repository.Delete(repositoryPath);
         }
 
         public void ModifyTable()
         {
+            var query = from table in this.tables
+                        from column in table.Columns
+                        where column.CremaType != null
+                        select column.CremaType;
+
+            var types = query.Distinct();
             foreach (var item in this.tables)
             {
-                this.ValidateTableExists(item.Path);
+                var repositoryPath = new RepositoryPath(this.TableContext, item.Path);
+                repositoryPath.ValidateExists();
             }
             this.Serialize();
 
-            var status = this.Repository.Status();
-            var typesDirectory = Path.Combine(this.dataBase.BasePath, CremaSchema.TypeDirectory);
-            foreach (var item in status)
+            foreach (var item in types)
             {
-                if (item.Path.StartsWith(typesDirectory) == true)
+                var repositoryPath = new RepositoryPath(this.TypeContext, item.Path);
+                repositoryPath.ValidateExists();
+                var status = this.Repository.Status(repositoryPath.GetFiles());
+                foreach (var file in status)
                 {
-                    throw new Exception("타입이 변경되었습니다.");
+                    if (file.Status != RepositoryItemStatus.None)
+                    {
+                        throw new CremaException("타입이 변경되었습니다.");
+                    }
                 }
             }
         }
@@ -355,57 +356,38 @@ namespace Ntreev.Crema.Services.Data
         {
             foreach (var item in this.types)
             {
+                var itemPath1 = new RepositoryPath(this.TypeContext, item.Path);
                 if (item.ExtendedProperties.ContainsKey(typeof(TypeInfo)) == true)
                 {
                     var typeInfo = (TypeInfo)item.ExtendedProperties[typeof(TypeInfo)];
-                    var itemPath1 = new RepositoryPath(this.TypeContext, item.Path);
                     var itemPath2 = new RepositoryPath(this.TypeContext, typeInfo.Path);
-
                     if (itemPath1 != itemPath2)
                     {
-                        this.ValidateTypeNotExists(item.Path);
-                        this.ValidateTypeExists(typeInfo.Path);
+                        itemPath1.ValidateNotExists();
                     }
-                    else
-                    {
-                        this.ValidateTypeExists(item.Path);
-                    }
+                    itemPath2.ValidateExists();
 
                     this.Serializer.Serialize(itemPath2, item, ObjectSerializerSettings.Empty);
                 }
                 else
                 {
-                    this.ValidateTypeNotExists(item.Path);
-                    var itemPath = new RepositoryPath(this.TypeContext, item.Path);
-                    var sss = Path.GetFileName(itemPath.Path);
-
-                    var files = DirectoryUtility.GetAllFiles(this.dataBase.BasePath, sss + ".*");
-                    if (files.Any())
-                    {
-                        System.Diagnostics.Debugger.Launch();
-                    }
-
-                    this.Serializer.Serialize(itemPath, item, ObjectSerializerSettings.Empty);
+                    itemPath1.ValidateNotExists();
+                    this.Serializer.Serialize(itemPath1, item, ObjectSerializerSettings.Empty);
                 }
             }
 
             foreach (var item in this.tables)
             {
+                var itemPath1 = new RepositoryPath(this.TableContext, item.Path);
                 if (item.ExtendedProperties.ContainsKey(typeof(TableInfo)) == true)
                 {
                     var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
-                    var itemPath1 = new RepositoryPath(this.TableContext, item.Path);
                     var itemPath2 = new RepositoryPath(this.TableContext, tableInfo.Path);
-
                     if (itemPath1 != itemPath2)
                     {
-                        this.ValidateTableNotExists(item.Path);
-                        this.ValidateTableExists(tableInfo.Path);
+                        itemPath1.ValidateNotExists();
                     }
-                    else
-                    {
-                        this.ValidateTableExists(item.Path);
-                    }
+                    itemPath2.ValidateExists();
 
                     var parentItemPath = string.Empty;
                     if (item.ExtendedProperties[nameof(TableInfo.TemplatedParent)] is TableInfo parentInfo)
@@ -418,89 +400,10 @@ namespace Ntreev.Crema.Services.Data
                 }
                 else
                 {
-                    this.ValidateTableNotExists(item.Path);
-                    var itemPath = new RepositoryPath(this.TableContext, item.Path);
-                    var sss = Path.GetFileName(itemPath.Path);
-
-                    var files = DirectoryUtility.GetAllFiles(this.dataBase.BasePath, sss + ".*");
-                    if (files.Any())
-                    {
-                        System.Diagnostics.Debugger.Launch();
-                    }
-
+                    itemPath1.ValidateNotExists();
                     var props = new CremaDataTableSerializerSettings(item.Namespace, item.TemplateNamespace);
-                    this.Serializer.Serialize(itemPath, item, props);
+                    this.Serializer.Serialize(itemPath1, item, props);
                 }
-            }
-        }
-
-        private void AddTypesRepositoryPath()
-        {
-            foreach (var item in this.types)
-            {
-                if (item.ExtendedProperties.ContainsKey(typeof(TypeInfo)) == true)
-                    continue;
-
-                this.AddRepositoryPath(item);
-            }
-        }
-
-        private void MoveTypesRepositoryPath()
-        {
-            foreach (var item in this.types)
-            {
-                var typeInfo = (TypeInfo)item.ExtendedProperties[typeof(TypeInfo)];
-                if (typeInfo.Path == item.Path)
-                    continue;
-
-                this.MoveRepositoryPath(item, typeInfo.Path);
-            }
-        }
-
-        private void DeleteTypesRepositoryPath()
-        {
-            foreach (var item in this.types)
-            {
-                var typeInfo = (TypeInfo)item.ExtendedProperties[typeof(TypeInfo)];
-                if (item.DataSet != null)
-                    continue;
-
-                this.DeleteRepositoryPath(item, typeInfo.Path);
-            }
-        }
-
-        private void AddTablesRepositoryPath()
-        {
-            foreach (var item in this.tables)
-            {
-                if (item.ExtendedProperties.ContainsKey(typeof(TableInfo)) == true)
-                    continue;
-
-                this.AddRepositoryPath(item);
-            }
-        }
-
-        private void MoveTablesRepositoryPath()
-        {
-            foreach (var item in this.tables)
-            {
-                var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
-                if (tableInfo.Path == item.Path)
-                    continue;
-
-                this.MoveRepositoryPath(item, tableInfo.Path);
-            }
-        }
-
-        private void DeleteTablesRepositoryPath()
-        {
-            foreach (var item in this.tables)
-            {
-                var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
-                if (item.DataSet != null)
-                    continue;
-
-                this.DeleteRepositoryPath(item, tableInfo.Path);
             }
         }
 
@@ -537,33 +440,6 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        private void MoveRepositoryPath(CremaDataType dataType, string typePath)
-        {
-            var itemPath = new RepositoryPath(this.TypeContext, typePath);
-            var files = itemPath.GetFiles();
-
-            for (var i = 0; i < files.Length; i++)
-            {
-                var path1 = files[i];
-                var extension = Path.GetExtension(path1);
-                var repositoryPath2 = new RepositoryPath(this.TypeContext, dataType.Path);
-                var path2 = repositoryPath2.Path + extension;
-                this.Repository.Move(path1, path2);
-            }
-        }
-
-        private void DeleteRepositoryPath(CremaDataType dataType, string typePath)
-        {
-            var repositoryPath = new RepositoryPath(this.TypeContext, typePath);
-            var files = repositoryPath.GetFiles();
-            foreach (var item in files)
-            {
-                if (File.Exists(item) == false)
-                    throw new FileNotFoundException();
-            }
-            this.Repository.DeleteRange(files);
-        }
-
         private void AddRepositoryPath(CremaDataTable dataTable)
         {
             var repositoryPath = new RepositoryPath(this.TableContext, dataTable.Path);
@@ -595,77 +471,6 @@ namespace Ntreev.Crema.Services.Data
                         }
                     }
                 }
-            }
-        }
-
-        private void MoveRepositoryPath(CremaDataTable dataTable, string tablePath)
-        {
-            var repositoryPath = new RepositoryPath(this.TableContext, tablePath);
-            var files = repositoryPath.GetFiles();
-
-            for (var i = 0; i < files.Length; i++)
-            {
-                var path1 = files[i];
-                var extension = Path.GetExtension(path1);
-                var repositoryPath2 = new RepositoryPath(this.TableContext, dataTable.Path);
-                var path2 = repositoryPath2.Path + extension;
-                this.Repository.Move(path1, path2);
-            }
-        }
-
-        private void DeleteRepositoryPath(CremaDataTable dataTable, string tablePath)
-        {
-            var repositoryPath = new RepositoryPath(this.TableContext, tablePath);
-            var files = repositoryPath.GetFiles();
-            foreach (var item in files)
-            {
-                if (File.Exists(item) == false)
-                    throw new FileNotFoundException();
-            }
-            this.Repository.DeleteRange(files);
-        }
-
-        private void ValidateTypeExists(string typePath)
-        {
-            var repositoryPath = new RepositoryPath(this.TypeContext, typePath);
-            var files = this.Serializer.GetPath(repositoryPath.Path, typeof(CremaDataType), ObjectSerializerSettings.Empty);
-            foreach (var item in files)
-            {
-                if (File.Exists(item) == false)
-                    throw new FileNotFoundException();
-            }
-        }
-
-        private void ValidateTypeNotExists(string typePath)
-        {
-            var repositoryPath = new RepositoryPath(this.TypeContext, typePath);
-            var files = this.Serializer.GetPath(repositoryPath.Path, typeof(CremaDataType), ObjectSerializerSettings.Empty);
-            foreach (var item in files)
-            {
-                if (File.Exists(item) == true)
-                    throw new FileNotFoundException();
-            }
-        }
-
-        private void ValidateTableExists(string tablePath)
-        {
-            var repositoryPath = new RepositoryPath(this.TableContext, tablePath);
-            var files = this.Serializer.GetPath(repositoryPath.Path, typeof(CremaDataTable), ObjectSerializerSettings.Empty);
-            foreach (var item in files)
-            {
-                if (File.Exists(item) == false)
-                    throw new FileNotFoundException();
-            }
-        }
-
-        private void ValidateTableNotExists(string tablePath)
-        {
-            var repositoryPath = new RepositoryPath(this.TableContext, tablePath);
-            var files = this.Serializer.GetPath(repositoryPath.Path, typeof(CremaDataTable), ObjectSerializerSettings.Empty);
-            foreach (var item in files)
-            {
-                if (File.Exists(item) == true)
-                    throw new FileNotFoundException();
             }
         }
 

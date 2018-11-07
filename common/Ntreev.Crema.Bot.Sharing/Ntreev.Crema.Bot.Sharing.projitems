@@ -17,7 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TaskContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TaskMethodAttribute.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tasks\IAutobotTask.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Tasks\IDataBaseCollectionTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tasks\IDataBaseContextTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tasks\IDataBaseTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tasks\ITableCategoryTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tasks\ITableColumnTask.cs" />

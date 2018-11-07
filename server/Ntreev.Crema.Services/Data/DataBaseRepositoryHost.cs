@@ -259,15 +259,16 @@ namespace Ntreev.Crema.Services.Data
             return null;
         }
 
-        public void CreateTypeCategory(string itemPath)
+        public void CreateTypeCategory(string categoryPath)
         {
-            var directoryName = PathUtility.GetDirectoryName(itemPath);
-            if (Directory.Exists(directoryName) == false)
-                throw new DirectoryNotFoundException();
-            if (Directory.Exists(itemPath) == true)
-                throw new IOException();
-            Directory.CreateDirectory(itemPath);
-            this.Add(itemPath);
+            var repositoryPath = new RepositoryPath(this.TypeContext, categoryPath);
+            var parentPath = repositoryPath.ParentPath;
+
+            parentPath.ValidateExists();
+            repositoryPath.ValidateNotExists();
+
+            Directory.CreateDirectory(repositoryPath.Path);
+            this.Add(repositoryPath);
         }
 
         public void RenameTypeCategory(DataBaseSet dataBaseSet, string categoryPath, string newCategoryPath)
@@ -285,15 +286,16 @@ namespace Ntreev.Crema.Services.Data
             dataBaseSet.DeleteTypeCategory(categoryPath);
         }
 
-        public void CreateTableCategory(string itemPath)
+        public void CreateTableCategory(string categoryPath)
         {
-            var directoryName = PathUtility.GetDirectoryName(itemPath);
-            if (Directory.Exists(directoryName) == false)
-                throw new DirectoryNotFoundException();
-            if (Directory.Exists(itemPath) == true)
-                throw new IOException();
-            Directory.CreateDirectory(itemPath);
-            this.Add(itemPath);
+            var repositoryPath = new RepositoryPath(this.TableContext, categoryPath);
+            var parentPath = repositoryPath.ParentPath;
+
+            parentPath.ValidateExists();
+            repositoryPath.ValidateNotExists();
+
+            Directory.CreateDirectory(repositoryPath.Path);
+            this.Add(repositoryPath);
         }
 
         public void RenameTableCategory(DataBaseSet dataBaseSet, string categoryPath, string newCategoryPath)

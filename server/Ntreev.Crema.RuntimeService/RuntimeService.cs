@@ -71,11 +71,11 @@ namespace Ntreev.Crema.RuntimeService
         {
             this.authentication = authentication;
 
-            if (this.cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
+            if (this.cremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
             {
-                await dataBases.Dispatcher.InvokeAsync(() =>
+                await dataBaseContext.Dispatcher.InvokeAsync(() =>
                 {
-                    foreach (var item in dataBases)
+                    foreach (var item in dataBaseContext)
                     {
                         var obj = new RuntimeServiceItem(item, this.dispatcher, authentication);
                         this.items.Add(item.ID, obj);
@@ -211,7 +211,7 @@ namespace Ntreev.Crema.RuntimeService
             get { return this.dispatcher; }
         }
 
-        private void DataBases_ItemCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
         {
             foreach (var item in e.Items)
             {
@@ -220,7 +220,7 @@ namespace Ntreev.Crema.RuntimeService
             }
         }
 
-        private void DataBases_ItemDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
         {
             foreach (var item in e.Items)
             {
@@ -232,12 +232,12 @@ namespace Ntreev.Crema.RuntimeService
 
         private async void CremaHost_Opened(object sender, EventArgs e)
         {
-            if (this.cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
+            if (this.cremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
             {
-                await dataBases.Dispatcher.InvokeAsync(() =>
+                await dataBaseContext.Dispatcher.InvokeAsync(() =>
                 {
-                    dataBases.ItemsCreated += DataBases_ItemCreated;
-                    dataBases.ItemsDeleted += DataBases_ItemDeleted;
+                    dataBaseContext.ItemsCreated += DataBaseContext_ItemCreated;
+                    dataBaseContext.ItemsDeleted += DataBaseContext_ItemDeleted;
                 });
             }
         }

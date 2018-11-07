@@ -48,7 +48,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;
             this.UserContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
             this.DomainContext = cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
-            this.DataBases = cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
+            this.DataBasesContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
 
             this.LogService.Debug($"{nameof(DataBaseService)} Constructor");
         }
@@ -66,9 +66,9 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 this.authentication = await this.UserContext.AuthenticateAsync(authenticationToken);
                 await this.authentication.AddRefAsync(this);
                 this.OwnerID = this.authentication.ID;
-                await this.DataBases.Dispatcher.InvokeAsync(() =>
+                await this.DataBasesContext.Dispatcher.InvokeAsync(() =>
                 {
-                    this.dataBase = this.DataBases[dataBaseName];
+                    this.dataBase = this.DataBasesContext[dataBaseName];
                     this.dataBaseName = dataBaseName;
                 });
                 await this.dataBase.EnterAsync(this.authentication);
@@ -949,7 +949,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         public IUserContext UserContext { get; }
 
-        public IDataBaseCollection DataBases { get; }
+        public IDataBaseContext DataBasesContext { get; }
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {
@@ -980,13 +980,14 @@ namespace Ntreev.Crema.ServiceHosts.Data
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTablesStateChanged(callbackInfo, tableNames, states));
         }
 
-        private void Tables_TablesChanged(object sender, ItemsEventArgs<ITable> e)
+        private void Tables_TablesChanged(object sender, ItemsChangedEventArgs<ITable> e)
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
             var values = e.Items.Select(item => item.TableInfo).ToArray();
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTablesChanged(callbackInfo, values));
+            var itemType = e.ItemType;
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTablesChanged(callbackInfo, values, itemType));
         }
 
         private void TableContext_ItemCreated(object sender, ItemsCreatedEventArgs<ITableItem> e)

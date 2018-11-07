@@ -12,9 +12,9 @@ namespace Ntreev.Crema.Services.Extensions
     {
         public static Task<bool> ContainsDataBaseAsync(this ICremaHost cremaHost, string dataBaseName)
         {
-            if (cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
+            if (cremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
             {
-                return dataBases.Dispatcher.InvokeAsync(() => dataBases.Contains(dataBaseName));
+                return dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext.Contains(dataBaseName));
             }
             throw new NotImplementedException();
         }
@@ -87,13 +87,13 @@ namespace Ntreev.Crema.Services.Extensions
         {
             if (dataBaseName == null)
                 throw new ArgumentNullException(nameof(dataBaseName));
-            if (cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
+            if (cremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
             {
-                return dataBases.Dispatcher.InvokeAsync(() =>
+                return dataBaseContext.Dispatcher.InvokeAsync(() =>
                 {
-                    if (dataBases.Contains(dataBaseName) == false)
+                    if (dataBaseContext.Contains(dataBaseName) == false)
                         throw new DataBaseNotFoundException(dataBaseName);
-                    var dataBase = dataBases[dataBaseName];
+                    var dataBase = dataBaseContext[dataBaseName];
                     if (isLoaded == true && dataBase.IsLoaded == false)
                         throw new InvalidOperationException("database is not loaded");
                     return dataBase;

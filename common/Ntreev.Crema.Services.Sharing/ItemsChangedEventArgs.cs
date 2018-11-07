@@ -15,26 +15,24 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services;
-using Ntreev.Library.Random;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services.Random
+namespace Ntreev.Crema.Services
 {
-    public static class CremaHostExtensions
+    public class ItemsChangedEventArgs<T> : ItemsEventArgs<T>
     {
-        public static Task<IDataBase> CreateRandomAsync(this ICremaHost cremaHost, Authentication authentication)
+        public ItemsChangedEventArgs(Authentication authentication, IEnumerable<T> items, object metaData, string itemType)
+            : base(authentication, items, metaData)
         {
-            var dataBaseName = RandomUtility.NextIdentifier();
-            var comment = RandomUtility.NextString();
-            if (cremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
-            {
-                return dataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, comment);
-            }
-            throw new NotImplementedException();
+            this.ItemType = itemType;
         }
+
+        public string ItemType { get; }
     }
 }

@@ -44,9 +44,9 @@ namespace Ntreev.Crema.Services
 
         public static async Task<UsingDataBase> SetAsync(ICremaHost cremaHost, string dataBaseName, Authentication authentication)
         {
-            if (cremaHost.GetService(typeof(IDataBaseCollection)) is IDataBaseCollection dataBases)
+            if (cremaHost.GetService(typeof(IDataBaseContext)) is IDataBaseContext dataBaseContext)
             {
-                var dataBase = await dataBases.Dispatcher.InvokeAsync(() => dataBases[dataBaseName]);
+                var dataBase = await dataBaseContext.Dispatcher.InvokeAsync(() => dataBaseContext[dataBaseName]);
                 if (dataBase == null)
                     throw new DataBaseNotFoundException(dataBaseName);
 

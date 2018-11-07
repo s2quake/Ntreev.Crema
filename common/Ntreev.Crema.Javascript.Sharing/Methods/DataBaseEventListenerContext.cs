@@ -45,8 +45,8 @@ namespace Ntreev.Crema.Javascript.Methods
             {
                 item.Dispatcher = this.dispatcher;
             }
-            this.DataBases.Dispatcher.Invoke(() => this.DataBases.ItemsLoaded += DataBases_ItemsLoaded);
-            this.DataBases.Dispatcher.Invoke(() => this.DataBases.ItemsUnloaded += DataBases_ItemsUnloaded);
+            this.DataBases.Dispatcher.Invoke(() => this.DataBases.ItemsLoaded += DataBaseContext_ItemsLoaded);
+            this.DataBases.Dispatcher.Invoke(() => this.DataBases.ItemsUnloaded += DataBaseContext_ItemsUnloaded);
         }
 
         public void Dispose()
@@ -110,7 +110,7 @@ namespace Ntreev.Crema.Javascript.Methods
             });
         }
 
-        private void DataBases_ItemsLoaded(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsLoaded(object sender, ItemsEventArgs<IDataBase> e)
         {
             if (sender is IDataBase dataBase)
             {
@@ -127,7 +127,7 @@ namespace Ntreev.Crema.Javascript.Methods
             }
         }
 
-        private void DataBases_ItemsUnloaded(object sender, ItemsEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemsUnloaded(object sender, ItemsEventArgs<IDataBase> e)
         {
             if (sender is IDataBase dataBase)
             {
@@ -141,7 +141,7 @@ namespace Ntreev.Crema.Javascript.Methods
             }
         }
 
-        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
+        private IDataBaseContext DataBases => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
 
         #region classes
 

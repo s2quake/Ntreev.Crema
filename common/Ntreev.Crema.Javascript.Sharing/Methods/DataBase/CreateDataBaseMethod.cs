@@ -45,6 +45,6 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
             await this.DataBases.AddNewDataBaseAsync(authentication, dataBaseName, comment);
         }
 
-        private IDataBaseCollection DataBases => this.CremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
+        private IDataBaseContext DataBases => this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }
 }
