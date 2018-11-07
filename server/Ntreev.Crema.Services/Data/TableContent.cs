@@ -86,7 +86,7 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync), this.Table);
                     this.ValidateBeginEdit(authentication);
-                    this.domainHost = new TableContentDomainHost(this.Container, this.Table.GetRelations().ToArray());
+                    this.domainHost = new TableContentGroup(this.Container, this.Table.GetRelations().ToArray());
                     this.domainHost.SetServiceState(ServiceState.Opening);
                 });
                 try

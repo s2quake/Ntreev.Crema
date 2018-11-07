@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://www.ntreev.com" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.ntreev.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://www.ntreev.com/Imports">
+      <xsd:import namespace="http://www.ntreev.com" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import namespace="http://schemas.ntreev.com" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/System" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IUserContextService_Subscribe_InputMessage">
+    <wsdl:part name="parameters" element="tns:Subscribe" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_Subscribe_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SubscribeResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_Unsubscribe_InputMessage">
+    <wsdl:part name="parameters" element="tns:Unsubscribe" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_Unsubscribe_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UnsubscribeResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_Shutdown_InputMessage">
+    <wsdl:part name="parameters" element="tns:Shutdown" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_Shutdown_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ShutdownResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_CancelShutdown_InputMessage">
+    <wsdl:part name="parameters" element="tns:CancelShutdown" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_CancelShutdown_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CancelShutdownResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_NewUser_InputMessage">
+    <wsdl:part name="parameters" element="tns:NewUser" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_NewUser_OutputMessage">
+    <wsdl:part name="parameters" element="tns:NewUserResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_NewUserCategory_InputMessage">
+    <wsdl:part name="parameters" element="tns:NewUserCategory" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_NewUserCategory_OutputMessage">
+    <wsdl:part name="parameters" element="tns:NewUserCategoryResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_RenameUserItem_InputMessage">
+    <wsdl:part name="parameters" element="tns:RenameUserItem" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_RenameUserItem_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RenameUserItemResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_MoveUserItem_InputMessage">
+    <wsdl:part name="parameters" element="tns:MoveUserItem" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_MoveUserItem_OutputMessage">
+    <wsdl:part name="parameters" element="tns:MoveUserItemResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_DeleteUserItem_InputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteUserItem" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_DeleteUserItem_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DeleteUserItemResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_ChangeUserInfo_InputMessage">
+    <wsdl:part name="parameters" element="tns:ChangeUserInfo" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_ChangeUserInfo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ChangeUserInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_Kick_InputMessage">
+    <wsdl:part name="parameters" element="tns:Kick" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_Kick_OutputMessage">
+    <wsdl:part name="parameters" element="tns:KickResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_Ban_InputMessage">
+    <wsdl:part name="parameters" element="tns:Ban" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_Ban_OutputMessage">
+    <wsdl:part name="parameters" element="tns:BanResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_Unban_InputMessage">
+    <wsdl:part name="parameters" element="tns:Unban" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_Unban_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UnbanResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_SendMessage_InputMessage">
+    <wsdl:part name="parameters" element="tns:SendMessage" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_SendMessage_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SendMessageResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_NotifyMessage_InputMessage">
+    <wsdl:part name="parameters" element="tns:NotifyMessage" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_NotifyMessage_OutputMessage">
+    <wsdl:part name="parameters" element="tns:NotifyMessageResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_IsAlive_InputMessage">
+    <wsdl:part name="parameters" element="tns:IsAlive" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_IsAlive_OutputMessage">
+    <wsdl:part name="parameters" element="tns:IsAliveResponse" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_OnServiceClosed_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnServiceClosed" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_OnUsersChanged_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUsersChanged" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_OnUsersStateChanged_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUsersStateChanged" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_OnUserItemsCreated_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUserItemsCreated" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_OnUserItemsRenamed_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUserItemsRenamed" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_OnUserItemsMoved_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUserItemsMoved" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_OnUserItemsDeleted_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUserItemsDeleted" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_OnUsersLoggedIn_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUsersLoggedIn" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_OnUsersLoggedOut_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUsersLoggedOut" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_OnUsersKicked_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUsersKicked" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_OnUsersBanChanged_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUsersBanChanged" />
+  </wsdl:message>
+  <wsdl:message name="IUserContextService_OnMessageReceived_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnMessageReceived" />
+  </wsdl:message>
+  <wsdl:portType msc:usingSession="true" name="IUserContextService">
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Subscribe">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/Subscribe" message="tns:IUserContextService_Subscribe_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/SubscribeResponse" message="tns:IUserContextService_Subscribe_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Unsubscribe">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/Unsubscribe" message="tns:IUserContextService_Unsubscribe_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/UnsubscribeResponse" message="tns:IUserContextService_Unsubscribe_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Shutdown">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/Shutdown" message="tns:IUserContextService_Shutdown_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/ShutdownResponse" message="tns:IUserContextService_Shutdown_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="CancelShutdown">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/CancelShutdown" message="tns:IUserContextService_CancelShutdown_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/CancelShutdownResponse" message="tns:IUserContextService_CancelShutdown_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="NewUser">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/NewUser" message="tns:IUserContextService_NewUser_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/NewUserResponse" message="tns:IUserContextService_NewUser_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="NewUserCategory">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/NewUserCategory" message="tns:IUserContextService_NewUserCategory_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/NewUserCategoryResponse" message="tns:IUserContextService_NewUserCategory_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="RenameUserItem">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/RenameUserItem" message="tns:IUserContextService_RenameUserItem_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/RenameUserItemResponse" message="tns:IUserContextService_RenameUserItem_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="MoveUserItem">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/MoveUserItem" message="tns:IUserContextService_MoveUserItem_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/MoveUserItemResponse" message="tns:IUserContextService_MoveUserItem_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="DeleteUserItem">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/DeleteUserItem" message="tns:IUserContextService_DeleteUserItem_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/DeleteUserItemResponse" message="tns:IUserContextService_DeleteUserItem_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="ChangeUserInfo">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/ChangeUserInfo" message="tns:IUserContextService_ChangeUserInfo_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/ChangeUserInfoResponse" message="tns:IUserContextService_ChangeUserInfo_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Kick">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/Kick" message="tns:IUserContextService_Kick_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/KickResponse" message="tns:IUserContextService_Kick_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Ban">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/Ban" message="tns:IUserContextService_Ban_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/BanResponse" message="tns:IUserContextService_Ban_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Unban">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/Unban" message="tns:IUserContextService_Unban_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/UnbanResponse" message="tns:IUserContextService_Unban_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="SendMessage">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/SendMessage" message="tns:IUserContextService_SendMessage_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/SendMessageResponse" message="tns:IUserContextService_SendMessage_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="NotifyMessage">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/NotifyMessage" message="tns:IUserContextService_NotifyMessage_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/NotifyMessageResponse" message="tns:IUserContextService_NotifyMessage_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="IsAlive">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/IsAlive" message="tns:IUserContextService_IsAlive_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/IsAliveResponse" message="tns:IUserContextService_IsAlive_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnServiceClosed">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/OnServiceClosed" message="tns:IUserContextService_OnServiceClosed_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUsersChanged">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/OnUsersChanged" message="tns:IUserContextService_OnUsersChanged_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUsersStateChanged">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/OnUsersStateChanged" message="tns:IUserContextService_OnUsersStateChanged_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUserItemsCreated">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/OnUserItemsCreated" message="tns:IUserContextService_OnUserItemsCreated_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUserItemsRenamed">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/OnUserItemsRenamed" message="tns:IUserContextService_OnUserItemsRenamed_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUserItemsMoved">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/OnUserItemsMoved" message="tns:IUserContextService_OnUserItemsMoved_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUserItemsDeleted">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/OnUserItemsDeleted" message="tns:IUserContextService_OnUserItemsDeleted_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUsersLoggedIn">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/OnUsersLoggedIn" message="tns:IUserContextService_OnUsersLoggedIn_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUsersLoggedOut">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/OnUsersLoggedOut" message="tns:IUserContextService_OnUsersLoggedOut_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUsersKicked">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/OnUsersKicked" message="tns:IUserContextService_OnUsersKicked_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUsersBanChanged">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/OnUsersBanChanged" message="tns:IUserContextService_OnUsersBanChanged_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnMessageReceived">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/OnMessageReceived" message="tns:IUserContextService_OnMessageReceived_OutputCallbackMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

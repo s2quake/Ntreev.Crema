@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.UserService;
+using Ntreev.Crema.Services.UserContextService;
 using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 using System;
@@ -120,7 +120,7 @@ namespace Ntreev.Crema.Services.Users
             base.Name = name;
         }
 
-        public IUserService Service => this.Context.Service;
+        public IUserContextService Service => this.Context.Service;
 
         public CremaHost CremaHost => this.Context.CremaHost;
 

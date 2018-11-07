@@ -66,8 +66,8 @@
     <Compile Include="CremaBootstrapper.cs" />
     <Compile Include="Authentication.cs" />
     <Compile Include="CremaSettings.cs" />
-    <Compile Include="Data\DataBaseCollectionServiceFactory.cs" />
-    <Compile Include="Data\DataBaseCollection.cs" />
+    <Compile Include="Data\DataBaseContextServiceFactory.cs" />
+    <Compile Include="Data\DataBaseContext.cs" />
     <Compile Include="Data\DataBaseTransaction.cs" />
     <Compile Include="Data\DataServiceFactory.cs" />
     <Compile Include="Data\DomainBasedRow.cs" />
@@ -75,7 +75,7 @@
     <Compile Include="Data\TableColumn.cs" />
     <Compile Include="Data\TableContent.cs" />
     <Compile Include="Data\NewTableTemplate.cs" />
-    <Compile Include="Data\TableContentDomainHost.cs" />
+    <Compile Include="Data\TableContentGroup.cs" />
     <Compile Include="Data\TableRow.cs" />
     <Compile Include="Data\TableTemplate.cs" />
     <Compile Include="Data\TableTemplateBase.cs" />
@@ -102,7 +102,7 @@
     <Compile Include="AuthenticationProvider.cs" />
     <Compile Include="ResultBaseExtensions.cs" />
     <Compile Include="ICremaService.cs" />
-    <Compile Include="Service References\DataBaseCollectionService\Reference.cs">
+    <Compile Include="Service References\DataBaseContextService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
@@ -135,7 +135,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-    <Compile Include="Service References\UserService\Reference.cs">
+    <Compile Include="Service References\UserContextService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
@@ -145,7 +145,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Service References\DomainService\Reference.cs">
+    <Compile Include="Service References\DomainContextService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
@@ -187,18 +187,18 @@
     <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.ServiceInfo.datasource" />
     <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.UserContextMetaData.datasource" />
     <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.UserInfo.datasource" />
-    <None Include="Service References\DataBaseCollectionService\Arrays.xsd">
+    <None Include="Service References\DataBaseContextService\Arrays1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\DataBaseCollectionService\schemas.ntreev.com.xsd">
+    <None Include="Service References\DataBaseContextService\schemas.ntreev.com1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\DataBaseCollectionService\service.wsdl" />
-    <None Include="Service References\DataBaseCollectionService\service1.xsd">
+    <None Include="Service References\DataBaseContextService\service.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\DataBaseCollectionService\www.ntreev.com.wsdl" />
-    <None Include="Service References\DataBaseCollectionService\www.ntreev.com.xsd">
+    <None Include="Service References\DataBaseContextService\service1.wsdl" />
+    <None Include="Service References\DataBaseContextService\www.ntreev.com1.wsdl" />
+    <None Include="Service References\DataBaseContextService\www.ntreev.com1.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\DataBaseService\Arrays.xsd">
@@ -238,56 +238,56 @@
     <None Include="Service References\DescriptorService\www.ntreev.com.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\DomainService\Arrays.xsd">
+    <None Include="Service References\DomainContextService\Arrays1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\DomainService\schemas.ntreev.com.xsd">
+    <None Include="Service References\DomainContextService\schemas.ntreev.com1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\DomainService\service1.wsdl" />
-    <None Include="Service References\DomainService\service21.xsd">
+    <None Include="Service References\DomainContextService\service.wsdl" />
+    <None Include="Service References\DomainContextService\service.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\DomainService\System.xsd">
+    <None Include="Service References\DomainContextService\System1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\DomainService\www.ntreev.com.wsdl" />
-    <None Include="Service References\DomainService\www.ntreev.com.xsd">
+    <None Include="Service References\DomainContextService\www.ntreev.com1.wsdl" />
+    <None Include="Service References\DomainContextService\www.ntreev.com1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\UserService\Arrays.xsd">
+    <None Include="Service References\UserContextService\Arrays1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\UserService\schemas.ntreev.com.xsd">
+    <None Include="Service References\UserContextService\schemas.ntreev.com1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\UserService\service.wsdl" />
-    <None Include="Service References\UserService\service1.xsd">
+    <None Include="Service References\UserContextService\service.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\UserService\System.xsd">
+    <None Include="Service References\UserContextService\service1.wsdl" />
+    <None Include="Service References\UserContextService\System1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\UserService\www.ntreev.com.wsdl" />
-    <None Include="Service References\UserService\www.ntreev.com.xsd">
+    <None Include="Service References\UserContextService\www.ntreev.com1.wsdl" />
+    <None Include="Service References\UserContextService\www.ntreev.com1.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadataStorage Include="Service References\DataBaseCollectionService\" />
+    <WCFMetadataStorage Include="Service References\DataBaseContextService\" />
     <WCFMetadataStorage Include="Service References\DataBaseService\" />
     <WCFMetadataStorage Include="Service References\DescriptorService\" />
-    <WCFMetadataStorage Include="Service References\DomainService\" />
-    <WCFMetadataStorage Include="Service References\UserService\" />
+    <WCFMetadataStorage Include="Service References\DomainContextService\" />
+    <WCFMetadataStorage Include="Service References\UserContextService\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\DomainService\configuration91.svcinfo" />
+    <None Include="Service References\DomainContextService\configuration91.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\DomainService\configuration.svcinfo" />
+    <None Include="Service References\DomainContextService\configuration.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\DomainService\Reference.svcmap">
+    <None Include="Service References\DomainContextService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
@@ -318,13 +318,13 @@
     <None Include="Service References\DescriptorService\configuration91.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\DataBaseCollectionService\configuration91.svcinfo" />
+    <None Include="Service References\DataBaseContextService\configuration91.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\DataBaseCollectionService\configuration.svcinfo" />
+    <None Include="Service References\DataBaseContextService\configuration.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\DataBaseCollectionService\Reference.svcmap">
+    <None Include="Service References\DataBaseContextService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
@@ -342,13 +342,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\UserService\configuration91.svcinfo" />
+    <None Include="Service References\UserContextService\configuration91.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\UserService\configuration.svcinfo" />
+    <None Include="Service References\UserContextService\configuration.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\UserService\Reference.svcmap">
+    <None Include="Service References\UserContextService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>

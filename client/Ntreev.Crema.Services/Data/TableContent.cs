@@ -88,7 +88,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginEditAsync), this.Table);
                     return this.Table.Name;
                 });
-                var domainHost = new TableContentDomainHost(this.Container);
+                var domainHost = new TableContentGroup(this.Container);
                 var signatureDate = await domainHost.BeginContentAsync(authentication, name);
                 this.domainHost = domainHost;
                 await this.Dispatcher.InvokeAsync(() =>

@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.DataBaseCollectionService;
+using Ntreev.Crema.Services.DataBaseContextService;
 using Ntreev.Crema.Services.Domains;
 using System;
 using System.Threading.Tasks;
@@ -27,9 +27,9 @@ namespace Ntreev.Crema.Services.Data
     {
         private Authentication authentication;
         private readonly DataBase dataBase;
-        private readonly IDataBaseCollectionService service;
+        private readonly IDataBaseContextService service;
 
-        public DataBaseTransaction(Authentication authentication, DataBase dataBase, IDataBaseCollectionService service)
+        public DataBaseTransaction(Authentication authentication, DataBase dataBase, IDataBaseContextService service)
         {
             this.authentication = authentication;
             this.dataBase = dataBase;

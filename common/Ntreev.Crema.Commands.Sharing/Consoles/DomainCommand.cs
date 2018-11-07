@@ -97,7 +97,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
             var dataBaseInfos = this.cremaHost.Dispatcher.Invoke(() =>
             {
-                return this.DataBases.Select(item => item.DataBaseInfo).ToArray();
+                return this.DataBaseContext.Select(item => item.DataBaseInfo).ToArray();
             });
 
             var query = from domainInfo in domainInfos
@@ -160,9 +160,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private string[] GetDataBaseNames()
         {
-            return this.DataBases.Dispatcher.Invoke(() =>
+            return this.DataBaseContext.Dispatcher.Invoke(() =>
             {
-                var query = from item in this.DataBases
+                var query = from item in this.DataBaseContext
                             select item.Name;
                 return query.ToArray();
             });
@@ -189,6 +189,6 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private ICremaHost CremaHost => this.cremaHost;
 
-        private IDataBaseContext DataBases => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+        private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }
 }

@@ -70,7 +70,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             try
             {
                 this.BeginProgress(Resources.Message_CreatingNewDataBase);
-                await this.DataBases.AddNewDataBaseAsync(this.authentication, this.DataBaseName, this.Comment);
+                await this.DataBaseContext.AddNewDataBaseAsync(this.authentication, this.DataBaseName, this.Comment);
                 this.EndProgress();
                 this.TryClose(true);
                 AppMessageBox.Show(Resources.Message_CreatedNewDataBase);
@@ -122,6 +122,6 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             }
         }
 
-        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
+        private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }
 }

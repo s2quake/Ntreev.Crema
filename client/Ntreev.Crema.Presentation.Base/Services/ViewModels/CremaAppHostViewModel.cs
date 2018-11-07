@@ -779,7 +779,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         private async Task EnterDataBaseAsync(string dataBaseName)
         {
-            var dataBases = this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
+            var dataBases = this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
             var autoLoad = this.authenticator.Authority == Authority.Admin && Keyboard.Modifiers == ModifierKeys.Shift;
             var dataBase = await dataBases.Dispatcher.InvokeAsync(() => dataBases[dataBaseName]);
             if (dataBase == null)

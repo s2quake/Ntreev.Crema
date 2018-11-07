@@ -17,7 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Data;
-using Ntreev.Crema.Services.DomainService;
+using Ntreev.Crema.Services.DomainContextService;
 using Ntreev.Crema.Services.Users;
 using Ntreev.Library;
 using Ntreev.Library.IO;
@@ -35,9 +35,9 @@ namespace Ntreev.Crema.Services.Domains
 {
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     class DomainContext : ItemContext<Domain, DomainCategory, DomainCollection, DomainCategoryCollection, DomainContext>,
-        IDomainServiceCallback, IDomainContext, IServiceProvider, ICremaService
+        IDomainContextServiceCallback, IDomainContext, IServiceProvider, ICremaService
     {
-        private DomainServiceClient service;
+        private DomainContextServiceClient service;
         private Timer timer;
 
         private ItemsCreatedEventHandler<IDomainItem> itemsCreated;
@@ -65,9 +65,9 @@ namespace Ntreev.Crema.Services.Domains
             await this.Dispatcher.InvokeAsync(() =>
             {
                 var binding = CremaHost.CreateBinding(serviceInfo);
-                var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/DomainService");
+                var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/DomainContextService");
                 var instanceContext = new InstanceContext(this);
-                this.service = new DomainServiceClient(instanceContext, binding, endPointAddress);
+                this.service = new DomainContextServiceClient(instanceContext, binding, endPointAddress);
                 this.service.Open();
                 if (this.service is ICommunicationObject service)
                 {
@@ -83,11 +83,11 @@ namespace Ntreev.Crema.Services.Domains
                 var metaData = result.Value;
                 this.metaData = metaData;
                 this.Initialize(metaData);
-                this.CremaHost.DataBases.Dispatcher.Invoke(() =>
+                this.CremaHost.DataBaseContext.Dispatcher.Invoke(() =>
                 {
-                    this.CremaHost.DataBases.ItemsCreated += DataBases_ItemsCreated;
-                    this.CremaHost.DataBases.ItemsRenamed += DataBases_ItemsRenamed;
-                    this.CremaHost.DataBases.ItemsDeleted += DataBases_ItemDeleted;
+                    this.CremaHost.DataBaseContext.ItemsCreated += DataBaseContext_ItemsCreated;
+                    this.CremaHost.DataBaseContext.ItemsRenamed += DataBaseContext_ItemsRenamed;
+                    this.CremaHost.DataBaseContext.ItemsDeleted += DataBaseContext_ItemDeleted;
                 });
                 this.CremaHost.AddService(this);
             });
@@ -313,7 +313,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public CremaDispatcher CallbackDispatcher { get; set; }
 
-        public IDomainService Service => this.service;
+        public IDomainContextService Service => this.service;
 
         public event ItemsCreatedEventHandler<IDomainItem> ItemsCreated
         {
@@ -400,7 +400,7 @@ namespace Ntreev.Crema.Services.Domains
                     var category = this.Categories.AddNew(item);
                     if (category.Parent == this.Root)
                     {
-                        category.DataBase = this.CremaHost.DataBases[category.Name];
+                        category.DataBase = this.CremaHost.DataBaseContext[category.Name];
                     }
                 }
             }
@@ -424,7 +424,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        private async void DataBases_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
+        private async void DataBaseContext_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
         {
             var authentication = await this.UserContext.AuthenticateAsync(e.SignatureDate);
             await this.Dispatcher.InvokeAsync(() =>
@@ -445,7 +445,7 @@ namespace Ntreev.Crema.Services.Domains
 
         }
 
-        private async void DataBases_ItemsRenamed(object sender, ItemsRenamedEventArgs<IDataBase> e)
+        private async void DataBaseContext_ItemsRenamed(object sender, ItemsRenamedEventArgs<IDataBase> e)
         {
             var authentication = await this.UserContext.AuthenticateAsync(e.SignatureDate);
             await this.Dispatcher.InvokeAsync(() =>
@@ -470,7 +470,7 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        private void DataBases_ItemDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
+        private void DataBaseContext_ItemDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
         {
             var categoryList = new List<DomainCategory>(e.Items.Length);
             var categoryPathList = new List<string>(e.Items.Length);
@@ -518,9 +518,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        #region IDomainServiceCallback
+        #region IDomainContextServiceCallback
 
-        async void IDomainServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
+        async void IDomainContextServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
             //await this.callbackEvent.BeginAsync(callbackInfo.Index);
             //await this.callbackEvent.EndAsync(callbackInfo.Index);
@@ -540,9 +540,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnDomainsCreated(CallbackInfo callbackInfo, DomainMetaData[] metaDatas)
+        async void IDomainContextServiceCallback.OnDomainsCreated(CallbackInfo callbackInfo, DomainMetaData[] metaDatas)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnDomainsCreated)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnDomainsCreated)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
@@ -560,9 +560,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnDomainsDeleted(CallbackInfo callbackInfo, Guid[] domainIDs, bool[] isCanceleds, object[] results)
+        async void IDomainContextServiceCallback.OnDomainsDeleted(CallbackInfo callbackInfo, Guid[] domainIDs, bool[] isCanceleds, object[] results)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnDomainsDeleted)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnDomainsDeleted)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
@@ -644,9 +644,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnDomainInfoChanged(CallbackInfo callbackInfo, Guid domainID, DomainInfo domainInfo)
+        async void IDomainContextServiceCallback.OnDomainInfoChanged(CallbackInfo callbackInfo, Guid domainID, DomainInfo domainInfo)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnDomainInfoChanged)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnDomainInfoChanged)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
@@ -665,9 +665,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnDomainStateChanged(CallbackInfo callbackInfo, Guid domainID, DomainState domainState)
+        async void IDomainContextServiceCallback.OnDomainStateChanged(CallbackInfo callbackInfo, Guid domainID, DomainState domainState)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnDomainStateChanged)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnDomainStateChanged)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
@@ -686,9 +686,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnUserAdded(CallbackInfo callbackInfo, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState, byte[] data)
+        async void IDomainContextServiceCallback.OnUserAdded(CallbackInfo callbackInfo, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState, byte[] data)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnUserAdded)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnUserAdded)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
@@ -707,9 +707,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnUserRemoved(CallbackInfo callbackInfo, Guid domainID, string userID, string ownerID, RemoveInfo removeInfo)
+        async void IDomainContextServiceCallback.OnUserRemoved(CallbackInfo callbackInfo, Guid domainID, string userID, string ownerID, RemoveInfo removeInfo)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnUserRemoved)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnUserRemoved)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
@@ -730,9 +730,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnUserLocationChanged(CallbackInfo callbackInfo, Guid domainID, DomainLocationInfo domainLocationInfo)
+        async void IDomainContextServiceCallback.OnUserLocationChanged(CallbackInfo callbackInfo, Guid domainID, DomainLocationInfo domainLocationInfo)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnUserLocationChanged)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnUserLocationChanged)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
@@ -752,9 +752,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnUserStateChanged(CallbackInfo callbackInfo, Guid domainID, DomainUserState domainUserState)
+        async void IDomainContextServiceCallback.OnUserStateChanged(CallbackInfo callbackInfo, Guid domainID, DomainUserState domainUserState)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnUserStateChanged)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnUserStateChanged)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
@@ -774,9 +774,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnUserEditBegun(CallbackInfo callbackInfo, Guid domainID, DomainLocationInfo domainLocationInfo)
+        async void IDomainContextServiceCallback.OnUserEditBegun(CallbackInfo callbackInfo, Guid domainID, DomainLocationInfo domainLocationInfo)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnUserEditBegun)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnUserEditBegun)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
@@ -796,9 +796,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnUserEditEnded(CallbackInfo callbackInfo, Guid domainID)
+        async void IDomainContextServiceCallback.OnUserEditEnded(CallbackInfo callbackInfo, Guid domainID)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnUserEditEnded)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnUserEditEnded)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
@@ -818,9 +818,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnOwnerChanged(CallbackInfo callbackInfo, Guid domainID, string ownerID)
+        async void IDomainContextServiceCallback.OnOwnerChanged(CallbackInfo callbackInfo, Guid domainID, string ownerID)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnOwnerChanged)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnOwnerChanged)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
@@ -840,9 +840,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnRowAdded(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows)
+        async void IDomainContextServiceCallback.OnRowAdded(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnRowAdded)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnRowAdded)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
@@ -862,9 +862,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnRowChanged(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows)
+        async void IDomainContextServiceCallback.OnRowChanged(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnRowChanged)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnRowChanged)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
@@ -884,9 +884,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnRowRemoved(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows)
+        async void IDomainContextServiceCallback.OnRowRemoved(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnRowRemoved)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnRowRemoved)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
@@ -906,9 +906,9 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainServiceCallback.OnPropertyChanged(CallbackInfo callbackInfo, Guid domainID, string propertyName, object value)
+        async void IDomainContextServiceCallback.OnPropertyChanged(CallbackInfo callbackInfo, Guid domainID, string propertyName, object value)
         {
-            Log(callbackInfo.Index, $"{nameof(IDomainServiceCallback.OnPropertyChanged)}\t{callbackInfo.SignatureDate.ID}");
+            Log(callbackInfo.Index, $"{nameof(IDomainContextServiceCallback.OnPropertyChanged)}\t{callbackInfo.SignatureDate.ID}");
             try
             {
                 await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>

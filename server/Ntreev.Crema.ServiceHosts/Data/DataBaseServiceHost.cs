@@ -39,10 +39,8 @@ namespace Ntreev.Crema.ServiceHosts.Data
 {
     class DataBaseServiceHost : CremaServiceItemHost
     {
-        private const string address = "net.tcp://localhost:{0}/DataBaseService";
-
         public DataBaseServiceHost(ICremaHost cremaHost, int port)
-            : base(cremaHost, typeof(DataBaseService), address, port)
+            : base(cremaHost, typeof(DataBaseService), $"net.tcp://localhost:{port}/{nameof(DataBaseService)}", port)
         {
             var binding = CreateBinding();
 

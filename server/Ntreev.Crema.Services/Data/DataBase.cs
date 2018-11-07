@@ -1444,7 +1444,7 @@ namespace Ntreev.Crema.Services.Data
 
         private void ValidateUnload(Authentication authentication)
         {
-            if (base.DataBaseState == DataBaseState.Loaded)
+            if (base.DataBaseState != DataBaseState.Loaded)
                 throw new InvalidOperationException(Resources.Exception_DataBaseHasNotBeenLoaded);
             if (authentication.IsSystem == false && authentication.IsAdmin == false)
                 throw new PermissionDeniedException();
@@ -1511,7 +1511,7 @@ namespace Ntreev.Crema.Services.Data
 
             if (itemType == nameof(TableContent))
             {
-                return new TableContent.TableContentDomainHost(this.TableContext.Tables, itemPath);
+                return new TableContent.TableContentGroup(this.TableContext.Tables, itemPath);
             }
             else if (itemType == nameof(NewTableTemplate))
             {

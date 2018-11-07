@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="c2caad76-9ea7-40e6-84da-38292c019ece" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>true</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="net.tcp://localhost:4004/DomainContextService/mex" Protocol="mex" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="www.ntreev.com1.wsdl" MetadataType="Wsdl" ID="334f7d7b-210f-4769-bb5c-5816249448e0" SourceId="1" SourceUrl="net.tcp://localhost:4004/DomainContextService/mex" />
+    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="18a04612-c093-454e-83dc-a8d4747ffef7" SourceId="1" SourceUrl="net.tcp://localhost:4004/DomainContextService/mex" />
+    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="0449be98-74df-4d3b-ab54-7d80b880a4c8" SourceId="1" SourceUrl="net.tcp://localhost:4004/DomainContextService/mex" />
+    <MetadataFile FileName="System1.xsd" MetadataType="Schema" ID="8d8bad69-3fa8-44ae-9f19-f0403941b415" SourceId="1" SourceUrl="net.tcp://localhost:4004/DomainContextService/mex" />
+    <MetadataFile FileName="www.ntreev.com1.xsd" MetadataType="Schema" ID="d1580687-bf20-4a12-a5dd-eb11b937886d" SourceId="1" SourceUrl="net.tcp://localhost:4004/DomainContextService/mex" />
+    <MetadataFile FileName="schemas.ntreev.com1.xsd" MetadataType="Schema" ID="7d66aa1d-c88a-4579-859e-06dffc29692a" SourceId="1" SourceUrl="net.tcp://localhost:4004/DomainContextService/mex" />
+    <MetadataFile FileName="Arrays1.xsd" MetadataType="Schema" ID="f7ef4d14-d03f-4073-9c64-f286c8c5a1ac" SourceId="1" SourceUrl="net.tcp://localhost:4004/DomainContextService/mex" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

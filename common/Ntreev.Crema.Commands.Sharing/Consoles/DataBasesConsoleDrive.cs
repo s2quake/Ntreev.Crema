@@ -55,7 +55,7 @@ namespace Ntreev.Crema.Commands.Consoles
                 {
                     PathUtility.Separator
                 };
-                foreach (var item in this.DataBases)
+                foreach (var item in this.DataBaseContext)
                 {
                     var items = item.DataBaseInfo.Paths.Select(i => $"{PathUtility.SeparatorChar}{item.Name}{i}");
                     pathList.AddRange(items);
@@ -77,7 +77,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
             if (dataBaseName != string.Empty && dataBasePath.DataBaseName != dataBaseName)
             {
-                var dataBase = this.DataBases.Dispatcher.Invoke(() => this.DataBases[dataBaseName]);
+                var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[dataBaseName]);
                 await dataBase.Dispatcher.InvokeAsync(() =>
                 {
                     dataBase.Unloaded -= DataBase_Unloaded;
@@ -90,7 +90,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
             if (dataBasePath.DataBaseName != string.Empty && dataBasePath.DataBaseName != dataBaseName)
             {
-                var dataBase = this.DataBases.Dispatcher.Invoke(() => this.DataBases[dataBasePath.DataBaseName]);
+                var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[dataBasePath.DataBaseName]);
                 if (dataBase.IsLoaded == false)
                     await dataBase.LoadAsync(authentication);
                 await dataBase.EnterAsync(authentication);
@@ -126,7 +126,7 @@ namespace Ntreev.Crema.Commands.Consoles
             else if (path == PathUtility.Separator)
             {
                 var comment = this.CommandContext.ReadString("comment:");
-                await this.DataBases.AddNewDataBaseAsync(authentication, name, comment);
+                await this.DataBaseContext.AddNewDataBaseAsync(authentication, name, comment);
             }
             else
             {
@@ -371,7 +371,7 @@ namespace Ntreev.Crema.Commands.Consoles
             if (dataBasePath.DataBaseName == string.Empty)
                 return null;
 
-            var dataBase = this.DataBases[dataBasePath.DataBaseName];
+            var dataBase = this.DataBaseContext[dataBasePath.DataBaseName];
             if (dataBase == null)
                 throw new DataBaseNotFoundException(dataBasePath.DataBaseName);
 
@@ -416,7 +416,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private ICremaHost CremaHost => this.cremaHost;
 
-        private IDataBaseContext DataBases => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+        private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
 
         #region IPartImportsSatisfiedNotification
 

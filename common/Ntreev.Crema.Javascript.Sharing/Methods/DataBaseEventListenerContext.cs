@@ -45,8 +45,8 @@ namespace Ntreev.Crema.Javascript.Methods
             {
                 item.Dispatcher = this.dispatcher;
             }
-            this.DataBases.Dispatcher.Invoke(() => this.DataBases.ItemsLoaded += DataBaseContext_ItemsLoaded);
-            this.DataBases.Dispatcher.Invoke(() => this.DataBases.ItemsUnloaded += DataBaseContext_ItemsUnloaded);
+            this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext.ItemsLoaded += DataBaseContext_ItemsLoaded);
+            this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext.ItemsUnloaded += DataBaseContext_ItemsUnloaded);
         }
 
         public void Dispose()
@@ -74,7 +74,7 @@ namespace Ntreev.Crema.Javascript.Methods
 
                     this.listeners[eventName].Add(listener);
 
-                    var dataBases = this.DataBases.Dispatcher.Invoke(() => this.DataBases.Where(item => item.IsLoaded).ToArray());
+                    var dataBases = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext.Where(item => item.IsLoaded).ToArray());
                     var listenerHost = this.listenerHosts[eventName];
                     foreach (var item in dataBases)
                     {
@@ -94,7 +94,7 @@ namespace Ntreev.Crema.Javascript.Methods
             {
                 if (this.listenerHosts.ContainsKey(eventName) == true)
                 {
-                    var dataBases = this.DataBases.Dispatcher.Invoke(() => this.DataBases.Where(item => item.IsLoaded).ToArray());
+                    var dataBases = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext.Where(item => item.IsLoaded).ToArray());
                     var listenerHost = this.listenerHosts[eventName];
                     foreach (var item in dataBases)
                     {
@@ -141,7 +141,7 @@ namespace Ntreev.Crema.Javascript.Methods
             }
         }
 
-        private IDataBaseContext DataBases => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+        private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
 
         #region classes
 

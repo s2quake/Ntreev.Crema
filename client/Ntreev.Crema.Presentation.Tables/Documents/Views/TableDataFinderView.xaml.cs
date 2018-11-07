@@ -33,7 +33,6 @@ using System.IO;
 using Ntreev.Crema.Data;
 using System.Xml;
 using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Services.DomainService;
 using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Tables.Documents.ViewModels;
 using Ntreev.ModernUI.Framework;

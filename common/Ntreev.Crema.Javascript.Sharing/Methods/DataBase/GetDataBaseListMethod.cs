@@ -40,12 +40,12 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
 
         protected override Task<string[]> OnExecuteAsync()
         {
-            return this.DataBases.Dispatcher.InvokeAsync(() =>
+            return this.DataBaseContext.Dispatcher.InvokeAsync(() =>
             {
-                return this.DataBases.Select(item => item.Name).ToArray();
+                return this.DataBaseContext.Select(item => item.Name).ToArray();
             });
         }
 
-        private IDataBaseContext DataBases => this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+        private IDataBaseContext DataBaseContext => this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }
 }

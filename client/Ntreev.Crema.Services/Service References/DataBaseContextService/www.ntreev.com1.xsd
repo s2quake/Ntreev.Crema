@@ -1,0 +1,447 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://www.ntreev.com" elementFormDefault="qualified" targetNamespace="http://www.ntreev.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://schemas.ntreev.com" />
+  <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+  <xs:element name="DefinitionType">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q1="http://schemas.ntreev.com" minOccurs="0" name="param1" nillable="true" type="q1:ArrayOfLogInfo" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DefinitionTypeResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q2="http://schemas.ntreev.com" minOccurs="0" name="DefinitionTypeResult" type="q2:ResultBase" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Subscribe">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q3="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="authenticationToken" type="q3:guid" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SubscribeResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q4="http://schemas.ntreev.com" minOccurs="0" name="SubscribeResult" type="q4:ResultBaseOfDataBaseCollectionMetaDataq8erDhHE" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Unsubscribe">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UnsubscribeResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="http://schemas.ntreev.com" minOccurs="0" name="UnsubscribeResult" type="q5:ResultBase" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetPublic">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetPublicResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q6="http://schemas.ntreev.com" minOccurs="0" name="SetPublicResult" type="q6:ResultBase" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetPrivate">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetPrivateResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q7="http://schemas.ntreev.com" minOccurs="0" name="SetPrivateResult" type="q7:ResultBaseOfAccessInfoq8erDhHE" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddAccessMember">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="memberID" nillable="true" type="xs:string" />
+        <xs:element xmlns:q8="http://schemas.ntreev.com" minOccurs="0" name="accessType" type="q8:AccessType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddAccessMemberResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q9="http://schemas.ntreev.com" minOccurs="0" name="AddAccessMemberResult" type="q9:ResultBaseOfAccessMemberInfoq8erDhHE" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetAccessMember">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="memberID" nillable="true" type="xs:string" />
+        <xs:element xmlns:q10="http://schemas.ntreev.com" minOccurs="0" name="accessType" type="q10:AccessType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetAccessMemberResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q11="http://schemas.ntreev.com" minOccurs="0" name="SetAccessMemberResult" type="q11:ResultBaseOfAccessMemberInfoq8erDhHE" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RemoveAccessMember">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="memberID" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RemoveAccessMemberResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q12="http://schemas.ntreev.com" minOccurs="0" name="RemoveAccessMemberResult" type="q12:ResultBase" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Lock">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="comment" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LockResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q13="http://schemas.ntreev.com" minOccurs="0" name="LockResult" type="q13:ResultBaseOfLockInfoq8erDhHE" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Unlock">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UnlockResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q14="http://schemas.ntreev.com" minOccurs="0" name="UnlockResult" type="q14:ResultBase" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Load">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LoadResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q15="http://schemas.ntreev.com" minOccurs="0" name="LoadResult" type="q15:ResultBase" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Unload">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UnloadResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q16="http://schemas.ntreev.com" minOccurs="0" name="UnloadResult" type="q16:ResultBase" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Create">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="comment" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CreateResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q17="http://schemas.ntreev.com" minOccurs="0" name="CreateResult" type="q17:ResultBaseOfDataBaseInfoq8erDhHE" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Copy">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="newDataBaseName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="comment" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="force" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CopyResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q18="http://schemas.ntreev.com" minOccurs="0" name="CopyResult" type="q18:ResultBaseOfDataBaseInfoq8erDhHE" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Rename">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="newDataBaseName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RenameResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q19="http://schemas.ntreev.com" minOccurs="0" name="RenameResult" type="q19:ResultBase" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Delete">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q20="http://schemas.ntreev.com" minOccurs="0" name="DeleteResult" type="q20:ResultBase" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetLog">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="revision" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetLogResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q21="http://schemas.ntreev.com" minOccurs="0" name="GetLogResult" type="q21:ResultBaseOfArrayOfLogInfoq8erDhHE" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Revert">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="revision" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RevertResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q22="http://schemas.ntreev.com" minOccurs="0" name="RevertResult" type="q22:ResultBaseOfDataBaseInfoq8erDhHE" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BeginTransaction">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BeginTransactionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q23="http://schemas.ntreev.com" minOccurs="0" name="BeginTransactionResult" type="q23:ResultBaseOfguid" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="EndTransaction">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q24="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="transactionID" type="q24:guid" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="EndTransactionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q25="http://schemas.ntreev.com" minOccurs="0" name="EndTransactionResult" type="q25:ResultBase" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CancelTransaction">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q26="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="transactionID" type="q26:guid" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CancelTransactionResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q27="http://schemas.ntreev.com" minOccurs="0" name="CancelTransactionResult" type="q27:ResultBaseOfDataBaseMetaDataq8erDhHE" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IsAlive">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IsAliveResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="IsAliveResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnServiceClosed">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q28="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q28:CallbackInfo" />
+        <xs:element xmlns:q29="http://schemas.ntreev.com" minOccurs="0" name="closeInfo" type="q29:CloseInfo" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnDataBasesCreated">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q30="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q30:CallbackInfo" />
+        <xs:element xmlns:q31="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="dataBaseNames" nillable="true" type="q31:ArrayOfstring" />
+        <xs:element xmlns:q32="http://schemas.ntreev.com" minOccurs="0" name="dataBaseInfos" nillable="true" type="q32:ArrayOfDataBaseInfo" />
+        <xs:element minOccurs="0" name="comment" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnDataBasesRenamed">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q33="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q33:CallbackInfo" />
+        <xs:element xmlns:q34="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="dataBaseNames" nillable="true" type="q34:ArrayOfstring" />
+        <xs:element xmlns:q35="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="newDataBaseNames" nillable="true" type="q35:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnDataBasesDeleted">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q36="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q36:CallbackInfo" />
+        <xs:element xmlns:q37="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="dataBaseNames" nillable="true" type="q37:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnDataBasesLoaded">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q38="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q38:CallbackInfo" />
+        <xs:element xmlns:q39="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="dataBaseNames" nillable="true" type="q39:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnDataBasesUnloaded">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q40="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q40:CallbackInfo" />
+        <xs:element xmlns:q41="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="dataBaseNames" nillable="true" type="q41:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnDataBasesResetting">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q42="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q42:CallbackInfo" />
+        <xs:element xmlns:q43="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="dataBaseNames" nillable="true" type="q43:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnDataBasesReset">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q44="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q44:CallbackInfo" />
+        <xs:element xmlns:q45="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="dataBaseNames" nillable="true" type="q45:ArrayOfstring" />
+        <xs:element xmlns:q46="http://schemas.ntreev.com" minOccurs="0" name="metaDatas" nillable="true" type="q46:ArrayOfDataBaseMetaData" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnDataBasesAuthenticationEntered">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q47="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q47:CallbackInfo" />
+        <xs:element xmlns:q48="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="dataBaseNames" nillable="true" type="q48:ArrayOfstring" />
+        <xs:element xmlns:q49="http://schemas.ntreev.com" minOccurs="0" name="authenticationInfo" type="q49:AuthenticationInfo" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnDataBasesAuthenticationLeft">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q50="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q50:CallbackInfo" />
+        <xs:element xmlns:q51="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="dataBaseNames" nillable="true" type="q51:ArrayOfstring" />
+        <xs:element xmlns:q52="http://schemas.ntreev.com" minOccurs="0" name="authenticationInfo" type="q52:AuthenticationInfo" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnDataBasesInfoChanged">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q53="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q53:CallbackInfo" />
+        <xs:element xmlns:q54="http://schemas.ntreev.com" minOccurs="0" name="dataBaseInfos" nillable="true" type="q54:ArrayOfDataBaseInfo" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnDataBasesStateChanged">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q55="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q55:CallbackInfo" />
+        <xs:element xmlns:q56="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="dataBaseNames" nillable="true" type="q56:ArrayOfstring" />
+        <xs:element xmlns:q57="http://schemas.ntreev.com" minOccurs="0" name="dataBaseStates" nillable="true" type="q57:ArrayOfDataBaseState" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnDataBasesAccessChanged">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q58="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q58:CallbackInfo" />
+        <xs:element xmlns:q59="http://schemas.ntreev.com" minOccurs="0" name="changeType" type="q59:AccessChangeType" />
+        <xs:element xmlns:q60="http://schemas.ntreev.com" minOccurs="0" name="accessInfos" nillable="true" type="q60:ArrayOfAccessInfo" />
+        <xs:element xmlns:q61="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="memberIDs" nillable="true" type="q61:ArrayOfstring" />
+        <xs:element xmlns:q62="http://schemas.ntreev.com" minOccurs="0" name="accessTypes" nillable="true" type="q62:ArrayOfAccessType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OnDataBasesLockChanged">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q63="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q63:CallbackInfo" />
+        <xs:element xmlns:q64="http://schemas.ntreev.com" minOccurs="0" name="changeType" type="q64:LockChangeType" />
+        <xs:element xmlns:q65="http://schemas.ntreev.com" minOccurs="0" name="lockInfos" nillable="true" type="q65:ArrayOfLockInfo" />
+        <xs:element xmlns:q66="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="comments" nillable="true" type="q66:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

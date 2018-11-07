@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.ServiceHosts.Data
 {
     [Export(typeof(IServiceHostProvider))]
-    [Dependency(typeof(DataBaseCollectionServiceHostProvider))]
+    [Dependency(typeof(DataBaseContextServiceHostProvider))]
     class DataBaseServiceHostProvider : IServiceHostProvider
     {
         private readonly ICremaHost cremaHost;

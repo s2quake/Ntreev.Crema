@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.UserService;
+using Ntreev.Crema.Services.UserContextService;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections;
@@ -195,7 +195,7 @@ namespace Ntreev.Crema.Services.Users
 
         public CremaDispatcher Dispatcher => this.Context.Dispatcher;
 
-        public IUserService Service => this.Context.Service;
+        public IUserContextService Service => this.Context.Service;
 
         public new int Count
         {

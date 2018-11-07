@@ -49,7 +49,7 @@ namespace Ntreev.Crema.Services.Data
         private TaskResetEvent<Guid> taskEvent;
         private IndexedDispatcher callbackEvent;
 
-        public DataBase(DataBaseCollection dataBases, DataBaseInfo dataBaseInfo)
+        public DataBase(DataBaseContext dataBases, DataBaseInfo dataBaseInfo)
         {
             this.DataBases = dataBases;
             this.Dispatcher = dataBases.Dispatcher;
@@ -57,7 +57,7 @@ namespace Ntreev.Crema.Services.Data
             base.DataBaseInfo = dataBaseInfo;
         }
 
-        public DataBase(DataBaseCollection dataBases, DataBaseMetaData metaData)
+        public DataBase(DataBaseContext dataBases, DataBaseMetaData metaData)
         {
             this.DataBases = dataBases;
             this.Dispatcher = dataBases.Dispatcher;
@@ -812,6 +812,7 @@ namespace Ntreev.Crema.Services.Data
             this.timer?.Dispose();
             this.timer = null;
             await Task.Delay(1000);
+            await this.callbackEvent.DisposeAsync();
             await this.Dispatcher.DisposeAsync();
             this.service.Close();
             this.service = null;
@@ -887,7 +888,7 @@ namespace Ntreev.Crema.Services.Data
 
             if (itemType == nameof(TableContent))
             {
-                return new TableContent.TableContentDomainHost(this.TableContext.Tables, domain, itemPath);
+                return new TableContent.TableContentGroup(this.TableContext.Tables, domain, itemPath);
             }
             else if (itemType == nameof(NewTableTemplate))
             {
@@ -930,7 +931,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (itemType == nameof(TableContent))
                 {
-                    return new TableContent.TableContentDomainHost(this.TableContext.Tables, domain, itemPath);
+                    return new TableContent.TableContentGroup(this.TableContext.Tables, domain, itemPath);
                 }
                 else if (itemType == nameof(NewTableTemplate))
                 {
@@ -986,7 +987,7 @@ namespace Ntreev.Crema.Services.Data
 
         public CremaHost CremaHost => this.DataBases.CremaHost;
 
-        public DataBaseCollection DataBases { get; }
+        public DataBaseContext DataBases { get; }
 
         public TableContext TableContext { get; private set; }
 

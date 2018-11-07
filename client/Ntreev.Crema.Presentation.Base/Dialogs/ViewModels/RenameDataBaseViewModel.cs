@@ -67,7 +67,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 
         protected async override void VerifyRename(string newName, Action<bool> isVerify)
         {
-            var dataBases = this.dataBase.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
+            var dataBases = this.dataBase.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
             var result = await dataBases.ContainsAsync(newName) == false;
             isVerify(result);
         }

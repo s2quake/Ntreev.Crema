@@ -58,7 +58,7 @@ namespace Ntreev.Crema.Commands.Consoles
         public Task CreateAsync(string dataBaseName)
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            return this.DataBases.AddNewDataBaseAsync(authentication, dataBaseName, MessageProperties.Message);
+            return this.DataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, MessageProperties.Message);
         }
 
         [CommandMethod]
@@ -127,9 +127,9 @@ namespace Ntreev.Crema.Commands.Consoles
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         public void List()
         {
-            var items = this.DataBases.Dispatcher.Invoke(() =>
+            var items = this.DataBaseContext.Dispatcher.Invoke(() =>
             {
-                var query = from item in this.DataBases
+                var query = from item in this.DataBaseContext
                             where StringUtility.GlobMany(item.Name, FilterProperties.FilterExpression)
                             select new ItemObject(item.Name, item.IsLoaded);
                 return query.ToArray();
@@ -195,9 +195,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private string[] GetDataBaseNames()
         {
-            return this.DataBases.Dispatcher.Invoke(() =>
+            return this.DataBaseContext.Dispatcher.Invoke(() =>
             {
-                var query = from item in this.DataBases
+                var query = from item in this.DataBaseContext
                             select item.Name;
                 return query.ToArray();
             });
@@ -205,18 +205,18 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private IDataBase GetDataBase(string dataBaseName)
         {
-            var dataBase = this.DataBases.Dispatcher.Invoke(GetDataBase);
+            var dataBase = this.DataBaseContext.Dispatcher.Invoke(GetDataBase);
             if (dataBase == null)
                 throw new DataBaseNotFoundException(dataBaseName);
             return dataBase;
 
             IDataBase GetDataBase()
             {
-                return this.DataBases[dataBaseName];
+                return this.DataBaseContext[dataBaseName];
             }
         }
 
-        private IDataBaseContext DataBases => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+        private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
 
         #region classes
 

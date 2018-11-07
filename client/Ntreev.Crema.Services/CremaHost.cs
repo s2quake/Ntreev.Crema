@@ -69,8 +69,8 @@ namespace Ntreev.Crema.Services
         {
             if (serviceType == typeof(ICremaHost))
                 return this;
-            if (serviceType == typeof(IDataBaseCollection))
-                return this.DataBases;
+            if (serviceType == typeof(IDataBaseContext))
+                return this.DataBaseContext;
             if (serviceType == typeof(IUserContext))
                 return this.UserContext;
             if (serviceType == typeof(IUserCollection))
@@ -162,12 +162,12 @@ namespace Ntreev.Crema.Services
                         Verbose = this.settings.Verbose
                     };
                     this.UserContext = new UserContext(this);
-                    this.DataBases = new DataBaseCollection(this);
+                    this.DataBaseContext = new DataBaseContext(this);
                     this.DomainContext = new DomainContext(this);
                 });
-                this.AuthenticationToken = await this.UserContext.InitializeAsync(this.IPAddress, ServiceInfos[nameof(UserService)], userID, password);
-                await this.DataBases.InitializeAsync(this.IPAddress, this.AuthenticationToken, ServiceInfos[nameof(DataBaseCollectionService)]);
-                await this.DomainContext.InitializeAsync(this.IPAddress, this.AuthenticationToken, ServiceInfos[nameof(DomainService)]);
+                this.AuthenticationToken = await this.UserContext.InitializeAsync(this.IPAddress, ServiceInfos[nameof(UserContextService)], userID, password);
+                await this.DataBaseContext.InitializeAsync(this.IPAddress, this.AuthenticationToken, ServiceInfos[nameof(DataBaseContextService)]);
+                await this.DomainContext.InitializeAsync(this.IPAddress, this.AuthenticationToken, ServiceInfos[nameof(DomainContextService)]);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Authority = this.UserContext.CurrentUser.Authority;
@@ -395,7 +395,7 @@ namespace Ntreev.Crema.Services
 
         public Authority Authority { get; private set; }
 
-        public DataBaseCollection DataBases { get; private set; }
+        public DataBaseContext DataBaseContext { get; private set; }
 
         public DomainContext DomainContext { get; private set; }
 
@@ -483,15 +483,15 @@ namespace Ntreev.Crema.Services
                 if (item is DataBase)
                     await item.CloseAsync(closeInfo);
             }
-            if (this.services.Contains(this.DataBases) == true)
-                await this.DataBases.CloseAsync(closeInfo);
+            if (this.services.Contains(this.DataBaseContext) == true)
+                await this.DataBaseContext.CloseAsync(closeInfo);
             if (this.services.Contains(this.UserContext) == true)
                 await this.UserContext.CloseAsync(closeInfo);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.services.Clear();
                 this.DomainContext = null;
-                this.DataBases = null;
+                this.DataBaseContext = null;
                 this.UserContext = null;
                 foreach (var item in this.plugins.Reverse())
                 {

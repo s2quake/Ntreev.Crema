@@ -443,7 +443,7 @@ namespace Ntreev.Crema.Services.Data
 
         protected virtual void OnDetach()
         {
-            this.DetachDomainEvent();
+            this.domain.Dispatcher.Invoke(this.DetachDomainEvent);
             this.domain = null;
         }
 

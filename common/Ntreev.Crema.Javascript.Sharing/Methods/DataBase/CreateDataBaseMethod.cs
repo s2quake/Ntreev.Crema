@@ -42,9 +42,9 @@ namespace Ntreev.Crema.Javascript.Methods.DataBase
         protected override async Task OnExecuteAsync(string dataBaseName, string comment)
         {
             var authentication = this.Context.GetAuthentication(this);
-            await this.DataBases.AddNewDataBaseAsync(authentication, dataBaseName, comment);
+            await this.DataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, comment);
         }
 
-        private IDataBaseContext DataBases => this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+        private IDataBaseContext DataBaseContext => this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }
 }

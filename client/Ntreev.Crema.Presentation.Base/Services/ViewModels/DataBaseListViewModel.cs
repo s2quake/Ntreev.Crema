@@ -132,11 +132,11 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         private async void CremaHost_Opened(object sender, EventArgs e)
         {
-            var dataBases = await this.DataBases.Dispatcher.InvokeAsync(() =>
+            var dataBases = await this.DataBaseContext.Dispatcher.InvokeAsync(() =>
             {
-                this.DataBases.ItemsCreated += DataBases_ItemsCreated;
-                this.DataBases.ItemsDeleted += DataBases_ItemsDeleted;
-                return this.DataBases.Select(item => new DataBaseItemViewModel(this.authenticator, item, this)).ToArray();
+                this.DataBaseContext.ItemsCreated += DataBaseContext_ItemsCreated;
+                this.DataBaseContext.ItemsDeleted += DataBaseContext_ItemsDeleted;
+                return this.DataBaseContext.Select(item => new DataBaseItemViewModel(this.authenticator, item, this)).ToArray();
             });
             
             await this.Dispatcher.InvokeAsync(() =>
@@ -162,7 +162,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             });
         }
 
-        private async void DataBases_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
+        private async void DataBaseContext_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
         {
             var dataBases = e.Items.Select(item => new DataBaseItemViewModel(this.authenticator, item, this)).ToArray();
             await this.Dispatcher.InvokeAsync(() =>
@@ -174,7 +174,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             });
         }
 
-        private async void DataBases_ItemsDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
+        private async void DataBaseContext_ItemsDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
         {
             var dataBaseNames = e.ItemPaths;
             await this.Dispatcher.InvokeAsync(() =>
@@ -211,6 +211,6 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             get { return this.cremaAppHost.Value; }
         }
 
-        private IDataBaseCollection DataBases => this.cremaHost.GetService(typeof(IDataBaseCollection)) as IDataBaseCollection;
+        private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }
 }

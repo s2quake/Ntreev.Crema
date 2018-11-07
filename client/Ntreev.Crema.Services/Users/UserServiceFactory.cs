@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.UserService;
+using Ntreev.Crema.Services.UserContextService;
 using Ntreev.Library;
 using System;
 using System.ServiceModel;
@@ -25,85 +25,85 @@ using System.Threading;
 
 namespace Ntreev.Crema.Services.Users
 {
-    class UserServiceFactory : IUserServiceCallback
+    class UserContextServiceFactory : IUserContextServiceCallback
     {
         private readonly EndpointAddress endPointAddress;
         private readonly Binding binding;
         private readonly InstanceContext instanceContext;
 
-        private UserServiceFactory(string address, ServiceInfo serviceInfo, IUserServiceCallback userServiceCallback)
+        private UserContextServiceFactory(string address, ServiceInfo serviceInfo, IUserContextServiceCallback userServiceCallback)
         {
             this.binding = CremaHost.CreateBinding(serviceInfo);
-            this.endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/UserService");
+            this.endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/UserContextService");
             this.instanceContext = new InstanceContext(userServiceCallback ?? (this));
             //if (Environment.OSVersion.Platform != PlatformID.Unix)
             //    this.instanceContext.SynchronizationContext = SynchronizationContext.Current;
         }
 
-        public static UserServiceClient CreateServiceClient(string address, ServiceInfo serviceInfo, IUserServiceCallback userServiceCallback)
+        public static UserContextServiceClient CreateServiceClient(string address, ServiceInfo serviceInfo, IUserContextServiceCallback userServiceCallback)
         {
-            var factory = new UserServiceFactory(address, serviceInfo, userServiceCallback);
-            return new UserServiceClient(factory.instanceContext, factory.binding, factory.endPointAddress);
+            var factory = new UserContextServiceFactory(address, serviceInfo, userServiceCallback);
+            return new UserContextServiceClient(factory.instanceContext, factory.binding, factory.endPointAddress);
         }
 
-        #region IUserServiceCallback
+        #region IUserContextServiceCallback
 
-        void IUserServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
-        {
-            throw new NotImplementedException();
-        }
-
-        void IUserServiceCallback.OnUsersChanged(CallbackInfo callbackInfo, UserInfo[] userInfos)
+        void IUserContextServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUsersStateChanged(CallbackInfo callbackInfo, string[] userIDs, UserState[] states)
+        void IUserContextServiceCallback.OnUsersChanged(CallbackInfo callbackInfo, UserInfo[] userInfos)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUserItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, UserInfo?[] args)
+        void IUserContextServiceCallback.OnUsersStateChanged(CallbackInfo callbackInfo, string[] userIDs, UserState[] states)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUserItemsRenamed(CallbackInfo callbackInfo, string[] itemPaths, string[] newNames)
+        void IUserContextServiceCallback.OnUserItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, UserInfo?[] args)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUserItemsMoved(CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths)
+        void IUserContextServiceCallback.OnUserItemsRenamed(CallbackInfo callbackInfo, string[] itemPaths, string[] newNames)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUserItemsDeleted(CallbackInfo callbackInfo, string[] itemPaths)
+        void IUserContextServiceCallback.OnUserItemsMoved(CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUsersLoggedIn(CallbackInfo callbackInfo, string[] userIDs)
+        void IUserContextServiceCallback.OnUserItemsDeleted(CallbackInfo callbackInfo, string[] itemPaths)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUsersLoggedOut(CallbackInfo callbackInfo, string[] userIDs, CloseInfo closeInfo)
+        void IUserContextServiceCallback.OnUsersLoggedIn(CallbackInfo callbackInfo, string[] userIDs)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUsersKicked(CallbackInfo callbackInfo, string[] userIDs, string[] comments)
+        void IUserContextServiceCallback.OnUsersLoggedOut(CallbackInfo callbackInfo, string[] userIDs, CloseInfo closeInfo)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnUsersBanChanged(CallbackInfo callbackInfo, BanInfo[] banInfos, BanChangeType changeType, string[] comments)
+        void IUserContextServiceCallback.OnUsersKicked(CallbackInfo callbackInfo, string[] userIDs, string[] comments)
         {
             throw new NotImplementedException();
         }
 
-        void IUserServiceCallback.OnMessageReceived(CallbackInfo callbackInfo, string[] userIDs, string message, MessageType messageType)
+        void IUserContextServiceCallback.OnUsersBanChanged(CallbackInfo callbackInfo, BanInfo[] banInfos, BanChangeType changeType, string[] comments)
+        {
+            throw new NotImplementedException();
+        }
+
+        void IUserContextServiceCallback.OnMessageReceived(CallbackInfo callbackInfo, string[] userIDs, string message, MessageType messageType)
         {
             throw new NotImplementedException();
         }

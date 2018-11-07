@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.DomainService;
+using Ntreev.Crema.Services.DomainContextService;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Crema.Services.Users;
 using Ntreev.Library;
@@ -1358,7 +1358,7 @@ namespace Ntreev.Crema.Services.Domains
             result.Validate(authentication);
         }
 
-        private IDomainService Service => this.Context.Service;
+        private IDomainContextService Service => this.Context.Service;
 
         #region IDomain
 

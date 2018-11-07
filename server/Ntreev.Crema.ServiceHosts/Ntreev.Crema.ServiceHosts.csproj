@@ -61,27 +61,27 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthenticationUtility.cs" />
-    <Compile Include="Data\DataBaseCollectionServiceSync.cs" />
+    <Compile Include="Data\DataBaseContextServiceSync.cs" />
     <Compile Include="Data\DataBaseServiceSync.cs" />
     <Compile Include="DescriptorService.cs" />
     <Compile Include="DescriptorServiceHost.cs" />
     <Compile Include="CremaServiceItemHost.cs" />
-    <Compile Include="Data\DataBaseCollectionServiceHost.cs" />
-    <Compile Include="Data\DataBaseCollectionServiceHostProvider.cs" />
+    <Compile Include="Data\DataBaseContextServiceHost.cs" />
+    <Compile Include="Data\DataBaseContextServiceHostProvider.cs" />
     <Compile Include="Data\DataBaseServiceHost.cs" />
-    <Compile Include="Data\DataBaseCollectionService.cs" />
+    <Compile Include="Data\DataBaseContextService.cs" />
     <Compile Include="Data\DataBaseService.cs" />
     <Compile Include="Data\DataBaseServiceHostProvider.cs" />
-    <Compile Include="Data\IDataBaseCollectionEventCallback.cs" />
+    <Compile Include="Data\IDataBaseContextEventCallback.cs" />
     <Compile Include="Data\IDataBaseEventCallback.cs" />
-    <Compile Include="Data\IDataBaseCollectionService.cs" />
+    <Compile Include="Data\IDataBaseContextService.cs" />
     <Compile Include="Data\IDataBaseService.cs" />
-    <Compile Include="Domains\DomainServiceSync.cs" />
-    <Compile Include="Domains\DomainServiceHost.cs" />
-    <Compile Include="Domains\DomainService.cs" />
-    <Compile Include="Domains\DomainServiceHostProvider.cs" />
-    <Compile Include="Domains\IDomainEventCallback.cs" />
-    <Compile Include="Domains\IDomainService.cs" />
+    <Compile Include="Domains\DomainContextServiceSync.cs" />
+    <Compile Include="Domains\DomainContextServiceHost.cs" />
+    <Compile Include="Domains\DomainContextService.cs" />
+    <Compile Include="Domains\DomainContextServiceHostProvider.cs" />
+    <Compile Include="Domains\IDomainContextEventCallback.cs" />
+    <Compile Include="Domains\IDomainContextService.cs" />
     <Compile Include="CremaServiceItemBase.cs" />
     <Compile Include="CremaService.cs" />
     <Compile Include="IDescriptorService.cs" />
@@ -96,12 +96,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Users\UserServiceSync.cs" />
-    <Compile Include="Users\UserServiceHost.cs" />
-    <Compile Include="Users\IUserEventCallback.cs" />
-    <Compile Include="Users\IUserService.cs" />
-    <Compile Include="Users\UserService.cs" />
-    <Compile Include="Users\UserServiceHostProvider.cs" />
+    <Compile Include="Users\UserContextServiceSync.cs" />
+    <Compile Include="Users\UserContextServiceHost.cs" />
+    <Compile Include="Users\IUserContextEventCallback.cs" />
+    <Compile Include="Users\IUserContextService.cs" />
+    <Compile Include="Users\UserContextService.cs" />
+    <Compile Include="Users\UserContextServiceHostProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj">

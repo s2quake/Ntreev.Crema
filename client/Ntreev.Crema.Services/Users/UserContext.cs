@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.UserService;
+using Ntreev.Crema.Services.UserContextService;
 using Ntreev.Library;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
@@ -35,9 +35,9 @@ namespace Ntreev.Crema.Services.Users
 {
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     class UserContext : ItemContext<User, UserCategory, UserCollection, UserCategoryCollection, UserContext>,
-        IUserServiceCallback, IUserContext, ICremaService
+        IUserContextServiceCallback, IUserContext, ICremaService
     {
-        private UserServiceClient service;
+        private UserContextServiceClient service;
         private Timer timer;
 
         private ItemsCreatedEventHandler<IUserItem> itemsCreated;
@@ -63,7 +63,7 @@ namespace Ntreev.Crema.Services.Users
             var version = typeof(CremaHost).Assembly.GetName().Version;
             return await this.Dispatcher.InvokeAsync(() =>
             {
-                this.service = UserServiceFactory.CreateServiceClient(address, serviceInfo, this);
+                this.service = UserContextServiceFactory.CreateServiceClient(address, serviceInfo, this);
                 this.service.Open();
                 if (this.service is ICommunicationObject service)
                 {
@@ -281,7 +281,7 @@ namespace Ntreev.Crema.Services.Users
 
         public User CurrentUser { get; private set; }
 
-        public IUserService Service => this.service;
+        public IUserContextService Service => this.service;
 
         public UserCollection Users => this.Items;
 
@@ -412,15 +412,15 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        #region IUserServiceCallback
+        #region IUserContextServiceCallback
 
-        async void IUserServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
+        async void IUserContextServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
             await this.CloseAsync(closeInfo);
             this.CremaHost.RemoveServiceAsync(this);
         }
 
-        async void IUserServiceCallback.OnUsersChanged(CallbackInfo callbackInfo, UserInfo[] userInfos)
+        async void IUserContextServiceCallback.OnUsersChanged(CallbackInfo callbackInfo, UserInfo[] userInfos)
         {
             try
             {
@@ -448,7 +448,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUsersStateChanged(CallbackInfo callbackInfo, string[] userIDs, UserState[] states)
+        async void IUserContextServiceCallback.OnUsersStateChanged(CallbackInfo callbackInfo, string[] userIDs, UserState[] states)
         {
             try
             {
@@ -474,7 +474,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUserItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, UserInfo?[] args)
+        async void IUserContextServiceCallback.OnUserItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, UserInfo?[] args)
         {
             try
             {
@@ -523,7 +523,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUserItemsRenamed(CallbackInfo callbackInfo, string[] itemPaths, string[] newNames)
+        async void IUserContextServiceCallback.OnUserItemsRenamed(CallbackInfo callbackInfo, string[] itemPaths, string[] newNames)
         {
             try
             {
@@ -601,7 +601,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUserItemsMoved(CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths)
+        async void IUserContextServiceCallback.OnUserItemsMoved(CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths)
         {
             try
             {
@@ -679,7 +679,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUserItemsDeleted(CallbackInfo callbackInfo, string[] itemPaths)
+        async void IUserContextServiceCallback.OnUserItemsDeleted(CallbackInfo callbackInfo, string[] itemPaths)
         {
             try
             {
@@ -752,7 +752,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUsersLoggedIn(CallbackInfo callbackInfo, string[] userIDs)
+        async void IUserContextServiceCallback.OnUsersLoggedIn(CallbackInfo callbackInfo, string[] userIDs)
         {
             try
             {
@@ -779,7 +779,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUsersLoggedOut(CallbackInfo callbackInfo, string[] userIDs, CloseInfo closeInfo)
+        async void IUserContextServiceCallback.OnUsersLoggedOut(CallbackInfo callbackInfo, string[] userIDs, CloseInfo closeInfo)
         {
             try
             {
@@ -806,7 +806,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUsersKicked(CallbackInfo callbackInfo, string[] userIDs, string[] comments)
+        async void IUserContextServiceCallback.OnUsersKicked(CallbackInfo callbackInfo, string[] userIDs, string[] comments)
         {
             try
             {
@@ -833,7 +833,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnUsersBanChanged(CallbackInfo callbackInfo, BanInfo[] banInfos, BanChangeType changeType, string[] comments)
+        async void IUserContextServiceCallback.OnUsersBanChanged(CallbackInfo callbackInfo, BanInfo[] banInfos, BanChangeType changeType, string[] comments)
         {
             try
             {
@@ -869,7 +869,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        async void IUserServiceCallback.OnMessageReceived(CallbackInfo callbackInfo, string[] userIDs, string message, MessageType messageType)
+        async void IUserContextServiceCallback.OnMessageReceived(CallbackInfo callbackInfo, string[] userIDs, string message, MessageType messageType)
         {
             try
             {
