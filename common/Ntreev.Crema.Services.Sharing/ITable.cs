@@ -35,9 +35,9 @@ namespace Ntreev.Crema.Services
 
         Task DeleteAsync(Authentication authentication);
 
-        Task<ITable> CopyAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent);
+        Task<ITable[]> CopyAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent);
 
-        Task<ITable> InheritAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent);
+        Task<ITable[]> InheritAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent);
 
         Task<ITableTemplate> NewTableAsync(Authentication authentication);
 

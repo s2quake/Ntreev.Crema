@@ -78,7 +78,8 @@ namespace Ntreev.Crema.Services.Data
                 this.type.UpdateTypeInfo(typeInfo);
                 this.type.TypeState = TypeState.None;
                 this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
-                this.Container.InvokeTypesChangedEvent(authentication, this.types, dataBaseSet.DataSet, taskID);
+                this.Container.InvokeTypesChangedEvent(authentication, this.types, dataBaseSet.DataSet);
+                this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
             });
             await this.Repository.UnlockAsync(this.ItemPaths);
         }

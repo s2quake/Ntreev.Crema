@@ -62,10 +62,10 @@ namespace Ntreev.Crema.Services.Domains
             this.Context.InvokeItemsCreatedEvent(authentication, domains, domainInfos);
         }
 
-        public void InvokeDomainDeletedEvent(Authentication authentication, Domain[] domains, bool[] isCanceleds, Guid taskID)
+        public void InvokeDomainDeletedEvent(Authentication authentication, Domain[] domains, bool[] isCanceleds)
         {
             var itemPaths = domains.Select(item => item.Path).ToArray();
-            var args = new DomainsDeletedEventArgs(authentication, domains, isCanceleds) { TaskID = taskID };
+            var args = new DomainsDeletedEventArgs(authentication, domains, isCanceleds);
             for (var i = 0; i < domains.Length; i++)
             {
                 var item = domains[i];
@@ -123,7 +123,6 @@ namespace Ntreev.Crema.Services.Domains
         {
             var args = new DomainUserEventArgs(authentication, domain, domainUser) { TaskID = taskID };
             this.OnDomainUserEditEnded(args);
-
         }
 
         public void InvokeDomainOwnerChangedEvent(Authentication authentication, Domain domain, DomainUser domainUser, Guid taskID)

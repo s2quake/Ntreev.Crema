@@ -24,12 +24,6 @@ namespace Ntreev.Crema.Services.DomainContextService {
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainContextService/GetMetaData", ReplyAction="http://www.ntreev.com/IDomainContextService/GetMetaDataResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData[]> GetMetaData(System.Guid dataBaseID);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainContextService/Enter", ReplyAction="http://www.ntreev.com/IDomainContextService/EnterResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase Enter(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainAccessType accessType);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainContextService/Leave", ReplyAction="http://www.ntreev.com/IDomainContextService/LeaveResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase Leave(System.Guid domainID);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDomainContextService/SetUserLocation", ReplyAction="http://www.ntreev.com/IDomainContextService/SetUserLocationResponse")]
         Ntreev.Crema.ServiceModel.ResultBase SetUserLocation(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo location);
         
@@ -205,10 +199,10 @@ namespace Ntreev.Crema.Services.DomainContextService {
         void OnDomainStateChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainState domainState);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainContextService/OnUserAdded")]
-        void OnUserAdded(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainUserInfo domainUserInfo, Ntreev.Crema.ServiceModel.DomainUserState domainUserState, byte[] data);
+        void OnUserAdded(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainUserInfo domainUserInfo, Ntreev.Crema.ServiceModel.DomainUserState domainUserState, byte[] data, System.Guid taskID);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainContextService/OnUserRemoved")]
-        void OnUserRemoved(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, string userID, string ownerID, Ntreev.Crema.ServiceModel.RemoveInfo removeInfo);
+        void OnUserRemoved(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, string userID, string ownerID, Ntreev.Crema.ServiceModel.RemoveInfo removeInfo, System.Guid taskID);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainContextService/OnUserLocationChanged")]
         void OnUserLocationChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo domainLocationInfo);
@@ -217,22 +211,22 @@ namespace Ntreev.Crema.Services.DomainContextService {
         void OnUserStateChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainUserState domainUserState);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainContextService/OnUserEditBegun")]
-        void OnUserEditBegun(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo domainLocationInfo);
+        void OnUserEditBegun(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo domainLocationInfo, System.Guid taskID);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainContextService/OnUserEditEnded")]
-        void OnUserEditEnded(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID);
+        void OnUserEditEnded(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, System.Guid taskID);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainContextService/OnOwnerChanged")]
-        void OnOwnerChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, string ownerID);
+        void OnOwnerChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, string ownerID, System.Guid taskID);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainContextService/OnRowAdded")]
-        void OnRowAdded(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
+        void OnRowAdded(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows, System.Guid taskID);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainContextService/OnRowChanged")]
-        void OnRowChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
+        void OnRowChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows, System.Guid taskID);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainContextService/OnRowRemoved")]
-        void OnRowRemoved(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows);
+        void OnRowRemoved(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, Ntreev.Crema.ServiceModel.DomainRowInfo[] rows, System.Guid taskID);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainContextService/OnPropertyChanged")]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(System.DBNull))]
@@ -276,7 +270,10 @@ namespace Ntreev.Crema.Services.DomainContextService {
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(System.Guid[]))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(bool[]))]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(object[]))]
-        void OnPropertyChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, string propertyName, object value);
+        void OnPropertyChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid domainID, string propertyName, object value, System.Guid taskID);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDomainContextService/OnTaskCompleted")]
+        void OnTaskCompleted(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid[] taskIDs);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -317,14 +314,6 @@ namespace Ntreev.Crema.Services.DomainContextService {
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DomainMetaData[]> GetMetaData(System.Guid dataBaseID) {
             return base.Channel.GetMetaData(dataBaseID);
-        }
-        
-        public Ntreev.Crema.ServiceModel.ResultBase Enter(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainAccessType accessType) {
-            return base.Channel.Enter(domainID, accessType);
-        }
-        
-        public Ntreev.Crema.ServiceModel.ResultBase Leave(System.Guid domainID) {
-            return base.Channel.Leave(domainID);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase SetUserLocation(System.Guid domainID, Ntreev.Crema.ServiceModel.DomainLocationInfo location) {

@@ -81,7 +81,8 @@ namespace Ntreev.Crema.Services.Data
                 this.table.UpdateComment(template.Comment);
                 this.table.TableState = TableState.None;
                 this.Container.InvokeTablesStateChangedEvent(authentication, this.tables);
-                this.Container.InvokeTablesTemplateChangedEvent(authentication, this.tables, dataSet, taskID);
+                this.Container.InvokeTablesTemplateChangedEvent(authentication, this.tables, dataSet);
+                this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
             });
             await this.Repository.UnlockAsync(this.ItemPaths);
         }
@@ -106,7 +107,7 @@ namespace Ntreev.Crema.Services.Data
         protected override async Task<CremaTemplate> CreateSourceAsync(Authentication authentication)
         {
             var tablePath = this.table.Path;
-            var dataSet = await this.table.ReadDataForTemplateAsync(authentication, false);
+            var dataSet = await this.table.ReadDataForTemplateAsync(authentication);
             var dataTable = dataSet.Tables[this.table.Name, this.table.Category.Path];
             if (dataTable == null)
                 throw new TableNotFoundException(tablePath);

@@ -57,7 +57,8 @@ namespace Ntreev.Crema.Services.Users
                 {
                     base.Name = name;
                     this.CremaHost.Sign(authentication);
-                    this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, taskID);
+                    this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 await this.Repository.UnlockAsync(userContextSet.Paths);
                 return taskID;
@@ -93,7 +94,8 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.Parent = this.Container[parentPath];
                     this.CremaHost.Sign(authentication);
-                    this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths, taskID);
+                    this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 await this.Repository.UnlockAsync(userContextSet.Paths);
                 return taskID;
@@ -130,7 +132,8 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.Dispose();
                     cremaHost.Sign(authentication);
-                    container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths, taskID);
+                    container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 await repository.UnlockAsync(userContextSet.Paths);
                 return taskID;

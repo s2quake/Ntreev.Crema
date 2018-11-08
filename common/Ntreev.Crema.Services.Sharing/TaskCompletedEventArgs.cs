@@ -16,54 +16,34 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
-    public interface IDataBaseContext : IReadOnlyCollection<IDataBase>, IEnumerable<IDataBase>, IDispatcherObject
+    public class TaskCompletedEventArgs : EventArgs
     {
-        Task<IDataBase> AddNewDataBaseAsync(Authentication authentication, string dataBaseName, string comment);
+        public TaskCompletedEventArgs(Authentication authentication, params Guid[] taskIDs)
+        {
+            if (authentication == null)
+                throw new ArgumentNullException(nameof(authentication));
+            if (authentication.SignatureDate.ID == string.Empty)
+                throw new ArgumentException(ServiceModel.Properties.Resources.Exception_AuthenticationDoesNotSigned, nameof(authentication));
+            this.SignatureDate = authentication.SignatureDate;
+            this.TaskIDs = taskIDs;
+        }
 
-        bool Contains(string dataBaseName);
+        public string UserID => this.SignatureDate.ID;
 
-        IDataBase this[string dataBaseName] { get; }
+        public SignatureDate SignatureDate { get; }
 
-        IDataBase this[Guid dataBaseID] { get; }
+        public DateTime DateTime => this.SignatureDate.DateTime;
 
-        event ItemsCreatedEventHandler<IDataBase> ItemsCreated;
-
-        event ItemsRenamedEventHandler<IDataBase> ItemsRenamed;
-
-        event ItemsDeletedEventHandler<IDataBase> ItemsDeleted;
-
-        event ItemsEventHandler<IDataBase> ItemsLoaded;
-
-        event ItemsEventHandler<IDataBase> ItemsUnloaded;
-
-        event ItemsEventHandler<IDataBase> ItemsResetting;
-
-        event ItemsEventHandler<IDataBase> ItemsReset;
-
-        event ItemsEventHandler<IDataBase> ItemsAuthenticationEntered;
-
-        event ItemsEventHandler<IDataBase> ItemsAuthenticationLeft;
-
-        event ItemsEventHandler<IDataBase> ItemsInfoChanged;
-
-        event ItemsEventHandler<IDataBase> ItemsStateChanged;
-
-        event ItemsEventHandler<IDataBase> ItemsAccessChanged;
-
-        event ItemsEventHandler<IDataBase> ItemsLockChanged;
-
-        event TaskCompletedEventHandler TaskCompleted;
-
-        DataBaseCollectionMetaData GetMetaData(Authentication authentication);
+        public Guid[] TaskIDs { get; }
     }
 }

@@ -367,6 +367,9 @@
   <wsdl:message name="IDataBaseService_OnTypeItemsLockChanged_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnTypeItemsLockChanged" />
   </wsdl:message>
+  <wsdl:message name="IDataBaseService_OnTaskCompleted_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnTaskCompleted" />
+  </wsdl:message>
   <wsdl:portType msc:usingSession="true" name="IDataBaseService">
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="DefinitionType">
       <wsdl:input wsaw:Action="http://www.ntreev.com/IDataBaseService/DefinitionType" message="tns:IDataBaseService_DefinitionType_InputMessage" />
@@ -622,6 +625,9 @@
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnTypeItemsLockChanged">
       <wsdl:output wsaw:Action="http://www.ntreev.com/IDataBaseService/OnTypeItemsLockChanged" message="tns:IDataBaseService_OnTypeItemsLockChanged_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnTaskCompleted">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IDataBaseService/OnTaskCompleted" message="tns:IDataBaseService_OnTaskCompleted_OutputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
 </wsdl:definitions>

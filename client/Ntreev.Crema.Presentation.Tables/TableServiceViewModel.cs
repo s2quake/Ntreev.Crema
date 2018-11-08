@@ -247,15 +247,17 @@ namespace Ntreev.Crema.Presentation.Tables
                 {
                     if (itemType == "NewTableTemplate")
                     {
-                        var category = dataBase.TableContext[itemPath] as ITableCategory;
-                        var dialog = await category.Dispatcher.InvokeAsync(() => new NewTableViewModel(this.authenticator, category, template));
-                        restoreList.Add(new System.Action(() => dialog.ShowDialog()));
-                    }
-                    else if (itemType == "NewChildTableTemplate")
-                    {
-                        var table = dataBase.TableContext[itemPath] as ITable;
-                        var dialog = await table.Dispatcher.InvokeAsync(() => new NewChildTableViewModel(this.authenticator, table, template));
-                        restoreList.Add(new System.Action(() => dialog.ShowDialog()));
+                        var tableItem = dataBase.TableContext[itemPath];
+                        if (tableItem is ITableCategory category)
+                        {
+                            var dialog = await category.Dispatcher.InvokeAsync(() => new NewTableViewModel(this.authenticator, category, template));
+                            restoreList.Add(new System.Action(() => dialog.ShowDialog()));
+                        }
+                        else if (tableItem is ITable table)
+                        {
+                            var dialog = await table.Dispatcher.InvokeAsync(() => new NewChildTableViewModel(this.authenticator, table, template));
+                            restoreList.Add(new System.Action(() => dialog.ShowDialog()));
+                        }
                     }
                     else if (itemType == "TableTemplate")
                     {

@@ -43,24 +43,6 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="Enter">
-      <soap12:operation soapAction="http://www.ntreev.com/IDomainContextService/Enter" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="Leave">
-      <soap12:operation soapAction="http://www.ntreev.com/IDomainContextService/Leave" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="SetUserLocation">
       <soap12:operation soapAction="http://www.ntreev.com/IDomainContextService/SetUserLocation" style="document" />
       <wsdl:input>
@@ -252,6 +234,12 @@
     </wsdl:operation>
     <wsdl:operation name="OnPropertyChanged">
       <soap12:operation soapAction="http://www.ntreev.com/IDomainContextService/OnPropertyChanged" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OnTaskCompleted">
+      <soap12:operation soapAction="http://www.ntreev.com/IDomainContextService/OnTaskCompleted" style="document" />
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>

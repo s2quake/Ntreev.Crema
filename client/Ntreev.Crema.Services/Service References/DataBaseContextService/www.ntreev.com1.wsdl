@@ -182,6 +182,9 @@
   <wsdl:message name="IDataBaseContextService_OnDataBasesLockChanged_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnDataBasesLockChanged" />
   </wsdl:message>
+  <wsdl:message name="IDataBaseContextService_OnTaskCompleted_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnTaskCompleted" />
+  </wsdl:message>
   <wsdl:portType msc:usingSession="true" name="IDataBaseContextService">
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="DefinitionType">
       <wsdl:input wsaw:Action="http://www.ntreev.com/IDataBaseContextService/DefinitionType" message="tns:IDataBaseContextService_DefinitionType_InputMessage" />
@@ -312,6 +315,9 @@
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnDataBasesLockChanged">
       <wsdl:output wsaw:Action="http://www.ntreev.com/IDataBaseContextService/OnDataBasesLockChanged" message="tns:IDataBaseContextService_OnDataBasesLockChanged_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnTaskCompleted">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IDataBaseContextService/OnTaskCompleted" message="tns:IDataBaseContextService_OnTaskCompleted_OutputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
 </wsdl:definitions>

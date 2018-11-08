@@ -49,6 +49,8 @@ namespace Ntreev.Crema.Services
 
         event ItemsEventHandler<IUserItem> ItemsChanged;
 
+        event TaskCompletedEventHandler TaskCompleted;
+
 #if SERVER
         Task<Authentication> LoginAsync(string userID, SecureString password);
 

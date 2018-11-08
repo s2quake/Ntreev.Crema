@@ -43,12 +43,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         ResultBase<DomainMetaData[]> GetMetaData(Guid dataBaseID);
 
         [OperationContract]
-        ResultBase Enter(Guid domainID, DomainAccessType accessType);
-
-        [OperationContract]
-        ResultBase Leave(Guid domainID);
-
-        [OperationContract]
         ResultBase SetUserLocation(Guid domainID, DomainLocationInfo location);
 
         [OperationContract]

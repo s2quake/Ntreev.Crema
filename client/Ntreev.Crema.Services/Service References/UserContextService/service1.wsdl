@@ -232,6 +232,12 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="OnTaskCompleted">
+      <soap12:operation soapAction="http://www.ntreev.com/IUserContextService/OnTaskCompleted" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="UserContextService">
     <wsdl:port name="NetTcpBinding_IUserContextService" binding="tns:NetTcpBinding_IUserContextService">

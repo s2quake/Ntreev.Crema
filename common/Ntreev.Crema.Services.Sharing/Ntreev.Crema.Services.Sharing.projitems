@@ -21,6 +21,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)DomainUserAddedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableContentGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableContentExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TaskCompletedEventHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TaskCompletedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ItemsChangedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ItemsChangedEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ServiceState.cs" />

@@ -120,6 +120,10 @@ namespace Ntreev.Crema.ServiceModel
             {
                 this.name = value;
                 this.dataBaseInfo.Name = value;
+                if (this.accessInfo.Path != string.Empty)
+                    this.accessInfo.Path = value;
+                if (this.lockInfo.Path != string.Empty)
+                    this.lockInfo.Path = value;
                 this.OnRenamed(EventArgs.Empty);
                 if (this.accessInfo.UserID != string.Empty)
                 {

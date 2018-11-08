@@ -247,13 +247,14 @@ namespace Ntreev.Crema.Services.Data
         }
 
         // TODO: 자식 테이블 이름 변경 해결 해야됨
-        public void RenameTable(string tablePath, string tableName)
+        public void RenameTable(string tablePath, string name)
         {
+            var tableName = CremaDataTable.GetTableName(name);
             var dataTable = this.tables.First(item => item.Path == tablePath);
             var repositoryPath1 = new RepositoryPath(this.TableContext, tablePath);
-            var repositoryPath2 = new RepositoryPath(this.TableContext, dataTable.CategoryPath + tableName);
+            var repositoryPath2 = new RepositoryPath(this.TableContext, dataTable.CategoryPath + name);
             repositoryPath1.ValidateExists();
-            repositoryPath1.ValidateNotExists();
+            repositoryPath2.ValidateNotExists();
             dataTable.TableName = tableName;
             this.Serialize();
             this.Repository.Move(repositoryPath1, repositoryPath2);

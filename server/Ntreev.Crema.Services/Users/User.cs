@@ -67,7 +67,8 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.CremaHost.Sign(authentication);
                     base.Move(authentication, categoryPath);
-                    this.Container.InvokeUsersMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths, taskID);
+                    this.Container.InvokeUsersMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 await this.Repository.UnlockAsync(userContextSet.Paths);
                 return taskID;
@@ -87,6 +88,7 @@ namespace Ntreev.Crema.Services.Users
                 var container = this.Container;
                 var repository = this.Repository;
                 var cremaHost = this.CremaHost;
+                var context = this.Context;
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
@@ -105,7 +107,8 @@ namespace Ntreev.Crema.Services.Users
                 {
                     base.Delete(authentication);
                     cremaHost.Sign(authentication);
-                    container.InvokeUsersDeletedEvent(authentication, tuple.items, tuple.oldPaths, taskID);
+                    container.InvokeUsersDeletedEvent(authentication, tuple.items, tuple.oldPaths);
+                    context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 await repository.UnlockAsync(userContextSet.Paths);
                 return taskID;
@@ -134,13 +137,14 @@ namespace Ntreev.Crema.Services.Users
                         var message = "다른 기기에서 동일한 아이디로 접속하였습니다.";
                         var closeInfo = new CloseInfo(CloseReason.Reconnected, message);
                         this.Authentication.InvokeExpiredEvent(this.ID, message);
-                        this.Container.InvokeUsersLoggedOutEvent(this.Authentication, users, closeInfo, Guid.Empty);
+                        this.Container.InvokeUsersLoggedOutEvent(this.Authentication, users, closeInfo);
                     }
                     this.Authentication = authentication;
                     this.IsOnline = true;
                     this.CremaHost.Sign(authentication);
                     this.Container.InvokeUsersStateChangedEvent(this.Authentication, users);
-                    this.Container.InvokeUsersLoggedInEvent(this.Authentication, users, taskID);
+                    this.Container.InvokeUsersLoggedInEvent(this.Authentication, users);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                     return this.Authentication;
                 });
             }
@@ -167,7 +171,8 @@ namespace Ntreev.Crema.Services.Users
                     this.IsOnline = false;
                     this.CremaHost.Sign(authentication);
                     this.Container.InvokeUsersStateChangedEvent(authentication, users);
-                    this.Container.InvokeUsersLoggedOutEvent(authentication, users, CloseInfo.Empty, taskID);
+                    this.Container.InvokeUsersLoggedOutEvent(authentication, users, CloseInfo.Empty);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                     return taskID;
                 });
             }
@@ -201,15 +206,16 @@ namespace Ntreev.Crema.Services.Users
                     var userInfo = userContextSet.GetUserInfo(this.Path);
                     base.Ban(authentication, (BanInfo)userInfo.BanInfo);
                     this.CremaHost.Sign(authentication);
-                    this.Container.InvokeUsersBannedEvent(authentication, tuple.items, tuple.comments, taskID);
+                    this.Container.InvokeUsersBannedEvent(authentication, tuple.items, tuple.comments);
                     if (this.IsOnline == true)
                     {
                         this.Authentication.InvokeExpiredEvent(authentication.ID, comment);
                         this.Authentication = null;
                         this.IsOnline = false;
                         this.Container.InvokeUsersStateChangedEvent(authentication, tuple.items);
-                        this.Container.InvokeUsersLoggedOutEvent(authentication, tuple.items, new CloseInfo(CloseReason.Banned, comment), taskID);
+                        this.Container.InvokeUsersLoggedOutEvent(authentication, tuple.items, new CloseInfo(CloseReason.Banned, comment));
                     }
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 await this.Repository.UnlockAsync(userContextSet.Paths);
                 return taskID;
@@ -242,7 +248,8 @@ namespace Ntreev.Crema.Services.Users
                 {
                     this.CremaHost.Sign(authentication);
                     base.Unban(authentication);
-                    this.Container.InvokeUsersUnbannedEvent(authentication, tuple.items, taskID);
+                    this.Container.InvokeUsersUnbannedEvent(authentication, tuple.items);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 await this.Repository.UnlockAsync(userContextSet.Paths);
                 return taskID;
@@ -270,9 +277,10 @@ namespace Ntreev.Crema.Services.Users
                     this.IsOnline = false;
                     this.Authentication.InvokeExpiredEvent(authentication.ID, comment);
                     this.Authentication = null;
-                    this.Container.InvokeUsersKickedEvent(authentication, items, comments, taskID);
+                    this.Container.InvokeUsersKickedEvent(authentication, items, comments);
                     this.Container.InvokeUsersStateChangedEvent(authentication, items);
-                    this.Container.InvokeUsersLoggedOutEvent(authentication, items, new CloseInfo(CloseReason.Kicked, comment), Guid.Empty);
+                    this.Container.InvokeUsersLoggedOutEvent(authentication, items, new CloseInfo(CloseReason.Kicked, comment));
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                     return taskID;
                 });
             }
@@ -307,7 +315,8 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.Sign(authentication);
                     this.Password = UserContext.StringToSecureString(userInfo.Password);
                     base.UpdateUserInfo((UserInfo)userInfo);
-                    this.Container.InvokeUsersChangedEvent(authentication, tuple.items, taskID);
+                    this.Container.InvokeUsersChangedEvent(authentication, tuple.items);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 await this.Repository.UnlockAsync(userContextSet.Paths);
                 return taskID;
@@ -330,7 +339,8 @@ namespace Ntreev.Crema.Services.Users
                     this.ValidateSendMessage(authentication, message);
                     var taskID = Guid.NewGuid();
                     this.CremaHost.Sign(authentication);
-                    this.Container.InvokeSendMessageEvent(authentication, this, message, taskID);
+                    this.Container.InvokeSendMessageEvent(authentication, this, message);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                     return taskID;
                 });
 

@@ -184,7 +184,7 @@ namespace Ntreev.Crema.Services.Data
                     }
                     this.editors = null;
                     this.owner = null;
-                    this.Container.InvokeTablesContentChangedEvent(authentication, tables, dataSet, taskID);
+                    this.Container.InvokeTablesContentChangedEvent(authentication, tables, dataSet);
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
                 await this.Repository.UnlockAsync(this.dataBaseSet.ItemPaths);

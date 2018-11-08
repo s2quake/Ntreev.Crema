@@ -102,6 +102,9 @@ namespace Ntreev.Crema.Services.UserContextService {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserContextService/OnMessageReceived")]
         void OnMessageReceived(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, string[] userIDs, string message, Ntreev.Crema.ServiceModel.MessageType messageType);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IUserContextService/OnTaskCompleted")]
+        void OnTaskCompleted(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid[] taskIDs);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]

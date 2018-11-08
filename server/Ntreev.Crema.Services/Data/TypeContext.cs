@@ -174,99 +174,99 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public void InvokeItemsSetPublicEvent(Authentication authentication, ITypeItem[] items, Guid taskID)
+        public void InvokeItemsSetPublicEvent(Authentication authentication, ITypeItem[] items)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsSetPublicEvent), items);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetPublicEvent), items);
             var message = EventMessageBuilder.SetPublicTypeItem(authentication, items);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Public);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData) { TaskID = taskID });
+            this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData));
         }
 
-        public void InvokeItemsSetPrivateEvent(Authentication authentication, ITypeItem[] items, Guid taskID)
+        public void InvokeItemsSetPrivateEvent(Authentication authentication, ITypeItem[] items)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsSetPrivateEvent), items);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetPrivateEvent), items);
             var message = EventMessageBuilder.SetPrivateTypeItem(authentication, items);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Private);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData) { TaskID = taskID });
+            this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData));
         }
 
-        public void InvokeItemsAddAccessMemberEvent(Authentication authentication, ITypeItem[] items, string[] memberIDs, AccessType[] accessTypes, Guid taskID)
+        public void InvokeItemsAddAccessMemberEvent(Authentication authentication, ITypeItem[] items, string[] memberIDs, AccessType[] accessTypes)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsAddAccessMemberEvent), items, memberIDs, accessTypes);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsAddAccessMemberEvent), items, memberIDs, accessTypes);
             var message = EventMessageBuilder.AddAccessMemberToTypeItem(authentication, items, memberIDs, accessTypes);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Add, memberIDs, accessTypes);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData) { TaskID = taskID });
+            this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData));
         }
 
-        public void InvokeItemsSetAccessMemberEvent(Authentication authentication, ITypeItem[] items, string[] memberIDs, AccessType[] accessTypes, Guid taskID)
+        public void InvokeItemsSetAccessMemberEvent(Authentication authentication, ITypeItem[] items, string[] memberIDs, AccessType[] accessTypes)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsSetAccessMemberEvent), items, memberIDs, accessTypes);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsSetAccessMemberEvent), items, memberIDs, accessTypes);
             var message = EventMessageBuilder.SetAccessMemberOfTypeItem(authentication, items, memberIDs, accessTypes);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Set, memberIDs, accessTypes);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData) { TaskID = taskID });
+            this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData));
         }
 
-        public void InvokeItemsRemoveAccessMemberEvent(Authentication authentication, ITypeItem[] items, string[] memberIDs, Guid taskID)
+        public void InvokeItemsRemoveAccessMemberEvent(Authentication authentication, ITypeItem[] items, string[] memberIDs)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsRemoveAccessMemberEvent), items, memberIDs);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsRemoveAccessMemberEvent), items, memberIDs);
             var message = EventMessageBuilder.RemoveAccessMemberFromTypeItem(authentication, items, memberIDs);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Remove, memberIDs);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, new object[] { AccessChangeType.Remove, memberIDs, }) { TaskID = taskID });
+            this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, new object[] { AccessChangeType.Remove, memberIDs, }));
         }
 
-        public void InvokeItemsLockedEvent(Authentication authentication, ITypeItem[] items, string[] comments, Guid taskID)
+        public void InvokeItemsLockedEvent(Authentication authentication, ITypeItem[] items, string[] comments)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsLockedEvent), items, comments);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsLockedEvent), items, comments);
             var message = EventMessageBuilder.LockTypeItem(authentication, items, comments);
             var metaData = EventMetaDataBuilder.Build(items, LockChangeType.Lock, comments);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsLockChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData) { TaskID = taskID });
+            this.OnItemsLockChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData));
         }
 
-        public void InvokeItemsUnlockedEvent(Authentication authentication, ITypeItem[] items, Guid taskID)
+        public void InvokeItemsUnlockedEvent(Authentication authentication, ITypeItem[] items)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeItemsUnlockedEvent), items);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeItemsUnlockedEvent), items);
             var message = EventMessageBuilder.UnlockTypeItem(authentication, items);
             var metaData = EventMetaDataBuilder.Build(items, LockChangeType.Unlock);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsLockChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData) { TaskID = taskID });
+            this.OnItemsLockChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData));
         }
 
-        public void InvokeItemsCreatedEvent(Authentication authentication, ITypeItem[] items, object[] args, object metaData, Guid taskID)
+        public void InvokeItemsCreatedEvent(Authentication authentication, ITypeItem[] items, object[] args, object metaData)
         {
-            this.OnItemsCreated(new ItemsCreatedEventArgs<ITypeItem>(authentication, items, args, metaData) { TaskID = taskID });
+            this.OnItemsCreated(new ItemsCreatedEventArgs<ITypeItem>(authentication, items, args, metaData));
         }
 
-        public void InvokeItemsRenamedEvent(Authentication authentication, ITypeItem[] items, string[] oldNames, string[] oldPaths, object metaData, Guid taskID)
+        public void InvokeItemsRenamedEvent(Authentication authentication, ITypeItem[] items, string[] oldNames, string[] oldPaths, object metaData)
         {
-            this.OnItemsRenamed(new ItemsRenamedEventArgs<ITypeItem>(authentication, items, oldNames, oldPaths, metaData) { TaskID = taskID });
+            this.OnItemsRenamed(new ItemsRenamedEventArgs<ITypeItem>(authentication, items, oldNames, oldPaths, metaData));
         }
 
-        public void InvokeItemsMovedEvent(Authentication authentication, ITypeItem[] items, string[] oldPaths, string[] oldParentPaths, object metaData, Guid taskID)
+        public void InvokeItemsMovedEvent(Authentication authentication, ITypeItem[] items, string[] oldPaths, string[] oldParentPaths, object metaData)
         {
-            this.OnItemsMoved(new ItemsMovedEventArgs<ITypeItem>(authentication, items, oldPaths, oldParentPaths, metaData) { TaskID = taskID });
+            this.OnItemsMoved(new ItemsMovedEventArgs<ITypeItem>(authentication, items, oldPaths, oldParentPaths, metaData));
         }
 
-        public void InvokeItemsDeleteEvent(Authentication authentication, ITypeItem[] items, string[] itemPaths, object metaData, Guid taskID)
+        public void InvokeItemsDeleteEvent(Authentication authentication, ITypeItem[] items, string[] itemPaths, object metaData)
         {
-            this.OnItemsDeleted(new ItemsDeletedEventArgs<ITypeItem>(authentication, items, itemPaths, metaData) { TaskID = taskID });
+            this.OnItemsDeleted(new ItemsDeletedEventArgs<ITypeItem>(authentication, items, itemPaths, metaData));
         }
 
-        public void InvokeItemsChangedEvent(Authentication authentication, ITypeItem[] items, object metaData, Guid taskID)
+        public void InvokeItemsChangedEvent(Authentication authentication, ITypeItem[] items, object metaData)
         {
-            this.OnItemsChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData) { TaskID = taskID });
+            this.OnItemsChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData));
         }
 
         public LogInfo[] GetTypeLog(string path, string revision)

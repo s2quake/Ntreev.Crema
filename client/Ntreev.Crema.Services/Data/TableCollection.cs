@@ -80,6 +80,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(InheritAsync), this, table, newTableName, categoryPath, copyContent);
                     return table.Name;
                 });
+                var taskID = GuidUtility.FromName(nameof(InheritAsync) + categoryPath + newTableName + copyContent);
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.InheritTable(name, newTableName, categoryPath, copyContent));
                 var tables = await this.AddNewAsync(authentication, result.Value);
                 return await this.Dispatcher.InvokeAsync(() =>
@@ -105,6 +106,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), this, table, newTableName, categoryPath, copyContent);
                     return table.Name;
                 });
+                var taskID = GuidUtility.FromName(nameof(CopyAsync) + categoryPath + newTableName + copyContent);
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.CopyTable(name, newTableName, categoryPath, copyContent));
                 var tables = this.AddNewAsync(authentication, result.Value);
                 return await this.Dispatcher.InvokeAsync(() =>

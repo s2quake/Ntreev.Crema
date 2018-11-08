@@ -112,45 +112,45 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        public async Task<Guid> EnterAsync(Authentication authentication, DomainAccessType accessType)
-        {
-            try
-            {
-                this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(EnterAsync), this, accessType);
-                });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.Enter(this.ID, accessType));
-                await this.taskEvent.WaitAsync(result.TaskID);
-                return result.TaskID;
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
+        //public async Task<Guid> EnterAsync(Authentication authentication, DomainAccessType accessType)
+        //{
+        //    try
+        //    {
+        //        this.ValidateExpired();
+        //        await this.Dispatcher.InvokeAsync(() =>
+        //        {
+        //            this.CremaHost.DebugMethod(authentication, this, nameof(EnterAsync), this, accessType);
+        //        });
+        //        var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.Enter(this.ID, accessType));
+        //        await this.taskEvent.WaitAsync(result.TaskID);
+        //        return result.TaskID;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        this.CremaHost.Error(e);
+        //        throw;
+        //    }
+        //}
 
-        public async Task<Guid> LeaveAsync(Authentication authentication)
-        {
-            try
-            {
-                this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(LeaveAsync), this);
-                });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.Leave(this.ID));
-                await this.taskEvent.WaitAsync(result.TaskID);
-                return result.TaskID;
-            }
-            catch (Exception e)
-            {
-                this.CremaHost.Error(e);
-                throw;
-            }
-        }
+        //public async Task<Guid> LeaveAsync(Authentication authentication)
+        //{
+        //    try
+        //    {
+        //        this.ValidateExpired();
+        //        await this.Dispatcher.InvokeAsync(() =>
+        //        {
+        //            this.CremaHost.DebugMethod(authentication, this, nameof(LeaveAsync), this);
+        //        });
+        //        var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.Leave(this.ID));
+        //        await this.taskEvent.WaitAsync(result.TaskID);
+        //        return result.TaskID;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        this.CremaHost.Error(e);
+        //        throw;
+        //    }
+        //}
 
         public async Task<Guid> BeginUserEditAsync(Authentication authentication, DomainLocationInfo location)
         {
@@ -511,15 +511,15 @@ namespace Ntreev.Crema.Services.Domains
             this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
         }
 
-        private void Log(Guid taskID, string name)
-        {
-            //this.Dispatcher.Invoke(() =>
-            //{
-            var path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "debug", this.CremaHost.UserID, "ClientDomainLog.txt");
-            Ntreev.Library.IO.FileUtility.Prepare(path);
-            System.IO.File.AppendAllText(path, $"{taskID}\t{DateTime.Now}\t{name}{Environment.NewLine}");
-            //});
-        }
+        //private void Log(Guid taskID, string name)
+        //{
+        //    //this.Dispatcher.Invoke(() =>
+        //    //{
+        //    var path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "debug", this.CremaHost.UserID, "ClientDomainLog.txt");
+        //    Ntreev.Library.IO.FileUtility.Prepare(path);
+        //    System.IO.File.AppendAllText(path, $"{taskID}\t{DateTime.Now}\t{name}{Environment.NewLine}");
+        //    //});
+        //}
 
         //private Task WaitEventAsync(long id)
         //{
@@ -576,27 +576,27 @@ namespace Ntreev.Crema.Services.Domains
             this.Container.InvokeDomainStateChangedEvent(authentication, this);
         }
 
-        public async void InvokeDeleteAsync(Authentication authentication, bool isCanceled, object result, Guid taskID)
+        public async void InvokeDeleteAsync(Authentication authentication, bool isCanceled, object result)
         {
             this.Result = result;
             if (this.Host is IDomainHost host && this.Source != null)
             {
                 this.Host = null;
                 await host.DeleteAsync(authentication, isCanceled);
-                this.taskEvent.Set(taskID);
+                this.taskEvent.Set(this.ID);
             }
             var context = this.Context;
             var container = this.Container;
             this.CremaHost.Sign(authentication, authentication.SignatureDate);
             this.Dispose();
             this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
-            container.InvokeDomainDeletedEvent(authentication, new Domain[] { this }, new bool[] { isCanceled }, taskID);
+            container.InvokeDomainDeletedEvent(authentication, new Domain[] { this }, new bool[] { isCanceled });
             context.deletionEvent.Set(this.ID);
         }
 
         public async void InvokeUserAddedAsync(Authentication authentication, DomainUserInfo domainUserInfo, DomainUserState domainUserState, byte[] data, Guid taskID)
         {
-            Log(taskID,$"{nameof(InvokeUserAddedAsync)}: {authentication.ID}");
+            //Log(taskID,$"{nameof(InvokeUserAddedAsync)}: {authentication.ID}");
             //if (id <= this.metaData.CompetionID)
             //    return;
             //this.postList.Add(id);
@@ -621,7 +621,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public async void InvokeUserRemovedAsync(Authentication authentication, DomainUser domainUser, DomainUser ownerUser, RemoveInfo removeInfo, Guid taskID)
         {
-            Log(taskID,$"{nameof(InvokeUserRemovedAsync)}: {authentication.ID}");
+            //Log(taskID,$"{nameof(InvokeUserRemovedAsync)}: {authentication.ID}");
             //if (id <= this.metaData.CompetionID)
             //    return;
             //this.postList.Add(id);
@@ -662,7 +662,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public async void InvokeUserEditBegunAsync(Authentication authentication, DomainUser domainUser, DomainLocationInfo domainLocationInfo, Guid taskID)
         {
-            Log(taskID,$"{nameof(InvokeUserEditBegunAsync)}: {authentication.ID}");
+            //Log(taskID,$"{nameof(InvokeUserEditBegunAsync)}: {authentication.ID}");
             //if (id <= this.metaData.CompetionID)
             //    return;
             //this.postList.Add(id);
@@ -685,7 +685,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public async void InvokeUserEditEndedAsync(Authentication authentication, DomainUser domainUser, Guid taskID)
         {
-            Log(taskID,$"{nameof(InvokeUserEditEndedAsync)}: {authentication.ID}");
+            //Log(taskID,$"{nameof(InvokeUserEditEndedAsync)}: {authentication.ID}");
             //if (id <= this.metaData.CompetionID)
             //    return;
             //this.postList.Add(id);
@@ -703,7 +703,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public void InvokeOwnerChangedAsync(Authentication authentication, DomainUser domainUser, Guid taskID)
         {
-            Log(taskID,$"{nameof(InvokeOwnerChangedAsync)}: {authentication.ID}");
+            //Log(taskID,$"{nameof(InvokeOwnerChangedAsync)}: {authentication.ID}");
             //if (id <= this.metaData.CompetionID)
             //    return;
             //this.postList.Add(id);
@@ -716,7 +716,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public async void InvokeRowAddedAsync(Authentication authentication, DomainUser domainUser, DomainRowInfo[] rows, Guid taskID)
         {
-            Log(taskID,$"{nameof(InvokeRowAddedAsync)}: {authentication.ID}");
+            //Log(taskID,$"{nameof(InvokeRowAddedAsync)}: {authentication.ID}");
             //if (id <= this.metaData.CompetionID)
             //    return;
             //this.postList.Add(id);
@@ -741,7 +741,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public async void InvokeRowChangedAsync(Authentication authentication, DomainUser domainUser, DomainRowInfo[] rows, Guid taskID)
         {
-            Log(taskID,$"{nameof(InvokeRowChangedAsync)}: {authentication.ID}");
+            //Log(taskID,$"{nameof(InvokeRowChangedAsync)}: {authentication.ID}");
             //if (id <= this.metaData.CompetionID)
             //    return;
             //this.postList.Add(id);
@@ -767,7 +767,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public async void InvokeRowRemovedAsync(Authentication authentication, DomainUser domainUser, DomainRowInfo[] rows, Guid taskID)
         {
-            Log(taskID,$"{nameof(InvokeRowRemovedAsync)}: {authentication.ID}");
+            //Log(taskID,$"{nameof(InvokeRowRemovedAsync)}: {authentication.ID}");
             //if (id <= this.metaData.CompetionID)
             //    return;
             //this.postList.Add(id);
@@ -793,7 +793,6 @@ namespace Ntreev.Crema.Services.Domains
 
         public async void InvokePropertyChangedAsync(Authentication authentication, DomainUser domainUser, string propertyName, object value, Guid taskID)
         {
-            Log(taskID,$"{nameof(InvokePropertyChangedAsync)}: {authentication.ID}");
             //this.postList.Add(id);
             await this.DataDispatcher.InvokeAsync(() =>
             {
@@ -1365,16 +1364,6 @@ namespace Ntreev.Crema.Services.Domains
         Task IDomain.DeleteAsync(Authentication authentication, bool isCanceled)
         {
             return this.DeleteAsync(authentication, isCanceled);
-        }
-
-        Task IDomain.EnterAsync(Authentication authentication, DomainAccessType accessType)
-        {
-            return this.EnterAsync(authentication, accessType);
-        }
-
-        Task IDomain.LeaveAsync(Authentication authentication)
-        {
-            return this.LeaveAsync(authentication);
         }
 
         Task IDomain.BeginUserEditAsync(Authentication authentication, DomainLocationInfo location)

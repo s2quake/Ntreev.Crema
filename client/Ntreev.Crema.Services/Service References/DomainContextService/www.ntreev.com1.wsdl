@@ -27,18 +27,6 @@
   <wsdl:message name="IDomainContextService_GetMetaData_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetMetaDataResponse" />
   </wsdl:message>
-  <wsdl:message name="IDomainContextService_Enter_InputMessage">
-    <wsdl:part name="parameters" element="tns:Enter" />
-  </wsdl:message>
-  <wsdl:message name="IDomainContextService_Enter_OutputMessage">
-    <wsdl:part name="parameters" element="tns:EnterResponse" />
-  </wsdl:message>
-  <wsdl:message name="IDomainContextService_Leave_InputMessage">
-    <wsdl:part name="parameters" element="tns:Leave" />
-  </wsdl:message>
-  <wsdl:message name="IDomainContextService_Leave_OutputMessage">
-    <wsdl:part name="parameters" element="tns:LeaveResponse" />
-  </wsdl:message>
   <wsdl:message name="IDomainContextService_SetUserLocation_InputMessage">
     <wsdl:part name="parameters" element="tns:SetUserLocation" />
   </wsdl:message>
@@ -153,6 +141,9 @@
   <wsdl:message name="IDomainContextService_OnPropertyChanged_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnPropertyChanged" />
   </wsdl:message>
+  <wsdl:message name="IDomainContextService_OnTaskCompleted_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnTaskCompleted" />
+  </wsdl:message>
   <wsdl:portType msc:usingSession="true" name="IDomainContextService">
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Subscribe">
       <wsdl:input wsaw:Action="http://www.ntreev.com/IDomainContextService/Subscribe" message="tns:IDomainContextService_Subscribe_InputMessage" />
@@ -165,14 +156,6 @@
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetMetaData">
       <wsdl:input wsaw:Action="http://www.ntreev.com/IDomainContextService/GetMetaData" message="tns:IDomainContextService_GetMetaData_InputMessage" />
       <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainContextService/GetMetaDataResponse" message="tns:IDomainContextService_GetMetaData_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Enter">
-      <wsdl:input wsaw:Action="http://www.ntreev.com/IDomainContextService/Enter" message="tns:IDomainContextService_Enter_InputMessage" />
-      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainContextService/EnterResponse" message="tns:IDomainContextService_Enter_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Leave">
-      <wsdl:input wsaw:Action="http://www.ntreev.com/IDomainContextService/Leave" message="tns:IDomainContextService_Leave_InputMessage" />
-      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainContextService/LeaveResponse" message="tns:IDomainContextService_Leave_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="SetUserLocation">
       <wsdl:input wsaw:Action="http://www.ntreev.com/IDomainContextService/SetUserLocation" message="tns:IDomainContextService_SetUserLocation_InputMessage" />
@@ -265,6 +248,9 @@
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnPropertyChanged">
       <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainContextService/OnPropertyChanged" message="tns:IDomainContextService_OnPropertyChanged_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnTaskCompleted">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IDomainContextService/OnTaskCompleted" message="tns:IDomainContextService_OnTaskCompleted_OutputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
 </wsdl:definitions>

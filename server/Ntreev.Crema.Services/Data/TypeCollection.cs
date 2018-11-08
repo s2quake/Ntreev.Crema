@@ -51,7 +51,7 @@ namespace Ntreev.Crema.Services.Data
             return this.BaseAddNew(name, categoryPath, authentication);
         }
 
-        public async Task<Type> AddNewAsync(Authentication authentication, CremaDataType dataType, Guid taskID)
+        public async Task<Type> AddNewAsync(Authentication authentication, CremaDataType dataType)
         {
             try
             {
@@ -70,7 +70,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.Sign(authentication);
                     var type = this.BaseAddNew(dataType.Name, dataType.CategoryPath, authentication);
                     type.Initialize(dataType.TypeInfo);
-                    this.InvokeTypesCreatedEvent(authentication, new Type[] { type }, dataSet, taskID);
+                    this.InvokeTypesCreatedEvent(authentication, new Type[] { type }, dataSet);
                     return type;
                 });
                 await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
@@ -110,7 +110,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.Sign(authentication);
                     var newType = this.BaseAddNew(newTypeName, categoryPath, authentication);
                     newType.Initialize(newDataType.TypeInfo);
-                    this.InvokeTypesCreatedEvent(authentication, new Type[] { newType }, dataSet, taskID);
+                    this.InvokeTypesCreatedEvent(authentication, new Type[] { newType }, dataSet);
                     return newType;
                 });
                 await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
@@ -223,56 +223,56 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public void InvokeTypesCreatedEvent(Authentication authentication, Type[] types, CremaDataSet dataSet, Guid taskID)
+        public void InvokeTypesCreatedEvent(Authentication authentication, Type[] types, CremaDataSet dataSet)
         {
             var args = types.Select(item => (object)item.TypeInfo).ToArray();
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeTypesCreatedEvent), types);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesCreatedEvent), types);
             var message = EventMessageBuilder.CreateType(authentication, types);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnTypesCreated(new ItemsCreatedEventArgs<IType>(authentication, types, args, dataSet) { TaskID = taskID });
-            this.Context.InvokeItemsCreatedEvent(authentication, types, args, dataSet, taskID);
+            this.OnTypesCreated(new ItemsCreatedEventArgs<IType>(authentication, types, args, dataSet));
+            this.Context.InvokeItemsCreatedEvent(authentication, types, args, dataSet);
         }
 
-        public void InvokeTypesRenamedEvent(Authentication authentication, Type[] types, string[] oldNames, string[] oldPaths, CremaDataSet dataSet, Guid taskID)
+        public void InvokeTypesRenamedEvent(Authentication authentication, Type[] types, string[] oldNames, string[] oldPaths, CremaDataSet dataSet)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeTypesRenamedEvent), types, oldNames, oldPaths);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesRenamedEvent), types, oldNames, oldPaths);
             var message = EventMessageBuilder.RenameType(authentication, types, oldNames);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnTypesRenamed(new ItemsRenamedEventArgs<IType>(authentication, types, oldNames, oldPaths) { TaskID = taskID });
-            this.Context.InvokeItemsRenamedEvent(authentication, types, oldNames, oldPaths, dataSet, taskID);
+            this.OnTypesRenamed(new ItemsRenamedEventArgs<IType>(authentication, types, oldNames, oldPaths));
+            this.Context.InvokeItemsRenamedEvent(authentication, types, oldNames, oldPaths, dataSet);
         }
 
-        public void InvokeTypesMovedEvent(Authentication authentication, Type[] types, string[] oldPaths, string[] oldCategoryPaths, CremaDataSet dataSet, Guid taskID)
+        public void InvokeTypesMovedEvent(Authentication authentication, Type[] types, string[] oldPaths, string[] oldCategoryPaths, CremaDataSet dataSet)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeTypesMovedEvent), types, oldPaths, oldCategoryPaths);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesMovedEvent), types, oldPaths, oldCategoryPaths);
             var message = EventMessageBuilder.MoveType(authentication, types, oldCategoryPaths);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnTypesMoved(new ItemsMovedEventArgs<IType>(authentication, types, oldPaths, oldCategoryPaths) { TaskID = taskID });
-            this.Context.InvokeItemsMovedEvent(authentication, types, oldPaths, oldCategoryPaths, dataSet, taskID);
+            this.OnTypesMoved(new ItemsMovedEventArgs<IType>(authentication, types, oldPaths, oldCategoryPaths));
+            this.Context.InvokeItemsMovedEvent(authentication, types, oldPaths, oldCategoryPaths, dataSet);
         }
 
-        public void InvokeTypesDeletedEvent(Authentication authentication, Type[] types, string[] oldPaths, Guid taskID)
+        public void InvokeTypesDeletedEvent(Authentication authentication, Type[] types, string[] oldPaths)
         {
             var dataSet = CremaDataSet.Create(new SignatureDateProvider(authentication.ID));
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeTypesDeletedEvent), oldPaths);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesDeletedEvent), oldPaths);
             var message = EventMessageBuilder.DeleteType(authentication, types);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnTypesDeleted(new ItemsDeletedEventArgs<IType>(authentication, types, oldPaths) { TaskID = taskID });
-            this.Context.InvokeItemsDeleteEvent(authentication, types, oldPaths, dataSet, taskID);
+            this.OnTypesDeleted(new ItemsDeletedEventArgs<IType>(authentication, types, oldPaths));
+            this.Context.InvokeItemsDeleteEvent(authentication, types, oldPaths, dataSet);
         }
 
-        public void InvokeTypesChangedEvent(Authentication authentication, Type[] types, CremaDataSet dataSet, Guid taskID)
+        public void InvokeTypesChangedEvent(Authentication authentication, Type[] types, CremaDataSet dataSet)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeTypesChangedEvent), types);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTypesChangedEvent), types);
             var message = EventMessageBuilder.ChangeTypeTemplate(authentication, types);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnTypesChanged(new ItemsEventArgs<IType>(authentication, types) { TaskID = taskID });
-            this.Context.InvokeItemsChangedEvent(authentication, types, dataSet, taskID);
+            this.OnTypesChanged(new ItemsEventArgs<IType>(authentication, types));
+            this.Context.InvokeItemsChangedEvent(authentication, types, dataSet);
         }
 
         public void InvokeTypesStateChangedEvent(Authentication authentication, Type[] types)

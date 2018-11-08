@@ -58,7 +58,7 @@ namespace Ntreev.Crema.Services.Data
             return this.BaseAddNew(name, categoryPath, authentication);
         }
 
-        public async Task<Table[]> AddNewAsync(Authentication authentication, CremaDataSet dataSet, CremaDataTable[] dataTables, Guid taskID)
+        public async Task<Table[]> AddNewAsync(Authentication authentication, CremaDataSet dataSet, CremaDataTable[] dataTables)
         {
             foreach (var item in dataTables)
             {
@@ -78,13 +78,13 @@ namespace Ntreev.Crema.Services.Data
                     table.Initialize(item.TableInfo);
                     tableList.Add(table);
                 }
-                this.InvokeTablesCreatedEvent(authentication, tableList.ToArray(), dataSet, taskID);
+                this.InvokeTablesCreatedEvent(authentication, tableList.ToArray(), dataSet);
             });
             await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
             return tableList.ToArray();
         }
 
-        public async Task<Table> InheritAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
+        public async Task<Table[]> InheritAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace Ntreev.Crema.Services.Data
                     this.ValidateInherit(authentication, table, newTableName, categoryPath, copyContent);
                     return table.Path;
                 });
-                var taskID = GuidUtility.FromName(categoryPath + newTableName);
+                var taskID = GuidUtility.FromName(nameof(InheritAsync) + categoryPath + newTableName + copyContent);
                 var itemName = new ItemName(path);
                 var targetName = new ItemName(categoryPath, newTableName);
                 var dataSet = await table.ReadDataForCopyAsync(authentication, targetName);
@@ -107,8 +107,9 @@ namespace Ntreev.Crema.Services.Data
                             orderby item.Name
                             orderby item.TemplatedParentName != string.Empty
                             select item;
-                var tables = await this.AddNewAsync(authentication, dataSet, query.ToArray(), taskID);
-                return await this.Dispatcher.InvokeAsync(() => this[newTableName]);
+                var tables = await this.AddNewAsync(authentication, dataSet, query.ToArray());
+                await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
+                return tables;
             }
             catch (Exception e)
             {
@@ -118,7 +119,7 @@ namespace Ntreev.Crema.Services.Data
         }
 
         // TODO: 상속된 테이블 복사시 에러가 발생
-        public async Task<Table> CopyAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
+        public async Task<Table[]> CopyAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
         {
             try
             {
@@ -129,7 +130,7 @@ namespace Ntreev.Crema.Services.Data
                     this.ValidateCopy(authentication, table, newTableName, categoryPath, copyContent);
                     return table.Path;
                 });
-                var taskID = GuidUtility.FromName(categoryPath + newTableName);
+                var taskID = GuidUtility.FromName(nameof(CopyAsync) + categoryPath + newTableName + copyContent);
                 var itemName = new ItemName(path);
                 var targetName = new ItemName(categoryPath, newTableName);
                 var dataSet = await table.ReadDataForCopyAsync(authentication, targetName);
@@ -141,8 +142,9 @@ namespace Ntreev.Crema.Services.Data
                             orderby item.Name
                             orderby item.TemplatedParentName != string.Empty
                             select item;
-                await this.AddNewAsync(authentication, dataSet, query.ToArray(), taskID);
-                return await this.Dispatcher.InvokeAsync(() => this[newTableName]);
+                var tables = await this.AddNewAsync(authentication, dataSet, query.ToArray());
+                await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
+                return tables;
             }
             catch (Exception e)
             {
@@ -195,12 +197,13 @@ namespace Ntreev.Crema.Services.Data
 
         public Task InvokeTableRenameAsync(Authentication authentication, TableInfo tableInfo, string newName, DataBaseSet dataBaseSet)
         {
-            var message = EventMessageBuilder.RenameTable(authentication, tableInfo.Name, newName);
+            var name = tableInfo.ParentName == string.Empty ? newName : tableInfo.ParentName + "." + newName;
+            var message = EventMessageBuilder.RenameTable(authentication, tableInfo.Name, name);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    this.Repository.RenameTable(dataBaseSet, tableInfo.Path, newName);
+                    this.Repository.RenameTable(dataBaseSet, tableInfo.Path, name);
                     this.Repository.Commit(authentication, message);
                 }
                 catch
@@ -286,46 +289,46 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public void InvokeTablesCreatedEvent(Authentication authentication, Table[] tables, CremaDataSet dataSet, Guid taskID)
+        public void InvokeTablesCreatedEvent(Authentication authentication, Table[] tables, CremaDataSet dataSet)
         {
             var args = tables.Select(item => (object)item.TableInfo).ToArray();
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeTablesCreatedEvent), tables);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTablesCreatedEvent), tables);
             var message = EventMessageBuilder.CreateTable(authentication, tables);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnTablesCreated(new ItemsCreatedEventArgs<ITable>(authentication, tables, args, dataSet) { TaskID = taskID });
-            this.Context.InvokeItemsCreatedEvent(authentication, tables, args, dataSet, taskID);
+            this.OnTablesCreated(new ItemsCreatedEventArgs<ITable>(authentication, tables, args, dataSet));
+            this.Context.InvokeItemsCreatedEvent(authentication, tables, args, dataSet);
         }
 
-        public void InvokeTablesRenamedEvent(Authentication authentication, Table[] tables, string[] oldNames, string[] oldPaths, CremaDataSet dataSet, Guid taskID)
+        public void InvokeTablesRenamedEvent(Authentication authentication, Table[] tables, string[] oldNames, string[] oldPaths, CremaDataSet dataSet)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeTablesRenamedEvent), tables, oldNames, oldPaths);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTablesRenamedEvent), tables, oldNames, oldPaths);
             var message = EventMessageBuilder.RenameTable(authentication, tables, oldNames);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnTablesRenamed(new ItemsRenamedEventArgs<ITable>(authentication, tables, oldNames, oldPaths, dataSet) { TaskID = taskID });
-            this.Context.InvokeItemsRenamedEvent(authentication, tables, oldNames, oldPaths, dataSet, taskID);
+            this.OnTablesRenamed(new ItemsRenamedEventArgs<ITable>(authentication, tables, oldNames, oldPaths, dataSet));
+            this.Context.InvokeItemsRenamedEvent(authentication, tables, oldNames, oldPaths, dataSet);
         }
 
-        public void InvokeTablesMovedEvent(Authentication authentication, Table[] tables, string[] oldPaths, string[] oldCategoryPaths, CremaDataSet dataSet, Guid taskID)
+        public void InvokeTablesMovedEvent(Authentication authentication, Table[] tables, string[] oldPaths, string[] oldCategoryPaths, CremaDataSet dataSet)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeTablesMovedEvent), tables, oldPaths, oldCategoryPaths);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTablesMovedEvent), tables, oldPaths, oldCategoryPaths);
             var message = EventMessageBuilder.MoveTable(authentication, tables, oldCategoryPaths);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnTablesMoved(new ItemsMovedEventArgs<ITable>(authentication, tables, oldPaths, oldCategoryPaths, dataSet) { TaskID = taskID });
-            this.Context.InvokeItemsMovedEvent(authentication, tables, oldPaths, oldCategoryPaths, dataSet, taskID);
+            this.OnTablesMoved(new ItemsMovedEventArgs<ITable>(authentication, tables, oldPaths, oldCategoryPaths, dataSet));
+            this.Context.InvokeItemsMovedEvent(authentication, tables, oldPaths, oldCategoryPaths, dataSet);
         }
 
-        public void InvokeTablesDeletedEvent(Authentication authentication, Table[] tables, string[] oldPaths, Guid taskID)
+        public void InvokeTablesDeletedEvent(Authentication authentication, Table[] tables, string[] oldPaths)
         {
             var dataSet = CremaDataSet.Create(new SignatureDateProvider(authentication.ID));
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeTablesDeletedEvent), oldPaths);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTablesDeletedEvent), oldPaths);
             var message = EventMessageBuilder.DeleteTable(authentication, tables);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnTablesDeleted(new ItemsDeletedEventArgs<ITable>(authentication, tables, oldPaths, dataSet) { TaskID = taskID });
-            this.Context.InvokeItemsDeletedEvent(authentication, tables, oldPaths, dataSet, taskID);
+            this.OnTablesDeleted(new ItemsDeletedEventArgs<ITable>(authentication, tables, oldPaths, dataSet));
+            this.Context.InvokeItemsDeletedEvent(authentication, tables, oldPaths, dataSet);
         }
 
         public void InvokeTablesStateChangedEvent(Authentication authentication, Table[] tables)
@@ -334,24 +337,24 @@ namespace Ntreev.Crema.Services.Data
             this.OnTablesStateChanged(new ItemsEventArgs<ITable>(authentication, tables));
         }
 
-        public void InvokeTablesTemplateChangedEvent(Authentication authentication, Table[] tables, CremaDataSet dataSet, Guid taskID)
+        public void InvokeTablesTemplateChangedEvent(Authentication authentication, Table[] tables, CremaDataSet dataSet)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeTablesTemplateChangedEvent), tables);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTablesTemplateChangedEvent), tables);
             var message = EventMessageBuilder.ChangeTableTemplate(authentication, tables);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnTablesChanged(new ItemsChangedEventArgs<ITable>(authentication, tables, dataSet, DomainItemType.TableTemplate) { TaskID = taskID });
-            this.Context.InvokeItemsChangedEvent(authentication, tables, dataSet, taskID);
+            this.OnTablesChanged(new ItemsChangedEventArgs<ITable>(authentication, tables, dataSet, DomainItemType.TableTemplate));
+            this.Context.InvokeItemsChangedEvent(authentication, tables, dataSet);
         }
 
-        public void InvokeTablesContentChangedEvent(Authentication authentication, Table[] tables, CremaDataSet dataSet, Guid taskID)
+        public void InvokeTablesContentChangedEvent(Authentication authentication, Table[] tables, CremaDataSet dataSet)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeTablesContentChangedEvent), tables);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeTablesContentChangedEvent), tables);
             var message = EventMessageBuilder.ChangeTableContent(authentication, tables);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnTablesChanged(new ItemsChangedEventArgs<ITable>(authentication, tables, dataSet, DomainItemType.TableContent) { TaskID = taskID });
-            this.Context.InvokeItemsChangedEvent(authentication, tables, dataSet, taskID);
+            this.OnTablesChanged(new ItemsChangedEventArgs<ITable>(authentication, tables, dataSet, DomainItemType.TableContent));
+            this.Context.InvokeItemsChangedEvent(authentication, tables, dataSet);
         }
 
         public DataBaseRepositoryHost Repository => this.DataBase.Repository;

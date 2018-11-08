@@ -65,7 +65,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.Sign(authentication);
                     var category = this.BaseAddNew(name, parentPath, authentication);
                     var items = EnumerableUtility.One(category).ToArray();
-                    this.InvokeCategoriesCreatedEvent(authentication, items, taskID);
+                    this.InvokeCategoriesCreatedEvent(authentication, items);
                     return category;
                 });
                 await this.Repository.UnlockAsync(fullPath);
@@ -163,47 +163,47 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public void InvokeCategoriesCreatedEvent(Authentication authentication, TableCategory[] categories, Guid taskID)
+        public void InvokeCategoriesCreatedEvent(Authentication authentication, TableCategory[] categories)
         {
             var args = categories.Select(item => (object)null).ToArray();
             var dataSet = CremaDataSet.Create(new SignatureDateProvider(authentication.ID));
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeCategoriesCreatedEvent), categories);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesCreatedEvent), categories);
             var message = EventMessageBuilder.CreateTableCategory(authentication, categories);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnCategoriesCreated(new ItemsCreatedEventArgs<ITableCategory>(authentication, categories, args) { TaskID = taskID });
-            this.Context.InvokeItemsCreatedEvent(authentication, categories, args, dataSet, taskID);
+            this.OnCategoriesCreated(new ItemsCreatedEventArgs<ITableCategory>(authentication, categories, args));
+            this.Context.InvokeItemsCreatedEvent(authentication, categories, args, dataSet);
         }
 
-        public void InvokeCategoriesRenamedEvent(Authentication authentication, TableCategory[] categories, string[] oldNames, string[] oldPaths, CremaDataSet dataSet, Guid taskID)
+        public void InvokeCategoriesRenamedEvent(Authentication authentication, TableCategory[] categories, string[] oldNames, string[] oldPaths, CremaDataSet dataSet)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeCategoriesRenamedEvent), categories, oldNames, oldPaths);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesRenamedEvent), categories, oldNames, oldPaths);
             var message = EventMessageBuilder.RenameTableCategory(authentication, categories, oldNames);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnCategoriesRenamed(new ItemsRenamedEventArgs<ITableCategory>(authentication, categories, oldNames, oldPaths, dataSet) { TaskID = taskID });
-            this.Context.InvokeItemsRenamedEvent(authentication, categories, oldNames, oldPaths, dataSet, taskID);
+            this.OnCategoriesRenamed(new ItemsRenamedEventArgs<ITableCategory>(authentication, categories, oldNames, oldPaths, dataSet));
+            this.Context.InvokeItemsRenamedEvent(authentication, categories, oldNames, oldPaths, dataSet);
         }
 
-        public void InvokeCategoriesMovedEvent(Authentication authentication, TableCategory[] categories, string[] oldPaths, string[] oldParentPaths, CremaDataSet dataSet, Guid taskID)
+        public void InvokeCategoriesMovedEvent(Authentication authentication, TableCategory[] categories, string[] oldPaths, string[] oldParentPaths, CremaDataSet dataSet)
         {
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeCategoriesMovedEvent), categories, oldPaths, oldParentPaths);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesMovedEvent), categories, oldPaths, oldParentPaths);
             var message = EventMessageBuilder.MoveTableCategory(authentication, categories, oldPaths, oldParentPaths);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnCategoriesMoved(new ItemsMovedEventArgs<ITableCategory>(authentication, categories, oldPaths, oldParentPaths, dataSet) { TaskID = taskID });
-            this.Context.InvokeItemsMovedEvent(authentication, categories, oldPaths, oldParentPaths, dataSet, taskID);
+            this.OnCategoriesMoved(new ItemsMovedEventArgs<ITableCategory>(authentication, categories, oldPaths, oldParentPaths, dataSet));
+            this.Context.InvokeItemsMovedEvent(authentication, categories, oldPaths, oldParentPaths, dataSet);
         }
 
-        public void InvokeCategoriesDeletedEvent(Authentication authentication, TableCategory[] categories, string[] categoryPaths, Guid taskID)
+        public void InvokeCategoriesDeletedEvent(Authentication authentication, TableCategory[] categories, string[] categoryPaths)
         {
             var dataSet = CremaDataSet.Create(new SignatureDateProvider(authentication.ID));
-            var eventLog = EventLogBuilder.BuildMany(taskID, authentication, this, nameof(InvokeCategoriesDeletedEvent), categoryPaths);
+            var eventLog = EventLogBuilder.BuildMany(authentication, this, nameof(InvokeCategoriesDeletedEvent), categoryPaths);
             var message = EventMessageBuilder.DeleteTableCategory(authentication, categories);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnCategoriesDeleted(new ItemsDeletedEventArgs<ITableCategory>(authentication, categories, categoryPaths, dataSet) { TaskID = taskID });
-            this.Context.InvokeItemsDeletedEvent(authentication, categories, categoryPaths, dataSet, taskID);
+            this.OnCategoriesDeleted(new ItemsDeletedEventArgs<ITableCategory>(authentication, categories, categoryPaths, dataSet));
+            this.Context.InvokeItemsDeletedEvent(authentication, categories, categoryPaths, dataSet);
         }
 
         public DataBaseRepositoryHost Repository => this.DataBase.Repository;

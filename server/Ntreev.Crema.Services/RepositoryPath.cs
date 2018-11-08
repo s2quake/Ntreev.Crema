@@ -38,9 +38,6 @@ namespace Ntreev.Crema.Services
 
         internal RepositoryPath(Ntreev.Crema.Services.Data.DataBase dataBase, string path)
         {
-            if (path.StartsWith(PathUtility.Separator + CremaSchema.TypeDirectory) == false &&
-                path.StartsWith(PathUtility.Separator + CremaSchema.TableDirectory) == false)
-                throw new ArgumentException(nameof(path));
             this.Path = GeneratePath(dataBase.BasePath, path);
         }
 
@@ -91,7 +88,7 @@ namespace Ntreev.Crema.Services
             if (this.IsDirectory == true)
                 throw new InvalidOperationException();
             var directoryName = System.IO.Path.GetDirectoryName(this.Path);
-            var name = System.IO.Path.GetFileNameWithoutExtension(this.Path);
+            var name = System.IO.Path.GetFileName(this.Path);
             var files = Directory.GetFiles(directoryName, $"{name}.*").Where(item => System.IO.Path.GetFileNameWithoutExtension(item) == name).ToArray();
             return files;
         }

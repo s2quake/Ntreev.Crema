@@ -66,7 +66,7 @@
     <Compile Include="CremaBootstrapper.cs" />
     <Compile Include="Authentication.cs" />
     <Compile Include="CremaSettings.cs" />
-    <Compile Include="Data\DataBaseContextServiceFactory.cs" />
+    <None Include="Data\DataBaseContextServiceFactory.cs" />
     <Compile Include="Data\DataBaseContext.cs" />
     <Compile Include="Data\DataBaseTransaction.cs" />
     <Compile Include="Data\DataServiceFactory.cs" />
@@ -153,7 +153,7 @@
     <Compile Include="Domains\Domain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Users\UserAuthenticationProvider.cs" />
-    <Compile Include="Users\UserServiceFactory.cs" />
+    <None Include="Users\UserServiceFactory.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Users\UserCategory.cs" />
     <Compile Include="Users\UserCategoryCollection.cs" />

@@ -130,13 +130,13 @@ namespace Ntreev.Crema.Services.Random
             }
         }
 
-        public static Task<ITable> AddRandomDerivedTableAsync(this ITableContext tableContext, Authentication authentication)
+        public static Task<ITable[]> AddRandomDerivedTableAsync(this ITableContext tableContext, Authentication authentication)
         {
             var category = tableContext.Categories.Random();
             return AddRandomDerivedTableAsync(category, authentication);
         }
 
-        public static async Task<ITable> AddRandomDerivedTableAsync(this ITableCategory category, Authentication authentication)
+        public static async Task<ITable[]> AddRandomDerivedTableAsync(this ITableCategory category, Authentication authentication)
         {
             var tableName = RandomUtility.NextIdentifier();
             var copyData = RandomUtility.NextBoolean();

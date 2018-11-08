@@ -36,7 +36,6 @@ namespace Ntreev.Crema.Services.Data
         public static DataBaseContextServiceClient CreateServiceClient(string address, ServiceInfo serviceInfo, IDataBaseContextServiceCallback callback)
         {
             var binding = CremaHost.CreateBinding(serviceInfo);
-
             var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/DataBaseContextService");
             var instanceContext = new InstanceContext(callback ?? empty);
             //if (Environment.OSVersion.Platform != PlatformID.Unix)

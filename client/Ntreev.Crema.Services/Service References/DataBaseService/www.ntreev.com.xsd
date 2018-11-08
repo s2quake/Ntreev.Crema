@@ -905,4 +905,12 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="OnTaskCompleted">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q122="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q122:CallbackInfo" />
+        <xs:element xmlns:q123="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="taskIDs" nillable="true" type="q123:ArrayOfguid" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>

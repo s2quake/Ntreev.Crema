@@ -44,6 +44,7 @@ namespace Ntreev.Crema.Services.Domains
         private ItemsRenamedEventHandler<IDomainItem> itemsRenamed;
         private ItemsMovedEventHandler<IDomainItem> itemsMoved;
         private ItemsDeletedEventHandler<IDomainItem> itemsDeleted;
+        private TaskCompletedEventHandler taskCompleted;
 
         public DomainContext(CremaHost cremaHost)
         {
@@ -89,6 +90,11 @@ namespace Ntreev.Crema.Services.Domains
             this.OnItemsDeleted(new ItemsDeletedEventArgs<IDomainItem>(authentication, items, itemPaths));
         }
 
+        //public void InvokeTaskCompletedEvent(Authentication authentication, Guid taskID)
+        //{
+        //    this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskID));
+        //}
+
         public object GetService(System.Type serviceType)
         {
             return this.CremaHost.GetService(serviceType);
@@ -117,7 +123,7 @@ namespace Ntreev.Crema.Services.Domains
             {
                 this.Domains.Remove(domain);
                 domain.Dispose(authentication, isCanceled);
-                this.Domains.InvokeDomainDeletedEvent(authentication, new Domain[] { domain }, new bool[] { isCanceled }, taskID);
+                this.Domains.InvokeDomainDeletedEvent(authentication, new Domain[] { domain }, new bool[] { isCanceled });
             });
         }
 
@@ -189,7 +195,7 @@ namespace Ntreev.Crema.Services.Domains
                     item.Logger.Dispatcher.Dispose();
                     item.Dispose(authentication, true);
                 }
-                this.Domains.InvokeDomainDeletedEvent(authentication, domains, isCanceleds, Guid.Empty);
+                this.Domains.InvokeDomainDeletedEvent(authentication, domains, isCanceleds);
             });
         }
 
@@ -339,6 +345,20 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
+        public event TaskCompletedEventHandler TaskCompleted
+        {
+            add
+            {
+                this.Dispatcher.VerifyAccess();
+                this.taskCompleted += value;
+            }
+            remove
+            {
+                this.Dispatcher.VerifyAccess();
+                this.taskCompleted -= value;
+            }
+        }
+
         public async Task RestoreAsync(CremaSettings settings)
         {
             if (settings.NoCache == false)
@@ -430,6 +450,11 @@ namespace Ntreev.Crema.Services.Domains
         protected virtual void OnItemsDeleted(ItemsDeletedEventArgs<IDomainItem> e)
         {
             this.itemsDeleted?.Invoke(this, e);
+        }
+
+        protected virtual void OnTaskCompleted(TaskCompletedEventArgs e)
+        {
+            this.taskCompleted?.Invoke(this, e);
         }
 
         private async void CremaHost_Opened(object sender, EventArgs e)

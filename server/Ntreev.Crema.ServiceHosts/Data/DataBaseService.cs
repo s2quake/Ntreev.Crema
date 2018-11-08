@@ -974,7 +974,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var tableNames = e.Items.Select(item => item.Name).ToArray();
             var states = e.Items.Select(item => item.TableState).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTablesStateChanged(callbackInfo, tableNames, states));
@@ -984,7 +984,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = e.Items.Select(item => item.TableInfo).ToArray();
             var itemType = e.ItemType;
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTablesChanged(callbackInfo, values, itemType));
@@ -994,7 +994,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var paths = e.Items.Select(item => item.Path).ToArray();
             var arguments = e.Arguments.Select(item => item is TableInfo tableInfo ? (TableInfo?)tableInfo : null).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTableItemsCreated(callbackInfo, paths, arguments));
@@ -1004,7 +1004,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
             var itemNames = e.Items.Select(item => item.Name).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTableItemsRenamed(callbackInfo, oldPaths, itemNames));
@@ -1014,7 +1014,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
             var parentPaths = e.Items.Select(item => item.Parent.Path).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTableItemsMoved(callbackInfo, oldPaths, parentPaths));
@@ -1024,7 +1024,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemPaths = e.ItemPaths;
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTableItemsDeleted(callbackInfo, itemPaths));
         }
@@ -1033,7 +1033,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = new AccessInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
             {
@@ -1058,7 +1058,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = new LockInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
             {
@@ -1082,7 +1082,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var typeNames = e.Items.Select(item => item.Name).ToArray();
             var states = e.Items.Select(item => item.TypeState).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypesStateChanged(callbackInfo, typeNames, states));
@@ -1092,7 +1092,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = e.Items.Select(item => item.TypeInfo).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypesChanged(callbackInfo, values));
         }
@@ -1101,7 +1101,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemPaths = e.Items.Select(item => item.Path).ToArray();
             var arguments = e.Arguments.Select(item => item is TypeInfo typeInfo ? (TypeInfo?)typeInfo : null).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypeItemsCreated(callbackInfo, itemPaths, arguments));
@@ -1111,7 +1111,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
             var itemNames = e.Items.Select(item => item.Name).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypeItemsRenamed(callbackInfo, oldPaths, itemNames));
@@ -1121,7 +1121,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
             var parentPaths = e.Items.Select(item => item.Parent.Path).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypeItemsMoved(callbackInfo, oldPaths, parentPaths));
@@ -1131,7 +1131,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemPaths = e.ItemPaths;
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypeItemsDeleted(callbackInfo, itemPaths));
         }
@@ -1140,7 +1140,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = new AccessInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
             {
@@ -1165,7 +1165,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         {
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = new LockInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
             {
@@ -1182,6 +1182,13 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var changeType = (LockChangeType)metaData[0];
             var comments = metaData[1] as string[];
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTypeItemsLockChanged(callbackInfo, changeType, values, comments));
+        }
+
+        private void DataBase_TaskCompleted(object sender, TaskCompletedEventArgs e)
+        {
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
+            var taskIDs = e.TaskIDs;
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTaskCompleted(callbackInfo, taskIDs));
         }
 
         private void DataBase_Unloaded(object sender, EventArgs e)
@@ -1215,6 +1222,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 this.TypeContext.ItemsAccessChanged += TypeContext_ItemsAccessChanged;
                 this.TypeContext.ItemsLockChanged += TypeContext_ItemsLockChanged;
 
+                this.dataBase.TaskCompleted += DataBase_TaskCompleted;
                 this.dataBase.Unloaded += DataBase_Unloaded;
                 return this.dataBase.GetMetaData(this.authentication);
             });
@@ -1244,6 +1252,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 this.TypeContext.ItemsAccessChanged -= TypeContext_ItemsAccessChanged;
                 this.TypeContext.ItemsLockChanged -= TypeContext_ItemsLockChanged;
 
+                this.dataBase.TaskCompleted -= DataBase_TaskCompleted;
                 this.dataBase.Unloaded -= DataBase_Unloaded;
             });
             await this.UserContext.Dispatcher.InvokeAsync(() =>

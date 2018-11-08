@@ -20,7 +20,9 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
+using Ntreev.Library.ObjectModel;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -147,9 +149,10 @@ namespace Ntreev.Crema.Services.Data
             var taskID = this.Domain.ID;
             await this.Repository.LockAsync(itemPaths);
             dataSet.AddItemPaths(itemPaths);
-            this.tables = await this.Container.AddNewAsync(authentication, dataSet, dataTables, taskID);
+            this.tables = await this.Container.AddNewAsync(authentication, dataSet, dataTables);
             this.Domain.Result = dataTables.Select(item => item.TableInfo).ToArray();
             await base.OnEndEditAsync(authentication);
+            await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
             this.parent = null;
             this.permission = null;
         }
@@ -177,9 +180,9 @@ namespace Ntreev.Crema.Services.Data
             }
             else if (this.parent is Table table)
             {
-                var dataSet = await table.ReadDataForTemplateAsync(authentication, true);
+                var dataSet = await table.ReadDataForNewTemplateAsync(authentication);
                 var dataTable = dataSet.Tables[table.Name, table.Category.Path];
-                this.tableNames = dataSet.Tables.Select(item => item.Name).ToArray();
+                this.tableNames = this.GetTableNames(dataSet);
                 return CremaTemplate.Create(dataTable);
             }
             throw new NotImplementedException();
@@ -195,12 +198,29 @@ namespace Ntreev.Crema.Services.Data
             else if (this.parent is Table table)
             {
                 var dataSet = this.TemplateSource.DataSet;
-                this.tableNames = dataSet.Tables.Select(item => item.Name).ToArray();
+                this.tableNames = this.GetTableNames(dataSet);
             }
         }
 
         private TableCollection Container { get; }
 
         public TableContext Context => this.Container.Context;
+
+        private string[] GetTableNames(CremaDataSet dataSet)
+        {
+            var itemPaths = dataSet.GetItemPaths();
+            var tableNameList = new List<string>(dataSet.Tables.Count);
+                foreach (var item in itemPaths)
+            {
+                if (item.StartsWith(DataBase.TablePathPrefix) == true)
+                {
+                    var path = item.Substring(DataBase.TablePathPrefix.Length);
+                    var itemName = new ItemName(path);
+                    tableNameList.Add(itemName.Name);
+                }
+            }
+
+            return tableNameList.ToArray();
+        }
     }
 }

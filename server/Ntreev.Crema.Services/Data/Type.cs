@@ -64,7 +64,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     base.AccessInfo = result;
                     this.CremaHost.Sign(authentication);
-                    this.Context.InvokeItemsSetPublicEvent(authentication, new ITypeItem[] { this }, taskID);
+                    this.Context.InvokeItemsSetPublicEvent(authentication, new ITypeItem[] { this });
+                    this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
             }
@@ -94,7 +95,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     base.AccessInfo = result;
                     this.CremaHost.Sign(authentication);
-                    this.Context.InvokeItemsSetPrivateEvent(authentication, new ITypeItem[] { this }, taskID);
+                    this.Context.InvokeItemsSetPrivateEvent(authentication, new ITypeItem[] { this });
+                    this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
             }
@@ -124,7 +126,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     base.AccessInfo = result;
                     this.CremaHost.Sign(authentication);
-                    this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, new AccessType[] { accessType }, taskID);
+                    this.Context.InvokeItemsAddAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
+                    this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
             }
@@ -154,7 +157,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     base.AccessInfo = result;
                     this.CremaHost.Sign(authentication);
-                    this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, new AccessType[] { accessType }, taskID);
+                    this.Context.InvokeItemsSetAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, new AccessType[] { accessType });
+                    this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
             }
@@ -184,7 +188,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     base.AccessInfo = result;
                     this.CremaHost.Sign(authentication);
-                    this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID }, taskID);
+                    this.Context.InvokeItemsRemoveAccessMemberEvent(authentication, new ITypeItem[] { this }, new string[] { memberID });
+                    this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 return taskID;
             }
@@ -214,7 +219,8 @@ namespace Ntreev.Crema.Services.Data
                     };
                     base.LockInfo = lockInfo;
                     this.CremaHost.Sign(authentication);
-                    this.Context.InvokeItemsLockedEvent(authentication, new ITypeItem[] { this }, new string[] { comment }, taskID);
+                    this.Context.InvokeItemsLockedEvent(authentication, new ITypeItem[] { this }, new string[] { comment });
+                    this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
                     return taskID;
                 });
             }
@@ -238,7 +244,8 @@ namespace Ntreev.Crema.Services.Data
                     var lockInfo = LockInfo.Empty;
                     base.LockInfo = lockInfo;
                     this.CremaHost.Sign(authentication);
-                    this.Context.InvokeItemsUnlockedEvent(authentication, new ITypeItem[] { this }, taskID);
+                    this.Context.InvokeItemsUnlockedEvent(authentication, new ITypeItem[] { this });
+                    this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
                     return taskID;
                 });
             }
@@ -273,7 +280,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.Sign(authentication);
                     base.Rename(authentication, name);
-                    this.Container.InvokeTypesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, dataSet, taskID);
+                    this.Container.InvokeTypesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, dataSet);
+                    this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
                 return taskID;
@@ -309,7 +317,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.Sign(authentication);
                     base.Move(authentication, categoryPath);
-                    this.Container.InvokeTypesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths, dataSet, taskID);
+                    this.Container.InvokeTypesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths, dataSet);
+                    this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
                 return taskID;
@@ -329,6 +338,7 @@ namespace Ntreev.Crema.Services.Data
                 var container = this.Container;
                 var repository = this.Repository;
                 var cremaHost = this.CremaHost;
+                var dataBase = this.DataBase;
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(Delete), this);
@@ -347,7 +357,8 @@ namespace Ntreev.Crema.Services.Data
                 {
                     base.Delete(authentication);
                     cremaHost.Sign(authentication);
-                    container.InvokeTypesDeletedEvent(authentication, tuple.items, tuple.oldPaths, taskID);
+                    container.InvokeTypesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
+                    dataBase.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 await repository.UnlockAsync(dataBaseSet.ItemPaths);
                 return taskID;

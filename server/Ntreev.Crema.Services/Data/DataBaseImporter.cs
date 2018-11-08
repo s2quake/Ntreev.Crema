@@ -65,7 +65,7 @@ namespace Ntreev.Crema.Services.Data
                         throw;
                     }
 
-                    this.UpdateTables(authentication, targetSet, taskID);
+                    this.UpdateTables(authentication, targetSet);
                     return taskID;
                 }
                 finally
@@ -137,7 +137,7 @@ namespace Ntreev.Crema.Services.Data
                 item.LockInternal(Authentication.System, comment);
                 dataSet.Types[item.Name].ExtendedProperties[this] = true;
             }
-            this.TypeContext.InvokeItemsLockedEvent(authentication, items, comments, Guid.NewGuid());
+            this.TypeContext.InvokeItemsLockedEvent(authentication, items, comments);
         }
 
         private void LockTables(Authentication authentication, CremaDataSet dataSet, string comment)
@@ -155,7 +155,7 @@ namespace Ntreev.Crema.Services.Data
                 item.LockInternal(Authentication.System, comment);
                 dataSet.Tables[item.Name].ExtendedProperties[this] = true;
             }
-            this.TableContext.InvokeItemsLockedEvent(Authentication.System, items, comments, Guid.NewGuid());
+            this.TableContext.InvokeItemsLockedEvent(Authentication.System, items, comments);
         }
 
         private void UnlockTypes(Authentication authentication, CremaDataSet dataSet)
@@ -170,7 +170,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 item.UnlockInternal(Authentication.System);
             }
-            this.TypeContext.InvokeItemsUnlockedEvent(Authentication.System, items, Guid.NewGuid());
+            this.TypeContext.InvokeItemsUnlockedEvent(Authentication.System, items);
         }
 
         private void UnlockTables(Authentication authentication, CremaDataSet dataSet)
@@ -185,10 +185,10 @@ namespace Ntreev.Crema.Services.Data
             {
                 item.UnlockInternal(Authentication.System);
             }
-            this.TableContext.InvokeItemsUnlockedEvent(Authentication.System, items, Guid.NewGuid());
+            this.TableContext.InvokeItemsUnlockedEvent(Authentication.System, items);
         }
 
-        private void UpdateTables(Authentication authentication, CremaDataSet dataSet, Guid taskID)
+        private void UpdateTables(Authentication authentication, CremaDataSet dataSet)
         {
             var tableList = new List<Table>(dataSet.Tables.Count);
             foreach (var item in dataSet.Tables)
@@ -197,7 +197,7 @@ namespace Ntreev.Crema.Services.Data
                 tableList.Add(table);
                 table.UpdateContent(item.TableInfo);
             }
-            this.TableContext.InvokeItemsChangedEvent(authentication, tableList.ToArray(), dataSet, taskID);
+            this.TableContext.InvokeItemsChangedEvent(authentication, tableList.ToArray(), dataSet);
         }
     }
 }

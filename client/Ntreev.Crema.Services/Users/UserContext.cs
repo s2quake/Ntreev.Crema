@@ -45,6 +45,7 @@ namespace Ntreev.Crema.Services.Users
         private ItemsMovedEventHandler<IUserItem> itemsMoved;
         private ItemsDeletedEventHandler<IUserItem> itemsDeleted;
         private ItemsEventHandler<IUserItem> itemsChanged;
+        private TaskCompletedEventHandler taskCompleted;
 
         private readonly Dictionary<string, Authentication> customAuthentications = new Dictionary<string, Authentication>();
         private readonly TaskResetEvent<Guid> taskEvent;
@@ -63,7 +64,10 @@ namespace Ntreev.Crema.Services.Users
             var version = typeof(CremaHost).Assembly.GetName().Version;
             return await this.Dispatcher.InvokeAsync(() =>
             {
-                this.service = UserContextServiceFactory.CreateServiceClient(address, serviceInfo, this);
+                var binding = CremaHost.CreateBinding(serviceInfo);
+                var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/UserContextService");
+                var instanceContext = new InstanceContext(this);
+                this.service = new UserContextServiceClient(instanceContext, binding, endPointAddress);
                 this.service.Open();
                 if (this.service is ICommunicationObject service)
                 {
@@ -183,29 +187,34 @@ namespace Ntreev.Crema.Services.Users
             return null;
         }
 
-        public void InvokeItemsCreatedEvent(Authentication authentication, IUserItem[] items, object[] args, Guid taskID)
+        public void InvokeItemsCreatedEvent(Authentication authentication, IUserItem[] items, object[] args)
         {
-            this.OnItemsCreated(new ItemsCreatedEventArgs<IUserItem>(authentication, items, args) { TaskID = taskID });
+            this.OnItemsCreated(new ItemsCreatedEventArgs<IUserItem>(authentication, items, args));
         }
 
-        public void InvokeItemsRenamedEvent(Authentication authentication, IUserItem[] items, string[] oldNames, string[] oldPaths, Guid taskID)
+        public void InvokeItemsRenamedEvent(Authentication authentication, IUserItem[] items, string[] oldNames, string[] oldPaths)
         {
-            this.OnItemsRenamed(new ItemsRenamedEventArgs<IUserItem>(authentication, items, oldNames, oldPaths) { TaskID = taskID });
+            this.OnItemsRenamed(new ItemsRenamedEventArgs<IUserItem>(authentication, items, oldNames, oldPaths));
         }
 
-        public void InvokeItemsMovedEvent(Authentication authentication, IUserItem[] items, string[] oldPaths, string[] oldParentPaths, Guid taskID)
+        public void InvokeItemsMovedEvent(Authentication authentication, IUserItem[] items, string[] oldPaths, string[] oldParentPaths)
         {
-            this.OnItemsMoved(new ItemsMovedEventArgs<IUserItem>(authentication, items, oldPaths, oldParentPaths) { TaskID = taskID });
+            this.OnItemsMoved(new ItemsMovedEventArgs<IUserItem>(authentication, items, oldPaths, oldParentPaths));
         }
 
-        public void InvokeItemsDeleteEvent(Authentication authentication, IUserItem[] items, string[] itemPaths, Guid taskID)
+        public void InvokeItemsDeleteEvent(Authentication authentication, IUserItem[] items, string[] itemPaths)
         {
-            this.OnItemsDeleted(new ItemsDeletedEventArgs<IUserItem>(authentication, items, itemPaths) { TaskID = taskID });
+            this.OnItemsDeleted(new ItemsDeletedEventArgs<IUserItem>(authentication, items, itemPaths));
         }
 
-        public void InvokeItemsChangedEvent(Authentication authentication, IUserItem[] items, Guid taskID)
+        public void InvokeItemsChangedEvent(Authentication authentication, IUserItem[] items)
         {
-            this.OnItemsChanged(new ItemsEventArgs<IUserItem>(authentication, items) { TaskID = taskID });
+            this.OnItemsChanged(new ItemsEventArgs<IUserItem>(authentication, items));
+        }
+
+        public void InvokeTaskCompletedEvent(Authentication authentication, Guid taskID)
+        {
+            this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskID));
         }
 
         public UserContextMetaData GetMetaData(Authentication authentication)
@@ -359,6 +368,20 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
+        public event TaskCompletedEventHandler TaskCompleted
+        {
+            add
+            {
+                this.Dispatcher.VerifyAccess();
+                this.taskCompleted += value;
+            }
+            remove
+            {
+                this.Dispatcher.VerifyAccess();
+                this.taskCompleted -= value;
+            }
+        }
+
         protected virtual void OnItemsCreated(ItemsCreatedEventArgs<IUserItem> e)
         {
             this.itemsCreated?.Invoke(this, e);
@@ -382,6 +405,11 @@ namespace Ntreev.Crema.Services.Users
         protected virtual void OnItemsChanged(ItemsEventArgs<IUserItem> e)
         {
             this.itemsChanged?.Invoke(this, e);
+        }
+
+        protected virtual void OnTaskCompleted(TaskCompletedEventArgs e)
+        {
+            this.taskCompleted?.Invoke(this, e);
         }
 
         private async void Service_Faulted(object sender, EventArgs e)
@@ -437,8 +465,7 @@ namespace Ntreev.Crema.Services.Users
                             user.SetUserInfo(userInfo);
                             users[i] = user;
                         }
-                        this.Users.InvokeUsersChangedEvent(authentication, users, callbackInfo.TaskID);
-                        this.taskEvent.Set(callbackInfo.TaskID);
+                        this.Users.InvokeUsersChangedEvent(authentication, users);
                     });
                 });
             }
@@ -507,13 +534,12 @@ namespace Ntreev.Crema.Services.Users
                         }
                         if (categories.Any() == true)
                         {
-                            this.Categories.InvokeCategoriesCreatedEvent(authentication, categories.ToArray(), callbackInfo.TaskID);
+                            this.Categories.InvokeCategoriesCreatedEvent(authentication, categories.ToArray());
                         }
                         if (users.Any() == true)
                         {
-                            this.Users.InvokeUsersCreatedEvent(authentication, users.ToArray(), callbackInfo.TaskID);
+                            this.Users.InvokeUsersCreatedEvent(authentication, users.ToArray());
                         }
-                        this.taskEvent.Set(callbackInfo.TaskID);
                     });
                 });
             }
@@ -559,7 +585,7 @@ namespace Ntreev.Crema.Services.Users
                                 category.InternalSetName(newNames[i]);
                             }
 
-                            this.Categories.InvokeCategoriesRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray(), callbackInfo.TaskID);
+                            this.Categories.InvokeCategoriesRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
                         }
 
                         {
@@ -589,9 +615,8 @@ namespace Ntreev.Crema.Services.Users
                                 user.Name = newNames[i];
                             }
 
-                            this.Users.InvokeUsersRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray(), callbackInfo.TaskID);
+                            this.Users.InvokeUsersRenamedEvent(authentication, items.ToArray(), oldNames.ToArray(), oldPaths.ToArray());
                         }
-                        this.taskEvent.Set(callbackInfo.TaskID);
                     });
                 });
             }
@@ -637,7 +662,7 @@ namespace Ntreev.Crema.Services.Users
                                 category.Parent = this.Categories[parentPaths[i]];
                             }
 
-                            this.Categories.InvokeCategoriesMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray(), callbackInfo.TaskID);
+                            this.Categories.InvokeCategoriesMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
                         }
 
                         {
@@ -667,9 +692,8 @@ namespace Ntreev.Crema.Services.Users
                                 user.Category = this.Categories[parentPaths[i]];
                             }
 
-                            this.Users.InvokeUsersMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray(), callbackInfo.TaskID);
+                            this.Users.InvokeUsersMovedEvent(authentication, items.ToArray(), oldPaths.ToArray(), oldParentPaths.ToArray());
                         }
-                        this.taskEvent.Set(callbackInfo.TaskID);
                     });
                 });
             }
@@ -713,7 +737,7 @@ namespace Ntreev.Crema.Services.Users
                                 category.Dispose();
                             }
 
-                            this.Categories.InvokeCategoriesDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray(), callbackInfo.TaskID);
+                            this.Categories.InvokeCategoriesDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
                         }
 
                         {
@@ -740,9 +764,8 @@ namespace Ntreev.Crema.Services.Users
                                 var user = userItem as User;
                                 user.Dispose();
                             }
-                            this.Users.InvokeUsersDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray(), callbackInfo.TaskID);
+                            this.Users.InvokeUsersDeletedEvent(authentication, items.ToArray(), oldPaths.ToArray());
                         }
-                        this.taskEvent.Set(callbackInfo.TaskID);
                     });
                 });
             }
@@ -768,8 +791,7 @@ namespace Ntreev.Crema.Services.Users
                             user.IsOnline = true;
                             users[i] = user;
                         }
-                        this.Users.InvokeUsersLoggedInEvent(authentication, users, callbackInfo.TaskID);
-                        this.taskEvent.Set(callbackInfo.TaskID);
+                        this.Users.InvokeUsersLoggedInEvent(authentication, users);
                     });
                 });
             }
@@ -795,8 +817,7 @@ namespace Ntreev.Crema.Services.Users
                             user.IsOnline = false;
                             users[i] = user;
                         }
-                        this.Users.InvokeUsersLoggedOutEvent(authentication, users, closeInfo, callbackInfo.TaskID);
-                        this.taskEvent.Set(callbackInfo.TaskID);
+                        this.Users.InvokeUsersLoggedOutEvent(authentication, users, closeInfo);
                     });
                 });
             }
@@ -822,8 +843,7 @@ namespace Ntreev.Crema.Services.Users
                             user.IsOnline = false;
                             users[i] = user;
                         }
-                        this.Users.InvokeUsersKickedEvent(authentication, users, comments, callbackInfo.TaskID);
-                        this.taskEvent.Set(callbackInfo.TaskID);
+                        this.Users.InvokeUsersKickedEvent(authentication, users, comments);
                     });
                 });
             }
@@ -853,13 +873,12 @@ namespace Ntreev.Crema.Services.Users
                         switch (changeType)
                         {
                             case BanChangeType.Ban:
-                                this.Users.InvokeUsersBannedEvent(authentication, users, comments, callbackInfo.TaskID);
+                                this.Users.InvokeUsersBannedEvent(authentication, users, comments);
                                 break;
                             case BanChangeType.Unban:
-                                this.Users.InvokeUsersUnbannedEvent(authentication, users, callbackInfo.TaskID);
+                                this.Users.InvokeUsersUnbannedEvent(authentication, users);
                                 break;
                         }
-                        this.taskEvent.Set(callbackInfo.TaskID);
                     });
                 });
             }
@@ -883,7 +902,7 @@ namespace Ntreev.Crema.Services.Users
                             foreach (var item in userIDs)
                             {
                                 var user = this.Users[item];
-                                this.Users.InvokeSendMessageEvent(authentication, user, message, callbackInfo.TaskID);
+                                this.Users.InvokeSendMessageEvent(authentication, user, message);
                             }
                         }
                         else if (messageType == MessageType.Notification)
@@ -894,9 +913,26 @@ namespace Ntreev.Crema.Services.Users
                                 var user = this.Users[userIDs[i]];
                                 users[i] = user;
                             }
-                            this.Users.InvokeNotifyMessageEvent(authentication, users, message, callbackInfo.TaskID);
+                            this.Users.InvokeNotifyMessageEvent(authentication, users, message);
                         }
-                        this.taskEvent.Set(callbackInfo.TaskID);
+                    });
+                });
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Error(e);
+            }
+        }
+
+        async void IUserContextServiceCallback.OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs)
+        {
+            try
+            {
+                await this.callbackEvent.InvokeAsync(callbackInfo.Index, () =>
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        this.taskEvent.Set(taskIDs);
                     });
                 });
             }

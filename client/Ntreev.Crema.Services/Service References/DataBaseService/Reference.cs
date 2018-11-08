@@ -222,6 +222,9 @@ namespace Ntreev.Crema.Services.DataBaseService {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTypeItemsLockChanged")]
         void OnTypeItemsLockChanged(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, Ntreev.Crema.ServiceModel.LockChangeType changeType, Ntreev.Crema.ServiceModel.LockInfo[] lockInfos, string[] comments);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://www.ntreev.com/IDataBaseService/OnTaskCompleted")]
+        void OnTaskCompleted(Ntreev.Crema.ServiceModel.CallbackInfo callbackInfo, System.Guid[] taskIDs);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]

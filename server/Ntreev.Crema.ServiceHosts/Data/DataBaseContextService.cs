@@ -436,9 +436,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private void DataBaseContext_ItemsCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
         {
-            var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var dataBaseNames = e.Items.Select(item => item.Name).ToArray();
             var dataBaseInfos = e.Arguments.Select(item => (DataBaseInfo)item).ToArray();
             var comment = e.MetaData as string;
@@ -447,9 +445,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private void DataBaseContext_ItemsRenamed(object sender, ItemsRenamedEventArgs<IDataBase> e)
         {
-            var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldNames = e.OldNames;
             var itemNames = e.Items.Select(item => item.Name).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesRenamed(callbackInfo, oldNames, itemNames));
@@ -457,45 +453,35 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private void DataBaseContext_ItemsDeleted(object sender, ItemsDeletedEventArgs<IDataBase> e)
         {
-            var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemPaths = e.ItemPaths;
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesDeleted(callbackInfo, itemPaths));
         }
 
         private void DataBaseContext_ItemsLoaded(object sender, ItemsEventArgs<IDataBase> e)
         {
-            var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemNames = e.Items.Select(item => item.Name).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesLoaded(callbackInfo, itemNames));
         }
 
         private void DataBaseContext_ItemsUnloaded(object sender, ItemsEventArgs<IDataBase> e)
         {
-            var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemNames = e.Items.Select(item => item.Name).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesUnloaded(callbackInfo, itemNames));
         }
 
         private void DataBaseContext_ItemsResetting(object sender, ItemsEventArgs<IDataBase> e)
         {
-            var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemNames = e.Items.Select(item => item.Name).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesResetting(callbackInfo, itemNames));
         }
 
         private void DataBaseContext_ItemsReset(object sender, ItemsEventArgs<IDataBase> e)
         {
-            var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemNames = e.Items.Select(item => item.Name).ToArray();
             var metaDatas = e.MetaData as DataBaseMetaData[];
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesReset(callbackInfo, itemNames, metaDatas));
@@ -503,9 +489,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private void DataBaseContext_ItemsAuthenticationEntered(object sender, ItemsEventArgs<IDataBase> e)
         {
-            var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemNames = e.Items.Select(item => item.Name).ToArray();
             var authenticationInfo = (AuthenticationInfo)e.MetaData;
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesAuthenticationEntered(callbackInfo, itemNames, authenticationInfo));
@@ -513,9 +497,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private void DataBaseContext_ItemsAuthenticationLeft(object sender, ItemsEventArgs<IDataBase> e)
         {
-            var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemNames = e.Items.Select(item => item.Name).ToArray();
             var authenticationInfo = (AuthenticationInfo)e.MetaData;
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesAuthenticationLeft(callbackInfo, itemNames, authenticationInfo));
@@ -523,9 +505,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private void DataBaseContext_ItemsInfoChanged(object sender, ItemsEventArgs<IDataBase> e)
         {
-            var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var dataBaseInfos = e.Items.Select(item => item.DataBaseInfo).ToArray();
 
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesInfoChanged(callbackInfo, dataBaseInfos));
@@ -533,9 +513,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private void DataBaseContext_ItemsStateChanged(object sender, ItemsEventArgs<IDataBase> e)
         {
-            var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemNames = e.Items.Select(item => item.Name).ToArray();
             var dataBaseStates = e.Items.Select(item => item.DataBaseState).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesStateChanged(callbackInfo, itemNames, dataBaseStates));
@@ -543,51 +521,50 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private void DataBaseContext_ItemsAccessChanged(object sender, ItemsEventArgs<IDataBase> e)
         {
-            var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
-            var values = new AccessInfo[e.Items.Length];
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
+            var metaData = e.MetaData as object[];
+            var changeType = (AccessChangeType)metaData[0];
+            var accessInfos = new AccessInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
             {
                 var item = e.Items[i];
                 var accessInfo = item.AccessInfo;
-                if (item.AccessInfo.Path != item.Name)
+                if (changeType == AccessChangeType.Public)
                 {
-                    accessInfo = AccessInfo.Empty;
                     accessInfo.Path = item.Name;
                 }
-                values[i] = accessInfo;
+                accessInfos[i] = accessInfo;
             }
-            var metaData = e.MetaData as object[];
-            var changeType = (AccessChangeType)metaData[0];
             var memberIDs = metaData[1] as string[];
             var accessTypes = metaData[2] as AccessType[];
-
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesAccessChanged(callbackInfo, changeType, values, memberIDs, accessTypes));
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesAccessChanged(callbackInfo, changeType, accessInfos, memberIDs, accessTypes));
         }
 
         private void DataBaseContext_ItemsLockChanged(object sender, ItemsEventArgs<IDataBase> e)
         {
-            var userID = this.authentication.ID;
-            var exceptionUserID = e.UserID;
-            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate, TaskID = e.TaskID };
-            var values = new LockInfo[e.Items.Length];
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
+            var metaData = e.MetaData as object[];
+            var changeType = (LockChangeType)metaData[0];
+            var lockInfos = new LockInfo[e.Items.Length];
             for (var i = 0; i < e.Items.Length; i++)
             {
                 var item = e.Items[i];
                 var lockInfo = item.LockInfo;
-                if (item.LockInfo.Path != item.Name)
+                if (changeType == LockChangeType.Unlock)
                 {
-                    lockInfo = LockInfo.Empty;
                     lockInfo.Path = item.Name;
                 }
-                values[i] = lockInfo;
+                lockInfos[i] = lockInfo;
             }
-            var metaData = e.MetaData as object[];
-            var changeType = (LockChangeType)metaData[0];
             var comments = metaData[1] as string[];
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesLockChanged(callbackInfo, changeType, lockInfos, comments));
+        }
 
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDataBasesLockChanged(callbackInfo, changeType, values, comments));
+        private void DataBaseContext_TaskCompleted(object sender, TaskCompletedEventArgs e)
+        {
+            var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
+            var taskIDs = e.TaskIDs;
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTaskCompleted(callbackInfo, taskIDs));
         }
 
         private async Task<DataBaseCollectionMetaData> AttachEventHandlersAsync()
@@ -611,6 +588,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 this.DataBaseContext.ItemsStateChanged += DataBaseContext_ItemsStateChanged;
                 this.DataBaseContext.ItemsAccessChanged += DataBaseContext_ItemsAccessChanged;
                 this.DataBaseContext.ItemsLockChanged += DataBaseContext_ItemsLockChanged;
+                this.DataBaseContext.TaskCompleted += DataBaseContext_TaskCompleted;
                 return this.DataBaseContext.GetMetaData(this.authentication);
             });
             this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(AttachEventHandlersAsync)}");
@@ -634,6 +612,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 this.DataBaseContext.ItemsStateChanged -= DataBaseContext_ItemsStateChanged;
                 this.DataBaseContext.ItemsAccessChanged -= DataBaseContext_ItemsAccessChanged;
                 this.DataBaseContext.ItemsLockChanged -= DataBaseContext_ItemsLockChanged;
+                this.DataBaseContext.TaskCompleted -= DataBaseContext_TaskCompleted;
             });
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {

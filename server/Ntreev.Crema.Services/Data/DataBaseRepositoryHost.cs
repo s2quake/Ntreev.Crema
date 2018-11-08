@@ -363,12 +363,12 @@ namespace Ntreev.Crema.Services.Data
             dataBaseSet.CreateTable();
         }
 
-        public void RenameTable(DataBaseSet dataBaseSet, string tablePath, string tableName)
+        public void RenameTable(DataBaseSet dataBaseSet, string tablePath, string name)
         {
             this.Dispatcher.VerifyAccess();
-            if (this.tables.Contains(tableName))
-                throw new ItemAlreadyExistsException(tableName);
-            dataBaseSet.RenameTable(tablePath, tableName);
+            if (this.tables.Contains(name))
+                throw new ItemAlreadyExistsException(name);
+            dataBaseSet.RenameTable(tablePath, name);
         }
 
         public void MoveTable(DataBaseSet dataBaseSet, string tablePath, string categoryPath)

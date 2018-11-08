@@ -105,7 +105,7 @@ namespace Ntreev.Crema.Services.Domains
                     domainUser.DomainUserState &= ~DomainUserState.Detached;
                     this.Logger.Complete(result.ID, this);
                     this.CremaHost.Sign(authentication);
-                    this.OnUserAdded(new DomainUserEventArgs(authentication, this, domainUser) { TaskID = taskID });
+                    this.OnUserAdded(new DomainUserEventArgs(authentication, this, domainUser));
                     this.Container?.InvokeDomainUserAddedEvent(authentication, this, domainUser, result.Data, taskID);
                 });
                 return taskID;
@@ -137,7 +137,7 @@ namespace Ntreev.Crema.Services.Domains
                     this.Users.Remove(domainUser.ID);
                     this.Logger.Complete(result, this);
                     this.CremaHost.Sign(authentication);
-                    this.OnUserRemoved(new DomainUserRemovedEventArgs(authentication, this, domainUser, RemoveInfo.Empty) { TaskID = taskID });
+                    this.OnUserRemoved(new DomainUserRemovedEventArgs(authentication, this, domainUser, RemoveInfo.Empty));
                     this.Container?.InvokeDomainUserRemovedEvent(authentication, this, domainUser, RemoveInfo.Empty, taskID);
                 });
                 return taskID;
@@ -154,12 +154,13 @@ namespace Ntreev.Crema.Services.Domains
             try
             {
                 this.ValidateExpired();
+                var container = this.Container;
+                var context = this.Context;
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this, isCanceled);
                     this.ValidateDelete(authentication, isCanceled);
                 });
-                var taskID = Guid.NewGuid();
                 var id = await this.Logger.Dispatcher.InvokeAsync(() => this.Logger.Delete(authentication));
                 if (this.Host is IDomainHost host)
                 {
@@ -177,14 +178,13 @@ namespace Ntreev.Crema.Services.Domains
                 await this.Logger?.DisposeAsync(true);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var container = this.Container;
                     this.Sign(authentication, true);
                     this.Logger = null;
                     this.Dispose();
-                    this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled) { TaskID = taskID });
-                    container.InvokeDomainDeletedEvent(authentication, new Domain[] { this }, new bool[] { isCanceled }, taskID);
+                    this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
+                    container.InvokeDomainDeletedEvent(authentication, new Domain[] { this }, new bool[] { isCanceled });
                 });
-                return taskID;
+                return this.ID;
             }
             catch (Exception e)
             {
@@ -1238,16 +1238,6 @@ namespace Ntreev.Crema.Services.Domains
         Task IDomain.DeleteAsync(Authentication authentication, bool isCanceled)
         {
             return this.DeleteAsync(authentication, isCanceled);
-        }
-
-        Task IDomain.EnterAsync(Authentication authentication, DomainAccessType accessType)
-        {
-            return this.EnterAsync(authentication, accessType);
-        }
-
-        Task IDomain.LeaveAsync(Authentication authentication)
-        {
-            return this.LeaveAsync(authentication);
         }
 
         Task IDomain.BeginUserEditAsync(Authentication authentication, DomainLocationInfo location)

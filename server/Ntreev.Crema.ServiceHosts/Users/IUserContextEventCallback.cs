@@ -64,5 +64,8 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         [OperationContract(IsOneWay = true)]
         void OnMessageReceived(CallbackInfo callbackInfo, string[] userIDs, string message, MessageType messageType);
+
+        [OperationContract(IsOneWay = true)]
+        void OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs);
     }
 }

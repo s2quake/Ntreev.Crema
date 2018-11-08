@@ -298,6 +298,12 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="OnTaskCompleted">
+      <soap12:operation soapAction="http://www.ntreev.com/IDataBaseContextService/OnTaskCompleted" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="DataBaseContextService">
     <wsdl:port name="NetTcpBinding_IDataBaseContextService" binding="tns:NetTcpBinding_IDataBaseContextService">

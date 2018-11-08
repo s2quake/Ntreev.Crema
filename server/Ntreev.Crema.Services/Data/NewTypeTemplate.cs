@@ -95,9 +95,10 @@ namespace Ntreev.Crema.Services.Data
             var taskID = this.Domain.ID;
             await this.Repository.LockAsync(itemPath);
             dataSet.AddItemPaths(itemPath);
-            this.type = await this.Types.AddNewAsync(authentication, dataType, taskID);
+            this.type = await this.Types.AddNewAsync(authentication, dataType);
             this.Domain.Result = new TypeInfo[] { dataType.TypeInfo };
             await base.OnEndEditAsync(authentication);
+            await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)

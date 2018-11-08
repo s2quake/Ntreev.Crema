@@ -80,5 +80,8 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         [OperationContract(IsOneWay = true)]
         void OnTypeItemsLockChanged(CallbackInfo callbackInfo, LockChangeType changeType, LockInfo[] lockInfos, string[] comments);
+
+        [OperationContract(IsOneWay = true)]
+        void OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs);
     }
 }

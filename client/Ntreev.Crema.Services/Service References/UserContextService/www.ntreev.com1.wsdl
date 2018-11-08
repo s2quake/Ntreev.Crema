@@ -141,6 +141,9 @@
   <wsdl:message name="IUserContextService_OnMessageReceived_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnMessageReceived" />
   </wsdl:message>
+  <wsdl:message name="IUserContextService_OnTaskCompleted_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnTaskCompleted" />
+  </wsdl:message>
   <wsdl:portType msc:usingSession="true" name="IUserContextService">
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Subscribe">
       <wsdl:input wsaw:Action="http://www.ntreev.com/IUserContextService/Subscribe" message="tns:IUserContextService_Subscribe_InputMessage" />
@@ -241,6 +244,9 @@
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnMessageReceived">
       <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/OnMessageReceived" message="tns:IUserContextService_OnMessageReceived_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnTaskCompleted">
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IUserContextService/OnTaskCompleted" message="tns:IUserContextService_OnTaskCompleted_OutputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
 </wsdl:definitions>

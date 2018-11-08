@@ -66,7 +66,6 @@ namespace Ntreev.Crema.Services.Data
             var domain = this.Domain;
             var taskID = domain.ID;
             await base.OnEndEditAsync(authentication);
-            await this.DataBase.WaitAsync(taskID);
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)

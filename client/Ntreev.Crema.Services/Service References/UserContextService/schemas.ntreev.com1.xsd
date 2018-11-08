@@ -235,7 +235,6 @@
     <xs:sequence>
       <xs:element minOccurs="0" name="Index" type="xs:long" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
-      <xs:element minOccurs="0" name="TaskID" type="ser:guid" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="CallbackInfo" nillable="true" type="tns:CallbackInfo" />
