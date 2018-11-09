@@ -78,6 +78,13 @@ namespace Ntreev.Crema.Reader.Binary
                             return new TimeSpan(BitConverter.ToInt64(this.fieldbytes, offset));
                         return new TimeSpan(BitConverter.ToInt32(this.fieldbytes, offset));
                     }
+                    else if (column.DataType == typeof(Guid))
+                    {
+                        if (offset == 0)
+                            return Guid.Empty;
+                        int id = BitConverter.ToInt32(this.fieldbytes, offset);
+                        return new Guid(StringResource.GetString(id));
+                    }
                 }
                 throw new Exception();
             }

@@ -296,6 +296,10 @@ namespace Ntreev.Crema.Runtime.Serialization.Binary
                 else
                     throw new InvalidOperationException($"{value.GetType()} is invalid timespan type");
             }
+            else if (dataColumn.DataType == typeof(Guid).GetTypeName())
+            {
+                writer.Write(this.GetStringID(value.ToString()));
+            }
             else if (dataColumn.DataType == typeof(string).GetTypeName())
             {
                 writer.Write(this.GetStringID(value.ToString()));

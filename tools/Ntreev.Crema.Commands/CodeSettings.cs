@@ -144,6 +144,7 @@ namespace Ntreev.Crema.Commands
         [CommandProperty]
         [Description("개발 전용으로 생성합니다.")]
         [DefaultValue(false)]
+        [Obsolete]
         public static bool Devmode
         {
             get; set;

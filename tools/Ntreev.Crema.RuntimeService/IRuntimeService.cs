@@ -28,14 +28,14 @@ namespace Ntreev.Crema.RuntimeService
 {
     public interface IRuntimeService
     {
-        GenerationSet GetCodeGenerationData(string address, string dataBaseName, string tags, string filterExpression, string revision);
+        Task<GenerationSet> GetCodeGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision);
 
-        SerializationSet GetDataGenerationData(string address, string dataBaseName, string tags, string filterExpression, bool isDevmode, string revision);
+        Task<SerializationSet> GetDataGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision);
 
-        Tuple<GenerationSet, SerializationSet> GetMetaData(string address, string dataBaseName, string tags, string filterExpression, bool isDevmode, string revision);
+        Task<Tuple<GenerationSet, SerializationSet>> GetMetaDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision);
 
-        void ResetData(string address, string dataBaseName);
+        Task ResetDataAsync(string address, string dataBaseName);
 
-        string GetRevision(string address, string dataBaseName);
+        Task<string> GetRevisionAsync(string address, string dataBaseName);
     }
 }

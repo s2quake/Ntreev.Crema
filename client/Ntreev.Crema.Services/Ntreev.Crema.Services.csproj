@@ -66,7 +66,6 @@
     <Compile Include="CremaBootstrapper.cs" />
     <Compile Include="Authentication.cs" />
     <Compile Include="CremaSettings.cs" />
-    <None Include="Data\DataBaseContextServiceFactory.cs" />
     <Compile Include="Data\DataBaseContext.cs" />
     <Compile Include="Data\DataBaseTransaction.cs" />
     <Compile Include="Data\DataServiceFactory.cs" />
@@ -101,7 +100,7 @@
     <Compile Include="Domains\TypeDomain.cs" />
     <Compile Include="AuthenticationProvider.cs" />
     <Compile Include="ResultBaseExtensions.cs" />
-    <Compile Include="ICremaService.cs" />
+    <None Include="ICremaService.cs" />
     <Compile Include="Service References\DataBaseContextService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -170,7 +169,6 @@
     <None Include="Service References\DataBaseContextService\Ntreev.Crema.Data.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Users\UserServiceFactory.cs" />
     <Compile Include="Users\User.cs" />
     <Compile Include="Users\UserCategory.cs" />
     <Compile Include="Users\UserCategoryCollection.cs" />

@@ -105,7 +105,7 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
             if (dialog.ShowDialog() != true)
                 return;
 
-            var dataTable = template.TargetTable.CopyTo(this.dataSet);
+            var dataTable = template.DataTable.CopyTo(this.dataSet);
             var viewModel = new TableTreeViewItemViewModel(dataTable, this.selector)
             {
                 Parent = this,

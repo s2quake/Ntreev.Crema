@@ -36,7 +36,7 @@ namespace Ntreev.Crema.Commands
     [CommandStaticProperty(typeof(CodeSettings))]
     [CommandStaticProperty(typeof(FilterSettings))]
     [CommandStaticProperty(typeof(DataBaseSettings))]
-    class GetCommand : CommandBase
+    class GetCommand : CommandAsyncBase
     {
         [Import]
         private IRuntimeService service = null;
@@ -103,7 +103,7 @@ namespace Ntreev.Crema.Commands
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             if (this.Culture != string.Empty)
             {
@@ -112,7 +112,7 @@ namespace Ntreev.Crema.Commands
             }
 
             this.Out.WriteLine("receiving info");
-            var metaData = this.service.GetMetaData(this.Address, DataBaseSettings.DataBaseName, DataBaseSettings.Tags, FilterSettings.FilterExpression, CodeSettings.Devmode, this.Revision);
+            var metaData = await this.service.GetMetaDataAsync(this.Address, DataBaseSettings.DataBaseName, DataBaseSettings.Tags, FilterSettings.FilterExpression, this.Revision);
 
             var generationSettings = new CodeGenerationSettings()
             {

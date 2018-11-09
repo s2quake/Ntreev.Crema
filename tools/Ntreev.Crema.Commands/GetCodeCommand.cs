@@ -34,7 +34,7 @@ namespace Ntreev.Crema.Commands
     [CommandStaticProperty(typeof(CodeSettings))]
     [CommandStaticProperty(typeof(FilterSettings))]
     [CommandStaticProperty(typeof(DataBaseSettings))]
-    class GetCodeCommand : CommandBase
+    class GetCodeCommand : CommandAsyncBase
     {
         [Import]
         private IRuntimeService service = null;
@@ -79,7 +79,7 @@ namespace Ntreev.Crema.Commands
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             if (this.Culture != string.Empty)
             {
@@ -89,22 +89,22 @@ namespace Ntreev.Crema.Commands
 
             if (CodeSettings.IsBuildMode == true)
             {
-                this.CompileCode();
+                await this.CompileCodeAsync();
             }
             else
             {
-                this.GenerateCode();
+                await this.GenerateCodeAsync();
             }
         }
 
-        private void GenerateCode()
+        private async Task GenerateCodeAsync()
         {
             var generator = this.generators.FirstOrDefault(item => item.Name == CodeSettings.LanguageType);
             if (generator == null)
                 throw new InvalidOperationException($"'{CodeSettings.LanguageType}'은(는) 존재하지 언어입니다.");
 
             this.Out.WriteLine("receiving info");
-            var metaData = this.service.GetMetaData(this.Address, DataBaseSettings.DataBaseName, DataBaseSettings.Tags, FilterSettings.FilterExpression, CodeSettings.Devmode, this.Revision);
+            var metaData = await this.service.GetMetaDataAsync(this.Address, DataBaseSettings.DataBaseName, DataBaseSettings.Tags, FilterSettings.FilterExpression, this.Revision);
 
             var generationSettings = new CodeGenerationSettings()
             {
@@ -124,14 +124,14 @@ namespace Ntreev.Crema.Commands
             this.Out.WriteLine("code generated.");
         }
 
-        private void CompileCode()
+        private async Task CompileCodeAsync()
         {
             var compiler = this.compilers.FirstOrDefault(item => item.Name == CodeSettings.LanguageType);
             if (compiler == null)
                 throw new InvalidOperationException($"'{CodeSettings.LanguageType}'은(는) 존재하지 언어입니다.");
 
             this.Out.WriteLine("receiving info");
-            var metaData = this.service.GetMetaData(this.Address, DataBaseSettings.DataBaseName, DataBaseSettings.Tags, FilterSettings.FilterExpression, CodeSettings.Devmode, null);
+            var metaData = await this.service.GetMetaDataAsync(this.Address, DataBaseSettings.DataBaseName, DataBaseSettings.Tags, FilterSettings.FilterExpression, null);
 
             var generationSettings = new CodeGenerationSettings()
             {

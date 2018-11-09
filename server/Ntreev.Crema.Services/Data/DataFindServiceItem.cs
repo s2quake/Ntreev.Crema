@@ -53,7 +53,7 @@ namespace Ntreev.Crema.Services.Data
                 if (item.EndsWith(PathUtility.Separator) == true)
                     continue;
                 var itemName = new ItemName(item);
-                var cacheInfo = (FindTableSerializationInfo)this.ReadType(itemName.Name, true);
+                var cacheInfo = (FindTableSerializationInfo)this.ReadType(itemName.Name);
                 this.FindType(item, text, options, cacheInfo, this.findResults);
             }
 
@@ -71,7 +71,7 @@ namespace Ntreev.Crema.Services.Data
                     continue;
 
                 var itemName = new ItemName(item);
-                var cacheInfo = (FindTableSerializationInfo)this.ReadTable(itemName.Name, true);
+                var cacheInfo = (FindTableSerializationInfo)this.ReadTable(itemName.Name);
                 this.FindTable(item, text, options, cacheInfo, this.findResults);
             }
 

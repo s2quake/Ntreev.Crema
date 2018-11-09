@@ -37,12 +37,6 @@ namespace Ntreev.Crema.ServiceHosts.Users
         [OperationContract]
         ResultBase Unsubscribe();
 
-        //[OperationContract]
-        //ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message);
-
-        //[OperationContract]
-        //ResultBase CancelShutdown();
-
         [OperationContract]
         ResultBase<UserInfo> NewUser(string userID, string categoryPath, byte[] password, string userName, Authority authority);
 

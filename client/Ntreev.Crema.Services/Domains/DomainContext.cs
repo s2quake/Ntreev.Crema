@@ -35,9 +35,10 @@ namespace Ntreev.Crema.Services.Domains
 {
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     class DomainContext : ItemContext<Domain, DomainCategory, DomainCollection, DomainCategoryCollection, DomainContext>,
-        IDomainContextServiceCallback, IDomainContext, IServiceProvider, ICremaService
+        IDomainContextServiceCallback, IDomainContext, IServiceProvider
     {
         private DomainContextServiceClient service;
+        private bool isDisposed;
         private Timer timer;
 
         private ItemsCreatedEventHandler<IDomainItem> itemsCreated;
@@ -90,7 +91,6 @@ namespace Ntreev.Crema.Services.Domains
                     this.CremaHost.DataBaseContext.ItemsRenamed += DataBaseContext_ItemsRenamed;
                     this.CremaHost.DataBaseContext.ItemsDeleted += DataBaseContext_ItemDeleted;
                 });
-                this.CremaHost.AddService(this);
             });
         }
 
@@ -151,8 +151,16 @@ namespace Ntreev.Crema.Services.Domains
 
         public async Task CloseAsync(CloseInfo closeInfo)
         {
-            if (this.service == null)
+            var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.isDisposed == true)
+                    return false;
+                this.isDisposed = true;
+                return true;
+            });
+            if (result == false)
                 return;
+
             if (closeInfo.Reason != CloseReason.Faulted)
                 this.service.Unsubscribe();
             this.timer?.Dispose();
@@ -193,19 +201,6 @@ namespace Ntreev.Crema.Services.Domains
             };
         }
 
-        //public async Task<DomainContextMetaData> GetMetaDataAsync(Authentication authentication)
-        //{
-        //    var domains = await this.Domains.GetMetaDataAsync(authentication);
-        //    return await this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        return new DomainContextMetaData()
-        //        {
-        //            DomainCategories = this.Categories.GetMetaData(authentication),
-        //            Domains = domains,
-        //        };
-        //    });
-        //}
-
         public void AttachDomainHost(Authentication[] authentications, IDictionary<Domain, IDomainHost> domainHostByDomain)
         {
             this.Dispatcher.VerifyAccess();
@@ -244,30 +239,6 @@ namespace Ntreev.Crema.Services.Domains
             });
         }
 
-        //public async Task WaitEventAsync(long id)
-        //{
-        //    await await this.Dispatcher.InvokeAsync(async () =>
-        //    {
-        //        if (this.Logger.CompletionID < id)
-        //        {
-        //            this.setsByID.Add(id, new ManualResetEvent(false));
-        //            var set = this.setsByID[id];
-        //            await Task.Run(() => set.WaitOne());
-        //        }
-        //    });
-        //}
-        //private Task SetEventAsync(long id)
-        //{
-        //    return this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        if (this.setsByID.ContainsKey(id) == true)
-        //        {
-        //            this.setsByID[id].Set();
-        //            this.setsByID.Remove(id);
-        //        }
-        //    });
-        //}
-
         public Domain[] GetDomains(Guid dataBaseID)
         {
             this.Dispatcher.VerifyAccess();
@@ -281,27 +252,6 @@ namespace Ntreev.Crema.Services.Domains
             }
             return domainList.ToArray();
         }
-
-        //public Task<Domain[]> GetDomainsAsync(Guid dataBaseID)
-        //{
-        //    return this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        var domainList = new List<Domain>(this.Domains.Count);
-        //        foreach (var item in this.Domains)
-        //        {
-        //            if (item.DataBaseID == dataBaseID)
-        //            {
-        //                domainList.Add(item);
-        //            }
-        //        }
-        //        return domainList.ToArray();
-        //    });
-        //}
-
-        //public Task<Domain> GetDomainAsync(Guid domainID)
-        //{
-        //    return this.Dispatcher.InvokeAsync(() => this.Domains[domainID]);
-        //}
 
         public Domain GetDomain(Guid domainID)
         {
@@ -527,7 +477,6 @@ namespace Ntreev.Crema.Services.Domains
         private async void Service_Faulted(object sender, EventArgs e)
         {
             await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
-            this.CremaHost.RemoveServiceAsync(this);
         }
 
         private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -549,7 +498,6 @@ namespace Ntreev.Crema.Services.Domains
         async void IDomainContextServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
             await this.CloseAsync(closeInfo);
-            this.CremaHost.RemoveServiceAsync(this);
         }
 
         async void IDomainContextServiceCallback.OnDomainsCreated(CallbackInfo callbackInfo, DomainMetaData[] metaDatas)

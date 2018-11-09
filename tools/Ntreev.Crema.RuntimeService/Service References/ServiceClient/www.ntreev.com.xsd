@@ -24,7 +24,6 @@
         <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="tags" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="filterExpression" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="isDevmode" type="xs:boolean" />
         <xs:element minOccurs="0" name="revision" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
@@ -42,7 +41,6 @@
         <xs:element minOccurs="0" name="dataBaseName" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="tags" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="filterExpression" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="isDevmode" type="xs:boolean" />
         <xs:element minOccurs="0" name="revision" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>

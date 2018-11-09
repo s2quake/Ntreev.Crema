@@ -38,7 +38,7 @@ namespace Ntreev.Crema.ResxGenerator
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var settings = new Settings();
             var parser = new CommandLineParser(settings);
@@ -46,7 +46,7 @@ namespace Ntreev.Crema.ResxGenerator
             try
             {
                 parser.Parse(Environment.CommandLine);
-                Write(settings);
+                await WriteAsync(settings);
             }
             catch (Exception e)
             {
@@ -55,10 +55,10 @@ namespace Ntreev.Crema.ResxGenerator
             }
         }
 
-        static void Write(Settings settings)
+        static async Task WriteAsync(Settings settings)
         {
             var runtimeService = Container.Get<IRuntimeService>();
-            var data = runtimeService.GetDataGenerationData(settings.Address, settings.DataBaseName, "all", null, false, null);
+            var data = await runtimeService.GetDataGenerationDataAsync(settings.Address, settings.DataBaseName, "all", null, null);
             var dataSet = SerializationUtility.Create(data);
 
             var projectInfoTable = dataSet.Tables[settings.ExportName];

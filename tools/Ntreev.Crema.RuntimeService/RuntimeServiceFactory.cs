@@ -15,7 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.RuntimeService.DescriptorService;
+using Ntreev.Crema.RuntimeService.CremaHostService;
 using Ntreev.Crema.RuntimeService.ServiceClient;
 using Ntreev.Crema.ServiceModel;
 using System;
@@ -31,8 +31,10 @@ using System.Xml;
 
 namespace Ntreev.Crema.RuntimeService
 {
-    class RuntimeServiceFactory
+    class RuntimeServiceFactory : ICremaHostServiceCallback
     {
+        private static readonly RuntimeServiceFactory empty = new RuntimeServiceFactory();
+
         public static RuntimeServiceClient CreateServiceClient(string address)
         {
             var binding = CreateBinding(TimeSpan.MaxValue);
@@ -46,8 +48,9 @@ namespace Ntreev.Crema.RuntimeService
         private static int GetServicePort(string address)
         {
             var binding = CreateBinding(TimeSpan.MaxValue);
-            var endPointAddress = new EndpointAddress($"net.tcp://{AddressUtility.ConnectionAddress(address)}/DescriptorService");
-            var serviceClient = new DescriptorServiceClient(binding, endPointAddress);
+            var endPointAddress = new EndpointAddress($"net.tcp://{AddressUtility.ConnectionAddress(address)}/CremaHostService");
+            var instanceContext = new InstanceContext(empty);
+            var serviceClient = new CremaHostServiceClient(instanceContext, binding, endPointAddress);
 
             try
             {
@@ -81,5 +84,19 @@ namespace Ntreev.Crema.RuntimeService
 
             return binding;
         }
+
+        #region ICremaHostServiceCallback
+
+        void ICremaHostServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
+        {
+            throw new NotImplementedException();
+        }
+
+        void ICremaHostServiceCallback.OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
     }
 }

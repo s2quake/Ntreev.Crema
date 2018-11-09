@@ -44,9 +44,9 @@ namespace Ntreev.Crema.Services.Data
         private Dictionary<string, TypeInfo> typeInfos = new Dictionary<string, TypeInfo>();
         private Dictionary<string, object> tableDatas = new Dictionary<string, object>();
         private Dictionary<string, object> typeDatas = new Dictionary<string, object>();
-        private Dictionary<string, object> tableDomainDatas = new Dictionary<string, object>();
-        private Dictionary<string, object> typeDomainDatas = new Dictionary<string, object>();
-        private Dictionary<string, IDomain> domainItems = new Dictionary<string, IDomain>();
+        //private Dictionary<string, object> tableDomainDatas = new Dictionary<string, object>();
+        //private Dictionary<string, object> typeDomainDatas = new Dictionary<string, object>();
+        //private Dictionary<string, IDomain> domainItems = new Dictionary<string, IDomain>();
         private DataServiceItemInfo info;
 
         protected DataServiceItemBase(IDataBase dataBase)
@@ -221,20 +221,12 @@ namespace Ntreev.Crema.Services.Data
 
         protected abstract System.Type TypeDataType { get; }
 
-        protected object ReadTable(string name, bool isDevmode)
+        protected object ReadTable(string name)
         {
-            if (isDevmode == true && this.domainItems.ContainsKey(name) == true)
-            {
-                var domain = this.domainItems[name];
-                if (this.tableDomainDatas.ContainsKey(name) == false)
-                    this.Serialize(domain);
-                return this.tableDomainDatas[name];
-            }
-
             return this.tableDatas[name];
         }
 
-        protected object ReadType(string name, bool isDevmode)
+        protected object ReadType(string name)
         {
             return this.typeDatas[name];
         }
@@ -362,15 +354,12 @@ namespace Ntreev.Crema.Services.Data
 
             this.Dispatcher.InvokeAsync(() =>
             {
-                this.domainItems.Clear();
                 this.Commit();
 
                 this.tableInfos.Clear();
                 this.typeInfos.Clear();
                 this.tableDatas.Clear();
                 this.typeDatas.Clear();
-                this.tableDomainDatas.Clear();
-                this.typeDomainDatas.Clear();
                 this.initialized = false;
             });
         }
@@ -689,7 +678,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (this.CanSerialize(item) == true)
                 {
-                    this.tableDomainDatas[item.Name] = this.GetObject(item);
+                    //this.tableDomainDatas[item.Name] = this.GetObject(item);
                 }
             }
 
@@ -697,7 +686,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 if (this.CanSerialize(item) == true)
                 {
-                    this.typeDomainDatas[item.Name] = this.GetObject(item);
+                    //this.typeDomainDatas[item.Name] = this.GetObject(item);
                 }
             }
         }

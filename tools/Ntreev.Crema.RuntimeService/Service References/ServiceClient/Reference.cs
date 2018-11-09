@@ -19,10 +19,10 @@ namespace Ntreev.Crema.RuntimeService.ServiceClient {
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Runtime.Generation.GenerationSet> GetCodeGenerationData(string dataBaseName, string tags, string filterExpression, string revision);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IRuntimeService/GetDataGenerationData", ReplyAction="http://www.ntreev.com/IRuntimeService/GetDataGenerationDataResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Runtime.Serialization.SerializationSet> GetDataGenerationData(string dataBaseName, string tags, string filterExpression, bool isDevmode, string revision);
+        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Runtime.Serialization.SerializationSet> GetDataGenerationData(string dataBaseName, string tags, string filterExpression, string revision);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IRuntimeService/GetMetaData", ReplyAction="http://www.ntreev.com/IRuntimeService/GetMetaDataResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Runtime.Generation.GenerationSet, Ntreev.Crema.Runtime.Serialization.SerializationSet> GetMetaData(string dataBaseName, string tags, string filterExpression, bool isDevmode, string revision);
+        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Runtime.Generation.GenerationSet, Ntreev.Crema.Runtime.Serialization.SerializationSet> GetMetaData(string dataBaseName, string tags, string filterExpression, string revision);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IRuntimeService/ResetData", ReplyAction="http://www.ntreev.com/IRuntimeService/ResetDataResponse")]
         Ntreev.Crema.ServiceModel.ResultBase ResetData(string dataBaseName);
@@ -62,12 +62,12 @@ namespace Ntreev.Crema.RuntimeService.ServiceClient {
             return base.Channel.GetCodeGenerationData(dataBaseName, tags, filterExpression, revision);
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Runtime.Serialization.SerializationSet> GetDataGenerationData(string dataBaseName, string tags, string filterExpression, bool isDevmode, string revision) {
-            return base.Channel.GetDataGenerationData(dataBaseName, tags, filterExpression, isDevmode, revision);
+        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Runtime.Serialization.SerializationSet> GetDataGenerationData(string dataBaseName, string tags, string filterExpression, string revision) {
+            return base.Channel.GetDataGenerationData(dataBaseName, tags, filterExpression, revision);
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Runtime.Generation.GenerationSet, Ntreev.Crema.Runtime.Serialization.SerializationSet> GetMetaData(string dataBaseName, string tags, string filterExpression, bool isDevmode, string revision) {
-            return base.Channel.GetMetaData(dataBaseName, tags, filterExpression, isDevmode, revision);
+        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Runtime.Generation.GenerationSet, Ntreev.Crema.Runtime.Serialization.SerializationSet> GetMetaData(string dataBaseName, string tags, string filterExpression, string revision) {
+            return base.Channel.GetMetaData(dataBaseName, tags, filterExpression, revision);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase ResetData(string dataBaseName) {

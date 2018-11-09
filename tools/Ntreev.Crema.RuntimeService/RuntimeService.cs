@@ -24,20 +24,20 @@ using System.Threading.Tasks;
 using Ntreev.Crema.Runtime.Serialization;
 using Ntreev.Crema.Runtime.Generation;
 using Ntreev.Crema.Data;
+using Ntreev.Crema.ServiceModel;
 
 namespace Ntreev.Crema.RuntimeService
 {
     [Export(typeof(IRuntimeService))]
     class RuntimeService : IRuntimeService
     {
-        public GenerationSet GetCodeGenerationData(string address, string dataBaseName, string tags, string filterExpression, string revision)
+        public async Task<GenerationSet> GetCodeGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
         {
             var service = RuntimeServiceFactory.CreateServiceClient(address);
             service.Open();
             try
             {
-                var result = service.GetCodeGenerationData(dataBaseName, tags, filterExpression, revision);
-                result.Validate();
+                var result = await this.InvokeServiceAsync(() => service.GetCodeGenerationData(dataBaseName, tags, filterExpression, revision));
                 return result.Value;
             }
             finally
@@ -46,14 +46,13 @@ namespace Ntreev.Crema.RuntimeService
             }
         }
 
-        public SerializationSet GetDataGenerationData(string address, string dataBaseName, string tags, string filterExpression, bool isDevmode, string revision)
+        public async Task<SerializationSet> GetDataGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
         {
             var service = RuntimeServiceFactory.CreateServiceClient(address);
             service.Open();
             try
             {
-                var result = service.GetDataGenerationData(dataBaseName, tags, filterExpression, isDevmode, revision);
-                result.Validate();
+                var result = await this.InvokeServiceAsync(() => service.GetDataGenerationData(dataBaseName, tags, filterExpression, revision));
                 return result.Value;
             }
             finally
@@ -62,14 +61,13 @@ namespace Ntreev.Crema.RuntimeService
             }
         }
 
-        public Tuple<GenerationSet, SerializationSet> GetMetaData(string address, string dataBaseName, string tags, string filterExpression, bool isDevmode, string revision)
+        public async Task<Tuple<GenerationSet, SerializationSet>> GetMetaDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
         {
             var service = RuntimeServiceFactory.CreateServiceClient(address);
             service.Open();
             try
             {
-                var result = service.GetMetaData(dataBaseName, tags, filterExpression, isDevmode, revision);
-                result.Validate();
+                var result = await this.InvokeServiceAsync(() => service.GetMetaData(dataBaseName, tags, filterExpression, revision));
                 return new Tuple<GenerationSet, SerializationSet>(result.Value1, result.Value2);
             }
             finally
@@ -78,14 +76,13 @@ namespace Ntreev.Crema.RuntimeService
             }
         }
 
-        public void ResetData(string address, string dataBaseName)
+        public async Task ResetDataAsync(string address, string dataBaseName)
         {
             var service = RuntimeServiceFactory.CreateServiceClient(address);
             service.Open();
             try
             {
-                var result = service.ResetData(dataBaseName);
-                result.Validate();
+                await this.InvokeServiceAsync(() => service.ResetData(dataBaseName));
             }
             finally
             {
@@ -93,20 +90,40 @@ namespace Ntreev.Crema.RuntimeService
             }
         }
 
-        public string GetRevision(string address, string dataBaseName)
+        public async Task<string> GetRevisionAsync(string address, string dataBaseName)
         {
             var service = RuntimeServiceFactory.CreateServiceClient(address);
             service.Open();
             try
             {
-                var result = service.GetRevision(dataBaseName);
-                result.Validate();
+                var result = await this.InvokeServiceAsync(() => service.GetRevision(dataBaseName));
                 return result.Value;
             }
             finally
             {
                 service.Close();
             }
+        }
+
+        public async Task<ResultBase<TResult>> InvokeServiceAsync<TResult>(Func<ResultBase<TResult>> func)
+        {
+            var result = await Task.Run(func);
+            result.Validate();
+            return result;
+        }
+
+        public async Task<ResultBase<T1, T2>> InvokeServiceAsync<T1, T2>(Func<ResultBase<T1, T2>> func)
+        {
+            var result = await Task.Run(func);
+            result.Validate();
+            return result;
+        }
+
+        public async Task<ResultBase> InvokeServiceAsync(Func<ResultBase> func)
+        {
+            var result = await Task.Run(func);
+            result.Validate();
+            return result;
         }
     }
 }

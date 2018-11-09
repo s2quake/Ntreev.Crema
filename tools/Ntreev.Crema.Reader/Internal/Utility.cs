@@ -54,6 +54,8 @@ namespace Ntreev.Crema.Reader.Internal
                 return typeof(DateTime);
             else if (typeName == "duration")
                 return typeof(TimeSpan);
+            else if (typeName == "guid")
+                return typeof(Guid);
 
             return typeof(int);
         }

@@ -55,7 +55,7 @@ namespace Ntreev.Crema.RuntimeService
             this.logService = dataBase.GetService(typeof(ILogService)) as ILogService;
         }
 
-        public Task<GenerationSet> GernerationAsync(TagInfo tags, string filterExpression, bool isDevmode, string revision)
+        public Task<GenerationSet> GernerationAsync(TagInfo tags, string filterExpression, string revision)
         {
             return this.dispatcher.Invoke(async () =>
             {
@@ -98,7 +98,7 @@ namespace Ntreev.Crema.RuntimeService
             });
         }
 
-        public Task<SerializationSet> SerializeAsync(TagInfo tags, string filterExpression, bool isDevmode, string revision)
+        public Task<SerializationSet> SerializeAsync(TagInfo tags, string filterExpression, string revision)
         {
             return this.dispatcher.Invoke(async () =>
             {
@@ -112,7 +112,7 @@ namespace Ntreev.Crema.RuntimeService
                 {
                     var cacheKey = tags.ToString() + filterExpression;
 
-                    if (isDevmode == false && this.caches.ContainsKey(cacheKey) == true)
+                    if (this.caches.ContainsKey(cacheKey) == true)
                     {
                         return this.caches[cacheKey];
                     }
@@ -123,20 +123,17 @@ namespace Ntreev.Crema.RuntimeService
                         Revision = this.Revision,
                     };
 
-                    var tableItems = this.ReadTables(isDevmode);
+                    var tableItems = this.ReadTables();
                     dataSet.Tables = tableItems.Cast<SerializationTable>().ToArray();
 
-                    var typeItems = this.ReadTypes(isDevmode);
+                    var typeItems = this.ReadTypes();
                     dataSet.Types = typeItems.Cast<SerializationType>().ToArray();
 
                     dataSet = dataSet.Filter(tags);
                     if (filterExpression != string.Empty)
                         dataSet = dataSet.Filter(filterExpression);
 
-                    if (isDevmode == false)
-                    {
-                        this.caches[cacheKey] = dataSet;
-                    }
+                    this.caches[cacheKey] = dataSet;
 
                     return dataSet;
                 }
@@ -216,26 +213,26 @@ namespace Ntreev.Crema.RuntimeService
             get { return this.authentication; }
         }
 
-        private object[] ReadTables(bool isDevmode)
+        private object[] ReadTables()
         {
             var tableNames = this.GetTables().ToArray();
             var items = new List<object>(tableNames.Length);
             for (var i = 0; i < tableNames.Length; i++)
             {
                 var tableName = tableNames[i];
-                items.Add(this.ReadTable(tableName, isDevmode));
+                items.Add(this.ReadTable(tableName));
             }
             return items.ToArray();
         }
 
-        private object[] ReadTypes(bool isDevmode)
+        private object[] ReadTypes()
         {
             var typeNames = this.GetTypes().ToArray();
             var items = new List<object>(typeNames.Length);
             for (var i = 0; i < typeNames.Length; i++)
             {
                 var typeName = typeNames[i];
-                items.Add(this.ReadType(typeName, isDevmode));
+                items.Add(this.ReadType(typeName));
             }
             return items.ToArray();
         }

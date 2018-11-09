@@ -332,6 +332,21 @@ namespace Ntreev.Crema.Reader
             return (TimeSpan)row[column];
         }
 
+        public static Guid ToGuid(this IRow row, string columnName)
+        {
+            return (Guid)row[columnName];
+        }
+
+        public static Guid ToGuid(this IRow row, int columnIndex)
+        {
+            return (Guid)row[columnIndex];
+        }
+
+        public static Guid ToDurToGuidation(this IRow row, IColumn column)
+        {
+            return (Guid)row[column];
+        }
+
         public static IEnumerable<object> GetKeys(this IRow row)
         {
             return row.Table.Keys.Select(item => row[item]).ToArray();

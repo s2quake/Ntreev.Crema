@@ -438,31 +438,13 @@ namespace Ntreev.Crema.Services.Domains
             }
             else
             {
-                if (metaData.CompetionID != 0 && metaData.PostID != metaData.CompetionID)
-                {
-                    int qwer = 0;
-                }
                 this.OnInitialize(metaData.Data);
-                if (this.DataDispatcher != null)
-                {
-                    int qwer = 0;
-                }
                 this.Logger = new DomainLogger(this)
                 {
                     PostID = metaData.PostID,
                     CompletionID = metaData.CompetionID,
                 };
                 this.initialized = true;
-                //foreach (var item in metaData.Users)
-                //{
-                //    var userInfo = item.DomainUserInfo;
-                //    if (this.Users.ContainsKey(item.DomainUserInfo.UserID) == false)
-                //    {
-                //        var signatureDate = new SignatureDate(item.DomainUserInfo.UserID, authentication.SignatureDate.DateTime);
-                //        var userAuthentication = this.UserContext.Authenticate(signatureDate);
-                //        this.Users.Add(new DomainUser(this, item.DomainUserInfo, item.DomainUserState, false));
-                //    }
-                //}
             }
         }
 

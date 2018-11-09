@@ -14,6 +14,7 @@
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
+      <xs:element minOccurs="0" name="TaskID" type="ser:guid" />
       <xs:element minOccurs="0" name="Value" type="tns:GenerationSet" />
     </xs:sequence>
   </xs:complexType>
@@ -203,6 +204,7 @@
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
+      <xs:element minOccurs="0" name="TaskID" type="ser:guid" />
       <xs:element minOccurs="0" name="Value" type="tns:SerializationSet" />
     </xs:sequence>
   </xs:complexType>
@@ -377,6 +379,7 @@
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
+      <xs:element minOccurs="0" name="TaskID" type="ser:guid" />
       <xs:element minOccurs="0" name="Value1" type="tns:GenerationSet" />
       <xs:element minOccurs="0" name="Value2" type="tns:SerializationSet" />
     </xs:sequence>
@@ -391,6 +394,7 @@
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
+      <xs:element minOccurs="0" name="TaskID" type="ser:guid" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ResultBase" nillable="true" type="tns:ResultBase" />
@@ -407,6 +411,7 @@
     <xs:sequence>
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
+      <xs:element minOccurs="0" name="TaskID" type="ser:guid" />
       <xs:element minOccurs="0" name="Value" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>

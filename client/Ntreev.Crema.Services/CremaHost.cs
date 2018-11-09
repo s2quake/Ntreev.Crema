@@ -41,27 +41,24 @@ namespace Ntreev.Crema.Services
     [InheritedExport(typeof(ICremaHost))]
     class CremaHost : ICremaHost, IServiceProvider, ILogService, ICremaHostServiceCallback
     {
+        private readonly IServiceProvider container;
+        private readonly IConfigurationPropertyProvider[] propertiesProviders;
+        private readonly CremaSettings settings;
         private readonly List<Authentication> authentications = new List<Authentication>();
-        private readonly List<ICremaService> services = new List<ICremaService>();
-        private CloseInfo closeInfo;
 
         private CremaConfiguration configs;
         private IEnumerable<IPlugin> plugins;
-
-        [Import]
-        private IServiceProvider container = null;
-        private readonly CremaSettings settings;
+        
         private LogService log;
         private Guid token;
         private CremaHostServiceClient service;
 
-        [ImportMany]
-        private IEnumerable<IConfigurationPropertyProvider> propertiesProviders = null;
-
         [ImportingConstructor]
-        public CremaHost(CremaSettings settings)
+        public CremaHost(IServiceProvider container, [ImportMany]IEnumerable<IConfigurationPropertyProvider> propertiesProviders, CremaSettings settings)
         {
             CremaLog.Attach(this);
+            this.container = container;
+            this.propertiesProviders = propertiesProviders.ToArray();
             this.settings = settings;
             this.Dispatcher = new CremaDispatcher(this);
             CremaLog.Debug($"available tags : {string.Join(",", TagInfoUtility.Names)}");
@@ -107,36 +104,36 @@ namespace Ntreev.Crema.Services
             return null;
         }
 
-        public void AddService(ICremaService service)
-        {
-            this.Dispatcher.Invoke(() =>
-            {
-                this.services.Add(service);
-                CremaLog.Debug($"{service.GetType().Name} Initialized.");
-            });
-        }
+        //public void AddService(ICremaService service)
+        //{
+        //    this.Dispatcher.Invoke(() =>
+        //    {
+        //        this.services.Add(service);
+        //        CremaLog.Debug($"{service.GetType().Name} Initialized.");
+        //    });
+        //}
 
-        public async void RemoveServiceAsync(ICremaService service)
-        {
-            var isAny = await this.Dispatcher.InvokeAsync(() =>
-            {
-                if (this.services.Contains(service) == false)
-                    return false;
-                this.services.Remove(service);
-                CremaLog.Debug($"{service.GetType().Name} Released.");
-                return this.services.Any();
-            });
-            if (isAny == false)
-            {
-                await this.CloseAsync(closeInfo);
-            }
-        }
+        //public async void RemoveServiceAsync(ICremaService service)
+        //{
+        //    var isAny = await this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        if (this.services.Contains(service) == false)
+        //            return false;
+        //        this.services.Remove(service);
+        //        CremaLog.Debug($"{service.GetType().Name} Released.");
+        //        return this.services.Any();
+        //    });
+        //    if (isAny == false)
+        //    {
+        //        await this.CloseAsync(closeInfo);
+        //    }
+        //}
 
-        public void RemoveServiceAsync(ICremaService service, CloseInfo closeInfo)
-        {
-            this.closeInfo = closeInfo;
-            this.RemoveServiceAsync(service);
-        }
+        //public void RemoveServiceAsync(ICremaService service, CloseInfo closeInfo)
+        //{
+        //    this.closeInfo = closeInfo;
+        //    this.RemoveServiceAsync(service);
+        //}
 
         public Task InvokeCloseAsync(CloseInfo closeInfo)
         {
@@ -163,6 +160,11 @@ namespace Ntreev.Crema.Services
                     var instanceConetxt = new InstanceContext(this);
                     this.service = new CremaHostServiceClient(instanceConetxt, binding, endPointAddress);
                     this.service.Open();
+                    if (this.service is ICommunicationObject service)
+                    {
+                        service.Faulted += Service_Faulted;
+                    }
+
                     this.ServiceInfos = this.service.GetServiceInfos().ToDictionary(item => item.Name);
                     var result = this.InvokeService(() => this.service.Subscribe(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}"));
                     this.AuthenticationToken = result.Value;
@@ -211,6 +213,11 @@ namespace Ntreev.Crema.Services
                 CremaLog.Error(e);
                 throw;
             }
+        }
+
+        private async void Service_Faulted(object sender, EventArgs e)
+        {
+            await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
         }
 
         public void SaveConfigs()
@@ -504,19 +511,14 @@ namespace Ntreev.Crema.Services
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.OnClosing(EventArgs.Empty);
+                foreach (var item in this.plugins.Reverse())
+                {
+                    item.Release();
+                }
             });
             await this.DomainContext.CloseAsync(closeInfo);
-            //if (this.services.Contains(this.DomainContext) == true)
-            //    await this.DomainContext.CloseAsync(closeInfo);
-            foreach (var item in this.services.Reverse<ICremaService>())
-            {
-                if (item is DataBase)
-                    await item.CloseAsync(closeInfo);
-            }
-            if (this.services.Contains(this.DataBaseContext) == true)
-                await this.DataBaseContext.CloseAsync(closeInfo);
-            if (this.services.Contains(this.UserContext) == true)
-                await this.UserContext.CloseAsync(closeInfo);
+            await this.DataBaseContext.CloseAsync(closeInfo);
+            await this.UserContext.CloseAsync(closeInfo);
 
             if (closeInfo.Reason != CloseReason.Faulted)
                 this.service.Unsubscribe();
@@ -528,14 +530,9 @@ namespace Ntreev.Crema.Services
 
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.services.Clear();
                 this.DomainContext = null;
                 this.DataBaseContext = null;
                 this.UserContext = null;
-                foreach (var item in this.plugins.Reverse())
-                {
-                    item.Release();
-                }
                 foreach (var item in this.authentications)
                 {
                     item.InvokeExpiredEvent(Authentication.SystemID);
@@ -592,9 +589,9 @@ namespace Ntreev.Crema.Services
 
         #region ICremaHostServiceCallback
 
-        void ICremaHostServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
+        async void ICremaHostServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
-
+            await this.CloseAsync(closeInfo);
         }
 
         void ICremaHostServiceCallback.OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs)

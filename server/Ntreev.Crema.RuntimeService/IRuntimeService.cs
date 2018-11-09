@@ -39,18 +39,16 @@ namespace Ntreev.Crema.RuntimeService
 
         [OperationContract]
         [ServiceKnownType(typeof(DBNull))]
-        Task<ResultBase<SerializationSet>> GetDataGenerationDataAsync(string dataBaseName, string tags, string filterExpression, bool isDevmode, string revision);
+        Task<ResultBase<SerializationSet>> GetDataGenerationDataAsync(string dataBaseName, string tags, string filterExpression, string revision);
 
         [OperationContract]
         [ServiceKnownType(typeof(DBNull))]
-        Task<ResultBase<GenerationSet, SerializationSet>> GetMetaDataAsync(string dataBaseName, string tags, string filterExpression, bool isDevmode, string revision);
+        Task<ResultBase<GenerationSet, SerializationSet>> GetMetaDataAsync(string dataBaseName, string tags, string filterExpression, string revision);
 
         [OperationContract]
         Task<ResultBase> ResetDataAsync(string dataBaseName);
 
         [OperationContract]
         Task<ResultBase<string>> GetRevisionAsync(string dataBaseName);
-
-        CremaDispatcher Dispatcher { get; }
     }
 }

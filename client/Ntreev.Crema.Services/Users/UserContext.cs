@@ -35,9 +35,10 @@ namespace Ntreev.Crema.Services.Users
 {
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     class UserContext : ItemContext<User, UserCategory, UserCollection, UserCategoryCollection, UserContext>,
-        IUserContextServiceCallback, IUserContext, ICremaService
+        IUserContextServiceCallback, IUserContext
     {
         private UserContextServiceClient service;
+        private bool isDisposed;
         private Timer timer;
 
         private ItemsCreatedEventHandler<IUserItem> itemsCreated;
@@ -98,7 +99,6 @@ namespace Ntreev.Crema.Services.Users
 
                     this.CurrentUser = this.Users[userID];
                     this.CurrentUser.SetUserState(UserState.Online);
-                    this.CremaHost.AddService(this);
                 }
                 catch
                 {
@@ -269,8 +269,16 @@ namespace Ntreev.Crema.Services.Users
 
         public async Task CloseAsync(CloseInfo closeInfo)
         {
-            if (this.service == null)
+            var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.isDisposed == true)
+                    return false;
+                this.isDisposed = true;
+                return true;
+            });
+            if (result == false)
                 return;
+
             if (closeInfo.Reason != CloseReason.Faulted)
                 this.service.Unsubscribe();
             this.timer?.Dispose();
@@ -412,16 +420,7 @@ namespace Ntreev.Crema.Services.Users
 
         private async void Service_Faulted(object sender, EventArgs e)
         {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.service.Abort();
-                this.service = null;
-                this.timer?.Dispose();
-                this.timer = null;
-                this.Dispatcher.Dispose();
-                this.Dispatcher = null;
-            });
-            this.CremaHost.RemoveServiceAsync(this, new CloseInfo(CloseReason.Faulted, "서버와의 연결이 끊어졌습니다."));
+            await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
         }
 
         private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -443,7 +442,6 @@ namespace Ntreev.Crema.Services.Users
         async void IUserContextServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
             await this.CloseAsync(closeInfo);
-            this.CremaHost.RemoveServiceAsync(this);
         }
 
         async void IUserContextServiceCallback.OnUsersChanged(CallbackInfo callbackInfo, UserInfo[] userInfos)

@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Consoles\RuntimeCommand.cs" />
     <Compile Include="IRuntimeService.cs" />
+    <Compile Include="RuntimeServiceSync.cs" />
     <Compile Include="RuntimeServiceHost.cs" />
     <Compile Include="RuntimeServiceHostProvider.cs" />
     <Compile Include="RuntimeService.cs" />

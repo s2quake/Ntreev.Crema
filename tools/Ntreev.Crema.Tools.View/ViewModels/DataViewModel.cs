@@ -87,7 +87,7 @@ namespace Ntreev.Crema.Tools.View.ViewModels
                 contentService.Contents.Add(viewModel);
                 contentService.SelectedContent = viewModel;
                 viewModel.Disposed += ViewModel_Disposed;
-                viewModel.Connect(dialog.Address, dialog.DataBase, dialog.Tags, dialog.FilterExpression, dialog.IsDevmode);
+                viewModel.Connect(dialog.Address, dialog.DataBase, dialog.Tags, dialog.FilterExpression);
                 this.configs.Commit(dialog);
             }
         }

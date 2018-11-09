@@ -36,9 +36,10 @@ namespace Ntreev.Crema.Services.Data
 {
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     class DataBase : DataBaseBase<Type, TypeCategory, TypeCollection, TypeCategoryCollection, TypeContext, Table, TableCategory, TableCollection, TableCategoryCollection, TableContext>,
-        IDataBaseServiceCallback, IDataBase, ICremaService, IInfoProvider, IStateProvider
+        IDataBaseServiceCallback, IDataBase, IInfoProvider, IStateProvider
     {
         private DataBaseServiceClient service;
+        private bool isDisposed;
         private DataBaseMetaData metaData;
         private Timer timer;
 
@@ -326,7 +327,6 @@ namespace Ntreev.Crema.Services.Data
                         base.UpdateAccessParent();
                         base.UpdateLockParent();
                         this.AttachDomainHost();
-                        this.CremaHost.AddService(this);
                         this.authenticationEntered?.Invoke(this, new AuthenticationEventArgs(authentication.AuthenticationInfo));
                         this.DataBaseContext.InvokeItemsAuthenticationEnteredEvent(authentication, new IDataBase[] { this });
                         return true;
@@ -731,15 +731,27 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task CloseAsync(CloseInfo closeInfo)
         {
-            if (this.Dispatcher.Owner is DataBase == false)
+            var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.isDisposed == true)
+                    return false;
+                this.isDisposed = true;
+                return this.Dispatcher.Owner is DataBase;
+            });
+            if (result == false)
                 return;
-            this.service.Unsubscribe();
+
+            if (closeInfo.Reason != CloseReason.Faulted)
+                this.service.Unsubscribe();
             this.timer?.Dispose();
             this.timer = null;
-            await Task.Delay(1000);
+            await Task.Delay(100);
+            if (closeInfo.Reason != CloseReason.Faulted)
+                this.service.Close();
+            else
+                this.service.Abort();
             await this.callbackEvent.DisposeAsync();
             await this.Dispatcher.DisposeAsync();
-            this.service.Close();
             this.service = null;
             this.Dispatcher = null;
         }
@@ -1119,7 +1131,7 @@ namespace Ntreev.Crema.Services.Data
 
         private SignatureDate ReleaseService()
         {
-            var result = this.service.Unsubscribe();
+            var result = this.CremaHost.InvokeService(() => this.service.Unsubscribe());
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                 this.service.Close();
             else
@@ -1127,24 +1139,12 @@ namespace Ntreev.Crema.Services.Data
             this.timer?.Dispose();
             this.timer = null;
             this.service = null;
-
-            result.Validate();
-            this.CremaHost.RemoveServiceAsync(this);
             return result.SignatureDate;
         }
 
         private async void Service_Faulted(object sender, EventArgs e)
         {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.service.Abort();
-                this.service = null;
-                this.timer?.Dispose();
-                this.timer = null;
-                this.Dispatcher.Dispose();
-                this.Dispatcher = null;
-            });
-            this.CremaHost.RemoveServiceAsync(this);
+            await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
         }
 
         private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -1166,7 +1166,6 @@ namespace Ntreev.Crema.Services.Data
         async void IDataBaseServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
             await this.CloseAsync(closeInfo);
-            this.CremaHost.RemoveServiceAsync(this);
         }
 
         async void IDataBaseServiceCallback.OnTablesChanged(CallbackInfo callbackInfo, TableInfo[] tableInfos, string itemType)

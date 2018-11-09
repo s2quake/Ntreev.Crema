@@ -34,7 +34,7 @@ namespace Ntreev.Crema.Commands
     [Export(typeof(ICommand))]
     [CommandStaticProperty(typeof(FilterSettings))]
     [CommandStaticProperty(typeof(DataBaseSettings))]
-    class GetDataCommand : CommandBase
+    class GetDataCommand : CommandAsyncBase
     {
         [Import]
         private IRuntimeService service = null;
@@ -70,6 +70,7 @@ namespace Ntreev.Crema.Commands
 
         [CommandProperty]
         [Description("개발 전용으로 생성합니다.")]
+        [Obsolete]
         public bool Devmode
         {
             get; set;
@@ -92,7 +93,7 @@ namespace Ntreev.Crema.Commands
             get; set;
         }
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync()
         {
             if (this.Culture != string.Empty)
             {
@@ -101,7 +102,7 @@ namespace Ntreev.Crema.Commands
             }
 
             this.Out.WriteLine("receiving info");
-            var metaData = service.GetDataGenerationData(this.Address, DataBaseSettings.DataBaseName, DataBaseSettings.Tags, FilterSettings.FilterExpression, this.Devmode, this.Revision);
+            var metaData = await service.GetDataGenerationDataAsync(this.Address, DataBaseSettings.DataBaseName, DataBaseSettings.Tags, FilterSettings.FilterExpression, this.Revision);
 
             this.Out.WriteLine("data serializing.");
             var serializer = this.serializers.FirstOrDefault(item => item.Name == this.OutputType);

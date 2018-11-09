@@ -300,7 +300,7 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
             var cmf = new CodeMemberField();
             cmf.Attributes = MemberAttributes.Private;
             cmf.Name = "_revision";
-            cmf.Type = new CodeTypeReference(typeof(long));
+            cmf.Type = new CodeTypeReference(typeof(string));
 
             classType.Members.Add(cmf);
         }
@@ -353,7 +353,7 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
             cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
             cmm.Name = "Revision";
             cmm.HasGet = true;
-            cmm.Type = new CodeTypeReference(typeof(long));
+            cmm.Type = new CodeTypeReference(typeof(string));
             cmm.GetStatements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_revision"));
 
             classType.Members.Add(cmm);
@@ -418,7 +418,7 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
             var right1 = new CodePrimitiveExpression(true);
             var left = new CodeBinaryOperatorExpression(left1, CodeBinaryOperatorType.IdentityEquality, right1);
 
-            var left2 = new CodeCastExpression(typeof(int), new CodePrimitiveExpression(generationInfo.Revision));
+            var left2 = new CodeCastExpression(typeof(string), new CodePrimitiveExpression(generationInfo.Revision));
             var right2 = new CodePropertyReferenceExpression(new CodeVariableReferenceExpression("dataSet"), "Revision");
             var right = new CodeBinaryOperatorExpression(left2, CodeBinaryOperatorType.IdentityInequality, right2);
 

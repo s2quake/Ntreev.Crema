@@ -37,7 +37,7 @@ namespace Ntreev.Crema.RuntimeService
     [Export(typeof(IRuntimeService))]
     [Export(typeof(RuntimeService))]
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Single)]
-    class RuntimeService : IPlugin, IRuntimeService
+    partial class RuntimeService : IPlugin, IRuntimeService
     {
         public const string ServiceID = "B8CD9F7C-58B8-4BDA-B6AE-B99ED216DA22";
         private readonly ICremaHost cremaHost;
@@ -111,7 +111,7 @@ namespace Ntreev.Crema.RuntimeService
                     var dataBaseID = dataBaseItem.DataBase.ID;
                     var project = this.GetServiceItem(dataBaseID);
                     var tagInfo = new TagInfo(tags);
-                    result.Value = await project.GernerationAsync(tagInfo, filterExpression, false, revision);
+                    result.Value = await project.GernerationAsync(tagInfo, filterExpression, revision);
                 }
             }
             catch (Exception e)
@@ -122,7 +122,7 @@ namespace Ntreev.Crema.RuntimeService
             return result;
         }
 
-        public async Task<ResultBase<SerializationSet>> GetDataGenerationDataAsync(string dataBaseName, string tags, string filterExpression, bool isDevmode, string revision)
+        public async Task<ResultBase<SerializationSet>> GetDataGenerationDataAsync(string dataBaseName, string tags, string filterExpression, string revision)
         {
             var result = new ResultBase<SerializationSet>();
             try
@@ -132,7 +132,7 @@ namespace Ntreev.Crema.RuntimeService
                     var dataBaseID = dataBaseItem.DataBase.ID;
                     var project = this.GetServiceItem(dataBaseID);
                     var tagInfo = (TagInfo)tags;
-                    result.Value = await project.SerializeAsync(tagInfo, filterExpression, isDevmode, revision);
+                    result.Value = await project.SerializeAsync(tagInfo, filterExpression, revision);
                 }
             }
             catch (Exception e)
@@ -143,7 +143,7 @@ namespace Ntreev.Crema.RuntimeService
             return result;
         }
 
-        public async Task<ResultBase<GenerationSet, SerializationSet>> GetMetaDataAsync(string dataBaseName, string tags, string filterExpression, bool isDevmode, string revision)
+        public async Task<ResultBase<GenerationSet, SerializationSet>> GetMetaDataAsync(string dataBaseName, string tags, string filterExpression, string revision)
         {
             var result = new ResultBase<GenerationSet, SerializationSet>();
             try
@@ -153,8 +153,8 @@ namespace Ntreev.Crema.RuntimeService
                     var dataBaseID = dataBaseItem.DataBase.ID;
                     var project = this.GetServiceItem(dataBaseID);
                     var tagInfo = (TagInfo)tags;
-                    result.Value1 = await project.GernerationAsync(tagInfo, filterExpression, isDevmode, revision);
-                    result.Value2 = await project.SerializeAsync(tagInfo, filterExpression, isDevmode, revision);
+                    result.Value1 = await project.GernerationAsync(tagInfo, filterExpression, revision);
+                    result.Value2 = await project.SerializeAsync(tagInfo, filterExpression, revision);
                 }
             }
             catch (Exception e)

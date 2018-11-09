@@ -36,27 +36,7 @@ namespace Ntreev.Crema.ApplicationHost
     {
         static App()
         {
-            RegisterLicense($"{typeof(App).Namespace}.Licenses.Xceed.Wpf.Toolkit.license", item => Xceed.Wpf.Toolkit.Licenser.LicenseKey = item);
 
-            void RegisterLicense(string licenseName, Action<string> action)
-            {
-                try
-                {
-                    using (var stream = typeof(App).Assembly.GetManifestResourceStream(licenseName))
-                    using (var reader = new StreamReader(stream))
-                    {
-                        var license = reader.ReadToEnd();
-                        if (license == string.Empty)
-                            Trace.WriteLine($"license does not registered : {licenseName}");
-                        else
-                            action(license);
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw e;
-                }
-            }
         }
     }
 }

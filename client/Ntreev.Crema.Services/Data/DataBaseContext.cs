@@ -34,10 +34,11 @@ using Ntreev.Library.Threading;
 namespace Ntreev.Crema.Services.Data
 {
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
-    class DataBaseContext : ContainerBase<DataBase>, IDataBaseContext, IDataBaseContextServiceCallback, ICremaService
+    class DataBaseContext : ContainerBase<DataBase>, IDataBaseContext, IDataBaseContextServiceCallback
     {
-        private Timer timer;
         private DataBaseContextServiceClient service;
+        private bool isDisposed;
+        private Timer timer;
 
         private ItemsCreatedEventHandler<IDataBase> itemsCreated;
         private ItemsRenamedEventHandler<IDataBase> itemsRenamed;
@@ -93,7 +94,6 @@ namespace Ntreev.Crema.Services.Data
                 this.timer.Start();
 #endif
                 this.Initialize(metaData);
-                this.CremaHost.AddService(this);
             });
         }
 
@@ -440,6 +440,22 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task CloseAsync(CloseInfo closeInfo)
         {
+            var result = await this.CremaHost.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.isDisposed == true)
+                    return false;
+                this.isDisposed = true;
+                return true;
+            });
+            if (result == false)
+                return;
+
+            var dataBases = await this.Dispatcher.InvokeAsync(() => this.ToArray<DataBase>());
+            foreach (var item in dataBases)
+            {
+                await item.CloseAsync(closeInfo);
+            }
+
             if (this.service == null)
                 return;
             if (closeInfo.Reason != CloseReason.Faulted)
@@ -779,16 +795,7 @@ namespace Ntreev.Crema.Services.Data
 
         private async void Service_Faulted(object sender, EventArgs e)
         {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.service.Abort();
-                this.service = null;
-                this.timer?.Dispose();
-                this.timer = null;
-                this.Dispatcher.Dispose();
-                this.Dispatcher = null;
-            });
-            this.CremaHost.RemoveServiceAsync(this);
+            await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
         }
 
         #region IDataBaseContextServiceCallback
@@ -796,7 +803,6 @@ namespace Ntreev.Crema.Services.Data
         async void IDataBaseContextServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
             await this.CloseAsync(closeInfo);
-            this.CremaHost.RemoveServiceAsync(this);
         }
 
         async void IDataBaseContextServiceCallback.OnDataBasesCreated(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseInfo[] dataBaseInfos, string comment)

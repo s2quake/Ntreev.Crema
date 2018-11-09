@@ -121,6 +121,7 @@ namespace Ntreev.Crema.Tools.View.Dialogs.ViewModels
         }
 
         [ConfigurationProperty("devmode")]
+        [Obsolete]
         public bool IsDevmode
         {
             get { return this.isDevmode; }

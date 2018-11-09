@@ -53,14 +53,14 @@ namespace Ntreev.Crema.Tools.View.ViewModels
             this.serializer = serializer;
         }
 
-        public async void Connect(string address, string dataBaseName, string tags, string filterExpression, bool isDevmode)
+        public async void Connect(string address, string dataBaseName, string tags, string filterExpression)
         {
             this.DisplayName = "connecting...";
 
             try
             {
                 this.BeginProgress();
-                var metaData = await Task.Run(() => this.service.GetDataGenerationData(address, dataBaseName, tags, filterExpression, isDevmode, null));
+                var metaData = await this.service.GetDataGenerationDataAsync(address, dataBaseName, tags, filterExpression, null);
                 using (var stream = new MemoryStream())
                 {
                     this.serializer.Serialize(stream, metaData);
