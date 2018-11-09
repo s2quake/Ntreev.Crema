@@ -48,6 +48,11 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return this.InvokeTask(Task.Run(() => this.UnsubscribeAsync()));
         }
 
+        public ResultBase<CremaDataSet> GetDataSet(string dataBaseName, DataSetType dataSetType, string filterExpression, string revision)
+        {
+            return this.InvokeTask(Task.Run(() => this.GetDataSetAsync(dataBaseName, dataSetType, filterExpression, revision)));
+        }
+
         public ResultBase SetPublic(string dataBaseName)
         {
             return this.InvokeTask(Task.Run(() => this.SetPublicAsync(dataBaseName)));

@@ -59,10 +59,9 @@ namespace Ntreev.Crema.Services.Users
             this.callbackEvent = new IndexedDispatcher(this);
         }
 
-        public async Task<Guid> InitializeAsync(string address, ServiceInfo serviceInfo, string userID, SecureString password)
+        public async Task InitializeAsync(string address, string userID, Guid authenticationToken, ServiceInfo serviceInfo)
         {
-            var version = typeof(CremaHost).Assembly.GetName().Version;
-            return await this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 var binding = CremaHost.CreateBinding(serviceInfo);
                 var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/UserContextService");
@@ -76,7 +75,7 @@ namespace Ntreev.Crema.Services.Users
 
                 try
                 {
-                    var result = this.CremaHost.InvokeService(() => this.service.Subscribe(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}"));
+                    var result = this.CremaHost.InvokeService(() => this.service.Subscribe(authenticationToken));
 #if !DEBUG
                     this.timer = new Timer(30000);
                     this.timer.Elapsed += Timer_Elapsed;
@@ -100,7 +99,6 @@ namespace Ntreev.Crema.Services.Users
                     this.CurrentUser = this.Users[userID];
                     this.CurrentUser.SetUserState(UserState.Online);
                     this.CremaHost.AddService(this);
-                    return metaData.AuthenticationToken;
                 }
                 catch
                 {

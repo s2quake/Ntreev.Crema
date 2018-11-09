@@ -45,8 +45,7 @@ namespace Ntreev.Crema.ServiceHosts
         private readonly List<ServiceInfo> serviceInfos = new List<ServiceInfo>();
         private ICremaHost cremaHost;
         private ILogService logService;
-        private DescriptorService descriptorService;
-        private DescriptorServiceHost descriptorServiceHost;
+        private CremaHostServiceHost cremaHostServiceHost;
         private Guid token;
 
         static CremaService()
@@ -72,10 +71,9 @@ namespace Ntreev.Crema.ServiceHosts
             this.cremaHost.Closed += CremaHost_Closed;
             await CremaService.Dispatcher.InvokeAsync(() =>
             {
-                this.descriptorService = new DescriptorService(this, this.cremaHost);
-                this.descriptorServiceHost = new DescriptorServiceHost(this.cremaHost, this.descriptorService, this.Port);
-                this.descriptorServiceHost.Open();
-                this.logService.Info(Resources.ServiceStart, nameof(DescriptorServiceHost));
+                this.cremaHostServiceHost = new CremaHostServiceHost(this.cremaHost, this, this.Port);
+                this.cremaHostServiceHost.Open();
+                this.logService.Info(Resources.ServiceStart, nameof(CremaHostServiceHost));
             });
             await this.StartServicesAsync();
             await CremaService.Dispatcher.InvokeAsync(() =>
@@ -94,10 +92,9 @@ namespace Ntreev.Crema.ServiceHosts
             await this.StopServicesAsync();
             await CremaService.Dispatcher.InvokeAsync(() =>
             {
-                this.descriptorServiceHost.Close();
-                this.descriptorServiceHost = null;
-                this.descriptorService = null;
-                this.logService.Info(Resources.ServiceStop, nameof(DescriptorServiceHost));
+                this.cremaHostServiceHost.Close();
+                this.cremaHostServiceHost = null;
+                this.logService.Info(Resources.ServiceStop, nameof(CremaHostServiceHost));
             });
             await this.cremaHost.CloseAsync(this.token);
             this.cremaHost.SaveConfigs();
@@ -202,10 +199,9 @@ namespace Ntreev.Crema.ServiceHosts
                 {
                     if (e.Reason == CloseReason.Shutdown)
                     {
-                        this.descriptorServiceHost.Close();
-                        this.descriptorServiceHost = null;
-                        this.descriptorService = null;
-                        this.logService.Info(Resources.ServiceStop, nameof(DescriptorServiceHost));
+                        this.cremaHostServiceHost.Close();
+                        this.cremaHostServiceHost = null;
+                        this.logService.Info(Resources.ServiceStop, nameof(CremaHostServiceHost));
                         this.cremaHost.SaveConfigs();
                         this.token = Guid.Empty;
                         this.ServiceState = ServiceState.Closed;

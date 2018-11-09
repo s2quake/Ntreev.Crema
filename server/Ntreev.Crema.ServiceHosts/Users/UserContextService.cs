@@ -54,19 +54,13 @@ namespace Ntreev.Crema.ServiceHosts.Users
             return new ResultBase();
         }
 
-        public async Task<ResultBase<UserContextMetaData>> SubscribeAsync(string userID, byte[] password, string version, string platformID, string culture)
+        public async Task<ResultBase<UserContextMetaData>> SubscribeAsync(Guid authenticationToken)
         {
             var result = new ResultBase<UserContextMetaData>();
             try
             {
-                var serverVersion = typeof(ICremaHost).Assembly.GetName().Version;
-                var clientVersion = new Version(version);
-
-                if (clientVersion < serverVersion)
-                    throw new ArgumentException(Resources.Exception_LowerVersion, nameof(version));
-
-                this.authentication = await this.UserContext.LoginAsync(userID, ToSecureString(userID, password));
-                await this.authentication.AddRefAsync(this, (a) => this.UserContext.LogoutAsync(a));
+                this.authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
+                await this.authentication.AddRefAsync(this);
                 this.OwnerID = this.authentication.ID;
                 result.Value = await this.AttachEventHandlersAsync();
                 result.SignatureDate = this.authentication.SignatureDate;
@@ -74,19 +68,9 @@ namespace Ntreev.Crema.ServiceHosts.Users
             }
             catch (Exception e)
             {
-                this.OwnerID = $"{userID} - failed";
                 result.Fault = new CremaFault(e);
             }
             return result;
-        }
-
-        private async void AuthenticationUtility_Disconnected(object sender, EventArgs e)
-        {
-            var authentication = sender as Authentication;
-            if (this.authentication != null && this.authentication == authentication)
-            {
-                await this.UserContext.LogoutAsync(this.authentication);
-            }
         }
 
         public async Task<ResultBase> UnsubscribeAsync()
@@ -96,7 +80,6 @@ namespace Ntreev.Crema.ServiceHosts.Users
             {
                 await this.DetachEventHandlersAsync();
                 await this.authentication.RemoveRefAsync(this);
-                await this.UserContext.LogoutAsync(this.authentication);
                 this.authentication = null;
                 this.LogService.Debug($"[{this.OwnerID}] {nameof(UserContextService)} {nameof(UnsubscribeAsync)}");
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
@@ -104,36 +87,6 @@ namespace Ntreev.Crema.ServiceHosts.Users
             catch (Exception e)
             {
                 result.Fault = new CremaFault(e);
-            }
-            return result;
-        }
-
-        public async Task<ResultBase> ShutdownAsync(int milliseconds, ShutdownType shutdownType, string message)
-        {
-            var result = new ResultBase();
-            try
-            {
-                await this.CremaHost.ShutdownAsync(this.authentication, milliseconds, shutdownType, message);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
-            return result;
-        }
-
-        public async Task<ResultBase> CancelShutdownAsync()
-        {
-            var result = new ResultBase();
-            try
-            {
-                await this.CremaHost.CancelShutdownAsync(this.authentication);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
             }
             return result;
         }
@@ -341,7 +294,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             if (this.authentication != null)
             {
                 await this.DetachEventHandlersAsync();
-                await this.UserContext.LogoutAsync(this.authentication);
+                await this.CremaHost.LogoutAsync(this.authentication);
                 this.authentication = null;
             }
         }
@@ -482,27 +435,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var userIDs = e.Items.Select(item => item.ID).ToArray();
-            if (actionUserID != this.authentication.ID && contains == true)
-            {
-                this.UserContext.Users.UsersStateChanged -= Users_UsersStateChanged;
-                this.UserContext.Users.UsersChanged -= Users_UsersChanged;
-                this.UserContext.ItemsCreated -= UserContext_ItemsCreated;
-                this.UserContext.ItemsRenamed -= UserContext_ItemsRenamed;
-                this.UserContext.ItemsMoved -= UserContext_ItemsMoved;
-                this.UserContext.ItemsDeleted -= UserContext_ItemsDeleted;
-                this.UserContext.Users.UsersLoggedIn -= Users_UsersLoggedIn;
-                this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-                this.UserContext.Users.UsersKicked -= Users_UsersKicked;
-                this.UserContext.Users.UsersBanChanged -= Users_UsersBanChanged;
-                this.UserContext.Users.MessageReceived -= UserContext_MessageReceived;
-                this.UserContext.TaskCompleted -= UserContext_TaskCompleted;
-                this.authentication = null;
-                this.Channel.Abort();
-            }
-            else
-            {
-                this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUsersLoggedOut(callbackInfo, userIDs, closeInfo));
-            }
+            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUsersLoggedOut(callbackInfo, userIDs, closeInfo));
         }
 
         private void Users_UsersKicked(object sender, ItemsEventArgs<IUser> e)

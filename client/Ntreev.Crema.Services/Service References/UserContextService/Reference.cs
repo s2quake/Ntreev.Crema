@@ -16,16 +16,10 @@ namespace Ntreev.Crema.Services.UserContextService {
     internal interface IUserContextService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserContextService/Subscribe", ReplyAction="http://www.ntreev.com/IUserContextService/SubscribeResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserContextMetaData> Subscribe(string userID, byte[] password, string version, string platformID, string culture);
+        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserContextMetaData> Subscribe(System.Guid authenticationToken);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserContextService/Unsubscribe", ReplyAction="http://www.ntreev.com/IUserContextService/UnsubscribeResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Unsubscribe();
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserContextService/Shutdown", ReplyAction="http://www.ntreev.com/IUserContextService/ShutdownResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase Shutdown(int milliseconds, Ntreev.Crema.ServiceModel.ShutdownType shutdownType, string message);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserContextService/CancelShutdown", ReplyAction="http://www.ntreev.com/IUserContextService/CancelShutdownResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase CancelShutdown();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IUserContextService/NewUser", ReplyAction="http://www.ntreev.com/IUserContextService/NewUserResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserInfo> NewUser(string userID, string categoryPath, byte[] password, string userName, Ntreev.Crema.ServiceModel.Authority authority);
@@ -135,20 +129,12 @@ namespace Ntreev.Crema.Services.UserContextService {
                 base(callbackInstance, binding, remoteAddress) {
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserContextMetaData> Subscribe(string userID, byte[] password, string version, string platformID, string culture) {
-            return base.Channel.Subscribe(userID, password, version, platformID, culture);
+        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserContextMetaData> Subscribe(System.Guid authenticationToken) {
+            return base.Channel.Subscribe(authenticationToken);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase Unsubscribe() {
             return base.Channel.Unsubscribe();
-        }
-        
-        public Ntreev.Crema.ServiceModel.ResultBase Shutdown(int milliseconds, Ntreev.Crema.ServiceModel.ShutdownType shutdownType, string message) {
-            return base.Channel.Shutdown(milliseconds, shutdownType, message);
-        }
-        
-        public Ntreev.Crema.ServiceModel.ResultBase CancelShutdown() {
-            return base.Channel.CancelShutdown();
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.UserInfo> NewUser(string userID, string categoryPath, byte[] password, string userName, Ntreev.Crema.ServiceModel.Authority authority) {

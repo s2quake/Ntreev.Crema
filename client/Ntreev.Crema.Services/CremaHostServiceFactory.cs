@@ -16,28 +16,33 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.CremaHostService;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Ntreev.Crema.ServiceHosts
+namespace Ntreev.Crema.Services
 {
-    [ServiceContract(Namespace = CremaService.Namespace)]
-    public interface IDescriptorService
+    class CremaHostServiceFactory : ICremaHostServiceCallback
     {
-        [OperationContract]
-        string GetVersion();
+        private static readonly CremaHostServiceFactory empty = new CremaHostServiceFactory();
 
-        [OperationContract]
-        bool IsOnline(string userID, byte[] password);
+        public static CremaHostServiceClient CreateServiceClient(string address)
+        {
+            var binding = CremaHost.CreateBinding(ServiceInfo.Empty);
+            var endPointAddress = new EndpointAddress(string.Format("net.tcp://{0}/CremaHostService", AddressUtility.ConnectionAddress(address)));
+            var instanceContext = new InstanceContext(empty);
+            var serviceClient = new CremaHostServiceClient(instanceContext, binding, endPointAddress);
+            return serviceClient;
+        }
 
-        [OperationContract]
-        DataBaseInfo[] GetDataBaseInfos();
+        public void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
+        {
+            throw new NotImplementedException();
+        }
 
-        [OperationContract]
-        ServiceInfo[] GetServiceInfos();
+        public void OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

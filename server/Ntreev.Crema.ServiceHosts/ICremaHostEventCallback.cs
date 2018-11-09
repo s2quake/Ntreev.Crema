@@ -15,20 +15,25 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.DescriptorService;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.ServiceModel;
+using Ntreev.Crema.Services;
+using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
+using Ntreev.Library;
+using Ntreev.Crema.Data;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.ServiceHosts
 {
-    class DescriptorServiceFactory
+    public interface ICremaHostEventCallback
     {
-        public static DescriptorServiceClient CreateServiceClient(string address)
-        {
-            var binding = CremaHost.CreateBinding(ServiceInfo.Empty);
-            var endPointAddress = new EndpointAddress(string.Format("net.tcp://{0}/DescriptorService", AddressUtility.ConnectionAddress(address)));
-            var serviceClient = new DescriptorServiceClient(binding, endPointAddress);
-            return serviceClient;
-        }
+        [OperationContract(IsOneWay = true)]
+        void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo);
+        
+        [OperationContract(IsOneWay = true)]
+        void OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs);
     }
 }

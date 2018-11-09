@@ -174,16 +174,16 @@ namespace Ntreev.Crema.Presentation.Framework
         public bool IsBeingEdited => TableDescriptorUtility.IsBeingEdited(this.authentication, this);
 
         [DescriptorProperty]
-        public bool IsContentEditor => TableDescriptorUtility.IsBeingEdited(this.authentication, this) && this.ContentDescriptor.IsEditor;
+        public bool IsContentEditor => TableDescriptorUtility.IsBeingEdited(this.authentication, this) && this.ContentDescriptor != null && this.ContentDescriptor.IsEditor;
 
         [DescriptorProperty]
-        public bool IsContentOwner => TableDescriptorUtility.IsBeingEdited(this.authentication, this) && this.ContentDescriptor.IsOwner;
+        public bool IsContentOwner => TableDescriptorUtility.IsBeingEdited(this.authentication, this) && this.ContentDescriptor != null && this.ContentDescriptor.IsOwner;
 
         [DescriptorProperty]
         public bool IsBeingSetup => TableDescriptorUtility.IsBeingSetup(this.authentication, this);
 
         [DescriptorProperty]
-        public bool IsTemplateEditor => TableDescriptorUtility.IsBeingSetup(this.authentication, this) && this.TemplateDescriptor.Editor == this.authentication.ID;
+        public bool IsTemplateEditor => TableDescriptorUtility.IsBeingSetup(this.authentication, this) && this.TemplateDescriptor != null && this.TemplateDescriptor.Editor == this.authentication.ID;
 
         [DescriptorProperty]
         public bool IsInherited => TableDescriptorUtility.IsInherited(this.authentication, this);

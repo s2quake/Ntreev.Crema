@@ -6,6 +6,7 @@
       <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
       <xsd:import namespace="http://schemas.ntreev.com" />
       <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/Ntreev.Crema.Data" />
     </xsd:schema>
   </wsdl:types>
   <wsdl:message name="IDataBaseContextService_DefinitionType_InputMessage">
@@ -25,6 +26,12 @@
   </wsdl:message>
   <wsdl:message name="IDataBaseContextService_Unsubscribe_OutputMessage">
     <wsdl:part name="parameters" element="tns:UnsubscribeResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataBaseContextService_GetDataSet_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDataSet" />
+  </wsdl:message>
+  <wsdl:message name="IDataBaseContextService_GetDataSet_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDataSetResponse" />
   </wsdl:message>
   <wsdl:message name="IDataBaseContextService_SetPublic_InputMessage">
     <wsdl:part name="parameters" element="tns:SetPublic" />
@@ -197,6 +204,10 @@
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Unsubscribe">
       <wsdl:input wsaw:Action="http://www.ntreev.com/IDataBaseContextService/Unsubscribe" message="tns:IDataBaseContextService_Unsubscribe_InputMessage" />
       <wsdl:output wsaw:Action="http://www.ntreev.com/IDataBaseContextService/UnsubscribeResponse" message="tns:IDataBaseContextService_Unsubscribe_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetDataSet">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IDataBaseContextService/GetDataSet" message="tns:IDataBaseContextService_GetDataSet_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IDataBaseContextService/GetDataSetResponse" message="tns:IDataBaseContextService_GetDataSet_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="SetPublic">
       <wsdl:input wsaw:Action="http://www.ntreev.com/IDataBaseContextService/SetPublic" message="tns:IDataBaseContextService_SetPublic_InputMessage" />

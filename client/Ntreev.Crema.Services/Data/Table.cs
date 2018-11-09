@@ -269,12 +269,12 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public Task<Table> CopyAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent)
+        public Task<Table[]> CopyAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent)
         {
             return this.Container.CopyAsync(authentication, this, newTableName, categoryPath, copyContent);
         }
 
-        public Task<Table> InheritAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent)
+        public Task<Table[]> InheritAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent)
         {
             return this.Container.InheritAsync(authentication, this, newTableName, categoryPath, copyContent);
         }
@@ -581,12 +581,12 @@ namespace Ntreev.Crema.Services.Data
             return this.DeleteAsync(authentication);
         }
 
-        async Task<ITable> ITable.CopyAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent)
+        async Task<ITable[]> ITable.CopyAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent)
         {
             return await this.CopyAsync(authentication, newTableName, categoryPath, copyContent);
         }
 
-        async Task<ITable> ITable.InheritAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent)
+        async Task<ITable[]> ITable.InheritAsync(Authentication authentication, string newTableName, string categoryPath, bool copyContent)
         {
             return await this.InheritAsync(authentication, newTableName, categoryPath, copyContent);
         }

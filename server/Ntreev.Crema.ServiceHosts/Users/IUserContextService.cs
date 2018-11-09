@@ -32,16 +32,16 @@ namespace Ntreev.Crema.ServiceHosts.Users
     public partial interface IUserContextService
     {
         [OperationContract]
-        ResultBase<UserContextMetaData> Subscribe(string userID, byte[] password, string version, string platformID, string culture);
+        ResultBase<UserContextMetaData> Subscribe(Guid authenticationToken);
 
         [OperationContract]
         ResultBase Unsubscribe();
 
-        [OperationContract]
-        ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message);
+        //[OperationContract]
+        //ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message);
 
-        [OperationContract]
-        ResultBase CancelShutdown();
+        //[OperationContract]
+        //ResultBase CancelShutdown();
 
         [OperationContract]
         ResultBase<UserInfo> NewUser(string userID, string categoryPath, byte[] password, string userName, Authority authority);

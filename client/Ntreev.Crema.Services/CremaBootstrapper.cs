@@ -57,7 +57,7 @@ namespace Ntreev.Crema.Services
 
         public static async Task<bool> IsOnlineAsync(string address, string userID, SecureString password)
         {
-            var serviceClient = DescriptorServiceFactory.CreateServiceClient(address);
+            var serviceClient = CremaHostServiceFactory.CreateServiceClient(address);
             serviceClient.Open();
             try
             {
@@ -71,7 +71,7 @@ namespace Ntreev.Crema.Services
 
         public static DataBaseInfo[] GetDataBases(string address)
         {
-            var serviceClient = DescriptorServiceFactory.CreateServiceClient(address);
+            var serviceClient = CremaHostServiceFactory.CreateServiceClient(address);
             serviceClient.Open();
             try
             {

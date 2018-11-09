@@ -1,23 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://www.ntreev.com" elementFormDefault="qualified" targetNamespace="http://www.ntreev.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
   <xs:import namespace="http://schemas.ntreev.com" />
   <xs:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
   <xs:import namespace="http://schemas.datacontract.org/2004/07/System" />
   <xs:element name="Subscribe">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="userID" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="password" nillable="true" type="xs:base64Binary" />
-        <xs:element minOccurs="0" name="version" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="platformID" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="culture" nillable="true" type="xs:string" />
+        <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/" minOccurs="0" name="authenticationToken" type="q1:guid" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="SubscribeResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q1="http://schemas.ntreev.com" minOccurs="0" name="SubscribeResult" type="q1:ResultBaseOfUserContextMetaDataq8erDhHE" />
+        <xs:element xmlns:q2="http://schemas.ntreev.com" minOccurs="0" name="SubscribeResult" type="q2:ResultBaseOfUserContextMetaDataq8erDhHE" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -29,35 +26,7 @@
   <xs:element name="UnsubscribeResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q2="http://schemas.ntreev.com" minOccurs="0" name="UnsubscribeResult" type="q2:ResultBase" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Shutdown">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="milliseconds" type="xs:int" />
-        <xs:element xmlns:q3="http://schemas.ntreev.com" minOccurs="0" name="shutdownType" type="q3:ShutdownType" />
-        <xs:element minOccurs="0" name="message" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="ShutdownResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q4="http://schemas.ntreev.com" minOccurs="0" name="ShutdownResult" type="q4:ResultBase" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="CancelShutdown">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="CancelShutdownResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q5="http://schemas.ntreev.com" minOccurs="0" name="CancelShutdownResult" type="q5:ResultBase" />
+        <xs:element xmlns:q3="http://schemas.ntreev.com" minOccurs="0" name="UnsubscribeResult" type="q3:ResultBase" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -68,14 +37,14 @@
         <xs:element minOccurs="0" name="categoryPath" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="password" nillable="true" type="xs:base64Binary" />
         <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string" />
-        <xs:element xmlns:q6="http://schemas.ntreev.com" minOccurs="0" name="authority" type="q6:Authority" />
+        <xs:element xmlns:q4="http://schemas.ntreev.com" minOccurs="0" name="authority" type="q4:Authority" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="NewUserResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q7="http://schemas.ntreev.com" minOccurs="0" name="NewUserResult" type="q7:ResultBaseOfUserInfoq8erDhHE" />
+        <xs:element xmlns:q5="http://schemas.ntreev.com" minOccurs="0" name="NewUserResult" type="q5:ResultBaseOfUserInfoq8erDhHE" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -89,7 +58,7 @@
   <xs:element name="NewUserCategoryResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q8="http://schemas.ntreev.com" minOccurs="0" name="NewUserCategoryResult" type="q8:ResultBase" />
+        <xs:element xmlns:q6="http://schemas.ntreev.com" minOccurs="0" name="NewUserCategoryResult" type="q6:ResultBase" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -104,7 +73,7 @@
   <xs:element name="RenameUserItemResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q9="http://schemas.ntreev.com" minOccurs="0" name="RenameUserItemResult" type="q9:ResultBase" />
+        <xs:element xmlns:q7="http://schemas.ntreev.com" minOccurs="0" name="RenameUserItemResult" type="q7:ResultBase" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -119,7 +88,7 @@
   <xs:element name="MoveUserItemResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q10="http://schemas.ntreev.com" minOccurs="0" name="MoveUserItemResult" type="q10:ResultBase" />
+        <xs:element xmlns:q8="http://schemas.ntreev.com" minOccurs="0" name="MoveUserItemResult" type="q8:ResultBase" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -133,7 +102,7 @@
   <xs:element name="DeleteUserItemResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q11="http://schemas.ntreev.com" minOccurs="0" name="DeleteUserItemResult" type="q11:ResultBase" />
+        <xs:element xmlns:q9="http://schemas.ntreev.com" minOccurs="0" name="DeleteUserItemResult" type="q9:ResultBase" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -144,14 +113,14 @@
         <xs:element minOccurs="0" name="password" nillable="true" type="xs:base64Binary" />
         <xs:element minOccurs="0" name="newPassword" nillable="true" type="xs:base64Binary" />
         <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string" />
-        <xs:element xmlns:q12="http://schemas.ntreev.com" minOccurs="0" name="authority" nillable="true" type="q12:Authority" />
+        <xs:element xmlns:q10="http://schemas.ntreev.com" minOccurs="0" name="authority" nillable="true" type="q10:Authority" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="ChangeUserInfoResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q13="http://schemas.ntreev.com" minOccurs="0" name="ChangeUserInfoResult" type="q13:ResultBaseOfUserInfoq8erDhHE" />
+        <xs:element xmlns:q11="http://schemas.ntreev.com" minOccurs="0" name="ChangeUserInfoResult" type="q11:ResultBaseOfUserInfoq8erDhHE" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -166,7 +135,7 @@
   <xs:element name="KickResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q14="http://schemas.ntreev.com" minOccurs="0" name="KickResult" type="q14:ResultBase" />
+        <xs:element xmlns:q12="http://schemas.ntreev.com" minOccurs="0" name="KickResult" type="q12:ResultBase" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -181,7 +150,7 @@
   <xs:element name="BanResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q15="http://schemas.ntreev.com" minOccurs="0" name="BanResult" type="q15:ResultBaseOfBanInfoq8erDhHE" />
+        <xs:element xmlns:q13="http://schemas.ntreev.com" minOccurs="0" name="BanResult" type="q13:ResultBaseOfBanInfoq8erDhHE" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -195,7 +164,7 @@
   <xs:element name="UnbanResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q16="http://schemas.ntreev.com" minOccurs="0" name="UnbanResult" type="q16:ResultBase" />
+        <xs:element xmlns:q14="http://schemas.ntreev.com" minOccurs="0" name="UnbanResult" type="q14:ResultBase" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -210,14 +179,14 @@
   <xs:element name="SendMessageResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q17="http://schemas.ntreev.com" minOccurs="0" name="SendMessageResult" type="q17:ResultBase" />
+        <xs:element xmlns:q15="http://schemas.ntreev.com" minOccurs="0" name="SendMessageResult" type="q15:ResultBase" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="NotifyMessage">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q18="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q18:ArrayOfstring" />
+        <xs:element xmlns:q16="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q16:ArrayOfstring" />
         <xs:element minOccurs="0" name="message" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
@@ -225,7 +194,7 @@
   <xs:element name="NotifyMessageResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q19="http://schemas.ntreev.com" minOccurs="0" name="NotifyMessageResult" type="q19:ResultBase" />
+        <xs:element xmlns:q17="http://schemas.ntreev.com" minOccurs="0" name="NotifyMessageResult" type="q17:ResultBase" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -244,114 +213,114 @@
   <xs:element name="OnServiceClosed">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q20="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q20:CallbackInfo" />
-        <xs:element xmlns:q21="http://schemas.ntreev.com" minOccurs="0" name="closeInfo" type="q21:CloseInfo" />
+        <xs:element xmlns:q18="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q18:CallbackInfo" />
+        <xs:element xmlns:q19="http://schemas.ntreev.com" minOccurs="0" name="closeInfo" type="q19:CloseInfo" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnUsersChanged">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q22="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q22:CallbackInfo" />
-        <xs:element xmlns:q23="http://schemas.ntreev.com" minOccurs="0" name="userInfos" nillable="true" type="q23:ArrayOfUserInfo" />
+        <xs:element xmlns:q20="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q20:CallbackInfo" />
+        <xs:element xmlns:q21="http://schemas.ntreev.com" minOccurs="0" name="userInfos" nillable="true" type="q21:ArrayOfUserInfo" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnUsersStateChanged">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q24="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q24:CallbackInfo" />
-        <xs:element xmlns:q25="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q25:ArrayOfstring" />
-        <xs:element xmlns:q26="http://schemas.ntreev.com" minOccurs="0" name="states" nillable="true" type="q26:ArrayOfUserState" />
+        <xs:element xmlns:q22="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q22:CallbackInfo" />
+        <xs:element xmlns:q23="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q23:ArrayOfstring" />
+        <xs:element xmlns:q24="http://schemas.ntreev.com" minOccurs="0" name="states" nillable="true" type="q24:ArrayOfUserState" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnUserItemsCreated">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q27="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q27:CallbackInfo" />
-        <xs:element xmlns:q28="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="itemPaths" nillable="true" type="q28:ArrayOfstring" />
-        <xs:element xmlns:q29="http://schemas.datacontract.org/2004/07/System" minOccurs="0" name="args" nillable="true" type="q29:ArrayOfNullableOfUserInfoq8erDhHE" />
+        <xs:element xmlns:q25="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q25:CallbackInfo" />
+        <xs:element xmlns:q26="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="itemPaths" nillable="true" type="q26:ArrayOfstring" />
+        <xs:element xmlns:q27="http://schemas.datacontract.org/2004/07/System" minOccurs="0" name="args" nillable="true" type="q27:ArrayOfNullableOfUserInfoq8erDhHE" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnUserItemsRenamed">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q30="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q30:CallbackInfo" />
-        <xs:element xmlns:q31="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="itemPaths" nillable="true" type="q31:ArrayOfstring" />
-        <xs:element xmlns:q32="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="newNames" nillable="true" type="q32:ArrayOfstring" />
+        <xs:element xmlns:q28="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q28:CallbackInfo" />
+        <xs:element xmlns:q29="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="itemPaths" nillable="true" type="q29:ArrayOfstring" />
+        <xs:element xmlns:q30="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="newNames" nillable="true" type="q30:ArrayOfstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnUserItemsMoved">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q33="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q33:CallbackInfo" />
-        <xs:element xmlns:q34="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="itemPaths" nillable="true" type="q34:ArrayOfstring" />
-        <xs:element xmlns:q35="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="parentPaths" nillable="true" type="q35:ArrayOfstring" />
+        <xs:element xmlns:q31="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q31:CallbackInfo" />
+        <xs:element xmlns:q32="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="itemPaths" nillable="true" type="q32:ArrayOfstring" />
+        <xs:element xmlns:q33="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="parentPaths" nillable="true" type="q33:ArrayOfstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnUserItemsDeleted">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q36="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q36:CallbackInfo" />
-        <xs:element xmlns:q37="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="itemPaths" nillable="true" type="q37:ArrayOfstring" />
+        <xs:element xmlns:q34="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q34:CallbackInfo" />
+        <xs:element xmlns:q35="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="itemPaths" nillable="true" type="q35:ArrayOfstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnUsersLoggedIn">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q38="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q38:CallbackInfo" />
-        <xs:element xmlns:q39="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q39:ArrayOfstring" />
+        <xs:element xmlns:q36="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q36:CallbackInfo" />
+        <xs:element xmlns:q37="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q37:ArrayOfstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnUsersLoggedOut">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q40="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q40:CallbackInfo" />
-        <xs:element xmlns:q41="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q41:ArrayOfstring" />
-        <xs:element xmlns:q42="http://schemas.ntreev.com" minOccurs="0" name="closeInfo" type="q42:CloseInfo" />
+        <xs:element xmlns:q38="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q38:CallbackInfo" />
+        <xs:element xmlns:q39="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q39:ArrayOfstring" />
+        <xs:element xmlns:q40="http://schemas.ntreev.com" minOccurs="0" name="closeInfo" type="q40:CloseInfo" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnUsersKicked">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q43="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q43:CallbackInfo" />
-        <xs:element xmlns:q44="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q44:ArrayOfstring" />
-        <xs:element xmlns:q45="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="comments" nillable="true" type="q45:ArrayOfstring" />
+        <xs:element xmlns:q41="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q41:CallbackInfo" />
+        <xs:element xmlns:q42="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q42:ArrayOfstring" />
+        <xs:element xmlns:q43="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="comments" nillable="true" type="q43:ArrayOfstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnUsersBanChanged">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q46="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q46:CallbackInfo" />
-        <xs:element xmlns:q47="http://schemas.ntreev.com" minOccurs="0" name="banInfos" nillable="true" type="q47:ArrayOfBanInfo" />
-        <xs:element xmlns:q48="http://schemas.ntreev.com" minOccurs="0" name="changeType" type="q48:BanChangeType" />
-        <xs:element xmlns:q49="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="comments" nillable="true" type="q49:ArrayOfstring" />
+        <xs:element xmlns:q44="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q44:CallbackInfo" />
+        <xs:element xmlns:q45="http://schemas.ntreev.com" minOccurs="0" name="banInfos" nillable="true" type="q45:ArrayOfBanInfo" />
+        <xs:element xmlns:q46="http://schemas.ntreev.com" minOccurs="0" name="changeType" type="q46:BanChangeType" />
+        <xs:element xmlns:q47="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="comments" nillable="true" type="q47:ArrayOfstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnMessageReceived">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q50="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q50:CallbackInfo" />
-        <xs:element xmlns:q51="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q51:ArrayOfstring" />
+        <xs:element xmlns:q48="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q48:CallbackInfo" />
+        <xs:element xmlns:q49="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="userIDs" nillable="true" type="q49:ArrayOfstring" />
         <xs:element minOccurs="0" name="message" nillable="true" type="xs:string" />
-        <xs:element xmlns:q52="http://schemas.ntreev.com" minOccurs="0" name="messageType" type="q52:MessageType" />
+        <xs:element xmlns:q50="http://schemas.ntreev.com" minOccurs="0" name="messageType" type="q50:MessageType" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="OnTaskCompleted">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q53="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q53:CallbackInfo" />
-        <xs:element xmlns:q54="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="taskIDs" nillable="true" type="q54:ArrayOfguid" />
+        <xs:element xmlns:q51="http://schemas.ntreev.com" minOccurs="0" name="callbackInfo" type="q51:CallbackInfo" />
+        <xs:element xmlns:q52="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="taskIDs" nillable="true" type="q52:ArrayOfguid" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

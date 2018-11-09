@@ -495,11 +495,12 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                var name = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, dataSetType, filterExpression, revision);
+                    return base.Name;
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.GetDataSet(dataSetType, filterExpression, revision));
+                var result = await this.CremaHost.InvokeServiceAsync(() => this.DataBaseContext.Service.GetDataSet(name, dataSetType, filterExpression, revision));
                 return await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);

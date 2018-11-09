@@ -52,15 +52,6 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="GetDataSet">
-      <soap12:operation soapAction="http://www.ntreev.com/IDataBaseService/GetDataSet" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="ImportDataSet">
       <soap12:operation soapAction="http://www.ntreev.com/IDataBaseService/ImportDataSet" style="document" />
       <wsdl:input>

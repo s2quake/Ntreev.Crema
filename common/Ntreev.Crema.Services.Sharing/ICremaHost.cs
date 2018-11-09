@@ -39,7 +39,9 @@ namespace Ntreev.Crema.Services
 #elif SERVER
         Task<Guid> OpenAsync();
 
-        Task<Authentication> LoginAsync(string userID, SecureString password);
+        Task<Guid> LoginAsync(string userID, SecureString password);
+
+        Task<Authentication> AuthenticateAsync(Guid authenticationToken);
 
         Task LogoutAsync(Authentication authentication);
 

@@ -41,15 +41,6 @@ namespace Ntreev.Crema.Presentation.Framework
         private IType type;
         private readonly object owner;
 
-        private TypeInfo typeInfo = TypeInfo.Default;
-        private AccessInfo accessInfo = AccessInfo.Empty;
-        private LockInfo lockInfo = LockInfo.Empty;
-        private AccessType accessType;
-        private TypeState typeState;
-        private TypeAttribute typeAttribute;
-
-        private TypeTemplateDescriptor templateDescriptor;
-
         public TypeDescriptor(Authentication authentication, ITypeDescriptor descriptor, bool isSubscriptable, object owner)
             : base(authentication, descriptor.Target, descriptor, isSubscriptable)
         {
@@ -63,14 +54,14 @@ namespace Ntreev.Crema.Presentation.Framework
             this.type = type;
             this.owner = owner ?? this;
             this.type.Dispatcher.VerifyAccess();
-            this.typeInfo = type.TypeInfo;
-            this.typeState = type.TypeState;
+            this.TypeInfo = type.TypeInfo;
+            this.TypeState = type.TypeState;
             if (this.type.TypeInfo.IsFlag == true)
-                this.typeAttribute |= TypeAttribute.IsFlag;
-            this.lockInfo = type.LockInfo;
-            this.accessInfo = type.AccessInfo;
-            this.accessType = type.GetAccessType(this.authentication);
-            this.templateDescriptor = new TypeTemplateDescriptor(authentication, type.Template, descriptorTypes);
+                this.TypeAttribute |= TypeAttribute.IsFlag;
+            this.LockInfo = type.LockInfo;
+            this.AccessInfo = type.AccessInfo;
+            this.AccessType = type.GetAccessType(this.authentication);
+            this.TemplateDescriptor = new TypeTemplateDescriptor(authentication, type.Template, descriptorTypes);
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
             {
@@ -83,43 +74,43 @@ namespace Ntreev.Crema.Presentation.Framework
         }
 
         [DescriptorProperty]
-        public string Name => this.typeInfo.Name;
+        public string Name => this.TypeInfo.Name;
 
         [DescriptorProperty]
-        public string TypeName => this.typeInfo.Name;
+        public string TypeName => this.TypeInfo.Name;
 
         [DescriptorProperty]
-        public string Path => this.typeInfo.CategoryPath + this.typeInfo.Name;
+        public string Path => this.TypeInfo.CategoryPath + this.TypeInfo.Name;
 
         [DescriptorProperty]
-        public string DisplayName => this.typeInfo.Name;
+        public string DisplayName => this.TypeInfo.Name;
 
-        [DescriptorProperty(nameof(typeInfo))]
-        public TypeInfo TypeInfo => this.typeInfo;
+        [DescriptorProperty]
+        public TypeInfo TypeInfo { get; private set; } = TypeInfo.Default;
 
-        [DescriptorProperty(nameof(typeState))]
-        public TypeState TypeState => this.typeState;
+        [DescriptorProperty]
+        public TypeState TypeState { get; private set; }
 
-        [DescriptorProperty(nameof(typeAttribute))]
-        public TypeAttribute TypeAttribute => this.typeAttribute;
+        [DescriptorProperty]
+        public TypeAttribute TypeAttribute { get; private set; }
 
         [DescriptorProperty]
         public bool IsBeingEdited => TypeDescriptorUtility.IsBeingEdited(this.authentication, this);
 
         [DescriptorProperty]
-        public bool IsContentEditor => TypeDescriptorUtility.IsBeingEdited(this.authentication, this) && this.templateDescriptor.Editor == this.authentication.ID;
+        public bool IsContentEditor => TypeDescriptorUtility.IsBeingEdited(this.authentication, this) && this.TemplateDescriptor != null && this.TemplateDescriptor.Editor == this.authentication.ID;
 
         [DescriptorProperty]
         public bool IsFlag => TypeDescriptorUtility.IsFlag(this.authentication, this);
 
-        [DescriptorProperty(nameof(lockInfo))]
-        public LockInfo LockInfo => this.lockInfo;
+        [DescriptorProperty]
+        public LockInfo LockInfo { get; private set; } = LockInfo.Empty;
 
-        [DescriptorProperty(nameof(accessInfo))]
-        public AccessInfo AccessInfo => this.accessInfo;
+        [DescriptorProperty]
+        public AccessInfo AccessInfo { get; private set; } = AccessInfo.Empty;
 
-        [DescriptorProperty(nameof(accessType))]
-        public AccessType AccessType => this.accessType;
+        [DescriptorProperty]
+        public AccessType AccessType { get; private set; }
 
         [DescriptorProperty]
         public bool IsLocked => LockableDescriptorUtility.IsLocked(this.authentication, this);
@@ -143,7 +134,7 @@ namespace Ntreev.Crema.Presentation.Framework
         public bool IsAccessMember => AccessibleDescriptorUtility.IsAccessMember(this.authentication, this);
 
         [DescriptorProperty]
-        public TypeTemplateDescriptor TemplateDescriptor => this.templateDescriptor;
+        public TypeTemplateDescriptor TemplateDescriptor { get; }
 
         protected async override void OnDisposed(EventArgs e)
         {
@@ -175,31 +166,31 @@ namespace Ntreev.Crema.Presentation.Framework
 
         private async void Type_LockChanged(object sender, EventArgs e)
         {
-            this.lockInfo = this.type.LockInfo;
-            this.accessType = this.type.GetAccessType(this.authentication);
+            this.LockInfo = this.type.LockInfo;
+            this.AccessType = this.type.GetAccessType(this.authentication);
             await this.RefreshAsync();
         }
 
         private async void Type_AccessChanged(object sender, EventArgs e)
         {
-            this.accessInfo = this.type.AccessInfo;
-            this.accessType = this.type.GetAccessType(this.authentication);
+            this.AccessInfo = this.type.AccessInfo;
+            this.AccessType = this.type.GetAccessType(this.authentication);
             await this.RefreshAsync();
         }
 
         private async void Type_TypeInfoChanged(object sender, EventArgs e)
         {
-            this.typeInfo = this.type.TypeInfo;
-            if (this.typeInfo.IsFlag == true)
-                this.typeAttribute |= TypeAttribute.IsFlag;
+            this.TypeInfo = this.type.TypeInfo;
+            if (this.TypeInfo.IsFlag == true)
+                this.TypeAttribute |= TypeAttribute.IsFlag;
             else
-                this.typeAttribute &= ~TypeAttribute.IsFlag;
+                this.TypeAttribute &= ~TypeAttribute.IsFlag;
             await this.RefreshAsync();
         }
 
         private async void Type_TypeStateChanged(object sender, EventArgs e)
         {
-            this.typeState = this.type.TypeState;
+            this.TypeState = this.type.TypeState;
             await this.RefreshAsync();
         }
 

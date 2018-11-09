@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.CremaHostService;
 using Ntreev.Crema.Services.Data;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Crema.Services.Properties;
@@ -25,6 +26,7 @@ using Ntreev.Library;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security;
@@ -37,7 +39,7 @@ namespace Ntreev.Crema.Services
 {
     [Export(typeof(ILogService))]
     [InheritedExport(typeof(ICremaHost))]
-    class CremaHost : ICremaHost, IServiceProvider, ILogService
+    class CremaHost : ICremaHost, IServiceProvider, ILogService, ICremaHostServiceCallback
     {
         private readonly List<Authentication> authentications = new List<Authentication>();
         private readonly List<ICremaService> services = new List<ICremaService>();
@@ -51,6 +53,7 @@ namespace Ntreev.Crema.Services
         private readonly CremaSettings settings;
         private LogService log;
         private Guid token;
+        private CremaHostServiceClient service;
 
         [ImportMany]
         private IEnumerable<IConfigurationPropertyProvider> propertiesProviders = null;
@@ -151,9 +154,18 @@ namespace Ntreev.Crema.Services
                     this.ServiceState = ServiceState.Opening;
                     this.OnOpening(EventArgs.Empty);
                 });
-                this.ServiceInfos = await GetServiceInfoAsync(address);
+
                 await this.Dispatcher.InvokeAsync(() =>
                 {
+                    var version = typeof(CremaHost).Assembly.GetName().Version;
+                    var binding = CremaHost.CreateBinding(ServiceInfo.Empty);
+                    var endPointAddress = new EndpointAddress($"net.tcp://{AddressUtility.ConnectionAddress(address)}/CremaHostService");
+                    var instanceConetxt = new InstanceContext(this);
+                    this.service = new CremaHostServiceClient(instanceConetxt, binding, endPointAddress);
+                    this.service.Open();
+                    this.ServiceInfos = this.service.GetServiceInfos().ToDictionary(item => item.Name);
+                    var result = this.InvokeService(() => this.service.Subscribe(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}"));
+                    this.AuthenticationToken = result.Value;
                     this.IPAddress = AddressUtility.GetIPAddress(address);
                     this.Address = AddressUtility.GetDisplayAddress(address);
                     this.UserID = userID;
@@ -165,7 +177,7 @@ namespace Ntreev.Crema.Services
                     this.DataBaseContext = new DataBaseContext(this);
                     this.DomainContext = new DomainContext(this);
                 });
-                this.AuthenticationToken = await this.UserContext.InitializeAsync(this.IPAddress, ServiceInfos[nameof(UserContextService)], userID, password);
+                await this.UserContext.InitializeAsync(this.IPAddress, userID, this.AuthenticationToken, ServiceInfos[nameof(UserContextService)]);
                 await this.DataBaseContext.InitializeAsync(this.IPAddress, this.AuthenticationToken, ServiceInfos[nameof(DataBaseContextService)]);
                 await this.DomainContext.InitializeAsync(this.IPAddress, this.AuthenticationToken, ServiceInfos[nameof(DomainContextService)]);
                 await this.Dispatcher.InvokeAsync(() =>
@@ -240,7 +252,7 @@ namespace Ntreev.Crema.Services
                 {
                     this.DebugMethod(authentication, this, nameof(ShutdownAsync), this, milliseconds, shutdownType, message);
                 });
-                var result = await this.InvokeServiceAsync(() => this.UserContext.Service.Shutdown(milliseconds, shutdownType, message));
+                var result = await this.InvokeServiceAsync(() => this.Service.Shutdown(milliseconds, shutdownType, message));
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Sign(authentication, result);
@@ -261,7 +273,7 @@ namespace Ntreev.Crema.Services
                 {
                     this.DebugMethod(authentication, this, nameof(CancelShutdownAsync));
                 });
-                var result = await this.InvokeServiceAsync(() => this.UserContext.Service.CancelShutdown());
+                var result = await this.InvokeServiceAsync(() => this.Service.CancelShutdown());
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Sign(authentication, result);
@@ -329,6 +341,22 @@ namespace Ntreev.Crema.Services
         {
             authentication.Sign(signatureDate.DateTime);
         }
+
+        //public async Task CloseAsync(CloseInfo closeInfo)
+        //{
+        //    if (this.service == null)
+        //        return;
+        //    if (closeInfo.Reason != CloseReason.Faulted)
+        //        this.service.Unsubscribe();
+        //    await Task.Delay(100);
+        //    if (closeInfo.Reason != CloseReason.Faulted)
+        //        this.service.Close();
+        //    else
+        //        this.service.Abort();
+        //    await this.Dispatcher.DisposeAsync();
+        //    this.service = null;
+        //    this.Dispatcher = null;
+        //}
 
         public async Task<ResultBase<TResult>> InvokeServiceAsync<TResult>(Func<ResultBase<TResult>> func)
         {
@@ -409,6 +437,8 @@ namespace Ntreev.Crema.Services
 
         public ServiceState ServiceState { get; set; }
 
+        private ICremaHostService Service => this.service;
+
         public event EventHandler Opening;
 
         public event EventHandler Opened;
@@ -487,6 +517,15 @@ namespace Ntreev.Crema.Services
                 await this.DataBaseContext.CloseAsync(closeInfo);
             if (this.services.Contains(this.UserContext) == true)
                 await this.UserContext.CloseAsync(closeInfo);
+
+            if (closeInfo.Reason != CloseReason.Faulted)
+                this.service.Unsubscribe();
+            await Task.Delay(100);
+            if (closeInfo.Reason != CloseReason.Faulted)
+                this.service.Close();
+            else
+                this.service.Abort();
+
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.services.Clear();
@@ -514,7 +553,7 @@ namespace Ntreev.Crema.Services
 
         private static async Task<IReadOnlyDictionary<string, ServiceInfo>> GetServiceInfoAsync(string address)
         {
-            var serviceClient = DescriptorServiceFactory.CreateServiceClient(address);
+            var serviceClient = CremaHostServiceFactory.CreateServiceClient(address);
             serviceClient.Open();
             try
             {
@@ -550,6 +589,20 @@ namespace Ntreev.Crema.Services
         }
 
         internal Guid AuthenticationToken { get; set; }
+
+        #region ICremaHostServiceCallback
+
+        void ICremaHostServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
+        {
+
+        }
+
+        void ICremaHostServiceCallback.OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs)
+        {
+
+        }
+
+        #endregion
 
         #region ILogService
 

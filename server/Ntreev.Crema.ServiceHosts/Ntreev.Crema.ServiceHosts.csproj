@@ -61,10 +61,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthenticationUtility.cs" />
+    <Compile Include="CremaHostServiceSync.cs" />
     <Compile Include="Data\DataBaseContextServiceSync.cs" />
     <Compile Include="Data\DataBaseServiceSync.cs" />
-    <Compile Include="DescriptorService.cs" />
-    <Compile Include="DescriptorServiceHost.cs" />
+    <Compile Include="CremaHostService.cs" />
+    <Compile Include="CremaHostServiceHost.cs" />
     <Compile Include="CremaServiceItemHost.cs" />
     <Compile Include="Data\DataBaseContextServiceHost.cs" />
     <Compile Include="Data\DataBaseContextServiceHostProvider.cs" />
@@ -84,9 +85,10 @@
     <Compile Include="Domains\IDomainContextService.cs" />
     <Compile Include="CremaServiceItemBase.cs" />
     <Compile Include="CremaService.cs" />
-    <Compile Include="IDescriptorService.cs" />
+    <Compile Include="ICremaHostService.cs" />
     <Compile Include="ICremaService.cs" />
     <Compile Include="ICremaServiceItem.cs" />
+    <Compile Include="ICremaHostEventCallback.cs" />
     <Compile Include="InstanceProvider.cs" />
     <Compile Include="InstanceProviderBehavior.cs" />
     <Compile Include="IServiceHostProvider.cs" />

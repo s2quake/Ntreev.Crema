@@ -36,9 +36,9 @@ namespace Ntreev.Crema.ServiceHosts.Users
 {
     partial class UserContextService
     {
-        public ResultBase<UserContextMetaData> Subscribe(string userID, byte[] password, string version, string platformID, string culture)
+        public ResultBase<UserContextMetaData> Subscribe(Guid authenticationToken)
         {
-            return this.InvokeTask(Task.Run(() =>  this.SubscribeAsync(userID, password, version, platformID, culture)));
+            return this.InvokeTask(Task.Run(() =>  this.SubscribeAsync(authenticationToken)));
         }
 
         public ResultBase Unsubscribe()
@@ -46,15 +46,15 @@ namespace Ntreev.Crema.ServiceHosts.Users
             return this.InvokeTask(Task.Run(() =>  this.UnsubscribeAsync()));
         }
 
-        public ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message)
-        {
-            return this.InvokeTask(Task.Run(() =>  this.ShutdownAsync(milliseconds, shutdownType, message)));
-        }
+        //public ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message)
+        //{
+        //    return this.InvokeTask(Task.Run(() =>  this.ShutdownAsync(milliseconds, shutdownType, message)));
+        //}
 
-        public ResultBase CancelShutdown()
-        {
-            return this.InvokeTask(Task.Run(() =>  this.CancelShutdownAsync()));
-        }
+        //public ResultBase CancelShutdown()
+        //{
+        //    return this.InvokeTask(Task.Run(() =>  this.CancelShutdownAsync()));
+        //}
 
         public ResultBase<UserInfo> NewUser(string userID, string categoryPath, byte[] password, string userName, Authority authority)
         {

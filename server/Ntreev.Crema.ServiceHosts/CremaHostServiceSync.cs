@@ -27,42 +27,32 @@ using Ntreev.Library;
 
 namespace Ntreev.Crema.ServiceHosts
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple, IncludeExceptionDetailInFaults = true)]
-    class DescriptorService : IDescriptorService
+    partial class CremaHostService
     {
-        private readonly CremaService service;
-        private readonly ICremaHost cremaHost;
-
-        public DescriptorService(CremaService service, ICremaHost cremaHost)
+        public ResultBase<Guid> Subscribe(string userID, byte[] password, string version, string platformID, string culture)
         {
-            this.service = service;
-            this.cremaHost = cremaHost;
+            return this.InvokeTask(Task.Run(() => this.SubscribeAsync(userID, password, version, platformID, culture)));
         }
 
-        public ServiceInfo[] GetServiceInfos()
+        public ResultBase Unsubscribe()
         {
-            return this.service.ServiceInfos;
+            return this.InvokeTask(Task.Run(() => this.UnsubscribeAsync()));
         }
 
-        public DataBaseInfo[] GetDataBaseInfos()
+        public ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message)
         {
-            return this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext.Select(item => item.DataBaseInfo).ToArray());
+            return this.InvokeTask(Task.Run(() => this.ShutdownAsync(milliseconds, shutdownType, message)));
         }
 
-        public string GetVersion()
+        public ResultBase CancelShutdown()
         {
-            return AppUtility.ProductVersion.ToString();
+            return this.InvokeTask(Task.Run(() => this.CancelShutdownAsync()));
         }
 
-        public bool IsOnline(string userID, byte[] password)
+        private T InvokeTask<T>(Task<T> task)
         {
-            var userContext = this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            var text = Encoding.UTF8.GetString(password);
-            var task = userContext.IsOnlineUserAsync(userID, StringUtility.ToSecureString(StringUtility.Decrypt(text, userID)));
             task.Wait();
             return task.Result;
         }
-
-        private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }
 }

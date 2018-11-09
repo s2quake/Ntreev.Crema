@@ -131,6 +131,16 @@ namespace Ntreev.Crema.Presentation.Framework
                         var fieldInfo = this.GetType().GetField(propAttr.FieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                         fieldInfo.SetValue(this, sourceValue);
                     }
+                    else
+                    {
+                        var sourceProp = this.referenceTarget.GetType().GetProperty(item.Name);
+                        if (sourceProp == null)
+                            continue;
+                        var sourceValue = sourceProp.GetValue(this.referenceTarget);
+                        var propertyInfo = this.GetType().GetProperty(item.Name);
+                        if (propertyInfo.CanWrite == true)
+                        propertyInfo.SetValue(this, sourceValue);
+                    }
                 }
             }
         }

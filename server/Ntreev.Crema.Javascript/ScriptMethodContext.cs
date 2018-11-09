@@ -65,7 +65,8 @@ namespace Ntreev.Crema.Javascript
                 throw new ArgumentNullException(nameof(userID));
             if (password == null)
                 throw new ArgumentNullException(nameof(password));
-            this.authentication = await this.cremaHost.LoginAsync(userID, StringUtility.ToSecureString(password));
+            var authenticationToken = await this.cremaHost.LoginAsync(userID, StringUtility.ToSecureString(password));
+            this.authentication = await this.cremaHost.AuthenticateAsync(authenticationToken);
             this.token = $"{Guid.NewGuid()}";
             return this.token;
         }

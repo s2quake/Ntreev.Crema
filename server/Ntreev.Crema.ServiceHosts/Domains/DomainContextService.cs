@@ -110,40 +110,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             return result;
         }
 
-        //public async Task<ResultBase> EnterAsync(Guid domainID, DomainAccessType accessType)
-        //{
-        //    var result = new ResultBase();
-        //    try
-        //    {
-        //        var domain = await this.GetDomainAsync(domainID);
-        //        var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.EnterAsync(this.authentication, accessType);
-        //        result.TaskID = info.ID;
-        //        result.SignatureDate = this.authentication.SignatureDate;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        result.Fault = new CremaFault(e);
-        //    }
-        //    return result;
-        //}
-
-        //public async Task<ResultBase> LeaveAsync(Guid domainID)
-        //{
-        //    var result = new ResultBase();
-        //    try
-        //    {
-        //        var domain = await this.GetDomainAsync(domainID);
-        //        var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.LeaveAsync(this.authentication);
-        //        result.TaskID = info.ID;
-        //        result.SignatureDate = this.authentication.SignatureDate;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        result.Fault = new CremaFault(e);
-        //    }
-        //    return result;
-        //}
-
         public async Task<ResultBase<DomainRowInfo[]>> SetRowAsync(Guid domainID, DomainRowInfo[] rows)
         {
             var result = new ResultBase<DomainRowInfo[]>();

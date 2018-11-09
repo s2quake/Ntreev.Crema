@@ -34,24 +34,6 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="Shutdown">
-      <soap12:operation soapAction="http://www.ntreev.com/IUserContextService/Shutdown" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="CancelShutdown">
-      <soap12:operation soapAction="http://www.ntreev.com/IUserContextService/CancelShutdown" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="NewUser">
       <soap12:operation soapAction="http://www.ntreev.com/IUserContextService/NewUser" style="document" />
       <wsdl:input>

@@ -34,12 +34,6 @@
   <wsdl:message name="IDataBaseService_GetMetaData_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetMetaDataResponse" />
   </wsdl:message>
-  <wsdl:message name="IDataBaseService_GetDataSet_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetDataSet" />
-  </wsdl:message>
-  <wsdl:message name="IDataBaseService_GetDataSet_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetDataSetResponse" />
-  </wsdl:message>
   <wsdl:message name="IDataBaseService_ImportDataSet_InputMessage">
     <wsdl:part name="parameters" element="tns:ImportDataSet" />
   </wsdl:message>
@@ -386,10 +380,6 @@
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetMetaData">
       <wsdl:input wsaw:Action="http://www.ntreev.com/IDataBaseService/GetMetaData" message="tns:IDataBaseService_GetMetaData_InputMessage" />
       <wsdl:output wsaw:Action="http://www.ntreev.com/IDataBaseService/GetMetaDataResponse" message="tns:IDataBaseService_GetMetaData_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetDataSet">
-      <wsdl:input wsaw:Action="http://www.ntreev.com/IDataBaseService/GetDataSet" message="tns:IDataBaseService_GetDataSet_InputMessage" />
-      <wsdl:output wsaw:Action="http://www.ntreev.com/IDataBaseService/GetDataSetResponse" message="tns:IDataBaseService_GetDataSet_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="ImportDataSet">
       <wsdl:input wsaw:Action="http://www.ntreev.com/IDataBaseService/ImportDataSet" message="tns:IDataBaseService_ImportDataSet_InputMessage" />

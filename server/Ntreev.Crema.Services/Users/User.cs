@@ -120,7 +120,7 @@ namespace Ntreev.Crema.Services.Users
             }
         }
 
-        public async Task<Authentication> LoginAsync(SecureString password)
+        public async Task<Guid> LoginAsync(SecureString password)
         {
             try
             {
@@ -145,7 +145,7 @@ namespace Ntreev.Crema.Services.Users
                     this.Container.InvokeUsersStateChangedEvent(this.Authentication, users);
                     this.Container.InvokeUsersLoggedInEvent(this.Authentication, users);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
-                    return this.Authentication;
+                    return this.Authentication.Token;
                 });
             }
             catch (Exception e)

@@ -40,10 +40,6 @@ namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
 {
     public class TypeTreeViewItemViewModel : TypeTreeItemBase
     {
-        private ICommand renameCommand;
-        private ICommand deleteCommand;
-        private ICommand viewCommand;
-
         public TypeTreeViewItemViewModel(Authentication authentication, IType type)
             : this(authentication, type, null)
         {
@@ -65,9 +61,9 @@ namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
         public TypeTreeViewItemViewModel(Authentication authentication, TypeDescriptor descriptor, object owner)
             : base(authentication, descriptor, owner)
         {
-            this.renameCommand = new DelegateCommand(async item => await this.RenameAsync(), item => this.CanRename);
-            this.deleteCommand = new DelegateCommand(async item => await this.DeleteAsync(), item => this.CanDelete);
-            this.viewCommand = new DelegateCommand(async item => await this.ViewTemplateAsync(), item => this.CanViewTemplate);
+            this.RenameCommand = new DelegateCommand(async item => await this.RenameAsync(), item => this.CanRename);
+            this.DeleteCommand = new DelegateCommand(async item => await this.DeleteAsync(), item => this.CanDelete);
+            this.ViewCommand = new DelegateCommand(async item => await this.ViewTemplateAsync(), item => this.CanViewTemplate);
         }
 
         public async Task EditTemplateAsync()
@@ -137,11 +133,11 @@ namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
         [DescriptorProperty]
         public bool CanViewTemplate => TypeUtility.CanViewTemplate(this.authentication, this.descriptor);
 
-        public ICommand RenameCommand => this.renameCommand;
+        public ICommand RenameCommand { get; }
 
-        public ICommand DeleteCommand => this.deleteCommand;
+        public ICommand DeleteCommand { get; }
 
-        public ICommand ViewCommand => this.viewCommand;
+        public ICommand ViewCommand { get; }
 
         public override string DisplayName => this.descriptor.TypeName;
     }

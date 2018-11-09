@@ -18,15 +18,15 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="net.tcp://localhost:4004/DescriptorService/mex" Protocol="mex" SourceId="1" />
+    <MetadataSource Address="net.tcp://localhost:4004/CremaHostService/mex" Protocol="mex" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="www.ntreev.com.wsdl" MetadataType="Wsdl" ID="8a2a9a43-8dc7-4065-9ee3-6596b7bdcb50" SourceId="1" SourceUrl="net.tcp://localhost:4004/DescriptorService/mex" />
-    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="1aa1936c-b2da-45b3-b083-8d3bf96a0350" SourceId="1" SourceUrl="net.tcp://localhost:4004/DescriptorService/mex" />
-    <MetadataFile FileName="www.ntreev.com.xsd" MetadataType="Schema" ID="3ec917e2-6bae-478e-8fe8-9e13eb897b0c" SourceId="1" SourceUrl="net.tcp://localhost:4004/DescriptorService/mex" />
-    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="cf710cc0-5253-4662-9994-39ac5c196383" SourceId="1" SourceUrl="net.tcp://localhost:4004/DescriptorService/mex" />
-    <MetadataFile FileName="schemas.ntreev.com.xsd" MetadataType="Schema" ID="7644d3a5-6b5f-4c3e-ad1a-f727e5c73d78" SourceId="1" SourceUrl="net.tcp://localhost:4004/DescriptorService/mex" />
-    <MetadataFile FileName="Arrays.xsd" MetadataType="Schema" ID="80721743-0b1c-4497-a0a4-58ffb27bcf8d" SourceId="1" SourceUrl="net.tcp://localhost:4004/DescriptorService/mex" />
+    <MetadataFile FileName="www.ntreev.com1.wsdl" MetadataType="Wsdl" ID="4d2d8cbc-0f9d-4960-a7f3-9c2476e78af7" SourceId="1" SourceUrl="net.tcp://localhost:4004/CremaHostService/mex" />
+    <MetadataFile FileName="service1.wsdl" MetadataType="Wsdl" ID="fd2fa12d-dbe2-48f5-b5f0-8bf2f3f1c008" SourceId="1" SourceUrl="net.tcp://localhost:4004/CremaHostService/mex" />
+    <MetadataFile FileName="www.ntreev.com1.xsd" MetadataType="Schema" ID="74052a57-e0a3-444b-9ed4-46f976a60ee1" SourceId="1" SourceUrl="net.tcp://localhost:4004/CremaHostService/mex" />
+    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="162c1349-4c34-4aeb-a387-af1aaff0a342" SourceId="1" SourceUrl="net.tcp://localhost:4004/CremaHostService/mex" />
+    <MetadataFile FileName="schemas.ntreev.com1.xsd" MetadataType="Schema" ID="6efe78d5-926f-4433-87b3-8659bd5081af" SourceId="1" SourceUrl="net.tcp://localhost:4004/CremaHostService/mex" />
+    <MetadataFile FileName="Arrays1.xsd" MetadataType="Schema" ID="7fa40156-df6a-4280-ae03-dcc9b5a848bc" SourceId="1" SourceUrl="net.tcp://localhost:4004/CremaHostService/mex" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

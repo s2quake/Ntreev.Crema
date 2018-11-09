@@ -27,9 +27,6 @@ namespace Ntreev.Crema.Services.DataBaseService {
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseService/GetMetaData", ReplyAction="http://www.ntreev.com/IDataBaseService/GetMetaDataResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseMetaData> GetMetaData();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseService/GetDataSet", ReplyAction="http://www.ntreev.com/IDataBaseService/GetDataSetResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.CremaDataSet> GetDataSet(Ntreev.Crema.ServiceModel.DataSetType dataSetType, string filterExpression, string revision);
-        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseService/ImportDataSet", ReplyAction="http://www.ntreev.com/IDataBaseService/ImportDataSetResponse")]
         Ntreev.Crema.ServiceModel.ResultBase ImportDataSet(Ntreev.Crema.Data.CremaDataSet dataSet, string comment);
         
@@ -269,10 +266,6 @@ namespace Ntreev.Crema.Services.DataBaseService {
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseMetaData> GetMetaData() {
             return base.Channel.GetMetaData();
-        }
-        
-        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.CremaDataSet> GetDataSet(Ntreev.Crema.ServiceModel.DataSetType dataSetType, string filterExpression, string revision) {
-            return base.Channel.GetDataSet(dataSetType, filterExpression, revision);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase ImportDataSet(Ntreev.Crema.Data.CremaDataSet dataSet, string comment) {

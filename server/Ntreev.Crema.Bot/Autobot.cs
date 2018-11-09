@@ -52,9 +52,10 @@ namespace Ntreev.Crema.Bot
 
         public override AutobotServiceBase Service => this.service;
 
-        protected override Task<Authentication> OnLoginAsync()
+        protected override async Task<Authentication> OnLoginAsync()
         {
-            return this.cremaHost.LoginAsync(this.AutobotID, this.password);
+            var token = await this.cremaHost.LoginAsync(this.AutobotID, this.password);
+            return await this.cremaHost.AuthenticateAsync(token);
         }
 
         protected override Task OnLogoutAsync(Authentication authentication)

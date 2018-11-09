@@ -96,6 +96,24 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return result;
         }
 
+        public async Task<ResultBase<CremaDataSet>> GetDataSetAsync(string dataBaseName, DataSetType dataSetType, string filterExpression, string revision)
+        {
+            var result = new ResultBase<CremaDataSet>();
+            try
+            {
+                var dataBase = await this.GetDataBaseAsync(dataBaseName);
+                result.Value = await dataBase.GetDataSetAsync(this.authentication, dataSetType, filterExpression, revision);
+                result.SignatureDate = this.authentication.SignatureDate;
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
+        }
+
+
+
         public async Task<ResultBase> SetPublicAsync(string dataBaseName)
         {
             var result = new ResultBase();

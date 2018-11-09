@@ -70,7 +70,7 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public async Task<Table> InheritAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
+        public async Task<Table[]> InheritAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
         {
             try
             {
@@ -82,12 +82,10 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var taskID = GuidUtility.FromName(nameof(InheritAsync) + categoryPath + newTableName + copyContent);
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.InheritTable(name, newTableName, categoryPath, copyContent));
-                var tables = await this.AddNewAsync(authentication, result.Value);
-                return await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.Sign(authentication, result);
-                    return this[newTableName];
-                });
+                var tableInfos = result.Value;
+                await this.DataBase.WaitAsync(taskID);
+                return await this.Dispatcher.InvokeAsync(() => tableInfos.Select(item => this[item.Name]).ToArray());
+                
             }
             catch (Exception e)
             {
@@ -96,7 +94,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task<Table> CopyAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
+        public async Task<Table[]> CopyAsync(Authentication authentication, Table table, string newTableName, string categoryPath, bool copyContent)
         {
             try
             {
@@ -108,12 +106,9 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var taskID = GuidUtility.FromName(nameof(CopyAsync) + categoryPath + newTableName + copyContent);
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.CopyTable(name, newTableName, categoryPath, copyContent));
-                var tables = this.AddNewAsync(authentication, result.Value);
-                return await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.Sign(authentication, result);
-                    return this[newTableName];
-                });
+                var tableInfos = result.Value;
+                await this.DataBase.WaitAsync(taskID);
+                return await this.Dispatcher.InvokeAsync(() => tableInfos.Select(item => this[item.Name]).ToArray());
             }
             catch (Exception e)
             {

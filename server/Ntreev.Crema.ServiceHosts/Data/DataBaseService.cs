@@ -120,21 +120,6 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return result;
         }
 
-        public async Task<ResultBase<CremaDataSet>> GetDataSetAsync(DataSetType dataSetType, string filterExpression, string revision)
-        {
-            var result = new ResultBase<CremaDataSet>();
-            try
-            {
-                result.Value = await this.dataBase.GetDataSetAsync(this.authentication, dataSetType, filterExpression, revision);
-                result.SignatureDate = this.authentication.SignatureDate;
-            }
-            catch (Exception e)
-            {
-                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
-            }
-            return result;
-        }
-
         public async Task<ResultBase> ImportDataSetAsync(CremaDataSet dataSet, string comment)
         {
             var result = new ResultBase();

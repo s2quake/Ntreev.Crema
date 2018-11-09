@@ -287,9 +287,14 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        public Task<Authentication> LoginAsync(string userID, SecureString password)
+        public Task<Guid> LoginAsync(string userID, SecureString password)
         {
             return this.UserContext.LoginAsync(userID, password);
+        }
+
+        public Task<Authentication> AuthenticateAsync(Guid authenticationToken)
+        {
+            return this.UserContext.AuthenticateAsync(authenticationToken);
         }
 
         public Task LogoutAsync(Authentication authentication)

@@ -472,7 +472,7 @@ namespace Ntreev.Crema.Services.Data
                     DataBase.TablePathPrefix + targetName,
                 };
                 var items = EnumerableUtility.FamilyTree(this as ITableItem, item => item.Childs);
-                var itemPaths = items.Select(item => new RepositoryPath(this.Context, item.Path).Path).ToArray();
+                var itemPaths = items.Select(item => DataBase.TablePathPrefix + item.Path).ToArray();
                 var baseTables = items.Where(item => item is Table).Select(item => item as Table).ToArray();
 
                 if (baseTables.Distinct().Count() != baseTables.Length)

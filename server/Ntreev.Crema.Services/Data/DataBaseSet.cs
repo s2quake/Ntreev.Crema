@@ -142,7 +142,7 @@ namespace Ntreev.Crema.Services.Data
             var repositoryPath2 = new RepositoryPath(this.TypeContext, dataType.CategoryPath + typeName);
 
             repositoryPath1.ValidateExists();
-            repositoryPath1.ValidateNotExists();
+            repositoryPath2.ValidateNotExists();
             dataType.TypeName = typeName;
             this.Serialize();
             this.Repository.Move(repositoryPath1, repositoryPath2);
@@ -155,7 +155,7 @@ namespace Ntreev.Crema.Services.Data
             var repositoryPath2 = new RepositoryPath(this.TypeContext, categoryPath + dataType.Name);
 
             repositoryPath1.ValidateExists();
-            repositoryPath1.ValidateNotExists();
+            repositoryPath2.ValidateNotExists();
             dataType.CategoryPath = categoryPath;
             this.Serialize();
             this.Repository.Move(repositoryPath1, repositoryPath2);
@@ -267,7 +267,7 @@ namespace Ntreev.Crema.Services.Data
             var repositoryPath2 = new RepositoryPath(this.TableContext, categoryPath + dataTable.Name);
 
             repositoryPath1.ValidateExists();
-            repositoryPath1.ValidateNotExists();
+            repositoryPath2.ValidateNotExists();
             dataTable.CategoryPath = categoryPath;
             this.Serialize();
             this.Repository.Move(repositoryPath1, repositoryPath2);

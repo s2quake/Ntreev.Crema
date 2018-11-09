@@ -121,6 +121,14 @@ namespace Ntreev.Crema.Presentation.Framework
                 var fieldInfo = this.target.GetType().GetField(propAttr.FieldName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 fieldInfo.SetValue(this.target, sourceValue);
             }
+            else
+            {
+                var propertyInfo = this.target.GetType().GetProperty(propertyName);
+                if (propertyInfo.CanWrite == true)
+                {
+                    propertyInfo.SetValue(this.target, sourceValue);
+                }
+            }
             this.properties[propertyName] = sourceValue;
             this.notifyList.Add(propertyName);
             await this.RefreshAsync();

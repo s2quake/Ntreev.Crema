@@ -27,6 +27,7 @@
     <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="1d97ccd5-231e-4aff-8abc-c3962c3bdcf6" SourceId="1" SourceUrl="net.tcp://localhost:4004/DataBaseContextService/mex" />
     <MetadataFile FileName="schemas.ntreev.com1.xsd" MetadataType="Schema" ID="3ed8a44a-0665-488e-88e4-983f7912aec5" SourceId="1" SourceUrl="net.tcp://localhost:4004/DataBaseContextService/mex" />
     <MetadataFile FileName="Arrays1.xsd" MetadataType="Schema" ID="f58dd603-eccc-4297-835f-a71c02cf6a9f" SourceId="1" SourceUrl="net.tcp://localhost:4004/DataBaseContextService/mex" />
+    <MetadataFile FileName="Ntreev.Crema.Data.xsd" MetadataType="Schema" ID="952ff9b1-5a7c-4cad-843f-40cc97089d4a" SourceId="1" SourceUrl="net.tcp://localhost:4004/DataBaseContextService/mex" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

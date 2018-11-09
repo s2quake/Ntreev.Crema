@@ -47,9 +47,6 @@ namespace Ntreev.Crema.ServiceHosts.Data
         ResultBase<DataBaseMetaData> GetMetaData();
 
         [OperationContract]
-        ResultBase<CremaDataSet> GetDataSet(DataSetType dataSetType, string filterExpression, string revision);
-
-        [OperationContract]
         ResultBase ImportDataSet(CremaDataSet dataSet, string comment);
 
         [OperationContract]

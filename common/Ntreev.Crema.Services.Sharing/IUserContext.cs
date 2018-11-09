@@ -52,9 +52,9 @@ namespace Ntreev.Crema.Services
         event TaskCompletedEventHandler TaskCompleted;
 
 #if SERVER
-        Task<Authentication> LoginAsync(string userID, SecureString password);
+        //Task<Authentication> LoginAsync(string userID, SecureString password);
 
-        Task LogoutAsync(Authentication authentication);
+        //Task LogoutAsync(Authentication authentication);
 
         Task<Authentication> AuthenticateAsync(Guid authenticationToken);
 

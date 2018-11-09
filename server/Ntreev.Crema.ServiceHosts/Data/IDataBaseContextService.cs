@@ -44,6 +44,9 @@ namespace Ntreev.Crema.ServiceHosts.Data
         ResultBase Unsubscribe();
 
         [OperationContract]
+        ResultBase<CremaDataSet> GetDataSet(string dataBaseName, DataSetType dataSetType, string filterExpression, string revision);
+
+        [OperationContract]
         ResultBase SetPublic(string dataBaseName);
 
         [OperationContract]

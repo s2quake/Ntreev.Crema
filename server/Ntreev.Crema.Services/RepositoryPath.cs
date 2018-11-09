@@ -88,6 +88,8 @@ namespace Ntreev.Crema.Services
             if (this.IsDirectory == true)
                 throw new InvalidOperationException();
             var directoryName = System.IO.Path.GetDirectoryName(this.Path);
+            if (Directory.Exists(directoryName) == false)
+                return new string[] { };
             var name = System.IO.Path.GetFileName(this.Path);
             var files = Directory.GetFiles(directoryName, $"{name}.*").Where(item => System.IO.Path.GetFileNameWithoutExtension(item) == name).ToArray();
             return files;

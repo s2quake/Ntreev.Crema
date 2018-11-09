@@ -170,7 +170,7 @@ namespace Ntreev.Crema.Services.Data
         public CremaDataSet GetTableData(IObjectSerializer serializer, string path, string templatedPath, string revision)
         {
             var repositoryPath = new RepositoryPath(this.TableContext, path);
-            var templatedItemPath = templatedPath ?? new RepositoryPath(this.TableContext, templatedPath).Path;
+            var templatedItemPath = templatedPath != null ? new RepositoryPath(this.TableContext, templatedPath).Path : null;
             var tempPath = PathUtility.GetTempPath(true);
             try
             {

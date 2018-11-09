@@ -96,7 +96,7 @@ namespace Ntreev.Crema.Services.Users
             this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskID));
         }
 
-        public async Task<Authentication> LoginAsync(string userID, SecureString password)
+        public async Task<Guid> LoginAsync(string userID, SecureString password)
         {
             try
             {
@@ -248,7 +248,6 @@ namespace Ntreev.Crema.Services.Users
                 metaData.Users = query.ToArray();
             }
 
-            metaData.AuthenticationToken = authentication.Token;
             return metaData;
         }
 
@@ -280,7 +279,6 @@ namespace Ntreev.Crema.Services.Users
                     metaData.Users = query.ToArray();
                 }
 
-                metaData.AuthenticationToken = authentication.Token;
                 return metaData;
             });
         }

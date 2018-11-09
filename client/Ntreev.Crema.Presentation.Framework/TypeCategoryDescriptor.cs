@@ -91,16 +91,22 @@ namespace Ntreev.Crema.Presentation.Framework
                 foreach (var item in this.category.Categories)
                 {
                     var descriptor = new TypeCategoryDescriptor(this.authentication, item, this.descriptorTypes, this.owner);
+                    item.ExtendedProperties[this.owner] = descriptor;
                     this.categories.Add(descriptor);
                 }
 
                 foreach (var item in this.category.Types)
                 {
                     var descriptor = new TypeDescriptor(this.authentication, item, this.descriptorTypes, this.owner);
+                    item.ExtendedProperties[this.owner] = descriptor;
                     this.types.Add(descriptor);
                 }
             }
         }
+
+        public ReadOnlyObservableCollection<TypeCategoryDescriptor> Categories => this.categoriesReadonly;
+
+        public ReadOnlyObservableCollection<TypeDescriptor> Types => this.typesReadonly;
 
         [DescriptorProperty(nameof(categoryName))]
         public string Name => this.categoryName ?? string.Empty;
@@ -119,10 +125,6 @@ namespace Ntreev.Crema.Presentation.Framework
 
         [DescriptorProperty(nameof(accessType))]
         public AccessType AccessType => this.accessType;
-
-        public ReadOnlyObservableCollection<TypeCategoryDescriptor> Categories => this.categoriesReadonly;
-
-        public ReadOnlyObservableCollection<TypeDescriptor> Types => this.typesReadonly;
 
         [DescriptorProperty]
         public bool IsLocked => LockableDescriptorUtility.IsLocked(this.authentication, this);

@@ -55,11 +55,6 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return this.InvokeTask(Task.Run(() => this.GetMetaDataAsync()));
         }
 
-        public ResultBase<CremaDataSet> GetDataSet(DataSetType dataSetType, string filterExpression, string revision)
-        {
-            return this.InvokeTask(Task.Run(() => this.GetDataSetAsync(dataSetType, filterExpression, revision)));
-        }
-
         public ResultBase ImportDataSet(CremaDataSet dataSet, string comment)
         {
             return this.InvokeTask(Task.Run(() => this.ImportDataSetAsync(dataSet, comment)));

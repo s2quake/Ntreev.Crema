@@ -24,6 +24,9 @@ namespace Ntreev.Crema.Services.DataBaseContextService {
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseContextService/Unsubscribe", ReplyAction="http://www.ntreev.com/IDataBaseContextService/UnsubscribeResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Unsubscribe();
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseContextService/GetDataSet", ReplyAction="http://www.ntreev.com/IDataBaseContextService/GetDataSetResponse")]
+        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.CremaDataSet> GetDataSet(string dataBaseName, Ntreev.Crema.ServiceModel.DataSetType dataSetType, string filterExpression, string revision);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseContextService/SetPublic", ReplyAction="http://www.ntreev.com/IDataBaseContextService/SetPublicResponse")]
         Ntreev.Crema.ServiceModel.ResultBase SetPublic(string dataBaseName);
         
@@ -169,6 +172,10 @@ namespace Ntreev.Crema.Services.DataBaseContextService {
         
         public Ntreev.Crema.ServiceModel.ResultBase Unsubscribe() {
             return base.Channel.Unsubscribe();
+        }
+        
+        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Data.CremaDataSet> GetDataSet(string dataBaseName, Ntreev.Crema.ServiceModel.DataSetType dataSetType, string filterExpression, string revision) {
+            return base.Channel.GetDataSet(dataBaseName, dataSetType, filterExpression, revision);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase SetPublic(string dataBaseName) {

@@ -15,38 +15,41 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel.Channels;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Crema.Services;
-using System.ServiceModel.Description;
-using Ntreev.Crema.ServiceModel;
-using System.ServiceModel;
 
 namespace Ntreev.Crema.ServiceHosts
 {
-    class DescriptorServiceHost : ServiceHost
+    [ServiceContract(Namespace = CremaService.Namespace, SessionMode = SessionMode.Required, CallbackContract = typeof(ICremaHostEventCallback))]
+    public interface ICremaHostService
     {
-        private readonly DescriptorService service;
+        [OperationContract]
+        string GetVersion();
 
-        public DescriptorServiceHost(ICremaHost cremaHost, DescriptorService service, int port)
-            : base(service, new Uri($"net.tcp://localhost:{port}/DescriptorService"))
-        {
-            var binding = CremaServiceItemHost.CreateBinding();
+        [OperationContract]
+        bool IsOnline(string userID, byte[] password);
 
-            this.service = service;
-            this.AddServiceEndpoint(typeof(IDescriptorService), binding, string.Empty);
+        [OperationContract]
+        DataBaseInfo[] GetDataBaseInfos();
 
-#if DEBUG
-            if (Environment.OSVersion.Platform != PlatformID.Unix)
-            {
-                this.Description.Behaviors.Add(new ServiceMetadataBehavior());
-                this.AddServiceEndpoint(typeof(IMetadataExchange), MetadataExchangeBindings.CreateMexTcpBinding(), "mex");
-            }
-#endif
-        }
+        [OperationContract]
+        ServiceInfo[] GetServiceInfos();
+
+        [OperationContract]
+        ResultBase<Guid> Subscribe(string userID, byte[] password, string version, string platformID, string culture);
+
+        [OperationContract]
+        ResultBase Unsubscribe();
+
+        [OperationContract]
+        ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message);
+
+        [OperationContract]
+        ResultBase CancelShutdown();
     }
 }
