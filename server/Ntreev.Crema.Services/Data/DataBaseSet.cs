@@ -76,7 +76,7 @@ namespace Ntreev.Crema.Services.Data
             }
             catch
             {
-                this.Repository.Dispatcher.Invoke(() => this.Repository.Unlock(dataSet.GetItemPaths()));
+                this.Repository.Dispatcher.Invoke(() => this.Repository.Unlock(Authentication.System, this, nameof(DataBaseSet), dataSet.GetItemPaths()));
                 throw;
             }
         }
@@ -257,7 +257,17 @@ namespace Ntreev.Crema.Services.Data
             repositoryPath2.ValidateNotExists();
             dataTable.TableName = tableName;
             this.Serialize();
-            this.Repository.Move(repositoryPath1, repositoryPath2);
+            foreach (var item in this.tables)
+            {
+                var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
+                if (tableInfo.Path == item.Path)
+                    continue;
+                var itemPath1 = new RepositoryPath(this.TableContext, tableInfo.Path);
+                var itemPath2 = new RepositoryPath(this.TableContext, item.Path);
+                itemPath1.ValidateExists();
+                itemPath2.ValidateNotExists();
+                this.Repository.Move(itemPath1, itemPath2);
+            }
         }
 
         public void MoveTable(string tablePath, string categoryPath)
@@ -270,7 +280,17 @@ namespace Ntreev.Crema.Services.Data
             repositoryPath2.ValidateNotExists();
             dataTable.CategoryPath = categoryPath;
             this.Serialize();
-            this.Repository.Move(repositoryPath1, repositoryPath2);
+            foreach (var item in this.tables)
+            {
+                var tableInfo = (TableInfo)item.ExtendedProperties[typeof(TableInfo)];
+                if (tableInfo.Path == item.Path)
+                    continue;
+                var itemPath1 = new RepositoryPath(this.TableContext, tableInfo.Path);
+                var itemPath2 = new RepositoryPath(this.TableContext, item.Path);
+                itemPath1.ValidateExists();
+                itemPath2.ValidateNotExists();
+                this.Repository.Move(itemPath1, itemPath2);
+            }
         }
 
         public void DeleteTable(string tablePath)

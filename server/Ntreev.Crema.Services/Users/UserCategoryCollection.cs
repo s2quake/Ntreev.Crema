@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Services.Users
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                     return category;
                 });
-                await this.Repository.UnlockAsync(categoryName);
+                await this.Repository.UnlockAsync(authentication, this, nameof(AddNewAsync), new string[] { categoryName });
                 return result;
             }
             catch (Exception e)
@@ -78,19 +78,20 @@ namespace Ntreev.Crema.Services.Users
 
         public Task InvokeCategoryCreateAsync(Authentication authentication, string categoryPath)
         {
+            var itemPaths = new string[] { categoryPath };
             var message = EventMessageBuilder.CreateUserCategory(authentication, categoryPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    this.Repository.Lock(categoryPath);
+                    this.Repository.Lock(authentication, this, nameof(InvokeCategoryCreateAsync), itemPaths);
                     this.Repository.CreateUserCategory(categoryPath);
                     this.Repository.Commit(authentication, message);
                 }
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(categoryPath);
+                    this.Repository.Unlock(authentication, this, nameof(InvokeCategoryCreateAsync), itemPaths);
                     throw;
                 }
             });
@@ -110,7 +111,7 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(userContextSet.Paths);
+                    this.Repository.Unlock(authentication, this, nameof(InvokeCategoryRenameAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -131,7 +132,7 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(userContextSet.Paths);
+                    this.Repository.Unlock(authentication, this, nameof(InvokeCategoryMoveAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -150,7 +151,7 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(userContextSet.Paths);
+                    this.Repository.Unlock(authentication, this, nameof(InvokeCategoryDeleteAsync), userContextSet.Paths);
                     throw;
                 }
             });

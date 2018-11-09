@@ -30,6 +30,7 @@ using Ntreev.Library;
 using Ntreev.Library.Serialization;
 using System.IO;
 using System.Text;
+using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.ServiceHosts.Data
 {
@@ -1001,7 +1002,12 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
-            var parentPaths = e.Items.Select(item => item.Parent.Path).ToArray();
+            var parentPaths = e.Items.Select(item =>
+            {
+                if (NameValidator.VerifyCategoryPath(item.Path) == true)
+                    return new CategoryName(item.Path).ParentPath;
+                return new ItemName(item.Path).CategoryPath;
+            }).ToArray();
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTableItemsMoved(callbackInfo, oldPaths, parentPaths));
         }
 

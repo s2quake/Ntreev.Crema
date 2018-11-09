@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Services.Users
                     this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
-                await this.Repository.UnlockAsync(userContextSet.Paths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(RenameAsync), userContextSet.Paths);
                 return taskID;
             }
             catch (Exception e)
@@ -97,7 +97,7 @@ namespace Ntreev.Crema.Services.Users
                     this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
-                await this.Repository.UnlockAsync(userContextSet.Paths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(MoveAsync), userContextSet.Paths);
                 return taskID;
             }
             catch (Exception e)
@@ -135,7 +135,7 @@ namespace Ntreev.Crema.Services.Users
                     container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
-                await repository.UnlockAsync(userContextSet.Paths);
+                await repository.UnlockAsync(authentication, this, nameof(DeleteAsync), userContextSet.Paths);
                 return taskID;
             }
             catch (Exception e)
@@ -208,7 +208,7 @@ namespace Ntreev.Crema.Services.Users
             });
             return await this.Repository.Dispatcher.InvokeAsync((Func<UserSet>)(() =>
             {
-                this.Repository.Lock(tuple.paths);
+                this.Repository.Lock(authentication, this, nameof(ReadDataForPathAsync), tuple.paths);
                 var userInfoList = new List<UserSerializationInfo>(tuple.userPaths.Length);
                 foreach (var item in tuple.userPaths)
                 {

@@ -285,7 +285,7 @@ namespace Ntreev.Crema.Services.Data
                     this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, dataSet);
                     this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
                 });
-                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(RenameAsync), dataBaseSet.ItemPaths);
                 return taskID;
             }
             catch (Exception e)
@@ -322,7 +322,7 @@ namespace Ntreev.Crema.Services.Data
                     this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths, dataSet);
                     this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
                 });
-                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(MoveAsync), dataBaseSet.ItemPaths);
                 return taskID;
             }
             catch (Exception e)
@@ -363,7 +363,7 @@ namespace Ntreev.Crema.Services.Data
                     container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths, dataSet);
                     dataBase.InvokeTaskCompletedEvent(authentication, taskID);
                 });
-                await repository.UnlockAsync(dataBaseSet.ItemPaths);
+                await repository.UnlockAsync(authentication, this, nameof(DeleteAsync), dataBaseSet.ItemPaths);
                 return taskID;
             }
             catch (Exception e)
@@ -487,7 +487,7 @@ namespace Ntreev.Crema.Services.Data
             });
             return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Lock(tuple.itemPaths);
+                this.Repository.Lock(authentication, this, nameof(ReadDataForPathAsync), tuple.itemPaths);
                 var dataSet = this.Repository.ReadDataSet(authentication, tuple.itemPaths);
                 dataSet.ExtendedProperties["TypeNames"] = tuple.typeNames;
                 return dataSet;
@@ -499,7 +499,7 @@ namespace Ntreev.Crema.Services.Data
             var fullPaths = new string[] { this.FullPath };
             return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Lock(fullPaths);
+                this.Repository.Lock(authentication, this, nameof(ReadDataForNewTemplateAsync), fullPaths);
                 return this.Repository.ReadDataSet(authentication, fullPaths);
             });
         }

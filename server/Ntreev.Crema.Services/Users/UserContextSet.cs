@@ -51,7 +51,7 @@ namespace Ntreev.Crema.Services.Users
             }
             catch
             {
-                this.Repository.Dispatcher.Invoke(() => this.Repository.Unlock(userSet.ItemPaths));
+                this.Repository.Dispatcher.Invoke(() => this.Repository.Unlock(Authentication.System, this, nameof(UserContextSet), userSet.ItemPaths));
                 throw;
             }
         }

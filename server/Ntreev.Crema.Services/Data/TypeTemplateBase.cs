@@ -449,7 +449,7 @@ namespace Ntreev.Crema.Services.Data
             this.TypeSource = domain.Source as CremaDataType;
             this.domain = domain as TypeDomain;
             this.ItemPaths = this.domain.ItemPaths;
-            this.Repository.Dispatcher.Invoke(() => this.Repository.Lock(this.ItemPaths));
+            this.Repository.Dispatcher.Invoke(() => this.Repository.Lock(Authentication.System, this, nameof(OnAttach), this.ItemPaths));
             if (this.TypeSource != null)
             {
                 this.table = this.TypeSource.View.Table;

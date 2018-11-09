@@ -61,7 +61,10 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), dataType.Name, dataType.CategoryPath);
                     this.ValidateAddNew(dataType.Name, dataType.CategoryPath, authentication);
                 });
+                var itemPaths = new string[] { dataType.FullPath };
                 var dataSet = dataType.DataSet;
+                await this.Repository.LockAsync(authentication, this, nameof(AddNewAsync), itemPaths);
+                dataSet.AddItemPaths(itemPaths);
                 var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, true, false);
                 var typePaths = new string[] { dataType.Path };
                 await this.InvokeTypeCreateAsync(authentication, typePaths, dataBaseSet);
@@ -73,7 +76,7 @@ namespace Ntreev.Crema.Services.Data
                     this.InvokeTypesCreatedEvent(authentication, new Type[] { type }, dataSet);
                     return type;
                 });
-                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(AddNewAsync), dataBaseSet.ItemPaths);
                 return newType;
             }
             catch (Exception e)
@@ -113,7 +116,7 @@ namespace Ntreev.Crema.Services.Data
                     this.InvokeTypesCreatedEvent(authentication, new Type[] { newType }, dataSet);
                     return newType;
                 });
-                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(CopyAsync), dataBaseSet.ItemPaths);
                 return result;
             }
             catch (Exception e)
@@ -142,7 +145,7 @@ namespace Ntreev.Crema.Services.Data
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                    this.Repository.Unlock(authentication, this, nameof(InvokeTypeCreateAsync), dataBaseSet.ItemPaths);
                     throw;
                 }
             });
@@ -161,7 +164,7 @@ namespace Ntreev.Crema.Services.Data
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                    this.Repository.Unlock(authentication, this, nameof(InvokeTypeRenameAsync), dataBaseSet.ItemPaths);
                     throw;
                 }
             });
@@ -180,7 +183,7 @@ namespace Ntreev.Crema.Services.Data
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                    this.Repository.Unlock(authentication, this, nameof(InvokeTypeMoveAsync), dataBaseSet.ItemPaths);
                     throw;
                 }
             });
@@ -199,7 +202,7 @@ namespace Ntreev.Crema.Services.Data
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(dataBaseSet.ItemPaths);
+                    this.Repository.Unlock(authentication, this, nameof(InvokeTypeDeleteAsync), dataBaseSet.ItemPaths);
                     throw;
                 }
             });

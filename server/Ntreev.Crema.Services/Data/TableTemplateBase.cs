@@ -422,7 +422,7 @@ namespace Ntreev.Crema.Services.Data
             this.TemplateSource = domain.Source as CremaTemplate;
             this.domain = domain as TableTemplateDomain;
             this.ItemPaths = this.domain.ItemPaths;
-            this.Repository.Dispatcher.Invoke(() => this.Repository.Lock(this.ItemPaths));
+            this.Repository.Dispatcher.Invoke(() => this.Repository.Lock(Authentication.System, this, nameof(OnAttach), this.ItemPaths));
             if (this.TemplateSource != null)
             {
                 this.table = this.TemplateSource.View.Table;

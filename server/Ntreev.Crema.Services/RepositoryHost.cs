@@ -172,7 +172,7 @@ namespace Ntreev.Crema.Services
                 this.Dispatcher.Dispose();
         }
 
-        public void Lock(params string[] paths)
+        public void Lock(Authentication authentication, object target, string methodName, string[] paths)
         {
             this.Dispatcher.VerifyAccess();
             if (paths.Distinct().Count() != paths.Length)
@@ -189,11 +189,10 @@ namespace Ntreev.Crema.Services
             {
                 this.paths.Add(item);
             }
-
-            this.CremaHost.Debug($"{this.GetType().Name} Lock{Environment.NewLine}{string.Join(Environment.NewLine, paths)}");
+            this.CremaHost.Debug($"[{authentication}] {target.GetType().Name}.{methodName} Lock{Environment.NewLine}{string.Join(Environment.NewLine, paths)}");
         }
 
-        public void Unlock(params string[] paths)
+        public void Unlock(Authentication authentication, object target, string methodName, string[] paths)
         {
             this.Dispatcher.VerifyAccess();
             if (paths.Distinct().Count() != paths.Length)
@@ -213,17 +212,17 @@ namespace Ntreev.Crema.Services
             {
                 this.paths.Remove(item);
             }
-            this.CremaHost.Debug($"{this.GetType().Name} Unlock{Environment.NewLine}{string.Join(Environment.NewLine, paths)}");
+            this.CremaHost.Debug($"[{authentication}] {target.GetType().Name}.{methodName} Unlock{Environment.NewLine}{string.Join(Environment.NewLine, paths)}");
         }
 
-        public Task LockAsync(params string[] paths)
+        public Task LockAsync(Authentication authentication, object target, string methodName, string[] paths)
         {
-            return this.Dispatcher.InvokeAsync(() => this.Lock(paths));
+            return this.Dispatcher.InvokeAsync(() => this.Lock(authentication, target, methodName, paths));
         }
 
-        public Task UnlockAsync(params string[] paths)
+        public Task UnlockAsync(Authentication authentication, object target, string methodName, string[] paths)
         {
-            return this.Dispatcher.InvokeAsync(() => this.Unlock(paths));
+            return this.Dispatcher.InvokeAsync(() => this.Unlock(authentication, target, methodName, paths));
         }
 
         public Task BeginTransactionAsync(string author, string name)

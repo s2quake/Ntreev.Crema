@@ -82,7 +82,7 @@ namespace Ntreev.Crema.Services.Users
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                     return user;
                 });
-                await this.Repository.UnlockAsync(userContextSet.Paths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(AddNewAsync), userContextSet.Paths);
                 return newUser;
             }
             catch (Exception e)
@@ -105,7 +105,7 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(userContextSet.Paths);
+                    this.Repository.Unlock(authentication, this, nameof(InvokeUserCreateAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -124,7 +124,7 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(userContextSet.Paths);
+                    this.Repository.Unlock(authentication, this, nameof(InvokeUserMoveAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -143,7 +143,7 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(userContextSet.Paths);
+                    this.Repository.Unlock(authentication, this, nameof(InvokeUserDeleteAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -162,7 +162,7 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(userContextSet.Paths);
+                    this.Repository.Unlock(authentication, this, nameof(InvokeUserChangeAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -181,7 +181,7 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(userContextSet.Paths);
+                    this.Repository.Unlock(authentication, this, nameof(InvokeUserBanAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -200,7 +200,7 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(userContextSet.Paths);
+                    this.Repository.Unlock(authentication, this, nameof(InvokeUserUnbanAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -330,7 +330,7 @@ namespace Ntreev.Crema.Services.Users
                      categoryPath,
                      categoryPath + userID,
                 };
-                this.Repository.Lock(itemPaths);
+                this.Repository.Lock(authentication, this, nameof(CreateDataForCreateAsync), itemPaths);
                 var userInfo = new UserSerializationInfo()
                 {
                     ID = userID,

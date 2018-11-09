@@ -131,7 +131,7 @@ namespace Ntreev.Crema.Services.Data
                 catch
                 {
                     if (this.dataBaseSet != null)
-                        await this.Repository.UnlockAsync(this.dataBaseSet.ItemPaths);
+                        await this.Repository.UnlockAsync(authentication, this, nameof(BeginContentAsync), this.dataBaseSet.ItemPaths);
                     this.dataSet = null;
                     this.domain = null;
                     this.dataBaseSet = null;
@@ -187,7 +187,7 @@ namespace Ntreev.Crema.Services.Data
                     this.Container.InvokeTablesContentChangedEvent(authentication, tables, dataSet);
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
                 });
-                await this.Repository.UnlockAsync(this.dataBaseSet.ItemPaths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(EndContentAsync), this.dataBaseSet.ItemPaths);
             }
 
             public async Task CancelContentAsync(Authentication authentication)
@@ -197,7 +197,7 @@ namespace Ntreev.Crema.Services.Data
                     await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                     await this.DomainContext.RemoveAsync(authentication, this.domain, true);
                 }
-                await this.Repository.UnlockAsync(this.itemPaths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(CancelContentAsync), this.itemPaths);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     foreach (var item in this.Contents)
@@ -585,7 +585,7 @@ namespace Ntreev.Crema.Services.Data
                 this.domain.Host = this;
                 this.dataBaseSet = DataBaseSet.Create(this.DataBase, dataSet, false, false);
                 this.itemPaths = this.dataSet.GetItemPaths();
-                this.Repository.Dispatcher.Invoke(() => this.Repository.Lock(this.itemPaths));
+                this.Repository.Dispatcher.Invoke(() => this.Repository.Lock(Authentication.System, this, nameof(IDomainHost.Attach), this.itemPaths));
                 foreach (var item in this.Contents)
                 {
                     item.domainHost = this;

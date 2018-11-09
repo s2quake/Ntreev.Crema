@@ -145,10 +145,7 @@ namespace Ntreev.Crema.Services.Data
                         select dataTable;
 
             var dataTables = query.ToArray();
-            var itemPaths = dataTables.Select(item => item.FullPath).ToArray();
             var taskID = this.Domain.ID;
-            await this.Repository.LockAsync(itemPaths);
-            dataSet.AddItemPaths(itemPaths);
             this.tables = await this.Container.AddNewAsync(authentication, dataSet, dataTables);
             this.Domain.Result = dataTables.Select(item => item.TableInfo).ToArray();
             await base.OnEndEditAsync(authentication);
@@ -159,7 +156,7 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
         {
-            await this.Repository.UnlockAsync(this.ItemPaths);
+            await this.Repository.UnlockAsync(authentication, this, nameof(OnCancelEditAsync), this.ItemPaths);
             await base.OnCancelEditAsync(authentication);
             this.parent = null;
             this.permission = null;

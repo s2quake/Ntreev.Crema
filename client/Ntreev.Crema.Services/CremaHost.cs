@@ -48,7 +48,7 @@ namespace Ntreev.Crema.Services
 
         private CremaConfiguration configs;
         private IEnumerable<IPlugin> plugins;
-        
+
         private LogService log;
         private Guid token;
         private CremaHostServiceClient service;

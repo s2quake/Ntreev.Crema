@@ -70,7 +70,7 @@ namespace Ntreev.Crema.Services.Users
                     this.Container.InvokeUsersMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
-                await this.Repository.UnlockAsync(userContextSet.Paths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(MoveAsync), userContextSet.Paths);
                 return taskID;
             }
             catch (Exception e)
@@ -110,7 +110,7 @@ namespace Ntreev.Crema.Services.Users
                     container.InvokeUsersDeletedEvent(authentication, tuple.items, tuple.oldPaths);
                     context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
-                await repository.UnlockAsync(userContextSet.Paths);
+                await repository.UnlockAsync(authentication, this, nameof(DeleteAsync), userContextSet.Paths);
                 return taskID;
             }
             catch (Exception e)
@@ -217,7 +217,7 @@ namespace Ntreev.Crema.Services.Users
                     }
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
-                await this.Repository.UnlockAsync(userContextSet.Paths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(BanAsync), userContextSet.Paths);
                 return taskID;
             }
             catch (Exception e)
@@ -251,7 +251,7 @@ namespace Ntreev.Crema.Services.Users
                     this.Container.InvokeUsersUnbannedEvent(authentication, tuple.items);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
-                await this.Repository.UnlockAsync(userContextSet.Paths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(UnbanAsync), userContextSet.Paths);
                 return taskID;
             }
             catch (Exception e)
@@ -318,7 +318,7 @@ namespace Ntreev.Crema.Services.Users
                     this.Container.InvokeUsersChangedEvent(authentication, tuple.items);
                     this.Context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
-                await this.Repository.UnlockAsync(userContextSet.Paths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(ChangeUserInfoAsync), userContextSet.Paths);
                 return taskID;
             }
             catch (Exception e)
@@ -370,7 +370,7 @@ namespace Ntreev.Crema.Services.Users
             });
             return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Lock(tuple.paths);
+                this.Repository.Lock(authentication, this, nameof(ReadDataForChangeAsync), tuple.paths);
                 var userInfo = this.Repository.Read(tuple.path);
                 var dataSet = new UserSet()
                 {
@@ -398,7 +398,7 @@ namespace Ntreev.Crema.Services.Users
             });
             return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Lock(tuple.paths);
+                this.Repository.Lock(authentication, this, nameof(ReadDataForPathAsync), tuple.paths);
                 var userInfo = (UserSerializationInfo)this.Repository.Read(tuple.path);
                 var dataSet = new UserSet()
                 {

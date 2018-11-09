@@ -81,7 +81,7 @@ namespace Ntreev.Crema.Services.Data
                 this.Container.InvokeTypesChangedEvent(authentication, this.types, dataBaseSet.DataSet);
                 this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
             });
-            await this.Repository.UnlockAsync(this.ItemPaths);
+            await this.Repository.UnlockAsync(authentication, this, nameof(OnEndEditAsync), this.ItemPaths);
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
@@ -92,7 +92,7 @@ namespace Ntreev.Crema.Services.Data
                 this.type.TypeState = TypeState.None;
                 this.Container.InvokeTypesStateChangedEvent(authentication, this.types);
             });
-            await this.Repository.UnlockAsync(this.ItemPaths);
+            await this.Repository.UnlockAsync(authentication, this, nameof(OnCancelEditAsync), this.ItemPaths);
         }
 
         protected override void OnAttach(Domain domain)

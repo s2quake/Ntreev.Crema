@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.DataBaseService;
+using Ntreev.Library;
 using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 using System;
@@ -46,20 +47,15 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                var categoryName = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);
+                    return new CategoryName(parentPath, name);
                 });
-                var categoryName = new CategoryName(parentPath, name);
+                var taskID = GuidUtility.FromName(categoryName);
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.NewTypeCategory(categoryName));
-                return await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.Sign(authentication, result);
-                    var category = this.BaseAddNew(name, parentPath, authentication);
-                    var items = EnumerableUtility.One(category).ToArray();
-                    this.InvokeCategoriesCreatedEvent(authentication, items);
-                    return category;
-                });
+                await this.DataBase.WaitAsync(taskID);
+                return await this.Dispatcher.InvokeAsync(() => this[categoryName]);
             }
             catch (Exception e)
             {

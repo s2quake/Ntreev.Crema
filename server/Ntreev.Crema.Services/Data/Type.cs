@@ -283,7 +283,7 @@ namespace Ntreev.Crema.Services.Data
                     this.Container.InvokeTypesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, dataSet);
                     this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
                 });
-                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(RenameAsync), dataBaseSet.ItemPaths);
                 return taskID;
             }
             catch (Exception e)
@@ -320,7 +320,7 @@ namespace Ntreev.Crema.Services.Data
                     this.Container.InvokeTypesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths, dataSet);
                     this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
                 });
-                await this.Repository.UnlockAsync(dataBaseSet.ItemPaths);
+                await this.Repository.UnlockAsync(authentication, this, nameof(MoveAsync), dataBaseSet.ItemPaths);
                 return taskID;
             }
             catch (Exception e)
@@ -360,7 +360,7 @@ namespace Ntreev.Crema.Services.Data
                     container.InvokeTypesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
                     dataBase.InvokeTaskCompletedEvent(authentication, taskID);
                 });
-                await repository.UnlockAsync(dataBaseSet.ItemPaths);
+                await repository.UnlockAsync(authentication, this, nameof(DeleteAsync), dataBaseSet.ItemPaths);
                 return taskID;
             }
             catch (Exception e)
@@ -448,7 +448,7 @@ namespace Ntreev.Crema.Services.Data
             });
             return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Lock(fullPaths);
+                this.Repository.Lock(authentication, this, nameof(ReadDataForCopyAsync), fullPaths);
                 return this.Repository.ReadDataSet(authentication, fullPaths);
             });
         }
@@ -466,7 +466,7 @@ namespace Ntreev.Crema.Services.Data
             });
             return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Lock(fullPaths);
+                this.Repository.Lock(authentication, this, nameof(MoveAsync), fullPaths);
                 return this.Repository.ReadDataSet(authentication, fullPaths);
             });
         }
@@ -489,7 +489,7 @@ namespace Ntreev.Crema.Services.Data
             });
             return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Lock(fullPaths);
+                this.Repository.Lock(authentication, this, nameof(ReadDataForPathAsync), fullPaths);
                 return this.Repository.ReadDataSet(authentication, fullPaths);
             });
         }
