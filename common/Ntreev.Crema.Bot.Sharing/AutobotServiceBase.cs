@@ -96,9 +96,7 @@ namespace Ntreev.Crema.Bot
                 }
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    Console.WriteLine("CreateAutobots 1");
                     var autobots = CreateAutobots(autobotIDList.ToArray(), autobotPasswordList.ToArray());
-                    Console.WriteLine("CreateAutobots 2");
                     this.StartAutobots(autobots);
                     this.ServiceState = ServiceState.Opened;
                 });
@@ -112,7 +110,6 @@ namespace Ntreev.Crema.Bot
 
         public async Task StopAsync()
         {
-            Console.WriteLine(nameof(StopAsync));
             var tasks = await this.Dispatcher.InvokeAsync(() =>
             {
                 if (this.ServiceState != ServiceState.Opened)
@@ -120,19 +117,8 @@ namespace Ntreev.Crema.Bot
                 this.ServiceState = ServiceState.Closing;
                 return this.botByID.Values.Select(item => item.CancelAsync()).ToArray();
             });
-            Console.WriteLine(tasks.Length);
 
-            foreach (var item in tasks)
-            {
-                if(item.Status == TaskStatus.WaitingToRun)
-                {
-                    int qerw = 0;
-                }
-                    
-            }
-            Console.WriteLine("ending");
             await Task.WhenAll(tasks);
-            Console.WriteLine("ended");
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.ServiceState = ServiceState.Closed;
@@ -156,7 +142,6 @@ namespace Ntreev.Crema.Bot
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.botByID.Remove(autobot.AutobotID);
-                    Console.WriteLine(this.botByID.Count);
                 });
             }
         }
@@ -208,7 +193,6 @@ namespace Ntreev.Crema.Bot
                 item.Disposed += Autobot_Disposed;
                 this.botByID.Add(item.AutobotID, item);
                 item.ExecuteAsync(this.TaskProviders);
-                Console.WriteLine("autobot start: " + item.AutobotID);
             }
         }
 

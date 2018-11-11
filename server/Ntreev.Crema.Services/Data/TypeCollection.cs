@@ -63,8 +63,6 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var itemPaths = new string[] { dataType.FullPath };
                 var dataSet = dataType.DataSet;
-                await this.Repository.LockAsync(authentication, this, nameof(AddNewAsync), itemPaths);
-                dataSet.AddItemPaths(itemPaths);
                 var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, true, false);
                 var typePaths = new string[] { dataType.Path };
                 await this.InvokeTypeCreateAsync(authentication, typePaths, dataBaseSet);
@@ -134,9 +132,12 @@ namespace Ntreev.Crema.Services.Data
         public Task InvokeTypeCreateAsync(Authentication authentication, string[] typePaths, DataBaseSet dataBaseSet)
         {
             var message = EventMessageBuilder.CreateType(authentication, typePaths);
-            var itemPaths = typePaths.Select(item => new RepositoryPath(this.Context, item).Path).ToArray();
+            var dataSet = dataBaseSet.DataSet;
+            var fullPaths = typePaths.Select(item => DataBase.TypePathPrefix + item).ToArray();
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
+                this.Repository.Lock(authentication, this, nameof(InvokeTypeCreateAsync), fullPaths);
+                dataSet.AddItemPaths(fullPaths);
                 try
                 {
                     this.Repository.CreateType(dataBaseSet, typePaths);
@@ -145,7 +146,6 @@ namespace Ntreev.Crema.Services.Data
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeTypeCreateAsync), dataBaseSet.ItemPaths);
                     throw;
                 }
             });

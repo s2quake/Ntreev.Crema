@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Presentation.Base
 
         public static bool CanCreate(Authentication authentication)
         {
-            return authentication.Authority == Authority.Admin;
+            return authentication != null && authentication.Authority == Authority.Admin;
         }
 
         public static bool CanRename(Authentication authentication, IDataBaseDescriptor descriptor)

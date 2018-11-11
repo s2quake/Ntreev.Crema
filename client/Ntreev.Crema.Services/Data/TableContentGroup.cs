@@ -298,6 +298,7 @@ namespace Ntreev.Crema.Services.Data
             public async Task EnterContentAsync(Authentication authentication)
             {
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EnterTableContentEdit(this.domain.ID));
+                await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
                 await this.domain.WaitUserEnterAsync(authentication);
                 await this.domain.DataDispatcher.InvokeAsync(() =>
                 {
@@ -307,7 +308,6 @@ namespace Ntreev.Crema.Services.Data
                         item.DataTable = dataSet?.Tables[item.Table.Name, item.Table.Category.Path];
                     }
                 });
-                await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Container.InvokeTablesStateChangedEvent(authentication, this.Tables);
@@ -505,7 +505,10 @@ namespace Ntreev.Crema.Services.Data
                     item.IsModified = domain.ModifiedTables.Contains(item.Table.Name);
                 }
                 if (this.domain.Source != null)
+                {
                     this.domain.Dispatcher.Invoke(this.AttachDomainEvent);
+                    this.domain.Dispatcher.Invoke(this.RefreshEditors);
+                }
             }
 
             async Task IDomainHost.DeleteAsync(Authentication authentication, bool isCanceled)

@@ -115,6 +115,7 @@ namespace Ntreev.Crema.Services.Users
                 var container = this.Container;
                 var repository = this.Repository;
                 var cremaHost = this.CremaHost;
+                var context = this.Context;
                 var tuple = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), this);
@@ -133,7 +134,7 @@ namespace Ntreev.Crema.Services.Users
                     this.Dispose();
                     cremaHost.Sign(authentication);
                     container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
-                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                    context.InvokeTaskCompletedEvent(authentication, taskID);
                 });
                 await repository.UnlockAsync(authentication, this, nameof(DeleteAsync), userContextSet.Paths);
                 return taskID;
