@@ -56,8 +56,6 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.Views
         private IStatusBarService statusBarService = null;
         private ILineInfo lineInfo;
 
-        private string columnsHashValue;
-
         public TableItemView()
         {
             InitializeComponent();

@@ -150,16 +150,16 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                await this.Dispatcher.InvokeAsync(() =>
+                var dataBaseName = await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyDataBaseAsync), dataBase, newDataBaseName, comment);
                     this.ValidateCopyDataBase(authentication, dataBase, newDataBaseName, force);
                     this.CremaHost.Sign(authentication);
+                    return dataBase.Name;
                 });
                 var taskID = GuidUtility.FromName(newDataBaseName + comment);
                 await this.RepositoryDispatcher.InvokeAsync(() =>
                 {
-                    var dataBaseName = dataBase.Name;
                     var message = EventMessageBuilder.CreateDataBase(authentication, newDataBaseName) + ": " + comment;
                     this.repositoryProvider.CopyRepository(authentication, this.RemotePath, dataBaseName, newDataBaseName, comment);
                 });
@@ -223,7 +223,7 @@ namespace Ntreev.Crema.Services.Data
             });
         }
 
-        public DataBaseCollectionMetaData GetMetaData(Authentication authentication)
+        public DataBaseContextMetaData GetMetaData(Authentication authentication)
         {
             if (authentication == null)
                 throw new ArgumentNullException(nameof(authentication));
@@ -235,13 +235,13 @@ namespace Ntreev.Crema.Services.Data
                 var metaData = item.Dispatcher.Invoke(() => item.GetMetaData(authentication));
                 metaList.Add(metaData);
             }
-            return new DataBaseCollectionMetaData()
+            return new DataBaseContextMetaData()
             {
                 DataBases = metaList.ToArray(),
             };
         }
 
-        public async Task<DataBaseCollectionMetaData> GetMetaDataAsync(Authentication authentication)
+        public async Task<DataBaseContextMetaData> GetMetaDataAsync(Authentication authentication)
         {
             if (authentication == null)
                 throw new ArgumentNullException(nameof(authentication));
@@ -253,7 +253,7 @@ namespace Ntreev.Crema.Services.Data
                 var metaData = await item.Dispatcher.InvokeAsync(() => item.GetMetaData(authentication));
                 metaList.Add(metaData);
             }
-            return new DataBaseCollectionMetaData()
+            return new DataBaseContextMetaData()
             {
                 DataBases = metaList.ToArray(),
             };
@@ -746,20 +746,7 @@ namespace Ntreev.Crema.Services.Data
                 return;
 
             if (dataBase.IsLoaded == true)
-            {
-                var types = dataBase.TypeContext.Types.Where<Type>(item => item.TypeState != TypeState.None).ToArray();
-                if (types.Any() == true)
-                    throw new InvalidOperationException(string.Format(Resources.Exception_TypeIsBeingEdited_Format, string.Join(", ", types.Select(item => item.Name))));
-
-                var tables = dataBase.TableContext.Tables.Where<Table>(item => item.TableState != TableState.None).ToArray();
-                if (tables.Any() == true)
-                    throw new InvalidOperationException(string.Format(Resources.Exception_TableIsBeingEdited_Format, string.Join(", ", tables.Select(item => item.Name))));
-
-                var domainContext = dataBase.GetService(typeof(DomainContext)) as DomainContext;
-                var domains = domainContext.Domains.Where<Domain>(item => item.DataBaseID == dataBase.ID).ToArray();
-                if (domains.Any() == true)
-                    throw new InvalidOperationException(string.Format(Resources.Exception_UnsavedDomainsExists_Format, string.Join(", ", domains.Select(item => item.Host))));
-            }
+                throw new InvalidOperationException(Resources.Exception_DataBaseHasBeenLoaded);
         }
 
         private void ValidateCreateDataBase(Authentication authentication, string dataBaseName)

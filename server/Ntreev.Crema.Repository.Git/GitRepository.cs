@@ -251,13 +251,13 @@ namespace Ntreev.Crema.Repository.Git
 
         public void Dispose()
         {
-            if (this.isModified == true)
+            //if (this.isModified == true)
             {
-                //this.Pull();
-                //this.Push();
-                //this.PushNotes();
+                this.Pull();
+                this.Push();
+                this.PushNotes();
             }
-            DirectoryUtility.Delete(this.repositoryPath);
+            //DirectoryUtility.Delete(this.repositoryPath);
         }
 
         public string Export(Uri uri, string exportPath)

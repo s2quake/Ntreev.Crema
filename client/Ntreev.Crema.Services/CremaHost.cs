@@ -104,37 +104,6 @@ namespace Ntreev.Crema.Services
             return null;
         }
 
-        //public void AddService(ICremaService service)
-        //{
-        //    this.Dispatcher.Invoke(() =>
-        //    {
-        //        this.services.Add(service);
-        //        CremaLog.Debug($"{service.GetType().Name} Initialized.");
-        //    });
-        //}
-
-        //public async void RemoveServiceAsync(ICremaService service)
-        //{
-        //    var isAny = await this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        if (this.services.Contains(service) == false)
-        //            return false;
-        //        this.services.Remove(service);
-        //        CremaLog.Debug($"{service.GetType().Name} Released.");
-        //        return this.services.Any();
-        //    });
-        //    if (isAny == false)
-        //    {
-        //        await this.CloseAsync(closeInfo);
-        //    }
-        //}
-
-        //public void RemoveServiceAsync(ICremaService service, CloseInfo closeInfo)
-        //{
-        //    this.closeInfo = closeInfo;
-        //    this.RemoveServiceAsync(service);
-        //}
-
         public Task InvokeCloseAsync(CloseInfo closeInfo)
         {
             return this.CloseAsync(closeInfo);

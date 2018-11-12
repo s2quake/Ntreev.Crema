@@ -591,14 +591,17 @@ namespace Ntreev.Crema.Services.Data
         {
             if (this.Dispatcher.Owner is DataBase)
             {
+                var signatureDate = this.ReleaseService();
+                authentication.SignatureDate = signatureDate;
                 this.DetachDomainHost();
-                this.ReleaseService();
+                this.TypeContext.Dispose();
+                this.TypeContext = null;
+                this.TableContext.Dispose();
+                this.TableContext = null;
+                this.Dispatcher.Dispose();
+                this.Dispatcher = this.DataBaseContext.Dispatcher;
             }
-            this.authentications.Clear();
-            this.TableContext?.Dispose();
-            this.TableContext = null;
-            this.TypeContext?.Dispose();
-            this.TypeContext = null;
+            
             base.DataBaseState = DataBaseState.None;
             base.Unload(authentication);
         }

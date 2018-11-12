@@ -38,7 +38,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
         ResultBase DefinitionType(LogInfo[] param1);
 
         [OperationContract]
-        ResultBase<DataBaseCollectionMetaData> Subscribe(Guid authenticationToken);
+        ResultBase<DataBaseContextMetaData> Subscribe(Guid authenticationToken);
 
         [OperationContract]
         ResultBase Unsubscribe();

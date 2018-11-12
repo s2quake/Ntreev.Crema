@@ -64,6 +64,6 @@ namespace Ntreev.Crema.Services
 
         event TaskCompletedEventHandler TaskCompleted;
 
-        DataBaseCollectionMetaData GetMetaData(Authentication authentication);
+        DataBaseContextMetaData GetMetaData(Authentication authentication);
     }
 }

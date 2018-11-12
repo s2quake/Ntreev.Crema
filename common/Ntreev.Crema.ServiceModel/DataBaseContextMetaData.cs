@@ -37,7 +37,7 @@ using Ntreev.Library.Serialization;
 namespace Ntreev.Crema.ServiceModel
 {
     [DataContract(Namespace = SchemaUtility.Namespace)]
-    public struct DataBaseCollectionMetaData
+    public struct DataBaseContextMetaData
     {
         [DataMember]
         public DataBaseMetaData[] DataBases { get; set; }

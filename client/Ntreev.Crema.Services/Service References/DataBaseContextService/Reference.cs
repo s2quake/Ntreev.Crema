@@ -19,7 +19,7 @@ namespace Ntreev.Crema.Services.DataBaseContextService {
         Ntreev.Crema.ServiceModel.ResultBase DefinitionType(Ntreev.Crema.ServiceModel.LogInfo[] param1);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseContextService/Subscribe", ReplyAction="http://www.ntreev.com/IDataBaseContextService/SubscribeResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseCollectionMetaData> Subscribe(System.Guid authenticationToken);
+        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseContextMetaData> Subscribe(System.Guid authenticationToken);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IDataBaseContextService/Unsubscribe", ReplyAction="http://www.ntreev.com/IDataBaseContextService/UnsubscribeResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Unsubscribe();
@@ -166,7 +166,7 @@ namespace Ntreev.Crema.Services.DataBaseContextService {
             return base.Channel.DefinitionType(param1);
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseCollectionMetaData> Subscribe(System.Guid authenticationToken) {
+        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseContextMetaData> Subscribe(System.Guid authenticationToken) {
             return base.Channel.Subscribe(authenticationToken);
         }
         

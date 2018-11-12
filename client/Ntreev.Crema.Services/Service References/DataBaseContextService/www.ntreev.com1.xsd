@@ -27,7 +27,7 @@
   <xs:element name="SubscribeResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q4="http://schemas.ntreev.com" minOccurs="0" name="SubscribeResult" type="q4:ResultBaseOfDataBaseCollectionMetaDataq8erDhHE" />
+        <xs:element xmlns:q4="http://schemas.ntreev.com" minOccurs="0" name="SubscribeResult" type="q4:ResultBaseOfDataBaseContextMetaDataq8erDhHE" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

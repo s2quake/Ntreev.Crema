@@ -90,11 +90,6 @@ namespace Ntreev.Crema.Services.Domains
             this.OnItemsDeleted(new ItemsDeletedEventArgs<IDomainItem>(authentication, items, itemPaths));
         }
 
-        //public void InvokeTaskCompletedEvent(Authentication authentication, Guid taskID)
-        //{
-        //    this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskID));
-        //}
-
         public object GetService(System.Type serviceType)
         {
             return this.CremaHost.GetService(serviceType);

@@ -88,11 +88,11 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="SignatureDate" nillable="true" type="tns:SignatureDate" />
-  <xs:complexType name="ResultBaseOfDataBaseCollectionMetaDataq8erDhHE">
+  <xs:complexType name="ResultBaseOfDataBaseContextMetaDataq8erDhHE">
     <xs:annotation>
       <xs:appinfo>
         <GenericType Name="ResultBaseOf{0}{#}" Namespace="http://schemas.ntreev.com" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">
-          <GenericParameter Name="DataBaseCollectionMetaData" Namespace="http://schemas.ntreev.com">
+          <GenericParameter Name="DataBaseContextMetaData" Namespace="http://schemas.ntreev.com">
           </GenericParameter>
         </GenericType>
         <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
@@ -102,11 +102,11 @@
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
       <xs:element minOccurs="0" name="TaskID" type="ser:guid" />
-      <xs:element minOccurs="0" name="Value" type="tns:DataBaseCollectionMetaData" />
+      <xs:element minOccurs="0" name="Value" type="tns:DataBaseContextMetaData" />
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="ResultBaseOfDataBaseCollectionMetaDataq8erDhHE" nillable="true" type="tns:ResultBaseOfDataBaseCollectionMetaDataq8erDhHE" />
-  <xs:complexType name="DataBaseCollectionMetaData">
+  <xs:element name="ResultBaseOfDataBaseContextMetaDataq8erDhHE" nillable="true" type="tns:ResultBaseOfDataBaseContextMetaDataq8erDhHE" />
+  <xs:complexType name="DataBaseContextMetaData">
     <xs:annotation>
       <xs:appinfo>
         <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
@@ -116,7 +116,7 @@
       <xs:element minOccurs="0" name="DataBases" nillable="true" type="tns:ArrayOfDataBaseMetaData" />
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="DataBaseCollectionMetaData" nillable="true" type="tns:DataBaseCollectionMetaData" />
+  <xs:element name="DataBaseContextMetaData" nillable="true" type="tns:DataBaseContextMetaData" />
   <xs:complexType name="ArrayOfDataBaseMetaData">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="DataBaseMetaData" type="tns:DataBaseMetaData" />

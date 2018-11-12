@@ -216,12 +216,6 @@ namespace Ntreev.Crema.Services.Data
 
         public void CreateTable()
         {
-            var query = from table in this.tables
-                        from column in table.Columns
-                        where column.CremaType != null
-                        select column.CremaType;
-            var types = query.Distinct();
-
             this.Serialize();
             foreach (var item in this.tables)
             {
@@ -231,7 +225,7 @@ namespace Ntreev.Crema.Services.Data
                 this.AddRepositoryPath(item);
             }
 
-            foreach (var item in types)
+            foreach (var item in this.types)
             {
                 var repositoryPath = new RepositoryPath(this.TypeContext, item.Path);
                 repositoryPath.ValidateExists();

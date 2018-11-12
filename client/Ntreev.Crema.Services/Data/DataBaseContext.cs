@@ -238,7 +238,7 @@ namespace Ntreev.Crema.Services.Data
             this.InvokeItemsRevertedEvent(authentication, new DataBase[] { dataBase }, new string[] { revision });
         }
 
-        public DataBaseCollectionMetaData GetMetaData(Authentication authentication)
+        public DataBaseContextMetaData GetMetaData(Authentication authentication)
         {
             this.Dispatcher.VerifyAccess();
             if (authentication == null)
@@ -251,13 +251,13 @@ namespace Ntreev.Crema.Services.Data
                 var metaData = item.Dispatcher.Invoke(() => item.GetMetaData(authentication));
                 metaList.Add(metaData);
             }
-            return new DataBaseCollectionMetaData()
+            return new DataBaseContextMetaData()
             {
                 DataBases = metaList.ToArray(),
             };
         }
 
-        public async Task<DataBaseCollectionMetaData> GetMetaDataAsync(Authentication authentication)
+        public async Task<DataBaseContextMetaData> GetMetaDataAsync(Authentication authentication)
         {
             if (authentication == null)
                 throw new ArgumentNullException(nameof(authentication));
@@ -268,7 +268,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 metaList.Add(await item.GetMetaDataAsync(authentication));
             }
-            return new DataBaseCollectionMetaData()
+            return new DataBaseContextMetaData()
             {
                 DataBases = metaList.ToArray(),
             };
@@ -769,7 +769,7 @@ namespace Ntreev.Crema.Services.Data
             base.OnCollectionChanged(e);
         }
 
-        private void Initialize(DataBaseCollectionMetaData metaData)
+        private void Initialize(DataBaseContextMetaData metaData)
         {
             for (var i = 0; i < metaData.DataBases.Length; i++)
             {

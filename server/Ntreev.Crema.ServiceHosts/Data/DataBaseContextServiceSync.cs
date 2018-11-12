@@ -38,7 +38,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return this.InvokeTask(Task.Run(() => this.DefinitionTypeAsync(param1)));
         }
 
-        public ResultBase<DataBaseCollectionMetaData> Subscribe(Guid authenticationToken)
+        public ResultBase<DataBaseContextMetaData> Subscribe(Guid authenticationToken)
         {
             return this.InvokeTask(Task.Run(() => this.SubscribeAsync(authenticationToken)));
         }

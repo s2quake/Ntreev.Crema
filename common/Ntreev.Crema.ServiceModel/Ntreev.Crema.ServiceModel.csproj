@@ -84,7 +84,7 @@
       <DependentUpon>EventResources.resx</DependentUpon>
     </Compile>
     <Compile Include="ServiceInfo.cs" />
-    <Compile Include="DataBaseCollectionMetaData.cs" />
+    <Compile Include="DataBaseContextMetaData.cs" />
     <Compile Include="DataBaseMetaData.cs" />
     <Compile Include="CategoryNotFoundException.cs" />
     <Compile Include="DataBaseState.cs" />

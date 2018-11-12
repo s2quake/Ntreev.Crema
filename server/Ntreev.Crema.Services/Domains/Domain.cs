@@ -37,6 +37,7 @@ namespace Ntreev.Crema.Services.Domains
         private const string usersKey = "Users";
         private Func<DateTime> dateTimeProvider;
         private readonly HashSet<string> modifiedTableList = new HashSet<string>();
+        private DomainMetaData metaData;
 
         private EventHandler<DomainUserEventArgs> userAdded;
         private EventHandler<DomainUserRemovedEventArgs> userRemoved;
@@ -95,8 +96,8 @@ namespace Ntreev.Crema.Services.Domains
                         IsOnline = authentication.Types.HasFlag(AuthenticationType.User),
                     };
                 });
-                var taskID = Guid.NewGuid();
                 var result = await this.InvokeAddUserAsync(authentication, domainUser);
+                var taskID = GuidUtility.Create(GuidUtility.GetLeft(this.ID), result.ID);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Users.Add(domainUser);
@@ -128,8 +129,8 @@ namespace Ntreev.Crema.Services.Domains
                     this.ValidateRemove(authentication);
                     return this.GetDomainUser(authentication);
                 });
-                var taskID = Guid.NewGuid();
                 var result = await this.InvokeRemoveUserAsync(authentication, domainUser);
+                var taskID = GuidUtility.Create(GuidUtility.GetLeft(this.ID), result);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     domainUser.Authentication = null;
@@ -204,8 +205,8 @@ namespace Ntreev.Crema.Services.Domains
                     this.ValidateBeginUserEdit(authentication, location);
                     return this.GetDomainUser(authentication);
                 });
-                var taskID = Guid.NewGuid();
                 var result = await this.InvokeBeginUserEditAsync(authentication, domainUser, location);
+                var taskID = GuidUtility.Create(GuidUtility.GetLeft(this.ID), result);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     domainUser.DomainLocationInfo = location;
@@ -235,8 +236,8 @@ namespace Ntreev.Crema.Services.Domains
                     this.ValidateEndUserEdit(authentication);
                     return this.GetDomainUser(authentication);
                 });
-                var taskID = Guid.NewGuid();
                 var result = await this.InvokeEndUserEditAsync(authentication, domainUser);
+                var taskID = GuidUtility.Create(GuidUtility.GetLeft(this.ID), result);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     domainUser.IsBeingEdited = false;
@@ -265,8 +266,8 @@ namespace Ntreev.Crema.Services.Domains
                     this.ValidateNewRow(authentication, rows);
                     return this.GetDomainUser(authentication);
                 });
-                var taskID = Guid.NewGuid();
                 var result = await this.InvokeNewRowAsync(authentication, domainUser, rows);
+                var taskID = GuidUtility.Create(GuidUtility.GetLeft(this.ID), result.ID);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     foreach (var item in result.Rows)
@@ -301,8 +302,8 @@ namespace Ntreev.Crema.Services.Domains
                     this.ValidateSetRow(authentication, rows);
                     return this.GetDomainUser(authentication);
                 });
-                var taskID = Guid.NewGuid();
                 var result = await this.InvokeSetRowAsync(authentication, domainUser, rows);
+                var taskID = GuidUtility.Create(GuidUtility.GetLeft(this.ID), result.ID);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     foreach (var item in result.Rows)
@@ -337,8 +338,8 @@ namespace Ntreev.Crema.Services.Domains
                     this.ValidateRemoveRow(authentication, rows);
                     return this.GetDomainUser(authentication);
                 });
-                var taskID = Guid.NewGuid();
                 var result = await this.InvokeRemoveRowAsync(authentication, domainUser, rows);
+                var taskID = GuidUtility.Create(GuidUtility.GetLeft(this.ID), result.ID);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     foreach (var item in result.Rows)
@@ -373,8 +374,8 @@ namespace Ntreev.Crema.Services.Domains
                     this.ValidateSetProperty(authentication, propertyName, value);
                     return this.GetDomainUser(authentication);
                 });
-                var taskID = Guid.NewGuid();
                 var result = await this.InvokeSetPropertyAsync(authentication, domainUser, propertyName, value);
+                var taskID = GuidUtility.Create(GuidUtility.GetLeft(this.ID), result);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     domainUser.IsModified = true;
@@ -428,8 +429,8 @@ namespace Ntreev.Crema.Services.Domains
                     this.ValidateKick(authentication, userID, comment);
                     return this.GetDomainUser(userID);
                 });
-                var taskID = Guid.NewGuid();
                 var result = await this.InvokeKickAsync(authentication, domainUser, userID, comment);
+                var taskID = GuidUtility.Create(GuidUtility.GetLeft(this.ID), result.ID);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Users.Remove(userID);
@@ -464,8 +465,8 @@ namespace Ntreev.Crema.Services.Domains
                     this.ValidateSetOwner(authentication, userID);
                     return this.GetDomainUser(userID);
                 });
-                var taskID = Guid.NewGuid();
                 var result = await this.InvokeSetOwnerAsync(authentication, domainUser);
+                var taskID = GuidUtility.Create(GuidUtility.GetLeft(this.ID), result);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Users.Owner = domainUser;
@@ -488,24 +489,22 @@ namespace Ntreev.Crema.Services.Domains
             this.Dispatcher.VerifyAccess();
             if (authentication == null)
                 throw new ArgumentNullException(nameof(authentication));
-            var metaData = new DomainMetaData()
-            {
-                DomainID = Guid.Parse(this.Name),
-                DomainInfo = base.DomainInfo,
-                Users = this.Users.Select<DomainUser, DomainUserMetaData>(item => item.GetMetaData(authentication)).ToArray(),
-                DomainState = base.DomainState,
-                ModifiedTables = this.modifiedTableList.ToArray(),
-                CompetionID = this.Logger.CompletionID,
-            };
+
+            this.metaData.DomainID = Guid.Parse(this.Name);
+            this.metaData.DomainInfo = base.DomainInfo;
+            this.metaData.Users = this.Users.Select<DomainUser, DomainUserMetaData>(item => item.GetMetaData(authentication)).ToArray();
+            this.metaData.DomainState = base.DomainState;
+            this.metaData.ModifiedTables = this.modifiedTableList.ToArray();
+            this.metaData.CompetionID = this.Logger.CompletionID;
             this.DataDispatcher.Invoke(() =>
             {
                 if (this.Users.ContainsKey(authentication.ID) == true || authentication.IsSystem == true)
                 {
-                    metaData.Data = this.SerializeSource(this.Source);
+                    this.metaData.Data = this.SerializeSource(this.Source);
                 }
-                metaData.PostID = this.Logger.ID;
+                this.metaData.PostID = this.Logger.ID;
             });
-            return metaData;
+            return this.metaData;
         }
 
         public Task<DomainMetaData> GetMetaDataAsync(Authentication authentication)

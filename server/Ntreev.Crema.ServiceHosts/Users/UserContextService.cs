@@ -114,7 +114,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var result = new ResultBase();
             try
             {
-                var categoryName = new Ntreev.Library.ObjectModel.CategoryName(categoryPath);
+                var categoryName = new CategoryName(categoryPath);
                 var category = await this.GetCategoryAsync(categoryName.ParentPath);
                 await category.AddNewCategoryAsync(this.authentication, categoryName.Name);
                 result.TaskID = GuidUtility.FromName(categoryPath);

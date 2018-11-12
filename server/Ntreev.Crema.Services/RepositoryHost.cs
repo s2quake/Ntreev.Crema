@@ -167,7 +167,7 @@ namespace Ntreev.Crema.Services
 
         public void Dispose()
         {
-            //this.Repository.Dispose();
+            this.Repository.Dispose();
             if (this.Dispatcher.Owner == this)
                 this.Dispatcher.Dispose();
         }
@@ -227,10 +227,7 @@ namespace Ntreev.Crema.Services
 
         public Task BeginTransactionAsync(string author, string name)
         {
-            return this.Dispatcher.InvokeAsync(() =>
-            {
-                this.BeginTransaction(author, name);
-            });
+            return this.Dispatcher.InvokeAsync(() => this.BeginTransaction(author, name));
         }
 
         public Task EndTransactionAsync()

@@ -92,7 +92,10 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 await this.DetachEventHandlersAsync();
-                await this.dataBase.LeaveAsync(this.authentication);
+                if (this.dataBase != null)
+                {
+                    await this.dataBase?.LeaveAsync(this.authentication);
+                }
                 await this.authentication.RemoveRefAsync(this);
                 this.dataBase = null;
                 this.authentication = null;
@@ -1223,29 +1226,32 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         private async Task DetachEventHandlersAsync()
         {
-            await this.dataBase.Dispatcher.InvokeAsync(() =>
+            if (this.dataBase != null)
             {
-                this.TableContext.Tables.TablesStateChanged -= Tables_TablesStateChanged;
-                this.TableContext.Tables.TablesChanged -= Tables_TablesChanged;
-                this.TableContext.ItemsCreated -= TableContext_ItemCreated;
-                this.TableContext.ItemsRenamed -= TableContext_ItemRenamed;
-                this.TableContext.ItemsMoved -= TableContext_ItemMoved;
-                this.TableContext.ItemsDeleted -= TableContext_ItemDeleted;
-                this.TableContext.ItemsAccessChanged -= TableContext_ItemsAccessChanged;
-                this.TableContext.ItemsLockChanged -= TableContext_ItemsLockChanged;
+                await this.dataBase.Dispatcher.InvokeAsync(() =>
+                {
+                    this.TableContext.Tables.TablesStateChanged -= Tables_TablesStateChanged;
+                    this.TableContext.Tables.TablesChanged -= Tables_TablesChanged;
+                    this.TableContext.ItemsCreated -= TableContext_ItemCreated;
+                    this.TableContext.ItemsRenamed -= TableContext_ItemRenamed;
+                    this.TableContext.ItemsMoved -= TableContext_ItemMoved;
+                    this.TableContext.ItemsDeleted -= TableContext_ItemDeleted;
+                    this.TableContext.ItemsAccessChanged -= TableContext_ItemsAccessChanged;
+                    this.TableContext.ItemsLockChanged -= TableContext_ItemsLockChanged;
 
-                this.TypeContext.Types.TypesStateChanged -= Types_TypesStateChanged;
-                this.TypeContext.Types.TypesChanged -= Types_TypesChanged;
-                this.TypeContext.ItemsCreated -= TypeContext_ItemCreated;
-                this.TypeContext.ItemsRenamed -= TypeContext_ItemRenamed;
-                this.TypeContext.ItemsMoved -= TypeContext_ItemMoved;
-                this.TypeContext.ItemsDeleted -= TypeContext_ItemDeleted;
-                this.TypeContext.ItemsAccessChanged -= TypeContext_ItemsAccessChanged;
-                this.TypeContext.ItemsLockChanged -= TypeContext_ItemsLockChanged;
+                    this.TypeContext.Types.TypesStateChanged -= Types_TypesStateChanged;
+                    this.TypeContext.Types.TypesChanged -= Types_TypesChanged;
+                    this.TypeContext.ItemsCreated -= TypeContext_ItemCreated;
+                    this.TypeContext.ItemsRenamed -= TypeContext_ItemRenamed;
+                    this.TypeContext.ItemsMoved -= TypeContext_ItemMoved;
+                    this.TypeContext.ItemsDeleted -= TypeContext_ItemDeleted;
+                    this.TypeContext.ItemsAccessChanged -= TypeContext_ItemsAccessChanged;
+                    this.TypeContext.ItemsLockChanged -= TypeContext_ItemsLockChanged;
 
-                this.dataBase.TaskCompleted -= DataBase_TaskCompleted;
-                this.dataBase.Unloaded -= DataBase_Unloaded;
-            });
+                    this.dataBase.TaskCompleted -= DataBase_TaskCompleted;
+                    this.dataBase.Unloaded -= DataBase_Unloaded;
+                });
+            }
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
                 this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;

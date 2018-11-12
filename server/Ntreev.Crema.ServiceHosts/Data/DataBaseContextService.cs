@@ -54,9 +54,9 @@ namespace Ntreev.Crema.ServiceHosts.Data
             return Task.Run(() => new ResultBase());
         }
 
-        public async Task<ResultBase<DataBaseCollectionMetaData>> SubscribeAsync(Guid authenticationToken)
+        public async Task<ResultBase<DataBaseContextMetaData>> SubscribeAsync(Guid authenticationToken)
         {
-            var result = new ResultBase<DataBaseCollectionMetaData>();
+            var result = new ResultBase<DataBaseContextMetaData>();
             try
             {
                 this.authentication = await this.UserContext.AuthenticateAsync(authenticationToken);
@@ -585,7 +585,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTaskCompleted(callbackInfo, taskIDs));
         }
 
-        private async Task<DataBaseCollectionMetaData> AttachEventHandlersAsync()
+        private async Task<DataBaseContextMetaData> AttachEventHandlersAsync()
         {
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {

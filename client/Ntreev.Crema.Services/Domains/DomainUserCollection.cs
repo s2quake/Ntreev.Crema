@@ -36,10 +36,6 @@ namespace Ntreev.Crema.Services.Domains
 
         public void Add(DomainUser domainUser)
         {
-            if (domainUser.DomainUserState.HasFlag(DomainUserState.Detached) == true)
-            {
-                int qwer = 0;
-            }
             this.AddBase(domainUser.ID, domainUser);
         }
 
