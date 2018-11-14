@@ -39,8 +39,9 @@ namespace Ntreev.Crema.Services
         private ConsoleAppender consoleAppender;
         private RollingFileAppender rollingAppender;
         private Hierarchy hierarchy;
-        private TextWriter redirectionWriter;
-        private TextWriterAppender textAppender;
+        //private TextWriter redirectionWriter;
+        //private TextWriterAppender textAppender;
+        private readonly Dictionary<TextWriter, TextWriterAppender> appendersByWriter = new Dictionary<TextWriter, TextWriterAppender>();
         private string name;
 
         public LogService()
@@ -290,9 +291,37 @@ namespace Ntreev.Crema.Services
         public void Dispose()
         {
             this.consoleAppender = null;
-            this.redirectionWriter = null;
+            this.appendersByWriter.Clear();
             this.hierarchy?.Shutdown();
             this.hierarchy = null;
+        }
+
+        public void AddRedirection(TextWriter writer, LogVerbose verbose)
+        {
+            var patternLayout = new PatternLayout()
+            {
+                ConversionPattern = conversionPattern
+            };
+            patternLayout.ActivateOptions();
+
+            var textAppender = new TextWriterAppender()
+            {
+                Layout = patternLayout,
+                Writer = writer,
+            };
+            textAppender.SetVerbose(verbose);
+            textAppender.ActivateOptions();
+            this.hierarchy.Root.AddAppender(textAppender);
+            this.appendersByWriter.Add(writer, textAppender);
+        }
+
+        public void RemoveRedirection(TextWriter writer)
+        {
+            if (this.appendersByWriter.ContainsKey(writer) == false)
+                throw new ArgumentException("not found writer", nameof(writer));
+            var textAppender = this.appendersByWriter[writer];
+            this.hierarchy.Root.RemoveAppender(textAppender);
+            this.appendersByWriter.Remove(writer);
         }
 
         public LogVerbose Verbose
@@ -308,43 +337,43 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        public TextWriter RedirectionWriter
-        {
-            get { return this.redirectionWriter; }
-            set
-            {
-                if (this.redirectionWriter == value)
-                    return;
+        //public TextWriter RedirectionWriter
+        //{
+        //    get { return this.redirectionWriter; }
+        //    set
+        //    {
+        //        if (this.redirectionWriter == value)
+        //            return;
 
-                var oldWriter = this.redirectionWriter;
+        //        var oldWriter = this.redirectionWriter;
 
-                this.redirectionWriter = value;
+        //        this.redirectionWriter = value;
 
-                if (this.redirectionWriter != null)
-                {
-                    var patternLayout = new PatternLayout()
-                    {
-                        ConversionPattern = conversionPattern
-                    };
-                    patternLayout.ActivateOptions();
+        //        if (this.redirectionWriter != null)
+        //        {
+        //            var patternLayout = new PatternLayout()
+        //            {
+        //                ConversionPattern = conversionPattern
+        //            };
+        //            patternLayout.ActivateOptions();
 
-                    this.textAppender = new TextWriterAppender()
-                    {
-                        Layout = patternLayout,
-                        Writer = this.redirectionWriter,
-                    };
-                    this.textAppender.ActivateOptions();
-                    this.hierarchy.Root.AddAppender(this.textAppender);
-                }
-                else
-                {
-                    if (this.textAppender != null)
-                    {
-                        this.hierarchy.Root.RemoveAppender(this.textAppender);
-                    }
-                }
-            }
-        }
+        //            this.textAppender = new TextWriterAppender()
+        //            {
+        //                Layout = patternLayout,
+        //                Writer = this.redirectionWriter,
+        //            };
+        //            this.textAppender.ActivateOptions();
+        //            this.hierarchy.Root.AddAppender(this.textAppender);
+        //        }
+        //        else
+        //        {
+        //            if (this.textAppender != null)
+        //            {
+        //                this.hierarchy.Root.RemoveAppender(this.textAppender);
+        //            }
+        //        }
+        //    }
+        //}
 
         public string Name
         {
@@ -370,7 +399,7 @@ namespace Ntreev.Crema.Services
 
     static class LogServiceExtensions
     {
-        public static void SetVerbose(this ConsoleAppender appender, LogVerbose verbose)
+        public static void SetVerbose(this AppenderSkeleton appender, LogVerbose verbose)
         {
             appender.ClearFilters();
             foreach (var item in Enum.GetValues(typeof(LogVerbose)))

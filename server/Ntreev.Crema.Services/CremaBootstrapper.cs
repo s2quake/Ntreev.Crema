@@ -38,8 +38,8 @@ namespace Ntreev.Crema.Services
         private const string pluginsString = "plugins";
         private const string serializersString = "serializers";
         private const string repoModulesString = "repo-modules";
-        private readonly CremaSettings settings = new CremaSettings();
         private CompositionContainer container;
+        private CremaSettings settings;
 
         public CremaBootstrapper()
         {
@@ -222,7 +222,6 @@ namespace Ntreev.Crema.Services
         {
             yield return new Tuple<System.Type, object>(typeof(CremaBootstrapper), this);
             yield return new Tuple<System.Type, object>(typeof(IServiceProvider), this);
-            yield return new Tuple<System.Type, object>(typeof(CremaSettings), this.settings);
         }
 
         public virtual IEnumerable<Assembly> GetAssemblies()
@@ -258,7 +257,12 @@ namespace Ntreev.Crema.Services
 
         public virtual IEnumerable<string> SelectPath()
         {
-            var dllPath = AppDomain.CurrentDomain.BaseDirectory;
+            return SelectPath(AppDomain.CurrentDomain.BaseDirectory);
+        }
+
+        public static IEnumerable<string> SelectPath(string basePath)
+        {
+            var dllPath = basePath;
             var rootPath = Path.GetDirectoryName(dllPath);
             var repositoryPath = Path.Combine(rootPath, RepositoryModulesPath);
             if (Directory.Exists(repositoryPath) == true)
@@ -367,7 +371,6 @@ namespace Ntreev.Crema.Services
             this.container = new CompositionContainer(catalog);
 
             var batch = new CompositionBatch();
-            batch.AddPart(this.settings);
             foreach (var item in this.GetParts())
             {
                 var contractName = AttributedModelServices.GetContractName(item.Item1);
@@ -382,6 +385,7 @@ namespace Ntreev.Crema.Services
             }
 
             this.container.Compose(batch);
+            this.settings = this.container.GetExportedValue<CremaSettings>();
         }
 
         protected virtual void OnDisposed(EventArgs e)

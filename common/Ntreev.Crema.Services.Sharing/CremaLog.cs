@@ -105,11 +105,21 @@ namespace Ntreev.Crema.Services
             LogService.Fatal(string.Format(format, args));
         }
 
-        public static TextWriter RedirectionWriter
+        public static void AddRedirection(TextWriter writer, LogVerbose verbose)
         {
-            get => LogService.RedirectionWriter;
-            set => LogService.RedirectionWriter = value;
+            LogService.AddRedirection(writer, verbose);
         }
+
+        public static void RemoveRedirection(TextWriter writer)
+        {
+            LogService.RemoveRedirection(writer);
+        }
+
+        //public static TextWriter RedirectionWriter
+        //{
+        //    get => LogService.RedirectionWriter;
+        //    set => LogService.RedirectionWriter = value;
+        //}
 
         public static LogVerbose Verbose
         {

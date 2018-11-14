@@ -43,10 +43,12 @@ namespace Ntreev.Crema.Services
 
         [Import]
         private IServiceProvider container = null;
-        private CremaSettings settings;
-        private readonly string databasesPath;
-        private readonly string usersPath;
-        private readonly LogService log;
+        private readonly CremaSettings settings;
+        private readonly IRepositoryProvider[] repositoryProviders;
+        private readonly IObjectSerializer[] serializers;
+        private string databasesPath;
+        private string usersPath;
+        private LogService log;
         private Guid token;
         private ShutdownTimer shutdownTimer;
 
@@ -61,21 +63,12 @@ namespace Ntreev.Crema.Services
             CremaLog.Attach(this);
             CremaLog.Debug("crema instance created.");
             this.settings = settings;
-            this.BasePath = settings.BasePath;
-            this.RepositoryProvider = repositoryProviders.First(item => item.Name == this.settings.RepositoryModule);
-            this.Serializer = serializers.First(item => item.Name == this.settings.FileType);
-            this.databasesPath = this.settings.RepositoryDataBasesUrl;
-            this.usersPath = this.settings.RepositoryUsersUrl;
-
-            this.log = new LogService("log", this.GetPath(CremaPath.Logs), false)
-            {
-                Name = "repository",
-                Verbose = settings.Verbose
-            };
+            this.repositoryProviders = repositoryProviders.ToArray();
+            this.serializers = serializers.ToArray();
             CremaLog.Debug("crema log service initialized.");
             CremaLog.Debug($"available tags : {string.Join(", ", TagInfoUtility.Names)}");
             this.Dispatcher = new CremaDispatcher(this);
-            this.RepositoryDispatcher = new CremaDispatcher(this.RepositoryProvider);
+            
             CremaLog.Debug("crema dispatcher initialized.");
         }
 
@@ -98,7 +91,7 @@ namespace Ntreev.Crema.Services
             if (serviceType == typeof(IDomainCategoryCollection))
                 return this.DomainContext.Categories;
             if (serviceType == typeof(ILogService))
-                return this;
+                return this.log != null ? this : null;
             if (serviceType == typeof(IObjectSerializer))
                 return this.Serializer;
             if (this.ServiceState == ServiceState.Opened && serviceType == typeof(ICremaConfiguration))
@@ -129,6 +122,20 @@ namespace Ntreev.Crema.Services
                     if (this.ServiceState != ServiceState.Closed)
                         throw new InvalidOperationException();
                     this.ServiceState = ServiceState.Opening;
+                });
+                this.BasePath = this.settings.BasePath;
+                this.RepositoryProvider = repositoryProviders.First(item => item.Name == this.settings.RepositoryModule);
+                this.Serializer = serializers.First(item => item.Name == this.settings.FileType);
+                this.databasesPath = this.settings.RepositoryDataBasesUrl;
+                this.usersPath = this.settings.RepositoryUsersUrl;
+                this.log = new LogService("log", this.GetPath(CremaPath.Logs), false)
+                {
+                    Name = "repository",
+                    Verbose = settings.Verbose
+                };
+                this.RepositoryDispatcher = new CremaDispatcher(this.RepositoryProvider);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
                     this.OnOpening(EventArgs.Empty);
                     this.Info(Resources.Message_ProgramInfo, AppUtility.ProductName, AppUtility.ProductVersion);
                     this.Info("Repository module : {0}", this.settings.RepositoryModule);
@@ -214,6 +221,10 @@ namespace Ntreev.Crema.Services
                     this.ServiceState = ServiceState.Closed;
                     this.OnClosed(new ClosedEventArgs(reason, message));
                 });
+                await this.RepositoryDispatcher.DisposeAsync();
+                this.RepositoryDispatcher = null;
+                this.log.Dispose();
+                this.log = null;
             }
             catch (Exception e)
             {
@@ -333,9 +344,6 @@ namespace Ntreev.Crema.Services
             {
                 throw new InvalidOperationException(Resources.Exception_NotClosed);
             }
-            this.log.Dispose();
-            this.RepositoryDispatcher.Dispose();
-            this.RepositoryDispatcher = null;
             this.Dispatcher.Dispose();
             this.Dispatcher = null;
             this.OnDisposed(EventArgs.Empty);
@@ -380,9 +388,9 @@ namespace Ntreev.Crema.Services
             throw new NotImplementedException();
         }
 
-        public IRepositoryProvider RepositoryProvider { get; }
+        public IRepositoryProvider RepositoryProvider { get; private set; }
 
-        public string BasePath { get; }
+        public string BasePath { get; private set; }
 
         public ServiceState ServiceState { get; set; }
 
@@ -404,7 +412,7 @@ namespace Ntreev.Crema.Services
 
         public CremaDispatcher RepositoryDispatcher { get; private set; }
 
-        public IObjectSerializer Serializer { get; }
+        public IObjectSerializer Serializer { get; private set; }
 
         public event EventHandler Opening;
 
@@ -547,10 +555,14 @@ namespace Ntreev.Crema.Services
             set => this.log.Verbose = value;
         }
 
-        TextWriter ILogService.RedirectionWriter
+        void ILogService.AddRedirection(TextWriter writer, LogVerbose verbose)
         {
-            get => this.log.RedirectionWriter;
-            set => this.log.RedirectionWriter = value;
+            this.log.AddRedirection(writer, verbose);
+        }
+
+        void ILogService.RemoveRedirection(TextWriter writer)
+        {
+            this.log.RemoveRedirection(writer);
         }
 
         string ILogService.Name => this.log.Name;

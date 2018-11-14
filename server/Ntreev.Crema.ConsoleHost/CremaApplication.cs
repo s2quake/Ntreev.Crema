@@ -34,10 +34,12 @@ using Ntreev.Library.IO;
 
 namespace Ntreev.Crema.ConsoleHost
 {
-    class CremaApplication : CremaService
+    class CremaApplication : CremaBootstrapper
     {
+        private readonly CremaService service;
         public CremaApplication()
         {
+            this.service = new CremaService(this);
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
@@ -48,11 +50,61 @@ namespace Ntreev.Crema.ConsoleHost
                 yield return item;
             }
             yield return new Tuple<Type, object>(typeof(CremaApplication), this);
+            yield return new Tuple<Type, object>(typeof(CremaService), this.service);
+            yield return new Tuple<Type, object>(typeof(ICremaService), this.service);
+        }
+
+        public int Port
+        {
+            get => this.service.Port;
+            set => this.service.Port = value;
         }
 
         public override IEnumerable<Assembly> GetAssemblies()
         {
             return EnumerableUtility.Friends(typeof(WindowCremaService).Assembly, base.GetAssemblies());
+        }
+
+        public Task OpenAsync()
+        {
+            return this.service.OpenAsync();
+        }
+
+        public Task CloseAsync()
+        {
+            return this.service.CloseAsync();
+        }
+
+        public ServiceState ServiceState => this.service.ServiceState;
+
+        public event EventHandler Opening
+        {
+            add { this.service.Opening += value; }
+            remove { this.service.Opening -= value; }
+        }
+
+        public event EventHandler Opened
+        {
+            add { this.service.Opened += value; }
+            remove { this.service.Opened -= value; }
+        }
+
+        public event EventHandler Closing
+        {
+            add { this.service.Closing += value; }
+            remove { this.service.Closing -= value; }
+        }
+
+        public event ClosedEventHandler Closed
+        {
+            add { this.service.Closed += value; }
+            remove { this.service.Closed -= value; }
+        }
+
+        protected override void OnDisposed(EventArgs e)
+        {
+            base.OnDisposed(e);
+            this.service.Dispose();
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

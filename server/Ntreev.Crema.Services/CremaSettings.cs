@@ -18,11 +18,13 @@
 using Ntreev.Library;
 using Ntreev.Library.IO;
 using System;
+using System.ComponentModel.Composition;
 using System.IO;
 
 namespace Ntreev.Crema.Services
 {
-    class CremaSettings
+    [Export]
+    public class CremaSettings
     {
         private string[] dataBaseList;
 

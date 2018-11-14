@@ -36,9 +36,11 @@ namespace Ntreev.Crema.Services
 
         void Fatal(object message);
 
-        LogVerbose Verbose { get; set; }
+        void AddRedirection(TextWriter writer, LogVerbose verbose);
 
-        TextWriter RedirectionWriter { get; set; }
+        void RemoveRedirection(TextWriter writer);
+
+        LogVerbose Verbose { get; set; }
 
         string Name { get; }
 

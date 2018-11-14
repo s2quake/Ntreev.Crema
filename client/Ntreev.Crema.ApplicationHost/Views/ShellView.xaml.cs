@@ -39,6 +39,7 @@ using Ntreev.Library;
 using System.Windows.Threading;
 using Ntreev.Library.IO;
 using Ntreev.Crema.ServiceModel;
+using System.IO;
 
 namespace Ntreev.Crema.ApplicationHost.Views
 {
@@ -65,6 +66,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
         private IAppConfiguration configs = null;
         [Import]
         private Lazy<IShell> shell = null;
+        private TextWriter redirectionWriter;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -138,18 +140,20 @@ namespace Ntreev.Crema.ApplicationHost.Views
 
             if (this.cremaHost.GetService(typeof(ILogService)) is ILogService logService)
             {
-                logService.RedirectionWriter = new LogWriter() { TextBox = this.logView, };
+                this.redirectionWriter = new LogWriter() { TextBox = this.logView, };
+                logService.AddRedirection(this.redirectionWriter, LogVerbose.Debug);
             }
         }
 
         private void CremaHost_Closing(object sender, EventArgs e)
         {
             var logService = this.cremaHost.GetService(typeof(ILogService)) as ILogService;
-            if (this.cremaHost.Address != null && logService.RedirectionWriter is LogWriter writer)
+            if (this.cremaHost.Address != null && this.redirectionWriter is LogWriter writer)
             {
                 writer.TextBox = null;
             }
-            logService.RedirectionWriter = null;
+            logService.RemoveRedirection(this.redirectionWriter);
+            this.redirectionWriter = null;
         }
 
         private void CremaAppHost_Loaded(object sender, EventArgs e)

@@ -41,7 +41,7 @@ namespace Ntreev.Crema.ApplicationHost
 
         static App()
         {
-            CremaLog.RedirectionWriter = writer;
+            CremaLog.AddRedirection(writer, LogVerbose.Debug);
         }
 
         public App()
@@ -76,7 +76,7 @@ namespace Ntreev.Crema.ApplicationHost
 
         protected override void OnExit(ExitEventArgs e)
         {
-            CremaLog.RedirectionWriter = null;
+            CremaLog.RemoveRedirection(writer);
             base.OnExit(e);
         }
 

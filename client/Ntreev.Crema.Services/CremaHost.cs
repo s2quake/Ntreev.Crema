@@ -578,10 +578,14 @@ namespace Ntreev.Crema.Services
             set => this.Log.Verbose = value;
         }
 
-        TextWriter ILogService.RedirectionWriter
+        void ILogService.AddRedirection(TextWriter writer, LogVerbose verbose)
         {
-            get => this.Log.RedirectionWriter;
-            set => this.Log.RedirectionWriter = value;
+            this.log.AddRedirection(writer, verbose);
+        }
+
+        void ILogService.RemoveRedirection(TextWriter writer)
+        {
+            this.log.RemoveRedirection(writer);
         }
 
         string ILogService.Name => this.log.Name;

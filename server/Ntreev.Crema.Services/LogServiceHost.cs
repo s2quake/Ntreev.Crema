@@ -33,17 +33,27 @@ namespace Ntreev.Crema.Services
             this.logService = new LogService(name, path, isSingle);
         }
 
+        public void AddRedirection(TextWriter writer, LogVerbose verbose)
+        {
+            this.logService.AddRedirection(writer, verbose);
+        }
+
+        public void RemoveRedirection(TextWriter writer)
+        {
+            this.logService.RemoveRedirection(writer);
+        }
+
         public LogVerbose Verbose
         {
             get => this.logService.Verbose;
             set => this.logService.Verbose = value;
         }
 
-        public TextWriter RedirectionWriter
-        {
-            get => this.logService.RedirectionWriter;
-            set => this.logService.RedirectionWriter = value;
-        }
+        //public TextWriter RedirectionWriter
+        //{
+        //    get => this.logService.RedirectionWriter;
+        //    set => this.logService.RedirectionWriter = value;
+        //}
 
         public string Name => this.logService.Name;
 

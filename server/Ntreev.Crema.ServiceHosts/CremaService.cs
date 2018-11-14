@@ -37,12 +37,13 @@ using System.Globalization;
 
 namespace Ntreev.Crema.ServiceHosts
 {
-    public class CremaService : CremaBootstrapper, ICremaService
+    public class CremaService : ICremaService, IServiceProvider
     {
         public const string Namespace = "http://www.ntreev.com";
         private const string cremaString = "Crema";
         private readonly List<ServiceHost> hosts = new List<ServiceHost>();
         private readonly List<ServiceInfo> serviceInfos = new List<ServiceInfo>();
+        private readonly IServiceProvider serviceProvider;
         private ICremaHost cremaHost;
         private ILogService logService;
         private CremaHostServiceHost cremaHostServiceHost;
@@ -53,9 +54,20 @@ namespace Ntreev.Crema.ServiceHosts
             Dispatcher = new CremaDispatcher(typeof(CremaServiceItemHost));
         }
 
-        public CremaService()
+        public CremaService(IServiceProvider serviceProvider)
         {
+            this.serviceProvider = serviceProvider;
+        }
 
+        public object GetService(Type serviceType)
+        {
+            return this.serviceProvider.GetService(serviceType);
+        }
+
+        public void Dispose()
+        {
+            Dispatcher.Dispose();
+            AuthenticationUtility.Dispose();
         }
 
         public async Task OpenAsync()
@@ -65,12 +77,12 @@ namespace Ntreev.Crema.ServiceHosts
                 this.ServiceState = ServiceState.Opening;
                 this.OnOpening(EventArgs.Empty);
                 this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
-                this.logService = this.cremaHost.GetService(typeof(ILogService)) as ILogService;
             });
             this.token = await this.cremaHost.OpenAsync();
             this.cremaHost.Closed += CremaHost_Closed;
             await CremaService.Dispatcher.InvokeAsync(() =>
             {
+                this.logService = this.cremaHost.GetService(typeof(ILogService)) as ILogService;
                 this.cremaHostServiceHost = new CremaHostServiceHost(this.cremaHost, this, this.Port);
                 this.cremaHostServiceHost.Open();
                 this.logService.Info(Resources.ServiceStart, nameof(CremaHostServiceHost));
@@ -130,15 +142,15 @@ namespace Ntreev.Crema.ServiceHosts
 
         public event ClosedEventHandler Closed;
 
-        public override IEnumerable<Tuple<System.Type, object>> GetParts()
-        {
-            foreach (var item in base.GetParts())
-            {
-                yield return item;
-            }
-            yield return new Tuple<Type, object>(typeof(CremaService), this);
-            yield return new Tuple<Type, object>(typeof(ICremaService), this);
-        }
+        //public override IEnumerable<Tuple<System.Type, object>> GetParts()
+        //{
+        //    foreach (var item in base.GetParts())
+        //    {
+        //        yield return item;
+        //    }
+        //    yield return new Tuple<Type, object>(typeof(CremaService), this);
+        //    yield return new Tuple<Type, object>(typeof(ICremaService), this);
+        //}
 
         protected virtual void OnOpening(EventArgs e)
         {
@@ -160,12 +172,12 @@ namespace Ntreev.Crema.ServiceHosts
             this.Closed?.Invoke(this, e);
         }
 
-        protected override void OnDisposed(EventArgs e)
-        {
-            base.OnDisposed(e);
-            Dispatcher.Dispose();
-            AuthenticationUtility.Dispose();
-        }
+        //protected override void OnDisposed(EventArgs e)
+        //{
+        //    base.OnDisposed(e);
+        //    Dispatcher.Dispose();
+        //    AuthenticationUtility.Dispose();
+        //}
 
         private async void CremaHost_Opened(object sender, EventArgs e)
         {

@@ -62,6 +62,8 @@ namespace Ntreev.Crema.Presentation.Users
 
         public static bool CanKick(Authentication authentication, IUserDescriptor descriptor)
         {
+            if (authentication == null)
+                return false;
             if (authentication.ID == descriptor.UserInfo.ID)
                 return false;
             if (authentication.Authority != Authority.Admin)
@@ -71,6 +73,8 @@ namespace Ntreev.Crema.Presentation.Users
 
         public static bool CanBan(Authentication authentication, IUserDescriptor descriptor)
         {
+            if (authentication == null)
+                return false;
             if (authentication.ID == descriptor.UserInfo.ID)
                 return false;
             if (authentication.Authority != Authority.Admin)
@@ -80,6 +84,8 @@ namespace Ntreev.Crema.Presentation.Users
 
         public static bool CanUnban(Authentication authentication, IUserDescriptor descriptor)
         {
+            if (authentication == null)
+                return false;
             if (authentication.ID == descriptor.UserInfo.ID)
                 return false;
             if (authentication.Authority != Authority.Admin)

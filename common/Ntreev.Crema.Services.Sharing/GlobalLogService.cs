@@ -51,17 +51,27 @@ namespace Ntreev.Crema.Services.Log
             CremaLog.Warn(message);
         }
 
+        public void AddRedirection(TextWriter writer, LogVerbose verbose)
+        {
+            CremaLog.AddRedirection(writer, verbose);
+        }
+
+        public void RemoveRedirection(TextWriter writer)
+        {
+            CremaLog.RemoveRedirection(writer);
+        }
+
         public LogVerbose Verbose
         {
             get => CremaLog.LogService.Verbose;
             set => CremaLog.LogService.Verbose = value;
         }
 
-        public TextWriter RedirectionWriter
-        {
-            get => CremaLog.LogService.RedirectionWriter;
-            set => CremaLog.LogService.RedirectionWriter = value;
-        }
+        //public TextWriter RedirectionWriter
+        //{
+        //    get => CremaLog.LogService.RedirectionWriter;
+        //    set => CremaLog.LogService.RedirectionWriter = value;
+        //}
 
         public string Name => CremaLog.LogService.Name;
 

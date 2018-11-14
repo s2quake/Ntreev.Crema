@@ -105,7 +105,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             this.CommandContext.SetAddress(this.Address);
 
 #if DEBUG
-            return this.Terminal.StartAsync(this.LoginAuthentication);
+            await this.Terminal.StartAsync(this.LoginAuthentication);
 #else
             await Task.Delay(1);
             this.Terminal.Start();
