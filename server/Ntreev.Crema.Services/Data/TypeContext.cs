@@ -119,7 +119,7 @@ namespace Ntreev.Crema.Services.Data
                     var signatureDate = authentication.Sign();
                     accessInfo.Add(signatureDate, memberID, accessType);
                     this.Serializer.Serialize(itemPath, (AccessSerializationInfo)accessInfo, AccessSerializationInfo.Settings);
-                    this.Repository.Commit(authentication, message); accessInfo.Add(authentication.SignatureDate, memberID, accessType);
+                    this.Repository.Commit(authentication, message);
                     return accessInfo;
                 }
                 catch
@@ -221,7 +221,7 @@ namespace Ntreev.Crema.Services.Data
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Remove, memberIDs);
             this.CremaHost.Debug(eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, new object[] { AccessChangeType.Remove, memberIDs, }));
+            this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData));
         }
 
         public void InvokeItemsLockedEvent(Authentication authentication, ITypeItem[] items, string[] comments)
@@ -604,11 +604,11 @@ namespace Ntreev.Crema.Services.Data
             {
                 var accessInfo = (AccessSerializationInfo)this.Serializer.Deserialize(item, typeof(AccessSerializationInfo), AccessSerializationInfo.Settings);
                 var tableItem = this.GetTypeItemByItemPath(item);
-                if (tableItem is Table table)
+                if (tableItem is Type type)
                 {
-                    table.SetAccessInfo((AccessInfo)accessInfo);
+                    type.SetAccessInfo((AccessInfo)accessInfo);
                 }
-                else if (tableItem is TableCategory category)
+                else if (tableItem is TypeCategory category)
                 {
                     category.SetAccessInfo((AccessInfo)accessInfo);
                 }

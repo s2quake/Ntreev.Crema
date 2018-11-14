@@ -274,17 +274,18 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var taskID = Guid.NewGuid();
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
-                await this.Container.InvokeTypeRenameAsync(authentication, tuple.typeInfo, name, dataBaseSet);
-                await this.Dispatcher.InvokeAsync(() =>
+                using (var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet))
                 {
-                    this.CremaHost.Sign(authentication);
-                    base.Rename(authentication, name);
-                    this.Container.InvokeTypesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, dataSet);
-                    this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
-                });
-                await this.Repository.UnlockAsync(authentication, this, nameof(RenameAsync), dataBaseSet.ItemPaths);
-                return taskID;
+                    await this.Container.InvokeTypeRenameAsync(authentication, tuple.typeInfo, name, dataBaseSet);
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.CremaHost.Sign(authentication);
+                        base.Rename(authentication, name);
+                        this.Container.InvokeTypesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, dataSet);
+                        this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
+                    });
+                    return taskID;
+                }
             }
             catch (Exception e)
             {
@@ -311,17 +312,18 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var taskID = Guid.NewGuid();
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
-                await this.Container.InvokeTypeMoveAsync(authentication, tuple.typeInfo, categoryPath, dataBaseSet);
-                await this.Dispatcher.InvokeAsync(() =>
+                using (var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet))
                 {
-                    this.CremaHost.Sign(authentication);
-                    base.Move(authentication, categoryPath);
-                    this.Container.InvokeTypesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths, dataSet);
-                    this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
-                });
-                await this.Repository.UnlockAsync(authentication, this, nameof(MoveAsync), dataBaseSet.ItemPaths);
-                return taskID;
+                    await this.Container.InvokeTypeMoveAsync(authentication, tuple.typeInfo, categoryPath, dataBaseSet);
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.CremaHost.Sign(authentication);
+                        base.Move(authentication, categoryPath);
+                        this.Container.InvokeTypesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths, dataSet);
+                        this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
+                    });
+                    return taskID;
+                }
             }
             catch (Exception e)
             {
@@ -351,17 +353,18 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var taskID = Guid.NewGuid();
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, false, false);
-                await this.Container.InvokeTypeDeleteAsync(authentication, tuple.typeInfo, dataBaseSet);
-                await this.Dispatcher.InvokeAsync(() =>
+                using (var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet))
                 {
-                    base.Delete(authentication);
-                    cremaHost.Sign(authentication);
-                    container.InvokeTypesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
-                    dataBase.InvokeTaskCompletedEvent(authentication, taskID);
-                });
-                await repository.UnlockAsync(authentication, this, nameof(DeleteAsync), dataBaseSet.ItemPaths);
-                return taskID;
+                    await this.Container.InvokeTypeDeleteAsync(authentication, tuple.typeInfo, dataBaseSet);
+                    await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        base.Delete(authentication);
+                        cremaHost.Sign(authentication);
+                        container.InvokeTypesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
+                        dataBase.InvokeTaskCompletedEvent(authentication, taskID);
+                    });
+                    return taskID;
+                }
             }
             catch (Exception e)
             {
@@ -434,14 +437,13 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public async Task<CremaDataSet> ReadDataForCopyAsync(Authentication authentication, ItemName targetName)
+        public async Task<CremaDataSet> ReadDataForCopyAsync(Authentication authentication, string categoryPath)
         {
             var fullPaths = await this.Dispatcher.InvokeAsync(() =>
             {
                 var itemPaths = new string[] 
                 {
-                    DataBase.TypePathPrefix + targetName.CategoryPath,
-                    DataBase.TypePathPrefix + targetName,
+                    DataBase.TypePathPrefix + categoryPath,
                     this.FullPath
                 };
                 return itemPaths;
@@ -759,6 +761,13 @@ namespace Ntreev.Crema.Services.Data
                         select item;
             if (query.Any() == true)
                 throw new InvalidOperationException(Resources.Exception_CannotDeleteTypeWithUsedTables);
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void SetAccessInfo(AccessInfo accessInfo)
+        {
+            accessInfo.Path = this.Path;
+            base.AccessInfo = accessInfo;
         }
 
         public void ValidateUsingTables(IAuthentication authentication)

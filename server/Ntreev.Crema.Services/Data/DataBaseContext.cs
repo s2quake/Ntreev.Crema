@@ -435,8 +435,9 @@ namespace Ntreev.Crema.Services.Data
                 this.Serializer.Serialize(filename, dataBaseInfo, DataBaseSerializationInfo.Settings);
                 await item.DisposeAsync();
             }
-            this.repositoryDispatcher.Dispose();
-            this.Dispatcher.Dispose();
+            await this.repositoryDispatcher.DisposeAsync();
+            await this.Dispatcher.DisposeAsync();
+            this.CremaHost.Info($"{nameof(DataBaseContext)} Disposed");
         }
 
         public new DataBase this[string dataBaseName] => base[dataBaseName];
@@ -802,6 +803,7 @@ namespace Ntreev.Crema.Services.Data
                     else
                         this.AddBase(item, new DataBase(this, item, caches[item]));
                 }
+                this.CremaHost.Info($"{nameof(DataBaseContext)} Initialized");
             });
         }
 

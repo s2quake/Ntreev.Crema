@@ -67,7 +67,7 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, this.TypeSource.DataSet, false, false);
+            var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, this.TypeSource.DataSet);
             var typeInfo = this.TypeSource.TypeInfo;
             var taskID = this.Domain.ID;
             this.Domain.Result = new TypeInfo[] { typeInfo };

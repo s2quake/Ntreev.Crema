@@ -59,17 +59,20 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var taskID = GuidUtility.FromName(categoryName);
                 var fullPaths = new string[] { PathUtility.Separator + CremaSchema.TableDirectory + categoryName };
-                await this.InvokeCategoryCreateAsync(authentication, categoryName, fullPaths);
-                var result = await this.Dispatcher.InvokeAsync(() =>
+                await this.Repository.LockAsync(authentication, this, nameof(AddNewAsync), fullPaths);
+                using (var dataBaseSet = await DataBaseSet.CreateEmptyAsync(this.DataBase, fullPaths))
                 {
-                    this.CremaHost.Sign(authentication);
-                    var category = this.BaseAddNew(name, parentPath, authentication);
-                    var items = EnumerableUtility.One(category).ToArray();
-                    this.InvokeCategoriesCreatedEvent(authentication, items);
-                    return category;
-                });
-                await this.Repository.UnlockAsync(authentication, this, nameof(AddNewAsync), fullPaths);
-                return result;
+                    await this.InvokeCategoryCreateAsync(authentication, categoryName);
+                    var result = await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.CremaHost.Sign(authentication);
+                        var category = this.BaseAddNew(name, parentPath, authentication);
+                        var items = EnumerableUtility.One(category).ToArray();
+                        this.InvokeCategoriesCreatedEvent(authentication, items);
+                        return category;
+                    });
+                    return result;
+                }
             }
             catch (Exception e)
             {
@@ -83,21 +86,19 @@ namespace Ntreev.Crema.Services.Data
             return this.DataBase.GetService(serviceType);
         }
 
-        public Task InvokeCategoryCreateAsync(Authentication authentication, string categoryPath, string[] fullPaths)
+        public Task InvokeCategoryCreateAsync(Authentication authentication, string categoryPath)
         {
             var message = EventMessageBuilder.CreateTableCategory(authentication, categoryPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    this.Repository.Lock(authentication, this, nameof(InvokeCategoryCreateAsync), fullPaths);
                     this.Repository.CreateTableCategory(categoryPath);
                     this.Repository.Commit(authentication, message);
                 }
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeCategoryCreateAsync), fullPaths);
                     throw;
                 }
             });
@@ -117,7 +118,6 @@ namespace Ntreev.Crema.Services.Data
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeCategoryRenameAsync), dataBaseSet.ItemPaths);
                     throw;
                 }
             });
@@ -138,7 +138,6 @@ namespace Ntreev.Crema.Services.Data
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeCategoryMoveAsync), dataBaseSet.ItemPaths);
                     throw;
                 }
             });
@@ -157,7 +156,6 @@ namespace Ntreev.Crema.Services.Data
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeCategoryDeleteAsync), dataBaseSet.ItemPaths);
                     throw;
                 }
             });

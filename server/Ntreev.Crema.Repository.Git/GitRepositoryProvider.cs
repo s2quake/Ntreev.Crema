@@ -22,6 +22,7 @@ using Ntreev.Library.IO;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -392,7 +393,7 @@ namespace Ntreev.Crema.Repository.Git
 
         private void SetCreationInfo(string repositoryPath, string repositoryName, SignatureDate signatureDate)
         {
-            GitConfig.SetValue(repositoryPath, $"branch.{repositoryName}.createdDateTime", $"{signatureDate}");
+            GitConfig.SetValue(repositoryPath, $"branch.{repositoryName}.createdDateTime", $"{signatureDate.ToString(CultureInfo.GetCultureInfo("en-US"))}");
         }
 
         private void UnsetCreationInfo(string repositoryPath, string repositoryName)
@@ -407,7 +408,7 @@ namespace Ntreev.Crema.Repository.Git
 
         private SignatureDate GetCreationInfo(string repositoryPath, string repositoryName)
         {
-            return SignatureDate.Parse(GitConfig.GetValue(repositoryPath, $"branch.{repositoryName}.createdDateTime"));
+            return SignatureDate.Parse(GitConfig.GetValue(repositoryPath, $"branch.{repositoryName}.createdDateTime"), CultureInfo.GetCultureInfo("en-US"));
         }
 
         private void SetDescription(string repositoryPath, string repositoryName, string description)

@@ -30,6 +30,7 @@ namespace Ntreev.Crema.Services.Data
     class NewTypeTemplate : TypeTemplateBase
     {
         private readonly TypeCategory category;
+        private Type[] types;
         private Type type;
 
         public NewTypeTemplate(TypeCategory category)
@@ -89,14 +90,28 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
+            var dataSet = this.TypeSource.DataSet;
             var dataType = this.TypeSource;
-            var dataSet = dataType.DataSet;
-            var itemPaths = new string[] { dataType.FullPath };
             var taskID = this.Domain.ID;
-            this.type = await this.Types.AddNewAsync(authentication, dataType);
-            this.Domain.Result = new TypeInfo[] { dataType.TypeInfo };
-            await base.OnEndEditAsync(authentication);
-            await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
+            var dataTypes = new CremaDataType[] { dataType };
+            var itemPaths = new string[] { dataType.FullPath };
+            var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, DataBaseSetOptions.OmitUnlock | DataBaseSetOptions.AllowTypeCreation);
+
+            await this.Repository.LockAsync(authentication, this, nameof(OnEndEditAsync), itemPaths);
+            try
+            {
+                dataBaseSet.TypesToCreate = dataTypes;
+                this.types = await this.Types.AddNewAsync(authentication, dataBaseSet);
+                this.type = this.types.First();
+                this.Domain.Result = dataTypes.Select(item => item.TypeInfo).ToArray();
+                await base.OnEndEditAsync(authentication);
+                await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
+            }
+            finally
+            {
+                await this.Repository.UnlockAsync(authentication, this, nameof(OnEndEditAsync), itemPaths);
+            }
+            await this.Repository.UnlockAsync(authentication, this, nameof(OnCancelEditAsync), this.ItemPaths);
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)

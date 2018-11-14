@@ -31,16 +31,18 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
 {
-    class DataBaseSet
+    class DataBaseSet : IDisposable
     {
         private readonly DataBase dataBase;
         private readonly List<CremaDataType> types = new List<CremaDataType>();
         private readonly List<CremaDataTable> tables = new List<CremaDataTable>();
+        private readonly DataBaseSetOptions options;
 
-        private DataBaseSet(DataBase dataBase, CremaDataSet dataSet, bool typeCreation, bool tableCreation)
+        private DataBaseSet(DataBase dataBase, CremaDataSet dataSet, DataBaseSetOptions options)
         {
             this.dataBase = dataBase ?? throw new ArgumentNullException(nameof(dataBase));
             this.DataSet = dataSet ?? throw new ArgumentNullException(nameof(dataSet));
+            this.options = options;
             this.dataBase.Dispatcher.VerifyAccess();
 
             try
@@ -48,7 +50,7 @@ namespace Ntreev.Crema.Services.Data
                 foreach (var item in dataSet.Types)
                 {
                     var type = dataBase.TypeContext.Types[item.Name, item.CategoryPath];
-                    if (type == null && typeCreation == false)
+                    if (type == null && this.options.HasFlag(DataBaseSetOptions.AllowTypeCreation) == false)
                     {
                         throw new TypeNotFoundException(item.Name);
                     }
@@ -62,7 +64,7 @@ namespace Ntreev.Crema.Services.Data
                 foreach (var item in dataSet.Tables)
                 {
                     var table = dataBase.TableContext.Tables[item.Name, item.CategoryPath];
-                    if (table == null && tableCreation == false)
+                    if (table == null && this.options.HasFlag(DataBaseSetOptions.AllowTableCreation) == false)
                     {
                         throw new TableNotFoundException(item.Name);
                     }
@@ -81,14 +83,26 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public static Task<DataBaseSet> CreateAsync(DataBase dataBase, CremaDataSet dataSet, bool typeCreation, bool tableCreation)
+        public static Task<DataBaseSet> CreateAsync(DataBase dataBase, CremaDataSet dataSet)
         {
-            return dataBase.Dispatcher.InvokeAsync(() => new DataBaseSet(dataBase, dataSet, typeCreation, tableCreation));
+            return dataBase.Dispatcher.InvokeAsync(() => new DataBaseSet(dataBase, dataSet, DataBaseSetOptions.None));
         }
 
-        public static DataBaseSet Create(DataBase dataBase, CremaDataSet dataSet, bool typeCreation, bool tableCreation)
+        public static Task<DataBaseSet> CreateAsync(DataBase dataBase, CremaDataSet dataSet, DataBaseSetOptions options)
         {
-            return new DataBaseSet(dataBase, dataSet, typeCreation, tableCreation);
+            return dataBase.Dispatcher.InvokeAsync(() => new DataBaseSet(dataBase, dataSet, options));
+        }
+
+        public static DataBaseSet Create(DataBase dataBase, CremaDataSet dataSet, DataBaseSetOptions options)
+        {
+            return new DataBaseSet(dataBase, dataSet, options);
+        }
+
+        public static Task<DataBaseSet> CreateEmptyAsync(DataBase dataBase, string[] fullPaths)
+        {
+            var dataSet = new CremaDataSet();
+            dataSet.SetItemPaths(fullPaths);
+            return dataBase.Dispatcher.InvokeAsync(() => new DataBaseSet(dataBase, dataSet, DataBaseSetOptions.None));
         }
 
         public void SetTypeCategoryPath(string categoryPath, string newCategoryPath)
@@ -135,15 +149,15 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public void RenameType(string typePath, string typeName)
+        public void RenameType(string typePath, string name)
         {
             var dataType = this.types.First(item => item.Path == typePath);
             var repositoryPath1 = new RepositoryPath(this.TypeContext, typePath);
-            var repositoryPath2 = new RepositoryPath(this.TypeContext, dataType.CategoryPath + typeName);
+            var repositoryPath2 = new RepositoryPath(this.TypeContext, dataType.CategoryPath + name);
 
             repositoryPath1.ValidateExists();
             repositoryPath2.ValidateNotExists();
-            dataType.TypeName = typeName;
+            dataType.TypeName = name;
             this.Serialize();
             this.Repository.Move(repositoryPath1, repositoryPath2);
         }
@@ -240,7 +254,6 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        // TODO: 자식 테이블 이름 변경 해결 해야됨
         public void RenameTable(string tablePath, string name)
         {
             var tableName = CremaDataTable.GetTableName(name);
@@ -330,40 +343,63 @@ namespace Ntreev.Crema.Services.Data
 
         public static void Modify(CremaDataSet dataSet, DataBase dataBase)
         {
-            var dataBaseSet = new DataBaseSet(dataBase, dataSet, false, false);
+            var dataBaseSet = new DataBaseSet(dataBase, dataSet, DataBaseSetOptions.None);
             dataBaseSet.Serialize();
         }
 
-        public DataBaseItemState GetTypeState(CremaDataType dataType)
-        {
-            if (dataType.ExtendedProperties.ContainsKey(typeof(TypeInfo)) == true)
-            {
-                var typeInfo = (TypeInfo)dataType.ExtendedProperties[typeof(TypeInfo)];
-                var itemPath1 = new RepositoryPath(this.TypeContext, dataType.Path);
-                var itemPath2 = new RepositoryPath(this.TypeContext, typeInfo.Path);
+        public CremaDataSet DataSet { get; }
 
-                if (dataType.Name != typeInfo.Name)
-                {
-                    return DataBaseItemState.Rename;
-                }
-                else if (itemPath1 != itemPath2)
-                {
-                    return DataBaseItemState.Move;
-                }
-                else
-                {
-                    return DataBaseItemState.None;
-                }
-            }
-            else
+        public CremaDataTable[] TablesToCreate
+        {
+            get
             {
-                return DataBaseItemState.Create;
+                var tableList = new List<CremaDataTable>(this.tables.Count);
+                foreach (var item in this.tables)
+                {
+                    if (item.ExtendedProperties.ContainsKey(typeof(TableInfo)) == true)
+                        continue;
+                    tableList.Add(item);
+                }
+                var query = from item in tableList
+                            orderby item.Name
+                            orderby item.TemplatedParentName != string.Empty
+                            select item;
+                return query.ToArray();
+            }
+            set
+            {
+                foreach (var item in value)
+                {
+                    if (this.DataSet.Tables.Contains(item) == false)
+                        throw new ArgumentOutOfRangeException(nameof(value));
+                    item.ExtendedProperties.Remove(typeof(TableInfo));
+                }
             }
         }
 
-        public IEnumerable<CremaDataType> Types => this.types;
-
-        public CremaDataSet DataSet { get; }
+        public CremaDataType[] TypesToCreate
+        {
+            get
+            {
+                var typeList = new List<CremaDataType>(this.types.Count);
+                foreach (var item in this.types)
+                {
+                    if (item.ExtendedProperties.ContainsKey(typeof(TypeInfo)) == true)
+                        continue;
+                    typeList.Add(item);
+                }
+                return typeList.ToArray();
+            }
+            set
+            {
+                foreach (var item in value)
+                {
+                    if (this.DataSet.Types.Contains(item) == false)
+                        throw new ArgumentOutOfRangeException(nameof(value));
+                    item.ExtendedProperties.Remove(typeof(TypeInfo));
+                }
+            }
+        }
 
         public string[] ItemPaths => this.DataSet.GetItemPaths();
 
@@ -496,5 +532,26 @@ namespace Ntreev.Crema.Services.Data
         private TypeContext TypeContext => this.dataBase.TypeContext;
 
         private TableContext TableContext => this.dataBase.TableContext;
+
+        private CremaHost CremaHost => this.dataBase.CremaHost;
+
+        #region IDisposable
+
+        async void IDisposable.Dispose()
+        {
+            if (this.options.HasFlag(DataBaseSetOptions.OmitUnlock) == true)
+                return;
+            try
+            {
+                await this.Repository.Dispatcher.InvokeAsync(() => this.Repository.Unlock(Authentication.System, this, nameof(IDisposable.Dispose), this.ItemPaths));
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Fatal(e);
+                throw;
+            }
+        }
+
+        #endregion
     }
 }

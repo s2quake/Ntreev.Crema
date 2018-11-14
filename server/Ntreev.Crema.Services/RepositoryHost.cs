@@ -172,6 +172,13 @@ namespace Ntreev.Crema.Services
                 this.Dispatcher.Dispose();
         }
 
+        public async Task DisposeAsync()
+        {
+            this.Repository.Dispose();
+            if (this.Dispatcher.Owner == this)
+                await this.Dispatcher.DisposeAsync();
+        }
+
         public void Lock(Authentication authentication, object target, string methodName, string[] paths)
         {
             this.Dispatcher.VerifyAccess();

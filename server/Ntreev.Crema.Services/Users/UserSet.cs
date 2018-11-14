@@ -21,5 +21,12 @@ namespace Ntreev.Crema.Services.Users
         public UserSerializationInfo[] Infos { get; set; }
 
         public SignatureDateProvider SignatureDateProvider { get; set; }
+
+        public static readonly UserSet Empty = new UserSet()
+        {
+            ItemPaths = new string[] { },
+            Infos = new UserSerializationInfo[] { },
+            SignatureDateProvider = SignatureDateProvider.Default,
+        };
     }
 }

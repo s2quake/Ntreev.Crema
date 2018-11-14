@@ -77,7 +77,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         {
             var result = await this.parent.Dispatcher.InvokeAsync(() =>
             {
-                return this.parent.Childs.Any(item => item.Name == this.TableName) == false;
+                return this.parent.Childs.Any(item => item.TableName == this.TableName) == false;
             });
             isVerify(result);
         }

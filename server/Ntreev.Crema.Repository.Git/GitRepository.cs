@@ -255,7 +255,14 @@ namespace Ntreev.Crema.Repository.Git
             {
                 this.Pull();
                 this.Push();
-                this.PushNotes();
+                try
+                {
+                    this.PushNotes();
+                }
+                catch (Exception e)
+                {
+                    this.logService.Error(e);
+                }
             }
             //DirectoryUtility.Delete(this.repositoryPath);
         }

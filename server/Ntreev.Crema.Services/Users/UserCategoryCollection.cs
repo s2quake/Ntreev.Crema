@@ -57,17 +57,21 @@ namespace Ntreev.Crema.Services.Users
                     return new CategoryName(parentPath, name);
                 });
                 var taskID = GuidUtility.FromName(categoryName);
-                await this.InvokeCategoryCreateAsync(authentication, categoryName);
-                var result = await this.Dispatcher.InvokeAsync(() =>
+                var itemPaths = new string[] { categoryName };
+                await this.Repository.LockAsync(authentication, this, nameof(AddNewAsync), itemPaths);
+                using (var userContextSet = await UserContextSet.CreateEmptyAsync(authentication, this.Context, itemPaths))
                 {
-                    this.CremaHost.Sign(authentication);
-                    var category = this.BaseAddNew(name, parentPath, authentication);
-                    this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
-                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
-                    return category;
-                });
-                await this.Repository.UnlockAsync(authentication, this, nameof(AddNewAsync), new string[] { categoryName });
-                return result;
+                    await this.InvokeCategoryCreateAsync(authentication, categoryName);
+                    var result = await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        this.CremaHost.Sign(authentication);
+                        var category = this.BaseAddNew(name, parentPath, authentication);
+                        this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
+                        this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                        return category;
+                    });
+                    return result;
+                }
             }
             catch (Exception e)
             {
@@ -78,20 +82,17 @@ namespace Ntreev.Crema.Services.Users
 
         public Task InvokeCategoryCreateAsync(Authentication authentication, string categoryPath)
         {
-            var itemPaths = new string[] { categoryPath };
             var message = EventMessageBuilder.CreateUserCategory(authentication, categoryPath);
             return this.Repository.Dispatcher.InvokeAsync(() =>
             {
                 try
                 {
-                    this.Repository.Lock(authentication, this, nameof(InvokeCategoryCreateAsync), itemPaths);
                     this.Repository.CreateUserCategory(categoryPath);
                     this.Repository.Commit(authentication, message);
                 }
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeCategoryCreateAsync), itemPaths);
                     throw;
                 }
             });
@@ -111,7 +112,6 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeCategoryRenameAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -132,7 +132,6 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeCategoryMoveAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -151,7 +150,6 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeCategoryDeleteAsync), userContextSet.Paths);
                     throw;
                 }
             });

@@ -29,16 +29,15 @@ using Ntreev.Library.IO;
 
 namespace Ntreev.Crema.Services.Data
 {
-    enum DataBaseItemState
+    [Flags]
+    enum DataBaseSetOptions
     {
-        None,
+        None = 0,
 
-        Create,
+        AllowTypeCreation = 1,
 
-        Rename,
+        AllowTableCreation = 2,
 
-        Move,
-
-        Delete,
+        OmitUnlock = 4,
     }
 }

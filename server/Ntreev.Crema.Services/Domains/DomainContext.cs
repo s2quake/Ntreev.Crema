@@ -67,6 +67,7 @@ namespace Ntreev.Crema.Services.Domains
                     var category = this.Categories.AddNew(categoryName);
                     category.DataBase = item;
                 }
+                this.CremaHost.Info($"{nameof(DomainContext)} Initialized");
             });
         }
 
@@ -420,11 +421,9 @@ namespace Ntreev.Crema.Services.Domains
                 return taskList.ToArray();
             });
             await Task.WhenAll(tasks);
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.Clear();
-                this.Dispatcher.Dispose();
-            });
+            await this.Dispatcher.InvokeAsync(() => this.Clear());
+            await this.Dispatcher.DisposeAsync();
+            this.CremaHost.Info($"{nameof(DomainContext)} Disposed");
         }
 
         protected virtual void OnItemsCreated(ItemsCreatedEventArgs<IDomainItem> e)

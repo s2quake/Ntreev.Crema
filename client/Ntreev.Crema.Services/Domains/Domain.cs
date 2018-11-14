@@ -488,7 +488,7 @@ namespace Ntreev.Crema.Services.Domains
         {
             await this.DataDispatcher.InvokeAsync(() =>
             {
-                
+                var ss = taskID;
                 this.OnNewRow(domainUser, rows, authentication.SignatureDate);
             });
             foreach (var item in rows)

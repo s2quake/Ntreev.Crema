@@ -122,7 +122,6 @@ namespace Ntreev.Crema.Services.Data
             var message = EventMessageBuilder.SetAccessMemberOfTypeItem(authentication, items, memberIDs, accessTypes);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Set, memberIDs, accessTypes);
             this.CremaHost.Debug(eventLog);
-            //this.repository.Commit(authentication, comment, eventLog);
             this.CremaHost.Info(message);
             this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData));
         }
@@ -133,9 +132,8 @@ namespace Ntreev.Crema.Services.Data
             var message = EventMessageBuilder.RemoveAccessMemberFromTypeItem(authentication, items, memberIDs);
             var metaData = EventMetaDataBuilder.Build(items, AccessChangeType.Remove, memberIDs);
             this.CremaHost.Debug(eventLog);
-            //this.repository.Commit(authentication, comment, eventLog);
             this.CremaHost.Info(message);
-            this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, new object[] { AccessChangeType.Remove, memberIDs, }));
+            this.OnItemsAccessChanged(new ItemsEventArgs<ITypeItem>(authentication, items, metaData));
         }
 
         public void InvokeItemsLockedEvent(Authentication authentication, ITypeItem[] items, string[] comments)

@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users
 {
-    class UserContextSet
+    class UserContextSet : IDisposable
     {
         private readonly Dictionary<string, UserSerializationInfo> users = new Dictionary<string, UserSerializationInfo>();
         private readonly Dictionary<string, UserSerializationInfo> usersToCreate = new Dictionary<string, UserSerializationInfo>();
@@ -59,6 +59,17 @@ namespace Ntreev.Crema.Services.Users
         public static Task<UserContextSet> CreateAsync(UserContext userContext, UserSet userSet, bool userCreation)
         {
             return userContext.Dispatcher.InvokeAsync(() => new UserContextSet(userContext, userSet, userCreation));
+        }
+
+        public static Task<UserContextSet> CreateEmptyAsync(Authentication authentication, UserContext userContext, string[] itemPaths)
+        {
+            var userSet = new UserSet
+            {
+                ItemPaths = itemPaths,
+                Infos = new UserSerializationInfo[] { },
+                SignatureDateProvider = new SignatureDateProvider(authentication.ID),
+            };
+            return userContext.Dispatcher.InvokeAsync(() => new UserContextSet(userContext, userSet, false));
         }
 
         public void SetUserCategoryPath(string categoryPath, string newCategoryPath)
@@ -221,5 +232,24 @@ namespace Ntreev.Crema.Services.Users
         private IObjectSerializer Serializer => this.UserContext.Serializer;
 
         private UserContext UserContext { get; }
+
+        private CremaHost CremaHost => this.UserContext.CremaHost;
+
+        #region IDisposable
+
+        async void IDisposable.Dispose()
+        {
+            try
+            {
+                await this.Repository.Dispatcher.InvokeAsync(() => this.Repository.Unlock(Authentication.System, this, nameof(IDisposable.Dispose), this.Paths));
+            }
+            catch (Exception e)
+            {
+                this.CremaHost.Fatal(e);
+                throw;
+            }
+        }
+
+        #endregion
     }
 }

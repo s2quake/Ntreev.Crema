@@ -34,28 +34,6 @@ namespace Ntreev.Crema.ServiceHosts
 
         private static Timer timer;
 
-        private static async void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            var descriptionList = new List<Description>();
-            lock (authentications)
-            {
-                var dateTime = DateTime.Now;
-                foreach (var item in authentications.ToArray())
-                {
-                    var authentication = item.Key;
-                    var description = item.Value;
-                    if (dateTime - description.DateTime > pingTimeout)
-                    {
-                        descriptionList.Add(item.Value);
-                        authentications.Remove(item.Key);
-                    }
-                }
-            }
-
-            var tasks = descriptionList.Select(item => item.DisposeAsync()).ToArray();
-            await Task.WhenAll(tasks);
-        }
-
         public static Task<int> AddRefAsync(this Authentication authentication, ICremaServiceItem obj)
         {
             return Dispatcher.InvokeAsync(() =>
@@ -142,6 +120,28 @@ namespace Ntreev.Crema.ServiceHosts
             dispatcher = null;
         }
 
+        private static async void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            var descriptionList = new List<Description>();
+            lock (authentications)
+            {
+                var dateTime = DateTime.Now;
+                foreach (var item in authentications.ToArray())
+                {
+                    var authentication = item.Key;
+                    var description = item.Value;
+                    if (dateTime - description.DateTime > pingTimeout)
+                    {
+                        descriptionList.Add(item.Value);
+                        authentications.Remove(item.Key);
+                    }
+                }
+            }
+
+            var tasks = descriptionList.Select(item => item.DisposeAsync()).ToArray();
+            await Task.WhenAll(tasks);
+        }
+
         private static CremaDispatcher Dispatcher
         {
             get
@@ -173,7 +173,6 @@ namespace Ntreev.Crema.ServiceHosts
                 {
                     authentications.Remove(Authentication);
                 });
-                //await this.AbortServieItemsAsync(false);
             }
 
             public void Ping()
@@ -183,8 +182,8 @@ namespace Ntreev.Crema.ServiceHosts
 
             public async Task DisposeAsync()
             {
+                await Task.Delay(1);
                 this.Authentication.Expired -= Authentication_Expired;
-                //await this.AbortServieItemsAsync(true);
                 if (this.ServiceItems.Any() == true)
                     this.action(this.Authentication);
             }

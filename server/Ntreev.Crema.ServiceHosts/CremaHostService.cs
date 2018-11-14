@@ -62,7 +62,6 @@ namespace Ntreev.Crema.ServiceHosts
                 this.authentication = await this.CremaHost.AuthenticateAsync(this.authenticationToken);
                 await this.authentication.AddRefAsync(this, (a) => this.CremaHost.LogoutAsync(a));
                 this.OwnerID = this.authentication.ID;
-                //result.Value = await this.AttachEventHandlersAsync();
                 result.Value = this.authenticationToken;
                 result.SignatureDate = this.authentication.SignatureDate;
                 this.LogService.Debug($"[{this.OwnerID}] {nameof(CremaHostService)} {nameof(SubscribeAsync)}");
@@ -89,8 +88,6 @@ namespace Ntreev.Crema.ServiceHosts
             var result = new ResultBase();
             try
             {
-                //await this.DetachEventHandlersAsync();
-                //await this.authentication.RemoveRefAsync(this);
                 await this.CremaHost.LogoutAsync(this.authentication);
                 this.authentication = null;
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
@@ -189,9 +186,9 @@ namespace Ntreev.Crema.ServiceHosts
 
         protected override async Task OnCloseAsync(bool disconnect)
         {
+            await Task.Delay(1);
             if (this.authentication != null)
             {
-                //await this.DetachEventHandlersAsync();
                 this.authentication = null;
             }
         }

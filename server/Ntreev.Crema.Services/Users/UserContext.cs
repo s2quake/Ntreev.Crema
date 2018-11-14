@@ -416,7 +416,7 @@ namespace Ntreev.Crema.Services.Users
                     user.Password = UserContext.StringToSecureString(userInfo.Password);
                 }
 
-                this.CremaHost.Info("UserContext Initialized");
+                this.CremaHost.Info($"{nameof(UserContext)} Initialized");
             });
         }
 
@@ -441,8 +441,9 @@ namespace Ntreev.Crema.Services.Users
 
                 base.Clear();
             });
-            this.Repository.Dispose();
-            this.Dispatcher.Dispose();
+            await this.Repository.DisposeAsync();
+            await this.Dispatcher.DisposeAsync();
+            this.CremaHost.Info($"{nameof(UserContext)} Disposed");
         }
 
         public UserRepositoryHost Repository { get; }

@@ -20,6 +20,7 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
+using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
@@ -31,10 +32,10 @@ namespace Ntreev.Crema.Services.Data
 {
     class NewTableTemplate : TableTemplateBase
     {
+        private const string ChildString = "Child";
         private object parent;
         private Table[] tables;
         private IPermission permission;
-        private string[] tableNames;
 
         public NewTableTemplate(TableCategory category)
         {
@@ -136,22 +137,29 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            var dataSet = this.TemplateSource.DataTable.DataSet;
-            var tableNames = dataSet.Tables.Select(item => item.Name).ToArray();
-            var query = from item in tableNames.Except(this.tableNames)
-                        let dataTable = dataSet.Tables[item]
-                        orderby dataTable.Name
-                        orderby dataTable.TemplatedParentName != string.Empty
-                        select dataTable;
-
-            var dataTables = query.ToArray();
+            var dataSet = this.TemplateSource.DataSet;
+            var dataTable = this.TemplateSource.DataTable;
             var taskID = this.Domain.ID;
-            this.tables = await this.Container.AddNewAsync(authentication, dataSet, dataTables);
-            this.Domain.Result = dataTables.Select(item => item.TableInfo).ToArray();
-            await base.OnEndEditAsync(authentication);
-            await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
-            this.parent = null;
-            this.permission = null;
+            var dataTables = EnumerableUtility.Friends(dataTable, dataTable.DerivedTables).ToArray();
+            var itemPaths = dataTables.Select(item => item.FullPath).ToArray();
+            var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, DataBaseSetOptions.OmitUnlock | DataBaseSetOptions.AllowTableCreation);
+
+            await this.Repository.LockAsync(authentication, this, nameof(OnEndEditAsync), itemPaths);
+            try
+            {
+                dataBaseSet.TablesToCreate = dataTables;
+                this.tables = await this.Container.AddNewAsync(authentication, dataBaseSet);
+                this.Domain.Result = dataTables.Select(item => item.TableInfo).ToArray();
+                await base.OnEndEditAsync(authentication);
+                await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
+                this.parent = null;
+                this.permission = null;
+            }
+            finally
+            {
+                await this.Repository.UnlockAsync(authentication, this, nameof(OnEndEditAsync), itemPaths);
+            }
+            await this.Repository.UnlockAsync(authentication, this, nameof(OnCancelEditAsync), this.ItemPaths);
         }
 
         protected override async Task OnCancelEditAsync(Authentication authentication)
@@ -169,55 +177,26 @@ namespace Ntreev.Crema.Services.Data
                 var typeContext = category.GetService(typeof(TypeContext)) as TypeContext;
                 var tableContext = category.GetService(typeof(TableContext)) as TableContext;
                 var dataSet = await category.ReadDataForNewTemplateAsync(authentication);
-                var tableNames = tableContext.Tables.Select((Table item) => item.Name).ToArray();
-                var newName = NameUtility.GenerateNewName(nameof(Table), tableContext.Tables.Select((Table item) => item.Name));
+                var tableNames = await tableContext.Dispatcher.InvokeAsync(() => tableContext.Tables.Select((Table item) => item.Name).ToArray());
+                var newName = NameUtility.GenerateNewName(nameof(Table), tableNames);
                 var templateSource = CremaTemplate.Create(dataSet, newName, category.Path);
-                this.tableNames = new string[] { };
                 return templateSource;
             }
             else if (this.parent is Table table)
             {
                 var dataSet = await table.ReadDataForNewTemplateAsync(authentication);
                 var dataTable = dataSet.Tables[table.Name, table.Category.Path];
-                this.tableNames = this.GetTableNames(dataSet);
-                return CremaTemplate.Create(dataTable);
+                var childNames = await table.Dispatcher.InvokeAsync(() => table.Childs.Select(item => item.TableName).Concat(new string[] { table.TableName }).ToArray());
+                var newName = NameUtility.GenerateNewName(ChildString, childNames);
+                var template = CremaTemplate.Create(dataTable);
+                template.TableName = newName;
+                return template;
             }
             throw new NotImplementedException();
-        }
-
-        protected override void OnAttach(Domain domain)
-        {
-            base.OnAttach(domain);
-            if (this.parent is TableCategory category)
-            {
-                this.tableNames = new string[] { };
-            }
-            else if (this.parent is Table table)
-            {
-                var dataSet = this.TemplateSource.DataSet;
-                this.tableNames = this.GetTableNames(dataSet);
-            }
         }
 
         private TableCollection Container { get; }
 
         public TableContext Context => this.Container.Context;
-
-        private string[] GetTableNames(CremaDataSet dataSet)
-        {
-            var itemPaths = dataSet.GetItemPaths();
-            var tableNameList = new List<string>(dataSet.Tables.Count);
-                foreach (var item in itemPaths)
-            {
-                if (item.StartsWith(DataBase.TablePathPrefix) == true)
-                {
-                    var path = item.Substring(DataBase.TablePathPrefix.Length);
-                    var itemName = new ItemName(path);
-                    tableNameList.Add(itemName.Name);
-                }
-            }
-
-            return tableNameList.ToArray();
-        }
     }
 }

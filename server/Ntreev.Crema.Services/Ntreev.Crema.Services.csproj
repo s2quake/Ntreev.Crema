@@ -62,7 +62,7 @@
     <Compile Include="AuthenticationToken.cs" />
     <Compile Include="CremaString.cs" />
     <Compile Include="Data\DataBaseImporter.cs" />
-    <Compile Include="Data\DataBaseItemState.cs" />
+    <Compile Include="Data\DataBaseSetOptions.cs" />
     <Compile Include="Data\DataSetExtensions.cs" />
     <Compile Include="Data\DataServiceItemInfo.cs" />
     <Compile Include="Data\DataBaseSet.cs" />

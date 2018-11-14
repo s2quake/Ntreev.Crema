@@ -67,23 +67,24 @@ namespace Ntreev.Crema.Services.Users
                 });
                 var taskID = GuidUtility.FromName(categoryPath + userID);
                 var userSet = await this.CreateDataForCreateAsync(authentication, userID, categoryPath, password, userName, authority);
-                var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, true);
-                var userPaths = new string[] { categoryPath + userID };
-                var userNames = new string[] { userName };
-                await this.InvokeUserCreateAsync(authentication, userPaths, userNames, userContextSet);
-                var newUser = await this.Dispatcher.InvokeAsync(() =>
+                using (var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, true))
                 {
-                    var user = this.BaseAddNew(userID, categoryPath, null);
-                    var userInfo = userContextSet.GetUserInfo(categoryPath + userID);
-                    user.Initialize((UserInfo)userInfo, (BanInfo)userInfo.BanInfo);
-                    user.Password = UserContext.StringToSecureString(userInfo.Password);
-                    this.CremaHost.Sign(authentication);
-                    this.InvokeUsersCreatedEvent(authentication, new User[] { user });
-                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
-                    return user;
-                });
-                await this.Repository.UnlockAsync(authentication, this, nameof(AddNewAsync), userContextSet.Paths);
-                return newUser;
+                    var userPaths = new string[] { categoryPath + userID };
+                    var userNames = new string[] { userName };
+                    await this.InvokeUserCreateAsync(authentication, userPaths, userNames, userContextSet);
+                    var newUser = await this.Dispatcher.InvokeAsync(() =>
+                    {
+                        var user = this.BaseAddNew(userID, categoryPath, null);
+                        var userInfo = userContextSet.GetUserInfo(categoryPath + userID);
+                        user.Initialize((UserInfo)userInfo, (BanInfo)userInfo.BanInfo);
+                        user.Password = UserContext.StringToSecureString(userInfo.Password);
+                        this.CremaHost.Sign(authentication);
+                        this.InvokeUsersCreatedEvent(authentication, new User[] { user });
+                        this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                        return user;
+                    });
+                    return newUser;
+                }
             }
             catch (Exception e)
             {
@@ -105,7 +106,6 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeUserCreateAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -124,7 +124,6 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeUserMoveAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -143,7 +142,6 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeUserDeleteAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -162,7 +160,6 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeUserChangeAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -181,7 +178,6 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeUserBanAsync), userContextSet.Paths);
                     throw;
                 }
             });
@@ -200,7 +196,6 @@ namespace Ntreev.Crema.Services.Users
                 catch
                 {
                     this.Repository.Revert();
-                    this.Repository.Unlock(authentication, this, nameof(InvokeUserUnbanAsync), userContextSet.Paths);
                     throw;
                 }
             });

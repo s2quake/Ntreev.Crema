@@ -73,13 +73,11 @@ namespace Ntreev.Crema.Services.Data
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), typeName, newTypeName, categoryPath);
                 });
+                var taskID = GuidUtility.FromName(categoryPath + newTypeName);
                 var result = await this.CremaHost.InvokeServiceAsync(() => this.Context.Service.CopyType(typeName, newTypeName, categoryPath));
-                var type = await this.AddNewAsync(authentication, result.Value);
-                return await this.Dispatcher.InvokeAsync(() =>
-                {
-                    this.CremaHost.Sign(authentication, result);
-                    return type;
-                });
+                var typeInfo = result.Value;
+                await this.DataBase.WaitAsync(taskID);
+                return await this.Dispatcher.InvokeAsync(() => this[typeInfo.Name, typeInfo.CategoryPath]);
             }
             catch (Exception e)
             {
