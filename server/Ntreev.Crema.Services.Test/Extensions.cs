@@ -43,8 +43,7 @@ namespace Ntreev.Crema.Services.Test
         {
 #if SERVER
             var repositoryPath = DirectoryUtility.Prepare(context.TestRunDirectory + "_repo", name);
-            CremaBootstrapper.CreateRepository(boot, repositoryPath, "svn", "xml", true);
-            boot.MultiThreading = true;
+            CremaBootstrapper.CreateRepository(boot, repositoryPath, "git", "xml", true);
             boot.BasePath = repositoryPath;
 #endif
 #if CLIENT
@@ -73,7 +72,7 @@ namespace Ntreev.Crema.Services.Test
         public static void Initialize(this IDataBase dataBase, Authentication authentication)
         {
 #if SERVER
-            dataBase.InitializeRandomItems(authentication);
+            dataBase.InitializeRandomItemsAsync(authentication);
 #else
             dataBase.InitializeRandomItems(authentication, false);
 #endif
@@ -82,8 +81,8 @@ namespace Ntreev.Crema.Services.Test
         public static Authentication Start(this ICremaHost cremaHost)
         {
 #if SERVER
-            var token = cremaHost.Open();
-            var authentication = cremaHost.Login("admin", Utility.AdminPassword);
+            var token = cremaHost.OpenAsync();
+            var authentication = cremaHost.LoginAsync("admin", Utility.AdminPassword);
             authenticationToToken.Add(authentication, token);
             return authentication;
 #endif

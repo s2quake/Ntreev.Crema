@@ -75,12 +75,5 @@ namespace Ntreev.Crema.Services.Test
         {
             
         }
-
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void DataBaseTest()
-        {
-            var dataBases = cremaHost.DataBases;
-        }
     }
 }
