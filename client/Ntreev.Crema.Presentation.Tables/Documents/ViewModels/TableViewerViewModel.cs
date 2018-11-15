@@ -59,13 +59,13 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             this.Initialize();
         }
 
-        protected override Task CloseAsync()
+        protected override async Task<bool> CloseAsync()
         {
             if (this.Tables.Any() == true)
             {
                 this.DetachEvent();
             }
-            return base.CloseAsync();
+            return await Task.Run(() => true);
         }
 
         private void ContentDescriptor_EditEnded(object sender, EventArgs e)

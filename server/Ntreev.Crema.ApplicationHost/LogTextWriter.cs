@@ -8,12 +8,12 @@ using System.Windows.Controls;
 
 namespace Ntreev.Crema.ApplicationHost
 {
-    class LogWriter : TextWriter
+    class LogTextWriter : TextWriter
     {
         private TextBox textBox;
         private readonly StringBuilder sb = new StringBuilder();
 
-        public LogWriter()
+        public LogTextWriter()
         {
 
         }

@@ -15,30 +15,64 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Library;
 using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
+using Ntreev.Crema.Commands.Consoles;
+using System.ComponentModel;
+using Ntreev.Crema.ApplicationHost.Dialogs.ViewModels;
 
-namespace Ntreev.Crema.Commands.Consoles
+namespace Ntreev.Crema.ApplicationHost.Commands.Consoles
 {
-    [ConsoleModeOnly]
     [Export(typeof(IConsoleCommand))]
     [ResourceDescription("Resources", IsShared = true)]
-    class ResetCommand : ConsoleCommandBase
+    class LoginCommand : ConsoleCommandAsyncBase
     {
-        public ResetCommand()
+        public LoginCommand()
+            : base("login")
         {
-            
+
         }
 
-        protected override void OnExecute()
+        [CommandProperty(IsRequired = true)]
+        [DefaultValue("")]
+        public string UserID
         {
-            Console.Clear();
+            get; set;
+        }
+
+        [CommandProperty(IsRequired = true)]
+        [DefaultValue("")]
+        public string Password
+        {
+            get; set;
+        }
+
+        public override bool IsEnabled => this.CommandContext.IsOnline == false;
+
+        public new ConsoleCommandContext CommandContext => base.CommandContext as ConsoleCommandContext;
+
+        protected override async Task OnExecuteAsync()
+        {
+            try
+            {
+                var dialog = new LoginViewModel();
+                if (dialog.ShowDialog() != true)
+                    return;
+                await this.CommandContext.LoginAsync(dialog.UserID, dialog.Password);
+            }
+            catch (OperationCanceledException e)
+            {
+                throw new Exception("login is cancelled.", e);
+            }
         }
     }
 }

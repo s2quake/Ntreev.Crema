@@ -124,9 +124,9 @@ namespace Ntreev.Crema.Comparer.Tables.ViewModels
             }
         }
 
-        protected override Task CloseAsync()
+        protected override async Task<bool> CloseAsync()
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            return await this.Dispatcher.InvokeAsync(() =>
             {
                 if (this.IsModified == false)
                 {
@@ -142,7 +142,8 @@ namespace Ntreev.Crema.Comparer.Tables.ViewModels
                         item.Source.AcceptChanges();
                     }
                 }
-            }).Task;
+                return true;
+            });
         }
 
         private void DocumentItem_PropertyChanged(object sender, PropertyChangedEventArgs e)

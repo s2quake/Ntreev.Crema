@@ -1,4 +1,6 @@
 ﻿using FirstFloor.ModernUI.Windows.Controls;
+using Ntreev.Crema.ApplicationHost.Commands.Consoles;
+using Ntreev.Crema.ApplicationHost.Controls;
 using Ntreev.Crema.Services;
 using System;
 using System.Collections.Generic;
@@ -24,7 +26,7 @@ namespace Ntreev.Crema.ApplicationHost
     [Export]
     public partial class ShellView : ModernWindow
     {
-        private static LogWriter writer = new LogWriter();
+        private static LogTextWriter writer = new LogTextWriter();
 
         private readonly ICremaHost cremaHost;
         private readonly ConsoleCommandContext commandContext;
@@ -68,6 +70,7 @@ namespace Ntreev.Crema.ApplicationHost
             try
             {
                 await Task.Run(() => this.commandContext.Execute(this.commandContext.Name + " " + commandLine));
+                this.SetPrompt();
             }
             catch (System.Reflection.TargetInvocationException e)
             {
@@ -147,7 +150,7 @@ namespace Ntreev.Crema.ApplicationHost
         {
             this.Dispatcher.InvokeAsync(() =>
             {
-                this.terminal.Reset();
+                //this.terminal.Reset();
             });
         }
 

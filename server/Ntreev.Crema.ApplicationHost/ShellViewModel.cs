@@ -3,7 +3,9 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using Ntreev.Crema.ServiceHosts;
 using Ntreev.Crema.Services;
 using Ntreev.Library;
+using Ntreev.Library.IO;
 using Ntreev.ModernUI.Framework;
+using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -86,6 +88,28 @@ namespace Ntreev.Crema.ApplicationHost
             }
         }
 
+        public void CreateRepository()
+        {
+            var dialog = new CommonOpenFileDialog()
+            {
+                IsFolderPicker = true,
+            };
+
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                var basePath = dialog.FileName;
+                var isEmpty = DirectoryUtility.IsEmpty(basePath);
+                if (isEmpty == false && AppMessageBox.ShowProceed("대상 경로는 비어있지 않습니다. 그래도 생성하시겠습니까?") == false)
+                {
+                    return;
+                }
+
+                CremaBootstrapper.CreateRepository(this.service, basePath, "git", "xml", !isEmpty);
+                AppMessageBox.Show("저장소를 생성했습니다.");
+                this.BasePath = basePath;
+            }
+        }
+
         public bool CanOpenService
         {
             get
@@ -124,14 +148,23 @@ namespace Ntreev.Crema.ApplicationHost
             }
         }
 
-        protected override async Task CloseAsync()
+        protected override async Task<bool> CloseAsync()
         {
             if (this.ServiceState == ServiceState.Opened)
             {
-                this.ServiceState = ServiceState.Closing;
-                await this.service.CloseAsync();
-                this.ServiceState = ServiceState.Closed;
+                if (AppMessageBox.ShowProceed("서비스가 실행중입니다. 서비스 중지후 종료하시겠습니까?") == true)
+                {
+                    this.ServiceState = ServiceState.Closing;
+                    await this.service.CloseAsync();
+                    this.ServiceState = ServiceState.Closed;
+                }
+                else
+                {
+                    return false;
+                }
             }
+
+            return true;
         }
 
         public override void TryClose(bool? dialogResult = null)

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.ApplicationHost
 {
     [Export(typeof(IConfigurationProperties))]
-    public class ConfigurationProperties : IConfigurationProperties
+    class ConfigurationProperties : IConfigurationProperties
     {
         private readonly ICremaHost cremaHost;
         private readonly ConfigurationPropertyDescriptorCollection properties;

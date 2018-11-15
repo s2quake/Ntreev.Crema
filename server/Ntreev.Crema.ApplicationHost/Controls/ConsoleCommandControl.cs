@@ -1,4 +1,5 @@
-﻿using Ntreev.Library.Commands;
+﻿using Ntreev.Crema.ApplicationHost.Commands.Consoles;
+using Ntreev.Library.Commands;
 using Ntreev.ModernUI.Framework.Controls;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Ntreev.Crema.ApplicationHost
+namespace Ntreev.Crema.ApplicationHost.Controls
 {
     class ConsoleCommandControl : TerminalControl
     {

@@ -224,7 +224,7 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             }
         }
 
-        protected async override Task CloseAsync()
+        protected async override Task<bool> CloseAsync()
         {
             var closed = false;
             if (this.cremaAppHost.IsOpened == true)
@@ -236,6 +236,7 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
                     await Task.Delay(1);
                 }
             }
+            return true;
         }
 
         public event EventHandler Loaded;

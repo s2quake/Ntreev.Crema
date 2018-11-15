@@ -40,7 +40,7 @@ namespace Ntreev.Crema.WindowsServiceHost
 {
     public partial class WindowCremaService : ServiceBase
     {
-        private CremaService cremaService;
+        private CremaApplication cremaApp;
         private ICremaHost cremaHost;
 
         public WindowCremaService()
@@ -61,37 +61,37 @@ namespace Ntreev.Crema.WindowsServiceHost
             var path = baseArgs[1];
             var port = int.Parse(baseArgs[2]);
 
-            this.cremaService = new CremaService()
+            this.cremaApp = new CremaApplication()
             {
                 BasePath = path,
                 Port = port,
             };
 
-            CremaLog.Debug("service base path : {0}", path);
-            CremaLog.Debug("service port : {0}", port);
+            this.EventLog.WriteEntry($"service base path : {path}");
+            this.EventLog.WriteEntry($"service port : {port}");
 
             try
             {
-                CremaLog.Debug(args.Length);
+                this.EventLog.WriteEntry($"args length: {args.Length}");
                 if (args.Any() == true)
                 {
                     var settings = new Settings()
                     {
-                        BasePath = this.cremaService.BasePath,
-                        Port = this.cremaService.Port,
+                        BasePath = this.cremaApp.BasePath,
+                        Port = this.cremaApp.Port,
                     };
                     var parser = new CommandLineParser("setting", settings);
                     parser.Parse(string.Join(" ", "setting", string.Join(" ", args)));
 
-                    this.cremaService.BasePath = settings.BasePath;
-                    this.cremaService.Port = settings.Port;
+                    this.cremaApp.BasePath = settings.BasePath;
+                    this.cremaApp.Port = settings.Port;
 
-                    CremaLog.Debug("=========================================================");
-                    CremaLog.Debug("new settings");
-                    CremaLog.Debug("service base path : {0}", settings.BasePath);
-                    CremaLog.Debug("service port : {0}", settings.Port);
-                    CremaLog.Debug("service repo module : {0}", settings.RepositoryModule);
-                    CremaLog.Debug("=========================================================");
+                    this.EventLog.WriteEntry($"=========================================================");
+                    this.EventLog.WriteEntry($"new settings");
+                    this.EventLog.WriteEntry($"service base path : {settings.BasePath}");
+                    this.EventLog.WriteEntry($"service port : {settings.Port}");
+                    this.EventLog.WriteEntry($"service repo module : {settings.RepositoryModule}");
+                    this.EventLog.WriteEntry($"=========================================================");
                 }
             }
             catch (Exception e)
@@ -100,24 +100,24 @@ namespace Ntreev.Crema.WindowsServiceHost
                 throw e;
             }
 
-            CremaLog.Debug("service open");
-            this.cremaService.OpenAsync().Wait();
-            this.cremaHost = this.cremaService.GetService(typeof(ICremaHost)) as ICremaHost;
-            this.cremaHost.Closed += CremaHost_Closed;
-            CremaLog.Debug("service opened.");
+            this.EventLog.WriteEntry("service open");
+            this.cremaApp.Open();
+            this.cremaHost = this.cremaApp.GetService(typeof(ICremaHost)) as ICremaHost;
+            this.cremaApp.Closed += CremaApp_Closed;
+            this.EventLog.WriteEntry("service opened.");
         }
 
         protected override void OnStop()
         {
             base.OnStop();
-            CremaLog.Debug("service close");
-            this.cremaService.CloseAsync().Wait();
-            CremaLog.Debug("service closed.");
+            this.EventLog.WriteEntry("service close");
+            this.cremaApp.Close();
+            this.EventLog.WriteEntry("service closed.");
         }
 
-        private void CremaHost_Closed(object sender, ClosedEventArgs e)
+        private void CremaApp_Closed(object sender, ClosedEventArgs e)
         {
-            CremaLog.Debug(nameof(CremaHost_Closed) + " " + e.Reason);
+            this.EventLog.WriteEntry($"{nameof(CremaApp_Closed)} {e.Reason}");
             if (e.Reason == CloseReason.Shutdown)
             {
                 Task.Run(() =>

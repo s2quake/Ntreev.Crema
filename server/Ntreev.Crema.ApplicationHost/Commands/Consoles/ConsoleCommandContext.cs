@@ -11,7 +11,7 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.ApplicationHost
+namespace Ntreev.Crema.ApplicationHost.Commands.Consoles
 {
     [Export(typeof(ConsoleCommandContext))]
     public class ConsoleCommandContext : ConsoleCommandContextBase
@@ -20,6 +20,11 @@ namespace Ntreev.Crema.ApplicationHost
         private Authentication authentication;
         [Import]
         private CremaService service = null;
+
+        static ConsoleCommandContext()
+        {
+            CommandSettings.IsConsoleMode = false;
+        }
 
         [ImportingConstructor]
         public ConsoleCommandContext(ICremaHost cremaHost,

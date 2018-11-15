@@ -92,15 +92,16 @@ namespace Ntreev.Crema.Comparer.Types.ViewModels
             get { return this.Source.IsResolved == false; }
         }
 
-        protected override Task CloseAsync()
+        protected override async Task<bool> CloseAsync()
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            return await this.Dispatcher.InvokeAsync(() =>
             {
                 if (this.IsModified == false)
                     this.Source.RejectChanges();
                 else
                     this.Source.AcceptChanges();
-            }).Task;
+                return true;
+            });
         }
 
         private void UndoService_Changed(object sender, EventArgs e)

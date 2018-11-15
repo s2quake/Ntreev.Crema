@@ -191,7 +191,7 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        public override bool IsEnabled => this.CommandContext.Drive is DataBasesConsoleDrive;
+        public override bool IsEnabled => this.CommandContext.Drive is DataBasesConsoleDrive && this.CommandContext.IsOnline == true;
 
         private string[] GetDataBaseNames()
         {
@@ -222,21 +222,20 @@ namespace Ntreev.Crema.Commands.Consoles
 
         class ItemObject : TerminalTextItem
         {
-            private bool isLoaded;
-            private string name;
+            private readonly string name;
 
             public ItemObject(string name, bool isLoaded)
                 : base(name)
             {
                 this.name = name;
-                this.isLoaded = isLoaded;
+                this.IsLoaded = isLoaded;
             }
 
-            public bool IsLoaded => this.isLoaded;
+            public bool IsLoaded { get; }
 
             protected override void OnDraw(TextWriter writer, string text)
             {
-                if (this.isLoaded == false)
+                if (this.IsLoaded == false)
                 {
                     using (TerminalColor.SetForeground(ConsoleColor.DarkGray))
                     {

@@ -126,9 +126,9 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
                 return this.Source.IsResolved == false && this.Source.UnresolvedItems.Any() == false;
             }
         }
-        protected override Task CloseAsync()
+        protected override async Task<bool> CloseAsync()
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            return await this.Dispatcher.InvokeAsync(() =>
             {
                 if (this.IsModified == false)
                 {
@@ -144,7 +144,8 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
                         item.Source.AcceptChanges();
                     }
                 }
-            }).Task;
+                return true;
+            });
         }
 
         private void DocumentItem_PropertyChanged(object sender, PropertyChangedEventArgs e)

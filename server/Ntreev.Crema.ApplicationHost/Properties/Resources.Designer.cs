@@ -22,7 +22,7 @@ namespace Ntreev.Crema.ApplicationHost.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Ntreev.Crema.ApplicationHost.Properties {
         ///   이 클래스에서 사용하는 캐시된 ResourceManager 인스턴스를 반환합니다.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Ntreev.Crema.ApplicationHost.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace Ntreev.Crema.ApplicationHost.Properties {
         ///   재정의합니다.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,9 +61,18 @@ namespace Ntreev.Crema.ApplicationHost.Properties {
         }
         
         /// <summary>
+        ///   Login과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string Button_Login {
+            get {
+                return ResourceManager.GetString("Button_Login", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Avaliable Commands:과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
-        internal static string Comment_AvaliableCommands {
+        public static string Comment_AvaliableCommands {
             get {
                 return ResourceManager.GetString("Comment_AvaliableCommands", resourceCulture);
             }
@@ -72,7 +81,7 @@ namespace Ntreev.Crema.ApplicationHost.Properties {
         /// <summary>
         ///   Hello!과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
-        internal static string Comment_Hello {
+        public static string Comment_Hello {
             get {
                 return ResourceManager.GetString("Comment_Hello", resourceCulture);
             }
@@ -81,7 +90,7 @@ namespace Ntreev.Crema.ApplicationHost.Properties {
         /// <summary>
         ///   type &apos;help&apos; for usage.과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
-        internal static string Comment_TypeHelp {
+        public static string Comment_TypeHelp {
             get {
                 return ResourceManager.GetString("Comment_TypeHelp", resourceCulture);
             }
@@ -90,9 +99,27 @@ namespace Ntreev.Crema.ApplicationHost.Properties {
         /// <summary>
         ///   type &apos;--version&apos; to see the version.과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
-        internal static string Comment_TypeVersion {
+        public static string Comment_TypeVersion {
             get {
                 return ResourceManager.GetString("Comment_TypeVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Password과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string Label_Password {
+            get {
+                return ResourceManager.GetString("Label_Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   UserID과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        public static string Label_UserID {
+            get {
+                return ResourceManager.GetString("Label_UserID", resourceCulture);
             }
         }
     }

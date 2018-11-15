@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace Ntreev.Crema.ApplicationHost
+namespace Ntreev.Crema.ApplicationHost.Controls
 {
     class ConsoleWriter : StringWriter
     {

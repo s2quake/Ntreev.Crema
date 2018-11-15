@@ -5,7 +5,7 @@
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                   xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-                  xmlns:local="clr-namespace:Ntreev.Crema.ApplicationHost"
+                  xmlns:ctrl="clr-namespace:Ntreev.Crema.ApplicationHost.Controls"
                   mc:Ignorable="d" Style="{StaticResource ModernWindow_Style}" 
                   ResizeMode="NoResize" Height="500" Width="500"
                   LogoData="F1M12.267,9.942C12.793,9.908,13.324,9.93,13.864,10.037L15.516,10.641 15.337,11.892C14.941,14.66 14.625,16.875 14.625,16.875 14.625,16.875 3.375,16.875 3.375,16.875 3.375,16.875 3.059,14.66 2.663,11.892L2.484,10.641 4.259,11.214C7.136,11.705,9.637,10.114,12.267,9.942z M1.125,1.125C1.125,1.125 16.875,1.125 16.875,1.125 16.875,1.125 16.312,5.062 15.75,9 15.867,8.18 15.984,7.359 15.984,7.359 11.484,4.922 6.891,9.891 2.016,7.359 2.016,7.359 2.133,8.18 2.25,9 1.688,5.062 1.125,1.125 1.125,1.125z">
@@ -27,7 +27,7 @@
                          PreviewTextInput="LogBox_PreviewTextInput" PreviewKeyDown="LogBox_PreviewKeyDown" />
             </TabItem>
             <TabItem Header="Console">
-                <local:ConsoleCommandControl x:Name="terminal" Executed="TerminalControl_Executed" />
+                <ctrl:ConsoleCommandControl x:Name="terminal" Executed="TerminalControl_Executed" />
             </TabItem>
         </TabControl>
         <Grid Grid.Row="2">
@@ -39,8 +39,8 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBox x:Name="BasePath" />
-            <Button Grid.Column="2" x:Name="SelectBasePath" Content="..." ToolTip="저장소 경로를 선택합니다." />
-            <nmfc:IconButton Grid.Column="4" x:Name="CreateRepository" Source="/Images/add.png" ToolTip="새로운 저장소를 생성합니다." />
+            <Button Grid.Column="2" x:Name="SelectBasePath" Content="..." ToolTip="저장소 경로를 선택합니다." Width="50" />
+            <nmfc:IconButton Grid.Column="4" x:Name="CreateRepository" Source="/cremaserverApp;component/Images/add.png" ToolTip="새로운 저장소를 생성합니다." Width="50" />
         </Grid>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="5">

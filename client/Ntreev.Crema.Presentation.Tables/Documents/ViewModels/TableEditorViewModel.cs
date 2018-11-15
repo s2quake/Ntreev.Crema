@@ -61,7 +61,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             this.Initialize();
         }
 
-        protected override async Task CloseAsync()
+        protected override async Task<bool> CloseAsync()
         {
             if (this.Tables.Any() == true)
             {
@@ -75,6 +75,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
                     AppMessageBox.ShowError(e);
                 }
             }
+            return true;
         }
 
         private void ContentDescriptor_EditEnded(object sender, EventArgs e)

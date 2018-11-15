@@ -303,7 +303,7 @@ namespace Ntreev.Crema.Services.Users
             {
                 administrator
             };
-            for (var i = 0; i < 1000; i++)
+            for (var i = 0; i < 10; i++)
             {
                 var admin = new UserSerializationInfo()
                 {
@@ -436,8 +436,11 @@ namespace Ntreev.Crema.Services.Users
                     item.IsOnline = false;
                 }
 
-                this.Users.InvokeUsersStateChangedEvent(Authentication.System, users);
-                this.Users.InvokeUsersLoggedOutEvent(Authentication.System, users, CloseInfo.Empty);
+                if (users.Any() == true)
+                {
+                    this.Users.InvokeUsersStateChangedEvent(Authentication.System, users);
+                    this.Users.InvokeUsersLoggedOutEvent(Authentication.System, users, CloseInfo.Empty);
+                }
 
                 base.Clear();
             });
