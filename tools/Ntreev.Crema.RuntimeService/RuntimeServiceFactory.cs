@@ -89,12 +89,12 @@ namespace Ntreev.Crema.RuntimeService
 
         void ICremaHostServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         void ICremaHostServiceCallback.OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         #endregion

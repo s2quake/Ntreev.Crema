@@ -583,7 +583,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 var typeCollection = this.GetService(typeof(TypeCollection)) as TypeCollection;
                 var tables = this.Collect().OrderBy(item => item.Name).ToArray();
-                var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
+                var types = typeCollection.ToArray<Type>();
                 var typeItemPaths = types.Select(item => item.FullPath).ToArray();
                 var tableItemPaths = tables.Select(item => item.FullPath).ToArray();
                 var itemPaths = typeItemPaths.Concat(tableItemPaths).ToArray();

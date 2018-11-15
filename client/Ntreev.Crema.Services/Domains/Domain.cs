@@ -389,6 +389,9 @@ namespace Ntreev.Crema.Services.Domains
             var context = this.Context;
             var container = this.Container;
             this.CremaHost.Sign(authentication, authentication.SignatureDate);
+            if (this.Logger != null)
+                await this.Logger.DisposeAsync();
+            this.Logger = null;
             this.Dispose();
             this.OnDeleted(new DomainDeletedEventArgs(authentication, this, isCanceled));
             container.InvokeDomainDeletedEvent(authentication, new Domain[] { this }, new bool[] { isCanceled });

@@ -31,7 +31,7 @@ namespace Ntreev.Crema.Tools.View.Dialogs.ViewModels
     class ConnectionViewModel : ModalDialogBase
     {
         private string address = "localhost";
-        private string dataBase = "default";
+        private string dataBase = "master";
         private string tags = "All";
         private bool isDevmode;
         private string filterExpression;

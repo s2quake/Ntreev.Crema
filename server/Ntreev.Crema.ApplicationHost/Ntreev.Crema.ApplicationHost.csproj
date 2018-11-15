@@ -163,6 +163,10 @@
       <Project>{20dab068-f188-4ec5-96fa-227c11bba46d}</Project>
       <Name>Ntreev.Crema.Commands</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Ntreev.Crema.RuntimeService\Ntreev.Crema.RuntimeService.csproj">
+      <Project>{3d7847d1-7706-4a64-8846-d8aa3639471c}</Project>
+      <Name>Ntreev.Crema.RuntimeService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.csproj">
       <Project>{a7bf94f7-94a5-46ba-a756-c04bde65f47b}</Project>
       <Name>Ntreev.Crema.ServiceHosts</Name>

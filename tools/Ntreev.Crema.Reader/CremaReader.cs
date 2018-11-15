@@ -29,7 +29,7 @@ namespace Ntreev.Crema.Reader
     {
         public static IDataSet Read(string ipAddress, int port)
         {
-            return Read(ipAddress, port, "default");
+            return Read(ipAddress, port, "master");
         }
 
         public static IDataSet Read(string ipAddress, int port, string dataBase)

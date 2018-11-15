@@ -134,7 +134,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             try
             {
                 var domain = await this.GetDomainAsync(domainID);
-                await domain.SetPropertyAsync(this.authentication, propertyName, value);
+                result.TaskID = await (Task<Guid>)domain.SetPropertyAsync(this.authentication, propertyName, value);
                 result.SignatureDate = this.authentication.SignatureDate;
             }
             catch (Exception e)

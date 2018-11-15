@@ -134,7 +134,7 @@ namespace Ntreev.Crema.Services.Data
                 this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync));
+                    this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync)); 
                 });
                 await this.OnCancelEditAsync(authentication);
                 await this.Dispatcher.InvokeAsync(() =>
