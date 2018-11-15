@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Runtime.Generation.NativeC.CodeDom
+namespace Ntreev.Crema.Runtime.Generation.Cpp.CodeDom
 {
     class CodeObjectDeleteExpression : CodeExpression
     {

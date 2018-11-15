@@ -24,7 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Ntreev.Library.ObjectModel;
 
-namespace Ntreev.Crema.Runtime.Generation.NativeC
+namespace Ntreev.Crema.Runtime.Generation.Cpp
 {
     public static class ColumnInfoExtensions
     {
@@ -46,6 +46,8 @@ namespace Ntreev.Crema.Runtime.Generation.NativeC
             if (CremaDataTypeUtility.IsBaseType(columnInfo.DataType) == true)
             {
                 var runtimeType = CremaDataTypeUtility.GetType(columnInfo.DataType);
+                if (runtimeType == typeof(Guid))
+                    runtimeType = typeof(string);
                 codeTypeRef = new CodeTypeReference(runtimeType);
                 if (runtimeType == typeof(string))
                 {
@@ -64,6 +66,8 @@ namespace Ntreev.Crema.Runtime.Generation.NativeC
         {
             if (CremaDataTypeUtility.IsBaseType(columnInfo.DataType) == true)
             {
+                if (columnInfo.DataType == typeof(Guid).GetTypeName())
+                    return new CodeTypeReference(typeof(string));
                 return new CodeTypeReference(CremaDataTypeUtility.GetType(columnInfo.DataType));
             }
             var itemName = new ItemName(columnInfo.DataType);
@@ -82,7 +86,7 @@ namespace Ntreev.Crema.Runtime.Generation.NativeC
 
         public static CodeExpression GetInitExpression(this ColumnInfo columnInfo)
         {
-            if (columnInfo.DataType != typeof(string).GetTypeName())
+            if (columnInfo.DataType != typeof(string).GetTypeName() && columnInfo.DataType != typeof(Guid).GetTypeName())
                 return new CodeCastExpression(columnInfo.GetCodeType(CodeType.None), new CodePrimitiveExpression(0));
             return null;
         }
@@ -171,9 +175,7 @@ namespace Ntreev.Crema.Runtime.Generation.NativeC
                 return "to_datetime";
             else if (columnInfo.DataType == "duration")
                 return "to_duration";
-            else if (columnInfo.DataType == "dictionary")
-                return "to_string";
-            else if (columnInfo.DataType == "table")
+            else if (columnInfo.DataType == "guid")
                 return "to_string";
 
             return "to_int32";

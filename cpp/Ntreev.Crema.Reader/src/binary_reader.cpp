@@ -36,11 +36,10 @@ namespace CremaReader {
 				if (fileHeader.tableCount == 0)
 					return;
 				stream.read((char*)&m_tableIndexes.front(), sizeof(table_index) * fileHeader.tableCount);
-				m_revision = fileHeader.revision;
-
 				stream.seekg(fileHeader.stringResourcesOffset);
 				string_resource::read(stream);
 				m_name = string_resource::get(fileHeader.name);
+				m_revision = string_resource::get(fileHeader.revision);
 
 				this->m_tables.set_size(m_tableIndexes);
 				this->m_tables.set_flag(flag);

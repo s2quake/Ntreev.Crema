@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
-using Ntreev.Crema.Runtime.Generation.NativeC.CodeDom;
+using Ntreev.Crema.Runtime.Generation.Cpp.CodeDom;
 using Ntreev.Library;
 using System;
 using System.CodeDom;
@@ -26,11 +26,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Runtime.Generation.NativeC
+namespace Ntreev.Crema.Runtime.Generation.Cpp
 {
     public static class TableInfoExtensions
     {
-        private const string seperator = "";
+        private const string separator = "";
         private const string tablePrefix = "Table";
         private const string rowPostfix = "Row";
 
@@ -51,44 +51,34 @@ namespace Ntreev.Crema.Runtime.Generation.NativeC
 
         public static string GetClassName(this TableInfo tableInfo)
         {
-            string tableName = tableInfo.TemplatedParent == string.Empty ? tableInfo.TableName : tableInfo.GetTemplatedParentTableName();
-            if (string.IsNullOrEmpty(tableInfo.ParentName) == false)
-                return string.Join(seperator, tableInfo.ParentName, tableName, tablePrefix);
-            return string.Join(seperator, tableName, tablePrefix);
+            var tableName = tableInfo.TemplatedParent == string.Empty ? tableInfo.Name : tableInfo.TemplatedParent;
+            var items = StringUtility.Split(tableName, '.');
+            return tablePrefix + string.Join(separator, items);
         }
 
         public static string GetParentClassName(this TableInfo tableInfo)
         {
-            if (string.IsNullOrEmpty(tableInfo.ParentName) == false)
-                return string.Join(seperator, tableInfo.ParentName, tablePrefix);
-            return string.Empty;
+            if (tableInfo.ParentName == string.Empty)
+                return string.Empty;
+            var items = StringUtility.Split(tableInfo.ParentName, '.');
+            return tablePrefix + string.Join(separator, items);
         }
 
         public static string GetRowClassName(this TableInfo tableInfo)
         {
-            string tableName = tableInfo.TemplatedParent == string.Empty ? tableInfo.TableName : tableInfo.GetTemplatedParentTableName();
-            if (string.IsNullOrEmpty(tableInfo.ParentName) == false)
-                return string.Join(seperator, tableInfo.ParentName, tableName, rowPostfix);
-            return string.Join(seperator, tableName, rowPostfix);
+            var tableName = tableInfo.TemplatedParent == string.Empty ? tableInfo.Name : tableInfo.TemplatedParent;
+            var itemList = StringUtility.Split(tableName, '.').ToList();
+            itemList.Add(rowPostfix);
+            return rowPostfix + string.Join(separator, itemList);
         }
 
         public static string GetParentRowClassName(this TableInfo tableInfo)
         {
-            if (string.IsNullOrEmpty(tableInfo.ParentName) == false)
-                return string.Join(seperator, tableInfo.ParentName, rowPostfix);
-            return string.Empty;
-        }
-
-        public static string GetTemplatedParentTableName(this TableInfo tableInfo)
-        {
-            if (tableInfo.TemplatedParent == string.Empty)
-                throw new CremaDataException();
-
-            if (tableInfo.TemplatedParent.Contains('.') == true)
-            {
-                return StringUtility.Split(tableInfo.TemplatedParent, '.')[1];
-            }
-            return tableInfo.TemplatedParent;
+            if (tableInfo.ParentName == string.Empty)
+                return string.Empty;
+            var itemList = StringUtility.Split(tableInfo.ParentName, '.').ToList();
+            itemList.Add(rowPostfix);
+            return rowPostfix + string.Join(separator, itemList);
         }
 
         public static CodeTypeReference GetCodeType(this TableInfo tableInfo, CodeType codeType)

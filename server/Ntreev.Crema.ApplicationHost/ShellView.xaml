@@ -45,10 +45,13 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="10" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="BasePath" />
-            <Button Grid.Column="2" x:Name="SelectBasePath" Content="..." ToolTip="저장소 경로를 선택합니다." Width="50" />
-            <nmfc:IconButton Grid.Column="4" x:Name="CreateRepository" Source="/cremaserverApp;component/Images/add.png" ToolTip="새로운 저장소를 생성합니다." Width="50" />
+            <TextBox x:Name="BasePath" ToolTip="크레마 저장소의 경로를 나타냅니다." />
+            <TextBox x:Name="Port" Grid.Column="2" Width="50" TextAlignment="Right" ToolTip="포트를 나타냅니다. 기본값은 4004입니다." />
+            <Button Grid.Column="4" x:Name="SelectBasePath" Content="..." ToolTip="저장소 경로를 선택합니다." Width="50" />
+            <nmfc:IconButton Grid.Column="6" x:Name="CreateRepository" Source="/cremaserverApp;component/Images/add.png" ToolTip="새로운 저장소를 생성합니다." Width="50" />
         </Grid>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="5">

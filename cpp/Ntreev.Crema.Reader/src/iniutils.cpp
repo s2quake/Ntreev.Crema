@@ -276,7 +276,7 @@ namespace CremaReader
 			return typeid(long long);
 		else if (typeName.compare("duration") == 0)
 			return typeid(int);
-		else if (typeName.compare("dictionary") == 0)
+		else if (typeName.compare("guid") == 0)
 			return typeid(std::string);
 		else if (typeName.compare("string") == 0)
 			return typeid(std::string);

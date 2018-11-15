@@ -24,9 +24,9 @@ using System.Threading.Tasks;
 using System.Collections.Specialized;
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Runtime.Generation.NativeC.CodeDom;
+using Ntreev.Crema.Runtime.Generation.Cpp.CodeDom;
 
-namespace Ntreev.Crema.Runtime.Generation.NativeC
+namespace Ntreev.Crema.Runtime.Generation.Cpp
 {
     static class CremaRowClassCreator
     {
@@ -263,7 +263,7 @@ namespace Ntreev.Crema.Runtime.Generation.NativeC
                 cmm.Parameters.Add(arrayType, "childs");
 
                 {
-                    var methodRefExp = new CodeMethodReferenceExpression(null, "SetParent");
+                    var methodRefExp = new CodeMethodReferenceExpression(tableInfo.GetRowCodeTypeExpression(CodeType.None), "SetParent");
                     //methodRefExp.TypeArguments.Add(tableInfo.GetRowCodeType());
                     //methodRefExp.TypeArguments.Add(item.GetRowCodeType());
 

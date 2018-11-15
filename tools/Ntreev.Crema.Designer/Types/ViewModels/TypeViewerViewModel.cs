@@ -173,16 +173,17 @@ namespace Ntreev.Crema.Designer.Types.ViewModels
             this.SelectionChanged?.Invoke(this, e);
         }
 
-        protected override Task CloseAsync()
+        protected override async Task<bool> CloseAsync()
         {
-            return Application.Current.Dispatcher.InvokeAsync(() =>
+            return await Application.Current.Dispatcher.InvokeAsync(() =>
             {
                 //foreach (var item in this.typeItems)
                 //{
                 //    item.Dispose();
                 //}
                 //this.typeItems = null;
-            }).Task;
+                return true;
+            });
         }
 
         private void Initialize()

@@ -162,9 +162,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Runtime.Generation.NativeC\Ntreev.Crema.Runtime.Generation.NativeC.csproj">
+    <ProjectReference Include="..\..\common\Ntreev.Crema.Runtime.Generation.Cpp\Ntreev.Crema.Runtime.Generation.Cpp.csproj">
       <Project>{3faf8044-a589-4198-b8ec-b9d34bccb6ee}</Project>
-      <Name>Ntreev.Crema.Runtime.Generation.NativeC</Name>
+      <Name>Ntreev.Crema.Runtime.Generation.Cpp</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\common\Ntreev.Crema.Runtime.Generation.TypeScript\Ntreev.Crema.Runtime.Generation.TypeScript.csproj">
       <Project>{0fc60f01-a2ce-4e41-bed0-af56ad18ca39}</Project>

@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Runtime.Generation.NativeC
+namespace Ntreev.Crema.Runtime.Generation.Cpp
 {
     static class Utility
     {

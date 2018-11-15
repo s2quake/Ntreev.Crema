@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Reader", "tool
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Runtime.Generation.TypeScript", "common\Ntreev.Crema.Runtime.Generation.TypeScript\Ntreev.Crema.Runtime.Generation.TypeScript.csproj", "{0FC60F01-A2CE-4E41-BED0-AF56AD18CA39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Runtime.Generation.NativeC", "common\Ntreev.Crema.Runtime.Generation.NativeC\Ntreev.Crema.Runtime.Generation.NativeC.csproj", "{3FAF8044-A589-4198-B8EC-B9D34BCCB6EE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Runtime.Generation.Cpp", "common\Ntreev.Crema.Runtime.Generation.Cpp\Ntreev.Crema.Runtime.Generation.Cpp.csproj", "{3FAF8044-A589-4198-B8EC-B9D34BCCB6EE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.ModernUI.Framework", "sub-modules\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework.csproj", "{20C3D3DD-DE99-4126-9449-BCA12E4D255D}"
 EndProject

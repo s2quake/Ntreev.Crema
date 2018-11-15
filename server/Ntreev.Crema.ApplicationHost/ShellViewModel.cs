@@ -25,6 +25,7 @@ namespace Ntreev.Crema.ApplicationHost
         private readonly CremaService service;
         private readonly IAppConfiguration configs;
         private ServiceState serviceState;
+        private int port = 4004;
 
         [ImportingConstructor]
         public ShellViewModel(CremaService service, CremaSettings settings, IAppConfiguration configs)
@@ -45,6 +46,7 @@ namespace Ntreev.Crema.ApplicationHost
             try
             {
                 this.BeginProgress();
+                this.service.Port = this.port;
                 await this.service.OpenAsync();
                 this.ServiceState = ServiceState.Opened;
                 this.EndProgress();
@@ -131,6 +133,20 @@ namespace Ntreev.Crema.ApplicationHost
             {
                 this.settings.BasePath = value;
                 this.NotifyOfPropertyChange(nameof(this.BasePath));
+                this.NotifyOfPropertyChange(nameof(this.CanOpenService));
+                this.NotifyOfPropertyChange(nameof(this.CanCloseService));
+            }
+        }
+
+        [ConfigurationProperty]
+        [DefaultValue(4004)]
+        public int Port
+        {
+            get => this.port;
+            set
+            {
+                this.port = value;
+                this.NotifyOfPropertyChange(nameof(this.Port));
                 this.NotifyOfPropertyChange(nameof(this.CanOpenService));
                 this.NotifyOfPropertyChange(nameof(this.CanCloseService));
             }

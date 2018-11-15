@@ -10,7 +10,7 @@ namespace CremaReader
 	public:
 		virtual const itable_array& tables() const = 0;
 		virtual const std::string& name() const = 0;
-		virtual int revision() const = 0;
+		virtual const std::string& revision() const = 0;
 		virtual const std::string& types_hash_value() const = 0;
 		virtual const std::string& tables_hash_value() const = 0;
 		virtual const std::string& tags() const = 0;

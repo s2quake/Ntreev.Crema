@@ -23,11 +23,11 @@ using System.IO;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Specialized;
-using Ntreev.Crema.Runtime.Generation.NativeC;
+using Ntreev.Crema.Runtime.Generation.Cpp;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
 
-namespace Ntreev.Crema.Runtime.Generation.NativeC
+namespace Ntreev.Crema.Runtime.Generation.Cpp
 {
     public static class CremaTypeEnumCreator
     {

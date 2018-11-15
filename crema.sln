@@ -65,7 +65,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Runtime.Serial
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Runtime.Generation", "common\Ntreev.Crema.Runtime.Generation\Ntreev.Crema.Runtime.Generation.csproj", "{79AEF7D1-93D1-4EEB-B09C-1595C82E7492}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Runtime.Generation.NativeC", "common\Ntreev.Crema.Runtime.Generation.NativeC\Ntreev.Crema.Runtime.Generation.NativeC.csproj", "{3FAF8044-A589-4198-B8EC-B9D34BCCB6EE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Runtime.Generation.Cpp", "common\Ntreev.Crema.Runtime.Generation.Cpp\Ntreev.Crema.Runtime.Generation.Cpp.csproj", "{3FAF8044-A589-4198-B8EC-B9D34BCCB6EE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Runtime.Generation.TypeScript", "common\Ntreev.Crema.Runtime.Generation.TypeScript\Ntreev.Crema.Runtime.Generation.TypeScript.csproj", "{0FC60F01-A2CE-4E41-BED0-AF56AD18CA39}"
 EndProject

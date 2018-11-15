@@ -135,16 +135,17 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
             this.SelectionChanged?.Invoke(this, e);
         }
 
-        protected override Task CloseAsync()
+        protected override async Task<bool> CloseAsync()
         {
-            return Application.Current.Dispatcher.InvokeAsync(() =>
+            return await Application.Current.Dispatcher.InvokeAsync(() =>
             {
                 foreach (var item in this.tableItems)
                 {
                     item.Dispose();
                 }
                 this.tableItems = null;
-            }).Task;
+                return true;
+            });
         }
 
         private void Initialize()

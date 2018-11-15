@@ -23,10 +23,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
 using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Runtime.Generation.NativeC.CodeDom;
+using Ntreev.Crema.Runtime.Generation.Cpp.CodeDom;
 using Ntreev.Crema.Data;
 
-namespace Ntreev.Crema.Runtime.Generation.NativeC
+namespace Ntreev.Crema.Runtime.Generation.Cpp
 {
     static class CremaTableClassCreator
     {

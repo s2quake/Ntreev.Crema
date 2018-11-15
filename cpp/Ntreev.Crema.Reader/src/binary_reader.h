@@ -23,7 +23,7 @@ namespace CremaReader {
 
 				virtual const itable_array& tables() const { return m_tables; }
 				virtual const std::string& name() const { return m_name; }
-				virtual int revision() const { return m_revision; }
+				virtual const std::string& revision() const { return m_revision; }
 				virtual const std::string& types_hash_value() const { return m_typesHashValue; };
 				virtual const std::string& tables_hash_value() const { return m_tablesHashValue; };
 				virtual const std::string& tags() const { return m_tags; };
@@ -50,7 +50,7 @@ namespace CremaReader {
 				std::vector<table_index> m_tableIndexes;
 				ReadFlag m_flag;
 				std::string m_name;
-				int m_revision;
+				std::string m_revision;
 				std::string m_typesHashValue;
 				std::string m_tablesHashValue;
 				std::string m_tags;

@@ -96,10 +96,11 @@ namespace CremaCode
 			_key = reader::iniutil::generate_hash(keyvalue1, keyvalue2, keyvalue3, keyvalue4, keyvalue5);
 		}
 
+	public:
 		template<typename T = CremaRow, typename U = CremaRow>
-		friend void SetParent(T* parent, const std::vector<U*>& childs)
+		static void SetParent(T* parent, const std::vector<U*>& childs)
 		{
-			for each (auto item in childs)
+			for (auto item : childs)
 			{
 				item->Parent = parent;
 			}
@@ -143,7 +144,7 @@ namespace CremaCode
 
 		virtual ~CremaTable()
 		{
-			for each(auto item in _rows)
+			for (auto item : _rows)
 			{
 				delete item;
 			}
@@ -183,7 +184,7 @@ namespace CremaCode
 				return;
 
 			_rows.reserve(rows.size());
-			for each (auto item in rows)
+			for (auto item : rows)
 			{
 				_keyToRow.insert(std::map<long, T*>::value_type(GetKey(item), item));
 				_rows.push_back(item);
@@ -197,14 +198,14 @@ namespace CremaCode
 		{
 			std::map<std::string, T*> relationToRow;
 
-			for each (auto item in this->Rows)
+			for (auto item : this->Rows)
 			{
 				relationToRow.insert(std::map<std::string, T*>::value_type(GetRelationID(item), item));
 			}
 
 			std::map<T*, std::vector<U*>> rowToChilds;
 
-			for each (auto item in childs)
+			for (auto item : childs)
 			{
 				auto itor = relationToRow.find(GetParentID(item));
 				if (itor == relationToRow.end())
@@ -218,7 +219,7 @@ namespace CremaCode
 				rowToChilds[parent].push_back(item);
 			}
 
-			for each (auto item in rowToChilds)
+			for (auto item : rowToChilds)
 			{
 				setChildsAction(item.first, childName, item.second);
 			}

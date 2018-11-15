@@ -17,7 +17,7 @@
 
 using Microsoft.CSharp;
 using Ntreev.Crema.Runtime.Generation;
-using Ntreev.Crema.Runtime.Generation.NativeC.Properties;
+using Ntreev.Crema.Runtime.Generation.Cpp.Properties;
 using Ntreev.Library;
 using Ntreev.Library.IO;
 using System;
@@ -32,7 +32,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Runtime.Generation.NativeC
+namespace Ntreev.Crema.Runtime.Generation.Cpp
 {
     [Export(typeof(ICodeGenerator))]
     sealed class CremaCodeGenerator : ICodeGenerator
@@ -94,7 +94,7 @@ namespace Ntreev.Crema.Runtime.Generation.NativeC
                 var value = this.GetResourceString(item);
                 var extension = Path.GetExtension(item).Replace(".", "[.]");
                 var key = Regex.Replace(item, "(^" + this.GetType().Namespace + @"[.])(\S+)" + extension, "$2").Replace('.', Path.DirectorySeparatorChar);
-                //var name = item.Replace("Ntreev.Crema.Runtime.Generation.NativeC.", string.Empty);
+                //var name = item.Replace("Ntreev.Crema.Runtime.Generation.Cpp.", string.Empty);
 
                 //var stream = new StreamReader(assembly.GetManifestResourceStream(item));
                 //var text = stream.ReadToEnd();

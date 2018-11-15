@@ -13,8 +13,7 @@ namespace CremaReader
 	using namespace internal;
 	using namespace internal::binary;
 
-	const unsigned int s_magic_value_obsolete = 0x8d31269e;
-	const int s_magic_value = 0x03050000;
+	const int s_magic_value = 0x04000000;
 
 	std::map<int, std::string> string_resource::m_strings;
 	std::string string_resource::empty_string;
@@ -80,7 +79,7 @@ namespace CremaReader
 		unsigned int magicValue;
 		stream.read((char*)&magicValue, sizeof(int));
 
-		if (magicValue == s_magic_value || magicValue == s_magic_value_obsolete)
+		if (magicValue == s_magic_value)
 		{
 			binary_reader* reader = new binary_reader();
 			reader->read_core(stream, flag);
