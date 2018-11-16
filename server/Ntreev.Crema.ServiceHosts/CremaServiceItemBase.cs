@@ -115,8 +115,15 @@ namespace Ntreev.Crema.ServiceHosts
 
         private void Host_Closing(object sender, EventArgs e)
         {
-            this.OnServiceClosed(SignatureDate.Empty, CloseInfo.Empty);
-            this.Callback = default(T);
+            try
+            {
+                this.OnServiceClosed(SignatureDate.Empty, CloseInfo.Empty);
+                this.Callback = default(T);
+            }
+            catch
+            {
+
+            }
         }
 
         private void Channel_Faulted(object sender, EventArgs e)

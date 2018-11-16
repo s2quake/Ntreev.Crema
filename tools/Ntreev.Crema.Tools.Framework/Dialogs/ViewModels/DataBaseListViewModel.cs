@@ -100,7 +100,7 @@ namespace Ntreev.Crema.Tools.Framework.Dialogs.ViewModels
                 var service = CremaHostServiceFactory.CreateServiceClient(this.address);
                 var result = await InvokeServiceAsync(() => service.GetDataBaseInfos());
                 var labels = result.Value;
-                service.Close();
+                service.CloseService();
                 var selectedValue = this.selectedValue;
                 this.ItemsSource = new ObservableCollection<DataBaseInfo>(labels);
                 foreach (var item in labels)

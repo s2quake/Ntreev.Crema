@@ -68,7 +68,7 @@ namespace Ntreev.Crema.RuntimeService
             }
             finally
             {
-                serviceClient.Close();
+                serviceClient.CloseService();
             }
         }
 

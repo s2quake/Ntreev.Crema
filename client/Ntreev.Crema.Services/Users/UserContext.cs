@@ -102,10 +102,7 @@ namespace Ntreev.Crema.Services.Users
                 }
                 catch
                 {
-                    if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                        this.service.Close();
-                    else
-                        this.service.Abort();
+                    this.service.CloseService();
                     this.callbackEvent.Dispose();
                     this.Dispatcher.Dispose();
                     throw;
@@ -285,7 +282,7 @@ namespace Ntreev.Crema.Services.Users
             this.timer = null;
             await Task.Delay(100);
             if (closeInfo.Reason != CloseReason.Faulted)
-                this.service.Close();
+                this.service.CloseService();
             else
                 this.service.Abort();
             await this.callbackEvent.DisposeAsync();

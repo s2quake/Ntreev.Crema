@@ -152,6 +152,7 @@
     </Compile>
     <Compile Include="Domains\Domain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceExtensions.cs" />
     <Compile Include="Users\UserAuthenticationProvider.cs" />
     <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DataBaseContextMetaData.datasource" />
     <None Include="Service References\CremaHostService\Arrays1.xsd">

@@ -42,7 +42,7 @@ namespace Ntreev.Crema.RuntimeService
             }
             finally
             {
-                service.Close();
+                service.CloseService();
             }
         }
 
@@ -57,7 +57,7 @@ namespace Ntreev.Crema.RuntimeService
             }
             finally
             {
-                service.Close();
+                service.CloseService();
             }
         }
 
@@ -72,7 +72,7 @@ namespace Ntreev.Crema.RuntimeService
             }
             finally
             {
-                service.Close();
+                service.CloseService();
             }
         }
 
@@ -86,7 +86,7 @@ namespace Ntreev.Crema.RuntimeService
             }
             finally
             {
-                service.Close();
+                service.CloseService();
             }
         }
 
@@ -101,7 +101,7 @@ namespace Ntreev.Crema.RuntimeService
             }
             finally
             {
-                service.Close();
+                service.CloseService();
             }
         }
 

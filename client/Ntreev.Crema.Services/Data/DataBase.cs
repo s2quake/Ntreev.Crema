@@ -750,7 +750,7 @@ namespace Ntreev.Crema.Services.Data
             this.timer = null;
             await Task.Delay(100);
             if (closeInfo.Reason != CloseReason.Faulted)
-                this.service.Close();
+                this.service.CloseService();
             else
                 this.service.Abort();
             await this.callbackEvent.DisposeAsync();
@@ -1135,10 +1135,7 @@ namespace Ntreev.Crema.Services.Data
         private SignatureDate ReleaseService()
         {
             var result = this.CremaHost.InvokeService(() => this.service.Unsubscribe());
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                this.service.Close();
-            else
-                this.service.Abort();
+            this.service.CloseService();
             this.timer?.Dispose();
             this.timer = null;
             this.service = null;

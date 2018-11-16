@@ -464,7 +464,7 @@ namespace Ntreev.Crema.Services.Data
             this.timer = null;
             await Task.Delay(100);
             if (closeInfo.Reason != CloseReason.Faulted)
-                this.service.Close();
+                this.service.CloseService();
             else
                 this.service.Abort();
             await this.callbackEvent.DisposeAsync();

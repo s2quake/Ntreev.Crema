@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Services
             }
             finally
             {
-                serviceClient.Close();
+                serviceClient.CloseService();
             }
         }
 
@@ -81,7 +81,7 @@ namespace Ntreev.Crema.Services
             }
             finally
             {
-                serviceClient.Close();
+                serviceClient.CloseService();
             }
         }
 
