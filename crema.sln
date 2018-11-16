@@ -103,8 +103,6 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Commands.Sprea
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Commands.Spreadsheet", "server\Ntreev.Crema.Commands.Spreadsheet\Ntreev.Crema.Commands.Spreadsheet.csproj", "{490F7E03-79F6-461C-9D90-80F24ACE659A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Comparer", "tools\Ntreev.Crema.Comparer\Ntreev.Crema.Comparer.csproj", "{FD83CA04-4B18-4CDD-AD18-12D42256640C}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Javascript.Sharing", "common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.shproj", "{A4955825-195F-4677-9695-5FC67362A449}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Javascript", "client\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.csproj", "{92AE7F66-00C6-4E96-8ABF-CDECD55C004E}"
@@ -186,7 +184,6 @@ Global
 		common\Ntreev.Crema.Commands.Spreadsheet.Sharing\Ntreev.Crema.Commands.Spreadsheet.Sharing.projitems*{e3b57af4-32f8-4293-8801-ffecc87afa88}*SharedItemsImports = 4
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{ea40ac57-d041-44f4-bd03-5e81d0572625}*SharedItemsImports = 4
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{edbc5495-35f7-4ce5-a1c6-57018043dcf0}*SharedItemsImports = 4
-		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{fd83ca04-4b18-4cdd-ad18-12d42256640c}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -357,10 +354,6 @@ Global
 		{490F7E03-79F6-461C-9D90-80F24ACE659A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{490F7E03-79F6-461C-9D90-80F24ACE659A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{490F7E03-79F6-461C-9D90-80F24ACE659A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FD83CA04-4B18-4CDD-AD18-12D42256640C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FD83CA04-4B18-4CDD-AD18-12D42256640C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FD83CA04-4B18-4CDD-AD18-12D42256640C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FD83CA04-4B18-4CDD-AD18-12D42256640C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{92AE7F66-00C6-4E96-8ABF-CDECD55C004E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{92AE7F66-00C6-4E96-8ABF-CDECD55C004E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92AE7F66-00C6-4E96-8ABF-CDECD55C004E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -443,7 +436,6 @@ Global
 		{E3B57AF4-32F8-4293-8801-FFECC87AFA88} = {51988BAC-DDBB-475A-BF13-576A97678AB5}
 		{05971A74-2D68-4781-9CEB-DF2B48F8BA75} = {2C88EBD3-AF02-4842-8922-7C439EC5AB5E}
 		{490F7E03-79F6-461C-9D90-80F24ACE659A} = {9BD2FC26-0766-4D0C-80CF-AC811DE44A4D}
-		{FD83CA04-4B18-4CDD-AD18-12D42256640C} = {FCEABDD4-4C3B-498B-A559-CA4C65D0C4BE}
 		{A4955825-195F-4677-9695-5FC67362A449} = {2C88EBD3-AF02-4842-8922-7C439EC5AB5E}
 		{92AE7F66-00C6-4E96-8ABF-CDECD55C004E} = {51988BAC-DDBB-475A-BF13-576A97678AB5}
 		{9ED00A26-BF13-4B1F-AF6E-3009C666AE15} = {9BD2FC26-0766-4D0C-80CF-AC811DE44A4D}
