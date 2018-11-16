@@ -3,6 +3,7 @@ using Ntreev.Crema.Data.Xml;
 using Ntreev.Library;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -13,12 +14,19 @@ namespace Ntreev.Crema.Runtime.Serialization
     [DataContract(Namespace = SchemaUtility.Namespace)]
     public struct SerializationField
     {
+        private static readonly CultureInfo cultureInfo = new CultureInfo("en-US");
+
         public SerializationField(object field)
         {
             if (field is DBNull)
             {
                 this.Type = nameof(DBNull);
                 this.Value = null;
+            }
+            else if (field is DateTime dateTime)
+            {
+                this.Type = field.GetType().GetTypeName();
+                this.Value = dateTime.ToString(cultureInfo);
             }
             else if (field != null)
             {
@@ -38,6 +46,10 @@ namespace Ntreev.Crema.Runtime.Serialization
             {
                 var type = CremaDataTypeUtility.GetType(this.Type);
                 return CremaConvert.ChangeType(this.Value, type);
+            }
+            else if (this.Type == typeof(DateTime).GetTypeName())
+            {
+                return DateTime.Parse(this.Value, cultureInfo);
             }
             else if (this.Type == nameof(DBNull))
             {

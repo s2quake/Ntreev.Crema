@@ -98,72 +98,19 @@
     <EmbeddedResource Include="code\crema_base.h" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\include\crema\inidata.h">
-      <Link>reader\include\crema\inidata.h</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\include\crema\inidefine.h">
-      <Link>reader\include\crema\inidefine.h</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\include\crema\iniexception.h">
-      <Link>reader\include\crema\iniexception.h</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\include\crema\inireader.h">
-      <Link>reader\include\crema\inireader.h</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\include\crema\initype.h">
-      <Link>reader\include\crema\initype.h</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\include\crema\iniutils.h">
-      <Link>reader\include\crema\iniutils.h</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\binary_data.cpp">
-      <Link>reader\src\binary_data.cpp</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\binary_data.h">
-      <Link>reader\src\binary_data.h</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\binary_reader.cpp">
-      <Link>reader\src\binary_reader.cpp</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\binary_reader.h">
-      <Link>reader\src\binary_reader.h</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\binary_type.h">
-      <Link>reader\src\binary_type.h</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\inidata.cpp">
-      <Link>reader\src\inidata.cpp</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\iniexception.cpp">
-      <Link>reader\src\iniexception.cpp</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\inireader.cpp">
-      <Link>reader\src\inireader.cpp</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\iniutils.cpp">
-      <Link>reader\src\iniutils.cpp</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\internal_utils.cpp">
-      <Link>reader\src\internal_utils.cpp</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\internal_utils.h">
-      <Link>reader\src\internal_utils.h</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\socketbuf.cpp">
-      <Link>reader\src\socketbuf.cpp</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\socketbuf.h">
-      <Link>reader\src\socketbuf.h</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\socket_istream.cpp">
-      <Link>reader\src\socket_istream.cpp</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\src\socket_istream.h">
-      <Link>reader\src\socket_istream.h</Link>
-    </EmbeddedResource>
     <EmbeddedResource Include="code\crema_base.cpp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\crema_reader.cpp">
+      <Link>code\crema_reader.cpp</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\cpp\Ntreev.Crema.Reader\crema_reader.h">
+      <Link>code\crema_reader.h</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="reader\" />
+  </ItemGroup>
   <Import Project="..\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

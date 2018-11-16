@@ -29,7 +29,7 @@ namespace Ntreev.Crema.Commands
     static class CodeSettings
     {
         [CommandProperty("lang")]
-        [DefaultValue("c#")]
+        [DefaultValue("cs")]
         public static string LanguageType
         {
             get; set;

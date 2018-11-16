@@ -141,7 +141,8 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
                 // check null and return defaultField
                 {
                     var state = new CodeConditionStatement();
-                    var condition = new CodeBinaryOperatorExpression(item.GetFieldExpression(), CodeBinaryOperatorType.IdentityEquality, new CodePrimitiveExpression(null));
+                    var nullCompare = new CodeBinaryOperatorExpression(item.GetFieldExpression(), CodeBinaryOperatorType.IdentityEquality, new CodePrimitiveExpression(null));
+                    var condition = new CodeBinaryOperatorExpression(nullCompare, CodeBinaryOperatorType.IdentityEquality, new CodePrimitiveExpression(true));
                     state.Condition = condition;
 
                     var codeTypeRef = new CodeTypeReferenceExpression(tableInfo.GetRowCodeType(CodeType.None));
@@ -169,7 +170,14 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
                 {
                     if (item.IsKey == true)
                     {
-                        methodInvokeExp.Parameters.Add(item.GetFieldExpression());
+                        if (item.DataType == typeof(string).GetTypeName() == true)
+                        {
+                            methodInvokeExp.Parameters.Add(new CodeMethodInvokeExpression(item.GetFieldExpression(), "c_str"));
+                        }
+                        else
+                        {
+                            methodInvokeExp.Parameters.Add(item.GetFieldExpression());
+                        }
                     }
                 }
                 cc.Statements.Add(methodInvokeExp);
@@ -252,7 +260,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
             foreach (var item in generationInfo.GetChilds(tableInfo))
             {
                 var cmm = new CodeMemberMethod();
-                cmm.Attributes = MemberAttributes.FamilyAndAssembly | MemberAttributes.Static;
+                cmm.Attributes = MemberAttributes.Public | MemberAttributes.Static;
                 cmm.Name = tableInfo.TableName + "Set" + item.TableName;
                 cmm.Parameters.Add(tableInfo.GetRowCodeType(CodeType.Pointer), "target");
                 var arrayType = new CodeTypeReference(item.GetRowCodeType(CodeType.Pointer), 1);

@@ -63,8 +63,7 @@ class StringResource {
 }
 
 class TableHeader {
-    public static defaultMagicValueObsolete: number = 0x6cfc4a14;
-    public static defaultMagicValue: number = 0x03050000;
+    public static defaultMagicValue: number = 0x04000000;
 
     public magicValue: number;
     public hashValue: number;
@@ -114,8 +113,7 @@ class ColumnInfo {
 }
 
 class FileHeader {
-    public static defaultMagicValueObsolete: number = 0x8d31269e;
-    public static defaultMagicValue: number = 0x03050000;
+    public static defaultMagicValue: number = 0x04000000;
 
     public magicValue; number;
     public revision: number;
@@ -170,7 +168,7 @@ class CremaRow {
 
 export interface IDataSet {
     tables?: { [key: string]: ITable; };
-    revision?: number;
+    revision?: string;
     name?: string;
     typesHashValue?: string;
     tablesHashValue?: string;
@@ -240,7 +238,7 @@ class BinaryReader extends CremaReader {
     private _tables: Array<BinaryTable>;
     private _t: { [key: string]: ITable; };
     private _version: number;
-    private _revision: number;
+    private _revision: string;
     private _name: string;
     private _typesHashValue: string;
     private _tablesHashValue: string;
@@ -252,7 +250,6 @@ class BinaryReader extends CremaReader {
         fileHeader.read(reader);
         this._tableIndexes = new Array<TableIndex>(fileHeader.tableCount);
         this._version = fileHeader.magicValue;
-        this._revision = fileHeader.revision;
 
         for (let i: number = 0; i < fileHeader.tableCount; i++) {
             let item: TableIndex = new TableIndex();
@@ -264,6 +261,7 @@ class BinaryReader extends CremaReader {
         StringResource.read(reader);
 
         this._name = StringResource.getString(fileHeader.name);
+		this._revision = StringResource.getString(fileHeader.revision);
         this._tables = new Array<BinaryTable>(this._tableIndexes.length);
         this._typesHashValue = StringResource.getString(fileHeader.typesHashValue);
         this._tablesHashValue = StringResource.getString(fileHeader.tablesHashValue);
@@ -289,7 +287,7 @@ class BinaryReader extends CremaReader {
         return this._version;
     }
 
-    public get revision(): number {
+    public get revision(): string {
         return this._revision;
     }
 
@@ -474,35 +472,30 @@ class BinaryColumn extends CremaColumn {
             return "float";
         } else if (typeName === "double") {
             return "double";
-        } else if (typeName === "byte") {
-            return "byte";
-        } else if (typeName === "unsignedByte") {
-            return "unsignedByte";
-        } else if (typeName === "short") {
-            return "short";
-        } else if (typeName === "unsignedShort") {
-            return "unsignedShort";
-        } else if (typeName === "int") {
-            return "int";
-        } else if (typeName === "unsignedInt") {
-            return "unsignedInt";
-        } else if (typeName === "long") {
-            return "long";
-        } else if (typeName === "unsignedLong") {
-            return "unsignedLong";
-        } else if (typeName === "dateTime") {
-            return "long";
+        } else if (typeName === "int8") {
+            return "int8";
+        } else if (typeName === "uint8") {
+            return "uint8";
+        } else if (typeName === "int16") {
+            return "int16";
+        } else if (typeName === "uint16") {
+            return "uint16";
+        } else if (typeName === "int32") {
+            return "int32";
+        } else if (typeName === "uint32") {
+            return "uint32";
+        } else if (typeName === "int64") {
+            return "int64";
+        } else if (typeName === "uint64") {
+            return "uint64";
+        } else if (typeName === "datetime") {
+            return "int64";
         } else if (typeName === "duration") {
-            if (this._table.version === TableHeader.defaultMagicValue) {
-                return "long";
-            }
-            return "int";
-        } else if (typeName === "dictionary") {
-            return "string";
-        } else if (typeName === "table") {
+            return "int64";
+		} else if (typeName === "guid") {
             return "string";
         }
-        return "int";
+        return "int64";
     }
 }
 
@@ -535,25 +528,25 @@ class BinaryRow extends CremaRow {
             }
             if (column.dataType === "boolean") {
                 return this._fieldbytes.readInt8(offset) === 0 ? false : true;
-            } else if (column.dataType === "unsignedByte") {
-                return this._fieldbytes.readUInt8(offset);
-            } else if (column.dataType === "byte") {
-                return this._fieldbytes.readInt8(offset);
-            } else if (column.dataType === "float") {
+			} else if (column.dataType === "float") {
                 return this._fieldbytes.readFloatLE(offset);
             } else if (column.dataType === "double") {
                 return this._fieldbytes.readDoubleLE(offset);
-            } else if (column.dataType === "short") {
+			} else if (column.dataType === "int8") {
+                return this._fieldbytes.readInt8(offset);
+            } else if (column.dataType === "uint8") {
+                return this._fieldbytes.readUInt8(offset);
+            } else if (column.dataType === "int16") {
                 return this._fieldbytes.readInt16LE(offset);
-            } else if (column.dataType === "unsignedShort") {
+            } else if (column.dataType === "uint16") {
                 return this._fieldbytes.readUInt16LE(offset);
-            } else if (column.dataType === "int") {
+            } else if (column.dataType === "int32") {
                 return this._fieldbytes.readInt32LE(offset);
-            } else if (column.dataType === "unsignedInt") {
+            } else if (column.dataType === "uint32") {
                 return this._fieldbytes.readUInt32LE(offset);
-            } else if (column.dataType === "long") {
+            } else if (column.dataType === "int64") {
                 return this._fieldbytes.readIntLE(offset, 8);
-            } else if (column.dataType === "unsignedLong") {
+            } else if (column.dataType === "uint64") {
                 return this._fieldbytes.readUIntLE(offset, 8);
             }
             throw new Error(column.dataType);

@@ -43,29 +43,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CremaReader.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="IColumn.cs" />
-    <Compile Include="IColumnCollection.cs" />
-    <Compile Include="Binary\CremaBinaryColumn.cs" />
-    <Compile Include="Binary\CremaBinaryRow.cs" />
-    <Compile Include="Binary\CremaBinaryRowCollection.cs" />
-    <Compile Include="Binary\CremaBinaryTable.cs" />
-    <Compile Include="Binary\CremaBinaryTableCollection.cs" />
-    <Compile Include="Binary\CremaBinaryReader.cs" />
-    <Compile Include="Binary\CremaBinaryType.cs" />
-    <Compile Include="Binary\CremaBinaryColumnCollection.cs" />
-    <Compile Include="IDataSet.cs" />
-    <Compile Include="Internal\RemoteStream.cs" />
-    <Compile Include="Internal\SocketStream.cs" />
-    <Compile Include="Internal\Utility.cs" />
-    <Compile Include="IO\BinaryWriterExtension.cs" />
-    <Compile Include="Internal\StringResource.cs" />
-    <Compile Include="IRow.cs" />
-    <Compile Include="IRowCollection.cs" />
-    <Compile Include="ITableCollection.cs" />
-    <Compile Include="IO\BinaryReaderExtension.cs" />
-    <Compile Include="ReadOptions.cs" />
-    <Compile Include="ITable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="..\..\common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems" Label="Shared" />

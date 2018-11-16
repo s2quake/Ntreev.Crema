@@ -17,8 +17,7 @@
 
 #pragma once
 #include <algorithm>
-#include "reader/include/crema/inireader.h"
-#include "reader/include/crema/iniutils.h"
+#include "crema_reader.h"
 #include <map>
 
 namespace CremaCode
@@ -30,7 +29,7 @@ namespace CremaCode
 	public:
 		static bool InvokeErrorOccured(const std::exception& e)
 		{
-			if (CremaData::ErrorOccured == NULL)
+			if (CremaData::ErrorOccured == nullptr)
 				return false;
 			return CremaData::ErrorOccured(e);
 		}
@@ -171,7 +170,7 @@ namespace CremaCode
 			{
 				reader::irow& item = table.rows().at(i);
 				T* row = (T*)(this->CreateRow(item, this));
-				_keyToRow.insert(std::map<long, T*>::value_type(GetKey(row), row));
+				_keyToRow.insert(std::pair<long, T*>(GetKey(row), row));
 				_rows.push_back(row);
 			}
 		}
@@ -186,7 +185,7 @@ namespace CremaCode
 			_rows.reserve(rows.size());
 			for (auto item : rows)
 			{
-				_keyToRow.insert(std::map<long, T*>::value_type(GetKey(item), item));
+				_keyToRow.insert(std::pair<long, T*>(GetKey(item), item));
 				_rows.push_back(item);
 			}
 		}
@@ -200,7 +199,7 @@ namespace CremaCode
 
 			for (auto item : this->Rows)
 			{
-				relationToRow.insert(std::map<std::string, T*>::value_type(GetRelationID(item), item));
+				relationToRow.insert(std::pair<std::string, T*>(GetRelationID(item), item));
 			}
 
 			std::map<T*, std::vector<U*>> rowToChilds;
@@ -214,7 +213,7 @@ namespace CremaCode
 				auto parent = itor->second;
 
 				if (rowToChilds.find(parent) == rowToChilds.end())
-					rowToChilds.insert(std::map<T*, std::vector<U*>>::value_type(parent, std::vector<U*>()));
+					rowToChilds.insert(std::pair<T*, std::vector<U*>>(parent, std::vector<U*>()));
 
 				rowToChilds[parent].push_back(item);
 			}

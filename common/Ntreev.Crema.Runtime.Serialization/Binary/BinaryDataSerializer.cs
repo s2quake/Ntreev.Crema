@@ -307,7 +307,7 @@ namespace Ntreev.Crema.Runtime.Serialization.Binary
             else
             {
                 var type = types.First(item => dataColumn.DataType == item.CategoryPath + item.Name);
-                writer.Write((int)type.ConvertFromString(value.ToString()));
+                writer.Write((long)type.ConvertFromString(value.ToString()));
             }
         }
 

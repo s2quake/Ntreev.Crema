@@ -44,6 +44,8 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
         {
             if (CremaDataTypeUtility.IsBaseType(columnInfo.DataType) == true)
             {
+                if (columnInfo.DataType == typeof(Guid).GetTypeName())
+                    return new CodeTypeReference(typeof(string));
                 return new CodeTypeReference(CremaDataTypeUtility.GetType(columnInfo.DataType));
             }
 
@@ -115,31 +117,29 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
                 return "toString";
             else if (columnInfo.DataType == "float")
                 return "toSingle";
-            else if (columnInfo.DataType == "float")
+            else if (columnInfo.DataType == "double")
                 return "toDouble";
-            else if (columnInfo.DataType == "byte")
+            else if (columnInfo.DataType == "int8")
                 return "toInt8";
-            else if (columnInfo.DataType == "unsignedByte")
+            else if (columnInfo.DataType == "uint8")
                 return "toUInt8";
-            else if (columnInfo.DataType == "short")
+            else if (columnInfo.DataType == "int16")
                 return "toInt16";
-            else if (columnInfo.DataType == "unsignedShort")
+            else if (columnInfo.DataType == "uint16")
                 return "toUInt16";
-            else if (columnInfo.DataType == "int")
+            else if (columnInfo.DataType == "int32")
                 return "toInt32";
-            else if (columnInfo.DataType == "unsignedInt")
+            else if (columnInfo.DataType == "uint32")
                 return "toUInt32";
-            else if (columnInfo.DataType == "long")
+            else if (columnInfo.DataType == "int64")
                 return "toInt64";
-            else if (columnInfo.DataType == "unsignedLong")
+            else if (columnInfo.DataType == "uint64")
                 return "toUInt64";
-            else if (columnInfo.DataType == "dateTime")
+            else if (columnInfo.DataType == "datetime")
                 return "toDateTime";
             else if (columnInfo.DataType == "duration")
                 return "toDuration";
-            else if (columnInfo.DataType == "dictionary")
-                return "toString";
-            else if (columnInfo.DataType == "table")
+            else if (columnInfo.DataType == "guid")
                 return "toString";
 
             return "toInt32";

@@ -19,9 +19,7 @@
 #include <stdarg.h>
 #include <locale>
 
-#include "reader/include/crema/iniutils.h"
-
 namespace CremaCode
 {
-	ErrorOccured CremaData::ErrorOccured = NULL;
+	ErrorOccured CremaData::ErrorOccured = nullptr;
 } /*namespace CremaCode*/

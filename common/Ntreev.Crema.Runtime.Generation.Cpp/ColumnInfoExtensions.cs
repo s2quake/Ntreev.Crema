@@ -155,23 +155,23 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
                 return "to_single";
             else if (columnInfo.DataType == "double")
                 return "to_double";
-            else if (columnInfo.DataType == "byte")
+            else if (columnInfo.DataType == "int8")
                 return "to_int8";
-            else if (columnInfo.DataType == "unsignedByte")
+            else if (columnInfo.DataType == "uint8")
                 return "to_uint8";
-            else if (columnInfo.DataType == "short")
+            else if (columnInfo.DataType == "int16")
                 return "to_int16";
-            else if (columnInfo.DataType == "unsignedShort")
+            else if (columnInfo.DataType == "uint16")
                 return "to_uint16";
-            else if (columnInfo.DataType == "int")
+            else if (columnInfo.DataType == "int32")
                 return "to_int32";
-            else if (columnInfo.DataType == "unsignedInt")
+            else if (columnInfo.DataType == "uint32")
                 return "to_uint32";
-            else if (columnInfo.DataType == "long")
+            else if (columnInfo.DataType == "int64")
                 return "to_int64";
-            else if (columnInfo.DataType == "unsignedLong")
+            else if (columnInfo.DataType == "uint64")
                 return "to_uint64";
-            else if (columnInfo.DataType == "dateTime")
+            else if (columnInfo.DataType == "datetime")
                 return "to_datetime";
             else if (columnInfo.DataType == "duration")
                 return "to_duration";

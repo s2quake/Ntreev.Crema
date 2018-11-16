@@ -58,7 +58,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
                     filename = Path.Combine(dirInfo.FullName, filename);
                     FileUtility.Prepare(filename);
 
-                    using (StreamWriter sw = new StreamWriter(filename, false, Encoding.UTF8))
+                    using (var sw = new StreamWriter(filename, false, Encoding.UTF8))
                     {
                         sw.WriteLine(item.Value);
                         this.PrintResult(filename);
@@ -86,29 +86,11 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
         {
             var codes = new Dictionary<string, string>();
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            var ns = string.Join(".", assembly.GetName().Name, "reader");
-            var files = assembly.GetManifestResourceNames().Where(item => item.StartsWith(ns) && (item.EndsWith(".h") || item.EndsWith(".cpp"))).ToArray();
 
-            foreach (var item in files)
-            {
-                var value = this.GetResourceString(item);
-                var extension = Path.GetExtension(item).Replace(".", "[.]");
-                var key = Regex.Replace(item, "(^" + this.GetType().Namespace + @"[.])(\S+)" + extension, "$2").Replace('.', Path.DirectorySeparatorChar);
-                //var name = item.Replace("Ntreev.Crema.Runtime.Generation.Cpp.", string.Empty);
-
-                //var stream = new StreamReader(assembly.GetManifestResourceStream(item));
-                //var text = stream.ReadToEnd();
-                //stream.Dispose();
-
-                value = this.ChangeReadNamespace(value, generationInfo);
-                codes.Add(key + Path.GetExtension(item), value);
-            }
-
-            var cremaBase = this.GenerateBaseHeader(generationInfo);
-            var cremaBaseCpp = this.GenerateBaseCpp(generationInfo);
-
-            codes.Add("crema_base.h", cremaBase);
-            codes.Add("crema_base.cpp", cremaBaseCpp);
+            codes.Add("crema_base.h", this.GenerateBaseHeader(generationInfo));
+            codes.Add("crema_base.cpp", this.GenerateBaseCpp(generationInfo));
+            codes.Add("crema_reader.h", this.GenerateReaderHeader(generationInfo));
+            codes.Add("crema_reader.cpp", this.GenerateReaderCpp(generationInfo));
 
             return codes;
         }
@@ -129,12 +111,9 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
             var cremaTypes = GenerateTypes(codeDomProvider, options, generationInfo);
             var cremaTables = GenerateTables(codeDomProvider, options, generationInfo);
 
-            string cremaTypesHeader, cremaTypesCpp;
-            string cremaTablesHeader, cremaTablesCpp;
+            SplitCode(cremaTypes, $"{generationInfo.Prefix}types{generationInfo.Postfix}.h", out var cremaTypesHeader, out var cremaTypesCpp);
+            SplitCode(cremaTables, $"{generationInfo.Prefix}tables{generationInfo.Postfix}.h", out var cremaTablesHeader, out var cremaTablesCpp);
 
-            SplitCode(cremaTypes, $"{generationInfo.Prefix}types{generationInfo.Postfix}.h", out cremaTypesHeader, out cremaTypesCpp);
-            SplitCode(cremaTables, $"{generationInfo.Prefix}tables{generationInfo.Postfix}.h", out cremaTablesHeader, out cremaTablesCpp);
-           
             codes.Add($"{generationInfo.Prefix}types{generationInfo.Postfix}.h", cremaTypesHeader);
             codes.Add($"{generationInfo.Prefix}types{generationInfo.Postfix}.cpp", cremaTypesCpp);
             codes.Add($"{generationInfo.Prefix}tables{generationInfo.Postfix}.h", cremaTablesHeader);
@@ -157,7 +136,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
         {
             get { return "cpp"; }
         }
-        
+
         private string GenerateBaseHeader(CodeGenerationInfo generationInfo)
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
@@ -174,9 +153,25 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
             return this.ChangeBaseNamespace(code, generationInfo);
         }
 
+        private string GenerateReaderHeader(CodeGenerationInfo generationInfo)
+        {
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var resourceName = string.Join(".", assembly.GetName().Name, "code", "crema_reader.h");
+            var code = this.GetResourceString(resourceName);
+            return this.ChangeReadNamespace(code, generationInfo);
+        }
+
+        private string GenerateReaderCpp(CodeGenerationInfo generationInfo)
+        {
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var resourceName = string.Join(".", assembly.GetName().Name, "code", "crema_reader.cpp");
+            var code = this.GetResourceString(resourceName);
+            return this.ChangeReadNamespace(code, generationInfo);
+        }
+
         private string ChangeBaseNamespace(string text, CodeGenerationInfo generationInfo)
         {
-            var segments = generationInfo.BaseNamespace.Split(new string[] { "::", }, StringSplitOptions.RemoveEmptyEntries); 
+            var segments = generationInfo.BaseNamespace.Split(new string[] { "::", }, StringSplitOptions.RemoveEmptyEntries);
             var firstNamespace = string.Join(" { ", segments.Select(item => "namespace " + item));
             var lastNamespace = string.Join(" ", segments.Select(item => "} /*namespace " + item + "*/"));
 
@@ -211,7 +206,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
                 var codeGenerator = codeDomProvider.CreateGenerator(sw);
                 var compileUnit = new CodeCompileUnit();
 
-                compileUnit.AddCustomInclude($"{generationInfo.RelativePath}reader/include/crema/inidata");
+                compileUnit.AddCustomInclude($"{generationInfo.RelativePath}crema_reader");
                 compileUnit.AddCustomInclude($"{generationInfo.Prefix}types{generationInfo.Postfix}");
                 compileUnit.AddCustomInclude($"{generationInfo.RelativePath}crema_base");
 

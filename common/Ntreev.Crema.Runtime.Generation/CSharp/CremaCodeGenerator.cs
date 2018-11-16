@@ -115,7 +115,7 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
 
         public string Name
         {
-            get { return "c#"; }
+            get { return "cs"; }
         }
 
         private IDictionary<string, string> GenerateCodes(CodeGenerationInfo generationInfo)
@@ -140,20 +140,20 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
         {
             var codes = new Dictionary<string, string>();
 
-            var cremaBase = this.GenerateBase(generationInfo);
-            codes.Add($"{generationInfo.RelativePath}CremaBase.cs", cremaBase);
+            codes.Add($"{generationInfo.RelativePath}CremaBase.cs", this.GenerateBase(generationInfo));
+            codes.Add($"{generationInfo.RelativePath}CremaReader.cs", this.GenerateReader(generationInfo));
 
-            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            var ns = string.Join(".", this.GetType().Namespace, "Reader");
-            var files = assembly.GetManifestResourceNames().Where(item => item.StartsWith(ns));
+            //var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            //var ns = string.Join(".", this.GetType().Namespace, "Reader");
+            //var files = assembly.GetManifestResourceNames().Where(item => item.StartsWith(ns));
 
-            foreach (var item in files)
-            {
-                var value = this.GetResourceString(item);
-                var key = Regex.Replace(item, "(^" + this.GetType().Namespace + @"[.])(\S+)[.]cs", "$2").Replace('.', Path.DirectorySeparatorChar);
-                value = value.Replace("Ntreev.Crema.Reader", generationInfo.ReaderNamespace);
-                codes.Add($"{generationInfo.RelativePath}{key}.cs", value);
-            }
+            //foreach (var item in files)
+            //{
+            //    var value = this.GetResourceString(item);
+            //    var key = Regex.Replace(item, "(^" + this.GetType().Namespace + @"[.])(\S+)[.]cs", "$2").Replace('.', Path.DirectorySeparatorChar);
+            //    value = value.Replace("Ntreev.Crema.Reader", generationInfo.ReaderNamespace);
+            //    codes.Add($"{generationInfo.RelativePath}{key}.cs", value);
+            //}
 
             return codes;
         }
@@ -162,6 +162,16 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var resourceName = string.Join(".", this.GetType().Namespace, "Code", "CremaBase.cs");
+            var code = this.GetResourceString(resourceName);
+            code = code.Replace("namespace Ntreev.Crema.Code", "namespace " + generationInfo.BaseNamespace);
+            code = code.Replace("Ntreev.Crema.Reader", generationInfo.ReaderNamespace);
+            return code;
+        }
+
+        private string GenerateReader(CodeGenerationInfo generationInfo)
+        {
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var resourceName = string.Join(".", this.GetType().Namespace, "Code", "CremaReader.cs");
             var code = this.GetResourceString(resourceName);
             code = code.Replace("namespace Ntreev.Crema.Code", "namespace " + generationInfo.BaseNamespace);
             code = code.Replace("Ntreev.Crema.Reader", generationInfo.ReaderNamespace);

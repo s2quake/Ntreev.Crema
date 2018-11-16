@@ -358,7 +358,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
             ccs.Condition = new CodeBinaryOperatorExpression(left, CodeBinaryOperatorType.IdentityInequality, right);
 
             var message = string.Format("데이터의 이름이 코드 이름({0})과 다릅니다.", generationInfo.DataBaseName);
-            var exception = new CodeMethodInvokeExpression(null, "std::exception", new CodePrimitiveExpression(message));
+            var exception = new CodeMethodInvokeExpression(null, "std::logic_error", new CodePrimitiveExpression(message));
             ccs.TrueStatements.Add(new CodeThrowExceptionStatement(exception));
 
             return ccs;
@@ -379,7 +379,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
             ccs.Condition = new CodeBinaryOperatorExpression(left, CodeBinaryOperatorType.BooleanAnd, right);
 
             var message = string.Format("데이터의 리비전 코드 리비전({0})과 다릅니다.", generationInfo.Revision);
-            var exception = new CodeMethodInvokeExpression(null, "std::exception", new CodePrimitiveExpression(message));
+            var exception = new CodeMethodInvokeExpression(null, "std::logic_error", new CodePrimitiveExpression(message));
             ccs.TrueStatements.Add(new CodeThrowExceptionStatement(exception));
 
             return ccs;
@@ -394,7 +394,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
             ccs.Condition = new CodeBinaryOperatorExpression(left, CodeBinaryOperatorType.IdentityInequality, right);
 
             var message = "타입 해시값이 잘못되었습니다.";
-            var exception = new CodeMethodInvokeExpression(null, "std::exception", new CodePrimitiveExpression(message));
+            var exception = new CodeMethodInvokeExpression(null, "std::logic_error", new CodePrimitiveExpression(message));
             ccs.TrueStatements.Add(new CodeThrowExceptionStatement(exception));
 
             return ccs;
@@ -409,7 +409,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
             ccs.Condition = new CodeBinaryOperatorExpression(left, CodeBinaryOperatorType.IdentityInequality, right);
 
             var message = "테이블 해시값이 잘못되었습니다.";
-            var exception = new CodeMethodInvokeExpression(null, "std::exception", new CodePrimitiveExpression(message));
+            var exception = new CodeMethodInvokeExpression(null, "std::logic_error", new CodePrimitiveExpression(message));
             ccs.TrueStatements.Add(new CodeThrowExceptionStatement(exception));
 
             return ccs;

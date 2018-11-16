@@ -9,7 +9,7 @@ declare module 'crema-reader' {
 
     export interface IDataSet {
         tables?: { [key: string]: ITable; }
-        revision?: number;
+        revision?: string;
         name?: string;
         typesHashValue?: string;
         tablesHashValue?: string;

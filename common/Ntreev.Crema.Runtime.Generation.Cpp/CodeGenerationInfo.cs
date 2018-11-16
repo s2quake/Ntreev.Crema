@@ -151,7 +151,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
         {
             get
             {
-                return this.BaseNamespace + "::" + "reader";
+                return "reader";
             }
         }
 

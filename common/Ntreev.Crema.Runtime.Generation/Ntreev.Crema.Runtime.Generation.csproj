@@ -45,77 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\Binary\CremaBinaryColumn.cs">
-      <Link>CSharp\Reader\Binary\CremaBinaryColumn.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\Binary\CremaBinaryColumnCollection.cs">
-      <Link>CSharp\Reader\Binary\CremaBinaryColumnCollection.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\Binary\CremaBinaryReader.cs">
-      <Link>CSharp\Reader\Binary\CremaBinaryReader.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\Binary\CremaBinaryRow.cs">
-      <Link>CSharp\Reader\Binary\CremaBinaryRow.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\Binary\CremaBinaryRowCollection.cs">
-      <Link>CSharp\Reader\Binary\CremaBinaryRowCollection.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\Binary\CremaBinaryTable.cs">
-      <Link>CSharp\Reader\Binary\CremaBinaryTable.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\Binary\CremaBinaryTableCollection.cs">
-      <Link>CSharp\Reader\Binary\CremaBinaryTableCollection.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\Binary\CremaBinaryType.cs">
-      <Link>CSharp\Reader\Binary\CremaBinaryType.cs</Link>
-    </EmbeddedResource>
     <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\CremaReader.cs">
-      <Link>CSharp\Reader\CremaReader.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\Extensions.cs">
-      <Link>CSharp\Reader\Extensions.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\IColumn.cs">
-      <Link>CSharp\Reader\IColumn.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\IColumnCollection.cs">
-      <Link>CSharp\Reader\IColumnCollection.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\IDataSet.cs">
-      <Link>CSharp\Reader\IDataSet.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\Internal\SocketStream.cs">
-      <Link>CSharp\Reader\Internal\SocketStream.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\Internal\StringResource.cs">
-      <Link>CSharp\Reader\Internal\StringResource.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\Internal\Utility.cs">
-      <Link>CSharp\Reader\Internal\Utility.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\IO\BinaryReaderExtension.cs">
-      <Link>CSharp\Reader\IO\BinaryReaderExtension.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\IO\BinaryWriterExtension.cs">
-      <Link>CSharp\Reader\IO\BinaryWriterExtension.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\IRow.cs">
-      <Link>CSharp\Reader\IRow.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\IRowCollection.cs">
-      <Link>CSharp\Reader\IRowCollection.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\ITable.cs">
-      <Link>CSharp\Reader\ITable.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\ITableCollection.cs">
-      <Link>CSharp\Reader\ITableCollection.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\ReadOptions.cs">
-      <Link>CSharp\Reader\ReadOptions.cs</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\tools\Ntreev.Crema.Reader\Internal\RemoteStream.cs">
-      <Link>CSharp\Reader\Internal\RemoteStream.cs</Link>
+      <Link>CSharp\Code\CremaReader.cs</Link>
     </EmbeddedResource>
     <Compile Include="CodeGenerationOptions.cs" />
     <Compile Include="GenerationSet.cs" />

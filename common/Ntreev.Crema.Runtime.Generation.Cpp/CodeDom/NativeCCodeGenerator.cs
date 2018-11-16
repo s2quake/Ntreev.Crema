@@ -2388,7 +2388,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp.CodeDom
                     return "time_t";
 
                 case "system.timespan":
-                    return "int";
+                    return "long long";
 
 
                 case "system.decimal":

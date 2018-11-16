@@ -227,11 +227,23 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
 
             // invoke base.FindRow
             {
-                var query = from item in tableInfo.Columns
-                            where item.IsKey
-                            select new CodeVariableReferenceExpression(item.Name);
+                var expressionList = new List<CodeExpression>(tableInfo.Columns.Length);
+                foreach (var item in tableInfo.Columns)
+                {
+                    if (item.IsKey == true)
+                    {
+                        if (item.DataType == typeof(string).GetTypeName())
+                        {
+                            expressionList.Add(new CodeMethodInvokeExpression(new CodeVariableReferenceExpression(item.Name), "c_str"));
+                        }
+                        else
+                        {
+                            expressionList.Add(new CodeVariableReferenceExpression(item.Name));
+                        }
+                    }
+                }
 
-                var invokeFindRow = new CodeMethodInvokeExpression(thisRef, "FindRow", query.ToArray());
+                var invokeFindRow = new CodeMethodInvokeExpression(thisRef, "FindRow", expressionList.ToArray());
 
                 cmm.Statements.AddMethodReturn(invokeFindRow);
             }
@@ -270,7 +282,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
             state.Condition = new CodeBinaryOperatorExpression(version, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(tableInfo.HashValue));
 
             var message = string.Format("{0} 테이블과 데이터의 형식이 맞지 않습니다.", tableInfo.Name);
-            var exception = new CodeObjectCreateExpression("std::exception", new CodePrimitiveExpression(message));
+            var exception = new CodeObjectCreateExpression("std::logic_error", new CodePrimitiveExpression(message));
             state.TrueStatements.Add(new CodeThrowExceptionStatement(exception));
 
             return state;

@@ -155,7 +155,7 @@ namespace Ntreev.Crema.Tools.Runtime.ViewModels
         public static readonly GenerationItemViewModel Empty = new GenerationItemViewModel()
         {
             Tags = (string)TagInfo.All,
-            LanguageType = "c#",
+            LanguageType = "cs",
         };
 
         public bool Equals(GenerationItemViewModel dest)

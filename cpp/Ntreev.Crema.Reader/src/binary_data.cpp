@@ -139,14 +139,8 @@ namespace CremaReader {
 
 			bool binary_row::equals_key(va_list& vl)
 			{
-#if _MSC_VER >= 1700
 				for (inicolumn& item : m_table->m_keys)
 				{
-#else
-				for (binary_key_array::iterator itor = m_table->keys.begin(); itor != m_table->keys.end(); itor++)
-				{
-					inicolumn& item = *itor;
-#endif
 					const std::type_info& typeinfo = *va_arg(vl, const std::type_info*);
 					if (typeinfo == typeid(bool))
 					{
@@ -252,14 +246,8 @@ namespace CremaReader {
 
 			binary_column_array::~binary_column_array()
 			{
-#if _MSC_VER >= 1700
 				for (binary_column* item : m_columns)
 				{
-#else
-				for (std::vector<binary_column*>::iterator itor = m_columns().begin(); itor != m_columns().end(); itor++)
-				{
-					binary_column* item = *itor;
-#endif
 					delete item;
 				}
 			}
@@ -343,14 +331,8 @@ namespace CremaReader {
 				binary_row& row = this->at(index);
 				const std::collate<char>& coll = std::use_facet< std::collate<char> >(std::locale());
 				std::vector<char> fields(keysize);
-#if _MSC_VER >= 1700
 				for (inicolumn& item : m_table->m_keys)
 				{
-#else
-				for (binary_key_array::iterator itor = m_table->keys.begin(); itor != m_table->keys.end(); itor++)
-				{
-					inicolumn& item = *itor;
-#endif
 					const std::type_info& typeinfo = item.datatype();
 					if (typeinfo == typeid(bool))
 					{
@@ -519,14 +501,8 @@ namespace CremaReader {
 			{
 				size_t size = 0;
 
-#if _MSC_VER >= 1700
 				for (inicolumn& item : m_table->m_keys)
 				{
-#else
-				for (binary_key_array::iterator itor = m_table->keys.begin(); itor != m_table->keys.end(); itor++)
-				{
-					inicolumn& item = *itor;
-#endif
 					const std::type_info& typeinfo = item.datatype();
 #ifdef _DEBUG
 					const char* name = typeinfo.name();
@@ -631,14 +607,8 @@ namespace CremaReader {
 
 			binary_table_array::~binary_table_array()
 			{
-#if _MSC_VER >= 1700
 				for (binary_table* item : m_tables)
 				{
-#else
-				for (std::vector<binary_table*>::iterator itor = m_tables.begin(); itor != m_tables.end(); itor++)
-				{
-					binary_table* item = *itor;
-#endif
 					delete item;
 				}
 			}
