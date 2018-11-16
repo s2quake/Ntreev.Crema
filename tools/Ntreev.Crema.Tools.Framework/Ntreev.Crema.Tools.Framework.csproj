@@ -95,7 +95,7 @@
   <ItemGroup>
     <Compile Include="ContentBase.cs" />
     <Compile Include="Controls\TagSelector.cs" />
-    <Compile Include="DescriptorServiceFactory.cs" />
+    <Compile Include="CremaHostServiceFactory.cs" />
     <Compile Include="Dialogs\ViewModels\DataBaseListViewModel.cs" />
     <Compile Include="Dialogs\Views\DataBaseListView.xaml.cs">
       <DependentUpon>DataBaseListView.xaml</DependentUpon>
@@ -115,7 +115,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Service References\DescriptorService\Reference.cs">
+    <Compile Include="Service References\CremaHostService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
@@ -126,23 +126,26 @@
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DataBaseInfo.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.ResultBase.datasource" />
+    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.ServiceInfo.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <None Include="Service References\DescriptorService\Arrays.xsd">
+    <None Include="Service References\CremaHostService\Arrays1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\DescriptorService\schemas.ntreev.com.xsd">
+    <None Include="Service References\CremaHostService\schemas.ntreev.com1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\DescriptorService\service.wsdl" />
-    <None Include="Service References\DescriptorService\service.xsd">
+    <None Include="Service References\CremaHostService\service1.wsdl" />
+    <None Include="Service References\CremaHostService\service1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\DescriptorService\www.ntreev.com.wsdl" />
-    <None Include="Service References\DescriptorService\www.ntreev.com.xsd">
+    <None Include="Service References\CremaHostService\www.ntreev.com1.wsdl" />
+    <None Include="Service References\CremaHostService\www.ntreev.com1.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
@@ -186,16 +189,16 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadataStorage Include="Service References\DescriptorService\" />
+    <WCFMetadataStorage Include="Service References\CremaHostService\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\DescriptorService\configuration91.svcinfo" />
+    <None Include="Service References\CremaHostService\configuration91.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\DescriptorService\configuration.svcinfo" />
+    <None Include="Service References\CremaHostService\configuration.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\DescriptorService\Reference.svcmap">
+    <None Include="Service References\CremaHostService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>

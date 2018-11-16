@@ -97,8 +97,9 @@ namespace Ntreev.Crema.Tools.Framework.Dialogs.ViewModels
         {
             try
             {
-                var service = DescriptorServiceFactory.CreateServiceClient(this.address);
-                var labels = await service.GetDataBaseInfosAsync();
+                var service = CremaHostServiceFactory.CreateServiceClient(this.address);
+                var result = await InvokeServiceAsync(() => service.GetDataBaseInfos());
+                var labels = result.Value;
                 service.Close();
                 var selectedValue = this.selectedValue;
                 this.ItemsSource = new ObservableCollection<DataBaseInfo>(labels);
@@ -119,6 +120,13 @@ namespace Ntreev.Crema.Tools.Framework.Dialogs.ViewModels
             {
                 //this.EndProgress();
             }
+        }
+
+        private static async Task<ResultBase<TResult>> InvokeServiceAsync<TResult>(Func<ResultBase<TResult>> func)
+        {
+            var result = await Task.Run(func);
+            result.Validate();
+            return result;
         }
     }
 }

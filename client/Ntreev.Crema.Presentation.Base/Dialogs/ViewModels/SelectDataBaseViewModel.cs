@@ -138,7 +138,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             try
             {
                 this.BeginProgress(Resources.Message_ReceivingInformation);
-                var dataBaseInfos = await Task.Run(() => CremaBootstrapper.GetDataBases(address));
+                var dataBaseInfos = await Task.Run(() => CremaBootstrapper.GetDataBasesAsync(address));
 
                 var query = from connectionItem in this.cremaAppHost.ConnectionItems
                             where connectionItem.Address == this.cremaAppHost.ConnectionItem.Address &&

@@ -44,6 +44,7 @@ namespace Ntreev.Crema.ServiceHosts
             this.CremaHost = cremaHost;
             this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;
             this.LogService.Debug($"{nameof(CremaHostService)} Constructor");
+            this.OwnerID = nameof(CremaHostService);
         }
 
         public async Task<ResultBase<Guid>> SubscribeAsync(string userID, byte[] password, string version, string platformID, string culture)
@@ -100,28 +101,66 @@ namespace Ntreev.Crema.ServiceHosts
             return result;
         }
 
-        public ServiceInfo[] GetServiceInfos()
+        public async Task<ResultBase<ServiceInfo[]>> GetServiceInfosAsync()
         {
-            return this.service.ServiceInfos;
+            var result = new ResultBase<ServiceInfo[]>();
+            try
+            {
+                result.Value = await Task.Run(() => this.service.ServiceInfos);
+                result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public DataBaseInfo[] GetDataBaseInfos()
+        public async Task<ResultBase<DataBaseInfo[]>> GetDataBaseInfosAsync()
         {
-            return this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext.Select(item => item.DataBaseInfo).ToArray());
+            var result = new ResultBase<DataBaseInfo[]>();
+            try
+            {
+                result.Value = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext.Select(item => item.DataBaseInfo).ToArray());
+                result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public string GetVersion()
+        public async Task<ResultBase<string>> GetVersionAsync()
         {
-            return AppUtility.ProductVersion.ToString();
+            var result = new ResultBase<string>();
+            try
+            {
+                result.Value = await Task.Run(() => AppUtility.ProductVersion.ToString());
+                result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
-        public bool IsOnline(string userID, byte[] password)
+        public async Task<ResultBase<bool>> IsOnlineAsync(string userID, byte[] password)
         {
-            var userContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            var text = Encoding.UTF8.GetString(password);
-            var task = userContext.IsOnlineUserAsync(userID, StringUtility.ToSecureString(StringUtility.Decrypt(text, userID)));
-            task.Wait();
-            return task.Result;
+            var result = new ResultBase<bool>();
+            try
+            {
+                var userContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
+                var text = Encoding.UTF8.GetString(password);
+                result.Value = await userContext.IsOnlineUserAsync(userID, StringUtility.ToSecureString(StringUtility.Decrypt(text, userID)));
+                result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
+            }
+            catch (Exception e)
+            {
+                result.Fault = new CremaFault() { ExceptionType = e.GetType().Name, Message = e.Message };
+            }
+            return result;
         }
 
         public async Task<ResultBase> ShutdownAsync(int milliseconds, ShutdownType shutdownType, string message)

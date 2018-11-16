@@ -8,36 +8,60 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Ntreev.Crema.Services.CremaHostService {
+namespace Ntreev.Crema.Tools.Framework.CremaHostService {
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="http://www.ntreev.com", ConfigurationName="CremaHostService.ICremaHostService", CallbackContract=typeof(Ntreev.Crema.Services.CremaHostService.ICremaHostServiceCallback), SessionMode=System.ServiceModel.SessionMode.Required)]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="http://www.ntreev.com", ConfigurationName="CremaHostService.ICremaHostService", CallbackContract=typeof(Ntreev.Crema.Tools.Framework.CremaHostService.ICremaHostServiceCallback), SessionMode=System.ServiceModel.SessionMode.Required)]
     internal interface ICremaHostService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/Subscribe", ReplyAction="http://www.ntreev.com/ICremaHostService/SubscribeResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<System.Guid> Subscribe(string userID, byte[] password, string version, string platformID, string culture);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/Subscribe", ReplyAction="http://www.ntreev.com/ICremaHostService/SubscribeResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<System.Guid>> SubscribeAsync(string userID, byte[] password, string version, string platformID, string culture);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/Unsubscribe", ReplyAction="http://www.ntreev.com/ICremaHostService/UnsubscribeResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Unsubscribe();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/Unsubscribe", ReplyAction="http://www.ntreev.com/ICremaHostService/UnsubscribeResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> UnsubscribeAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/GetVersion", ReplyAction="http://www.ntreev.com/ICremaHostService/GetVersionResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<string> GetVersion();
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/GetVersion", ReplyAction="http://www.ntreev.com/ICremaHostService/GetVersionResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<string>> GetVersionAsync();
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/IsOnline", ReplyAction="http://www.ntreev.com/ICremaHostService/IsOnlineResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<bool> IsOnline(string userID, byte[] password);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/IsOnline", ReplyAction="http://www.ntreev.com/ICremaHostService/IsOnlineResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<bool>> IsOnlineAsync(string userID, byte[] password);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/GetDataBaseInfos", ReplyAction="http://www.ntreev.com/ICremaHostService/GetDataBaseInfosResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo[]> GetDataBaseInfos();
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/GetDataBaseInfos", ReplyAction="http://www.ntreev.com/ICremaHostService/GetDataBaseInfosResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo[]>> GetDataBaseInfosAsync();
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/GetServiceInfos", ReplyAction="http://www.ntreev.com/ICremaHostService/GetServiceInfosResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo[]> GetServiceInfos();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/GetServiceInfos", ReplyAction="http://www.ntreev.com/ICremaHostService/GetServiceInfosResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo[]>> GetServiceInfosAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/Shutdown", ReplyAction="http://www.ntreev.com/ICremaHostService/ShutdownResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Shutdown(int milliseconds, Ntreev.Crema.ServiceModel.ShutdownType shutdownType, string message);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/Shutdown", ReplyAction="http://www.ntreev.com/ICremaHostService/ShutdownResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> ShutdownAsync(int milliseconds, Ntreev.Crema.ServiceModel.ShutdownType shutdownType, string message);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/CancelShutdown", ReplyAction="http://www.ntreev.com/ICremaHostService/CancelShutdownResponse")]
         Ntreev.Crema.ServiceModel.ResultBase CancelShutdown();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/CancelShutdown", ReplyAction="http://www.ntreev.com/ICremaHostService/CancelShutdownResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> CancelShutdownAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -51,12 +75,12 @@ namespace Ntreev.Crema.Services.CremaHostService {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    internal interface ICremaHostServiceChannel : Ntreev.Crema.Services.CremaHostService.ICremaHostService, System.ServiceModel.IClientChannel {
+    internal interface ICremaHostServiceChannel : Ntreev.Crema.Tools.Framework.CremaHostService.ICremaHostService, System.ServiceModel.IClientChannel {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    internal partial class CremaHostServiceClient : System.ServiceModel.DuplexClientBase<Ntreev.Crema.Services.CremaHostService.ICremaHostService>, Ntreev.Crema.Services.CremaHostService.ICremaHostService {
+    internal partial class CremaHostServiceClient : System.ServiceModel.DuplexClientBase<Ntreev.Crema.Tools.Framework.CremaHostService.ICremaHostService>, Ntreev.Crema.Tools.Framework.CremaHostService.ICremaHostService {
         
         public CremaHostServiceClient(System.ServiceModel.InstanceContext callbackInstance) : 
                 base(callbackInstance) {
@@ -82,32 +106,64 @@ namespace Ntreev.Crema.Services.CremaHostService {
             return base.Channel.Subscribe(userID, password, version, platformID, culture);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<System.Guid>> SubscribeAsync(string userID, byte[] password, string version, string platformID, string culture) {
+            return base.Channel.SubscribeAsync(userID, password, version, platformID, culture);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase Unsubscribe() {
             return base.Channel.Unsubscribe();
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> UnsubscribeAsync() {
+            return base.Channel.UnsubscribeAsync();
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<string> GetVersion() {
             return base.Channel.GetVersion();
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<string>> GetVersionAsync() {
+            return base.Channel.GetVersionAsync();
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase<bool> IsOnline(string userID, byte[] password) {
             return base.Channel.IsOnline(userID, password);
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<bool>> IsOnlineAsync(string userID, byte[] password) {
+            return base.Channel.IsOnlineAsync(userID, password);
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo[]> GetDataBaseInfos() {
             return base.Channel.GetDataBaseInfos();
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo[]>> GetDataBaseInfosAsync() {
+            return base.Channel.GetDataBaseInfosAsync();
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo[]> GetServiceInfos() {
             return base.Channel.GetServiceInfos();
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo[]>> GetServiceInfosAsync() {
+            return base.Channel.GetServiceInfosAsync();
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase Shutdown(int milliseconds, Ntreev.Crema.ServiceModel.ShutdownType shutdownType, string message) {
             return base.Channel.Shutdown(milliseconds, shutdownType, message);
         }
         
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> ShutdownAsync(int milliseconds, Ntreev.Crema.ServiceModel.ShutdownType shutdownType, string message) {
+            return base.Channel.ShutdownAsync(milliseconds, shutdownType, message);
+        }
+        
         public Ntreev.Crema.ServiceModel.ResultBase CancelShutdown() {
             return base.Channel.CancelShutdown();
+        }
+        
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> CancelShutdownAsync() {
+            return base.Channel.CancelShutdownAsync();
         }
     }
 }

@@ -27,17 +27,20 @@ using System.Text.RegularExpressions;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library;
 using System.Xml;
-using Ntreev.Crema.Tools.Framework.DescriptorService;
+using Ntreev.Crema.Tools.Framework.CremaHostService;
 
 namespace Ntreev.Crema.Tools.Framework
 {
-    class DescriptorServiceFactory
+    class CremaHostServiceFactory : ICremaHostServiceCallback
     {
-        public static DescriptorServiceClient CreateServiceClient(string address)
+        private static readonly CremaHostServiceFactory empty = new CremaHostServiceFactory();
+
+        public static CremaHostServiceClient CreateServiceClient(string address)
         {
             var binding = CreateBinding(TimeSpan.MaxValue);
-            var endPointAddress = new EndpointAddress($"net.tcp://{AddressUtility.ConnectionAddress(address)}/DescriptorService");
-            var serviceClient = new DescriptorServiceClient(binding, endPointAddress);
+            var endPointAddress = new EndpointAddress($"net.tcp://{AddressUtility.ConnectionAddress(address)}/CremaHostService");
+            var instanceContext = new InstanceContext(empty);
+            var serviceClient = new CremaHostServiceClient(instanceContext, binding, endPointAddress);
             return serviceClient;
         }
 
@@ -45,7 +48,7 @@ namespace Ntreev.Crema.Tools.Framework
         {
             var binding = new NetTcpBinding();
             binding.Security.Mode = SecurityMode.None;
-            binding.SendTimeout = timeSpan;
+            binding.ReceiveTimeout = TimeSpan.MaxValue;
             binding.MaxBufferPoolSize = long.MaxValue;
             binding.MaxBufferSize = int.MaxValue;
             binding.MaxReceivedMessageSize = int.MaxValue;
@@ -53,5 +56,19 @@ namespace Ntreev.Crema.Tools.Framework
 
             return binding;
         }
+
+        #region ICremaHostServiceCallback
+
+        void ICremaHostServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
+        {
+            //throw new NotImplementedException();
+        }
+
+        void ICremaHostServiceCallback.OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs)
+        {
+            //throw new NotImplementedException();
+        }
+
+        #endregion
     }
 }

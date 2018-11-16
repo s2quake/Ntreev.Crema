@@ -61,7 +61,8 @@ namespace Ntreev.Crema.Services
             serviceClient.Open();
             try
             {
-                return await Task.Run(() => serviceClient.IsOnline(userID, UserContext.Encrypt(userID, password)));
+                var result = await InvokeServiceAsync(() => serviceClient.IsOnline(userID, UserContext.Encrypt(userID, password)));
+                return result.Value;
             }
             finally
             {
@@ -69,13 +70,14 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        public static DataBaseInfo[] GetDataBases(string address)
+        public static async Task<DataBaseInfo[]> GetDataBasesAsync(string address)
         {
             var serviceClient = CremaHostServiceFactory.CreateServiceClient(address);
             serviceClient.Open();
             try
             {
-                return serviceClient.GetDataBaseInfos();
+                var result = await InvokeServiceAsync(() => serviceClient.GetDataBaseInfos());
+                return result.Value;
             }
             finally
             {
@@ -234,6 +236,13 @@ namespace Ntreev.Crema.Services
 
             this.container.Compose(batch);
             this.settings = this.container.GetExportedValue<CremaSettings>();
+        }
+
+        private static async Task<ResultBase<TResult>> InvokeServiceAsync<TResult>(Func<ResultBase<TResult>> func)
+        {
+            var result = await Task.Run(func);
+            result.Validate();
+            return result;
         }
 
         internal static TimeSpan DefaultInactivityTimeout { get; set; }

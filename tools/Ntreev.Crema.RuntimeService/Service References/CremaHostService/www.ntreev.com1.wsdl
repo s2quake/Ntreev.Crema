@@ -8,6 +8,18 @@
       <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
     </xsd:schema>
   </wsdl:types>
+  <wsdl:message name="ICremaHostService_Subscribe_InputMessage">
+    <wsdl:part name="parameters" element="tns:Subscribe" />
+  </wsdl:message>
+  <wsdl:message name="ICremaHostService_Subscribe_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SubscribeResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICremaHostService_Unsubscribe_InputMessage">
+    <wsdl:part name="parameters" element="tns:Unsubscribe" />
+  </wsdl:message>
+  <wsdl:message name="ICremaHostService_Unsubscribe_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UnsubscribeResponse" />
+  </wsdl:message>
   <wsdl:message name="ICremaHostService_GetVersion_InputMessage">
     <wsdl:part name="parameters" element="tns:GetVersion" />
   </wsdl:message>
@@ -32,18 +44,6 @@
   <wsdl:message name="ICremaHostService_GetServiceInfos_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetServiceInfosResponse" />
   </wsdl:message>
-  <wsdl:message name="ICremaHostService_Subscribe_InputMessage">
-    <wsdl:part name="parameters" element="tns:Subscribe" />
-  </wsdl:message>
-  <wsdl:message name="ICremaHostService_Subscribe_OutputMessage">
-    <wsdl:part name="parameters" element="tns:SubscribeResponse" />
-  </wsdl:message>
-  <wsdl:message name="ICremaHostService_Unsubscribe_InputMessage">
-    <wsdl:part name="parameters" element="tns:Unsubscribe" />
-  </wsdl:message>
-  <wsdl:message name="ICremaHostService_Unsubscribe_OutputMessage">
-    <wsdl:part name="parameters" element="tns:UnsubscribeResponse" />
-  </wsdl:message>
   <wsdl:message name="ICremaHostService_Shutdown_InputMessage">
     <wsdl:part name="parameters" element="tns:Shutdown" />
   </wsdl:message>
@@ -63,6 +63,14 @@
     <wsdl:part name="parameters" element="tns:OnTaskCompleted" />
   </wsdl:message>
   <wsdl:portType msc:usingSession="true" name="ICremaHostService">
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Subscribe">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/ICremaHostService/Subscribe" message="tns:ICremaHostService_Subscribe_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/ICremaHostService/SubscribeResponse" message="tns:ICremaHostService_Subscribe_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Unsubscribe">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/ICremaHostService/Unsubscribe" message="tns:ICremaHostService_Unsubscribe_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/ICremaHostService/UnsubscribeResponse" message="tns:ICremaHostService_Unsubscribe_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetVersion">
       <wsdl:input wsaw:Action="http://www.ntreev.com/ICremaHostService/GetVersion" message="tns:ICremaHostService_GetVersion_InputMessage" />
       <wsdl:output wsaw:Action="http://www.ntreev.com/ICremaHostService/GetVersionResponse" message="tns:ICremaHostService_GetVersion_OutputMessage" />
@@ -78,14 +86,6 @@
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetServiceInfos">
       <wsdl:input wsaw:Action="http://www.ntreev.com/ICremaHostService/GetServiceInfos" message="tns:ICremaHostService_GetServiceInfos_InputMessage" />
       <wsdl:output wsaw:Action="http://www.ntreev.com/ICremaHostService/GetServiceInfosResponse" message="tns:ICremaHostService_GetServiceInfos_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Subscribe">
-      <wsdl:input wsaw:Action="http://www.ntreev.com/ICremaHostService/Subscribe" message="tns:ICremaHostService_Subscribe_InputMessage" />
-      <wsdl:output wsaw:Action="http://www.ntreev.com/ICremaHostService/SubscribeResponse" message="tns:ICremaHostService_Subscribe_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Unsubscribe">
-      <wsdl:input wsaw:Action="http://www.ntreev.com/ICremaHostService/Unsubscribe" message="tns:ICremaHostService_Unsubscribe_InputMessage" />
-      <wsdl:output wsaw:Action="http://www.ntreev.com/ICremaHostService/UnsubscribeResponse" message="tns:ICremaHostService_Unsubscribe_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Shutdown">
       <wsdl:input wsaw:Action="http://www.ntreev.com/ICremaHostService/Shutdown" message="tns:ICremaHostService_Shutdown_InputMessage" />

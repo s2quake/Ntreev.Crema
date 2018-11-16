@@ -123,7 +123,6 @@ namespace Ntreev.Crema.Services
 
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var version = typeof(CremaHost).Assembly.GetName().Version;
                     var binding = CremaHost.CreateBinding(ServiceInfo.Empty);
                     var endPointAddress = new EndpointAddress($"net.tcp://{AddressUtility.ConnectionAddress(address)}/CremaHostService");
                     var instanceConetxt = new InstanceContext(this);
@@ -133,8 +132,11 @@ namespace Ntreev.Crema.Services
                     {
                         service.Faulted += Service_Faulted;
                     }
-
-                    this.ServiceInfos = this.service.GetServiceInfos().ToDictionary(item => item.Name);
+                });
+                this.ServiceInfos = (await this.InvokeServiceAsync(() => this.service.GetServiceInfos())).Value.ToDictionary(item => item.Name);
+                await this.Dispatcher.InvokeAsync(() =>
+                {
+                    var version = typeof(CremaHost).Assembly.GetName().Version;
                     var result = this.InvokeService(() => this.service.Subscribe(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}"));
                     this.AuthenticationToken = result.Value;
                     this.IPAddress = AddressUtility.GetIPAddress(address);
@@ -517,21 +519,21 @@ namespace Ntreev.Crema.Services
             });
         }
 
-        private static async Task<IReadOnlyDictionary<string, ServiceInfo>> GetServiceInfoAsync(string address)
-        {
-            var serviceClient = CremaHostServiceFactory.CreateServiceClient(address);
-            serviceClient.Open();
-            try
-            {
-                var version = await Task.Run(() => serviceClient.GetVersion());
-                var serviceInfos = await Task.Run(() => serviceClient.GetServiceInfos());
-                return serviceInfos.ToDictionary(item => item.Name);
-            }
-            finally
-            {
-                serviceClient.Close();
-            }
-        }
+        //private static async Task<IReadOnlyDictionary<string, ServiceInfo>> GetServiceInfoAsync(string address)
+        //{
+        //    var serviceClient = CremaHostServiceFactory.CreateServiceClient(address);
+        //    serviceClient.Open();
+        //    try
+        //    {
+        //        var version = await Task.Run(() => serviceClient.GetVersion());
+        //        var serviceInfos = await Task.Run(() => serviceClient.GetServiceInfos());
+        //        return serviceInfos.ToDictionary(item => item.Name);
+        //    }
+        //    finally
+        //    {
+        //        serviceClient.Close();
+        //    }
+        //}
 
         private string ConfigPath
         {

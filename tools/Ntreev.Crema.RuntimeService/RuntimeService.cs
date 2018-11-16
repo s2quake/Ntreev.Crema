@@ -33,7 +33,7 @@ namespace Ntreev.Crema.RuntimeService
     {
         public async Task<GenerationSet> GetCodeGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
         {
-            var service = RuntimeServiceFactory.CreateServiceClient(address);
+            var service = await RuntimeServiceFactory.CreateServiceClientAsync(address);
             service.Open();
             try
             {
@@ -48,7 +48,7 @@ namespace Ntreev.Crema.RuntimeService
 
         public async Task<SerializationSet> GetDataGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
         {
-            var service = RuntimeServiceFactory.CreateServiceClient(address);
+            var service = await RuntimeServiceFactory.CreateServiceClientAsync(address);
             service.Open();
             try
             {
@@ -63,7 +63,7 @@ namespace Ntreev.Crema.RuntimeService
 
         public async Task<Tuple<GenerationSet, SerializationSet>> GetMetaDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
         {
-            var service = RuntimeServiceFactory.CreateServiceClient(address);
+            var service = await RuntimeServiceFactory.CreateServiceClientAsync(address);
             service.Open();
             try
             {
@@ -78,7 +78,7 @@ namespace Ntreev.Crema.RuntimeService
 
         public async Task ResetDataAsync(string address, string dataBaseName)
         {
-            var service = RuntimeServiceFactory.CreateServiceClient(address);
+            var service = await RuntimeServiceFactory.CreateServiceClientAsync(address);
             service.Open();
             try
             {
@@ -92,7 +92,7 @@ namespace Ntreev.Crema.RuntimeService
 
         public async Task<string> GetRevisionAsync(string address, string dataBaseName)
         {
-            var service = RuntimeServiceFactory.CreateServiceClient(address);
+            var service = await RuntimeServiceFactory.CreateServiceClientAsync(address);
             service.Open();
             try
             {

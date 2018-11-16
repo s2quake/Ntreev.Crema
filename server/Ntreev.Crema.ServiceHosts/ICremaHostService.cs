@@ -29,22 +29,22 @@ namespace Ntreev.Crema.ServiceHosts
     public interface ICremaHostService
     {
         [OperationContract]
-        string GetVersion();
-
-        [OperationContract]
-        bool IsOnline(string userID, byte[] password);
-
-        [OperationContract]
-        DataBaseInfo[] GetDataBaseInfos();
-
-        [OperationContract]
-        ServiceInfo[] GetServiceInfos();
-
-        [OperationContract]
         ResultBase<Guid> Subscribe(string userID, byte[] password, string version, string platformID, string culture);
 
         [OperationContract]
         ResultBase Unsubscribe();
+
+        [OperationContract]
+        ResultBase<string> GetVersion();
+
+        [OperationContract]
+        ResultBase<bool> IsOnline(string userID, byte[] password);
+
+        [OperationContract]
+        ResultBase<DataBaseInfo[]> GetDataBaseInfos();
+
+        [OperationContract]
+        ResultBase<ServiceInfo[]> GetServiceInfos();
 
         [OperationContract]
         ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message);

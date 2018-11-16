@@ -35,17 +35,17 @@ namespace Ntreev.Crema.RuntimeService
     {
         private static readonly RuntimeServiceFactory empty = new RuntimeServiceFactory();
 
-        public static RuntimeServiceClient CreateServiceClient(string address)
+        public static async Task<RuntimeServiceClient> CreateServiceClientAsync(string address)
         {
             var binding = CreateBinding(TimeSpan.MaxValue);
             var ip = AddressUtility.GetIPAddress(address);
-            var port = GetServicePort(address);
+            var port = await GetServicePortAsync(address);
             var endPointAddress = new EndpointAddress($"net.tcp://{ip}:{port}/RuntimeService");
 
             return new RuntimeServiceClient(binding, endPointAddress);
         }
 
-        private static int GetServicePort(string address)
+        private static async Task<int> GetServicePortAsync(string address)
         {
             var binding = CreateBinding(TimeSpan.MaxValue);
             var endPointAddress = new EndpointAddress($"net.tcp://{AddressUtility.ConnectionAddress(address)}/CremaHostService");
@@ -54,8 +54,8 @@ namespace Ntreev.Crema.RuntimeService
 
             try
             {
-                var serviceInfos = serviceClient.GetServiceInfos();
-
+                var result = await InvokeServiceAsync(() => serviceClient.GetServiceInfos());
+                var serviceInfos = result.Value;
                 foreach (var item in serviceInfos)
                 {
                     if (item.Name == nameof(RuntimeService))
@@ -72,14 +72,21 @@ namespace Ntreev.Crema.RuntimeService
             }
         }
 
+        private static async Task<ResultBase<TResult>> InvokeServiceAsync<TResult>(Func<ResultBase<TResult>> func)
+        {
+            var result = await Task.Run(func);
+            result.Validate();
+            return result;
+        }
+
         private static Binding CreateBinding(TimeSpan timeSpan)
         {
             var binding = new NetTcpBinding();
             binding.Security.Mode = SecurityMode.None;
-            //binding.SendTimeout = timeSpan;
+            binding.ReceiveTimeout = TimeSpan.MaxValue;
             binding.MaxBufferPoolSize = long.MaxValue;
             binding.MaxBufferSize = int.MaxValue;
-            //binding.MaxReceivedMessageSize = int.MaxValue;
+            binding.MaxReceivedMessageSize = int.MaxValue;
             binding.ReaderQuotas = XmlDictionaryReaderQuotas.Max;
 
             return binding;

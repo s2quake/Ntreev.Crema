@@ -39,6 +39,26 @@ namespace Ntreev.Crema.ServiceHosts
             return this.InvokeTask(Task.Run(() => this.UnsubscribeAsync()));
         }
 
+        public ResultBase<string> GetVersion()
+        {
+            return this.InvokeTask(Task.Run(() => this.GetVersionAsync()));
+        }
+
+        public ResultBase<bool> IsOnline(string userID, byte[] password)
+        {
+            return this.InvokeTask(Task.Run(() => this.IsOnlineAsync(userID, password)));
+        }
+
+        public ResultBase<DataBaseInfo[]> GetDataBaseInfos()
+        {
+            return this.InvokeTask(Task.Run(() => this.GetDataBaseInfosAsync()));
+        }
+
+        public ResultBase<ServiceInfo[]> GetServiceInfos()
+        {
+            return this.InvokeTask(Task.Run(() => this.GetServiceInfosAsync()));
+        }
+
         public ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message)
         {
             return this.InvokeTask(Task.Run(() => this.ShutdownAsync(milliseconds, shutdownType, message)));
