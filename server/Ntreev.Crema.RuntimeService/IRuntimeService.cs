@@ -29,26 +29,16 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.RuntimeService
 {
-    [ServiceContract(Namespace = CremaService.Namespace)]
-    [ServiceKnownType(typeof(DBNull))]
     public interface IRuntimeService
     {
-        [OperationContract]
-        [ServiceKnownType(typeof(DBNull))]
         Task<ResultBase<GenerationSet>> GetCodeGenerationDataAsync(string dataBaseName, string tags, string filterExpression, string revision);
 
-        [OperationContract]
-        [ServiceKnownType(typeof(DBNull))]
         Task<ResultBase<SerializationSet>> GetDataGenerationDataAsync(string dataBaseName, string tags, string filterExpression, string revision);
 
-        [OperationContract]
-        [ServiceKnownType(typeof(DBNull))]
         Task<ResultBase<GenerationSet, SerializationSet>> GetMetaDataAsync(string dataBaseName, string tags, string filterExpression, string revision);
 
-        [OperationContract]
         Task<ResultBase> ResetDataAsync(string dataBaseName);
 
-        [OperationContract]
         Task<ResultBase<string>> GetRevisionAsync(string dataBaseName);
     }
 }

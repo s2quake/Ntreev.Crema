@@ -35,30 +35,27 @@ namespace Ntreev.Crema.RuntimeService
 {
     partial class RuntimeService
     {
-        public  ResultBase<GenerationSet> GetCodeGenerationData(string dataBaseName, string tags, string filterExpression, string revision)
+        public ResultBase<GenerationSet> GetCodeGenerationData(string dataBaseName, string tags, string filterExpression, string revision)
         {
             return this.InvokeTask(Task.Run(() => this.GetCodeGenerationDataAsync(dataBaseName, tags, filterExpression, revision)));
         }
 
-        public  ResultBase<SerializationSet> GetDataGenerationData(string dataBaseName, string tags, string filterExpression, string revision)
+        public ResultBase<SerializationSet> GetDataGenerationData(string dataBaseName, string tags, string filterExpression, string revision)
         {
             return this.InvokeTask(Task.Run(() => this.GetDataGenerationDataAsync(dataBaseName, tags, filterExpression, revision)));
         }
 
-        public  ResultBase<GenerationSet, SerializationSet> GetMetaData(string dataBaseName, string tags, string filterExpression, string revision)
-
+        public ResultBase<GenerationSet, SerializationSet> GetMetaData(string dataBaseName, string tags, string filterExpression, string revision)
         {
             return this.InvokeTask(Task.Run(() => this.GetMetaDataAsync(dataBaseName, tags, filterExpression, revision)));
         }
 
-        public  ResultBase ResetData(string dataBaseName)
-
+        public ResultBase ResetData(string dataBaseName)
         {
             return this.InvokeTask(Task.Run(() => this.ResetDataAsync(dataBaseName)));
         }
 
-        public  ResultBase<string> GetRevision(string dataBaseName)
-
+        public ResultBase<string> GetRevision(string dataBaseName)
         {
             return this.InvokeTask(Task.Run(() => this.GetRevisionAsync(dataBaseName)));
         }

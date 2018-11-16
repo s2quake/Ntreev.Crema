@@ -15,37 +15,40 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Runtime.Generation;
+using Ntreev.Crema.Runtime.Serialization;
+using Ntreev.Crema.ServiceHosts;
+using Ntreev.Crema.ServiceModel;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
 using System.ServiceModel;
-using System.ServiceModel.Description;
-using Ntreev.Crema.ServiceHosts;
-using System.ServiceModel.Channels;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceHosts.Domains;
-using System.ComponentModel.Composition;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.RuntimeService
 {
-    class RuntimeServiceHost : ServiceHost
+    [ServiceContract(Namespace = CremaService.Namespace)]
+    [ServiceKnownType(typeof(DBNull))]
+    interface IRuntimeServiceInternal
     {
-        private readonly RuntimeService service;
+        [OperationContract]
+        [ServiceKnownType(typeof(DBNull))]
+        ResultBase<GenerationSet> GetCodeGenerationData(string dataBaseName, string tags, string filterExpression, string revision);
 
-        public RuntimeServiceHost(ICremaHost cremaHost, RuntimeService service, int port)
-            : base(service, new Uri($"net.tcp://localhost:{port}/{nameof(RuntimeService)}"))
-        {
-            this.service = service;
-            this.AddServiceEndpoint(typeof(IRuntimeServiceInternal), CremaServiceItemHost.CreateBinding(), string.Empty);
+        [OperationContract]
+        [ServiceKnownType(typeof(DBNull))]
+        ResultBase<SerializationSet> GetDataGenerationData(string dataBaseName, string tags, string filterExpression, string revision);
 
-#if DEBUG
-            if (Environment.OSVersion.Platform != PlatformID.Unix)
-            {
-                this.Description.Behaviors.Add(new ServiceMetadataBehavior());
-                this.AddServiceEndpoint(typeof(IMetadataExchange), MetadataExchangeBindings.CreateMexTcpBinding(), "mex");
-            }
-#endif
-        }
+        [OperationContract]
+        [ServiceKnownType(typeof(DBNull))]
+        ResultBase<GenerationSet, SerializationSet> GetMetaData(string dataBaseName, string tags, string filterExpression, string revision);
+
+        [OperationContract]
+        ResultBase ResetData(string dataBaseName);
+
+        [OperationContract]
+        ResultBase<string> GetRevision(string dataBaseName);
     }
 }

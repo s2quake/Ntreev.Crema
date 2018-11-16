@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Consoles\RuntimeCommand.cs" />
+    <Compile Include="IRuntimeServiceInternal.cs" />
     <Compile Include="IRuntimeService.cs" />
     <Compile Include="RuntimeServiceSync.cs" />
     <Compile Include="RuntimeServiceHost.cs" />

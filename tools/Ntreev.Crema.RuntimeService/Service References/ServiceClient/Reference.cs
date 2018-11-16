@@ -12,49 +12,49 @@ namespace Ntreev.Crema.RuntimeService.ServiceClient {
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="http://www.ntreev.com", ConfigurationName="ServiceClient.IRuntimeService")]
-    internal interface IRuntimeService {
+    [System.ServiceModel.ServiceContractAttribute(Namespace="http://www.ntreev.com", ConfigurationName="ServiceClient.IRuntimeServiceInternal")]
+    internal interface IRuntimeServiceInternal {
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IRuntimeService/GetCodeGenerationData", ReplyAction="http://www.ntreev.com/IRuntimeService/GetCodeGenerationDataResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IRuntimeServiceInternal/GetCodeGenerationData", ReplyAction="http://www.ntreev.com/IRuntimeServiceInternal/GetCodeGenerationDataResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Runtime.Generation.GenerationSet> GetCodeGenerationData(string dataBaseName, string tags, string filterExpression, string revision);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IRuntimeService/GetDataGenerationData", ReplyAction="http://www.ntreev.com/IRuntimeService/GetDataGenerationDataResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IRuntimeServiceInternal/GetDataGenerationData", ReplyAction="http://www.ntreev.com/IRuntimeServiceInternal/GetDataGenerationDataResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Runtime.Serialization.SerializationSet> GetDataGenerationData(string dataBaseName, string tags, string filterExpression, string revision);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IRuntimeService/GetMetaData", ReplyAction="http://www.ntreev.com/IRuntimeService/GetMetaDataResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IRuntimeServiceInternal/GetMetaData", ReplyAction="http://www.ntreev.com/IRuntimeServiceInternal/GetMetaDataResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.Runtime.Generation.GenerationSet, Ntreev.Crema.Runtime.Serialization.SerializationSet> GetMetaData(string dataBaseName, string tags, string filterExpression, string revision);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IRuntimeService/ResetData", ReplyAction="http://www.ntreev.com/IRuntimeService/ResetDataResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IRuntimeServiceInternal/ResetData", ReplyAction="http://www.ntreev.com/IRuntimeServiceInternal/ResetDataResponse")]
         Ntreev.Crema.ServiceModel.ResultBase ResetData(string dataBaseName);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IRuntimeService/GetRevision", ReplyAction="http://www.ntreev.com/IRuntimeService/GetRevisionResponse")]
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/IRuntimeServiceInternal/GetRevision", ReplyAction="http://www.ntreev.com/IRuntimeServiceInternal/GetRevisionResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<string> GetRevision(string dataBaseName);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    internal interface IRuntimeServiceChannel : Ntreev.Crema.RuntimeService.ServiceClient.IRuntimeService, System.ServiceModel.IClientChannel {
+    internal interface IRuntimeServiceInternalChannel : Ntreev.Crema.RuntimeService.ServiceClient.IRuntimeServiceInternal, System.ServiceModel.IClientChannel {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    internal partial class RuntimeServiceClient : System.ServiceModel.ClientBase<Ntreev.Crema.RuntimeService.ServiceClient.IRuntimeService>, Ntreev.Crema.RuntimeService.ServiceClient.IRuntimeService {
+    internal partial class RuntimeServiceInternalClient : System.ServiceModel.ClientBase<Ntreev.Crema.RuntimeService.ServiceClient.IRuntimeServiceInternal>, Ntreev.Crema.RuntimeService.ServiceClient.IRuntimeServiceInternal {
         
-        public RuntimeServiceClient() {
+        public RuntimeServiceInternalClient() {
         }
         
-        public RuntimeServiceClient(string endpointConfigurationName) : 
+        public RuntimeServiceInternalClient(string endpointConfigurationName) : 
                 base(endpointConfigurationName) {
         }
         
-        public RuntimeServiceClient(string endpointConfigurationName, string remoteAddress) : 
+        public RuntimeServiceInternalClient(string endpointConfigurationName, string remoteAddress) : 
                 base(endpointConfigurationName, remoteAddress) {
         }
         
-        public RuntimeServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public RuntimeServiceInternalClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(endpointConfigurationName, remoteAddress) {
         }
         
-        public RuntimeServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public RuntimeServiceInternalClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(binding, remoteAddress) {
         }
         

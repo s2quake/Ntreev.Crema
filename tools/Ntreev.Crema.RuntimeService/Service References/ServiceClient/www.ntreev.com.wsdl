@@ -8,56 +8,56 @@
       <xsd:import namespace="http://schemas.ntreev.com" />
     </xsd:schema>
   </wsdl:types>
-  <wsdl:message name="IRuntimeService_GetCodeGenerationData_InputMessage">
+  <wsdl:message name="IRuntimeServiceInternal_GetCodeGenerationData_InputMessage">
     <wsdl:part name="parameters" element="tns:GetCodeGenerationData" />
   </wsdl:message>
-  <wsdl:message name="IRuntimeService_GetCodeGenerationData_OutputMessage">
+  <wsdl:message name="IRuntimeServiceInternal_GetCodeGenerationData_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetCodeGenerationDataResponse" />
   </wsdl:message>
-  <wsdl:message name="IRuntimeService_GetDataGenerationData_InputMessage">
+  <wsdl:message name="IRuntimeServiceInternal_GetDataGenerationData_InputMessage">
     <wsdl:part name="parameters" element="tns:GetDataGenerationData" />
   </wsdl:message>
-  <wsdl:message name="IRuntimeService_GetDataGenerationData_OutputMessage">
+  <wsdl:message name="IRuntimeServiceInternal_GetDataGenerationData_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetDataGenerationDataResponse" />
   </wsdl:message>
-  <wsdl:message name="IRuntimeService_GetMetaData_InputMessage">
+  <wsdl:message name="IRuntimeServiceInternal_GetMetaData_InputMessage">
     <wsdl:part name="parameters" element="tns:GetMetaData" />
   </wsdl:message>
-  <wsdl:message name="IRuntimeService_GetMetaData_OutputMessage">
+  <wsdl:message name="IRuntimeServiceInternal_GetMetaData_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetMetaDataResponse" />
   </wsdl:message>
-  <wsdl:message name="IRuntimeService_ResetData_InputMessage">
+  <wsdl:message name="IRuntimeServiceInternal_ResetData_InputMessage">
     <wsdl:part name="parameters" element="tns:ResetData" />
   </wsdl:message>
-  <wsdl:message name="IRuntimeService_ResetData_OutputMessage">
+  <wsdl:message name="IRuntimeServiceInternal_ResetData_OutputMessage">
     <wsdl:part name="parameters" element="tns:ResetDataResponse" />
   </wsdl:message>
-  <wsdl:message name="IRuntimeService_GetRevision_InputMessage">
+  <wsdl:message name="IRuntimeServiceInternal_GetRevision_InputMessage">
     <wsdl:part name="parameters" element="tns:GetRevision" />
   </wsdl:message>
-  <wsdl:message name="IRuntimeService_GetRevision_OutputMessage">
+  <wsdl:message name="IRuntimeServiceInternal_GetRevision_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetRevisionResponse" />
   </wsdl:message>
-  <wsdl:portType name="IRuntimeService">
+  <wsdl:portType name="IRuntimeServiceInternal">
     <wsdl:operation name="GetCodeGenerationData">
-      <wsdl:input wsaw:Action="http://www.ntreev.com/IRuntimeService/GetCodeGenerationData" message="tns:IRuntimeService_GetCodeGenerationData_InputMessage" />
-      <wsdl:output wsaw:Action="http://www.ntreev.com/IRuntimeService/GetCodeGenerationDataResponse" message="tns:IRuntimeService_GetCodeGenerationData_OutputMessage" />
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IRuntimeServiceInternal/GetCodeGenerationData" message="tns:IRuntimeServiceInternal_GetCodeGenerationData_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IRuntimeServiceInternal/GetCodeGenerationDataResponse" message="tns:IRuntimeServiceInternal_GetCodeGenerationData_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetDataGenerationData">
-      <wsdl:input wsaw:Action="http://www.ntreev.com/IRuntimeService/GetDataGenerationData" message="tns:IRuntimeService_GetDataGenerationData_InputMessage" />
-      <wsdl:output wsaw:Action="http://www.ntreev.com/IRuntimeService/GetDataGenerationDataResponse" message="tns:IRuntimeService_GetDataGenerationData_OutputMessage" />
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IRuntimeServiceInternal/GetDataGenerationData" message="tns:IRuntimeServiceInternal_GetDataGenerationData_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IRuntimeServiceInternal/GetDataGenerationDataResponse" message="tns:IRuntimeServiceInternal_GetDataGenerationData_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetMetaData">
-      <wsdl:input wsaw:Action="http://www.ntreev.com/IRuntimeService/GetMetaData" message="tns:IRuntimeService_GetMetaData_InputMessage" />
-      <wsdl:output wsaw:Action="http://www.ntreev.com/IRuntimeService/GetMetaDataResponse" message="tns:IRuntimeService_GetMetaData_OutputMessage" />
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IRuntimeServiceInternal/GetMetaData" message="tns:IRuntimeServiceInternal_GetMetaData_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IRuntimeServiceInternal/GetMetaDataResponse" message="tns:IRuntimeServiceInternal_GetMetaData_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="ResetData">
-      <wsdl:input wsaw:Action="http://www.ntreev.com/IRuntimeService/ResetData" message="tns:IRuntimeService_ResetData_InputMessage" />
-      <wsdl:output wsaw:Action="http://www.ntreev.com/IRuntimeService/ResetDataResponse" message="tns:IRuntimeService_ResetData_OutputMessage" />
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IRuntimeServiceInternal/ResetData" message="tns:IRuntimeServiceInternal_ResetData_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IRuntimeServiceInternal/ResetDataResponse" message="tns:IRuntimeServiceInternal_ResetData_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetRevision">
-      <wsdl:input wsaw:Action="http://www.ntreev.com/IRuntimeService/GetRevision" message="tns:IRuntimeService_GetRevision_InputMessage" />
-      <wsdl:output wsaw:Action="http://www.ntreev.com/IRuntimeService/GetRevisionResponse" message="tns:IRuntimeService_GetRevision_OutputMessage" />
+      <wsdl:input wsaw:Action="http://www.ntreev.com/IRuntimeServiceInternal/GetRevision" message="tns:IRuntimeServiceInternal_GetRevision_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/IRuntimeServiceInternal/GetRevisionResponse" message="tns:IRuntimeServiceInternal_GetRevision_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
 </wsdl:definitions>

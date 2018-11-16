@@ -35,14 +35,14 @@ namespace Ntreev.Crema.RuntimeService
     {
         private static readonly RuntimeServiceFactory empty = new RuntimeServiceFactory();
 
-        public static async Task<RuntimeServiceClient> CreateServiceClientAsync(string address)
+        public static async Task<RuntimeServiceInternalClient> CreateServiceClientAsync(string address)
         {
             var binding = CreateBinding(TimeSpan.MaxValue);
             var ip = AddressUtility.GetIPAddress(address);
             var port = await GetServicePortAsync(address);
             var endPointAddress = new EndpointAddress($"net.tcp://{ip}:{port}/RuntimeService");
 
-            return new RuntimeServiceClient(binding, endPointAddress);
+            return new RuntimeServiceInternalClient(binding, endPointAddress);
         }
 
         private static async Task<int> GetServicePortAsync(string address)
