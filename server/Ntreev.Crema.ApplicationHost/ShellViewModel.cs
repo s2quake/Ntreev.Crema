@@ -28,7 +28,7 @@ namespace Ntreev.Crema.ApplicationHost
         private int port = 4004;
 
         [ImportingConstructor]
-        public ShellViewModel(CremaService service, CremaSettings settings, IAppConfiguration configs)
+        public ShellViewModel(CremaService service, CremaSettings settings, IAppConfiguration configs, AppSettings appSettings)
         {
             this.service = service;
             this.settings = settings;
@@ -37,6 +37,7 @@ namespace Ntreev.Crema.ApplicationHost
             this.Dispatcher.InvokeAsync(() =>
             {
                 this.configs.Update(this);
+                this.Initialize(appSettings);
             });
         }
 
@@ -192,6 +193,24 @@ namespace Ntreev.Crema.ApplicationHost
         {
             base.OnDeactivate(close);
             this.configs.Commit(this);
+        }
+
+        private async void Initialize(AppSettings appSettings)
+        {
+            if (appSettings.BasePath != string.Empty)
+            {
+                this.BasePath = appSettings.BasePath;
+            }
+
+            if (appSettings.Port != 0)
+            {
+                this.Port = appSettings.Port;
+            }
+
+            if (appSettings.Run == true)
+            {
+                await this.OpenServiceAsync();
+            }
         }
     }
 }

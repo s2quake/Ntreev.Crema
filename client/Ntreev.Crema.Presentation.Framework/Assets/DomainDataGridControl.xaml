@@ -78,7 +78,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 </MultiTrigger.Setters>
             </MultiTrigger>
 
-            <DataTrigger Binding="{Binding Path=ParentRow.IsSelected, RelativeSource={RelativeSource Self}}" Value="True">
+            <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ncfc:DomainDataRow}}}" Value="True">
                 <Setter Property="Background" Value="{DynamicResource DataGridCellBackgroundSelected}" />
                 <Setter Property="Foreground" Value="{DynamicResource DataGridCellForegroundSelected}" />
                 <Setter TargetName="InnerBorder" Property="Visibility" Value="Hidden" />

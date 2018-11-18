@@ -23,6 +23,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
                     xmlns:nmfm="clr-namespace:Ntreev.ModernUI.Framework.Markup;assembly=Ntreev.ModernUI.Framework"
                     xmlns:nmfv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework"
+                    xmlns:nmgc="clr-namespace:Ntreev.ModernUI.Framework.DataGrid.Controls;assembly=Ntreev.ModernUI.Framework.DataGrid"
                     xmlns:ncpc="clr-namespace:Ntreev.Crema.Presentation.Controls"
                     xmlns:ncpv="clr-namespace:Ntreev.Crema.Presentation.Converters"
                     xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Properties">
@@ -34,17 +35,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <ncpv:SignatureDateToStringConverter x:Key="signatureDateToStringConverter" />
 
-    <xcdg:TableView x:Key="DataGridControl_View" x:Shared="false"
-                    AllowRowResize="False"
-                    Style="{StaticResource TableView_Style}"
-                    UseDefaultHeadersFooters="False">
-        <xcdg:TableView.FixedHeaders>
-            <DataTemplate>
-                <ncpc:DiffColumnManagerRow />
-            </DataTemplate>
-        </xcdg:TableView.FixedHeaders>
-    </xcdg:TableView>
-
     <Style x:Key="TypeName_TextBox_Style" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
     </Style>
 
@@ -53,32 +43,41 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
 
-    <Style x:Key="Comment_TextBox_Style" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
-    </Style>
+    <Style x:Key="Comment_TextBox_Style" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}" />
 
-    <Style x:Key="SignatureDate_TextBox_Style" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+    <Style x:Key="SignatureDate_TextBox_Style" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}" />
+
+    <Style x:Key="DiffDataGridControl_Style" TargetType="{x:Type ncpc:DiffDataGridControl}" BasedOn="{StaticResource {x:Type nmgc:ModernDataGridControl}}">
+        <Setter Property="AllowRowDrag" Value="True" />
     </Style>
 
     <ControlTemplate x:Key="CremaDataTypeControl_Template" TargetType="{x:Type ncpc:CremaDataTypeControl}">
         <ncpc:DiffDataGridControl x:Name="PART_DataGridControl" 
-                                  View="{StaticResource DataGridControl_View}"
-                                  AllowRowDrag="True"
+                                  Style="{StaticResource DiffDataGridControl_Style}"
                                   SelectionUnit="Row"
                                   SelectionMode="Extended"
                                   DefaultDetailConfiguration="{StaticResource DiffDataGridControl_DefaultDetailConfiguration}"
                                   BorderBrush="{TemplateBinding BorderBrush}"
                                   BorderThickness="{TemplateBinding BorderThickness}">
+            <ncpc:DiffDataGridControl.View>
+                <xcdg:TableView AllowRowResize="False" 
+                                Style="{StaticResource TableView_Style}"
+                                UseDefaultHeadersFooters="False">
+                    <xcdg:TableView.FixedHeaders>
+                        <DataTemplate>
+                            <ncpc:DiffColumnManagerRow />
+                        </DataTemplate>
+                    </xcdg:TableView.FixedHeaders>
+                </xcdg:TableView>
+            </ncpc:DiffDataGridControl.View>
             <ncpc:DiffDataGridControl.Resources>
                 <Style TargetType="{x:Type ncpc:DiffDataContainer}" BasedOn="{StaticResource DiffDataContainer_Style}" />
             </ncpc:DiffDataGridControl.Resources>
         </ncpc:DiffDataGridControl>
         <ControlTemplate.Triggers>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Source.ReadOnly}" Value="True">
+            <Trigger Property="ReadOnly" Value="True">
                 <Setter TargetName="PART_DataGridControl" Property="AllowRowDrag" Value="False" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=ReadOnly}" Value="True">
-                <Setter TargetName="PART_DataGridControl" Property="AllowRowDrag" Value="False" />
-            </DataTrigger>
+            </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
 

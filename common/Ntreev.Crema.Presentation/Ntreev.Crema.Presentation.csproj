@@ -95,9 +95,6 @@
     <Compile Include="Assets\CremaDataControl.xaml.cs">
       <DependentUpon>CremaDataControl.xaml</DependentUpon>
     </Compile>
-    <None Include="Assets\CremaDataSetControl.xaml.cs">
-      <DependentUpon>CremaDataSetControl.xaml</DependentUpon>
-    </None>
     <Compile Include="Assets\CremaDataTableItemControl.xaml.cs">
       <DependentUpon>CremaDataTableItemControl.xaml</DependentUpon>
     </Compile>
@@ -232,10 +229,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <None Include="Assets\CremaDataSetControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </None>
     <Page Include="Assets\CremaDataTableItemControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

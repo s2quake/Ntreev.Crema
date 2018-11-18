@@ -84,6 +84,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AppSettings.cs" />
     <Compile Include="Commands\Consoles\LoginCommand.cs" />
     <Compile Include="Commands\Consoles\LogoutCommand.cs" />
     <Compile Include="Commands\Consoles\ShutdownCommand.cs" />

@@ -55,6 +55,7 @@ namespace Ntreev.Crema.ApplicationHost
             this.commandContext.Out = new ConsoleWriter(this.terminal);
             this.terminal.CommandContext = this.commandContext;
             this.SetPrompt();
+            this.Dispatcher.InvokeAsync(() => this.logBox.Focus());
         }
 
         public override void OnApplyTemplate()
@@ -155,6 +156,11 @@ namespace Ntreev.Crema.ApplicationHost
         }
 
         private void OpenService_Click(object sender, RoutedEventArgs e)
+        {
+            this.logBox.Focus();
+        }
+
+        private void CloseService_Click(object sender, RoutedEventArgs e)
         {
             this.logBox.Focus();
         }

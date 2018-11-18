@@ -45,7 +45,7 @@ namespace Ntreev.Crema.RuntimeService.Consoles
         [CommandMethod]
         public async Task ResetAsync(string dataBaseName)
         {
-            var dataBaseID = this.DataBases.Dispatcher.Invoke(() =>
+            var dataBaseID = await this.DataBases.Dispatcher.InvokeAsync(() =>
             {
                 var dataBase = this.DataBases[dataBaseName];
                 if (dataBase == null)
@@ -73,6 +73,8 @@ namespace Ntreev.Crema.RuntimeService.Consoles
             var info = serviceItem.Dispatcher.Invoke(() => serviceItem.DataServiceItemInfo);
             this.CommandContext.WriteObject(info.ToDictionary(), FormatProperties.Format);
         }
+
+        public override bool IsEnabled => this.CremaHost.ServiceState == ServiceState.Opened;
 
         private RuntimeService RuntimeService => this.runtimeService.Value;
 

@@ -57,7 +57,7 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="5">
             <Button x:Name="OpenService" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Start" Click="OpenService_Click" />
             <Border Width="20" />
-            <Button x:Name="CloseService" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Stop" />
+            <Button x:Name="CloseService" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Stop" Click="CloseService_Click" />
         </StackPanel>
 
     </Grid>
