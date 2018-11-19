@@ -84,7 +84,7 @@ namespace Ntreev.Crema.Services.Data
                     }
                 }
             }
-            foreach (var item in settings.DataBaseList)
+            foreach (var item in settings.DataBases)
             {
                 if (this.ContainsKey(item) == true)
                 {

@@ -267,7 +267,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
             if (this.IsLogVisible == true)
                 this.logRow.Height = new GridLength(this.LogViewHeight);
             this.shell.Value.Closed += Shell_Closed;
-            this.Dispatcher.InvokeAsync(this.ConnectWithSettings, DispatcherPriority.Background);
+            this.Dispatcher.InvokeAsync(this.ConnectWithSettings);
         }
 
         private void Shell_Closed(object sender, EventArgs e)

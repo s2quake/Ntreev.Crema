@@ -38,23 +38,13 @@ namespace Ntreev.Crema.Services.Domains
 
         private static readonly XmlWriterSettings writerSettings = new XmlWriterSettings() { OmitXmlDeclaration = true, Indent = true };
 
-        //private readonly string basePath;
-
-        private readonly string completedPath;
         private DomainInfo domainInfo;
-
         private DomainCompletionItemSerializationInfo currentCompletion;
         private readonly List<DomainCompletionItemSerializationInfo> completionList = new List<DomainCompletionItemSerializationInfo>();
 
         public DomainLogger(Domain domain)
         {
             this.domainInfo = domain.DomainInfo;
-
-            //this.basePath = Path.Combine(AppUtility.UserAppDataPath, "domains", $"{domain.CremaHost.Address.Replace(':', '_')}_{domain.CremaHost.UserID}", domain.DataBaseID.ToString(), domain.Name);
-            //DirectoryUtility.Delete(this.basePath);
-            //Directory.CreateDirectory(this.basePath);
-
-            //this.completedPath = Path.Combine(this.basePath, CompletedItemPath);
             this.completionList = new List<DomainCompletionItemSerializationInfo>();
             this.Dispatcher = new CremaDispatcher(this);
         }
@@ -68,7 +58,6 @@ namespace Ntreev.Crema.Services.Domains
         {
             this.Dispatcher.Invoke(() =>
             {
-                //DirectoryUtility.Delete(this.basePath);
                 this.Dispatcher.Dispose();
                 this.Dispatcher = null;
             });
@@ -76,7 +65,6 @@ namespace Ntreev.Crema.Services.Domains
 
         public async Task DisposeAsync()
         {
-            //DirectoryUtility.Delete(this.basePath);
             await this.Dispatcher.DisposeAsync();
             this.Dispatcher = null;
         }
@@ -85,10 +73,8 @@ namespace Ntreev.Crema.Services.Domains
         {
             this.Dispatcher.Invoke(() =>
             {
-                //var itemPath = Path.Combine(this.basePath, $"{id}");
                 this.currentCompletion = new DomainCompletionItemSerializationInfo(id, action.UserID, action.AcceptTime, action.GetType());
                 this.completionList.Add(this.currentCompletion);
-                File.AppendAllText(this.completedPath, $"{this.currentCompletion}{Environment.NewLine}");
                 this.CompletionID = id;
             });
         }

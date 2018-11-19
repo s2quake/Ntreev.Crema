@@ -331,8 +331,8 @@ namespace Ntreev.Crema.Services
 
         public string[] DataBaseList
         {
-            get => this.settings.DataBaseList;
-            set => this.settings.DataBaseList = value;
+            get => this.settings.DataBases;
+            set => this.settings.DataBases = value;
         }
 
 #if DEBUG

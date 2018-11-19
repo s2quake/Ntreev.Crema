@@ -199,13 +199,15 @@ namespace Ntreev.Crema.ApplicationHost
         {
             if (appSettings.BasePath != string.Empty)
             {
-                this.BasePath = appSettings.BasePath;
+                this.BasePath = PathUtility.GetFullPath(appSettings.BasePath);
             }
 
             if (appSettings.Port != 0)
             {
                 this.Port = appSettings.Port;
             }
+
+            this.settings.DataBases = appSettings.DataBases;
 
             if (appSettings.Run == true)
             {

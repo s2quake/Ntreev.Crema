@@ -64,27 +64,24 @@ namespace Ntreev.Crema.Presentation.Framework
             this.RunAsync();
         }
 
-        public Task RunAsync()
+        public async void RunAsync()
         {
             var progress = new Progress();
             progress.Changed += Progress_Changed;
-            return Task.Run(() =>
+            try
             {
-                try
-                {
-                    this.isBusy = true;
-                    this.OnRun(progress, this.cancellation.Token);
-                    progress.Complete();
-                }
-                catch (Exception e)
-                {
-                    progress.Fail(e.Message);
-                }
-                finally
-                {
-                    this.isBusy = false;
-                }
-            });
+                this.isBusy = true;
+                await this.OnRunAsync(progress, this.cancellation.Token);
+                await this.Dispatcher.InvokeAsync(() => progress.Complete());
+            }
+            catch (Exception e)
+            {
+                await this.Dispatcher.InvokeAsync(() => progress.Fail(e.Message));
+            }
+            finally
+            {
+                this.isBusy = false;
+            }
         }
 
         public bool CanCancel
@@ -94,7 +91,7 @@ namespace Ntreev.Crema.Presentation.Framework
 
         public bool IsCancellationRequested => this.cancellation.IsCancellationRequested;
 
-        protected abstract void OnRun(IProgress progress, CancellationToken cancellation);
+        protected abstract Task OnRunAsync(IProgress progress, CancellationToken cancellation);
 
         protected virtual void OnProgressChanged(ProgressChangedEventArgs e)
         {

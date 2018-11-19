@@ -34,12 +34,21 @@
 ## 프로그램 구성
 ### cremaserver
 콘솔 기반 크레마 서버 구동 프로그램
+
 ![Alt text](cremaserver.png)
 
     실행 예시
     cremaserver.exe run repo-path
+### cremaserverApp
+GUI 기반 크레마 서버 구동 프로그램
+
+![Alt text](cremaserverApp.png)
+
+    실행 예시
+    cremaserverApp.exe --base-path repo-path --run
 ### crema
 UI 기반 크레마 클라이언트 프로그램
+
 ![Alt text](crema.png)
 ### cremaconsole
 콘솔 기반 크레마 클라이언트 프로그램
@@ -51,8 +60,9 @@ UI 기반 크레마 클라이언트 프로그램
 콘솔 기반 크레마 코드 및 바이너리 데이터 생성 프로그램
 
     실행 예시
-    cremadev.exe get localhost outputPath
+    cremadev.exe get localhost outputPath --lang cs
     cremadev.exe get localhost outputPath --lang ts
+    cremadev.exe get localhost outputPath --lang cpp
 
 ## Development Environment
 * Microsoft Visual Studio Professional 2017
@@ -61,18 +71,11 @@ UI 기반 크레마 클라이언트 프로그램
 * WPF(Windows Presentation Foundation)
 * WCF(Windows Communication Foundation)
 
-## Release 배포 버전 오픈 소스의 차이점
-* [Newtonsoft.Json.Schema](https://www.newtonsoft.com/jsonschema)
-    * cremaserver와 cremaconsole에서 사용
-    * 구동에는 문제가 없으나 일부 기능의 사용횟수가 제한됨(자주 사용되지 않는 기능)
-* 오픈 소스에는 DataGrid 무료 버전을 사용하기 때문에 Crema GUI 프로그램에서 일부 기능이 제한됨
-    * 새로운 행을 추가하지 못함
-    * 부모 테이블에서 자식 테이블의 내용을 추가,편집,삭제가 불가능
-    * DataGrid의 Layout 설정을 읽고 저장할 수 없음.
-
 ## 실행 필수 요소
-* [svn](https://tortoisesvn.net/)
-    * 미설치시 cremaserve 구동 불가능
+* [git](https://git-scm.com/)
+    * 미설치시 cremaserver 구동 불가능
+
+![Alt text](git-setup.png)
 
 ## 사용된 프로젝트
 * Second Earth

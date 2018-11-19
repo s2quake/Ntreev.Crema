@@ -26,7 +26,7 @@ namespace Ntreev.Crema.Services
     [Export]
     public class CremaSettings
     {
-        private string[] dataBaseList;
+        private string[] dataBases;
 
         public CremaSettings()
         {
@@ -93,10 +93,10 @@ namespace Ntreev.Crema.Services
 
         public bool NoCache { get; set; }
 
-        public string[] DataBaseList
+        public string[] DataBases
         {
-            get => this.dataBaseList ?? new string[] { };
-            set => this.dataBaseList = value;
+            get => this.dataBases ?? new string[] { };
+            set => this.dataBases = value;
         }
 
 #if DEBUG

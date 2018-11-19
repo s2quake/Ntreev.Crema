@@ -302,6 +302,15 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             this.Callback?.OnServiceClosed(callbackInfo, closeInfo);
         }
 
+        protected override async Task OnCloseAsync(bool disconnect)
+        {
+            if (this.authentication != null)
+            {
+                await this.DetachEventHandlersAsync();
+                this.authentication = null;
+            }
+        }
+
         private async Task<IDomain> GetDomainAsync(Guid domainID)
         {
             var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
@@ -315,11 +324,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
                 this.UserContext.Users.UsersLoggedOut += Users_UsersLoggedOut;
-            });
-            await this.DataBaseContext.Dispatcher.InvokeAsync(() =>
-            {
-                this.DataBaseContext.ItemsResetting += DataBaseContext_ItemsResetting;
-                this.DataBaseContext.ItemsReset += DataBaseContext_ItemsReset;
             });
             var metaData = await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
@@ -366,11 +370,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
                 this.DomainContext.Domains.DomainPropertyChanged -= Domains_DomainPropertyChanged;
                 this.DomainContext.TaskCompleted -= DomainContext_TaskCompleted;
             });
-            await this.DataBaseContext.Dispatcher.InvokeAsync(() =>
-            {
-                this.DataBaseContext.ItemsResetting -= DataBaseContext_ItemsResetting;
-                this.DataBaseContext.ItemsReset -= DataBaseContext_ItemsReset;
-            });
             await this.UserContext.Dispatcher.InvokeAsync(() =>
             {
                 this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
@@ -398,7 +397,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var metaDatas = e.MetaDatas;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDomainsCreated(callbackInfo, metaDatas));
+            this.InvokeEvent(() => this.Callback?.OnDomainsCreated(callbackInfo, metaDatas));
         }
 
         private void Domains_DomainsDeleted(object sender, DomainsDeletedEventArgs e)
@@ -409,7 +408,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var domainIDs = e.DomainInfos.Select(item => item.DomainID).ToArray();
             var isCanceleds = e.IsCanceleds;
             var results = e.Results;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDomainsDeleted(callbackInfo, domainIDs, isCanceleds, results));
+            this.InvokeEvent(() => this.Callback?.OnDomainsDeleted(callbackInfo, domainIDs, isCanceleds, results));
         }
 
         private void Domains_DomainInfoChanged(object sender, DomainEventArgs e)
@@ -419,7 +418,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
             var domainInfo = e.DomainInfo;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDomainInfoChanged(callbackInfo, domainID, domainInfo));
+            this.InvokeEvent(() => this.Callback?.OnDomainInfoChanged(callbackInfo, domainID, domainInfo));
         }
 
         private void Domains_DomainStateChanged(object sender, DomainEventArgs e)
@@ -429,8 +428,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
             var domainState = e.DomainState;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnDomainStateChanged(callbackInfo, domainID, domainState),
-                callbackInfo.Index, nameof(Domains_DomainStateChanged));
+            this.InvokeEvent(() => this.Callback?.OnDomainStateChanged(callbackInfo, domainID, domainState));
         }
 
         private void Domains_DomainUserAdded(object sender, DomainUserAddedEventArgs e)
@@ -441,7 +439,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var domainUserState = e.DomainUserState;
             var data = e.GetData(this.authentication);
             var taskID = e.TaskID;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUserAdded(callbackInfo, domainID, domainUserInfo, domainUserState, data, taskID));
+            this.InvokeEvent(() => this.Callback?.OnUserAdded(callbackInfo, domainID, domainUserInfo, domainUserState, data, taskID));
         }
 
         private void Domains_DomainUserRemoved(object sender, DomainUserRemovedEventArgs e)
@@ -452,7 +450,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var ownerID = e.OwnerID;
             var removeInfo = e.RemoveInfo;
             var taskID = e.TaskID;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUserRemoved(callbackInfo, domainID, userID, ownerID, removeInfo, taskID));
+            this.InvokeEvent(() => this.Callback?.OnUserRemoved(callbackInfo, domainID, userID, ownerID, removeInfo, taskID));
         }
 
         private void Domains_DomainUserLocationChanged(object sender, DomainUserLocationEventArgs e)
@@ -462,7 +460,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
             var domainLocationInfo = e.DomainLocationInfo;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUserLocationChanged(callbackInfo, domainID, domainLocationInfo));
+            this.InvokeEvent(() => this.Callback?.OnUserLocationChanged(callbackInfo, domainID, domainLocationInfo));
         }
 
         private void Domains_DomainUserStateChanged(object sender, DomainUserEventArgs e)
@@ -470,7 +468,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
             var domainUserState = e.DomainUserState;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUserStateChanged(callbackInfo, domainID, domainUserState));
+            this.InvokeEvent(() => this.Callback?.OnUserStateChanged(callbackInfo, domainID, domainUserState));
         }
 
         private void Domains_DomainUserEditBegun(object sender, DomainUserLocationEventArgs e)
@@ -481,7 +479,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var domainID = e.DomainInfo.DomainID;
             var domainLocationInfo = e.DomainLocationInfo;
             var taskID = e.TaskID;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUserEditBegun(callbackInfo, domainID, domainLocationInfo, taskID));
+            this.InvokeEvent(() => this.Callback?.OnUserEditBegun(callbackInfo, domainID, domainLocationInfo, taskID));
         }
 
         private void Domains_DomainUserEditEnded(object sender, DomainUserEventArgs e)
@@ -491,7 +489,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var domainID = e.DomainInfo.DomainID;
             var taskID = e.TaskID;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUserEditEnded(callbackInfo, domainID, taskID));
+            this.InvokeEvent(() => this.Callback?.OnUserEditEnded(callbackInfo, domainID, taskID));
         }
 
         private void Domains_DomainOwnerChanged(object sender, DomainUserEventArgs e)
@@ -500,7 +498,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var domainID = e.DomainInfo.DomainID;
             var ownerID = e.DomainUserInfo.UserID;
             var taskID = e.TaskID;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnOwnerChanged(callbackInfo, domainID, ownerID, taskID));
+            this.InvokeEvent(() => this.Callback?.OnOwnerChanged(callbackInfo, domainID, ownerID, taskID));
         }
 
         private void Domains_DomainRowAdded(object sender, DomainRowEventArgs e)
@@ -513,7 +511,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var domainID = e.DomainInfo.DomainID;
             var rows = e.Rows;
             var taskID = e.TaskID;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnRowAdded(callbackInfo, domainID, rows, taskID));
+            this.InvokeEvent(() => this.Callback?.OnRowAdded(callbackInfo, domainID, rows, taskID));
         }
 
         private void Domains_DomainRowChanged(object sender, DomainRowEventArgs e)
@@ -526,7 +524,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var domainID = e.DomainInfo.DomainID;
             var rows = e.Rows;
             var taskID = e.TaskID;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnRowChanged(callbackInfo, domainID, rows, taskID));
+            this.InvokeEvent(() => this.Callback?.OnRowChanged(callbackInfo, domainID, rows, taskID));
         }
 
         private void Domains_DomainRowRemoved(object sender, DomainRowEventArgs e)
@@ -539,7 +537,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var domainID = e.DomainInfo.DomainID;
             var rows = e.Rows;
             var taskID = e.TaskID;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnRowRemoved(callbackInfo, domainID, rows, taskID));
+            this.InvokeEvent(() => this.Callback?.OnRowRemoved(callbackInfo, domainID, rows, taskID));
         }
 
         private void Domains_DomainPropertyChanged(object sender, DomainPropertyEventArgs e)
@@ -553,43 +551,14 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             var propertyName = e.PropertyName;
             var value = e.Value;
             var taskID = e.TaskID;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnPropertyChanged(callbackInfo, domainID, propertyName, value, taskID));
+            this.InvokeEvent(() => this.Callback?.OnPropertyChanged(callbackInfo, domainID, propertyName, value, taskID));
         }
 
         private void DomainContext_TaskCompleted(object sender, TaskCompletedEventArgs e)
         {
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var taskIDs = e.TaskIDs;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTaskCompleted(callbackInfo, taskIDs));
+            this.InvokeEvent(() => this.Callback?.OnTaskCompleted(callbackInfo, taskIDs));
         }
-
-        private void DataBaseContext_ItemsResetting(object sender, ItemsEventArgs<IDataBase> e)
-        {
-            //foreach (var item in e.Items)
-            //{
-            //    this.resettings.Add(item.ID);
-            //}
-        }
-
-        private void DataBaseContext_ItemsReset(object sender, ItemsEventArgs<IDataBase> e)
-        {
-            //foreach (var item in e.Items)
-            //{
-            //    this.resettings.Remove(item.ID);
-            //}
-        }
-
-        #region ICremaServiceItem
-
-        protected override async Task OnCloseAsync(bool disconnect)
-        {
-            if (this.authentication != null)
-            {
-                await this.DetachEventHandlersAsync();
-                this.authentication = null;
-            }
-        }
-
-        #endregion
     }
 }

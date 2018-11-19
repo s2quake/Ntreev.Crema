@@ -354,7 +354,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var userIDs = e.Items.Select(item => item.ID).ToArray();
             var states = e.Items.Select(item => item.UserState).ToArray();
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUsersStateChanged(callbackInfo, userIDs, states));
+            this.InvokeEvent(() => this.Callback?.OnUsersStateChanged(callbackInfo, userIDs, states));
         }
 
         private void Users_UsersChanged(object sender, Services.ItemsEventArgs<IUser> e)
@@ -363,7 +363,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var values = e.Items.Select(item => item.UserInfo).ToArray();
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUsersChanged(callbackInfo, values));
+            this.InvokeEvent(() => this.Callback?.OnUsersChanged(callbackInfo, values));
         }
 
         private void UserContext_ItemsCreated(object sender, Services.ItemsCreatedEventArgs<IUserItem> e)
@@ -373,7 +373,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemPaths = e.Items.Select(item => item.Path).ToArray();
             var arguments = e.Arguments.Select(item => item is UserInfo userInfo ? (UserInfo?)userInfo : null).ToArray();
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUserItemsCreated(callbackInfo, itemPaths, arguments));
+            this.InvokeEvent(() => this.Callback?.OnUserItemsCreated(callbackInfo, itemPaths, arguments));
         }
 
         private void UserContext_ItemsRenamed(object sender, Services.ItemsRenamedEventArgs<IUserItem> e)
@@ -383,7 +383,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
             var itemNames = e.Items.Select(item => item.Name).ToArray();
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUserItemsRenamed(callbackInfo, oldPaths, itemNames));
+            this.InvokeEvent(() => this.Callback?.OnUserItemsRenamed(callbackInfo, oldPaths, itemNames));
         }
 
         private void UserContext_ItemsMoved(object sender, Services.ItemsMovedEventArgs<IUserItem> e)
@@ -393,7 +393,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var oldPaths = e.OldPaths;
             var parentPaths = e.Items.Select(item => item.Parent.Path).ToArray();
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUserItemsMoved(callbackInfo, oldPaths, parentPaths));
+            this.InvokeEvent(() => this.Callback?.OnUserItemsMoved(callbackInfo, oldPaths, parentPaths));
         }
 
         private void UserContext_ItemsDeleted(object sender, Services.ItemsDeletedEventArgs<IUserItem> e)
@@ -402,7 +402,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var itemPaths = e.ItemPaths;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUserItemsDeleted(callbackInfo, itemPaths));
+            this.InvokeEvent(() => this.Callback?.OnUserItemsDeleted(callbackInfo, itemPaths));
         }
 
         private void UserContext_MessageReceived(object sender, MessageEventArgs e)
@@ -414,7 +414,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var message = e.Message;
             var messageType = e.MessageType;
 
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnMessageReceived(callbackInfo, userIDs, message, messageType));
+            this.InvokeEvent(() => this.Callback?.OnMessageReceived(callbackInfo, userIDs, message, messageType));
         }
 
         private void Users_UsersLoggedIn(object sender, Services.ItemsEventArgs<IUser> e)
@@ -423,7 +423,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var exceptionUserID = e.UserID;
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var userIDs = e.Items.Select(item => item.ID).ToArray();
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUsersLoggedIn(callbackInfo, userIDs));
+            this.InvokeEvent(() => this.Callback?.OnUsersLoggedIn(callbackInfo, userIDs));
         }
 
         private void Users_UsersLoggedOut(object sender, Services.ItemsEventArgs<IUser> e)
@@ -435,7 +435,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var userID = this.authentication.ID;
             var exceptionUserID = e.UserID;
             var userIDs = e.Items.Select(item => item.ID).ToArray();
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUsersLoggedOut(callbackInfo, userIDs, closeInfo));
+            this.InvokeEvent(() => this.Callback?.OnUsersLoggedOut(callbackInfo, userIDs, closeInfo));
         }
 
         private void Users_UsersKicked(object sender, ItemsEventArgs<IUser> e)
@@ -445,7 +445,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var userIDs = e.Items.Select(item => item.ID).ToArray();
             var comments = e.MetaData as string[];
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUsersKicked(callbackInfo, userIDs, comments));
+            this.InvokeEvent(() => this.Callback?.OnUsersKicked(callbackInfo, userIDs, comments));
         }
 
         private void Users_UsersBanChanged(object sender, ItemsEventArgs<IUser> e)
@@ -468,14 +468,14 @@ namespace Ntreev.Crema.ServiceHosts.Users
             var metaData = e.MetaData as object[];
             var changeType = (BanChangeType)metaData[0];
             var comments = metaData[1] as string[];
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnUsersBanChanged(callbackInfo, values, changeType, comments));
+            this.InvokeEvent(() => this.Callback?.OnUsersBanChanged(callbackInfo, values, changeType, comments));
         }
 
         private void UserContext_TaskCompleted(object sender, TaskCompletedEventArgs e)
         {
             var callbackInfo = new CallbackInfo() { Index = this.index++, SignatureDate = e.SignatureDate };
             var taskIDs = e.TaskIDs;
-            this.InvokeEvent(this.authentication.ID, null, () => this.Callback?.OnTaskCompleted(callbackInfo, taskIDs));
+            this.InvokeEvent(() => this.Callback?.OnTaskCompleted(callbackInfo, taskIDs));
         }
 
         private static SecureString ToSecureString(string userID, byte[] password)

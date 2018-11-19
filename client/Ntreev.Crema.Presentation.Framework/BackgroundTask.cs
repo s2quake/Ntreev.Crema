@@ -29,7 +29,6 @@ namespace Ntreev.Crema.Presentation.Framework
     public class BackgroundTask : BackgroundTaskBase
     {
         private readonly Func<IProgress, CancellationToken, object> action;
-        private object result;
 
         public BackgroundTask(Action<IProgress, CancellationToken> action)
         {
@@ -45,14 +44,11 @@ namespace Ntreev.Crema.Presentation.Framework
             this.action = action;
         }
 
-        public object Result
-        {
-            get { return this.result; }
-        }
+        public object Result { get; private set; }
 
-        protected override void OnRun(IProgress progress, CancellationToken cancellation)
+        protected override async Task OnRunAsync(IProgress progress, CancellationToken cancellation)
         {
-            this.result = this.action(progress, cancellation);
+            this.Result = await Task.Run(() => this.action(progress, cancellation));
         }
     }
 }

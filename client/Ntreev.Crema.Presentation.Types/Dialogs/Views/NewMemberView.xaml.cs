@@ -24,5 +24,10 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.Views
         {
             InitializeComponent();
         }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.NameItem.Focus();
+        }
     }
 }
