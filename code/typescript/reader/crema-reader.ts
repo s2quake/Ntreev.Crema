@@ -191,6 +191,7 @@ export interface ITable extends CremaTable {
 export interface IColumn extends CremaColumn {
     table?: ITable;
     name?: string;
+    typeName?: string;
     dataType?: string;
     isKey?: boolean;
     index?: number;
@@ -430,6 +431,7 @@ class BinaryTable extends CremaTable {
 class BinaryColumn extends CremaColumn {
     private _table: BinaryTable;
     private _columnName: string;
+    private _typeName: string;
     private _type: string;
     private _isKey: boolean;
     private _index: number;
@@ -438,6 +440,7 @@ class BinaryColumn extends CremaColumn {
         super();
         this._table = table;
         this._columnName = columnName;
+        this._typeName = typeName;
         this._type = this.nameToType(typeName);
         this._isKey = isKey;
         this._index = index;
@@ -449,6 +452,10 @@ class BinaryColumn extends CremaColumn {
 
     public get name(): string {
         return this._columnName;
+    }
+
+    public get typeName(): string {
+        return this._typeName;
     }
 
     public get dataType(): string {
@@ -520,8 +527,26 @@ class BinaryRow extends CremaRow {
             if (offset === 0) {
                 return "";
             }
-            var id: number = this._fieldbytes.readInt32LE(offset);
-            return StringResource.getString(id);
+            if (column.typeName == "guid") {
+                let buffer = new Buffer(this._fieldbytes.buffer.slice(offset, offset + 16));
+                let items = new Array<string>(16);
+                for (let i: number = 0; i < 16; i++) {
+                    let text = buffer.readUInt8(i).toString(16);
+                    if (text.length == 1)
+                        text = "0" + text;
+                    items[i] = text;
+                }
+                let id1 = items[3] + items[2] + items[1] + items[0];
+                let id2 = items[5] + items[4];
+                let id3 = items[7] + items[6];
+                let id4 = items[8] + items[9];
+                let id5 = items[10] + items[11] + items[12] + items[13] + items[14] + items[15];
+                let guid = id1 + "-" + id2 + "-" + id3 + "-" + id4 + "-" + id5;
+                return guid;
+            } else {
+                var id: number = this._fieldbytes.readInt32LE(offset);
+                return StringResource.getString(id);
+            }
         } else {
             if (offset === 0) {
                 return null;

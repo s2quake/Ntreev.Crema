@@ -1619,17 +1619,14 @@ namespace Ntreev.Crema.Reader
                         else if (column.DataType == typeof(DateTime))
                             return new DateTime(1970, 1, 1) + TimeSpan.FromSeconds(Convert.ToDouble(BitConverter.ToInt64(this.fieldbytes, offset)));
                         else if (column.DataType == typeof(TimeSpan))
-                        {
-                            if (this.Table.Reader.Version == FileHeader.defaultMagicValue)
-                                return new TimeSpan(BitConverter.ToInt64(this.fieldbytes, offset));
-                            return new TimeSpan(BitConverter.ToInt32(this.fieldbytes, offset));
-                        }
+                            return new TimeSpan(BitConverter.ToInt64(this.fieldbytes, offset));
                         else if (column.DataType == typeof(Guid))
                         {
                             if (offset == 0)
                                 return Guid.Empty;
-                            int id = BitConverter.ToInt32(this.fieldbytes, offset);
-                            return new Guid(StringResource.GetString(id));
+                            var bytes = new Byte[16];
+                            Array.Copy(this.fieldbytes, offset, bytes, 0, 16);
+                            return new Guid(bytes);
                         }
                     }
                     throw new Exception();

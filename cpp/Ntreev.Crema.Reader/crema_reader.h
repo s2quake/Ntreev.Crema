@@ -118,6 +118,7 @@ namespace CremaCode {
 			inicolumn() {};
 
 			virtual const std::string& name() const = 0;
+			virtual const std::string& type_name() const = 0;
 			virtual const std::type_info& datatype() const = 0;
 			virtual bool is_key() const = 0;
 			virtual size_t index() const = 0;
@@ -125,12 +126,6 @@ namespace CremaCode {
 
 		protected:
 			virtual ~inicolumn() {};
-
-#ifdef _DEBUG
-		protected:
-			const char* typeName;
-#endif
-
 		};
 
 		class irow
@@ -450,10 +445,10 @@ namespace CremaCode {
 		class CremaReader : public idataset
 		{
 		public:
-	#ifndef _IGNORE_BOOST
+#ifndef _IGNORE_BOOST
 			//static CremaReader& read(const std::string& address, int port, const std::string& name = "default", ReadFlag flag = ReadFlag_none);
 			static CremaReader& read(const std::string& address, int port, const std::string& database, DataLocation datalocation, ReadFlag flag = ReadFlag_none);
-	#endif
+#endif
 			static CremaReader& read(const std::string& filename, ReadFlag flag = ReadFlag_none);
 			static CremaReader& read(std::istream& stream, ReadFlag flag = ReadFlag_none);
 
@@ -642,6 +637,10 @@ namespace CremaCode {
 				static void read(std::istream& stream);
 				static const std::string& get(int id);
 
+				static const std::string& getByPtr(const char* ptr);
+				static void add(const char* ptr, std::string text);
+				static bool contains(const char* ptr);
+
 				static void add_ref();
 				static void remove_ref();
 
@@ -650,6 +649,7 @@ namespace CremaCode {
 				static std::string invalid_type;
 			private:
 				static std::map<int, std::string> m_strings;
+				static std::map<const char*, std::string> m_stringsByPtr;
 				static int m_ref;
 			};
 
@@ -715,10 +715,11 @@ namespace CremaCode {
 				class binary_column : public inicolumn
 				{
 				public:
-					binary_column(const std::string& columnName, const std::type_info& dataType, bool iskey);
+					binary_column(const std::string& columnName, const std::string& typeName, bool iskey);
 					virtual ~binary_column();
 
 					virtual const std::string& name() const;
+					virtual const std::string& type_name() const;
 					virtual const std::type_info& datatype() const;
 					virtual bool is_key() const;
 					virtual size_t index() const;
@@ -732,6 +733,7 @@ namespace CremaCode {
 
 				private:
 					std::string m_columnName;
+					std::string m_typeName;
 					const std::type_info& m_dataType;
 					bool m_iskey;
 					size_t m_columnIndex;
@@ -949,4 +951,5 @@ namespace CremaCode {
 		} /*namespace internal*/
 	} /*namespace reader*/
 } /*namespace CremaCode*/
+
 

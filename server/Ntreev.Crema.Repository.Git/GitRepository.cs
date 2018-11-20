@@ -49,7 +49,6 @@ namespace Ntreev.Crema.Repository.Git
         private List<LogPropertyInfo> transactionPropertyList;
         private string transactionPatchPath;
         private RepositoryInfo repositoryInfo;
-        private bool isModified;
 
         public GitRepository(GitRepositoryProvider repositoryProvider, ILogService logService, string repositoryPath, string transactionPath, RepositoryInfo repositoryInfo)
         {
@@ -202,7 +201,7 @@ namespace Ntreev.Crema.Repository.Git
                     this.repositoryInfo.ModificationInfo = new SignatureDate(author, log.CommitDate);
 
                     this.SetNotes(properties);
-                    this.isModified = true;
+                    //this.isModified = true;
                     //this.Pull();
                     //this.Push();
                     //this.PushNotes();

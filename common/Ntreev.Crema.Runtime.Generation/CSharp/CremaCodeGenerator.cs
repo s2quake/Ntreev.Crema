@@ -384,7 +384,7 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
         private void PrintResult(string path)
         {
             var fileInfo = new FileInfo(path);
-            Trace.WriteLine($"generated : {fileInfo.FullName}");
+            Console.WriteLine($"generated : {fileInfo.FullName}");
         }
     }
 }

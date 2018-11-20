@@ -236,7 +236,7 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
                 var table = new CodeVariableReferenceExpression("table");
                 foreach (var item in generationInfo.GetChilds(tableInfo))
                 {
-                    var setRelations = new CodeMethodReferenceExpression(thisRef, "SetRelations");
+                    var setRelations = new CodeMethodReferenceExpression(thisRef, "setRelations");
                     var rows = new CodePropertyReferenceExpression(item.GetFieldExpression(), "rows");
                     var setChildAction = new CodePropertyReferenceExpression(tableInfo.GetRowCodeTypeExpression(), "set" + item.TableName);
                     var tableName = new CodePropertyReferenceExpression(table, "name");
@@ -298,7 +298,7 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
         {
             var cmm = new CodeMemberMethod();
             cmm.Attributes = MemberAttributes.Family | MemberAttributes.Override;
-            cmm.Name = "CreateRowInstance";
+            cmm.Name = "createRowInstance";
             cmm.ReturnType = tableInfo.GetRowCodeType();
             cmm.Parameters.Add("reader", "IRow", "row");
             cmm.Parameters.Add(typeof(object), "table");

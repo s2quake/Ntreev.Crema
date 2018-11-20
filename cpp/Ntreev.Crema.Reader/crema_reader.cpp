@@ -412,8 +412,8 @@ namespace CremaCode {
 				}
 				else if (typeinfo == typeid(std::string))
 				{
-					const std::string& text = *(const std::string*)va_arg(vl, const char*);
-					int stringID = iniutil::get_hash_code(text);
+					const std::string text = (const std::string)va_arg(vl, const std::string);
+					int stringID = iniutil::get_hash_code(*text);
 					internal_util::set_field_value(&fields.front(), offset, stringID);
 				}
 				else
@@ -496,6 +496,7 @@ namespace CremaCode {
 		const int s_magic_value = 0x04000000;
 
 		std::map<int, std::string> string_resource::m_strings;
+		std::map<const char*, std::string> string_resource::m_stringsByPtr;
 		std::string string_resource::empty_string;
 		int string_resource::m_ref = 0;
 		internal_util static_data;
@@ -597,7 +598,7 @@ namespace CremaCode {
 			: out_of_range(format_string(key, container_name).c_str())
 		{
 
-	}
+		}
 #endif
 
 		std::string keynotfoundexception::format_string(const std::string& key, const std::string& container_name)
@@ -924,6 +925,23 @@ namespace CremaCode {
 				return itor->second;
 			}
 
+			const std::string& string_resource::getByPtr(const char* ptr)
+			{
+				std::map<const char*, std::string>::const_iterator itor = m_stringsByPtr.find(ptr);
+				return itor->second;
+			}
+
+			void string_resource::add(const char* ptr, std::string text)
+			{
+				m_stringsByPtr.insert(std::pair<const char*, std::string>(ptr, text));
+			}
+
+			bool string_resource::contains(const char* ptr)
+			{
+				std::map<const char*, std::string>::const_iterator itor = m_stringsByPtr.find(ptr);
+				return itor != m_stringsByPtr.end();
+			}
+
 			void string_resource::add_ref()
 			{
 				m_ref++;
@@ -1060,7 +1078,7 @@ namespace CremaCode {
 						const std::string& typeName = string_resource::get(columninfo.dataType);
 						bool isKey = columninfo.iskey == 0 ? false : true;
 
-						binary_column* column = new binary_column(columnName, iniutil::name_to_type(typeName), isKey);
+						binary_column* column = new binary_column(columnName, typeName, isKey);
 
 						table.m_columns.set(i, column);
 
@@ -1087,12 +1105,10 @@ namespace CremaCode {
 					}
 				}
 
-				binary_column::binary_column(const std::string& columnName, const std::type_info& dataType, bool isKey)
-					: m_columnName(columnName), m_dataType(dataType), m_iskey(isKey)
+				binary_column::binary_column(const std::string& columnName, const std::string& typeName, bool isKey)
+					: m_columnName(columnName), m_typeName(typeName), m_dataType(iniutil::name_to_type(typeName)), m_iskey(isKey)
 				{
-#ifdef _DEBUG
-					this->typeName = m_dataType.name();
-#endif
+
 				}
 
 				binary_column::~binary_column()
@@ -1103,6 +1119,11 @@ namespace CremaCode {
 				const std::string& binary_column::name() const
 				{
 					return m_columnName;
+				}
+
+				const std::string& binary_column::type_name() const
+				{
+					return m_typeName;
 				}
 
 				const std::type_info& binary_column::datatype() const
@@ -1158,8 +1179,33 @@ namespace CremaCode {
 					{
 						if (offset == 0)
 							return &string_resource::empty_string;
-						int id = *(int*)valuePtr;
-						return &string_resource::get(id);
+						if (column.type_name() == "guid")
+						{
+							if (string_resource::contains(valuePtr) == false)
+							{
+								std::vector<unsigned char> bytes = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+								bytes.assign(valuePtr, valuePtr + 16);
+								std::stringstream stream;
+								stream.str("");
+								stream << std::hex << (int)bytes[3] << (int)bytes[2] << (int)bytes[1] << (int)bytes[0];
+								stream << "-";
+								stream << std::hex << (int)bytes[5] << (int)bytes[4];
+								stream << "-";
+								stream << std::hex << (int)bytes[7] << (int)bytes[6];
+								stream << "-";
+								stream << std::hex << (int)bytes[8] << (int)bytes[9];
+								stream << "-";
+								stream << std::hex << (int)bytes[10] << (int)bytes[11] << (int)bytes[12] << (int)bytes[13] << (int)bytes[14] << (int)bytes[15];
+								string_resource::add(valuePtr, stream.str());
+							}
+
+							return &string_resource::getByPtr(valuePtr);
+						}
+						else
+						{
+							int id = *(int*)valuePtr;
+							return &string_resource::get(id);
+						}
 					}
 					else
 					{
@@ -1782,5 +1828,6 @@ namespace CremaCode {
 				}
 			} /*namespace binary*/
 		} /*namespace internal*/
-} /*namespace reader*/
+	} /*namespace reader*/
 } /*namespace CremaCode*/
+
