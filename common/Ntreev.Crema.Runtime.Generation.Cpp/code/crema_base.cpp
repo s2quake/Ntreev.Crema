@@ -23,3 +23,4 @@ namespace CremaCode
 {
 	ErrorOccured CremaData::ErrorOccured = nullptr;
 } /*namespace CremaCode*/
+

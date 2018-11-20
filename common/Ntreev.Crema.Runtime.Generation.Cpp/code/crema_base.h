@@ -48,6 +48,7 @@ namespace CremaCode
 
 	protected:
 		CremaRow(reader::irow& row)
+			: _key(-1)
 		{
 			std::ostringstream stringStream;
 
@@ -278,3 +279,4 @@ namespace CremaCode
 		}
 	};
 } /*namespace CremaCode*/
+

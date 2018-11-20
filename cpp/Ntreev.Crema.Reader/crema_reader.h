@@ -17,32 +17,6 @@
 
 #pragma once
 
-//#define _CREMA_READER_VER 209
-//#define _IGNORE_BOOST
-
-//#ifdef _MSC_VER
-//#ifdef _WINDLL
-//#define __declspec(dllexport)
-//#else
-//#define 
-//#endif
-//
-//#if _MSC_VER < 1700
-////#define nullptr NULL
-//#endif
-//#else
-////#define 
-////#define
-////#define nullptr NULL
-//#define _IGNORE_BOOST
-//
-//#include <string>
-//namespace std
-//{
-//	typedef basic_string<wchar_t, char_traits<wchar_t>, allocator<wchar_t> > wstring;
-//}
-//#endif
-
 #include <string>
 #include <algorithm>
 #include <map>
@@ -75,7 +49,7 @@ namespace CremaCode {
 		class cremaiterator : public std::iterator<std::input_iterator_tag, _initype>
 		{
 		public:
-			cremaiterator(_inicontainer* c) : i(c->size()) { }
+			cremaiterator(_inicontainer* c) : i(c->size()), c(c) { }
 			cremaiterator(_inicontainer* c, size_t i) : i(i), c(c) { }
 			cremaiterator(const cremaiterator& mit) : i(mit.i), c(mit.c) { }
 
@@ -95,7 +69,7 @@ namespace CremaCode {
 		class const_cremaiterator : public std::iterator<std::input_iterator_tag, _initype>
 		{
 		public:
-			const_cremaiterator(const _inicontainer* c) : i(c->size()) { }
+			const_cremaiterator(const _inicontainer* c) : i(c->size()), c(c) { }
 			const_cremaiterator(const _inicontainer* c, size_t i) : i(i), c(c) { }
 			const_cremaiterator(const const_cremaiterator& mit) : i(mit.i), c(mit.c) { }
 
@@ -435,20 +409,9 @@ namespace CremaCode {
 			ReadFlag_mask = 0xff,
 		};
 
-		enum DataLocation
-		{
-			DataLocation_both,
-			DataLocation_server,
-			DataLocation_client,
-		};
-
 		class CremaReader : public idataset
 		{
 		public:
-#ifndef _IGNORE_BOOST
-			//static CremaReader& read(const std::string& address, int port, const std::string& name = "default", ReadFlag flag = ReadFlag_none);
-			static CremaReader& read(const std::string& address, int port, const std::string& database, DataLocation datalocation, ReadFlag flag = ReadFlag_none);
-#endif
 			static CremaReader& read(const std::string& filename, ReadFlag flag = ReadFlag_none);
 			static CremaReader& read(std::istream& stream, ReadFlag flag = ReadFlag_none);
 
@@ -546,7 +509,7 @@ namespace CremaCode {
 			static int get_hash_code(const std::string& text);
 			static std::string to_lower(const std::string& text);
 
-			static int get_type_size(const std::type_info& typeinfo);
+			//static int get_type_size(const std::type_info& typeinfo);
 
 			template<typename key_type>
 			static long generate_hash(key_type key_value)
@@ -627,8 +590,6 @@ namespace CremaCode {
 				}
 
 				std::list<CremaReader*> m_readers;
-
-
 			};
 
 			class string_resource
@@ -708,9 +669,8 @@ namespace CremaCode {
 				};
 
 				class binary_table;
+
 				class binary_reader;
-
-
 
 				class binary_column : public inicolumn
 				{
@@ -882,7 +842,6 @@ namespace CremaCode {
 					virtual void load_table(const std::string& tableName);
 					virtual void release_table(const std::string& tableName);
 
-
 					void set(size_t index, binary_table* dataTable);
 					void set_size(const std::vector<table_index>& indexes);
 					void set_flag(ReadFlag flag);
@@ -946,10 +905,8 @@ namespace CremaCode {
 					std::string m_tablesHashValue;
 					std::string m_tags;
 				};
-
 			} /*namespace binary*/
 		} /*namespace internal*/
 	} /*namespace reader*/
 } /*namespace CremaCode*/
-
 
