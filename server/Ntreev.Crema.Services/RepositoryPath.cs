@@ -57,11 +57,6 @@ namespace Ntreev.Crema.Services
             this.Path = GeneratePath(tableContext.BasePath, path);
         }
 
-        //public RepositoryPath(string basePath, string kind, string path)
-        //{
-        //    this.Path = GeneratePath(basePath, PathUtility.Separator + kind + path);
-        //}
-
         public override string ToString()
         {
             return this.Path;

@@ -138,7 +138,6 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
             // verify hashValue
             {
                 var css = CreateCompareTypeStatement(classType, tableInfo, generationInfo);
-                var tst = CremaDataClassCreator.CreateTryCatchStatement(classType, css, generationInfo.IsDevmode);
                 cmm.Statements.Add(css);
             }
 

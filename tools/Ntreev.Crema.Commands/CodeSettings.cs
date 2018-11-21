@@ -129,7 +129,8 @@ namespace Ntreev.Crema.Commands
         [DefaultValue(false)]
         public static bool IsBuildMode
         {
-            get; set;
+            get;
+            set;
         }
 
         [CommandProperty]
@@ -141,21 +142,11 @@ namespace Ntreev.Crema.Commands
             set;
         }
 
-        [CommandProperty]
-        [Description("개발 전용으로 생성합니다.")]
-        [DefaultValue(false)]
-        [Obsolete]
-        public static bool Devmode
-        {
-            get; set;
-        }
-
         public static CodeGenerationOptions Options
         {
             get
             {
                 var options = CodeGenerationOptions.None;
-
                 if (OmitComment == true)
                     options |= CodeGenerationOptions.OmitComments;
                 if (OmitSignatureDate == true)
@@ -164,9 +155,6 @@ namespace Ntreev.Crema.Commands
                     options |= CodeGenerationOptions.OmitBaseCode;
                 if (OmitCode == true)
                     options |= CodeGenerationOptions.OmitCode;
-                if (Devmode == true)
-                    options |= CodeGenerationOptions.Devmode;
-
                 return options;
             }
         }

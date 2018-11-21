@@ -190,11 +190,6 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
             }
         }
 
-        public bool IsDevmode
-        {
-            get { return this.settings.Options.HasFlag(CodeGenerationOptions.Devmode); }
-        }
-
         public string RelativePath
         {
             get; private set;
