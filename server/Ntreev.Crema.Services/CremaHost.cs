@@ -41,8 +41,7 @@ namespace Ntreev.Crema.Services
         private CremaConfiguration configs;
         private IPlugin[] plugins;
 
-        [Import]
-        private IServiceProvider container = null;
+        private readonly IServiceProvider container;
         private readonly CremaSettings settings;
         private readonly IRepositoryProvider[] repositoryProviders;
         private readonly IObjectSerializer[] serializers;
@@ -56,19 +55,19 @@ namespace Ntreev.Crema.Services
         private IEnumerable<IConfigurationPropertyProvider> propertiesProviders = null;
 
         [ImportingConstructor]
-        public CremaHost(CremaSettings settings,
+        public CremaHost(IServiceProvider container, CremaSettings settings,
             [ImportMany]IEnumerable<IRepositoryProvider> repositoryProviders,
             [ImportMany]IEnumerable<IObjectSerializer> serializers)
         {
             CremaLog.Attach(this);
             CremaLog.Debug("crema instance created.");
+            this.container = container;
             this.settings = settings;
             this.repositoryProviders = repositoryProviders.ToArray();
             this.serializers = serializers.ToArray();
             CremaLog.Debug("crema log service initialized.");
             CremaLog.Debug($"available tags : {string.Join(", ", TagInfoUtility.Names)}");
             this.Dispatcher = new CremaDispatcher(this);
-            
             CremaLog.Debug("crema dispatcher initialized.");
         }
 

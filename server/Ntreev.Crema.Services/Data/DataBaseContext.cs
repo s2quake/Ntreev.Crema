@@ -425,6 +425,24 @@ namespace Ntreev.Crema.Services.Data
             this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskID));
         }
 
+        public async Task InitializeAsync()
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                var caches = this.CremaHost.NoCache == true ? new Dictionary<string, DataBaseSerializationInfo>() : this.ReadCaches();
+                var dataBases = this.repositoryProvider.GetRepositories(this.RemotePath);
+
+                foreach (var item in dataBases)
+                {
+                    if (caches.ContainsKey(item) == false)
+                        this.AddBase(item, new DataBase(this, item));
+                    else
+                        this.AddBase(item, new DataBase(this, item, caches[item]));
+                }
+                this.CremaHost.Info($"{nameof(DataBaseContext)} Initialized");
+            });
+        }
+
         public async Task DisposeAsync()
         {
             var dataBases = await this.Dispatcher.InvokeAsync(() => this.ToArray<DataBase>());
@@ -787,24 +805,6 @@ namespace Ntreev.Crema.Services.Data
             var name = $"{dataBaseInfo.ID}";
             var files = Directory.GetFiles(directoryName, $"{name}.*").Where(item => Path.GetFileNameWithoutExtension(item) == name).ToArray();
             FileUtility.Delete(files);
-        }
-
-        public async Task InitializeAsync()
-        {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                var caches = this.CremaHost.NoCache == true ? new Dictionary<string, DataBaseSerializationInfo>() : this.ReadCaches();
-                var dataBases = this.repositoryProvider.GetRepositories(this.RemotePath);
-
-                foreach (var item in dataBases)
-                {
-                    if (caches.ContainsKey(item) == false)
-                        this.AddBase(item, new DataBase(this, item));
-                    else
-                        this.AddBase(item, new DataBase(this, item, caches[item]));
-                }
-                this.CremaHost.Info($"{nameof(DataBaseContext)} Initialized");
-            });
         }
 
         #region IDataBaseCollection

@@ -172,8 +172,18 @@ namespace Ntreev.Crema.ApplicationHost
                 if (AppMessageBox.ShowProceed("서비스가 실행중입니다. 서비스 중지후 종료하시겠습니까?") == true)
                 {
                     this.ServiceState = ServiceState.Closing;
-                    await this.service.CloseAsync();
-                    this.ServiceState = ServiceState.Closed;
+                    try
+                    {
+                        await this.service.CloseAsync();
+                    }
+                    catch (Exception e)
+                    {
+                        AppMessageBox.ShowError(e);
+                    }
+                    finally
+                    {
+                        this.ServiceState = ServiceState.Closed;
+                    }
                 }
                 else
                 {

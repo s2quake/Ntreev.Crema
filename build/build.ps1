@@ -26,7 +26,12 @@ if (Test-Path "$deploymentPath") {
     Remove-Item "$deploymentPath" -Recurse
 }
 
-Invoke-Expression "&`"$msbuildPath`" `"..\crema.sln`" -t:rebuild -v:m -p:Configuration=Release"
+Invoke-Expression "&`"$msbuildPath`" `"..\crema.sln`" -t:rebuild -v:q -p:Configuration=Release"
+
+if (-Not $LASTEXITCODE -eq 0) {
+    Write-Error "Build failed." -ErrorAction Stop
+}
+
 
 foreach ($item in $items) {
     $srcPath = Join-Path "..\bin\Release" $item

@@ -20,9 +20,7 @@ TestResults/
 *.bat
 /.gitattributes
 /version.txt
-/bin/git/
 *.opendb
-/bin/git/
 /bin/build/Release
 /.vs
 /vscode/typescript/sample/*.js

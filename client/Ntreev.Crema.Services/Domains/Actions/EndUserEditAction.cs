@@ -24,7 +24,6 @@ namespace Ntreev.Crema.Services.Domains.Actions
     [DataContract(Namespace = SchemaUtility.Namespace)]
     public class EndUserEditAction : DomainActionBase
     {
-        //[DataMember]
-        //public DomainLocationInfo Location { get; set; }
+        
     }
 }
