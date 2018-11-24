@@ -35,12 +35,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json.Schema, Version=3.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.Schema.3.0.1\lib\net45\Newtonsoft.Json.Schema.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -51,9 +45,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="YamlDotNet, Version=5.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\YamlDotNet.Signed.5.2.1\lib\net45\YamlDotNet.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandContext.cs" />
@@ -131,7 +122,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>10.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json.Schema">
+      <Version>3.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="YamlDotNet.Signed">
+      <Version>5.2.1</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="..\..\common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems" Label="Shared" />
   <Import Project="..\..\common\Ntreev.Crema.Commands.Sharing\Ntreev.Crema.Commands.Sharing.projitems" Label="Shared" />
