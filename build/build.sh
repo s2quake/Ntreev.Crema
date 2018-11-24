@@ -40,6 +40,6 @@ do
     srcPath="../bin/Release/$item"
     destPath="$deploymentPath/$item"
     mkdir $destPath
-    rsync $srcPath $destPath -v -q --recursive --exclude="*.pdb" --exclude="*.xml"
+    rsync $srcPath $deploymentPath -v -q --recursive --exclude="*.pdb" --exclude="*.xml"
 done
 #rsync ../bin/Release/cremaconsole/* ./Release/cremaconsole -v --recursive --exclude="*.pdb" --exclude="*.xml"
