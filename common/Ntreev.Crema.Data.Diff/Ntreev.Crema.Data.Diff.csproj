@@ -70,6 +70,11 @@
       <Name>Ntreev.Crema.Data</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DiffPlex">
+      <Version>1.4.2</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="..\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -18,9 +18,6 @@
 //#if !DEBUG
 //#define USE_PARALLEL
 //#endif
-using DiffPlex;
-using DiffPlex.DiffBuilder;
-using DiffPlex.DiffBuilder.Model;
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library;
