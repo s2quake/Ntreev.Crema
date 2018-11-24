@@ -26,6 +26,12 @@ if (Test-Path "$deploymentPath") {
     Remove-Item "$deploymentPath" -Recurse
 }
 
+Invoke-Expression "&`"$msbuildPath`" `"..\crema.sln`" -t:restore"
+
+if (-Not $LASTEXITCODE -eq 0) {
+    Write-Error "Restore failed." -ErrorAction Stop
+}
+
 Invoke-Expression "&`"$msbuildPath`" `"..\crema.sln`" -t:rebuild -v:q -p:Configuration=Release"
 
 if (-Not $LASTEXITCODE -eq 0) {
