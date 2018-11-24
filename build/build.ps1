@@ -20,7 +20,7 @@ if ($msbuildPath -eq "") {
     return 1
 }
 
-Write-Host "Delete release"
+Write-Host "Delete Release"
 foreach ($item in $items) {
     $path = Join-Path "..\bin\Release" $item
     if (Test-Path "$path") {
