@@ -27,7 +27,6 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
-using Ntreev.Crema.WindowsServiceHost;
 using Ntreev.Library.Linq;
 using Ntreev.Library.Commands;
 using Ntreev.Library.IO;
@@ -58,11 +57,6 @@ namespace Ntreev.Crema.ConsoleHost
         {
             get => this.service.Port;
             set => this.service.Port = value;
-        }
-
-        public override IEnumerable<Assembly> GetAssemblies()
-        {
-            return EnumerableUtility.Friends(typeof(WindowCremaService).Assembly, base.GetAssemblies());
         }
 
         public Task OpenAsync()
