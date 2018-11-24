@@ -202,6 +202,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
 #if DEBUG
                 await terminal.StartAsync(this.LoginAuthentication);
 #else
+                await Task.Delay(1);
                 terminal.Start();
 #endif
             }

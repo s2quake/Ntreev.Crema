@@ -104,6 +104,7 @@ namespace Ntreev.Crema.Services.Domains
 
         protected override void OnNewRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
         {
+            this.DataSet.BeginLoad();
             foreach (var item in rows)
             {
                 var view = this.views[item.TableName];
@@ -111,11 +112,13 @@ namespace Ntreev.Crema.Services.Domains
                 CremaDomainUtility.AddNew(view, item.Fields);
                 this.tables[view].ContentsInfo = signatureDate;
             }
+            this.DataSet.EndLoad();
             this.DataSet.AcceptChanges();
         }
 
         protected override void OnRemoveRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
         {
+            this.DataSet.BeginLoad();
             foreach (var item in rows.Reverse())
             {
                 var view = this.views[item.TableName];
@@ -129,25 +132,20 @@ namespace Ntreev.Crema.Services.Domains
                 }
                 this.tables[view].ContentsInfo = signatureDate;
             }
+            this.DataSet.EndLoad();
             this.DataSet.AcceptChanges();
         }
 
         protected override void OnSetRow(DomainUser domainUser, DomainRowInfo[] rows, SignatureDate signatureDate)
         {
             this.DataSet.BeginLoad();
-            try
+            foreach (var item in rows)
             {
-                foreach (var item in rows)
-                {
-                    var view = this.views[item.TableName];
-                    CremaDomainUtility.SetFieldsForce(view, item.Keys, item.Fields);
-                    this.tables[view].ContentsInfo = signatureDate;
-                }
+                var view = this.views[item.TableName];
+                CremaDomainUtility.SetFieldsForce(view, item.Keys, item.Fields);
+                this.tables[view].ContentsInfo = signatureDate;
             }
-            finally
-            {
-                this.DataSet.EndLoad();
-            }
+            this.DataSet.EndLoad();
             this.DataSet.AcceptChanges();
         }
     }

@@ -9,90 +9,98 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:local="clr-namespace:Ntreev.Crema.Presentation.Tables.Dialogs.Views"
              xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Tables.Properties"
-             mc:Ignorable="d" Width="400">
+             mc:Ignorable="d" Width="400" Loaded="UserControl_Loaded">
 
     <UserControl.Resources>
 
         <local:NewRowContentTemplateSelector x:Key="newRowContentTemplateSelector" />
 
+        <DataTemplate x:Key="HeaderedContentControl_HeaderTemplate">
+            <Label x:Name="label" Content="{Binding Name}" ToolTip="{Binding Comment}" />
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Tags.Color, Converter={StaticResource IsNotNullConverter}}" Value="True">
+                    <Setter Property="TextElement.Foreground" Value="{Binding Tags.Color}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsKey}" Value="True">
+                    <Setter Property="TextElement.FontWeight" Value="Bold" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsUnique}" Value="True">
+                    <Setter Property="TextElement.FontStyle" Value="Italic" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Comment}" Value="">
+                    <Setter Property="ToolTipService.IsEnabled" Value="False" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
         <Style x:Key="ItemContainer_Style" TargetType="{x:Type HeaderedContentControl}" BasedOn="{StaticResource PropertyItemsControl_ItemContainerStyle}">
-            <Setter Property="Header" Value="{Binding Name}" />
             <Setter Property="Height" Value="24" />
+            <Setter Property="HeaderTemplate" Value="{StaticResource HeaderedContentControl_HeaderTemplate}" />
         </Style>
 
         <DataTemplate x:Key="System.Boolean">
-            <CheckBox IsChecked="{Binding Value}" HorizontalAlignment="Left" />
+            <CheckBox IsChecked="{Binding Value}" HorizontalAlignment="Left" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.String">
-            <TextBox Text="{Binding Value}" />
+            <TextBox Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.Single">
-            <nmgc:NumericTextBox NumberStyles="Float" NullValue="{x:Null}" Text="{Binding Value, StringFormat=R}" />
+            <nmgc:NumericTextBox NumberStyles="Float" NullValue="{x:Null}" Text="{Binding Value, StringFormat=R}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
-        
+
         <DataTemplate x:Key="System.Double">
-            <nmgc:NumericTextBox NumberStyles="Float" NullValue="{x:Null}" Text="{Binding Value, StringFormat=R}" />
+            <nmgc:NumericTextBox NumberStyles="Float" NullValue="{x:Null}" Text="{Binding Value, StringFormat=R}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.SByte">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
-
         <DataTemplate x:Key="System.Byte">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.Int16">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.UInt16">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.Int32">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.UInt32">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.Int64">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.UInt64">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" />
+            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.DateTime">
-            <xctk:DateTimePicker Value="{Binding Value}" />
+            <xctk:DateTimePicker Value="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.TimeSpan">
-            <nmgc:TimeSpanUpDown InternalValue="{Binding Value}" />
+            <nmgc:TimeSpanUpDown InternalValue="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="CremaTypeSelector">
-            <ComboBox Text="{Binding Value}" IsEditable="True" 
-                          ItemsSource="{Binding Items}"
-                          DisplayMemberPath="Name"
-                          Template="{StaticResource DataCell_Editable_ComboBox_Template}" >
-                <ComboBox.Resources>
-                    <Style TargetType="{x:Type Popup}">
-                        <Setter Property="PlacementTarget" Value="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type HeaderedContentControl}}}" />
-                    </Style>
-                </ComboBox.Resources>
-            </ComboBox>
+            <ComboBox Text="{Binding Value}" IsEditable="True" ItemsSource="{Binding Items}" DisplayMemberPath="Name"
+                      Template="{StaticResource DataCell_Editable_ComboBox_Template}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="CremaFlagTypeSelector">
-            <nmfc:FlagControl Text="{Binding Value}" DisplayMemberPath="Name" NumericMemberPath="Value"
-                                      ItemsSource="{Binding Items}" >
+            <nmfc:FlagControl Text="{Binding Value}" DisplayMemberPath="Name" NumericMemberPath="Value" ItemsSource="{Binding Items}" Loaded="PropertyItem_Loaded">
                 <nmfc:FlagControl.Resources>
                     <Style TargetType="{x:Type Popup}">
                         <Setter Property="PlacementTarget" Value="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type HeaderedContentControl}}}" />
@@ -105,7 +113,7 @@
     </UserControl.Resources>
 
     <StackPanel>
-        <nmfc:PropertyItemsControl ItemsSource="{Binding Items}" 
+        <nmfc:PropertyItemsControl x:Name="properties" ItemsSource="{Binding Items}" 
                                    ItemContainerStyle="{StaticResource ItemContainer_Style}"
                                    ContentTemplateSelector="{StaticResource newRowContentTemplateSelector}" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">

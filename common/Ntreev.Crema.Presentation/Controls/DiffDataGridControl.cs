@@ -198,7 +198,6 @@ namespace Ntreev.Crema.Presentation.Controls
             {
                 throw new NotImplementedException();
             }
-            return null;
         }
 
         private void DiffDataGridControl_Loaded(object sender, RoutedEventArgs e)

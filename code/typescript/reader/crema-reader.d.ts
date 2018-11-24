@@ -31,6 +31,7 @@ declare module 'crema-reader' {
     export interface IColumn {
         table?: ITable;
         name?: string;
+		typeName?: string;
         dataType?: string;
         isKey?: boolean;
         index?: number;

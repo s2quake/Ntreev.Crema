@@ -502,6 +502,10 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.metaData.Data = this.SerializeSource(this.Source);
                 }
+                else
+                {
+                    this.metaData.Data = null;
+                }
                 this.metaData.PostID = this.Logger.ID;
             });
             return this.metaData;

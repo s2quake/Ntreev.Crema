@@ -298,7 +298,8 @@ namespace Ntreev.Crema.Runtime.Serialization.Binary
             }
             else if (dataColumn.DataType == typeof(Guid).GetTypeName())
             {
-                writer.Write(this.GetStringID(value.ToString()));
+                var bytes = ((Guid)value).ToByteArray();
+                writer.Write(bytes);
             }
             else if (dataColumn.DataType == typeof(string).GetTypeName())
             {

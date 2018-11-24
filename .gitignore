@@ -20,13 +20,9 @@ TestResults/
 *.bat
 /.gitattributes
 /version.txt
-/bin/git/
 *.opendb
-/.vs/tools/v15
-/bin/git/
-/repo
+/bin/build/Release
 /.vs
-/UpgradeLog3.htm
 /vscode/typescript/sample/*.js
 /vscode/typescript/sample/*.js.map
 /cpp/.vs

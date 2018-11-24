@@ -84,7 +84,7 @@ namespace Ntreev.Crema.Services.Data
                     }
                 }
             }
-            foreach (var item in settings.DataBaseList)
+            foreach (var item in settings.DataBases)
             {
                 if (this.ContainsKey(item) == true)
                 {
@@ -423,6 +423,24 @@ namespace Ntreev.Crema.Services.Data
         public void InvokeTaskCompletedEvent(Authentication authentication, Guid taskID)
         {
             this.OnTaskCompleted(new TaskCompletedEventArgs(authentication, taskID));
+        }
+
+        public async Task InitializeAsync()
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                var caches = this.CremaHost.NoCache == true ? new Dictionary<string, DataBaseSerializationInfo>() : this.ReadCaches();
+                var dataBases = this.repositoryProvider.GetRepositories(this.RemotePath);
+
+                foreach (var item in dataBases)
+                {
+                    if (caches.ContainsKey(item) == false)
+                        this.AddBase(item, new DataBase(this, item));
+                    else
+                        this.AddBase(item, new DataBase(this, item, caches[item]));
+                }
+                this.CremaHost.Info($"{nameof(DataBaseContext)} Initialized");
+            });
         }
 
         public async Task DisposeAsync()
@@ -787,24 +805,6 @@ namespace Ntreev.Crema.Services.Data
             var name = $"{dataBaseInfo.ID}";
             var files = Directory.GetFiles(directoryName, $"{name}.*").Where(item => Path.GetFileNameWithoutExtension(item) == name).ToArray();
             FileUtility.Delete(files);
-        }
-
-        public async Task InitializeAsync()
-        {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                var caches = this.CremaHost.NoCache == true ? new Dictionary<string, DataBaseSerializationInfo>() : this.ReadCaches();
-                var dataBases = this.repositoryProvider.GetRepositories(this.RemotePath);
-
-                foreach (var item in dataBases)
-                {
-                    if (caches.ContainsKey(item) == false)
-                        this.AddBase(item, new DataBase(this, item));
-                    else
-                        this.AddBase(item, new DataBase(this, item, caches[item]));
-                }
-                this.CremaHost.Info($"{nameof(DataBaseContext)} Initialized");
-            });
         }
 
         #region IDataBaseCollection

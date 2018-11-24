@@ -186,11 +186,6 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
             }
         }
 
-        public bool IsDevmode
-        {
-            get { return this.settings.Options.HasFlag(CodeGenerationOptions.Devmode); }
-        }
-
         public bool BlankLinesBetweenMembers
         {
             get;
@@ -217,7 +212,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
             get { return (TagInfo)this.metaData.Tags; }
         }
 
-        [Obsolete("타입 출력시 값의 포맷을 지정하는 임시 변수")]
+        //[Obsolete("타입 출력시 값의 포맷을 지정하는 임시 변수")]
         public Func<long, string> EnumFomrat
         {
             get; set;

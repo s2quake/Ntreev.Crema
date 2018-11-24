@@ -124,8 +124,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.ObjectSerializ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.ObjectSerializer.Json", "server\Ntreev.Crema.ObjectSerializer.Json\Ntreev.Crema.ObjectSerializer.Json.csproj", "{740BD1D4-C859-4920-9A8B-DAA3DF92582A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Services.Extentions", "client\Ntreev.Crema.Services.Extentions\Ntreev.Crema.Services.Extentions.csproj", "{5A7AF7DB-03CA-4DAA-9845-55721C0473DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Services.Extensions", "server\Ntreev.Crema.Services.Extensions\Ntreev.Crema.Services.Extensions.csproj", "{0261747B-0A44-4FB0-8E27-2CE4BAF2153B}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems*{0261747b-0a44-4fb0-8e27-2ce4baf2153b}*SharedItemsImports = 4
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{04aeb614-3510-4064-99af-0aa807c7f957}*SharedItemsImports = 4
 		common\Ntreev.Crema.Commands.Spreadsheet.Sharing\Ntreev.Crema.Commands.Spreadsheet.Sharing.projitems*{05971a74-2d68-4781-9ceb-df2b48f8ba75}*SharedItemsImports = 13
 		sub-modules\Ntreev.Library.Commands\Ntreev.Library.Commands.AssemblyInfo\Ntreev.Library.Commands.AssemblyInfo.projitems*{0d96cc61-6d74-49b4-a558-33ac0dcf8529}*SharedItemsImports = 4
@@ -154,6 +159,7 @@ Global
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{4c1fbd82-bca7-44d2-b832-bfa2ab80eebb}*SharedItemsImports = 4
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{520e5310-f4c2-4369-8a98-d6c74fd7e90d}*SharedItemsImports = 4
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{5775fed7-233e-48b2-8f83-538dc1123527}*SharedItemsImports = 4
+		common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems*{5a7af7db-03ca-4daa-9845-55721c0473dd}*SharedItemsImports = 4
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{6145e470-9838-4e40-b500-6f215b2703bc}*SharedItemsImports = 4
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{6478450a-dfa5-445d-890f-bc5f57c9a148}*SharedItemsImports = 4
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{65ca35f5-a1c3-4f0c-8a02-08157e3f5e21}*SharedItemsImports = 4
@@ -386,6 +392,14 @@ Global
 		{740BD1D4-C859-4920-9A8B-DAA3DF92582A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{740BD1D4-C859-4920-9A8B-DAA3DF92582A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{740BD1D4-C859-4920-9A8B-DAA3DF92582A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A7AF7DB-03CA-4DAA-9845-55721C0473DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A7AF7DB-03CA-4DAA-9845-55721C0473DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A7AF7DB-03CA-4DAA-9845-55721C0473DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A7AF7DB-03CA-4DAA-9845-55721C0473DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0261747B-0A44-4FB0-8E27-2CE4BAF2153B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0261747B-0A44-4FB0-8E27-2CE4BAF2153B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0261747B-0A44-4FB0-8E27-2CE4BAF2153B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0261747B-0A44-4FB0-8E27-2CE4BAF2153B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -445,6 +459,8 @@ Global
 		{0D972C0D-5134-4877-9DCD-8DCAF01E5E05} = {9BD2FC26-0766-4D0C-80CF-AC811DE44A4D}
 		{4D71A73A-7EAD-4415-B3CD-086E7EB5C083} = {9BD2FC26-0766-4D0C-80CF-AC811DE44A4D}
 		{740BD1D4-C859-4920-9A8B-DAA3DF92582A} = {9BD2FC26-0766-4D0C-80CF-AC811DE44A4D}
+		{5A7AF7DB-03CA-4DAA-9845-55721C0473DD} = {51988BAC-DDBB-475A-BF13-576A97678AB5}
+		{0261747B-0A44-4FB0-8E27-2CE4BAF2153B} = {9BD2FC26-0766-4D0C-80CF-AC811DE44A4D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4B597F4B-D27E-4576-ABBB-44B003E121A1}

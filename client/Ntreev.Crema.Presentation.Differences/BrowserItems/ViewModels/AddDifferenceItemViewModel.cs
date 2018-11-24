@@ -30,6 +30,8 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
+using Ntreev.Crema.Data;
 
 namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
 {
@@ -47,41 +49,13 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
         [Import]
         private Lazy<BrowserService> browserService = null;
 
-        public async Task AddAsync()
+        public void Add()
         {
             var destDataBaseName = this.SelectDataBase();
             if (destDataBaseName == null)
                 return;
 
-            var task = new BackgroundTask((p, c) =>
-            {
-                //p.Report(0, "현재 데이터 베이스 가져오는중");
-                //var dataBase = this.cremaHost.Dispatcher.Invoke(() => this.cremaHost.DataBases[this.cremaAppHost.DataBaseName]);
-                //await dataBase.GetDataSetAsync(this.authenticator, DataSetType.All, null, null);
-                //p.Report(0.33, "대상 데이터 베이스 가져오는중");
-                //var dataSet2 = this.cremaHost.Dispatcher.Invoke(() =>
-                //{
-                //    var dataBase = this.cremaHost.DataBases[destDataBaseName];
-                //    if (dataBase.IsLoaded == false)
-                //        dataBase.Load(this.authenticator);
-                //    dataBase.Enter(this.authenticator);
-                //    try
-                //    {
-                //        return dataBase.GetDataSet(this.authenticator, DataSetType.All, null, null);
-                //    }
-                //    finally
-                //    {
-                //        dataBase.Leave(this.authenticator);
-                //    }
-                //});
-                //p.Report(0.66, "비교하는중");
-                //return new DiffDataSet(dataSet2, dataSet1, DiffMergeTypes.ReadOnly2)
-                //{
-                //    Header1 = destDataBaseName,
-                //    Header2 = this.cremaAppHost.DataBaseName
-                //};
-            });
-
+            var task = new BackgroundViewModel(this.authenticator, this.cremaHost, this.cremaAppHost.DataBaseName, destDataBaseName);
             task.ProgressChanged += Task_ProgressChanged;
             var dialog = new BackgroundTaskViewModel(task) { DisplayName = "데이터 베이스 비교하기", };
             dialog.ShowDialog();
@@ -93,11 +67,11 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
 
         private void Task_ProgressChanged(object sender, Library.ProgressChangedEventArgs e)
         {
-            if (sender is BackgroundTask task)
+            if (sender is BackgroundViewModel task)
             {
-                if (e.State == ProgressChangeState.Completed && task.Result is DiffDataSet dataSet)
+                if (e.State == ProgressChangeState.Completed)
                 {
-                    this.browserService.Value.Add(dataSet);
+                    this.browserService.Value.Add(task.Result);
                 }
             }
         }
@@ -111,5 +85,50 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             }
             return null;
         }
+
+        #region classes
+
+        class BackgroundViewModel : BackgroundTaskBase
+        {
+            private readonly Authentication authentication;
+            private readonly ICremaHost cremaHost;
+            private readonly string dataBaseName1;
+            private readonly string dataBaseName2;
+            private DiffDataSet dataSet;
+
+            public BackgroundViewModel(Authentication authentication, ICremaHost cremaHost, string dataBaseName1, string dataBaseName2)
+            {
+                this.authentication = authentication;
+                this.cremaHost = cremaHost;
+                this.dataBaseName1 = dataBaseName1;
+                this.dataBaseName2 = dataBaseName2;
+            }
+
+            public DiffDataSet Result => this.dataSet;
+
+            protected override async Task OnRunAsync(IProgress progress, CancellationToken cancellation)
+            {
+                progress.Report(0, "데이터 베이스 가져오는중");
+
+                var dataBase1 = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.dataBaseName1]);
+                var dataBase2 = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.dataBaseName2]);
+                var tasks = new Task<CremaDataSet>[]
+                {
+                    dataBase1.GetDataSetAsync(this.authentication, DataSetType.All, null, null),
+                    dataBase2.GetDataSetAsync(this.authentication, DataSetType.All, null, null),
+                };
+                await Task.WhenAll(tasks);
+                progress.Report(0.5, "비교하는중");
+                this.dataSet = new DiffDataSet(tasks[1].Result, tasks[0].Result, DiffMergeTypes.ReadOnly2)
+                {
+                    Header1 = this.dataBaseName2,
+                    Header2 = this.dataBaseName1
+                };
+            }
+
+            private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+        }
+
+        #endregion
     }
 }

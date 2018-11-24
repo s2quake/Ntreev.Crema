@@ -61,10 +61,6 @@ namespace Ntreev.Crema.Presentation.Framework
             this.domain = domain;
             this.owner = owner ?? this;
             this.domain.Dispatcher.VerifyAccess();
-            if(domain.DomainInfo.ItemPath == null)
-            {
-                int qwer = 0;
-            }
             this.domainInfo = domain.DomainInfo;
             this.domainState = domain.DomainState;
 

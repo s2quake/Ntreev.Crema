@@ -47,11 +47,5 @@ namespace Ntreev.Crema.Runtime.Generation
         /// 코드를 생성하지 않습니다.
         /// </summary>
         OmitCode = 8,
-
-        /// <summary>
-        /// 개발모드로 코드를 생성합니다.
-        /// 개발모드로 설정되면 각 테이블 로드시 예외를 catch할 수있는 코드가 추가됩니다.
-        /// </summary>
-        Devmode = 16,
     }
 }

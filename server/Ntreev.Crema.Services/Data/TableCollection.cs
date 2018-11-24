@@ -157,18 +157,20 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task<CremaDataSet> ReadDataForContentAsync(Authentication authentication, Table[] tables)
         {
-            var fullPaths = await this.Dispatcher.InvokeAsync(() =>
+            var tuple = await this.Dispatcher.InvokeAsync(() =>
             {
                 var types = tables.SelectMany(item => item.GetTypes()).Distinct().ToArray();
                 var typePaths = types.Select(item => item.FullPath).ToArray();
                 var tablePaths = tables.Select(item => item.FullPath).ToArray();
-                var itemPaths = typePaths.Concat(tablePaths).ToArray();
-                return itemPaths;
+                var fullPaths = typePaths.Concat(tablePaths).ToArray();
+                return (tablePaths, typePaths, fullPaths);
             });
             return await this.Repository.Dispatcher.InvokeAsync(() =>
             {
-                this.Repository.Lock(authentication, this, nameof(ReadDataForContentAsync), fullPaths);
-                return this.Repository.ReadDataSet(authentication, fullPaths);
+                this.Repository.Lock(authentication, this, nameof(ReadDataForContentAsync), tuple.tablePaths);
+                var dataSet = this.Repository.ReadDataSet(authentication, tuple.fullPaths);
+                dataSet.SetItemPaths(tuple.tablePaths);
+                return dataSet;
             });
         }
 

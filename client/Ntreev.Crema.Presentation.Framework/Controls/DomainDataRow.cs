@@ -39,12 +39,9 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 {
     public class DomainDataRow : ModernDataRow
     {
-        private readonly DomainDataUserCollection userInfos = new DomainDataUserCollection();
-
         private IDomain domain;
         private object[] keys;
         private string tableName;
-        private string userID;
 
         public DomainDataRow()
         {
@@ -118,13 +115,13 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
                         this.domain.Deleted += Domain_Deleted;
                         if (this.domain.GetService(typeof(ICremaHost)) is ICremaHost cremaHost)
                         {
-                            this.userID = cremaHost.UserID;
+                            this.UserID = cremaHost.UserID;
                         }
                     });
                 }
             }
 
-            this.userInfos.Clear();
+            this.UserInfos.Clear();
 
             if (this.domain != null)
             {
@@ -139,13 +136,11 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
                 {
                     if (HashUtility.Equals(this.keys, i.DomainLocationInfo.Keys) == true && this.tableName == i.DomainLocationInfo.TableName)
                     {
-                        this.userInfos.Set(i.DomainUserInfo, i.DomainUserState, i.DomainLocationInfo);
+                        this.UserInfos.Set(i.DomainUserInfo, i.DomainUserState, i.DomainLocationInfo);
                     }
                 }
             }
         }
-
-        
 
         protected override void SetDataContext(object item)
         {
@@ -203,11 +198,11 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
                 if (HashUtility.Equals(this.keys, domainLocationInfo.Keys) == true && this.tableName == domainLocationInfo.TableName)
                 {
-                    this.userInfos.Set(domainUserInfo, domainUserState, domainLocationInfo);
+                    this.UserInfos.Set(domainUserInfo, domainUserState, domainLocationInfo);
                 }
                 else
                 {
-                    this.userInfos.Remove(domainUserInfo.UserID);
+                    this.UserInfos.Remove(domainUserInfo.UserID);
                 }
             });
         }
@@ -227,7 +222,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             var domainUserInfo = e.DomainUserInfo;
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.userInfos.Remove(domainUserInfo.UserID);
+                this.UserInfos.Remove(domainUserInfo.UserID);
             });
         }
 
@@ -270,20 +265,10 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
         }
 
-        internal bool IsBeginEnding
-        {
-            get;
-            set;
-        }
+        internal bool IsBeginEnding { get; set; }
 
-        internal DomainDataUserCollection UserInfos
-        {
-            get { return this.userInfos; }
-        }
+        internal DomainDataUserCollection UserInfos { get; } = new DomainDataUserCollection();
 
-        internal string UserID
-        {
-            get { return this.userID; }
-        }
+        internal string UserID { get; private set; }
     }
 }

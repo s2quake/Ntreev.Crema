@@ -108,7 +108,7 @@
     <Compile Include="IBrowserService.cs" />
     <Compile Include="IDifferenceDocumentService.cs" />
     <Compile Include="IPropertyService.cs" />
-    <Compile Include="MenuItems\CompareTableWithOtherDataBaseMenuItem.cs" />
+    <None Include="MenuItems\CompareTableWithOtherDataBaseMenuItem.cs" />
     <Compile Include="MenuItems\CompareTypeWithPrevRevisionMenuItem.cs" />
     <Compile Include="MenuItems\LogInfoViewModelTypeChangesWithLatestRevisionMenuItem.cs" />
     <Compile Include="MenuItems\LogInfoViewModelTypeChangesWithPrevRevisionMenuItem.cs" />

@@ -1,5 +1,6 @@
 ﻿using Ntreev.Crema.Data;
 using Ntreev.Crema.Services;
+using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
@@ -15,9 +16,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly ITableRow row;
         private readonly ColumnInfo columnInfo;
         private readonly TypeInfo typeInfo;
-        private readonly object[] items;
         private object value;
-        
 
         public NewRowItemViewModel(Authentication authentication, ITableRow row, ColumnInfo columnInfo)
         {
@@ -33,9 +32,9 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             this.row = row;
             this.columnInfo = columnInfo;
             this.typeInfo = typeInfo;
-            this.items = typeInfo.Members.Select(item => (object)item).ToArray();
+            this.Items = typeInfo.Members.Select(item => (object)item).ToArray();
             this.value = row[columnInfo.Name];
-            
+
         }
 
         public string DataType => this.columnInfo.DataType;
@@ -57,8 +56,16 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             }
         }
 
-        public object[] Items => this.items;
+        public object[] Items { get; }
 
         public bool IsFlag => this.typeInfo.IsFlag;
+
+        public string Comment => this.columnInfo.Comment;
+
+        public bool IsKey => this.columnInfo.IsKey;
+
+        public bool IsUnique => this.columnInfo.IsUnique;
+
+        public TagInfo Tags => this.columnInfo.DerivedTags;
     }
 }

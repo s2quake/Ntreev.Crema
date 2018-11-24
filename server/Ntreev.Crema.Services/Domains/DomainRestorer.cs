@@ -123,8 +123,7 @@ namespace Ntreev.Crema.Services.Domains
 
         private async Task RestoreDomainAsync()
         {
-            var dummyHost = new DummyDomainHost(this.Domain);
-            this.Domain.Host = dummyHost;
+            this.Domain.Host = new DummyDomainHost(this.Domain);
             this.Domain.Logger.IsEnabled = false;
 
             foreach (var item in this.actionList)
@@ -187,8 +186,7 @@ namespace Ntreev.Crema.Services.Domains
                 finally
                 {
                     this.Domain.DateTimeProvider = null;
-                    // 데이터 베이스 Reset에 의해서 복구가 되었을때 클라이언트에 이벤트 전달 순서가 꼬이는 경우가 생김
-                    Thread.Sleep(1);
+                    await Task.Delay(1);
                 }
             }
 

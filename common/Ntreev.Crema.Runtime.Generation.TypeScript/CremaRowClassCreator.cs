@@ -131,7 +131,7 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
             {
                 var cmm = new CodeMemberMethod();
                 cmm.Attributes = MemberAttributes.FamilyAndAssembly | MemberAttributes.Static;
-                cmm.Name = "Set" + item.TableName;
+                cmm.Name = "set" + item.TableName;
                 cmm.Parameters.Add(tableInfo.GetRowCodeType(), "target");
                 cmm.Parameters.Add(typeof(string), "childName");
                 cmm.Parameters.Add(item.GetRowCodeType(), 1, "childs");

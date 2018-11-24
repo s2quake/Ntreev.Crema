@@ -55,13 +55,8 @@ namespace Ntreev.Crema.ServiceHosts
             this.logService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(ICremaServiceItem.CloseAsync)}");
         }
 
-        protected void InvokeEvent(string userID, string exceptionUserID, Action action)
+        protected void InvokeEvent(Action action)
         {
-            if (userID != null && userID == exceptionUserID)
-                return;
-
-            //CremaService.Dispatcher.InvokeAsync(() =>
-            //{
             try
             {
                 action();
@@ -70,39 +65,6 @@ namespace Ntreev.Crema.ServiceHosts
             {
                 this.logService.Error(e);
             }
-            //});
-        }
-
-        protected void InvokeEvent(string userID, string exceptionUserID, Action action, long id, string name)
-        {
-            if (userID != null && userID == exceptionUserID)
-                return;
-
-            //CremaService.Dispatcher.InvokeAsync(() =>
-            //{
-            try
-            {
-                action();
-                if (name != null)
-                {
-                    if (userID != null)
-                    {
-                        var path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "debug", userID, "ServerServiceLog.txt");
-                        FileUtility.Prepare(path);
-                        File.AppendAllText(path, $"{id}\t{name}{Environment.NewLine}");
-                    }
-                    else
-                    {
-                        //System.Diagnostics.Trace.WriteLine(name);
-                    }
-
-                }
-            }
-            catch (Exception e)
-            {
-                this.logService.Error(e);
-            }
-            //});
         }
 
         protected T Callback { get; private set; }

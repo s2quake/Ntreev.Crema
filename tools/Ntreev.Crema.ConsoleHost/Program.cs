@@ -29,17 +29,24 @@ namespace Ntreev.Crema.ConsoleHost
     {
         static void Main(string[] args)
         {
-            Trace.Listeners.Add(new ConsoleTraceListener());
             var commandContext = Container.Get<CommandContext>();
-
             try
             {
                 commandContext.VerifyName = false;
                 commandContext.Execute(Environment.CommandLine);
             }
+            catch (AggregateException e)
+            {
+                foreach (var item in e.InnerExceptions)
+                {
+                    Console.WriteLine(item);
+                }
+                Environment.Exit(1);
+            }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+                Environment.Exit(1);
             }
         }
     }

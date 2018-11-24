@@ -35,7 +35,6 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
             codeNamespace.Comments.Add(new CodeCommentStatement($"dataBase: {generationInfo.DataBaseName}"));
             codeNamespace.Comments.Add(new CodeCommentStatement($"revision: {generationInfo.Revision}"));
             codeNamespace.Comments.Add(new CodeCommentStatement($"requested revision: {generationInfo.RequestedRevision}"));
-            codeNamespace.Comments.Add(new CodeCommentStatement($"devmode: {generationInfo.IsDevmode}"));
             codeNamespace.Comments.Add(new CodeCommentStatement($"hash value: {generationInfo.TablesHashValue}"));
             codeNamespace.Comments.Add(new CodeCommentStatement($"tags: {generationInfo.Tags}"));
             codeNamespace.Comments.Add(new CodeCommentStatement($"------------------------------------------------------------------------------"));
@@ -238,15 +237,7 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
                 var instance = new CodeObjectCreateExpression(item.GetCodeType(), table);
                 var assignStatement = new CodeAssignStatement(field, instance);
 
-                if (generationInfo.IsDevmode == true)
-                {
-                    var tryStatement = CreateTryCatchStatement(classType, assignStatement, generationInfo);
-                    cc.Statements.Add(tryStatement);
-                }
-                else
-                {
-                    cc.Statements.Add(assignStatement);
-                }
+                cc.Statements.Add(assignStatement);
             }
 
             classType.Members.Add(cc);

@@ -38,7 +38,6 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
             codeNamespace.Comments.Add(new CodeCommentStatement($"dataBase: {generationInfo.DataBaseName}"));
             codeNamespace.Comments.Add(new CodeCommentStatement($"revision: {generationInfo.Revision}"));
             codeNamespace.Comments.Add(new CodeCommentStatement($"requested revision: {generationInfo.RequestedRevision}"));
-            codeNamespace.Comments.Add(new CodeCommentStatement($"devmode: {generationInfo.IsDevmode}"));
             codeNamespace.Comments.Add(new CodeCommentStatement($"hash value: {generationInfo.TablesHashValue}"));
             codeNamespace.Comments.Add(new CodeCommentStatement($"tags: {generationInfo.Tags}"));
             codeNamespace.Comments.Add(new CodeCommentStatement($"------------------------------------------------------------------------------"));
@@ -153,26 +152,22 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
 
             {
                 var ccs = CreateCompareDataBaseStatement(classType, generationInfo);
-                var tst = CreateTryCatchStatement(classType, ccs, generationInfo.IsDevmode);
-                cmm.Statements.Add(tst);
+                cmm.Statements.Add(ccs);
             }
 
             {
                 var ccs = CreateCompareTypesHashValueStatement(classType, generationInfo);
-                var tst = CreateTryCatchStatement(classType, ccs, generationInfo.IsDevmode);
-                cmm.Statements.Add(tst);
+                cmm.Statements.Add(ccs);
             }
 
             {
                 var ccs = CreateCompareTablesHashValueStatement(classType, generationInfo);
-                var tst = CreateTryCatchStatement(classType, ccs, generationInfo.IsDevmode);
-                cmm.Statements.Add(tst);
+                cmm.Statements.Add(ccs);
             }
 
             {
                 var ccs = CreateCompareRevisionStatement(classType, generationInfo);
-                var tst = CreateTryCatchStatement(classType, ccs, generationInfo.IsDevmode);
-                cmm.Statements.Add(tst);
+                cmm.Statements.Add(ccs);
             }
 
             {
@@ -216,8 +211,7 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
                 var invoke = new CodeMethodInvokeExpression(createFromTable, table);
                 var assignStatement = new CodeAssignStatement(field, invoke);
 
-                var tryStatement = CreateTryCatchStatement(classType, assignStatement, generationInfo.IsDevmode);
-                cmm.Statements.Add(tryStatement);
+                cmm.Statements.Add(assignStatement);
             }
 
             classType.Members.Add(cmm);

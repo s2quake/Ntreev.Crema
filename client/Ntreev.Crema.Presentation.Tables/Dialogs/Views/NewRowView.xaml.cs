@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ntreev.ModernUI.Framework.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,25 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.Views
     /// </summary>
     public partial class NewRowView : UserControl
     {
+        private UIElement firstItem;
+
         public NewRowView()
         {
             InitializeComponent();
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void PropertyItem_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is UIElement element && this.firstItem == null)
+            {
+                this.firstItem = element;
+                this.Dispatcher.InvokeAsync(this.firstItem.Focus);
+            }
         }
     }
 }

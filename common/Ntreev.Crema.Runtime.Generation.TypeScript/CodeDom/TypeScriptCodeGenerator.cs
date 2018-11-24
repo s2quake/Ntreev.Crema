@@ -44,7 +44,7 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript.CodeDom
     class TypeScriptCodeGenerator : System.CodeDom.Compiler.ICodeCompiler, System.CodeDom.Compiler.ICodeGenerator
     {
         //private string regexPattern = "(^[a-zA-Z])|(^_[a-zA-Z])[^A-Z]";
-        private string regexPattern = "(^[A-Z])[^A-Z]";
+        //private string regexPattern = "(^[A-Z])[^A-Z]";
 
         private IndentedTextWriter output;
 
@@ -525,7 +525,7 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript.CodeDom
 
         private void OutputIdentifierAsCamelCase(string ident)
         {
-            ident = Regex.Replace(ident, this.regexPattern, i => i.Value.ToLower());
+            //ident = Regex.Replace(ident, this.regexPattern, i => i.Value.ToLower());
             this.Output.Write(this.CreateEscapedIdentifier(ident));
         }
 

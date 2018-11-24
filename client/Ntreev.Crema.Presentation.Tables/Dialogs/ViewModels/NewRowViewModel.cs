@@ -58,7 +58,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
                     this.items.Add(new NewRowItemViewModel(authentication, row, item));
                 }
             }
-            this.DisplayName = "New Row";
+            this.DisplayName = $"New Row - {tableInfo.Name}";
         }
 
         public static async Task<NewRowViewModel> CreateAsync(Authentication authentication, ITableContent content)

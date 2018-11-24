@@ -67,5 +67,11 @@ namespace Ntreev.Crema.ApplicationHost
         {
             get; set;
         }
+
+        [CommandPropertyArray]
+        public string[] DataBases
+        {
+            get; set;
+        }
     }
 }
