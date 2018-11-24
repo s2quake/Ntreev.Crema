@@ -1,15 +1,18 @@
 $items = @("crema", "cremaconsole", "cremaserver", "cremaserverApp", "cremadev", "cremadevApp")
-$msbuildPath = "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe"
+$msbuildPath = ""
 $deploymentPath = ".\Release"
 
-if (-Not (Test-Path "$msbuildPath")) {
-    foreach ($item in Invoke-Expression ".\vswhere.exe") {
-        if ($item -match "^installationPath: (.+)") {
-            $msbuildPath = Join-Path $Matches[1] "\MSBuild\15.0\Bin\MSBuild.exe"
-            break;
-        }
+foreach ($item in Invoke-Expression ".\vswhere.exe") {
+    if ($item -match "^installationPath: (.+)") {
+        $msbuildPath = Join-Path $Matches[1] "\MSBuild\15.0\Bin\MSBuild.exe"
+        break;
     }
-    $msbuildPath = ""
+}
+
+if ($msbuildPath -eq "") {
+    if (Test-Path "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe") {    
+        $msbuildPath = "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe"
+    }
 }
 
 if ($msbuildPath -eq "") {
