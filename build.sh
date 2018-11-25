@@ -1,7 +1,8 @@
 #!/bin/bash
 items=("cremaconsole" "cremadev" "cremaserver")
-releasePath="../bin/Release"
-deploymentPath="./Release"
+releasePath="./bin/Release"
+deploymentPath="./build"
+solutionPath="./crema.sln"
 
 echo "Delete Release"
 for item in ${items[@]}
@@ -17,7 +18,7 @@ if [ -d $deploymentPath ]; then
 fi
 
 echo "Restore"
-msbuild ../crema.sln -t:Restore -v:q
+msbuild $solutionPath -t:Restore -v:q
 
 if [ ! $? = 0 ]; then
     echo "Restore failed."
@@ -25,7 +26,7 @@ if [ ! $? = 0 ]; then
 fi
 
 echo "Build"
-msbuild ../crema.sln -t:Rebuild -v:q -p:Configuration=Mono
+msbuild $solutionPath -t:Rebuild -v:q -p:Configuration=Mono
 
 if [ ! $? = 0 ]; then
     echo "Build failed."
@@ -37,9 +38,8 @@ mkdir $deploymentPath
 
 for item in ${items[@]}
 do
-    srcPath="../bin/Release/$item"
+    srcPath="$releasePath/$item"
     destPath="$deploymentPath/$item"
     mkdir $destPath
     rsync $srcPath $deploymentPath -v -q --recursive --exclude="*.pdb" --exclude="*.xml"
 done
-#rsync ../bin/Release/cremaconsole/* ./Release/cremaconsole -v --recursive --exclude="*.pdb" --exclude="*.xml"

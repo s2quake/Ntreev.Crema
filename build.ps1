@@ -1,6 +1,8 @@
 $items = @("crema", "cremaconsole", "cremaserver", "cremaserverApp", "cremadev", "cremadevApp")
 $msbuildPath = ""
-$deploymentPath = ".\Release"
+$releasePath = ".\bin\Release"
+$deploymentPath = ".\build"
+$solutionPath = ".\crema.sln"
 
 foreach ($item in Invoke-Expression ".\vswhere.exe") {
     if ($item -match "^installationPath: (.+)") {
@@ -22,7 +24,7 @@ if ($msbuildPath -eq "") {
 
 Write-Host "Delete Release"
 foreach ($item in $items) {
-    $path = Join-Path "..\bin\Release" $item
+    $path = Join-Path "$releasePath" $item
     if (Test-Path "$path") {
         Remove-Item "$path" -Recurse
     }
@@ -33,14 +35,14 @@ if (Test-Path "$deploymentPath") {
 }
 
 Write-Host "Restore"
-Invoke-Expression "&`"$msbuildPath`" `"..\crema.sln`" -t:restore -v:q" 
+Invoke-Expression "&`"$msbuildPath`" `"$solutionPath`" -t:restore -v:q" 
 
 if (-Not $LASTEXITCODE -eq 0) {
     Write-Error "Restore failed." -ErrorAction Stop
 }
 
 Write-Host "Build"
-Invoke-Expression "&`"$msbuildPath`" `"..\crema.sln`" -t:rebuild -v:q -p:Configuration=Release"
+Invoke-Expression "&`"$msbuildPath`" `"$solutionPath`" -t:rebuild -v:q -p:Configuration=Release"
 
 if (-Not $LASTEXITCODE -eq 0) {
     Write-Error "Build failed." -ErrorAction Stop
@@ -48,7 +50,7 @@ if (-Not $LASTEXITCODE -eq 0) {
 
 Write-Host "Copy"
 foreach ($item in $items) {
-    $srcPath = Join-Path "..\bin\Release" $item
+    $srcPath = Join-Path "$releasePath" $item
     $destPath = Join-Path $deploymentPath $item
     Copy-Item "$srcPath" "$destPath" -Recurse -Exclude "*.pdb","*.xml"
 }
