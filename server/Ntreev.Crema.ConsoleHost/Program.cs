@@ -64,6 +64,7 @@ namespace Ntreev.Crema.ConsoleHost
                 using (var application = new CremaApplication())
                 {
                     var configs = application.GetService(typeof(ConsoleConfiguration)) as ConsoleConfiguration;
+                    var configs1= application.GetService(typeof(ConsoleConfiguration)) as ConsoleConfiguration;
                     var commandContext = application.GetService(typeof(CommandContext)) as CommandContext;
 #if DEBUG
                     commandContext.VerifyName = false;

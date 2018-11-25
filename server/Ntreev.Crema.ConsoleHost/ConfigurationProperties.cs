@@ -38,7 +38,7 @@ namespace Ntreev.Crema.ConsoleHost
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;
             this.cremaHost.Closed += CremaHost_Closed;
-            this.properties = new ConfigurationPropertyDescriptorCollection(providers);
+            this.properties = new ConfigurationPropertyDescriptorCollection(providers, typeof(ICremaConfiguration));
             this.disabledProperties = new List<ConfigurationPropertyDescriptor>();
 
             if (this.cremaHost.ServiceState == ServiceState.None)

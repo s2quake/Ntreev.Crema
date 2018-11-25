@@ -31,6 +31,7 @@ namespace Ntreev.Crema.ConsoleHost
 {
     [Export(typeof(IConsoleConfiguration))]
     [Export]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     class ConsoleConfiguration : ConfigurationBase, IConsoleConfiguration
     {
         private readonly string xsdPath;
@@ -39,7 +40,7 @@ namespace Ntreev.Crema.ConsoleHost
 
         [ImportingConstructor]
         public ConsoleConfiguration([ImportMany]IEnumerable<IConfigurationPropertyProvider> propertiesProvider)
-            : base(propertiesProvider)
+            : base(typeof(ICremaConfiguration), propertiesProvider)
         {
             this.xmlPath = AppUtility.GetDocumentFilename("configs") + ".xml";
             this.xsdPath = AppUtility.GetDocumentFilename("configs") + ".xsd";
