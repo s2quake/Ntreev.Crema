@@ -9,8 +9,29 @@
     4. Add codes to read and use (c#, typescript, c++)
     5. Compile and Run
 
-## 문서
-[위키 페이지](https://github.com/NtreevSoft/Crema/wiki)
+# Build
+## Windows
+1. https://visualstudio.microsoft.com/downloads 에서 Visual Studio Community 이상의 버전 설치
+2. 명령 프롬프트에서 `git clone https://github.com/s2quake/Crema.git --recursive` 을(를) 실행
+3. 명령 프롬프트에서 `cd Crema` 을(를) 실행하여 클론된 Crema 경로로 이동
+4. 명령 프롬프트에서 `.\build.bat` 을(를) 실행하여 빌드
+5. build 경로에서 결과물을 확인
+    * crema
+    * cremaconsole
+    * cremadev
+    * cremadevApp
+    * cremaserver
+    * cremaserverApp
+
+## Mac OS
+1. https://visualstudio.microsoft.com/downloads 에서 Visual Studio Community 이상의 버전 설치
+2. 터미널에서 `git clone https://github.com/s2quake/Crema.git --recursive` 을(를) 실행
+3. 터미널에서 `cd Crema` 을(를) 실행하여 클론된 Crema 경로로 이동
+4. 터미널에서 `./build.sh` 을(를) 실행하여 빌드
+5. build 경로에서 결과물을 확인 (Mac OS 에서는 콘솔형태의 프로그램만 사용 가능)
+    * cremaconsole
+    * cremadev
+    * cremaserver
 
 ## 주요 특징
 ### 게임 디자이너
@@ -18,11 +39,13 @@
 * 엑셀 파일 내보내기(export) 및 가져오기(import)
 * 데이터 버전 관리 및 복구
 * 데이터 비교 및 병합
+
 ### 게임 프로그래머
 * 코드 및 바이너리 데이터 생성
    * c#, typescript, c++
 * 쉽고 빠른 데이터 로딩
 * 키 값을 사용한 쉽고 빠른 데이터를 열람
+
 ### 기타
 * javascript 언어를 사용한 자동화 작업
 * 다양한 형태의 내보내기 지원(미포함)
@@ -65,8 +88,8 @@ UI 기반 크레마 클라이언트 프로그램
     cremadev.exe get localhost outputPath --lang cpp
 
 ## Development Environment
-* Microsoft Visual Studio Professional 2017
-* C# 7.0
+* Microsoft Visual Studio Community 2017
+* C# 7.2
 * .NET Framework 4.5
 * WPF(Windows Presentation Foundation)
 * WCF(Windows Communication Foundation)
