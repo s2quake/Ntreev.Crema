@@ -1663,12 +1663,10 @@ namespace Ntreev.Crema.Services.Data
         private IEnumerable<string> GetItemPaths()
         {
             yield return PathUtility.Separator;
-            yield return PathUtility.Separator + CremaSchema.TypeDirectory + PathUtility.Separator;
             foreach (var item in this.TypeContext)
             {
                 yield return PathUtility.Separator + CremaSchema.TypeDirectory + item.Path;
             }
-            yield return PathUtility.Separator + CremaSchema.TableDirectory + PathUtility.Separator;
             foreach (var item in this.TableContext)
             {
                 yield return PathUtility.Separator + CremaSchema.TableDirectory + item.Path;
