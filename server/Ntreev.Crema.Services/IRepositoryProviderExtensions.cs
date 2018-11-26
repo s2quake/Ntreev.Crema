@@ -22,6 +22,7 @@ using System.Text;
 using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Users;
+using Ntreev.Library;
 
 namespace Ntreev.Crema.Services
 {
@@ -29,22 +30,22 @@ namespace Ntreev.Crema.Services
     {
         public static void CreateRepository(this IRepositoryProvider repositoryProvider, Authentication authentication, string basePath, string initPath, string comment)
         {
-            repositoryProvider.CreateRepository(authentication.ID, basePath, initPath, comment, new LogPropertyInfo[] { });
+            repositoryProvider.CreateRepository(authentication.ID, basePath, initPath, comment, new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion });
         }
 
         public static void RenameRepository(this IRepositoryProvider repositoryProvider, Authentication authentication, string basePath, string repositoryName, string newRepositoryName, string comment)
         {
-            repositoryProvider.RenameRepository(authentication.ID, basePath, repositoryName, newRepositoryName, comment, new LogPropertyInfo[] { });
+            repositoryProvider.RenameRepository(authentication.ID, basePath, repositoryName, newRepositoryName, comment, new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion });
         }
 
         public static void CopyRepository(this IRepositoryProvider repositoryProvider, Authentication authentication, string basePath, string repositoryName, string newRepositoryName, string comment)
         {
-            repositoryProvider.CopyRepository(authentication.ID, basePath, repositoryName, newRepositoryName, comment, new LogPropertyInfo[] { });
+            repositoryProvider.CopyRepository(authentication.ID, basePath, repositoryName, newRepositoryName, comment, new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion });
         }
 
         public static void DeleteRepository(this IRepositoryProvider repositoryProvider, Authentication authentication, string basePath, string repositoryName, string comment)
         {
-            repositoryProvider.DeleteRepository(authentication.ID, basePath, repositoryName, comment, new LogPropertyInfo[] { });
+            repositoryProvider.DeleteRepository(authentication.ID, basePath, repositoryName, comment, new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion });
         }
     }
 }

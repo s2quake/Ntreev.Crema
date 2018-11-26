@@ -17,8 +17,10 @@
 
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
+using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Crema.Services.Users;
+using Ntreev.Library;
 using Ntreev.Library.IO;
 using Ntreev.Library.Linq;
 using System;
@@ -65,7 +67,7 @@ namespace Ntreev.Crema.Services
                 var dataSet = new CremaDataSet();
 
                 UserContext.GenerateDefaultUserInfos(usersPath, serializer);
-                repositoryProvider.InitializeRepository(usersRepo, usersPath);
+                repositoryProvider.InitializeRepository(usersRepo, usersPath, new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion });
 
                 dataSet.WriteToDirectory(dataBasesPath);
                 FileUtility.WriteAllText($"{CremaSchema.MajorVersion}.{CremaSchema.MinorVersion}", dataBasesPath, ".version");

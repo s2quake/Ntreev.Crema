@@ -81,7 +81,7 @@ namespace Ntreev.Crema.Repository.Svn
             return new SvnRepository(this, settings.LogService, settings.WorkingPath, settings.TransactionPath, repositoryInfo);
         }
 
-        public void InitializeRepository(string basePath, string initPath)
+        public void InitializeRepository(string basePath, string initPath, params LogPropertyInfo[] properties)
         {
             var baseUri = new Uri(basePath);
             var tempPath = PathUtility.GetTempPath(true);

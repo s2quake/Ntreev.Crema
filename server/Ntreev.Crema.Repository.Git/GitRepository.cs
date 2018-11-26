@@ -250,20 +250,17 @@ namespace Ntreev.Crema.Repository.Git
 
         public void Dispose()
         {
-            //if (this.isModified == true)
+            this.Pull();
+            this.PullNotes();
+            this.Push();
+            try
             {
-                this.Pull();
-                this.Push();
-                try
-                {
-                    this.PushNotes();
-                }
-                catch (Exception e)
-                {
-                    this.logService.Error(e);
-                }
+                this.PushNotes();
             }
-            //DirectoryUtility.Delete(this.repositoryPath);
+            catch (Exception e)
+            {
+                this.logService.Error(e);
+            }
         }
 
         public string Export(Uri uri, string exportPath)
@@ -372,6 +369,24 @@ namespace Ntreev.Crema.Repository.Git
         {
             var pushCommand = new GitCommand(this.repositoryPath, "push");
             pushCommand.Run(this.logService);
+        }
+
+        private void PullNotes()
+        {
+            var fetchCommand = new GitCommand(this.repositoryPath, "fetch")
+            {
+                "origin",
+                "refs/notes/commits:refs/notes/origin/commits",
+            };
+            fetchCommand.Run();
+
+            var mergeCommand = new GitCommand(this.repositoryPath, "notes")
+            {
+                "merge",
+                new GitCommandItem('v'),
+                "origin/commits",
+            };
+            mergeCommand.Run();
         }
 
         private void SetNotes(params LogPropertyInfo[] properties)

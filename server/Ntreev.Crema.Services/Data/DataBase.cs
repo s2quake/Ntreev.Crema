@@ -496,6 +496,7 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var taskID = Guid.NewGuid();
                 await this.DataBaseContext.InvokeDataBaseDeleteAsync(authentication, tuple.DataBaseInfo);
+                await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     base.DataBaseState = DataBaseState.None;

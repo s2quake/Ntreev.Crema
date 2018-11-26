@@ -27,7 +27,7 @@ namespace Ntreev.Crema.Services
 {
     public interface IRepositoryProvider
     {
-        void InitializeRepository(string basePath, string initPath);
+        void InitializeRepository(string basePath, string initPath, params LogPropertyInfo[] properties);
 
         void CreateRepository(string author, string basePath, string initPath, string comment, params LogPropertyInfo[] properties);
 

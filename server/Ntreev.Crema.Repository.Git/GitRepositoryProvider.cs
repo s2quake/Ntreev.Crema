@@ -79,7 +79,7 @@ namespace Ntreev.Crema.Repository.Git
                 var fetchCommand = new GitCommand(settings.WorkingPath, "fetch")
                 {
                     "origin",
-                    "refs/notes/*:refs/notes/*",
+                    "refs/notes/commits:refs/notes/commits",
                 };
                 fetchCommand.Run();
 
@@ -130,6 +130,16 @@ namespace Ntreev.Crema.Repository.Git
 
             var commitCommand = new GitCommitCommand(repositoryPath, author, comment);
             commitCommand.Run();
+
+            var props = properties.Select(item => (GitPropertyValue)item).ToArray();
+            var propText = propertySerializer.Serialize(props);
+            var addNotesCommand = new GitCommand(basePath, "notes")
+            {
+                "add",
+                "head",
+                GitCommandItem.FromMessage(propText)
+            };
+            addNotesCommand.Run();
             this.SetID(repositoryPath, repositoryName, Guid.NewGuid());
             this.SetDescription(repositoryPath, repositoryName, comment);
         }
@@ -331,7 +341,7 @@ namespace Ntreev.Crema.Repository.Git
             return revparseCommand.ReadLine();
         }
 
-        public void InitializeRepository(string basePath, string repositoryPath)
+        public void InitializeRepository(string basePath, string repositoryPath, params LogPropertyInfo[] properties)
         {
             var initCommand = new GitCommand(null, "init")
             {
@@ -361,12 +371,14 @@ namespace Ntreev.Crema.Repository.Git
 
             var commitCommand = new GitCommitCommand(basePath, Environment.UserName, "first commit");
             commitCommand.Run();
+
+            var props = properties.Select(item => (GitPropertyValue)item).ToArray();
+            var propText = propertySerializer.Serialize(props);
             var addNotesCommand = new GitCommand(basePath, "notes")
             {
                 "add",
                 "head",
-                new GitCommandItem("allow-empty"),
-                GitCommandItem.FromMessage("")
+                GitCommandItem.FromMessage(propText)
             };
             addNotesCommand.Run();
 
