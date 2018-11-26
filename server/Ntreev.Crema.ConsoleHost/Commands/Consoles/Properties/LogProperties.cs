@@ -35,7 +35,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles.Properties
 
         public string Name => "log";
 
-        [ConfigurationProperty(ScopeType = typeof(ICremaConfiguration))]
+        [ConfigurationProperty(ScopeType = typeof(IRepositoryConfiguration))]
         [DefaultValue(false)]
         public bool DetailExceptionMessage
         {

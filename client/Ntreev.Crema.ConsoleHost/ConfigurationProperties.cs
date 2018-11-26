@@ -18,6 +18,7 @@
 using Ntreev.Crema.Commands;
 using Ntreev.Crema.Services;
 using Ntreev.Library;
+using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -54,6 +55,10 @@ namespace Ntreev.Crema.ConsoleHost
 
         }
 
+        #region IConfigurationProperties
 
+        IContainer<ConfigurationPropertyDescriptor> IConfigurationProperties.Properties => this.Properties;
+
+        #endregion
     }
 }

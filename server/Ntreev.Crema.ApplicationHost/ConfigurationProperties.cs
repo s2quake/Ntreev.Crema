@@ -1,6 +1,7 @@
 ﻿using Ntreev.Crema.Commands;
 using Ntreev.Crema.Services;
 using Ntreev.Library;
+using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -14,7 +15,6 @@ namespace Ntreev.Crema.ApplicationHost
     class ConfigurationProperties : IConfigurationProperties
     {
         private readonly ICremaHost cremaHost;
-        private readonly ConfigurationPropertyDescriptorCollection properties;
         private readonly List<ConfigurationPropertyDescriptor> disabledProperties;
 
         [ImportingConstructor]
@@ -23,14 +23,14 @@ namespace Ntreev.Crema.ApplicationHost
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;
             this.cremaHost.Closed += CremaHost_Closed;
-            this.properties = new ConfigurationPropertyDescriptorCollection(providers);
+            this.Properties = new ConfigurationPropertyDescriptorCollection(providers);
             this.disabledProperties = new List<ConfigurationPropertyDescriptor>();
 
             if (this.cremaHost.ServiceState == ServiceState.None)
                 this.DetachCremaConfigs();
         }
 
-        public ConfigurationPropertyDescriptorCollection Properties => this.properties;
+        public ConfigurationPropertyDescriptorCollection Properties { get; }
 
         private void CremaHost_Closed(object sender, EventArgs e)
         {
@@ -46,21 +46,27 @@ namespace Ntreev.Crema.ApplicationHost
         {
             foreach (var item in this.disabledProperties)
             {
-                this.properties.Add(item);
+                this.Properties.Add(item);
             }
             this.disabledProperties.Clear();
         }
 
         private void DetachCremaConfigs()
         {
-            foreach (var item in this.properties.ToArray())
+            foreach (var item in this.Properties.ToArray())
             {
-                if (item.ScopeType == typeof(ICremaConfiguration))
+                if (item.ScopeType == typeof(IRepositoryConfiguration))
                 {
-                    this.properties.Remove(item);
+                    this.Properties.Remove(item);
                     this.disabledProperties.Add(item);
                 }
             }
         }
+
+        #region IConfigurationProperties
+
+        IContainer<ConfigurationPropertyDescriptor> IConfigurationProperties.Properties => this.Properties;
+
+        #endregion
     }
 }

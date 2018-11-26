@@ -21,12 +21,12 @@ using System.IO;
 
 namespace Ntreev.Crema.Services
 {
-    public class CremaConfiguration : ConfigurationBase, ICremaConfiguration
+    public class CremaConfiguration : ConfigurationBase, IUserConfiguration
     {
         private readonly string schemaPath;
         private readonly string xmlPath;
         public CremaConfiguration(string path, IEnumerable<IConfigurationPropertyProvider> propertiesProviders)
-            : base(typeof(ICremaConfiguration), propertiesProviders)
+            : base(typeof(IUserConfiguration), propertiesProviders)
         {
             this.xmlPath = path;
             this.schemaPath = Path.ChangeExtension(path, ".xsd");

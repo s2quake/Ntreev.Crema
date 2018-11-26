@@ -42,7 +42,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)EventMessageBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IAccessible.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IAuthenticationProvider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ICremaConfiguration.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICremaHost.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IDataBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IDataBaseContext.cs" />

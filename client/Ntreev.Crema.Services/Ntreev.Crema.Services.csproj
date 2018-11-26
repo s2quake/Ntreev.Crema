@@ -94,6 +94,7 @@
     <Compile Include="Domains\TableContentDomain.cs" />
     <Compile Include="Domains\TypeDomain.cs" />
     <Compile Include="AuthenticationProvider.cs" />
+    <Compile Include="IUserConfiguration.cs" />
     <Compile Include="ResultBaseExtensions.cs" />
     <None Include="ICremaService.cs" />
     <Compile Include="Service References\DataBaseContextService\Reference.cs">

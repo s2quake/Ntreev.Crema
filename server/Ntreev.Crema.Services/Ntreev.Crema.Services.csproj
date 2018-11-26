@@ -71,6 +71,7 @@
     <Compile Include="Domains\Serializations\DomainPostItemSerializationInfo.cs" />
     <Compile Include="Domains\Serializations\DomainPropertySerializationInfo.cs" />
     <Compile Include="Domains\Serializations\DomainSerializationInfo.cs" />
+    <Compile Include="IRepositoryConfiguration.cs" />
     <Compile Include="IRepositoryMigrator.cs" />
     <Compile Include="ObjectSerializerSettings.cs" />
     <Compile Include="LogServiceHost.cs" />
@@ -82,7 +83,7 @@
     <Compile Include="RepositoryPath.cs" />
     <Compile Include="RepositorySettings.cs" />
     <Compile Include="RepositoryInfo.cs" />
-    <Compile Include="CremaConfiguration.cs" />
+    <Compile Include="RepositoryConfiguration.cs" />
     <Compile Include="CremaPath.cs" />
     <Compile Include="CremaSettings.cs" />
     <Compile Include="Data\Serializations\AccessMemberSerializationInfo.cs" />

@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Services
     [InheritedExport(typeof(ICremaHost))]
     class CremaHost : ICremaHost, ILogService, IDisposable
     {
-        private CremaConfiguration configs;
+        private RepositoryConfiguration configs;
         private IPlugin[] plugins;
 
         private readonly IServiceProvider container;
@@ -93,7 +93,7 @@ namespace Ntreev.Crema.Services
                 return this.log != null ? this : null;
             if (serviceType == typeof(IObjectSerializer))
                 return this.Serializer;
-            if (this.ServiceState == ServiceState.Opened && serviceType == typeof(ICremaConfiguration))
+            if (this.ServiceState == ServiceState.Opened && serviceType == typeof(IRepositoryConfiguration))
                 return this.configs;
 
             if (this.container != null)
@@ -139,7 +139,7 @@ namespace Ntreev.Crema.Services
                     this.Info(Resources.Message_ProgramInfo, AppUtility.ProductName, AppUtility.ProductVersion);
                     this.Info("Repository module : {0}", this.settings.RepositoryModule);
                     this.Info(Resources.Message_ServiceStart);
-                    this.configs = new CremaConfiguration(Path.Combine(this.BasePath, "configs"), this.propertiesProviders);
+                    this.configs = new RepositoryConfiguration(Path.Combine(this.BasePath, "configs"), this.propertiesProviders);
                     this.UserContext = new UserContext(this);
                     this.DataBaseContext = new DataBaseContext(this);
                     this.DomainContext = new DomainContext(this);
@@ -588,8 +588,6 @@ namespace Ntreev.Crema.Services
             await this.CloseAsync(CloseReason.None, string.Empty);
             this.token = Guid.Empty;
         }
-
-        ICremaConfiguration ICremaHost.Configs => this.configs;
 
         #endregion
     }

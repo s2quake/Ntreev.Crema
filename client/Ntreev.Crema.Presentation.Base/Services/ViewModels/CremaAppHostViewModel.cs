@@ -593,10 +593,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             }
         }
 
-        public ICremaConfiguration UserConfigs
-        {
-            get { return this.cremaHost.Configs; }
-        }
+        public IUserConfiguration UserConfigs => this.cremaHost.GetService(typeof(IUserConfiguration)) as IUserConfiguration;
 
         public string DisplayName => Resources.Title_Start;
 

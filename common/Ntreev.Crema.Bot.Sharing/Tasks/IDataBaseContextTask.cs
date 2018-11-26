@@ -66,9 +66,6 @@ namespace Ntreev.Crema.Bot.Tasks
             await dataBaseContext.AddNewDataBaseAsync(authentication, dataBaseName, comment);
         }
 
-        [ConfigurationProperty(ScopeType = typeof(ICremaConfiguration))]
-        public bool IsEnabled { get; set; }
-
         #region IConfigurationPropertyProvider
 
         string IConfigurationPropertyProvider.Name => "bot.databaseCollection";

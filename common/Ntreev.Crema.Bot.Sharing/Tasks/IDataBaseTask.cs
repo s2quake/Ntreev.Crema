@@ -127,12 +127,6 @@ namespace Ntreev.Crema.Bot.Tasks
         //    await dataBase.CopyAsync(authentication, dataBaseName, comment, force);
         //}
 
-        [ConfigurationProperty(ScopeType = typeof(ICremaConfiguration))]
-        public bool IsEnabled
-        {
-            get; set;
-        }
-
         #region IConfigurationPropertyProvider
 
         string IConfigurationPropertyProvider.Name => "bot.database";

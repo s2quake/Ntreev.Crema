@@ -40,7 +40,7 @@ namespace Ntreev.Crema.ConsoleHost
 
         [ImportingConstructor]
         public ConsoleConfiguration([ImportMany]IEnumerable<IConfigurationPropertyProvider> propertiesProvider)
-            : base(typeof(ICremaConfiguration), propertiesProvider)
+            : base(propertiesProvider)
         {
             this.xmlPath = AppUtility.GetDocumentFilename("configs") + ".xml";
             this.xsdPath = AppUtility.GetDocumentFilename("configs") + ".xsd";

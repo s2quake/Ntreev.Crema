@@ -105,10 +105,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.Views
 
         }
 
-        private ICremaConfiguration Configs
-        {
-            get { return this.cremaHost.Configs; }
-        }
+        private IUserConfiguration Configs => this.cremaHost.GetService(typeof(IUserConfiguration)) as IUserConfiguration;
 
         private void DataTableControl_Loaded(object sender, RoutedEventArgs e)
         {

@@ -38,6 +38,7 @@ using Ntreev.Crema.Commands.Consoles;
 using Ntreev.Crema.Commands;
 using Newtonsoft.Json.Schema.Generation;
 using Newtonsoft.Json.Schema;
+using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
@@ -145,10 +146,7 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        private ConfigurationPropertyDescriptorCollection Properties
-        {
-            get => this.properties.Value.Properties;
-        }
+        private IContainer<ConfigurationPropertyDescriptor> Properties => this.properties.Value.Properties;
 
         private ConfigurationPropertyDescriptor GetProperty(string propertyName)
         {

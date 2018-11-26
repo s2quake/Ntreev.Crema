@@ -315,7 +315,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             this.UpdateBookmarkItems();
         }
 
-        [ConfigurationProperty(ScopeType = typeof(ICremaConfiguration))]
+        [ConfigurationProperty(ScopeType = typeof(IUserConfiguration))]
         private string[] Settings
         {
             get { return this.GetSettings(); }

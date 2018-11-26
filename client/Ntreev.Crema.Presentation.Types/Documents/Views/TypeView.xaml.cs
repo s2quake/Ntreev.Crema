@@ -159,10 +159,7 @@ namespace Ntreev.Crema.Presentation.Types.Documents.Views
             
         }
 
-        private ICremaConfiguration Configs
-        {
-            get { return this.cremaHost.Configs; }
-        }
+        private IUserConfiguration Configs => this.cremaHost.GetService(typeof(IUserConfiguration)) as IUserConfiguration;
 
         private void SearchBox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {

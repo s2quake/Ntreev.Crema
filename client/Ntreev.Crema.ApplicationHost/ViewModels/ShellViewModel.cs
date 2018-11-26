@@ -65,7 +65,7 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += (s, e) =>
             {
-                this.cremaHost.Configs.Update(this);
+                this.UserConfigs.Update(this);
             };
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += CremaAppHost_Opened;
@@ -202,7 +202,7 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
                     var contentService = this.selectedService as IContentService;
                     //this.ActivateItem(contentService);
                     this.selectedServiceType = contentService.GetType().FullName;
-                    this.cremaHost.Configs.Commit(this);
+                    this.UserConfigs.Commit(this);
                 }
 
                 this.OnServiceChanged(EventArgs.Empty);
@@ -315,5 +315,7 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             get { return this.selectedServiceType; }
             set { this.selectedServiceType = value; }
         }
+
+        private IUserConfiguration UserConfigs => this.cremaHost.GetService(typeof(IUserConfiguration)) as IUserConfiguration;
     }
 }

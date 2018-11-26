@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Library;
+using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 
@@ -23,6 +24,6 @@ namespace Ntreev.Crema.Commands
 {
     public interface IConfigurationProperties
     {
-        ConfigurationPropertyDescriptorCollection Properties { get; }
+        IContainer<ConfigurationPropertyDescriptor> Properties { get; }
     }
 }

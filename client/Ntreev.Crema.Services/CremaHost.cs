@@ -85,7 +85,7 @@ namespace Ntreev.Crema.Services
                 return this.DomainContext.Categories;
             if (serviceType == typeof(ILogService))
                 return this;
-            if (this.ServiceState == ServiceState.Opened && serviceType == typeof(ICremaConfiguration))
+            if (this.ServiceState == ServiceState.Opened && serviceType == typeof(IUserConfiguration))
                 return this.configs;
 
             if (this.container != null)
@@ -601,8 +601,6 @@ namespace Ntreev.Crema.Services
         #region ICremaHost
 
         string ICremaHost.Address => this.Address;
-
-        ICremaConfiguration ICremaHost.Configs => this.configs;
 
         #endregion
     }

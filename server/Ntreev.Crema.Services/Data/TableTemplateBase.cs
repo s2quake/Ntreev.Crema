@@ -390,6 +390,7 @@ namespace Ntreev.Crema.Services.Data
             if (this.domain.Host != null)
             {
                 await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                await this.domain.LeaveAsync(authentication);
                 await this.DomainContext.RemoveAsync(authentication, this.domain, false);
             }
             this.domain = null;
@@ -406,6 +407,7 @@ namespace Ntreev.Crema.Services.Data
             if (this.domain.Host != null)
             {
                 await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
+                await this.domain.LeaveAsync(authentication);
                 await this.DomainContext.RemoveAsync(authentication, this.domain, true);
             }
             this.domain = null;

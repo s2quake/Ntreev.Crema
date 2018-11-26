@@ -345,7 +345,7 @@ namespace Ntreev.Crema.Repository.Git
                 "ignore"
             };
             configCommand.Run();
-
+            
             DirectoryUtility.Copy(repositoryPath, basePath);
             foreach (var item in GetEmptyDirectories(basePath))
             {
@@ -353,18 +353,22 @@ namespace Ntreev.Crema.Repository.Git
             }
 
             var query = from item in DirectoryUtility.GetAllFiles(basePath, "*", true)
-                        select (GitPath)item;
+                        select (GitPath)PathUtility.GetFullPath(item);
             var itemList = query.ToList();
 
             var addCommand = new GitAddCommand(basePath, query.ToArray());
-            //foreach (var item in DirectoryUtility.GetAllFiles(basePath, "*", true))
-            //{
-            //    addCommand.Add((GitPath)item);
-            //}
             addCommand.Run();
 
             var commitCommand = new GitCommitCommand(basePath, Environment.UserName, "first commit");
             commitCommand.Run();
+            var addNotesCommand = new GitCommand(basePath, "notes")
+            {
+                "add",
+                "head",
+                new GitCommandItem("allow-empty"),
+                GitCommandItem.FromMessage("")
+            };
+            addNotesCommand.Run();
 
             this.SetID(basePath, "master", Guid.NewGuid());
         }

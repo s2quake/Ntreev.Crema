@@ -18,7 +18,7 @@ namespace Ntreev.Crema.Repository.Git
 
         }
 
-        [ConfigurationProperty(ScopeType = typeof(ICremaConfiguration))]
+        [ConfigurationProperty(ScopeType = typeof(IRepositoryConfiguration))]
         [DefaultValue(null)]
         [Description("git의 실행 경로를 나타냅니다.")]
         public string ExecutablePath
@@ -31,7 +31,7 @@ namespace Ntreev.Crema.Repository.Git
             }
         }
 
-        [ConfigurationProperty(ScopeType = typeof(ICremaConfiguration))]
+        [ConfigurationProperty(ScopeType = typeof(IRepositoryConfiguration))]
         [DefaultValue(0)]
         [Description("표시될 로그의 최대 개수를 나타냅니다.")]
         public int MaxLogCount

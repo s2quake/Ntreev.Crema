@@ -56,7 +56,7 @@ namespace Ntreev.Crema.Presentation.Framework
 
         IConnectionItem ConnectionItem { get; set; }
 
-        ICremaConfiguration UserConfigs { get; }
+        IUserConfiguration UserConfigs { get; }
 
         event EventHandler Loaded;
 

@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
-    public interface ICremaConfiguration
+    public interface IRepositoryConfiguration
     {
         void Commit(object target);
 
@@ -38,22 +38,7 @@ namespace Ntreev.Crema.Services
 
     public static class ICremaConfigurationExtensions
     {
-        //public static bool TryGetValue<T>(this ICremaConfiguration config, Type section, Type type, string key, out T value)
-        //{
-        //    var configItem = new ConfigurationItem(section.Name, type.FullName, key);
-        //    if (config.Contains(configItem) == true)
-        //    {
-        //        value = (T)config[configItem];
-        //        return true;
-        //    }
-        //    else
-        //    {
-        //        value = default(T);
-        //        return false;
-        //    }
-        //}
-
-        public static bool TryGetValue<T>(this ICremaConfiguration config, Type section, string key, out T value)
+        public static bool TryGetValue<T>(this IRepositoryConfiguration config, Type section, string key, out T value)
         {
             var configItem = new ConfigurationItem(section.Name, key);
             if (config.Contains(configItem) == true)
@@ -82,7 +67,7 @@ namespace Ntreev.Crema.Services
             return false;
         }
 
-        public static void SetValue<T>(this ICremaConfiguration config, Type section, string key, T value)
+        public static void SetValue<T>(this IRepositoryConfiguration config, Type section, string key, T value)
         {
             var configItem = new ConfigurationItem(section.Name, key);
             if (ConfigurationBase.CanSupportType(typeof(T)) == true)

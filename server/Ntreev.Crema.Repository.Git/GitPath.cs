@@ -23,7 +23,6 @@ namespace Ntreev.Crema.Repository.Git
                 this.path = this.path.TrimEnd(Path.DirectorySeparatorChar);
             if (this.path.EndsWith($"{Path.AltDirectorySeparatorChar}") == true)
                 this.path = this.path.TrimEnd(Path.AltDirectorySeparatorChar);
-            this.path = PathUtility.GetFullPath(this.path);
         }
 
         public GitPath(Uri uri)

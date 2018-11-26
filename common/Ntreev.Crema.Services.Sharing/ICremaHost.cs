@@ -69,9 +69,5 @@ namespace Ntreev.Crema.Services
         Task CancelShutdownAsync(Authentication authentication);
 
         ServiceState ServiceState { get; }
-
-        //IDataBaseContext DataBases { get; }
-
-        ICremaConfiguration Configs { get; }
     }
 }

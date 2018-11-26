@@ -177,7 +177,7 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
             return false;
         }
 
-        [ConfigurationProperty(ScopeType = typeof(ICremaConfiguration))]
+        [ConfigurationProperty(ScopeType = typeof(IUserConfiguration))]
         private string[] Settings
         {
             get { return this.GetSettings(); }

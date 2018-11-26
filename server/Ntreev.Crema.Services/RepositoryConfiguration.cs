@@ -22,11 +22,11 @@ using System.IO;
 
 namespace Ntreev.Crema.Services
 {
-    public class CremaConfiguration : ConfigurationBase, ICremaConfiguration
+    public class RepositoryConfiguration : ConfigurationBase, IRepositoryConfiguration
     {
         private readonly string itemName;
-        public CremaConfiguration(string itemName, IEnumerable<IConfigurationPropertyProvider> propertiesProvider)
-            : base(typeof(ICremaConfiguration), propertiesProvider)
+        public RepositoryConfiguration(string itemName, IEnumerable<IConfigurationPropertyProvider> propertiesProvider)
+            : base(typeof(IRepositoryConfiguration), propertiesProvider)
         {
             this.itemName = itemName;
             try
