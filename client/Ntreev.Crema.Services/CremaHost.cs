@@ -46,7 +46,7 @@ namespace Ntreev.Crema.Services
         private readonly CremaSettings settings;
         private readonly List<Authentication> authentications = new List<Authentication>();
 
-        private CremaConfiguration configs;
+        private UserConfiguration configs;
         private IEnumerable<IPlugin> plugins;
 
         private LogService log;
@@ -85,7 +85,7 @@ namespace Ntreev.Crema.Services
                 return this.DomainContext.Categories;
             if (serviceType == typeof(ILogService))
                 return this;
-            if (this.ServiceState == ServiceState.Opened && serviceType == typeof(IUserConfiguration))
+            if (serviceType == typeof(IUserConfiguration))
                 return this.configs;
 
             if (this.container != null)
@@ -156,7 +156,7 @@ namespace Ntreev.Crema.Services
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Authority = this.UserContext.CurrentUser.Authority;
-                    this.configs = new CremaConfiguration(this.ConfigPath, this.propertiesProviders);
+                    this.configs = new UserConfiguration(this.ConfigPath, this.propertiesProviders);
                     this.plugins = (this.container.GetService(typeof(IEnumerable<IPlugin>)) as IEnumerable<IPlugin>).ToArray();
                     foreach (var item in this.plugins)
                     {
@@ -319,22 +319,6 @@ namespace Ntreev.Crema.Services
         {
             authentication.Sign(signatureDate.DateTime);
         }
-
-        //public async Task CloseAsync(CloseInfo closeInfo)
-        //{
-        //    if (this.service == null)
-        //        return;
-        //    if (closeInfo.Reason != CloseReason.Faulted)
-        //        this.service.Unsubscribe();
-        //    await Task.Delay(100);
-        //    if (closeInfo.Reason != CloseReason.Faulted)
-        //        this.service.Close();
-        //    else
-        //        this.service.Abort();
-        //    await this.Dispatcher.DisposeAsync();
-        //    this.service = null;
-        //    this.Dispatcher = null;
-        //}
 
         public async Task<ResultBase<TResult>> InvokeServiceAsync<TResult>(Func<ResultBase<TResult>> func)
         {
@@ -515,25 +499,11 @@ namespace Ntreev.Crema.Services
                 this.ServiceState = ServiceState.Closed;
                 this.token = Guid.Empty;
                 this.OnClosed(new ClosedEventArgs(closeInfo.Reason, closeInfo.Message));
+                this.configs.Commit();
+                this.configs = null;
                 CremaLog.Debug("Crema closed.");
             });
         }
-
-        //private static async Task<IReadOnlyDictionary<string, ServiceInfo>> GetServiceInfoAsync(string address)
-        //{
-        //    var serviceClient = CremaHostServiceFactory.CreateServiceClient(address);
-        //    serviceClient.Open();
-        //    try
-        //    {
-        //        var version = await Task.Run(() => serviceClient.GetVersion());
-        //        var serviceInfos = await Task.Run(() => serviceClient.GetServiceInfos());
-        //        return serviceInfos.ToDictionary(item => item.Name);
-        //    }
-        //    finally
-        //    {
-        //        serviceClient.Close();
-        //    }
-        //}
 
         private string ConfigPath
         {

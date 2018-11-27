@@ -15,13 +15,32 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel;
-using System.Threading.Tasks;
+using Ntreev.Library;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Ntreev.Crema.Services
 {
-    interface ICremaService
+    public class UserConfiguration : ConfigurationBase, IUserConfiguration, IConfigurationCommitter
     {
-        Task CloseAsync(CloseInfo closeInfo);
+        private readonly string schemaPath;
+        private readonly string xmlPath;
+
+        public UserConfiguration(string path, IEnumerable<IConfigurationPropertyProvider> propertiesProviders)
+            : base(typeof(IUserConfiguration), propertiesProviders)
+        {
+            this.xmlPath = path;
+            this.schemaPath = Path.ChangeExtension(path, ".xsd");
+            if (File.Exists(this.xmlPath) == true)
+                this.Read(this.xmlPath);
+        }
+
+        public override string Name => "CremaConfigs";
+
+        public void Commit()
+        {
+            this.WriteSchema(this.schemaPath);
+            this.Write(this.xmlPath);
+        }
     }
 }

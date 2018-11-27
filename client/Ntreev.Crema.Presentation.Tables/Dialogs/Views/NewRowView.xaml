@@ -34,7 +34,7 @@
         </DataTemplate>
 
         <Style x:Key="ItemContainer_Style" TargetType="{x:Type HeaderedContentControl}" BasedOn="{StaticResource PropertyItemsControl_ItemContainerStyle}">
-            <Setter Property="Height" Value="24" />
+            <Setter Property="Height" Value="28" />
             <Setter Property="HeaderTemplate" Value="{StaticResource HeaderedContentControl_HeaderTemplate}" />
         </Style>
 
@@ -92,6 +92,10 @@
 
         <DataTemplate x:Key="System.TimeSpan">
             <nmgc:TimeSpanUpDown InternalValue="{Binding Value}" Loaded="PropertyItem_Loaded" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="System.Guid">
+            <nmfc:GuidControl Value="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="CremaTypeSelector">

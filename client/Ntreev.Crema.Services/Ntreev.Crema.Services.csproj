@@ -57,7 +57,7 @@
   <ItemGroup>
     <Compile Include="AuthenticationToken.cs" />
     <Compile Include="AuthenticatorBase.cs" />
-    <Compile Include="CremaConfiguration.cs" />
+    <Compile Include="UserConfiguration.cs" />
     <Compile Include="CremaBootstrapper.cs" />
     <Compile Include="Authentication.cs" />
     <Compile Include="CremaSettings.cs" />
@@ -96,7 +96,6 @@
     <Compile Include="AuthenticationProvider.cs" />
     <Compile Include="IUserConfiguration.cs" />
     <Compile Include="ResultBaseExtensions.cs" />
-    <None Include="ICremaService.cs" />
     <Compile Include="Service References\DataBaseContextService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

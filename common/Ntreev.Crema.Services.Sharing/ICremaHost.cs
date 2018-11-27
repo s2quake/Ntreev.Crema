@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Services
 
         event EventHandler Disposed;
 
-        void SaveConfigs();
+        //void SaveConfigs();
 
         Task CloseAsync(Guid token);
 

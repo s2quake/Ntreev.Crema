@@ -74,6 +74,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
         private string theme;
         private Authority authority;
         private string address;
+        private IConfigurationCommitter userConfigCommitter;
 
         [Import]
         private Lazy<DataBaseServiceViewModel> dataBaseService = null;
@@ -593,7 +594,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             }
         }
 
-        public IUserConfiguration UserConfigs => this.cremaHost.GetService(typeof(IUserConfiguration)) as IUserConfiguration;
+        public IUserConfiguration UserConfigs { get; private set; }
 
         public string DisplayName => Resources.Title_Start;
 
@@ -663,7 +664,6 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
         private async void CremaHost_Closed(object sender, ClosedEventArgs e)
         {
             this.isOpened = false;
-            Trace.WriteLine("CremaHost_Closed");
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.IsOpened = false;
@@ -682,7 +682,9 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
                 this.address = null;
                 this.Refresh();
                 this.OnClosed(EventArgs.Empty);
-                this.cremaHost.SaveConfigs();
+                this.userConfigCommitter.Commit();
+                this.userConfigCommitter = null;
+                this.UserConfigs = null;
             });
         }
 
@@ -760,6 +762,8 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             this.connectionItem.LastConnectedDateTime = DateTime.Now;
             this.ConnectionItems.Write();
             this.OnOpened(EventArgs.Empty);
+            this.UserConfigs = this.cremaHost.GetService(typeof(IUserConfiguration)) as IUserConfiguration;
+            this.userConfigCommitter = this.cremaHost.GetService(typeof(IUserConfiguration)) as IConfigurationCommitter;
         }
 
         private async Task CloseAsync()
@@ -771,7 +775,9 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             this.IsOpened = false;
             this.Refresh();
             this.OnClosed(EventArgs.Empty);
-            this.cremaHost.SaveConfigs();
+            this.userConfigCommitter.Commit();
+            this.userConfigCommitter = null;
+            this.UserConfigs = null;
         }
 
         private async Task EnterDataBaseAsync(string dataBaseName)
