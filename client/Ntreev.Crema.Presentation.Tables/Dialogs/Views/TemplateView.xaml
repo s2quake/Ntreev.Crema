@@ -168,11 +168,15 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <nmfc:PropertyItemsControl Grid.Row="0">
+        <nmfc:ExpandableToolBar Grid.Row="0">
+            <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/new.png" x:Name="NewColumn" />
+        </nmfc:ExpandableToolBar>
+        <nmfc:PropertyItemsControl Grid.Row="1">
             <TextBox x:Name="TableName" nmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_TableName}" 
                      Text="{Binding TableName, Mode=TwoWay, Delay=100, UpdateSourceTrigger=PropertyChanged}"
                      Style="{StaticResource TableName_TextBox_Style}" Loaded="TextBox_Loaded" Validation.Error="TableName_Error" />
@@ -181,8 +185,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <TextBox nmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_Comment}" 
                      Style="{StaticResource Comment_TextBox_Style}" />
         </nmfc:PropertyItemsControl>
-        <ncpc:CremaTemplateControl Grid.Row="1" Source="{Binding Source}" />
-        <StackPanel x:Name="buttons" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+        <ncpc:CremaTemplateControl Grid.Row="2" Source="{Binding Source}" />
+        <StackPanel x:Name="buttons" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button x:Name="Change" DockPanel.Dock="Right" Style="{StaticResource Change_Button_Style}" />
             <Border Width="4" />
             <Button x:Name="TryClose" DockPanel.Dock="Right" Style="{StaticResource Close_Button_Style}" />

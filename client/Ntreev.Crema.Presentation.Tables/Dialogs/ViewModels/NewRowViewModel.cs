@@ -38,14 +38,23 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly ITableRow row;
         private readonly TableInfo tableInfo;
         private readonly Dictionary<string, TypeInfo> typeInfoByName;
-        private readonly List<NewRowItemViewModel> items = new List<NewRowItemViewModel>();
+        private readonly List<object> items = new List<object>();
+        private readonly ITableContent parentContent;
 
         private NewRowViewModel(Authentication authentication, ITableRow row, TableInfo tableInfo, TypeInfo[] typeInfos)
         {
             this.authentication = authentication;
             this.row = row;
+            this.row.Dispatcher.VerifyAccess();
             this.tableInfo = tableInfo;
             this.typeInfoByName = typeInfos.ToDictionary(item => item.Path);
+            this.parentContent = row.Content.Tables.FirstOrDefault(item => item.Name == tableInfo.ParentName)?.Content;
+
+            if (this.parentContent != null)
+            {
+                this.items.Add(new NewRowParentItemViewModel(authentication, this.row, this.parentContent));
+            }
+
             foreach (var item in this.tableInfo.Columns)
             {
                 if (CremaDataTypeUtility.IsBaseType(item.DataType) == false)
@@ -73,10 +82,10 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
                 return (tableInfo, typeInfos);
             });
             var row = await content.AddNewAsync(authentication, null);
-            return new NewRowViewModel(authentication, row, tuple.tableInfo, tuple.typeInfos);
+            return await row.Dispatcher.InvokeAsync(() => new NewRowViewModel(authentication, row, tuple.tableInfo, tuple.typeInfos));
         }
 
-        public IReadOnlyList<NewRowItemViewModel> Items => this.items;
+        public IReadOnlyList<object> Items => this.items;
 
         public async Task InsertAsync()
         {

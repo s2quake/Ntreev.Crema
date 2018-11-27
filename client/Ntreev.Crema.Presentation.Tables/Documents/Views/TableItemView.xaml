@@ -22,7 +22,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Ntreev.Crema.Presentation.Tables.Documents.Views"
-             xmlns:nmfm="clr-namespace:Ntreev.ModernUI.Framework.Markup;assembly=Ntreev.ModernUI.Framework"
+             xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
              xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Tables.Properties"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="400">
@@ -43,6 +43,14 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
+
+            <Style x:Key="SelectParent_IconButton_Style" TargetType="{x:Type nmfc:IconButton}" BasedOn="{StaticResource ToolBar_IconButton_Style}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding HasParent}" Value="False">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
             
         </ResourceDictionary>
     </UserControl.Resources>
@@ -50,13 +58,19 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Text="{x:Static p:Resources.Message_IsReadOnly}" Style="{StaticResource ReadOnly_TextBlock_Style}" />
 
-        <local:TableSourceControl Grid.Row="1" x:Name="dataTableControl" 
+        <nmfc:ExpandableToolBar Grid.Row="1">
+            <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/new.png" x:Name="NewRow" />
+            <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/parent.png" x:Name="SelectParent" Style="{StaticResource SelectParent_IconButton_Style}" />
+        </nmfc:ExpandableToolBar>
+
+        <local:TableSourceControl Grid.Row="2" x:Name="dataTableControl" 
                                   Loaded="DataTableControl_Loaded"
                                   ReadOnly="{Binding IsReadOnly}"
                                   Source="{Binding Source}" 
@@ -65,7 +79,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                   SelectedColumn="{Binding SelectedColumn, Mode=TwoWay, Delay=100}"
                                   SearchText="{Binding Filter, Mode=TwoWay, Delay=300}"
                                   Domain="{Binding Domain}" />
-        <Border Grid.Row="2" BorderThickness="0 1 0 0" BorderBrush="{DynamicResource ItemBorder}">
+        <Border Grid.Row="3" BorderThickness="0 1 0 0" BorderBrush="{DynamicResource ItemBorder}">
             <TextBox Grid.Row="2" x:Name="currentField" IsReadOnly="True" VerticalScrollBarVisibility="Auto"
                      Foreground="{DynamicResource WindowText}"
                      BorderThickness="0" MaxLines="2" />

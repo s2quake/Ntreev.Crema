@@ -136,12 +136,12 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         public void MoveToWiki()
         {
-            Process.Start("https://github.com/NtreevSoft/Crema/wiki");
+            Process.Start("https://github.com/s2quake/Crema/wiki");
         }
 
         public void ShowHelp()
         {
-            Process.Start("https://github.com/NtreevSoft/Crema/wiki");
+            Process.Start("https://github.com/s2quake/Crema/wiki");
         }
 
         public Task LoginAsync()

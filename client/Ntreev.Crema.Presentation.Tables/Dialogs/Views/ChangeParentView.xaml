@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="Ntreev.Crema.Presentation.Tables.Dialogs.Views.ChangeParentView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Tables.Properties"
+             mc:Ignorable="d" Width="400" MaxHeight="600" >
+
+    <UserControl.Resources>
+
+        <Style x:Key="SelectParent_ListBoxItem_Style" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ListBoxItem_Style}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Tags.Color, Converter={StaticResource IsNotNullConverter}}" Value="True">
+                    <Setter Property="TextElement.Foreground" Value="{Binding Tags.Color}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                    <Setter Property="TextElement.Foreground" Value="{DynamicResource ItemTextDisabled}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+    </UserControl.Resources>
+
+    <StackPanel>
+        <ListBox ItemsSource="{Binding Items}" SelectedValuePath="Value" SelectedItem="{Binding Value}" 
+                 BorderThickness="1" BorderBrush="{DynamicResource InputBorder}"
+                 ItemContainerStyle="{StaticResource SelectParent_ListBoxItem_Style}" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="Change" Content="{x:Static p:Resources.Button_Change}" IsDefault="True" Style="{DynamicResource Dialog_Button_Style}" />
+            <Border Width="4" />
+            <Button x:Name="TryClose" Content="{x:Static p:Resources.Button_Close}" Style="{DynamicResource Dialog_Button_Style}" />
+        </StackPanel>
+    </StackPanel>
+
+</UserControl>

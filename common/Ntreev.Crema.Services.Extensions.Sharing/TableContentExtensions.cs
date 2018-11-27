@@ -23,9 +23,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.Services.Extensions
 {
-    public static class ITableContentExtensions
+    public static class TableContentExtensions
     {
         public static Task<string> GenerateFilterExpressionAsync(this ITableRow tableRow, params string[] columnNames)
         {

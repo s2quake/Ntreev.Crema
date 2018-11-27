@@ -89,6 +89,8 @@
     <Compile Include="BrowserService.cs" />
     <Compile Include="BrowserItems\ViewModels\TableTreeViewItemViewModel.cs" />
     <Compile Include="BrowserItems\ViewModels\TableCategoryTreeViewItemViewModel.cs" />
+    <Compile Include="Dialogs\ViewModels\ChangeParentViewModel.cs" />
+    <Compile Include="Dialogs\ViewModels\NewRowParentItemViewModel.cs" />
     <Compile Include="Dialogs\ViewModels\NewRowItemViewModel.cs" />
     <Compile Include="Dialogs\ViewModels\NewRowViewModel.cs" />
     <Compile Include="Dialogs\ViewModels\NewColumnViewModel.cs" />
@@ -113,6 +115,7 @@
     <Compile Include="Dialogs\ViewModels\RenameCategoryViewModel.cs" />
     <Compile Include="Dialogs\ViewModels\RenameTableViewModel.cs" />
     <Compile Include="BrowserItems\ViewModels\TableBrowserViewModel.cs" />
+    <Compile Include="Dialogs\ViewModels\RowItemByKey.cs" />
     <Compile Include="Dialogs\ViewModels\ViewTemplateViewModel.cs" />
     <Compile Include="Dialogs\ViewModels\TemplateViewModel.cs" />
     <Compile Include="Dialogs\ViewModels\LogViewModel.cs" />
@@ -134,6 +137,9 @@
     </Compile>
     <Compile Include="Dialogs\Views\PreviewTableDocumentView.xaml.cs">
       <DependentUpon>PreviewTableDocumentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Views\ChangeParentView.xaml.cs">
+      <DependentUpon>ChangeParentView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Views\ViewTemplateView.xaml.cs">
       <DependentUpon>ViewTemplateView.xaml</DependentUpon>
@@ -291,6 +297,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Dialogs\Views\ChangeParentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\Views\ViewTemplateView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -423,6 +433,12 @@
     <PackageReference Include="System.ValueTuple">
       <Version>4.5.0</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\new.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\parent.png" />
   </ItemGroup>
   <Import Project="..\..\common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

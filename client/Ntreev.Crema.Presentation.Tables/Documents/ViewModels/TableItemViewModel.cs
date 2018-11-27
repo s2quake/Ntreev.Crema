@@ -17,6 +17,7 @@
 
 using Caliburn.Micro;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using System;
@@ -45,10 +46,6 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             : base(authentication, descriptor, owner)
         {
             this.contentDescriptor = descriptor.ContentDescriptor;
-            //if (this.contentDescriptor.TargetDomain is IDomain domain && domain.Source is CremaDataSet dataSet)
-            //{
-            //    this.dataTable = dataSet.Tables[this.Name];
-            //}
         }
 
         public async Task NewRowAsync()
@@ -57,13 +54,18 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             dialog.ShowDialog();
         }
 
-        //public TableItemViewModel(Authentication authentication, TableDescriptor descriptor, CremaDataSet dataSet, object owner)
-        //    : base(authentication, descriptor, owner)
-        //{
-        //    this.contentDescriptor = descriptor.ContentDescriptor;
-        //    this.dataTable = dataSet.Tables[this.Name];
-        //    this.isReadOnly = true;
-        //}
+        public async Task SelectParentAsync()
+        {
+            var content = this.descriptor.ContentDescriptor.Target as ITableContent;
+            var keysExpression = CremaDataRowUtility.GetKeysExpression(this.SelectedItem);
+            var rows = await content.SelectAsync(this.authentication, keysExpression);
+            var row = rows.FirstOrDefault();
+            if (row == null)
+                return;
+
+            var dialog = await ChangeParentViewModel.CreateAsync(authentication, row);
+            dialog.ShowDialog();
+        }
 
         public override string DisplayName => this.descriptor.TableName;
 
@@ -79,6 +81,8 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             {
                 this.dataTable = value;
                 this.NotifyOfPropertyChange(nameof(this.Source));
+                this.NotifyOfPropertyChange(nameof(this.HasParent));
+                this.NotifyOfPropertyChange(nameof(this.CanSelectParent));
             }
         }
 
@@ -89,6 +93,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             {
                 this.selectedItem = value;
                 this.NotifyOfPropertyChange(nameof(this.SelectedItem));
+                this.NotifyOfPropertyChange(nameof(this.CanSelectParent));
             }
         }
 
@@ -112,6 +117,8 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             }
         }
 
+        public bool HasParent => this.dataTable != null && this.dataTable.ParentName != string.Empty;
+
         public IDomain Domain
         {
             get { return this.domain; }
@@ -121,6 +128,11 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
                 this.NotifyOfPropertyChange(nameof(this.Domain));
                 this.NotifyOfPropertyChange(nameof(this.IsReadOnly));
             }
+        }
+
+        public bool CanSelectParent
+        {
+            get => this.selectedItem != null;
         }
 
         protected override void OnDisposed(EventArgs e)

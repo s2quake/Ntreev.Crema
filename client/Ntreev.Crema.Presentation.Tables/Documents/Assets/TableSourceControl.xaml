@@ -107,7 +107,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     IsAlternatingRowStyleEnabled="False" AllowRowResize="True">
         <xcdg:TableView.FixedHeaders>
             <DataTemplate>
-                <xcdg:HierarchicalGroupByControl/>
+                <xcdg:HierarchicalGroupByControl />
             </DataTemplate>
             <DataTemplate>
                 <local:TableSourceColumnManagerRow />

@@ -398,7 +398,7 @@ namespace Ntreev.Crema.Services.Random
 
             if (parentContent != null && parentContent.Any() == true)
             {
-                relationID = parentContent.Random().RelationID;
+                relationID = parentContent.Random().ID;
             }
 
             var row = await content.AddNewAsync(authentication, relationID);
@@ -550,7 +550,7 @@ namespace Ntreev.Crema.Services.Random
                 var parentRow = parentContent.Random();
                 if (parentRow == null)
                     return null;
-                return await content.AddNewAsync(authentication, parentRow.RelationID);
+                return await content.AddNewAsync(authentication, parentRow.ID);
             }
             return await content.AddNewAsync(authentication, null);
         }

@@ -60,6 +60,11 @@ namespace Ntreev.Crema.Services.Data
             return base.SetFieldAsync(authentication, columnName, value);
         }
 
+        public Task SetParentAsync(Authentication authentication, string parentID)
+        {
+            return base.SetFieldAsync(authentication, CremaSchema.__ParentID__, parentID);
+        }
+
         public object this[string columnName] => base.GetField<object>(columnName);
 
         public TagInfo Tags => (TagInfo)(this.GetField<string>(CremaSchema.Tags));
@@ -74,7 +79,7 @@ namespace Ntreev.Crema.Services.Data
 
         public override CremaHost CremaHost => this.Content.CremaHost;
 
-        public string RelationID
+        public string ID
         {
             get
             {

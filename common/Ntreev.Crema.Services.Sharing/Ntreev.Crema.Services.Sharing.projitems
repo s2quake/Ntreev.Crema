@@ -20,7 +20,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)DomainUserLocationEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DomainUserAddedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ITableContentGroup.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ITableContentExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TaskCompletedEventHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TaskCompletedEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ItemsChangedEventArgs.cs" />

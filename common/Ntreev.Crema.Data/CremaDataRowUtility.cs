@@ -65,7 +65,7 @@ namespace Ntreev.Crema.Data
                 throw new ArgumentException();
 
             var rowView = component as DataRowView;
-            return CremaDataTable.GetTableName(rowView.Row.Table.TableName);
+            return rowView.Row.Table.TableName;
         }
 
         public static object[] GetKeys(object component)
@@ -75,6 +75,15 @@ namespace Ntreev.Crema.Data
 
             var rowView = component as DataRowView;
             return CremaDomainUtility.GetKeys(rowView);
+        }
+
+        public static string GetKeysExpression(object component)
+        {
+            if (component is DataRowView == false)
+                throw new ArgumentException();
+
+            var rowView = component as DataRowView;
+            return CremaDomainUtility.GetKeysExpression(rowView);
         }
 
         public static object[] GetFields(object component)

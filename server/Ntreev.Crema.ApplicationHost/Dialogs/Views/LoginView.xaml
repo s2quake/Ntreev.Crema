@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
              xmlns:p="clr-namespace:Ntreev.Crema.ApplicationHost.Properties"
-             mc:Ignorable="d" Width="250" >
+             mc:Ignorable="d" Width="250">
 
     <StackPanel>
         <nmfc:PropertyItemsControl>

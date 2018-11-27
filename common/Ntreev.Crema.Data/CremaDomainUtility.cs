@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
@@ -211,6 +212,20 @@ namespace Ntreev.Crema.Data
             var table = row.Table;
 
             return (from item in table.PrimaryKey select row[item]).ToArray();
+        }
+
+        public static string GetKeysExpression(DataRowView rowView)
+        {
+            var row = rowView.Row;
+            var table = row.Table;
+
+            var fieldList = new List<object>(table.PrimaryKey.Length);
+            foreach (var item in table.PrimaryKey)
+            {
+                var field = row[item];
+                fieldList.Add(CremaDataExtensions.GenerateFieldExpression(item.ColumnName, field));
+            }
+            return string.Join(" and ", fieldList);
         }
 
         public static object[] GetKeys(this DataRow row)

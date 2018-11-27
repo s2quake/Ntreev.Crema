@@ -187,7 +187,7 @@ namespace Ntreev.Crema.Presentation.Controls
                 try
                 {
 #if DEBUG
-                    this.dataGridControl.Columns.Add(new Column() { FieldName = CremaSchema.Index, ReadOnly = true, Width = 30, });
+                    //this.dataGridControl.Columns.Add(new Column() { FieldName = CremaSchema.Index, ReadOnly = true, Width = 30, });
 #endif
                 }
                 catch
@@ -326,7 +326,7 @@ namespace Ntreev.Crema.Presentation.Controls
 
             var index = 0;
 #if DEBUG
-            this.dataGridControl.Columns[CremaSchema.Index].VisiblePosition = index++;
+            //this.dataGridControl.Columns[CremaSchema.Index].VisiblePosition = index++;
 #endif
             this.dataGridControl.Columns[CremaSchema.Tags].VisiblePosition = index++;
             this.dataGridControl.Columns[CremaSchema.Enable].VisiblePosition = index++;

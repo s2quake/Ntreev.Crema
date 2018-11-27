@@ -209,7 +209,7 @@ namespace Ntreev.Crema.Services.Random
             if (table.Parent != null && parentRow == null)
                 return null;
 
-            var tableRow = await table.Content.AddNewAsync(authentication, parentRow?.RelationID);
+            var tableRow = await table.Content.AddNewAsync(authentication, parentRow?.ID);
             await tableRow.InitializeRandomAsync(authentication);
             await table.Content.EndNewAsync(authentication, tableRow);
             return tableRow;

@@ -30,6 +30,10 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.Views
                         return (DataTemplate)fe.FindResource("CremaTypeSelector");
                     }
                 }
+                else if (item is NewRowParentItemViewModel parentViewModel)
+                {
+                    return (DataTemplate)fe.FindResource("ParentSelector");
+                }
             }
             return base.SelectTemplate(item, container);
         }

@@ -35,6 +35,8 @@ namespace Ntreev.Crema.Services
 
         Task SetFieldAsync(Authentication authentication, string columnName, object field);
 
+        Task SetParentAsync(Authentication authentication, string parentID);
+
         object this[string columnName] { get; }
 
         TagInfo Tags { get; }
@@ -43,7 +45,7 @@ namespace Ntreev.Crema.Services
 
         ITableContent Content { get; }
 
-        string RelationID { get; }
+        string ID { get; }
 
         string ParentID { get; }
     }

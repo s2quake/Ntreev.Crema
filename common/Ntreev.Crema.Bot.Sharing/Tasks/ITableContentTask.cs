@@ -134,7 +134,7 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 if (parent.Content.Any() == false)
                     return null;
-                var relationID = parent.Content.Random().RelationID;
+                var relationID = parent.Content.Random().ID;
                 return await content.AddNewAsync(authentication, relationID);
             }
             return await content.AddNewAsync(authentication, null);

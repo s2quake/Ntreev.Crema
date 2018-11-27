@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DataBaseExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DomainCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DomainUserCollectionExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TableContentExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableCategoryCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableCategoryExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableCollectionExtensions.cs" />

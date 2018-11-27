@@ -34,7 +34,6 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             this.typeInfo = typeInfo;
             this.Items = typeInfo.Members.Select(item => (object)item).ToArray();
             this.value = row[columnInfo.Name];
-
         }
 
         public string DataType => this.columnInfo.DataType;

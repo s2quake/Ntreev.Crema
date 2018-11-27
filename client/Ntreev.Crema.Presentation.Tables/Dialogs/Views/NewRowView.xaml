@@ -34,7 +34,7 @@
         </DataTemplate>
 
         <Style x:Key="ItemContainer_Style" TargetType="{x:Type HeaderedContentControl}" BasedOn="{StaticResource PropertyItemsControl_ItemContainerStyle}">
-            <Setter Property="Height" Value="28" />
+            <Setter Property="Height" Value="26" />
             <Setter Property="HeaderTemplate" Value="{StaticResource HeaderedContentControl_HeaderTemplate}" />
         </Style>
 
@@ -95,7 +95,11 @@
         </DataTemplate>
 
         <DataTemplate x:Key="System.Guid">
-            <nmfc:GuidControl Value="{Binding Value}" Loaded="PropertyItem_Loaded" />
+            <DockPanel>
+                <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/new.png" DockPanel.Dock="Right" Margin="4 0 0 0"
+                                 Command="{x:Static nmfc:GuidControl.NewCommand}" CommandTarget="{Binding ElementName=guidControl}" />
+                <nmfc:GuidControl x:Name="guidControl" Value="{Binding Value}" Loaded="PropertyItem_Loaded"  />
+            </DockPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="CremaTypeSelector">
@@ -112,6 +116,22 @@
                     </Style>
                 </nmfc:FlagControl.Resources>
             </nmfc:FlagControl>
+        </DataTemplate>
+
+        <Style x:Key="ParentSelectorItem_Style" TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Tags.Color, Converter={StaticResource IsNotNullConverter}}" Value="True">
+                    <Setter Property="TextElement.Foreground" Value="{Binding Tags.Color}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                    <Setter Property="TextElement.Foreground" Value="{DynamicResource ItemTextDisabled}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <DataTemplate x:Key="ParentSelector">
+            <ComboBox ItemsSource="{Binding Items}" SelectedItem="{Binding Value}" DisplayMemberPath="Value" Loaded="PropertyItem_Loaded" 
+                      ItemContainerStyle="{StaticResource ParentSelectorItem_Style}" />
         </DataTemplate>
 
     </UserControl.Resources>
