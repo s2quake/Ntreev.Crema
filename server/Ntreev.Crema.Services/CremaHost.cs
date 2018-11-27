@@ -139,7 +139,7 @@ namespace Ntreev.Crema.Services
                     this.Info(Resources.Message_ProgramInfo, AppUtility.ProductName, AppUtility.ProductVersion);
                     this.Info("Repository module : {0}", this.settings.RepositoryModule);
                     this.Info(Resources.Message_ServiceStart);
-                    this.configs = new RepositoryConfiguration(Path.Combine(this.BasePath, "configs"), this.propertiesProviders);
+                    this.configs = new RepositoryConfiguration(this, Path.Combine(this.BasePath, "configs"), this.propertiesProviders);
                     this.UserContext = new UserContext(this);
                     this.DataBaseContext = new DataBaseContext(this);
                     this.DomainContext = new DomainContext(this);
@@ -168,19 +168,6 @@ namespace Ntreev.Crema.Services
                 this.UserContext = null;
                 this.DomainContext = null;
                 this.DataBaseContext = null;
-                this.log.Error(e);
-                throw;
-            }
-        }
-
-        public void SaveConfigs()
-        {
-            try
-            {
-                this.configs.Commit();
-            }
-            catch (Exception e)
-            {
                 this.log.Error(e);
                 throw;
             }
@@ -220,6 +207,7 @@ namespace Ntreev.Crema.Services
                     this.ServiceState = ServiceState.Closed;
                     this.OnClosed(new ClosedEventArgs(reason, message));
                 });
+                this.configs = null;
                 await this.RepositoryDispatcher.DisposeAsync();
                 this.RepositoryDispatcher = null;
                 this.log.Dispose();

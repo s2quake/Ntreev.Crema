@@ -34,6 +34,7 @@ using System.Xml.Serialization;
 using System.ServiceModel;
 using System.Diagnostics;
 using System.Globalization;
+using Ntreev.Library;
 
 namespace Ntreev.Crema.ServiceHosts
 {
@@ -46,6 +47,7 @@ namespace Ntreev.Crema.ServiceHosts
         private readonly IServiceProvider serviceProvider;
         private ICremaHost cremaHost;
         private ILogService logService;
+        private IConfigurationCommitter configCommitter;
         private CremaHostServiceHost cremaHostServiceHost;
         private Guid token;
 
@@ -79,6 +81,7 @@ namespace Ntreev.Crema.ServiceHosts
                 this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
             });
             this.token = await this.cremaHost.OpenAsync();
+            this.configCommitter = this.cremaHost.GetService(typeof(IRepositoryConfiguration)) as IConfigurationCommitter;
             this.cremaHost.Closed += CremaHost_Closed;
             await CremaService.Dispatcher.InvokeAsync(() =>
             {
@@ -109,7 +112,8 @@ namespace Ntreev.Crema.ServiceHosts
                 this.logService.Info(Resources.ServiceStop, nameof(CremaHostServiceHost));
             });
             await this.cremaHost.CloseAsync(this.token);
-            this.cremaHost.SaveConfigs();
+            this.configCommitter.Commit();
+            this.configCommitter = null;
             await CremaService.Dispatcher.InvokeAsync(() =>
             {
                 this.token = Guid.Empty;
@@ -121,8 +125,10 @@ namespace Ntreev.Crema.ServiceHosts
         {
             await this.StopServicesAsync();
             await this.cremaHost.CloseAsync(this.token);
-            this.cremaHost.SaveConfigs();
+            this.configCommitter.Commit();
+            this.configCommitter = null;
             this.token = await this.cremaHost.OpenAsync();
+            this.configCommitter = this.cremaHost.GetService(typeof(IRepositoryConfiguration)) as IConfigurationCommitter;
             await this.StartServicesAsync();
         }
 
@@ -214,7 +220,8 @@ namespace Ntreev.Crema.ServiceHosts
                         this.cremaHostServiceHost.Close();
                         this.cremaHostServiceHost = null;
                         this.logService.Info(Resources.ServiceStop, nameof(CremaHostServiceHost));
-                        this.cremaHost.SaveConfigs();
+                        this.configCommitter.Commit();
+                        this.configCommitter = null;
                         this.token = Guid.Empty;
                         this.ServiceState = ServiceState.Closed;
                         this.OnClosed(e);

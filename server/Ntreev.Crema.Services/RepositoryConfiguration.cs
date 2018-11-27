@@ -22,12 +22,15 @@ using System.IO;
 
 namespace Ntreev.Crema.Services
 {
-    public class RepositoryConfiguration : ConfigurationBase, IRepositoryConfiguration
+    public class RepositoryConfiguration : ConfigurationBase, IRepositoryConfiguration, IConfigurationCommitter
     {
+        private readonly ILogService logService;
         private readonly string itemName;
-        public RepositoryConfiguration(string itemName, IEnumerable<IConfigurationPropertyProvider> propertiesProvider)
+
+        public RepositoryConfiguration(ILogService logService, string itemName, IEnumerable<IConfigurationPropertyProvider> propertiesProvider)
             : base(typeof(IRepositoryConfiguration), propertiesProvider)
         {
+            this.logService = logService;
             this.itemName = itemName;
             try
             {
@@ -47,8 +50,16 @@ namespace Ntreev.Crema.Services
 
         public void Commit()
         {
-            this.WriteSchema(this.itemName + ".xsd");
-            this.Write(this.itemName + ".xml", Path.GetFileName(this.itemName) + ".xsd");
+            try
+            {
+                this.WriteSchema(this.itemName + ".xsd");
+                this.Write(this.itemName + ".xml", Path.GetFileName(this.itemName) + ".xsd");
+            }
+            catch (Exception e)
+            {
+                this.logService.Debug(e);
+                throw;
+            }
         }
     }
 }
