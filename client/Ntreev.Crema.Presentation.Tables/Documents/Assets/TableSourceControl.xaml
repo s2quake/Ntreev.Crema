@@ -113,7 +113,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <local:TableSourceColumnManagerRow />
             </DataTemplate>
             <DataTemplate>
-                <Button Content="추가..." x:Name="NewRow" Focusable="False" cal:Bind.Model="{Binding}" xcdg:TableView.CanScrollHorizontally="False" />
+                <nmgc:ModernInsertionButton x:Name="NewRow" cal:Bind.Model="{Binding}"
+                                            Width="{Binding (xcdg:DataGridControl.DataGridContext).(local:TableSourceColumnManagerRow.ColumnWidth), RelativeSource={RelativeSource Self}}" />
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding Path=ReadOnly, RelativeSource={RelativeSource AncestorType={x:Type xcdg:DataGridControl}}}" Value="True">
                         <Setter TargetName="NewRow" Property="Visibility" Value="Collapsed" />
@@ -121,9 +122,21 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 </DataTemplate.Triggers>
             </DataTemplate>
             <DataTemplate>
-                <Border x:Name="RowSplitter" BorderThickness="0 0 1 1" Height="3" VerticalAlignment="Bottom"
-                        BorderBrush="{DynamicResource DataGridGridLines}" 
-                        xcdg:TableView.CanScrollHorizontally="False" />
+                <Grid xcdg:TableView.CanScrollHorizontally="False" Height="3" VerticalAlignment="Bottom" 
+                      HorizontalAlignment="Left"
+                      Width="{Binding (xcdg:DataGridControl.DataGridContext).(local:TableSourceColumnManagerRow.ColumnWidth), RelativeSource={RelativeSource Self}}"
+                      xcdg:RowSelector.RowSelectorStyle="{DynamicResource DataRowSelector_Style}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <xcdg:HierarchicalGroupLevelIndicatorPane Grid.Column="0" Visibility="Hidden" xcdg:GroupLevelIndicatorPane.ShowIndicators="True" />
+                    <xcdg:GroupLevelIndicatorPane Grid.Column="1" Visibility="Hidden" x:Name="glip" />
+                    <Border Grid.Column="0" Grid.ColumnSpan="3" Height="1" BorderThickness="1 0 1 0" BorderBrush="{DynamicResource DataGridGridLines}" VerticalAlignment="Bottom" />
+                    <Border Grid.Column="3" BorderThickness="0 0 1 1" BorderBrush="{DynamicResource DataGridGridLines}" />
+                </Grid>
             </DataTemplate>
         </xcdg:TableView.FixedHeaders>
     </xcdg:TableView>

@@ -24,12 +24,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:local="clr-namespace:Ntreev.Crema.Presentation.Tables.Documents.Views"
              xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
              xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Tables.Properties"
+             xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="400">
 
     <UserControl.Resources>
         <ResourceDictionary>
-            
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Ntreev.Crema.Presentation.Tables;component/Documents/Assets/TableSourceControl.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -51,7 +51,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-            
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -69,22 +68,23 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/new.png" x:Name="NewRow" />
             <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/parent.png" x:Name="SelectParent" Style="{StaticResource SelectParent_IconButton_Style}" />
         </nmfc:ExpandableToolBar>
-
-        <local:TableSourceControl Grid.Row="2" x:Name="dataTableControl" 
-                                  Loaded="DataTableControl_Loaded"
-                                  ReadOnly="{Binding IsReadOnly}"
-                                  Source="{Binding Source}" 
-                                  SelectedItem="{Binding SelectedItem, Mode=TwoWay, Delay=100}"
-                                  SelectedItemIndex="{Binding SelectedItemIndex, Mode=TwoWay, Delay=100}"
-                                  SelectedColumn="{Binding SelectedColumn, Mode=TwoWay, Delay=100}"
-                                  SearchText="{Binding Filter, Mode=TwoWay, Delay=300}"
-                                  Domain="{Binding Domain}" />
+        <Border Grid.Row="2" BorderThickness="0 1 0 0" BorderBrush="{DynamicResource ItemBorder}">
+            <local:TableSourceControl x:Name="dataTableControl" 
+                                      Loaded="DataTableControl_Loaded"
+                                      ReadOnly="{Binding IsReadOnly}"
+                                      Source="{Binding Source}" 
+                                      SelectedItem="{Binding SelectedItem, Mode=TwoWay, Delay=100}"
+                                      SelectedItemIndex="{Binding SelectedItemIndex, Mode=TwoWay, Delay=100}"
+                                      SelectedColumn="{Binding SelectedColumn, Mode=TwoWay, Delay=100}"
+                                      SearchText="{Binding Filter, Mode=TwoWay, Delay=300}"
+                                      Domain="{Binding Domain}" />
+        </Border>
         <Border Grid.Row="3" BorderThickness="0 1 0 0" BorderBrush="{DynamicResource ItemBorder}">
             <TextBox Grid.Row="2" x:Name="currentField" IsReadOnly="True" VerticalScrollBarVisibility="Auto"
                      Foreground="{DynamicResource WindowText}"
                      BorderThickness="0" MaxLines="2" />
         </Border>
     </Grid>
-    
+
 </UserControl>
 

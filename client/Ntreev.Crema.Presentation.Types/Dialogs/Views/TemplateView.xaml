@@ -50,7 +50,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     <nmgc:ModernColumnManagerRow />
                 </DataTemplate>
                 <DataTemplate>
-                    <Button Content="추가..." x:Name="NewMember" Focusable="False" cal:Bind.Model="{Binding}" xcdg:TableView.CanScrollHorizontally="False" />
+                    <nmgc:ModernInsertionButton x:Name="NewMember" cal:Bind.Model="{Binding}"
+                                                Width="{Binding (xcdg:DataGridControl.DataGridContext).(nmgc:ModernColumnManagerRow.ColumnWidth), RelativeSource={RelativeSource Self}}" />
                     <DataTemplate.Triggers>
                         <DataTrigger Binding="{Binding Path=ReadOnly, RelativeSource={RelativeSource AncestorType={x:Type xcdg:DataGridControl}}}" Value="True">
                             <Setter TargetName="NewMember" Property="Visibility" Value="Collapsed" />
@@ -58,7 +59,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     </DataTemplate.Triggers>
                 </DataTemplate>
                 <DataTemplate>
-                    <Grid xcdg:TableView.CanScrollHorizontally="False" Height="3" VerticalAlignment="Bottom"
+                    <Grid xcdg:TableView.CanScrollHorizontally="False" Height="3" VerticalAlignment="Bottom" 
+                          HorizontalAlignment="Left"
+                          Width="{Binding (xcdg:DataGridControl.DataGridContext).(nmgc:ModernColumnManagerRow.ColumnWidth), RelativeSource={RelativeSource Self}}"
                           xcdg:RowSelector.RowSelectorStyle="{DynamicResource DataRowSelector_Style}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" />
@@ -196,11 +199,15 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <nmfc:PropertyItemsControl Grid.Row="0">
+        <nmfc:ExpandableToolBar Grid.Row="0">
+            <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Types;component/Images/new.png" x:Name="NewMember" />
+        </nmfc:ExpandableToolBar>
+        <nmfc:PropertyItemsControl Grid.Row="1">
             <TextBox x:Name="TypeName" nmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_TypeName}"
                      Text="{Binding TypeName, Mode=TwoWay, Delay=100, UpdateSourceTrigger=PropertyChanged}"
                      Style="{StaticResource TypeName_TextBox_Style}" Validation.Error="TypeName_Error" />
@@ -209,8 +216,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <TextBox nmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_Comment}" 
                      Style="{StaticResource Comment_TextBox_Style}" LostKeyboardFocus="TextBox_LostKeyboardFocus" />
         </nmfc:PropertyItemsControl>
-        <ncpc:CremaDataTypeControl x:Name="typeControl" Grid.Row="1" Source="{Binding Source}" />
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+        <ncpc:CremaDataTypeControl x:Name="typeControl" Grid.Row="2" Source="{Binding Source}" />
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button x:Name="Change" DockPanel.Dock="Right" IsDefault="True" Style="{StaticResource Change_Button_Style}" />
             <Border Width="4" />
             <Button x:Name="TryClose" DockPanel.Dock="Right" IsDefault="True" Style="{StaticResource Close_Button_Style}" />

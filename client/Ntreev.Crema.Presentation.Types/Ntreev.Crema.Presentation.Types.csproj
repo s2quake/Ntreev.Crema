@@ -289,7 +289,6 @@
   <ItemGroup>
     <Folder Include="BrowserItems\Assets\" />
     <Folder Include="Documents\Assets\" />
-    <Folder Include="Images\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Caliburn.Micro">
@@ -301,6 +300,9 @@
     <PackageReference Include="ModernUI.WPF">
       <Version>1.0.9</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\new.png" />
   </ItemGroup>
   <Import Project="..\..\common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
