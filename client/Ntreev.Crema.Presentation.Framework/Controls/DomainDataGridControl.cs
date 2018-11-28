@@ -49,6 +49,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
         private object currentItem;
         private ColumnBase currentColumn;
+        private bool isLocationSending;
 
         public DomainDataGridControl()
         {
@@ -209,9 +210,9 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             base.OnItemsSourceChanged(oldValue, newValue);
         }
 
-        private async void DomainDataGridControl_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void DomainDataGridControl_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            bool isChanged = false;
+            var isChanged = false;
             if (e.PropertyName == nameof(DomainDataGridControl.GlobalCurrentColumn))
             {
                 isChanged = this.currentColumn != this.GlobalCurrentColumn;
@@ -229,21 +230,29 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
             if (isChanged == true)
             {
-                var domain = this.Domain;
-                var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
-                if (this.currentItem != null && this.currentColumn != null)
+                if (this.isLocationSending == false)
                 {
-                    var currentItem = this.currentItem;
-                    var fieldName = this.currentColumn.FieldName;
-                    try
+                    this.isLocationSending = true;
+                    this.Dispatcher.InvokeAsync(async () =>
                     {
-                        await domain.SetLocationAsync(authenticator, currentItem, fieldName);
-                    }
-                    catch { }
-                }
-                else if (this.currentItem == null)
-                {
-                    await domain.SetLocationAsync(authenticator);
+                        var domain = this.Domain;
+                        var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
+                        if (this.currentItem != null && this.currentColumn != null)
+                        {
+                            var currentItem = this.currentItem;
+                            var fieldName = this.currentColumn.FieldName;
+                            try
+                            {
+                                await domain.SetLocationAsync(authenticator, currentItem, fieldName);
+                            }
+                            catch { }
+                        }
+                        else if (this.currentItem == null)
+                        {
+                            await domain.SetLocationAsync(authenticator);
+                        }
+                        this.isLocationSending = false;
+                    });
                 }
             }
         }
