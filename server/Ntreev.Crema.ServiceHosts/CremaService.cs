@@ -148,16 +148,6 @@ namespace Ntreev.Crema.ServiceHosts
 
         public event ClosedEventHandler Closed;
 
-        //public override IEnumerable<Tuple<System.Type, object>> GetParts()
-        //{
-        //    foreach (var item in base.GetParts())
-        //    {
-        //        yield return item;
-        //    }
-        //    yield return new Tuple<Type, object>(typeof(CremaService), this);
-        //    yield return new Tuple<Type, object>(typeof(ICremaService), this);
-        //}
-
         protected virtual void OnOpening(EventArgs e)
         {
             this.Opening?.Invoke(this, e);
@@ -177,13 +167,6 @@ namespace Ntreev.Crema.ServiceHosts
         {
             this.Closed?.Invoke(this, e);
         }
-
-        //protected override void OnDisposed(EventArgs e)
-        //{
-        //    base.OnDisposed(e);
-        //    Dispatcher.Dispose();
-        //    AuthenticationUtility.Dispose();
-        //}
 
         private async void CremaHost_Opened(object sender, EventArgs e)
         {

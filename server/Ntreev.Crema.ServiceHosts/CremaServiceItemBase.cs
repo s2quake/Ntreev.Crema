@@ -100,6 +100,17 @@ namespace Ntreev.Crema.ServiceHosts
         async Task ICremaServiceItem.CloseAsync(bool disconnect)
         {
             await this.OnCloseAsync(disconnect);
+            if (disconnect == true)
+            {
+                if (this.Channel != null)
+                {
+                    this.Channel.Closed -= Channel_Closed;
+                    this.Channel.Faulted -= Channel_Faulted;
+                    this.Channel.Abort();
+                }
+                this.Channel = null;
+                this.Callback = default(T);
+            }
             this.logService.Debug($"{this.GetType().Name}.{nameof(OnCloseAsync)}");
         }
     }

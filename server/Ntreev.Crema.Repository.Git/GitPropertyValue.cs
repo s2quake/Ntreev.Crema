@@ -28,37 +28,9 @@ namespace Ntreev.Crema.Repository.Git
 {
     struct GitPropertyValue
     {
-        //public string Prefix { get; private set; }
-
         public string Key { get; private set; }
 
         public string Value { get; private set; }
-
-        //public static GitPropertyValue Parse(XElement element)
-        //{
-        //    var propName = element.Attribute("name").Value;
-        //    var match = Regex.Match(propName, @"(?<prefix>[^:]+:)(?<key>.+)", RegexOptions.ExplicitCapture);
-        //    var prefix = match.Groups["prefix"].Value.Trim();
-        //    var name = match.Groups["key"].Value.Trim();
-
-        //    var obj = new GitPropertyValue()
-        //    {
-        //        Value = element.Value,
-        //    };
-
-        //    if (prefix == string.Empty)
-        //    {
-        //        obj.Prefix = string.Empty;
-        //        obj.Key = propName;
-        //    }
-        //    else
-        //    {
-        //        obj.Prefix = prefix;
-        //        obj.Key = name;
-        //    }
-
-        //    return obj;
-        //}
 
         public static explicit operator LogPropertyInfo(GitPropertyValue value)
         {

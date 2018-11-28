@@ -47,11 +47,11 @@ namespace Ntreev.Crema.Services
             this.pluginID = GuidUtility.FromName(name);
         }
 
-        public string Name => this.authentication.Name;
+        public string Name => this.authentication?.Name;
 
-        public string ID => this.authentication.ID;
+        public string ID => this.authentication?.ID;
 
-        public Authority Authority => this.authentication.Authority;
+        public Authority Authority => this.authentication != null ? this.authentication.Authority : Authority.None;
 
         public bool IsOpened => this.authentication != null;
 

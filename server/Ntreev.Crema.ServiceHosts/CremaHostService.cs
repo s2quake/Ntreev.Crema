@@ -58,7 +58,6 @@ namespace Ntreev.Crema.ServiceHosts
                 if (clientVersion < serverVersion)
                     throw new ArgumentException(Resources.Exception_LowerVersion, nameof(version));
 
-
                 this.authenticationToken = await this.CremaHost.LoginAsync(userID, ToSecureString(userID, password));
                 this.authentication = await this.CremaHost.AuthenticateAsync(this.authenticationToken);
                 await this.authentication.AddRefAsync(this, (a) => this.CremaHost.LogoutAsync(a));

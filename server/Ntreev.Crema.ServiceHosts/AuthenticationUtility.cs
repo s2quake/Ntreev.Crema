@@ -185,7 +185,11 @@ namespace Ntreev.Crema.ServiceHosts
                 await Task.Delay(1);
                 this.Authentication.Expired -= Authentication_Expired;
                 if (this.ServiceItems.Any() == true)
+                {
                     this.action(this.Authentication);
+                    var items = this.ServiceItems.Select(item => item.CloseAsync(true)).ToArray();
+                    await Task.WhenAll(items);
+                }
             }
 
             public Authentication Authentication { get; }

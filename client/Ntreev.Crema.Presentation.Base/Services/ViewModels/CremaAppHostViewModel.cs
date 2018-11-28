@@ -663,6 +663,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         private async void CremaHost_Closed(object sender, ClosedEventArgs e)
         {
+            this.cremaHost.Closed -= CremaHost_Closed;
             this.isOpened = false;
             await this.Dispatcher.InvokeAsync(() =>
             {

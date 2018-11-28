@@ -294,7 +294,8 @@ namespace Ntreev.Crema.ServiceHosts.Users
             if (this.authentication != null)
             {
                 await this.DetachEventHandlersAsync();
-                await this.CremaHost.LogoutAsync(this.authentication);
+                if (disconnect == false)
+                    await this.CremaHost.LogoutAsync(this.authentication);
                 this.authentication = null;
             }
         }
