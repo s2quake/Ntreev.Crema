@@ -29,13 +29,13 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.ConsoleHost
 {
     [Export(typeof(IConfigurationProperties))]
-    public class ConfigurationProperties : IConfigurationProperties
+    class ConfigurationProperties : IConfigurationProperties
     {
         private readonly ICremaHost cremaHost;
         private readonly ConfigurationPropertyDescriptorCollection properties;
 
         [ImportingConstructor]
-        public ConfigurationProperties(IConsoleConfiguration configs, ICremaHost cremaHost, [ImportMany]IEnumerable<IConfigurationPropertyProvider> providers)
+        public ConfigurationProperties(ICremaHost cremaHost, [ImportMany]IEnumerable<IConfigurationPropertyProvider> providers)
         {
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;

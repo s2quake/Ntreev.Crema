@@ -133,6 +133,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppSettings.cs" />
+    <Compile Include="ConfigurationProperties.cs" />
     <Compile Include="FileExceptionPublisher.cs" />
     <Compile Include="FlashService.cs" />
     <Compile Include="FlashWindowUtility.cs" />

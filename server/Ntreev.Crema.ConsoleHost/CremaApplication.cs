@@ -30,6 +30,7 @@ using System.Reflection;
 using Ntreev.Library.Linq;
 using Ntreev.Library.Commands;
 using Ntreev.Library.IO;
+using Ntreev.Crema.WindowsServiceHost;
 
 namespace Ntreev.Crema.ConsoleHost
 {
@@ -52,6 +53,12 @@ namespace Ntreev.Crema.ConsoleHost
             yield return new Tuple<Type, object>(typeof(CremaService), this.service);
             yield return new Tuple<Type, object>(typeof(ICremaService), this.service);
         }
+
+        public override IEnumerable<Assembly> GetAssemblies()
+        {
+            return EnumerableUtility.Friends(typeof(WindowCremaService).Assembly, base.GetAssemblies());
+        }
+
 
         public int Port
         {

@@ -133,6 +133,10 @@
       <Project>{b7b4c207-7729-4147-96c4-b55e85647a66}</Project>
       <Name>Ntreev.Crema.Services</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Ntreev.Crema.WindowsServiceHost\Ntreev.Crema.WindowsServiceHost.csproj">
+      <Project>{520e5310-f4c2-4369-8a98-d6c74fd7e90d}</Project>
+      <Name>Ntreev.Crema.WindowsServiceHost</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Commands\Consoles\Resources.ko-KR.resx" />

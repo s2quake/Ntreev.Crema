@@ -42,13 +42,6 @@ namespace Ntreev.Crema.WindowsServiceHost
             set;
         }
 
-        //[CommandProperty("repo-name")]
-        //public string RepositoryName
-        //{
-        //    get;
-        //    set;
-        //}
-
         [CommandProperty("repo-module")]
         public string RepositoryModule
         {

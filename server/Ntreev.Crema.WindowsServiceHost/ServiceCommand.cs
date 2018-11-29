@@ -76,7 +76,7 @@ namespace Ntreev.Crema.WindowsServiceHost
         }
 
         [CommandProperty("name")]
-        [DefaultValue("CremaService")]
+        [DefaultValue("Crema")]
         public string ServiceName
         {
             get;
@@ -84,7 +84,7 @@ namespace Ntreev.Crema.WindowsServiceHost
         }
 
         [CommandProperty("display-name")]
-        [DefaultValue("Crema Service")]
+        [DefaultValue("")]
         public string DisplayName
         {
             get;
@@ -97,7 +97,8 @@ namespace Ntreev.Crema.WindowsServiceHost
         {
             var pathArg = string.Format("/PATH={0}", basePath);
             var portArg = string.Format("/PORT={0}", this.Port);
-            var displayNameArg = string.Format("/DisplayName={0}", this.DisplayName);
+            var displayName = this.DisplayName == string.Empty ? $"{this.ServiceName} Service" : this.DisplayName;
+            var displayNameArg = string.Format("/DisplayName={0}", displayName);
             var serviceNameArg = string.Format("/ServiceName={0}", this.ServiceName);
             var comment = string.Format("/Comment={0}", this.Comment);
             var commandLineOptions = new string[] { pathArg, portArg, displayNameArg, serviceNameArg, comment };
@@ -111,7 +112,8 @@ namespace Ntreev.Crema.WindowsServiceHost
         {
             var pathArg = string.Format("/PATH={0}", basePath);
             var portArg = string.Format("/PORT={0}", this.Port);
-            var displayNameArg = string.Format("/DisplayName={0}", this.DisplayName);
+            var displayName = this.DisplayName == string.Empty ? $"{this.ServiceName} Service" : this.DisplayName;
+            var displayNameArg = string.Format("/DisplayName={0}", displayName);
             var serviceNameArg = string.Format("/ServiceName={0}", this.ServiceName);
             var commandLineOptions = new string[] { pathArg, portArg, displayNameArg, serviceNameArg };
             var installer = new AssemblyInstaller(exeFilename, commandLineOptions)

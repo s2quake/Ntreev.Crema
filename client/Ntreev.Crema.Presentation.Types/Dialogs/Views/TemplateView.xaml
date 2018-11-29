@@ -51,7 +51,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 </DataTemplate>
                 <DataTemplate>
                     <nmgc:ModernInsertionButton x:Name="NewMember" cal:Bind.Model="{Binding}"
-                                                Width="{Binding (xcdg:DataGridControl.DataGridContext).(nmgc:ModernColumnManagerRow.ColumnWidth), RelativeSource={RelativeSource Self}}" />
+                                                Width="{Binding Path=(xcdg:DataGridControl.DataGridContext).(nmgc:ModernColumnManagerRow.ColumnWidth), RelativeSource={RelativeSource Self}}" />
                     <DataTemplate.Triggers>
                         <DataTrigger Binding="{Binding Path=ReadOnly, RelativeSource={RelativeSource AncestorType={x:Type xcdg:DataGridControl}}}" Value="True">
                             <Setter TargetName="NewMember" Property="Visibility" Value="Collapsed" />
@@ -61,7 +61,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <DataTemplate>
                     <Grid xcdg:TableView.CanScrollHorizontally="False" Height="3" VerticalAlignment="Bottom" 
                           HorizontalAlignment="Left"
-                          Width="{Binding (xcdg:DataGridControl.DataGridContext).(nmgc:ModernColumnManagerRow.ColumnWidth), RelativeSource={RelativeSource Self}}"
+                          Width="{Binding Path=(xcdg:DataGridControl.DataGridContext).(nmgc:ModernColumnManagerRow.ColumnWidth), RelativeSource={RelativeSource Self}}"
                           xcdg:RowSelector.RowSelectorStyle="{DynamicResource DataRowSelector_Style}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto" />
