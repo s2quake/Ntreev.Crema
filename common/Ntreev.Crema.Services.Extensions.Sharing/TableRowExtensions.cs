@@ -25,8 +25,39 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Extensions
 {
-    public static class TableContentExtensions
+    public static class TableRowExtensions
     {
-        
+        public static Task<string> GenerateFilterExpressionAsync(this ITableRow tableRow, params string[] columnNames)
+        {
+            return tableRow.Dispatcher.InvokeAsync(() =>
+            {
+                var fieldList = new List<object>(columnNames.Length);
+                foreach (var item in columnNames)
+                {
+                    var field = tableRow[item];
+                    fieldList.Add(CremaDataExtensions.GenerateFieldExpression(item, field));
+                }
+                return string.Join(" and ", fieldList);
+            });
+        }
+
+        public static Task<object[]> GetKeysAsync(this ITableRow tableRow)
+        {
+            return tableRow.Dispatcher.InvokeAsync(() =>
+            {
+                var content = tableRow.Content;
+                var table = content.Table;
+                var tableInfo = table.TableInfo;
+                var keyList = new List<object>();
+                foreach (var item in tableInfo.Columns)
+                {
+                    if (item.IsKey == true)
+                    {
+                        keyList.Add(tableRow[item.Name]);
+                    }
+                }
+                return keyList.ToArray();
+            });
+        }
     }
 }

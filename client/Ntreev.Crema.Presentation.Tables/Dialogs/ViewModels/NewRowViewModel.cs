@@ -40,6 +40,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly Dictionary<string, TypeInfo> typeInfoByName;
         private readonly List<object> items = new List<object>();
         private readonly ITableContent parentContent;
+        private object[] keys;
 
         private NewRowViewModel(Authentication authentication, ITableRow row, TableInfo tableInfo, TypeInfo[] typeInfos)
         {
@@ -92,6 +93,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             try
             {
                 await this.row.Content.EndNewAsync(this.authentication, this.row);
+                this.keys = await this.row.GetKeysAsync();
                 this.TryClose(true);
             }
             catch (Exception e)
@@ -99,5 +101,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
                 AppMessageBox.ShowError(e);
             }
         }
+
+        public object[] Keys => this.keys;
     }
 }

@@ -51,7 +51,10 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
         public async Task NewRowAsync()
         {
             var dialog = await NewRowViewModel.CreateAsync(this.authentication, this.descriptor.ContentDescriptor.Target as ITableContent);
-            dialog.ShowDialog();
+            if (dialog.ShowDialog() == true)
+            {
+                this.SelectItem(dialog.Keys);
+            }
         }
 
         public async Task SelectParentAsync()
@@ -69,14 +72,11 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 
         public override string DisplayName => this.descriptor.TableName;
 
-        public bool IsReadOnly
-        {
-            get { return this.domain == null; }
-        }
+        public bool IsReadOnly => this.domain == null;
 
         public CremaDataTable Source
         {
-            get { return this.dataTable; }
+            get => this.dataTable;
             set
             {
                 this.dataTable = value;
@@ -88,7 +88,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 
         public object SelectedItem
         {
-            get { return this.selectedItem; }
+            get => this.selectedItem;
             set
             {
                 this.selectedItem = value;
@@ -99,7 +99,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 
         public int SelectedItemIndex
         {
-            get { return this.selectedIndex; }
+            get => this.selectedIndex;
             set
             {
                 this.selectedIndex = value;
@@ -109,7 +109,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 
         public string SelectedColumn
         {
-            get { return this.selectedColumn; }
+            get => this.selectedColumn;
             set
             {
                 this.selectedColumn = value;
@@ -121,7 +121,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 
         public IDomain Domain
         {
-            get { return this.domain; }
+            get => this.domain;
             set
             {
                 this.domain = value;
@@ -130,10 +130,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             }
         }
 
-        public bool CanSelectParent
-        {
-            get => this.selectedItem != null;
-        }
+        public bool CanSelectParent => this.selectedItem != null;
 
         protected override void OnDisposed(EventArgs e)
         {
@@ -143,6 +140,30 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             this.NotifyOfPropertyChange(nameof(this.Source));
             this.NotifyOfPropertyChange(nameof(this.Domain));
         }
+
+        private void SelectItem(object[] keys)
+        {
+            try
+            {
+                var view = this.dataTable.DefaultView;
+                for (var i = view.Count - 1; i >= 0; i--)
+                {
+                    var item = view[i];
+                    var itemKeys = CremaDataRowUtility.GetKeys(item);
+                    if (itemKeys.SequenceEqual(keys) == true)
+                    {
+                        this.SelectedItem = item;
+                        this.SelectedColumn = null;
+                        break;
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+        }
+
 
         #region ITableDocumentItem
 

@@ -343,10 +343,10 @@ namespace Ntreev.Crema.Presentation.Controls
             this.dataGridControl.Columns[CremaSchema.Creator].VisiblePosition = index++;
             this.dataGridControl.Columns[CremaSchema.CreatedDateTime].VisiblePosition = index++;
 
-            if (this.view != null)
-            {
-                this.view.FixedColumnCount = 2 + this.Source.PrimaryKey.Length;
-            }
+            //if (this.view != null)
+            //{
+            //    this.view.FixedColumnCount = 2 + this.Source.PrimaryKey.Length;
+            //}
 
             this.dataGridControl.PropertyChanged -= DataGridControl_PropertyChanged;
             this.dataGridControl.PropertyChanged += DataGridControl_PropertyChanged;
@@ -456,15 +456,23 @@ namespace Ntreev.Crema.Presentation.Controls
             var self = d as CremaDataTableItemControl;
             var gridControl = self.dataGridControl;
             var columnName = (string)e.NewValue;
-
             var column = gridControl.VisibleColumns.FirstOrDefault(item => item.FieldName == columnName);
-
-            if (column == null)
-                return;
+            //if (column == null)
+            //    return;
 
             if (gridControl.CurrentColumn != column)
             {
-                gridControl.CurrentColumn = column;
+                if (column == null)
+                {
+                    if (gridControl.CurrentItem != null)
+                    {
+                        gridControl.Select(DataGridControl.GetDataGridContext(gridControl), gridControl.CurrentItem);
+                    }
+                }
+                else
+                {
+                    gridControl.CurrentColumn = column;
+                }
             }
         }
 

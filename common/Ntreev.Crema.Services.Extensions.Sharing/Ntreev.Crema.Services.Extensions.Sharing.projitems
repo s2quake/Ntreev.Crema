@@ -19,6 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)TableCategoryExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableCollectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TableRowExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeTemplateExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TableTemplateExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TypeCategoryCollectionExtensions.cs" />

@@ -1046,11 +1046,10 @@ namespace Ntreev.Crema.Data
                 if (long.TryParse(textValue, out long value) == true)
                 {
                     textValue = dataType.ConvertToString(value);
-                    e.ProposedValue = textValue;
-                    return;
                 }
 
                 dataType.ValidateValue(textValue);
+                e.ProposedValue = textValue;
             }
         }
 
