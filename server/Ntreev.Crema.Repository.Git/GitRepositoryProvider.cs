@@ -136,7 +136,6 @@ namespace Ntreev.Crema.Repository.Git
             var addNotesCommand = new GitCommand(basePath, "notes")
             {
                 "add",
-                "head",
                 GitCommandItem.FromMessage(propText)
             };
             addNotesCommand.Run();
