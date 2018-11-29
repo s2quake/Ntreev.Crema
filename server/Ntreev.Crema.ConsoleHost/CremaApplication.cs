@@ -30,7 +30,7 @@ using System.Reflection;
 using Ntreev.Library.Linq;
 using Ntreev.Library.Commands;
 using Ntreev.Library.IO;
-using Ntreev.Crema.WindowsServiceHost;
+using System.IO;
 
 namespace Ntreev.Crema.ConsoleHost
 {
@@ -56,9 +56,18 @@ namespace Ntreev.Crema.ConsoleHost
 
         public override IEnumerable<Assembly> GetAssemblies()
         {
-            return EnumerableUtility.Friends(typeof(WindowCremaService).Assembly, base.GetAssemblies());
+            foreach (var item in base.GetAssemblies())
+            {
+                yield return item;
+            }
+            var assemblies = base.GetAssemblies();
+            var location = typeof(CremaApplication).Assembly.Location;
+            var servicePath = Path.Combine(Path.GetDirectoryName(location), $"cremaservice.exe");
+            if (File.Exists(servicePath) == true)
+            {
+                yield return Assembly.LoadFile(servicePath);
+            }
         }
-
 
         public int Port
         {
