@@ -308,7 +308,7 @@ namespace Ntreev.Crema.Services.Data
                     this.callbackEvent = new IndexedDispatcher(this);
                     await this.Dispatcher.InvokeAsync(() =>
                     {
-                        this.service = DataServiceFactory.CreateServiceClient(this.CremaHost.IPAddress, this.CremaHost.ServiceInfos[nameof(DataBaseService)], this);
+                        this.service = DataServiceFactory.CreateServiceClient(this.CremaHost.IPAddress, this.CremaHost.ServiceInfo.GetServiceItem(nameof(DataBaseService)), this);
                         this.service.Open();
                         if (this.service is ICommunicationObject service)
                         {
@@ -316,7 +316,7 @@ namespace Ntreev.Crema.Services.Data
                         }
                         var result = this.service.Subscribe(this.CremaHost.AuthenticationToken, base.Name);
                         var metaData = result.Value;
-                        this.pingTimer = new PingTimer(this.service.IsAlive);
+                        this.pingTimer = new PingTimer(this.service.IsAlive, this.CremaHost.ServiceInfo.Timeout);
                         this.CremaHost.Sign(authentication, result);
                         this.TypeContext = new TypeContext(this, metaData);
                         this.TableContext = new TableContext(this, metaData);

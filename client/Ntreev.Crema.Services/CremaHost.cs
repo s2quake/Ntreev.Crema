@@ -127,7 +127,7 @@ namespace Ntreev.Crema.Services
 
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var binding = CremaHost.CreateBinding(ServiceInfo.Empty);
+                    var binding = CremaHost.CreateBinding();
                     var endPointAddress = new EndpointAddress($"net.tcp://{AddressUtility.ConnectionAddress(address)}/CremaHostService");
                     var instanceConetxt = new InstanceContext(this);
                     this.service = new CremaHostServiceClient(instanceConetxt, binding, endPointAddress);
@@ -138,12 +138,13 @@ namespace Ntreev.Crema.Services
                         service.Closed += Service_Closed;
                     }
                 });
-                this.ServiceInfos = (await this.InvokeServiceAsync(() => this.service.GetServiceInfos())).Value.ToDictionary(item => item.Name);
+                this.ServiceInfo = (await this.InvokeServiceAsync(() => this.service.GetServiceInfo())).Value;
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     var version = typeof(CremaHost).Assembly.GetName().Version;
                     var result = this.InvokeService(() => this.service.Subscribe(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}"));
-                    this.pingTimer = new PingTimer(this.service.IsAlive);
+                    this.pingTimer = new PingTimer(this.service.IsAlive, this.ServiceInfo.Timeout);
+                    this.pingTimer.Faulted += PingTimer_Faulted;
                     this.AuthenticationToken = result.Value;
                     this.IPAddress = AddressUtility.GetIPAddress(address);
                     this.Address = AddressUtility.GetDisplayAddress(address);
@@ -156,9 +157,9 @@ namespace Ntreev.Crema.Services
                     this.DataBaseContext = new DataBaseContext(this);
                     this.DomainContext = new DomainContext(this);
                 });
-                await this.UserContext.InitializeAsync(this.IPAddress, userID, this.AuthenticationToken, ServiceInfos[nameof(UserContextService)]);
-                await this.DataBaseContext.InitializeAsync(this.IPAddress, this.AuthenticationToken, ServiceInfos[nameof(DataBaseContextService)]);
-                await this.DomainContext.InitializeAsync(this.IPAddress, this.AuthenticationToken, ServiceInfos[nameof(DomainContextService)]);
+                await this.UserContext.InitializeAsync(this.IPAddress, userID, this.AuthenticationToken, this.ServiceInfo.GetServiceItem(nameof(UserContextService)).Port, this.ServiceInfo.Timeout);
+                await this.DataBaseContext.InitializeAsync(this.IPAddress, this.AuthenticationToken, this.ServiceInfo.GetServiceItem(nameof(DataBaseContextService)).Port, this.ServiceInfo.Timeout);
+                await this.DomainContext.InitializeAsync(this.IPAddress, this.AuthenticationToken, this.ServiceInfo.GetServiceItem(nameof(DomainContextService)).Port, this.ServiceInfo.Timeout);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.Authority = this.UserContext.CurrentUser.Authority;
@@ -192,17 +193,7 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        private void Service_Closed(object sender, EventArgs e)
-        {
-            
-        }
-
-        private async void Service_Faulted(object sender, EventArgs e)
-        {
-            await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
-        }
-
-        public void SaveConfigs() 
+        public void SaveConfigs()
         {
             try
             {
@@ -361,7 +352,7 @@ namespace Ntreev.Crema.Services
 
         // mac의 mono 환경에서는 바인딩 값이 서버와 다를 경우 접속이 거부되는 현상이 있음(버그로 추정)
         // binding.SentTimeout 값이 달라도 접속이 안됨.
-        public static Binding CreateBinding(ServiceInfo serviceInfo)
+        public static Binding CreateBinding()
         {
             var binding = new NetTcpBinding();
             binding.Security.Mode = SecurityMode.None;
@@ -370,12 +361,6 @@ namespace Ntreev.Crema.Services
             binding.MaxBufferSize = int.MaxValue;
             binding.MaxReceivedMessageSize = int.MaxValue;
             binding.ReaderQuotas = XmlDictionaryReaderQuotas.Max;
-
-            if (serviceInfo.PlatformID != string.Empty && Enum.TryParse<PlatformID>(serviceInfo.PlatformID, out var platformID) == false)
-            {
-                platformID = (PlatformID)Enum.Parse(typeof(PlatformID), serviceInfo.PlatformID.Replace("DEBUG_", string.Empty));
-            }
-
             return binding;
         }
 
@@ -395,7 +380,7 @@ namespace Ntreev.Crema.Services
 
         public CremaDispatcher Dispatcher { get; private set; }
 
-        public IReadOnlyDictionary<string, ServiceInfo> ServiceInfos { get; private set; }
+        public ServiceInfo ServiceInfo { get; private set; }
 
         public string IPAddress { get; private set; }
 
@@ -456,6 +441,35 @@ namespace Ntreev.Crema.Services
         private void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
         {
 
+        }
+
+        private async void PingTimer_Faulted(object sender, EventArgs e)
+        {
+            try
+            {
+                await this.CloseAsync(new CloseInfo(CloseReason.NoResponding, string.Empty));
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void Service_Closed(object sender, EventArgs e)
+        {
+
+        }
+
+        private async void Service_Faulted(object sender, EventArgs e)
+        {
+            try
+            {
+                await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
+            }
+            catch
+            {
+
+            }
         }
 
         private async Task CloseAsync(CloseInfo closeInfo)

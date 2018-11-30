@@ -30,19 +30,19 @@ namespace Ntreev.Crema.ServiceHosts.Domains
     [Export(typeof(IServiceHostProvider))]
     class DomainContextServiceHostProvider : IServiceHostProvider
     {
-        private readonly ICremaHost cremaHost;
+        private readonly CremaService service;
 
         [ImportingConstructor]
-        public DomainContextServiceHostProvider(ICremaHost cremaHost)
+        public DomainContextServiceHostProvider(CremaService service)
         {
-            this.cremaHost = cremaHost;
+            this.service = service;
         }
 
         public string Name => nameof(DomainContextService);
 
         public ServiceHost CreateInstance(int port)
         {
-            return new DomainContextServiceHost(this.cremaHost, port);
+            return new DomainContextServiceHost(this.service, port);
         }
     }
 }

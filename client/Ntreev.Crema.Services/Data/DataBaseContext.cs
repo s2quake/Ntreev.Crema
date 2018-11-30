@@ -72,12 +72,12 @@ namespace Ntreev.Crema.Services.Data
             return this.taskEvent.WaitAsync(taskID);
         }
 
-        public async Task InitializeAsync(string address, Guid authenticationToken, ServiceInfo serviceInfo)
+        public async Task InitializeAsync(string address, Guid authenticationToken, int port, int timeout)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                var binding = CremaHost.CreateBinding(serviceInfo);
-                var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/DataBaseContextService");
+                var binding = CremaHost.CreateBinding();
+                var endPointAddress = new EndpointAddress($"net.tcp://{address}:{port}/DataBaseContextService");
                 var instanceContext = new InstanceContext(this);
                 this.service = new DataBaseContextServiceClient(instanceContext, binding, endPointAddress);
                 this.service.Open();
@@ -88,7 +88,7 @@ namespace Ntreev.Crema.Services.Data
 
                 var result = this.service.Subscribe(authenticationToken);
                 var metaData = result.Value;
-                this.pingTimer = new PingTimer(this.service.IsAlive);
+                this.pingTimer = new PingTimer(this.service.IsAlive, timeout);
                 this.Initialize(metaData);
             });
         }

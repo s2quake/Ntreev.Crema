@@ -43,8 +43,8 @@ namespace Ntreev.Crema.ServiceHosts
         public const string Namespace = "http://www.ntreev.com";
         private const string cremaString = "Crema";
         private readonly List<ServiceHost> hosts = new List<ServiceHost>();
-        private readonly List<ServiceInfo> serviceInfos = new List<ServiceInfo>();
         private readonly IServiceProvider serviceProvider;
+        private ServiceInfo serviceInfo;
         private ICremaHost cremaHost;
         private ILogService logService;
         private IConfigurationCommitter configCommitter;
@@ -84,7 +84,7 @@ namespace Ntreev.Crema.ServiceHosts
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.logService = this.cremaHost.GetService(typeof(ILogService)) as ILogService;
-                this.cremaHostServiceHost = new CremaHostServiceHost(this.cremaHost, this, this.Port);
+                this.cremaHostServiceHost = new CremaHostServiceHost(this, this.Port);
                 this.cremaHostServiceHost.Open();
                 this.logService.Info(Resources.ServiceStart, nameof(CremaHostServiceHost));
             });
@@ -132,7 +132,9 @@ namespace Ntreev.Crema.ServiceHosts
 
         public int Port { get; set; } = AddressUtility.DefaultPort;
 
-        public ServiceInfo[] ServiceInfos => this.serviceInfos.ToArray();
+        public int Timeout { get; set; } = 60000;
+
+        public ServiceInfo ServiceInfo => this.serviceInfo;
 
         public CremaDispatcher Dispatcher { get; private set; }
 
@@ -221,32 +223,29 @@ namespace Ntreev.Crema.ServiceHosts
             {
                 var providers = this.GetService(typeof(IEnumerable<IServiceHostProvider>)) as IEnumerable<IServiceHostProvider>;
                 var items = providers.TopologicalSort().ToArray();
-                var port = this.Port;
-                var version = new Version(FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).ProductVersion);
+                this.serviceInfo.Port = this.Port;
+                this.serviceInfo.Timeout = this.Timeout;
+                this.serviceInfo.Version = $"{new Version(FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).ProductVersion)}";
+                this.serviceInfo.PlatformID = $"{Environment.OSVersion.Platform}";
+                this.serviceInfo.Culture = $"{CultureInfo.CurrentCulture}";
 
-                if (Environment.OSVersion.Platform == PlatformID.Unix)
-                    port += 2;
+                var serviceItemList = new List<ServiceItemInfo>(items.Length);
+                var port = this.Port;
                 foreach (var item in items)
                 {
                     var host = item.CreateInstance(port);
                     host.Open();
                     this.hosts.Add(host);
                     this.logService.Info(Resources.ServiceStart_Port, host.GetType().Name, port);
-                    this.serviceInfos.Add(new ServiceInfo()
+                    serviceItemList.Add(new ServiceItemInfo()
                     {
                         Name = item.Name,
                         Port = port,
-#if DEBUG
-                        PlatformID = $"DEBUG_{Environment.OSVersion.Platform}",
-#else
-                        PlatformID = $"{Environment.OSVersion.Platform}",
-#endif
-                        Version = $"{version}",
-                        Culture = $"{CultureInfo.CurrentCulture}"
                     });
                     if (Environment.OSVersion.Platform == PlatformID.Unix)
                         port++;
                 }
+                this.serviceInfo.ServiceItems = serviceItemList.ToArray();
                 this.logService.Info(Resources.ServiceStart, cremaString);
             });
         }
@@ -265,7 +264,7 @@ namespace Ntreev.Crema.ServiceHosts
                 }
 
                 this.hosts.Clear();
-                this.serviceInfos.Clear();
+                this.serviceInfo = ServiceInfo.Empty;
                 this.logService.Info(Resources.ServiceStop, cremaString);
             });
         }

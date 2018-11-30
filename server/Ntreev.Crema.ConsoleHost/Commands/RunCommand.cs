@@ -74,6 +74,18 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             set;
         }
 
+        [CommandProperty("timeout")]
+#if DEBUG
+        [DefaultValue(-1)]
+#else
+        [DefaultValue(60000)]
+#endif
+        public int Timeout
+        {
+            get;
+            set;
+        }
+
         [CommandProperty("repo-module")]
         public string RepositoryModule
         {
@@ -173,6 +185,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             this.application.ValidationMode = this.ValidationMode;
 #endif
             this.application.Port = this.Port;
+            this.application.Timeout = this.Timeout;
             await this.application.OpenAsync();
             this.application.Closed += Application_Closed;
             Console.Title = $"{this.application.BasePath} --port {this.application.Port}";

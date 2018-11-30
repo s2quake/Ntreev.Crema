@@ -33,10 +33,10 @@ namespace Ntreev.Crema.ServiceModel
     public struct ServiceInfo
     {
         [DataMember]
-        public string Name { get; set; }
+        public int Port { get; set; }
 
         [DataMember]
-        public int Port { get; set; }
+        public int Timeout { get; set; }
 
         [DataMember]
         public string PlatformID { get; set; }
@@ -47,12 +47,26 @@ namespace Ntreev.Crema.ServiceModel
         [DataMember]
         public string Culture { get; set; }
 
+        [DataMember]
+        public ServiceItemInfo[] ServiceItems { get; set; }
+
         public readonly static ServiceInfo Empty = new ServiceInfo()
         {
-            Name = string.Empty,
             PlatformID = string.Empty,
             Version = string.Empty,
-            Culture = string.Empty
+            Culture = string.Empty,
+            Timeout = -1,
+            ServiceItems = new ServiceItemInfo[] { },
         };
+
+        internal ServiceItemInfo GetServiceItem(string name)
+        {
+            foreach (var item in this.ServiceItems)
+            {
+                if (item.Name == name)
+                    return item;
+            }
+            return ServiceItemInfo.Empty;
+        }
     }
 }

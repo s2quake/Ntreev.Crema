@@ -37,21 +37,23 @@ namespace Ntreev.Crema.ConsoleHost
     class CremaApplication : CremaBootstrapper
     {
         private readonly CremaService service;
+
         public CremaApplication()
         {
-            this.service = new CremaService(this);
+            this.service = this.GetService(typeof(CremaService)) as CremaService;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
         public override IEnumerable<Tuple<System.Type, object>> GetParts()
         {
+            var service = new CremaService(this);
             foreach (var item in base.GetParts())
             {
                 yield return item;
             }
             yield return new Tuple<Type, object>(typeof(CremaApplication), this);
-            yield return new Tuple<Type, object>(typeof(CremaService), this.service);
-            yield return new Tuple<Type, object>(typeof(ICremaService), this.service);
+            yield return new Tuple<Type, object>(typeof(CremaService), service);
+            yield return new Tuple<Type, object>(typeof(ICremaService), service);
         }
 
         public override IEnumerable<Assembly> GetAssemblies()
@@ -73,6 +75,12 @@ namespace Ntreev.Crema.ConsoleHost
         {
             get => this.service.Port;
             set => this.service.Port = value;
+        }
+
+        public int Timeout
+        {
+            get => this.service.Timeout;
+            set => this.service.Timeout = value;
         }
 
         public Task OpenAsync()

@@ -25,15 +25,11 @@ namespace Ntreev.Crema.Services.Data
 {
     class DataServiceFactory
     {
-        public static DataBaseServiceClient CreateServiceClient(string address, ServiceInfo serviceInfo, IDataBaseServiceCallback dataServiceCallback)
+        public static DataBaseServiceClient CreateServiceClient(string address, ServiceItemInfo serviceItemInfo, IDataBaseServiceCallback dataServiceCallback)
         {
-            var binding = CremaHost.CreateBinding(serviceInfo);
-
-            var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/DataBaseService");
+            var binding = CremaHost.CreateBinding();
+            var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceItemInfo.Port}/DataBaseService");
             var instanceContext = new InstanceContext(dataServiceCallback);
-            //if (Environment.OSVersion.Platform != PlatformID.Unix)
-            //    instanceContext.SynchronizationContext = SynchronizationContext.Current;
-
             var serviceClient = new DataBaseServiceClient(instanceContext, binding, endPointAddress);
             return serviceClient;
         }

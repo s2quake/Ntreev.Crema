@@ -44,7 +44,7 @@ namespace Ntreev.Crema.ServiceHosts
         ResultBase<DataBaseInfo[]> GetDataBaseInfos();
 
         [OperationContract]
-        ResultBase<ServiceInfo[]> GetServiceInfos();
+        ResultBase<ServiceInfo> GetServiceInfo();
 
         [OperationContract]
         ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message);

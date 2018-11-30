@@ -31,15 +31,11 @@ using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.ServiceHosts.Users
 {
-    [Export(typeof(CremaServiceItemHost))]
     class UserContextServiceHost : CremaServiceItemHost
     {
-        private readonly CremaService cremaService;
-
-        public UserContextServiceHost(ICremaHost cremaHost, int port, CremaService cremaService)
-            : base(cremaHost, typeof(UserContextService), $"net.tcp://localhost:{port}/{nameof(UserContextService)}", port)
+        public UserContextServiceHost(CremaService service, int port)
+            : base(service, typeof(UserContextService), $"net.tcp://localhost:{port}/{nameof(UserContextService)}", port)
         {
-            this.cremaService = cremaService;
             this.AddServiceEndpoint(typeof(IUserContextService), CreateBinding(), string.Empty);
             this.Description.Behaviors.Add(new InstanceProviderBehavior());
 
@@ -54,7 +50,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         public override object CreateInstance(Message message)
         {
-            return new UserContextService(this.CremaHost);
+            return new UserContextService(this.Service);
         }
     }
 }

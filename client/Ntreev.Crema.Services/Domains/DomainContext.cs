@@ -62,12 +62,12 @@ namespace Ntreev.Crema.Services.Domains
             this.callbackEvent = new IndexedDispatcher(this);
         }
 
-        public async Task InitializeAsync(string address, Guid authenticationToken, ServiceInfo serviceInfo)
+        public async Task InitializeAsync(string address, Guid authenticationToken, int port, int timeout)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                var binding = CremaHost.CreateBinding(serviceInfo);
-                var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/DomainContextService");
+                var binding = CremaHost.CreateBinding();
+                var endPointAddress = new EndpointAddress($"net.tcp://{address}:{port}/DomainContextService");
                 var instanceContext = new InstanceContext(this);
                 this.service = new DomainContextServiceClient(instanceContext, binding, endPointAddress);
                 this.service.Open();
@@ -77,8 +77,8 @@ namespace Ntreev.Crema.Services.Domains
                 }
 
                 var result = this.service.Subscribe(authenticationToken);
-                this.pingTimer = new PingTimer(this.service.IsAlive);
                 var metaData = result.Value;
+                this.pingTimer = new PingTimer(this.service.IsAlive, timeout);
                 this.metaData = metaData;
                 this.Initialize(metaData);
                 this.CremaHost.DataBaseContext.Dispatcher.Invoke(() =>
@@ -129,20 +129,6 @@ namespace Ntreev.Crema.Services.Domains
         public async Task DeleteAsync(Authentication authentication, Domain domain)
         {
             await this.deletionEvent.WaitAsync(domain.ID);
-            //if (domain.Host == null)
-            //{
-
-            //}
-            //else
-            //{
-            //    await this.Dispatcher.InvokeAsync(() =>
-            //    {
-            //        this.Domains.Remove(domain);
-            //        domain.Dispose(authentication, isCanceled);
-            //        this.Domains.InvokeDomainDeletedEvent(authentication, new Domain[] { domain }, new bool[] { isCanceled });
-            //        this.deletionEvent.Set(domain.ID);
-            //    });
-            //}
         }
 
         public async Task CloseAsync(CloseInfo closeInfo)

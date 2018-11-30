@@ -31,13 +31,11 @@ namespace Ntreev.Crema.ServiceHosts.Users
     [Order(0)]
     class UserContextServiceHostProvider : IServiceHostProvider
     {
-        private readonly ICremaHost cremaHost;
         private readonly CremaService cremaService;
 
         [ImportingConstructor]
-        public UserContextServiceHostProvider(ICremaHost cremaHost, CremaService cremaService)
+        public UserContextServiceHostProvider(CremaService cremaService)
         {
-            this.cremaHost = cremaHost;
             this.cremaService = cremaService;
         }
 
@@ -45,7 +43,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         public ServiceHost CreateInstance(int port)
         {
-            return new UserContextServiceHost(this.cremaHost, port, this.cremaService);
+            return new UserContextServiceHost(this.cremaService, port);
         }
     }
 }

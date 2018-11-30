@@ -28,7 +28,6 @@ namespace Ntreev.Crema.ServiceHosts
 {
     static class AuthenticationUtility
     {
-        private readonly static TimeSpan pingTimeout = new TimeSpan(0, 1, 0);
         private readonly static double pingInternal = 30000;
         private readonly static Dictionary<Authentication, Description> authentications = new Dictionary<Authentication, Description>();
         private readonly static List<CremaService> referenceList = new List<CremaService>();
@@ -66,21 +65,19 @@ namespace Ntreev.Crema.ServiceHosts
                 {
                     throw new ArgumentException(nameof(authentication));
                 }
-
                 var description = authentications[authentication];
                 description.ServiceItems.Add(obj);
-
                 return description.ServiceItems.Count;
             });
         }
 
-        public static Task<int> AddRefAsync(this Authentication authentication, ICremaServiceItem obj, Action<Authentication> action)
+        public static Task<int> AddRefAsync(this Authentication authentication, ICremaServiceItem obj, int timeout, Action<Authentication> action)
         {
             return Dispatcher.InvokeAsync(() =>
             {
                 if (authentications.ContainsKey(authentication) == false)
                 {
-                    authentications[authentication] = new Description(authentication, action);
+                    authentications[authentication] = new Description(authentication, timeout, action);
                 }
                 var description = authentications[authentication];
                 description.ServiceItems.Add(obj);
@@ -124,7 +121,7 @@ namespace Ntreev.Crema.ServiceHosts
                 {
                     var authentication = item.Key;
                     var description = item.Value;
-                    if (dateTime - description.DateTime > pingTimeout)
+                    if (dateTime - description.DateTime > description.Timeout)
                     {
                         descriptionList.Add(item.Value);
                         authentications.Remove(item.Key);
@@ -146,10 +143,11 @@ namespace Ntreev.Crema.ServiceHosts
         {
             private readonly Action<Authentication> action;
 
-            public Description(Authentication authentication, Action<Authentication> action)
+            public Description(Authentication authentication, int timeout, Action<Authentication> action)
             {
                 this.Authentication = authentication;
                 this.Authentication.Expired += Authentication_Expired;
+                this.Timeout = timeout < 0 ? TimeSpan.MaxValue : TimeSpan.FromSeconds(Math.Max(timeout, 10000));
                 this.action = action;
                 this.DateTime = DateTime.Now;
             }
@@ -185,6 +183,8 @@ namespace Ntreev.Crema.ServiceHosts
             public List<ICremaServiceItem> ServiceItems { get; } = new List<ICremaServiceItem>();
 
             public DateTime DateTime { get; private set; }
+
+            public TimeSpan Timeout { get; }
 
             private async Task AbortServieItemsAsync(bool disconnect)
             {

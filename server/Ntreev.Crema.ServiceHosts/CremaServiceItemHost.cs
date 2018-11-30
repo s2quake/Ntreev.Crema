@@ -36,12 +36,12 @@ namespace Ntreev.Crema.ServiceHosts
         private readonly ILogService logService;
         private readonly int port;
 
-        protected CremaServiceItemHost(ICremaHost cremaHost, Type serviceType, string address, int port)
+        protected CremaServiceItemHost(CremaService service, Type serviceType, string address, int port)
             : base(serviceType, new Uri(string.Format(address, port)))
         {
+            this.Service = service;
             this.serviceName = serviceType.Name;
-            this.CremaHost = cremaHost;
-            this.logService = cremaHost.GetService(typeof(ILogService)) as ILogService;
+            this.logService = this.CremaHost.GetService(typeof(ILogService)) as ILogService;
             this.port = port;
 #if !DEBUG
             this.DefaultInactivityTimeout = new TimeSpan(0, 1, 0);
@@ -50,12 +50,12 @@ namespace Ntreev.Crema.ServiceHosts
 #endif
         }
 
-        protected CremaServiceItemHost(ICremaHost cremaHost, object serviceInstance, string address, int port)
+        protected CremaServiceItemHost(CremaService service, object serviceInstance, string address, int port)
             : base(serviceInstance, new Uri(string.Format(address, port)))
         {
+            this.Service = service;
             this.serviceName = serviceInstance.GetType().Name;
-            this.CremaHost = cremaHost;
-            this.logService = cremaHost.GetService(typeof(ILogService)) as ILogService;
+            this.logService = this.CremaHost.GetService(typeof(ILogService)) as ILogService;
             this.port = port;
 #if !DEBUG
             this.DefaultInactivityTimeout = new TimeSpan(0, 1, 0);
@@ -64,7 +64,9 @@ namespace Ntreev.Crema.ServiceHosts
 #endif
         }
 
-        public ICremaHost CremaHost { get; }
+        public CremaService Service { get; }
+
+        public ICremaHost CremaHost => this.Service.GetService(typeof(ICremaHost)) as ICremaHost;
 
         public abstract object CreateInstance(Message message);
 

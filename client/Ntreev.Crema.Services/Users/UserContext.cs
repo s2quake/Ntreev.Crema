@@ -60,12 +60,12 @@ namespace Ntreev.Crema.Services.Users
             this.callbackEvent = new IndexedDispatcher(this);
         }
 
-        public async Task InitializeAsync(string address, string userID, Guid authenticationToken, ServiceInfo serviceInfo)
+        public async Task InitializeAsync(string address, string userID, Guid authenticationToken, int port, int timeout)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                var binding = CremaHost.CreateBinding(serviceInfo);
-                var endPointAddress = new EndpointAddress($"net.tcp://{address}:{serviceInfo.Port}/UserContextService");
+                var binding = CremaHost.CreateBinding();
+                var endPointAddress = new EndpointAddress($"net.tcp://{address}:{port}/UserContextService");
                 var instanceContext = new InstanceContext(this);
                 this.service = new UserContextServiceClient(instanceContext, binding, endPointAddress);
                 this.service.Open();
@@ -78,7 +78,7 @@ namespace Ntreev.Crema.Services.Users
                 {
                     var result = this.CremaHost.InvokeService(() => this.service.Subscribe(authenticationToken));
                     var metaData = result.Value;
-                    this.pingTimer = new PingTimer(this.service.IsAlive);
+                    this.pingTimer = new PingTimer(this.service.IsAlive, timeout);
                     foreach (var item in metaData.Categories)
                     {
                         if (item == this.Root.Path)

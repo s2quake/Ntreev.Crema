@@ -157,11 +157,11 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="TagInfo" nillable="true" type="tns:TagInfo" />
-  <xs:complexType name="ResultBaseOfArrayOfServiceInfoq8erDhHE">
+  <xs:complexType name="ResultBaseOfServiceInfoq8erDhHE">
     <xs:annotation>
       <xs:appinfo>
         <GenericType Name="ResultBaseOf{0}{#}" Namespace="http://schemas.ntreev.com" xmlns="http://schemas.microsoft.com/2003/10/Serialization/">
-          <GenericParameter Name="ArrayOfServiceInfo" Namespace="http://schemas.ntreev.com">
+          <GenericParameter Name="ServiceInfo" Namespace="http://schemas.ntreev.com">
           </GenericParameter>
         </GenericType>
         <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
@@ -171,16 +171,10 @@
       <xs:element minOccurs="0" name="Fault" nillable="true" type="tns:CremaFault" />
       <xs:element minOccurs="0" name="SignatureDate" type="tns:SignatureDate" />
       <xs:element minOccurs="0" name="TaskID" type="ser:guid" />
-      <xs:element minOccurs="0" name="Value" nillable="true" type="tns:ArrayOfServiceInfo" />
+      <xs:element minOccurs="0" name="Value" type="tns:ServiceInfo" />
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="ResultBaseOfArrayOfServiceInfoq8erDhHE" nillable="true" type="tns:ResultBaseOfArrayOfServiceInfoq8erDhHE" />
-  <xs:complexType name="ArrayOfServiceInfo">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="ServiceInfo" type="tns:ServiceInfo" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfServiceInfo" nillable="true" type="tns:ArrayOfServiceInfo" />
+  <xs:element name="ResultBaseOfServiceInfoq8erDhHE" nillable="true" type="tns:ResultBaseOfServiceInfoq8erDhHE" />
   <xs:complexType name="ServiceInfo">
     <xs:annotation>
       <xs:appinfo>
@@ -189,13 +183,32 @@
     </xs:annotation>
     <xs:sequence>
       <xs:element minOccurs="0" name="Culture" nillable="true" type="xs:string" />
-      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="PingTimeout" type="xs:int" />
       <xs:element minOccurs="0" name="PlatformID" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="Port" type="xs:int" />
+      <xs:element minOccurs="0" name="ServiceItems" nillable="true" type="tns:ArrayOfServiceItemInfo" />
       <xs:element minOccurs="0" name="Version" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ServiceInfo" nillable="true" type="tns:ServiceInfo" />
+  <xs:complexType name="ArrayOfServiceItemInfo">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ServiceItemInfo" type="tns:ServiceItemInfo" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfServiceItemInfo" nillable="true" type="tns:ArrayOfServiceItemInfo" />
+  <xs:complexType name="ServiceItemInfo">
+    <xs:annotation>
+      <xs:appinfo>
+        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Port" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ServiceItemInfo" nillable="true" type="tns:ServiceItemInfo" />
   <xs:simpleType name="ShutdownType">
     <xs:list>
       <xs:simpleType>

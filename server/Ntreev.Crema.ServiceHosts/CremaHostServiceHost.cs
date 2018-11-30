@@ -32,8 +32,8 @@ namespace Ntreev.Crema.ServiceHosts
     {
         private readonly CremaService service;
 
-        public CremaHostServiceHost(ICremaHost cremaHost, CremaService service, int port)
-            : base(cremaHost, typeof(CremaHostService), $"net.tcp://localhost:{port}/{nameof(CremaHostService)}", port)
+        public CremaHostServiceHost(CremaService service, int port)
+            : base(service, typeof(CremaHostService), $"net.tcp://localhost:{port}/{nameof(CremaHostService)}", port)
         {
             this.service = service;
             this.AddServiceEndpoint(typeof(ICremaHostService), CremaServiceItemHost.CreateBinding(), string.Empty);
@@ -50,7 +50,7 @@ namespace Ntreev.Crema.ServiceHosts
 
         public override object CreateInstance(Message message)
         {
-            return new CremaHostService(this.service, this.CremaHost);
+            return new CremaHostService(this.Service);
         }
     }
 }

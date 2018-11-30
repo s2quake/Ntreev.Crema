@@ -42,14 +42,12 @@ namespace Ntreev.Crema.ServiceHosts.Data
         private string dataBaseName;
         private long index = 0;
 
-        public DataBaseService(ICremaHost cremaHost)
-            : base(cremaHost)
+        public DataBaseService(CremaService service)
+            : base(service)
         {
-            this.CremaHost = cremaHost;
-            this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;
-            this.UserContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            this.DomainContext = cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
-            this.DataBasesContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+            this.UserContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            this.DomainContext = this.CremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
+            this.DataBasesContext = this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
 
             this.LogService.Debug($"{nameof(DataBaseService)} Constructor");
         }
@@ -929,10 +927,6 @@ namespace Ntreev.Crema.ServiceHosts.Data
             await this.authentication.PingAsync();
             return true;
         }
-
-        public ICremaHost CremaHost { get; }
-
-        public ILogService LogService { get; }
 
         public IDomainContext DomainContext { get; }
 

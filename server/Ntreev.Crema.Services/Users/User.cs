@@ -136,9 +136,8 @@ namespace Ntreev.Crema.Services.Users
                     var taskID = GuidUtility.FromName(this.ID);
                     if (this.Authentication != null)
                     {
-                        var message = "다른 기기에서 동일한 아이디로 접속하였습니다.";
-                        var closeInfo = new CloseInfo(CloseReason.Reconnected, message);
-                        this.Authentication.InvokeExpiredEvent(this.ID, message);
+                        var closeInfo = new CloseInfo(CloseReason.Reconnected, string.Empty);
+                        this.Authentication.InvokeExpiredEvent(this.ID, string.Empty);
                         this.Container.InvokeUsersLoggedOutEvent(this.Authentication, users, closeInfo);
                     }
                     this.Authentication = authentication;

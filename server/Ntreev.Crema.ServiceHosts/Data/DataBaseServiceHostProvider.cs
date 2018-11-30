@@ -31,19 +31,19 @@ namespace Ntreev.Crema.ServiceHosts.Data
     [Dependency(typeof(DataBaseContextServiceHostProvider))]
     class DataBaseServiceHostProvider : IServiceHostProvider
     {
-        private readonly ICremaHost cremaHost;
+        private readonly CremaService service;
 
         [ImportingConstructor]
-        public DataBaseServiceHostProvider(ICremaHost cremaHost)
+        public DataBaseServiceHostProvider(CremaService service)
         {
-            this.cremaHost = cremaHost;
+            this.service = service;
         }
 
         public string Name => nameof(DataBaseService);
 
         public ServiceHost CreateInstance(int port)
         {
-            return new DataBaseServiceHost(this.cremaHost, port);
+            return new DataBaseServiceHost(this.service, port);
         }
     }
 }

@@ -40,12 +40,10 @@ namespace Ntreev.Crema.ServiceHosts.Users
         private Authentication authentication;
         private long index = 0;
 
-        public UserContextService(ICremaHost cremaHost)
-            : base(cremaHost)
+        public UserContextService(CremaService service)
+            : base(service)
         {
-            this.CremaHost = cremaHost;
-            this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;
-            this.UserContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            this.UserContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
             this.LogService.Debug($"{nameof(UserContextService)} Constructor");
         }
 
@@ -282,10 +280,6 @@ namespace Ntreev.Crema.ServiceHosts.Users
             await this.authentication.PingAsync();
             return true;
         }
-
-        public ICremaHost CremaHost { get; }
-
-        public ILogService LogService { get; }
 
         public IUserContext UserContext { get; set; }
 

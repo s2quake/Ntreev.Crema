@@ -28,15 +28,14 @@ namespace Ntreev.Crema.ServiceHosts
 {
     public abstract class CremaServiceItemBase<T> : ICremaServiceItem, IDisposable
     {
-        private readonly ICremaHost cremaHost;
-        private readonly ILogService logService;
         private readonly string sessionID;
         private ServiceHostBase host;
 
-        protected CremaServiceItemBase(ICremaHost cremaHost)
+        protected CremaServiceItemBase(CremaService service)
         {
-            this.cremaHost = cremaHost;
-            this.logService = cremaHost.GetService(typeof(ILogService)) as ILogService;
+            this.Service = service;
+            this.CremaHost = this.Service.GetService(typeof(ICremaHost)) as ICremaHost;
+            this.LogService = this.CremaHost.GetService(typeof(ILogService)) as ILogService;
             OperationContext.Current.Host.Closing += Host_Closing;
             OperationContext.Current.Channel.Faulted += Channel_Faulted;
             OperationContext.Current.Channel.Closed += Channel_Closed;
@@ -52,7 +51,7 @@ namespace Ntreev.Crema.ServiceHosts
             this.host = null;
             this.Channel = null;
             this.Callback = default(T);
-            this.logService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(ICremaServiceItem.CloseAsync)}");
+            this.LogService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(ICremaServiceItem.CloseAsync)}");
         }
 
         protected void InvokeEvent(Action action)
@@ -63,7 +62,7 @@ namespace Ntreev.Crema.ServiceHosts
             }
             catch (Exception e)
             {
-                this.logService.Error(e);
+                this.LogService.Error(e);
             }
         }
 
@@ -74,6 +73,12 @@ namespace Ntreev.Crema.ServiceHosts
         protected abstract void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo);
 
         protected string OwnerID { get; set; }
+
+        protected CremaService Service { get; }
+
+        protected ICremaHost CremaHost { get; }
+
+        protected ILogService LogService { get; }
 
         private void Host_Closing(object sender, EventArgs e)
         {
@@ -111,7 +116,7 @@ namespace Ntreev.Crema.ServiceHosts
                 this.Channel = null;
                 this.Callback = default(T);
             }
-            this.logService.Debug($"{this.GetType().Name}.{nameof(OnCloseAsync)}");
+            this.LogService.Debug($"{this.GetType().Name}.{nameof(OnCloseAsync)}");
         }
 
         #region ICremaServiceItem

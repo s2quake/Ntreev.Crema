@@ -30,11 +30,10 @@ using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.ServiceHosts.Domains
 {
-    [Export(typeof(CremaServiceItemHost))]
     class DomainContextServiceHost : CremaServiceItemHost
     {
-        public DomainContextServiceHost(ICremaHost cremaHost, int port)
-            : base(cremaHost, typeof(DomainContextService), $"net.tcp://localhost:{port}/{nameof(DomainContextService)}", port)
+        public DomainContextServiceHost(CremaService service, int port)
+            : base(service, typeof(DomainContextService), $"net.tcp://localhost:{port}/{nameof(DomainContextService)}", port)
         {
             var binding = CreateBinding();
 
@@ -52,7 +51,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
 
         public override object CreateInstance(Message message)
         {
-            return new DomainContextService(this.CremaHost);
+            return new DomainContextService(this.Service);
         }
     }
 }

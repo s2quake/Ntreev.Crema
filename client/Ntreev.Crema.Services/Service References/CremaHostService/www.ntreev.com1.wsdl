@@ -38,11 +38,11 @@
   <wsdl:message name="ICremaHostService_GetDataBaseInfos_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetDataBaseInfosResponse" />
   </wsdl:message>
-  <wsdl:message name="ICremaHostService_GetServiceInfos_InputMessage">
-    <wsdl:part name="parameters" element="tns:GetServiceInfos" />
+  <wsdl:message name="ICremaHostService_GetServiceInfo_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetServiceInfo" />
   </wsdl:message>
-  <wsdl:message name="ICremaHostService_GetServiceInfos_OutputMessage">
-    <wsdl:part name="parameters" element="tns:GetServiceInfosResponse" />
+  <wsdl:message name="ICremaHostService_GetServiceInfo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetServiceInfoResponse" />
   </wsdl:message>
   <wsdl:message name="ICremaHostService_Shutdown_InputMessage">
     <wsdl:part name="parameters" element="tns:Shutdown" />
@@ -89,9 +89,9 @@
       <wsdl:input wsaw:Action="http://www.ntreev.com/ICremaHostService/GetDataBaseInfos" message="tns:ICremaHostService_GetDataBaseInfos_InputMessage" />
       <wsdl:output wsaw:Action="http://www.ntreev.com/ICremaHostService/GetDataBaseInfosResponse" message="tns:ICremaHostService_GetDataBaseInfos_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetServiceInfos">
-      <wsdl:input wsaw:Action="http://www.ntreev.com/ICremaHostService/GetServiceInfos" message="tns:ICremaHostService_GetServiceInfos_InputMessage" />
-      <wsdl:output wsaw:Action="http://www.ntreev.com/ICremaHostService/GetServiceInfosResponse" message="tns:ICremaHostService_GetServiceInfos_OutputMessage" />
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetServiceInfo">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/ICremaHostService/GetServiceInfo" message="tns:ICremaHostService_GetServiceInfo_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/ICremaHostService/GetServiceInfoResponse" message="tns:ICremaHostService_GetServiceInfo_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Shutdown">
       <wsdl:input wsaw:Action="http://www.ntreev.com/ICremaHostService/Shutdown" message="tns:ICremaHostService_Shutdown_InputMessage" />

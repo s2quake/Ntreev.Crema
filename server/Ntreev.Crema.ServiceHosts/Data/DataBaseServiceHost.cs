@@ -39,8 +39,8 @@ namespace Ntreev.Crema.ServiceHosts.Data
 {
     class DataBaseServiceHost : CremaServiceItemHost
     {
-        public DataBaseServiceHost(ICremaHost cremaHost, int port)
-            : base(cremaHost, typeof(DataBaseService), $"net.tcp://localhost:{port}/{nameof(DataBaseService)}", port)
+        public DataBaseServiceHost(CremaService service, int port)
+            : base(service, typeof(DataBaseService), $"net.tcp://localhost:{port}/{nameof(DataBaseService)}", port)
         {
             var binding = CreateBinding();
 
@@ -58,7 +58,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         public override object CreateInstance(Message message)
         {
-            return new DataBaseService(this.CremaHost);
+            return new DataBaseService(this.Service);
         }
     }
 }

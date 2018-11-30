@@ -15,34 +15,32 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.CremaHostService;
+using Ntreev.Library;
+using Ntreev.Library.Serialization;
 using System;
-using System.ServiceModel;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
-namespace Ntreev.Crema.Services
+namespace Ntreev.Crema.ServiceModel
 {
-    class CremaHostServiceFactory : ICremaHostServiceCallback
+    [DataContract(Namespace = SchemaUtility.Namespace)]
+    public struct ServiceItemInfo
     {
-        private static readonly CremaHostServiceFactory empty = new CremaHostServiceFactory();
+        [DataMember]
+        public string Name { get; set; }
 
-        public static CremaHostServiceClient CreateServiceClient(string address)
-        {
-            var binding = CremaHost.CreateBinding();
-            var endPointAddress = new EndpointAddress(string.Format("net.tcp://{0}/CremaHostService", AddressUtility.ConnectionAddress(address)));
-            var instanceContext = new InstanceContext(empty);
-            var serviceClient = new CremaHostServiceClient(instanceContext, binding, endPointAddress);
-            return serviceClient;
-        }
+        [DataMember]
+        public int Port { get; set; }
 
-        public void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
+        public readonly static ServiceItemInfo Empty = new ServiceItemInfo()
         {
-            throw new NotImplementedException();
-        }
-
-        public void OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs)
-        {
-            throw new NotImplementedException();
-        }
+            Name = string.Empty,
+        };
     }
 }

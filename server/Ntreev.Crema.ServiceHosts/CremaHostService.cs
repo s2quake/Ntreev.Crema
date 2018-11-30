@@ -32,17 +32,13 @@ namespace Ntreev.Crema.ServiceHosts
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
     partial class CremaHostService : CremaServiceItemBase<ICremaHostEventCallback>, ICremaHostService
     {
-        private readonly CremaService service;
         private Guid authenticationToken;
         private Authentication authentication;
         private long index = 0;
 
-        public CremaHostService(CremaService service, ICremaHost cremaHost)
-            : base(cremaHost)
+        public CremaHostService(CremaService service)
+            : base(service)
         {
-            this.service = service;
-            this.CremaHost = cremaHost;
-            this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;
             this.LogService.Debug($"{nameof(CremaHostService)} Constructor");
             this.OwnerID = nameof(CremaHostService);
         }
@@ -60,7 +56,7 @@ namespace Ntreev.Crema.ServiceHosts
 
                 this.authenticationToken = await this.CremaHost.LoginAsync(userID, ToSecureString(userID, password));
                 this.authentication = await this.CremaHost.AuthenticateAsync(this.authenticationToken);
-                await this.authentication.AddRefAsync(this, (a) => this.CremaHost.LogoutAsync(a));
+                await this.authentication.AddRefAsync(this, this.Service.Timeout, (a) => this.CremaHost.LogoutAsync(a));
                 this.OwnerID = this.authentication.ID;
                 result.Value = this.authenticationToken;
                 result.SignatureDate = this.authentication.SignatureDate;
@@ -100,12 +96,12 @@ namespace Ntreev.Crema.ServiceHosts
             return result;
         }
 
-        public async Task<ResultBase<ServiceInfo[]>> GetServiceInfosAsync()
+        public async Task<ResultBase<ServiceInfo>> GetServiceInfoAsync()
         {
-            var result = new ResultBase<ServiceInfo[]>();
+            var result = new ResultBase<ServiceInfo>();
             try
             {
-                result.Value = await Task.Run(() => this.service.ServiceInfos);
+                result.Value = await Task.Run(() => this.Service.ServiceInfo);
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
             }
             catch (Exception e)
@@ -200,10 +196,6 @@ namespace Ntreev.Crema.ServiceHosts
             await this.authentication.PingAsync();
             return true;
         }
-
-        public ICremaHost CremaHost { get; }
-
-        public ILogService LogService { get; }
 
         protected override void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo)
         {

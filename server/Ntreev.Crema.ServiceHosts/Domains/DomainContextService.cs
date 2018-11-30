@@ -37,14 +37,12 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         private Authentication authentication;
         private long index = 0;
 
-        public DomainContextService(ICremaHost cremaHost)
-            : base(cremaHost)
+        public DomainContextService(CremaService service)
+            : base(service)
         {
-            this.CremaHost = cremaHost;
-            this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;
-            this.UserContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
-            this.DomainContext = cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
-            this.DataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+            this.UserContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            this.DomainContext = this.CremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
+            this.DataBaseContext = this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
             this.LogService.Debug($"{nameof(DomainContextService)} Constructor");
         }
 
@@ -285,10 +283,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             await this.authentication.PingAsync();
             return true;
         }
-
-        public ICremaHost CremaHost { get; }
-
-        public ILogService LogService { get; }
 
         public IDomainContext DomainContext { get; }
 

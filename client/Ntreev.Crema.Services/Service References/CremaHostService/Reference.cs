@@ -30,8 +30,8 @@ namespace Ntreev.Crema.Services.CremaHostService {
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/GetDataBaseInfos", ReplyAction="http://www.ntreev.com/ICremaHostService/GetDataBaseInfosResponse")]
         Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo[]> GetDataBaseInfos();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/GetServiceInfos", ReplyAction="http://www.ntreev.com/ICremaHostService/GetServiceInfosResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo[]> GetServiceInfos();
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/GetServiceInfo", ReplyAction="http://www.ntreev.com/ICremaHostService/GetServiceInfoResponse")]
+        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo> GetServiceInfo();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/Shutdown", ReplyAction="http://www.ntreev.com/ICremaHostService/ShutdownResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Shutdown(int milliseconds, Ntreev.Crema.ServiceModel.ShutdownType shutdownType, string message);
@@ -101,8 +101,8 @@ namespace Ntreev.Crema.Services.CremaHostService {
             return base.Channel.GetDataBaseInfos();
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo[]> GetServiceInfos() {
-            return base.Channel.GetServiceInfos();
+        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo> GetServiceInfo() {
+            return base.Channel.GetServiceInfo();
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase Shutdown(int milliseconds, Ntreev.Crema.ServiceModel.ShutdownType shutdownType, string message) {

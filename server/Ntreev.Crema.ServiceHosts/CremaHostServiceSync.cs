@@ -54,9 +54,9 @@ namespace Ntreev.Crema.ServiceHosts
             return this.InvokeTask(Task.Run(() => this.GetDataBaseInfosAsync()));
         }
 
-        public ResultBase<ServiceInfo[]> GetServiceInfos()
+        public ResultBase<ServiceInfo> GetServiceInfo()
         {
-            return this.InvokeTask(Task.Run(() => this.GetServiceInfosAsync()));
+            return this.InvokeTask(Task.Run(() => this.GetServiceInfoAsync()));
         }
 
         public ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message)

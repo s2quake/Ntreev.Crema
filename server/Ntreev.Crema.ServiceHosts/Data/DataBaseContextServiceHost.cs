@@ -35,12 +35,11 @@ using Ntreev.Library;
 
 namespace Ntreev.Crema.ServiceHosts.Data
 {
-    [Export(typeof(CremaServiceItemHost))]
     [Dependency(typeof(Users.UserContextServiceHostProvider))]
     class DataBaseContextServiceHost : CremaServiceItemHost
     {
-        public DataBaseContextServiceHost(ICremaHost cremaHost, int port)
-            : base(cremaHost, typeof(DataBaseContextService), $"net.tcp://localhost:{port}/{nameof(DataBaseContextService)}", port)
+        public DataBaseContextServiceHost(CremaService service, int port)
+            : base(service, typeof(DataBaseContextService), $"net.tcp://localhost:{port}/{nameof(DataBaseContextService)}", port)
         {
             var binding = CreateBinding();
 
@@ -58,7 +57,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         public override object CreateInstance(Message message)
         {
-            return new DataBaseContextService(this.CremaHost);
+            return new DataBaseContextService(this.Service);
         }
     }
 }

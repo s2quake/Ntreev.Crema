@@ -14,19 +14,32 @@ namespace Ntreev.Crema.Services
         private Timer timer;
         private bool isProgressing;
 
-        public PingTimer(Func<bool> action)
+        public PingTimer(Func<bool> action, int timeout)
         {
             this.action = action;
-            this.timer = new Timer(pingInterval);
-            this.timer.Elapsed += Timer_Elapsed;
-            this.timer.Start();
+            if (timeout > 0)
+            {
+                this.timer = new Timer(Math.Max(pingInterval / 2, 1000));
+                this.timer.Elapsed += Timer_Elapsed;
+                this.timer.Start();
+            }
         }
 
         public void Dispose()
         {
-            this.timer.Stop();
-            this.timer.Dispose();
+            if (this.timer != null)
+            {
+                this.timer.Stop();
+                this.timer.Dispose();
+            }
             this.timer = null;
+        }
+
+        public event EventHandler Faulted;
+
+        protected virtual void OnFaulted(EventArgs e)
+        {
+            this.Faulted?.Invoke(this, e);
         }
 
         private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -40,7 +53,8 @@ namespace Ntreev.Crema.Services
             }
             catch
             {
-
+                this.Dispose();
+                this.OnFaulted(EventArgs.Empty);
             }
             finally
             {

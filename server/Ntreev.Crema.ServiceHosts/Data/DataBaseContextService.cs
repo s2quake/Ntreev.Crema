@@ -38,13 +38,11 @@ namespace Ntreev.Crema.ServiceHosts.Data
         private readonly Dictionary<Guid, ITransaction> transactionByID = new Dictionary<Guid, ITransaction>();
         private long index = 0;
 
-        public DataBaseContextService(ICremaHost cremaHost)
-            : base(cremaHost)
+        public DataBaseContextService(CremaService service)
+            : base(service)
         {
-            this.CremaHost = cremaHost;
-            this.LogService = cremaHost.GetService(typeof(ILogService)) as ILogService;
-            this.DataBaseContext = cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
-            this.UserContext = cremaHost.GetService(typeof(IUserContext)) as IUserContext;
+            this.DataBaseContext = this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+            this.UserContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
 
             this.LogService.Debug($"{nameof(DataBaseContextService)} Constructor");
         }
@@ -424,10 +422,6 @@ namespace Ntreev.Crema.ServiceHosts.Data
             await this.authentication.PingAsync();
             return true;
         }
-
-        public ICremaHost CremaHost { get; }
-
-        public ILogService LogService { get; }
 
         public IDataBaseContext DataBaseContext { get; }
 
