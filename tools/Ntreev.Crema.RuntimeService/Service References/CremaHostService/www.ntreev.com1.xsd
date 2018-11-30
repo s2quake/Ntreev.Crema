@@ -71,15 +71,15 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="GetServiceInfos">
+  <xs:element name="GetServiceInfo">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="GetServiceInfosResponse">
+  <xs:element name="GetServiceInfoResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q6="http://schemas.ntreev.com" minOccurs="0" name="GetServiceInfosResult" type="q6:ResultBaseOfArrayOfServiceInfoq8erDhHE" />
+        <xs:element xmlns:q6="http://schemas.ntreev.com" minOccurs="0" name="GetServiceInfoResult" type="q6:ResultBaseOfServiceInfoq8erDhHE" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -108,6 +108,18 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element xmlns:q9="http://schemas.ntreev.com" minOccurs="0" name="CancelShutdownResult" type="q9:ResultBase" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IsAlive">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IsAliveResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="IsAliveResult" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

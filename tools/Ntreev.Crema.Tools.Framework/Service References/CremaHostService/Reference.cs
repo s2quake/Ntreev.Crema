@@ -45,11 +45,11 @@ namespace Ntreev.Crema.Tools.Framework.CremaHostService {
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/GetDataBaseInfos", ReplyAction="http://www.ntreev.com/ICremaHostService/GetDataBaseInfosResponse")]
         System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.DataBaseInfo[]>> GetDataBaseInfosAsync();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/GetServiceInfos", ReplyAction="http://www.ntreev.com/ICremaHostService/GetServiceInfosResponse")]
-        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo[]> GetServiceInfos();
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/GetServiceInfo", ReplyAction="http://www.ntreev.com/ICremaHostService/GetServiceInfoResponse")]
+        Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo> GetServiceInfo();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/GetServiceInfos", ReplyAction="http://www.ntreev.com/ICremaHostService/GetServiceInfosResponse")]
-        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo[]>> GetServiceInfosAsync();
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/GetServiceInfo", ReplyAction="http://www.ntreev.com/ICremaHostService/GetServiceInfoResponse")]
+        System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo>> GetServiceInfoAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/Shutdown", ReplyAction="http://www.ntreev.com/ICremaHostService/ShutdownResponse")]
         Ntreev.Crema.ServiceModel.ResultBase Shutdown(int milliseconds, Ntreev.Crema.ServiceModel.ShutdownType shutdownType, string message);
@@ -62,6 +62,12 @@ namespace Ntreev.Crema.Tools.Framework.CremaHostService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/CancelShutdown", ReplyAction="http://www.ntreev.com/ICremaHostService/CancelShutdownResponse")]
         System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> CancelShutdownAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/IsAlive", ReplyAction="http://www.ntreev.com/ICremaHostService/IsAliveResponse")]
+        bool IsAlive();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/IsAlive", ReplyAction="http://www.ntreev.com/ICremaHostService/IsAliveResponse")]
+        System.Threading.Tasks.Task<bool> IsAliveAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -142,12 +148,12 @@ namespace Ntreev.Crema.Tools.Framework.CremaHostService {
             return base.Channel.GetDataBaseInfosAsync();
         }
         
-        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo[]> GetServiceInfos() {
-            return base.Channel.GetServiceInfos();
+        public Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo> GetServiceInfo() {
+            return base.Channel.GetServiceInfo();
         }
         
-        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo[]>> GetServiceInfosAsync() {
-            return base.Channel.GetServiceInfosAsync();
+        public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase<Ntreev.Crema.ServiceModel.ServiceInfo>> GetServiceInfoAsync() {
+            return base.Channel.GetServiceInfoAsync();
         }
         
         public Ntreev.Crema.ServiceModel.ResultBase Shutdown(int milliseconds, Ntreev.Crema.ServiceModel.ShutdownType shutdownType, string message) {
@@ -164,6 +170,14 @@ namespace Ntreev.Crema.Tools.Framework.CremaHostService {
         
         public System.Threading.Tasks.Task<Ntreev.Crema.ServiceModel.ResultBase> CancelShutdownAsync() {
             return base.Channel.CancelShutdownAsync();
+        }
+        
+        public bool IsAlive() {
+            return base.Channel.IsAlive();
+        }
+        
+        public System.Threading.Tasks.Task<bool> IsAliveAsync() {
+            return base.Channel.IsAliveAsync();
         }
     }
 }

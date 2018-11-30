@@ -54,9 +54,9 @@ namespace Ntreev.Crema.RuntimeService
 
             try
             {
-                var result = await InvokeServiceAsync(() => serviceClient.GetServiceInfos());
-                var serviceInfos = result.Value;
-                foreach (var item in serviceInfos)
+                var result = await InvokeServiceAsync(() => serviceClient.GetServiceInfo());
+                var serviceInfo = result.Value;
+                foreach (var item in serviceInfo.ServiceItems)
                 {
                     if (item.Name == nameof(RuntimeService))
                     {

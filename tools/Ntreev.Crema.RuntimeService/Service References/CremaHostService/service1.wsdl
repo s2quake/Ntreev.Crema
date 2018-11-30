@@ -61,8 +61,8 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="GetServiceInfos">
-      <soap12:operation soapAction="http://www.ntreev.com/ICremaHostService/GetServiceInfos" style="document" />
+    <wsdl:operation name="GetServiceInfo">
+      <soap12:operation soapAction="http://www.ntreev.com/ICremaHostService/GetServiceInfo" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -81,6 +81,15 @@
     </wsdl:operation>
     <wsdl:operation name="CancelShutdown">
       <soap12:operation soapAction="http://www.ntreev.com/ICremaHostService/CancelShutdown" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="IsAlive">
+      <soap12:operation soapAction="http://www.ntreev.com/ICremaHostService/IsAlive" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

@@ -391,12 +391,6 @@
     <PackageReference Include="WindowsAPICodePack-Shell">
       <Version>1.1.1</Version>
     </PackageReference>
-    <PackageReference Include="Xceed.Wpf.AvalonDock">
-      <Version>3.4.17280.14430</Version>
-    </PackageReference>
-    <PackageReference Include="Xceed.Wpf.Toolkit">
-      <Version>3.4.17280.14430</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="..\..\common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
