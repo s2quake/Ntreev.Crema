@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Services.Data
     {
         private DataBaseContextServiceClient service;
         private bool isDisposed;
-        private Timer timer;
+        private PingTimer pingTimer;
 
         private ItemsCreatedEventHandler<IDataBase> itemsCreated;
         private ItemsRenamedEventHandler<IDataBase> itemsRenamed;
@@ -88,11 +88,7 @@ namespace Ntreev.Crema.Services.Data
 
                 var result = this.service.Subscribe(authenticationToken);
                 var metaData = result.Value;
-#if !DEBUG
-                this.timer = new Timer(30000);
-                this.timer.Elapsed += Timer_Elapsed;
-                this.timer.Start();
-#endif
+                this.pingTimer = new PingTimer(this.service.IsAlive);
                 this.Initialize(metaData);
             });
         }
@@ -458,15 +454,11 @@ namespace Ntreev.Crema.Services.Data
 
             if (this.service == null)
                 return;
-            if (closeInfo.Reason != CloseReason.Faulted)
-                this.service.Unsubscribe();
-            this.timer?.Dispose();
-            this.timer = null;
+            this.service.Unsubscribe(closeInfo.Reason);
+            this.pingTimer.Dispose();
+            this.pingTimer = null;
             await Task.Delay(100);
-            if (closeInfo.Reason != CloseReason.Faulted)
-                this.service.CloseService();
-            else
-                this.service.Abort();
+            this.service.CloseService(closeInfo.Reason);
             await this.callbackEvent.DisposeAsync();
             await this.Dispatcher.DisposeAsync();
             this.service = null;
@@ -779,19 +771,19 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            this.timer?.Stop();
-            try
-            {
-                await this.Dispatcher.InvokeAsync(() => this.service.IsAlive());
-                this.timer?.Start();
-            }
-            catch
-            {
+        //private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        //{
+        //    this.timer?.Stop();
+        //    try
+        //    {
+        //        await this.Dispatcher.InvokeAsync(() => this.service.IsAlive());
+        //        this.timer?.Start();
+        //    }
+        //    catch
+        //    {
 
-            }
-        }
+        //    }
+        //}
 
         private async void Service_Faulted(object sender, EventArgs e)
         {

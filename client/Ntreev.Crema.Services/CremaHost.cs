@@ -33,6 +33,7 @@ using System.Security;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Xml;
 
 namespace Ntreev.Crema.Services
@@ -52,6 +53,7 @@ namespace Ntreev.Crema.Services
         private LogService log;
         private Guid token;
         private CremaHostServiceClient service;
+        private PingTimer pingTimer;
 
         [ImportingConstructor]
         public CremaHost(IServiceProvider container, [ImportMany]IEnumerable<IConfigurationPropertyProvider> propertiesProviders, CremaSettings settings)
@@ -138,6 +140,7 @@ namespace Ntreev.Crema.Services
                 {
                     var version = typeof(CremaHost).Assembly.GetName().Version;
                     var result = this.InvokeService(() => this.service.Subscribe(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}"));
+                    this.pingTimer = new PingTimer(this.service.IsAlive);
                     this.AuthenticationToken = result.Value;
                     this.IPAddress = AddressUtility.GetIPAddress(address);
                     this.Address = AddressUtility.GetDisplayAddress(address);
@@ -191,7 +194,7 @@ namespace Ntreev.Crema.Services
             await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
         }
 
-        public void SaveConfigs()
+        public void SaveConfigs() 
         {
             try
             {
@@ -474,15 +477,11 @@ namespace Ntreev.Crema.Services
             await this.DomainContext.CloseAsync(closeInfo);
             await this.DataBaseContext.CloseAsync(closeInfo);
             await this.UserContext.CloseAsync(closeInfo);
-
-            if (closeInfo.Reason != CloseReason.Faulted)
-                this.service.Unsubscribe();
+            this.pingTimer.Dispose();
+            this.pingTimer = null;
+            this.service.Unsubscribe(closeInfo.Reason);
             await Task.Delay(100);
-            if (closeInfo.Reason != CloseReason.Faulted)
-                this.service.CloseService();
-            else
-                this.service.Abort();
-
+            this.service.CloseService(closeInfo.Reason);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.DomainContext = null;

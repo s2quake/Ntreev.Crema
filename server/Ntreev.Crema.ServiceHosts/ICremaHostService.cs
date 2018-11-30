@@ -51,5 +51,8 @@ namespace Ntreev.Crema.ServiceHosts
 
         [OperationContract]
         ResultBase CancelShutdown();
+
+        [OperationContract]
+        bool IsAlive();
     }
 }

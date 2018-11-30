@@ -41,7 +41,7 @@ namespace Ntreev.Crema.Services.Data
         private DataBaseServiceClient service;
         private bool isDisposed;
         private DataBaseMetaData metaData;
-        private Timer timer;
+        private PingTimer pingTimer;
 
         private EventHandler<AuthenticationEventArgs> authenticationEntered;
         private EventHandler<AuthenticationEventArgs> authenticationLeft;
@@ -315,12 +315,8 @@ namespace Ntreev.Crema.Services.Data
                             service.Faulted += Service_Faulted;
                         }
                         var result = this.service.Subscribe(this.CremaHost.AuthenticationToken, base.Name);
-#if !DEBUG
-                        this.timer = new Timer(30000);
-                        this.timer.Elapsed += Timer_Elapsed;
-                        this.timer.Start();
-#endif
                         var metaData = result.Value;
+                        this.pingTimer = new PingTimer(this.service.IsAlive);
                         this.CremaHost.Sign(authentication, result);
                         this.TypeContext = new TypeContext(this, metaData);
                         this.TableContext = new TableContext(this, metaData);
@@ -601,7 +597,7 @@ namespace Ntreev.Crema.Services.Data
                 this.Dispatcher.Dispose();
                 this.Dispatcher = this.DataBaseContext.Dispatcher;
             }
-            
+
             base.DataBaseState = DataBaseState.None;
             base.Unload(authentication);
         }
@@ -744,15 +740,11 @@ namespace Ntreev.Crema.Services.Data
             if (result == false)
                 return;
 
-            if (closeInfo.Reason != CloseReason.Faulted)
-                this.service.Unsubscribe();
-            this.timer?.Dispose();
-            this.timer = null;
+            this.service.Unsubscribe(closeInfo.Reason);
+            this.pingTimer.Dispose();
+            this.pingTimer = null;
             await Task.Delay(100);
-            if (closeInfo.Reason != CloseReason.Faulted)
-                this.service.CloseService();
-            else
-                this.service.Abort();
+            this.service.CloseService(closeInfo.Reason);
             await this.callbackEvent.DisposeAsync();
             await this.Dispatcher.DisposeAsync();
             this.service = null;
@@ -1135,9 +1127,9 @@ namespace Ntreev.Crema.Services.Data
         private SignatureDate ReleaseService()
         {
             var result = this.CremaHost.InvokeService(() => this.service.Unsubscribe());
-            this.service.CloseService();
-            this.timer?.Dispose();
-            this.timer = null;
+            this.service.CloseService(CloseReason.None);
+            this.pingTimer.Dispose();
+            this.pingTimer = null;
             this.service = null;
             return result.SignatureDate;
         }
@@ -1145,20 +1137,6 @@ namespace Ntreev.Crema.Services.Data
         private async void Service_Faulted(object sender, EventArgs e)
         {
             await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
-        }
-
-        private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            this.timer?.Stop();
-            try
-            {
-                await this.Dispatcher.InvokeAsync(() => this.service.IsAlive());
-                this.timer?.Start();
-            }
-            catch
-            {
-
-            }
         }
 
         #region IDataBaseServiceCallback

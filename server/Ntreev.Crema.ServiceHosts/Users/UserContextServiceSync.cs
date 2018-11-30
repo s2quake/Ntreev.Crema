@@ -46,16 +46,6 @@ namespace Ntreev.Crema.ServiceHosts.Users
             return this.InvokeTask(Task.Run(() =>  this.UnsubscribeAsync()));
         }
 
-        //public ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message)
-        //{
-        //    return this.InvokeTask(Task.Run(() =>  this.ShutdownAsync(milliseconds, shutdownType, message)));
-        //}
-
-        //public ResultBase CancelShutdown()
-        //{
-        //    return this.InvokeTask(Task.Run(() =>  this.CancelShutdownAsync()));
-        //}
-
         public ResultBase<UserInfo> NewUser(string userID, string categoryPath, byte[] password, string userName, Authority authority)
         {
             return this.InvokeTask(Task.Run(() =>  this.NewUserAsync(userID, categoryPath, password, userName, authority)));

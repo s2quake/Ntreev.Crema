@@ -89,31 +89,6 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
             this.Release();
         }
 
-        //public override bool IsCommandVisible(ICommand command)
-        //{
-        //    if (this.cremaHost.IsOpened == false)
-        //        return false;
-
-        //    if (command is ICremaCommand == true && (command as ICremaCommand).IsVisible == false)
-        //        return false;
-
-        //    var attr = command.GetType().GetCustomAttribute<AuthorityAttribute>();
-        //    if (attr != null)
-        //        return this.authority >= attr.Authority;
-
-        //    return base.IsCommandVisible(command);
-        //}
-
-        //private static SecureString ToSecureString(string value)
-        //{
-        //    var secureString = new SecureString();
-        //    foreach (var item in value.Encrypt())
-        //    {
-        //        secureString.AppendChar(item);
-        //    }
-        //    return secureString;
-        //}
-
         private static string SecureStringToString(SecureString value)
         {
             var valuePtr = IntPtr.Zero;
@@ -132,11 +107,6 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
         {
             this.Release();
         }
-
-        //internal static SecureString Correct(SecureString value)
-        //{
-        //    return ToSecureString(SecureStringToString(value));
-        //}
 
         internal static void Validate(SecureString value1, SecureString value2)
         {

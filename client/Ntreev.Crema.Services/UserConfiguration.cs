@@ -16,6 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Library;
+using Ntreev.Library.IO;
 using System.Collections.Generic;
 using System.IO;
 
@@ -35,10 +36,11 @@ namespace Ntreev.Crema.Services
                 this.Read(this.xmlPath);
         }
 
-        public override string Name => "CremaConfigs";
+        public override string Name => "UserConfigs";
 
         public void Commit()
         {
+            FileUtility.Prepare(this.schemaPath);
             this.WriteSchema(this.schemaPath);
             this.Write(this.xmlPath);
         }

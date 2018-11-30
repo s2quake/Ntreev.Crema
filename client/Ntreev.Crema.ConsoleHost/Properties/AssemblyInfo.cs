@@ -19,8 +19,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Ntreev.Crema.ConsoleHost")]
+[assembly: AssemblyTitle("CremaConsole")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("Ntreev.Crema.ConsoleHost")]
+[assembly: AssemblyProduct("CremaConsole")]
 [assembly: ComVisible(false)]
 [assembly: Guid("019b8cea-2479-421f-bd4a-3751fc8131bd")]

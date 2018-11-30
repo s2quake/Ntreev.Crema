@@ -69,6 +69,11 @@ namespace Ntreev.Crema.ServiceHosts
             return this.InvokeTask(Task.Run(() => this.CancelShutdownAsync()));
         }
 
+        public bool IsAlive()
+        {
+            return this.InvokeTask(Task.Run(() => this.IsAliveAsync()));
+        }
+
         private T InvokeTask<T>(Task<T> task)
         {
             task.Wait();

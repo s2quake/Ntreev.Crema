@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Services.Users
     {
         private UserContextServiceClient service;
         private bool isDisposed;
-        private Timer timer;
+        private PingTimer pingTimer;
 
         private ItemsCreatedEventHandler<IUserItem> itemsCreated;
         private ItemsRenamedEventHandler<IUserItem> itemsRenamed;
@@ -77,12 +77,8 @@ namespace Ntreev.Crema.Services.Users
                 try
                 {
                     var result = this.CremaHost.InvokeService(() => this.service.Subscribe(authenticationToken));
-#if !DEBUG
-                    this.timer = new Timer(30000);
-                    this.timer.Elapsed += Timer_Elapsed;
-                    this.timer.Start();
-#endif
                     var metaData = result.Value;
+                    this.pingTimer = new PingTimer(this.service.IsAlive);
                     foreach (var item in metaData.Categories)
                     {
                         if (item == this.Root.Path)
@@ -102,7 +98,7 @@ namespace Ntreev.Crema.Services.Users
                 }
                 catch
                 {
-                    this.service.CloseService();
+                    this.service.CloseService(CloseReason.None);
                     this.callbackEvent.Dispose();
                     this.Dispatcher.Dispose();
                     throw;
@@ -276,15 +272,11 @@ namespace Ntreev.Crema.Services.Users
             if (result == false)
                 return;
 
-            if (closeInfo.Reason != CloseReason.Faulted)
-                this.service.Unsubscribe();
-            this.timer?.Dispose();
-            this.timer = null;
+            this.service.Unsubscribe(closeInfo.Reason);
+            this.pingTimer.Dispose();
+            this.pingTimer = null;
             await Task.Delay(100);
-            if (closeInfo.Reason != CloseReason.Faulted)
-                this.service.CloseService();
-            else
-                this.service.Abort();
+            this.service.CloseService(closeInfo.Reason);
             await this.callbackEvent.DisposeAsync();
             await this.Dispatcher.DisposeAsync();
             this.service = null;
@@ -418,20 +410,6 @@ namespace Ntreev.Crema.Services.Users
         private async void Service_Faulted(object sender, EventArgs e)
         {
             await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
-        }
-
-        private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            this.timer?.Stop();
-            try
-            {
-                await this.Dispatcher.InvokeAsync(() => this.service.IsAlive());
-                this.timer?.Start();
-            }
-            catch
-            {
-                await this.CremaHost.InvokeCloseAsync(new CloseInfo(CloseReason.NoResponding, "서버가 응답하질 않습니다."));
-            }
         }
 
         #region IUserContextServiceCallback

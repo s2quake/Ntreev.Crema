@@ -56,6 +56,12 @@
   <wsdl:message name="ICremaHostService_CancelShutdown_OutputMessage">
     <wsdl:part name="parameters" element="tns:CancelShutdownResponse" />
   </wsdl:message>
+  <wsdl:message name="ICremaHostService_IsAlive_InputMessage">
+    <wsdl:part name="parameters" element="tns:IsAlive" />
+  </wsdl:message>
+  <wsdl:message name="ICremaHostService_IsAlive_OutputMessage">
+    <wsdl:part name="parameters" element="tns:IsAliveResponse" />
+  </wsdl:message>
   <wsdl:message name="ICremaHostService_OnServiceClosed_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:OnServiceClosed" />
   </wsdl:message>
@@ -94,6 +100,10 @@
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="CancelShutdown">
       <wsdl:input wsaw:Action="http://www.ntreev.com/ICremaHostService/CancelShutdown" message="tns:ICremaHostService_CancelShutdown_InputMessage" />
       <wsdl:output wsaw:Action="http://www.ntreev.com/ICremaHostService/CancelShutdownResponse" message="tns:ICremaHostService_CancelShutdown_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="IsAlive">
+      <wsdl:input wsaw:Action="http://www.ntreev.com/ICremaHostService/IsAlive" message="tns:ICremaHostService_IsAlive_InputMessage" />
+      <wsdl:output wsaw:Action="http://www.ntreev.com/ICremaHostService/IsAliveResponse" message="tns:ICremaHostService_IsAlive_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnServiceClosed">
       <wsdl:output wsaw:Action="http://www.ntreev.com/ICremaHostService/OnServiceClosed" message="tns:ICremaHostService_OnServiceClosed_OutputCallbackMessage" />

@@ -192,6 +192,15 @@ namespace Ntreev.Crema.ServiceHosts
             return result;
         }
 
+        public async Task<bool> IsAliveAsync()
+        {
+            if (this.authentication == null)
+                return false;
+            this.LogService.Debug($"[{this.authentication}] {nameof(CremaHostService)}.{nameof(IsAliveAsync)} : {DateTime.Now}");
+            await this.authentication.PingAsync();
+            return true;
+        }
+
         public ICremaHost CremaHost { get; }
 
         public ILogService LogService { get; }

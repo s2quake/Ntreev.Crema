@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="AuthenticationToken.cs" />
     <Compile Include="AuthenticatorBase.cs" />
+    <Compile Include="PingTimer.cs" />
     <Compile Include="UserConfiguration.cs" />
     <Compile Include="CremaBootstrapper.cs" />
     <Compile Include="Authentication.cs" />

@@ -39,9 +39,6 @@ namespace Ntreev.Crema.Commands.Consoles
     public abstract class ConsoleCommandContextBase : CommandContextBase
     {
         private Authentication authentication;
-        private Authority authority;
-
-        private IConsoleDrive[] driveItems;
         private IConsoleDrive drive;
         private readonly Dictionary<IConsoleDrive, string> drivePaths = new Dictionary<IConsoleDrive, string>();
         private string path;
@@ -51,7 +48,7 @@ namespace Ntreev.Crema.Commands.Consoles
             : base(ConcatCommands(driveItems, commands), commandProviders.Select(item => item.CommandProvider))
         {
             this.Name = string.Empty;
-            this.driveItems = driveItems.ToArray();
+            this.DriveItems = driveItems.ToArray();
             foreach (var item in this.Commands)
             {
                 if (item is ConsoleCommandBase command)
@@ -111,16 +108,16 @@ namespace Ntreev.Crema.Commands.Consoles
             {
                 if (uri.Scheme != Uri.UriSchemeFile)
                 {
-                    return this.driveItems.First(item => item.Name == uri.Scheme);
+                    return this.DriveItems.First(item => item.Name == uri.Scheme);
                 }
                 return this.Drive;
             }
             else
             {
-                
+
                 if (uri.IsAbsoluteUri == true)
                 {
-                    return this.driveItems.First(item => item.Name == uri.Scheme);
+                    return this.DriveItems.First(item => item.Name == uri.Scheme);
                 }
                 return this.Drive;
             }
@@ -263,19 +260,16 @@ namespace Ntreev.Crema.Commands.Consoles
             this.WriteLine(text);
         }
 
-        public bool IsOnline
-        {
-            get { return this.authentication != null; }
-        }
+        public bool IsOnline => this.authentication != null;
 
         public IConsoleDrive Drive
         {
-            get { return this.drive; }
+            get => this.drive;
             set
             {
                 if (value == null)
                     throw new ArgumentNullException(nameof(value));
-                if (this.driveItems.Contains(value) == false)
+                if (this.DriveItems.Contains(value) == false)
                     throw new ItemNotFoundException(value.Name);
                 this.drive = value;
 
@@ -291,21 +285,12 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        public IConsoleDrive[] DriveItems
-        {
-            get { return this.driveItems; }
-        }
+        public IConsoleDrive[] DriveItems { get; }
 
         public string Path
         {
-            get
-            {
-                return this.path;
-            }
-            set
-            {
-                this.ChangeDirectory(this.authentication, value);
-            }
+            get => this.path;
+            set => this.ChangeDirectory(this.authentication, value);
         }
 
         public string Prompt
@@ -336,30 +321,15 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        public Authority Authority
-        {
-            get { return this.authority; }
-        }
+        public Authority Authority { get; private set; }
 
-        public abstract ICremaHost CremaHost
-        {
-            get;
-        }
+        public abstract ICremaHost CremaHost { get; }
 
-        public object Target
-        {
-            get; set;
-        }
+        public object Target { get; set; }
 
-        public abstract string Address
-        {
-            get;
-        }
+        public abstract string Address { get; }
 
-        public string UserID
-        {
-            get { return this.authentication.ID; }
-        }
+        public string UserID => this.authentication.ID;
 
         public ConsoleTerminalBase Terminal { get; internal set; }
 
@@ -368,10 +338,8 @@ namespace Ntreev.Crema.Commands.Consoles
         protected void Initialize(Authentication authentication)
         {
             this.authentication = authentication;
-#if SERVER
             this.authentication.Expired += Authentication_Expired;
-#endif
-            this.authority = GetAuthority();
+            this.Authority = GetAuthority();
             this.path = PathUtility.Separator;
 
             Authority GetAuthority()
@@ -383,12 +351,10 @@ namespace Ntreev.Crema.Commands.Consoles
 
         protected void Release()
         {
-#if SERVER
             if (this.authentication != null)
             {
                 this.authentication.Expired -= Authentication_Expired;
             }
-#endif
             this.authentication = null;
             this.commission = null;
             this.OnPathChanged(EventArgs.Empty);

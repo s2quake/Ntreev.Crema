@@ -88,6 +88,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="IsAlive">
+      <soap12:operation soapAction="http://www.ntreev.com/ICremaHostService/IsAlive" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="OnServiceClosed">
       <soap12:operation soapAction="http://www.ntreev.com/ICremaHostService/OnServiceClosed" style="document" />
       <wsdl:output>

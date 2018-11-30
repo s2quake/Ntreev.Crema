@@ -38,6 +38,9 @@ namespace Ntreev.Crema.Services.CremaHostService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/CancelShutdown", ReplyAction="http://www.ntreev.com/ICremaHostService/CancelShutdownResponse")]
         Ntreev.Crema.ServiceModel.ResultBase CancelShutdown();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://www.ntreev.com/ICremaHostService/IsAlive", ReplyAction="http://www.ntreev.com/ICremaHostService/IsAliveResponse")]
+        bool IsAlive();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -108,6 +111,10 @@ namespace Ntreev.Crema.Services.CremaHostService {
         
         public Ntreev.Crema.ServiceModel.ResultBase CancelShutdown() {
             return base.Channel.CancelShutdown();
+        }
+        
+        public bool IsAlive() {
+            return base.Channel.IsAlive();
         }
     }
 }

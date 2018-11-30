@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Services.Domains
     {
         private DomainContextServiceClient service;
         private bool isDisposed;
-        private Timer timer;
+        private PingTimer pingTimer;
 
         private ItemsCreatedEventHandler<IDomainItem> itemsCreated;
         private ItemsRenamedEventHandler<IDomainItem> itemsRenamed;
@@ -77,11 +77,7 @@ namespace Ntreev.Crema.Services.Domains
                 }
 
                 var result = this.service.Subscribe(authenticationToken);
-#if !DEBUG
-                this.timer = new Timer(30000);
-                this.timer.Elapsed += Timer_Elapsed;
-                this.timer.Start();
-#endif
+                this.pingTimer = new PingTimer(this.service.IsAlive);
                 var metaData = result.Value;
                 this.metaData = metaData;
                 this.Initialize(metaData);
@@ -161,15 +157,11 @@ namespace Ntreev.Crema.Services.Domains
             if (result == false)
                 return;
 
-            if (closeInfo.Reason != CloseReason.Faulted)
-                this.service.Unsubscribe();
-            this.timer?.Dispose();
-            this.timer = null;
+            this.service.Unsubscribe(closeInfo.Reason);
+            this.pingTimer.Dispose();
+            this.pingTimer = null;
             await Task.Delay(100);
-            if (closeInfo.Reason != CloseReason.Faulted)
-                this.service.CloseService();
-            else
-                this.service.Abort();
+            this.service.CloseService(closeInfo.Reason);
             var tasks = await this.Dispatcher.InvokeAsync(() =>
             {
                 var taskList = new List<Task>(this.Domains.Count);
@@ -479,19 +471,19 @@ namespace Ntreev.Crema.Services.Domains
             await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
         }
 
-        private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            this.timer?.Stop();
-            try
-            {
-                await this.Dispatcher.InvokeAsync(() => this.service.IsAlive());
-                this.timer?.Start();
-            }
-            catch
-            {
+        //private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        //{
+        //    this.pingTimer?.Stop();
+        //    try
+        //    {
+        //        await this.Dispatcher.InvokeAsync(() => this.service.IsAlive());
+        //        this.pingTimer?.Start();
+        //    }
+        //    catch
+        //    {
 
-            }
-        }
+        //    }
+        //}
 
         #region IDomainContextServiceCallback
 

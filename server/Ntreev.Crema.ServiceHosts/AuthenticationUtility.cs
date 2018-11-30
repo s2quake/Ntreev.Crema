@@ -29,10 +29,34 @@ namespace Ntreev.Crema.ServiceHosts
     static class AuthenticationUtility
     {
         private readonly static TimeSpan pingTimeout = new TimeSpan(0, 1, 0);
-        private static Dictionary<Authentication, Description> authentications = new Dictionary<Authentication, Description>();
-        private static CremaDispatcher dispatcher;
+        private readonly static double pingInternal = 30000;
+        private readonly static Dictionary<Authentication, Description> authentications = new Dictionary<Authentication, Description>();
+        private readonly static List<CremaService> referenceList = new List<CremaService>();
 
-        private static Timer timer;
+        public static void Initialize(CremaService service)
+        {
+            if (referenceList.Any() == false)
+            {
+                Dispatcher = new CremaDispatcher(typeof(AuthenticationUtility));
+                Timer = new Timer(pingInternal);
+                Timer.Elapsed += Timer_Elapsed;
+                Timer.Start();
+            }
+            referenceList.Add(service);
+        }
+
+        public static void Release(CremaService service)
+        {
+            referenceList.Remove(service);
+            if (referenceList.Any() == false)
+            {
+                Timer.Stop();
+                Timer.Dispose();
+                Timer = null;
+                Dispatcher?.Dispose();
+                Dispatcher = null;
+            }
+        }
 
         public static Task<int> AddRefAsync(this Authentication authentication, ICremaServiceItem obj)
         {
@@ -54,20 +78,10 @@ namespace Ntreev.Crema.ServiceHosts
         {
             return Dispatcher.InvokeAsync(() =>
             {
-                if (authentications.Any() == false && timer == null)
-                {
-#if !DEBUG
-                    timer = new Timer(30000);
-                    timer.Elapsed += Timer_Elapsed;
-                    timer.Start();
-#endif
-                }
-
                 if (authentications.ContainsKey(authentication) == false)
                 {
                     authentications[authentication] = new Description(authentication, action);
                 }
-
                 var description = authentications[authentication];
                 description.ServiceItems.Add(obj);
                 return description.ServiceItems.Count;
@@ -76,30 +90,16 @@ namespace Ntreev.Crema.ServiceHosts
 
         public static async Task<int> RemoveRefAsync(this Authentication authentication, ICremaServiceItem obj)
         {
-            return await await dispatcher.InvokeAsync(async () =>
+            return await await Dispatcher.InvokeAsync(async () =>
             {
                 var description = authentications[authentication];
                 description.ServiceItems.Remove(obj);
-
-                try
+                if (description.ServiceItems.Any() == false)
                 {
-                    if (description.ServiceItems.Any() == false)
-                    {
-                        authentications.Remove(authentication);
-                        await description.DisposeAsync();
-                    }
-
-                    return description.ServiceItems.Count;
+                    authentications.Remove(authentication);
+                    await description.DisposeAsync();
                 }
-                finally
-                {
-                    if (authentications.Any() == false && timer != null)
-                    {
-                        timer.Stop();
-                        timer.Dispose();
-                        timer = null;
-                    }
-                }
+                return description.ServiceItems.Count;
             });
         }
 
@@ -112,12 +112,6 @@ namespace Ntreev.Crema.ServiceHosts
                     authentications[authentication].Ping();
                 }
             });
-        }
-
-        public static void Dispose()
-        {
-            dispatcher?.Dispose();
-            dispatcher = null;
         }
 
         private static async void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -142,15 +136,9 @@ namespace Ntreev.Crema.ServiceHosts
             await Task.WhenAll(tasks);
         }
 
-        private static CremaDispatcher Dispatcher
-        {
-            get
-            {
-                if (dispatcher == null)
-                    dispatcher = new CremaDispatcher(typeof(AuthenticationUtility));
-                return dispatcher;
-            }
-        }
+        private static CremaDispatcher Dispatcher { get; set; }
+
+        private static Timer Timer { get; set; }
 
         #region classes
 
