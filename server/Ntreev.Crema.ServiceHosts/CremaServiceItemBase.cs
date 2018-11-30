@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ServiceHosts
 {
-    public abstract class CremaServiceItemBase<T> : ICremaServiceItem
+    public abstract class CremaServiceItemBase<T> : ICremaServiceItem, IDisposable
     {
         private readonly ICremaHost cremaHost;
         private readonly ILogService logService;
@@ -97,7 +97,7 @@ namespace Ntreev.Crema.ServiceHosts
 
         protected abstract Task OnCloseAsync(bool disconnect);
 
-        async Task ICremaServiceItem.CloseAsync(bool disconnect)
+        private async Task CloseAsync(bool disconnect)
         {
             await this.OnCloseAsync(disconnect);
             if (disconnect == true)
@@ -113,5 +113,23 @@ namespace Ntreev.Crema.ServiceHosts
             }
             this.logService.Debug($"{this.GetType().Name}.{nameof(OnCloseAsync)}");
         }
+
+        #region ICremaServiceItem
+
+        Task ICremaServiceItem.CloseAsync(bool disconnect)
+        {
+            return this.CloseAsync(disconnect);
+        }
+
+        #endregion
+
+        async void IDisposable.Dispose()
+        {
+            await this.CloseAsync(false);
+        }
+
+        #region IDisposable
+
+        #endregion
     }
 }

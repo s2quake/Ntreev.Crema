@@ -15,6 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Microsoft.Win32;
 using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.CremaHostService;
@@ -58,6 +59,7 @@ namespace Ntreev.Crema.Services
         [ImportingConstructor]
         public CremaHost(IServiceProvider container, [ImportMany]IEnumerable<IConfigurationPropertyProvider> propertiesProviders, CremaSettings settings)
         {
+            SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
             CremaLog.Attach(this);
             this.container = container;
             this.propertiesProviders = propertiesProviders.ToArray();
@@ -133,6 +135,7 @@ namespace Ntreev.Crema.Services
                     if (this.service is ICommunicationObject service)
                     {
                         service.Faulted += Service_Faulted;
+                        service.Closed += Service_Closed;
                     }
                 });
                 this.ServiceInfos = (await this.InvokeServiceAsync(() => this.service.GetServiceInfos())).Value.ToDictionary(item => item.Name);
@@ -187,6 +190,11 @@ namespace Ntreev.Crema.Services
                 CremaLog.Error(e);
                 throw;
             }
+        }
+
+        private void Service_Closed(object sender, EventArgs e)
+        {
+            
         }
 
         private async void Service_Faulted(object sender, EventArgs e)
@@ -363,19 +371,10 @@ namespace Ntreev.Crema.Services
             binding.MaxReceivedMessageSize = int.MaxValue;
             binding.ReaderQuotas = XmlDictionaryReaderQuotas.Max;
 
-            var isDebug = false;
             if (serviceInfo.PlatformID != string.Empty && Enum.TryParse<PlatformID>(serviceInfo.PlatformID, out var platformID) == false)
             {
-                isDebug = true;
                 platformID = (PlatformID)Enum.Parse(typeof(PlatformID), serviceInfo.PlatformID.Replace("DEBUG_", string.Empty));
             }
-
-#if DEBUG
-            if (isDebug == true && Environment.OSVersion.Platform != PlatformID.Unix)
-            {
-                binding.SendTimeout = TimeSpan.MaxValue;
-            }
-#endif
 
             return binding;
         }
@@ -452,6 +451,11 @@ namespace Ntreev.Crema.Services
                 throw new InvalidOperationException(Resources.Exception_NotClosed);
             if (this.Dispatcher == null)
                 throw new InvalidOperationException(Resources.Exception_AlreadyDisposed);
+        }
+
+        private void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
+        {
+
         }
 
         private async Task CloseAsync(CloseInfo closeInfo)

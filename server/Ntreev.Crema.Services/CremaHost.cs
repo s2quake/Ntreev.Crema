@@ -168,7 +168,7 @@ namespace Ntreev.Crema.Services
                 this.UserContext = null;
                 this.DomainContext = null;
                 this.DataBaseContext = null;
-                this.log.Error(e);
+                CremaLog.Error(e);
                 throw;
             }
         }

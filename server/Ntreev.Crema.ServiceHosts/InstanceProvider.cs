@@ -44,6 +44,7 @@ namespace Ntreev.Crema.ServiceHosts
             return this.GetInstance(instanceContext, null);
         }
 
+        // 모노 환경에서는 이 메소드가 호출되지 않음. 대신 인스턴스가 IDisposable 이 구현되어 있으면 Dispose가 호출됨
         public async void ReleaseInstance(InstanceContext instanceContext, object instance)
         {
             if (instance is ICremaServiceItem serviceItem)
