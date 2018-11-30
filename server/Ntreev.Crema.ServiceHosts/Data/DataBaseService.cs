@@ -70,7 +70,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                     this.dataBase = this.DataBasesContext[dataBaseName];
                     this.dataBaseName = dataBaseName;
                 });
-                await this.dataBase.EnterAsync(this.authentication);
+                result.TaskID = await (Task<Guid>)this.dataBase.EnterAsync(this.authentication);
                 result.Value = await this.AttachEventHandlersAsync();
                 result.SignatureDate = this.authentication.SignatureDate;
                 this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseService)} {nameof(SubscribeAsync)} : {dataBaseName}");
@@ -92,7 +92,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 await this.DetachEventHandlersAsync();
                 if (this.dataBase != null)
                 {
-                    await this.dataBase?.LeaveAsync(this.authentication);
+                    result.TaskID = await (Task<Guid>)this.dataBase?.LeaveAsync(this.authentication);
                 }
                 await this.authentication.RemoveRefAsync(this);
                 this.dataBase = null;
