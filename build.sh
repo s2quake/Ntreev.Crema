@@ -1,8 +1,9 @@
 #!/bin/bash
+BASEDIR=$(dirname "$0")
 items=("cremaconsole" "cremadev" "cremaserver")
-releasePath="./bin/Release"
-deploymentPath="./build"
-solutionPath="./crema.sln"
+releasePath="$BASEDIR/bin/Release"
+deploymentPath="$BASEDIR/build"
+solutionPath="$BASEDIR/crema.sln"
 
 echo "Delete Release"
 for item in ${items[@]}
