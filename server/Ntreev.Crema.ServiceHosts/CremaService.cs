@@ -230,7 +230,9 @@ namespace Ntreev.Crema.ServiceHosts
                 this.serviceInfo.Culture = $"{CultureInfo.CurrentCulture}";
 
                 var serviceItemList = new List<ServiceItemInfo>(items.Length);
-                var port = this.Port + 1;
+                var port = this.Port;
+                if (Environment.OSVersion.Platform == PlatformID.Unix)
+                    port++;
                 foreach (var item in items)
                 {
                     var host = item.CreateInstance(port);

@@ -48,11 +48,11 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
             this.DisplayName = Resources.MenuItem_LeaveDataBase;
         }
 
-        protected override void OnExecute(object parameter)
+        protected override async void OnExecute(object parameter)
         {
             if (AppMessageBox.ShowQuestion(Resources.Message_CloseDataBase) == true)
             {
-                this.cremaAppHost.Unload();
+                await this.cremaAppHost.UnloadAsync();
             }
         }
 

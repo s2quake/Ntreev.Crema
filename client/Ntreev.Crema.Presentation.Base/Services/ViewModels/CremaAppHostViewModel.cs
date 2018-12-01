@@ -354,17 +354,15 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             this.OnLoaded(EventArgs.Empty);
         }
 
-        public async void Unload()
-        {
-            await this.UnloadAsync();
-        }
-
         public async Task UnloadAsync()
         {
             if (this.DataBaseName == string.Empty)
                 throw new InvalidOperationException();
 
             await this.CloseDocumentsAsync(false);
+            var args = new InternalCloseRequestedEventArgs();
+            this.OnUnloadRequested(args);
+            await args.WhenAll();
             this.OnUnloading(EventArgs.Empty);
             this.BeginProgress();
             await this.LeaveDataBaseAsync();
@@ -602,6 +600,8 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         public event EventHandler Loaded;
 
+        public event CloseRequestedEventHandler UnloadRequested;
+
         public event EventHandler Unloading;
 
         public event EventHandler Unloaded;
@@ -624,6 +624,11 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
         protected virtual void OnLoaded(EventArgs e)
         {
             this.Loaded?.Invoke(this, e);
+        }
+
+        protected virtual void OnUnloadRequested(CloseRequestedEventArgs e)
+        {
+            this.UnloadRequested?.Invoke(this, e);
         }
 
         protected virtual void OnUnloading(EventArgs e)

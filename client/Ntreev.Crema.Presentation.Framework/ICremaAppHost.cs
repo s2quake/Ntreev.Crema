@@ -60,6 +60,8 @@ namespace Ntreev.Crema.Presentation.Framework
 
         event EventHandler Loaded;
 
+        event CloseRequestedEventHandler UnloadRequested;
+
         event EventHandler Unloaded;
 
         event EventHandler Resetting;
