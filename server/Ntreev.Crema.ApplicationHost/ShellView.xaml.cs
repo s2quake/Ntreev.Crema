@@ -39,7 +39,6 @@ namespace Ntreev.Crema.ApplicationHost
         public ShellView()
         {
             InitializeComponent();
-
         }
 
         [ImportingConstructor]

@@ -33,7 +33,6 @@ namespace Ntreev.Crema.ServiceHosts
     public abstract class CremaServiceItemHost : ServiceHost
     {
         private readonly string serviceName;
-        private readonly ILogService logService;
         private readonly int port;
 
         protected CremaServiceItemHost(CremaService service, Type serviceType, string address, int port)
@@ -41,7 +40,6 @@ namespace Ntreev.Crema.ServiceHosts
         {
             this.Service = service;
             this.serviceName = serviceType.Name;
-            this.logService = this.CremaHost.GetService(typeof(ILogService)) as ILogService;
             this.port = port;
 #if !DEBUG
             this.DefaultInactivityTimeout = new TimeSpan(0, 1, 0);
@@ -55,7 +53,6 @@ namespace Ntreev.Crema.ServiceHosts
         {
             this.Service = service;
             this.serviceName = serviceInstance.GetType().Name;
-            this.logService = this.CremaHost.GetService(typeof(ILogService)) as ILogService;
             this.port = port;
 #if !DEBUG
             this.DefaultInactivityTimeout = new TimeSpan(0, 1, 0);
@@ -85,15 +82,17 @@ namespace Ntreev.Crema.ServiceHosts
         protected override void OnOpened()
         {
             base.OnOpened();
-            this.logService.Debug("{0}[{1}] is started.", this.serviceName, this.port);
+            this.LogService.Debug("{0}[{1}] is started.", this.serviceName, this.port);
         }
 
         protected override void OnClosed()
         {
             base.OnClosed();
-            this.logService.Debug("{0}[{1}] is stopped.", this.serviceName, this.port);
+            this.LogService.Debug("{0}[{1}] is stopped.", this.serviceName, this.port);
         }
 
         protected TimeSpan DefaultInactivityTimeout { get; set; }
+
+        protected ILogService LogService => this.CremaHost.GetService(typeof(ILogService)) as ILogService;
     }
 }

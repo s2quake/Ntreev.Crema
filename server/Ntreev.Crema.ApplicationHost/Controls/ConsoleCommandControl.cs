@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
 
 namespace Ntreev.Crema.ApplicationHost.Controls
 {
@@ -128,6 +129,12 @@ namespace Ntreev.Crema.ApplicationHost.Controls
             base.OnRenderSizeChanged(sizeInfo);
 
             Ntreev.Library.Commands.Terminal.BufferWidth = (int)sizeInfo.NewSize.Width / 6;
+        }
+
+        protected override Inline[] GetPrompt(string prompt)
+        {
+
+            return base.GetPrompt(prompt);
         }
 
         private CommandMemberDescriptor FindMemberDescriptor(List<string> argList, List<CommandMemberDescriptor> memberList)

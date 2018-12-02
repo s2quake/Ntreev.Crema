@@ -15,18 +15,6 @@ namespace Ntreev.Crema.Services
 {
     static class ServiceExtensions
     {
-        //public static void CloseService<TChannel>(this ClientBase<TChannel> service) where TChannel : class
-        //{
-        //    if (Environment.OSVersion.Platform == PlatformID.Unix)
-        //    {
-        //        service.Abort();
-        //    }
-        //    else
-        //    {
-        //        service.Close();
-        //    }
-        //}
-
         public static void CloseService<TChannel>(this ClientBase<TChannel> service, CloseReason reason) where TChannel : class
         {
             if (reason != CloseReason.Faulted && reason != CloseReason.NoResponding)
@@ -89,6 +77,15 @@ namespace Ntreev.Crema.Services
 
                 }
             }
+        }
+
+        public static void Open(this ICommunicationObject service, Func<CloseInfo, Task> closeAction)
+        {
+            service.Open();
+            service.Faulted += async (s, e) =>
+            {
+                await closeAction(new CloseInfo(CloseReason.Faulted, string.Empty));
+            };
         }
 
         public static void Unsubscribe(this DataBaseServiceClient service, CloseReason reason)

@@ -287,7 +287,6 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        // TODO taskID  받아서 대기 해야함
         public async Task EnterAsync(Authentication authentication)
         {
             try
@@ -311,11 +310,7 @@ namespace Ntreev.Crema.Services.Data
                     var taskID = await this.Dispatcher.InvokeAsync(() =>
                     {
                         this.service = DataServiceFactory.CreateServiceClient(this.CremaHost.IPAddress, this.CremaHost.ServiceInfo.GetServiceItem(nameof(DataBaseService)), this);
-                        this.service.Open();
-                        if (this.service is ICommunicationObject service)
-                        {
-                            service.Faulted += Service_Faulted;
-                        }
+                        this.service.Open(this.CloseAsync);
                         var result = this.service.Subscribe(this.CremaHost.AuthenticationToken, base.Name);
                         var metaData = result.Value;
                         this.pingTimer = new PingTimer(this.service.IsAlive, this.CremaHost.ServiceInfo.Timeout);
@@ -622,10 +617,6 @@ namespace Ntreev.Crema.Services.Data
             this.IsResetting = true;
             base.ResettingDataBase(authentication);
             this.DataBaseContext.InvokeItemsResettingEvent(authentication, new IDataBase[] { this, });
-
-
-
-            //this.DomainContext.DeleteDomains(authentication, this.ID);
         }
 
         // TODO: SetReset
@@ -1138,11 +1129,6 @@ namespace Ntreev.Crema.Services.Data
             this.pingTimer = null;
             this.service = null;
             return result;
-        }
-
-        private async void Service_Faulted(object sender, EventArgs e)
-        {
-            await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
         }
 
         #region IDataBaseServiceCallback

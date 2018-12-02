@@ -68,41 +68,28 @@ namespace Ntreev.Crema.Services.Users
                 var endPointAddress = new EndpointAddress($"net.tcp://{address}:{port}/UserContextService");
                 var instanceContext = new InstanceContext(this);
                 this.service = new UserContextServiceClient(instanceContext, binding, endPointAddress);
-                this.service.Open();
-                if (this.service is ICommunicationObject service)
+                this.service.Open(this.CloseAsync);
+            });
+            var result = await this.CremaHost.InvokeServiceAsync(() => this.service.Subscribe(authenticationToken));
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                var metaData = result.Value;
+                this.pingTimer = new PingTimer(this.service.IsAlive, timeout);
+                foreach (var item in metaData.Categories)
                 {
-                    service.Faulted += Service_Faulted;
+                    if (item == this.Root.Path)
+                        continue;
+                    this.Categories.Prepare(item);
                 }
-
-                try
+                foreach (var item in metaData.Users)
                 {
-                    var result = this.CremaHost.InvokeService(() => this.service.Subscribe(authenticationToken));
-                    var metaData = result.Value;
-                    this.pingTimer = new PingTimer(this.service.IsAlive, timeout);
-                    foreach (var item in metaData.Categories)
-                    {
-                        if (item == this.Root.Path)
-                            continue;
-                        this.Categories.Prepare(item);
-                    }
-                    foreach (var item in metaData.Users)
-                    {
-                        var itemName = new ItemName(item.Path);
-                        var user = this.Users.BaseAddNew(itemName.Name, itemName.CategoryPath);
-                        user.Initialize(item.UserInfo, item.BanInfo);
-                        user.SetUserState(item.UserState);
-                    }
-
-                    this.CurrentUser = this.Users[userID];
-                    this.CurrentUser.SetUserState(UserState.Online);
+                    var itemName = new ItemName(item.Path);
+                    var user = this.Users.BaseAddNew(itemName.Name, itemName.CategoryPath);
+                    user.Initialize(item.UserInfo, item.BanInfo);
+                    user.SetUserState(item.UserState);
                 }
-                catch
-                {
-                    this.service.CloseService(CloseReason.None);
-                    this.callbackEvent.Dispose();
-                    this.Dispatcher.Dispose();
-                    throw;
-                }
+                this.CurrentUser = this.Users[userID];
+                this.CurrentUser.SetUserState(UserState.Online);
             });
         }
 
@@ -405,11 +392,6 @@ namespace Ntreev.Crema.Services.Users
         protected virtual void OnTaskCompleted(TaskCompletedEventArgs e)
         {
             this.taskCompleted?.Invoke(this, e);
-        }
-
-        private async void Service_Faulted(object sender, EventArgs e)
-        {
-            await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
         }
 
         #region IUserContextServiceCallback
