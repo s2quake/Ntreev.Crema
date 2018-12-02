@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace Ntreev.Crema.ApplicationHost.Controls
 {
@@ -133,8 +135,34 @@ namespace Ntreev.Crema.ApplicationHost.Controls
 
         protected override Inline[] GetPrompt(string prompt)
         {
-
-            return base.GetPrompt(prompt);
+            if (prompt == string.Empty)
+            {
+                return base.GetPrompt(prompt);
+            }
+            else
+            {
+                var match = Regex.Match(prompt, $"(.+)(?<postfix>[>] )$");
+                if (Uri.TryCreate(match.Groups[1].Value, UriKind.Absolute, out var uri) == true)
+                {
+                    var runList = new List<Run>();
+                    runList.Add(new Run() { Text = uri.Scheme, Foreground = Brushes.Green });
+                    runList.Add(new Run() { Text = Uri.SchemeDelimiter });
+                    runList.Add(new Run() { Text = uri.UserInfo, Foreground = Brushes.Cyan });
+                    runList.Add(new Run() { Text = "@" });
+                    runList.Add(new Run() { Text = uri.Authority, Foreground = Brushes.Cyan });
+                    runList.Add(new Run() { Text = uri.LocalPath });
+                    runList.Add(new Run() { Text = match.Groups[2].Value });
+                    return runList.ToArray();
+                }
+                else
+                {
+                    return new Run[]
+                    {
+                        new Run() { Text = match.Groups[1].Value, Foreground = Brushes.Green },
+                        new Run() { Text = match.Groups[2].Value },
+                    };
+                }
+            }
         }
 
         private CommandMemberDescriptor FindMemberDescriptor(List<string> argList, List<CommandMemberDescriptor> memberList)
