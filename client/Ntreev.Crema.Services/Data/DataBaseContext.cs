@@ -80,13 +80,11 @@ namespace Ntreev.Crema.Services.Data
                 var endPointAddress = new EndpointAddress($"net.tcp://{address}:{port}/DataBaseContextService");
                 var instanceContext = new InstanceContext(this);
                 this.service = new DataBaseContextServiceClient(instanceContext, binding, endPointAddress);
-                this.service.Open();
-                if (this.service is ICommunicationObject service)
-                {
-                    service.Faulted += Service_Faulted;
-                }
-
-                var result = this.service.Subscribe(authenticationToken);
+                this.service.Open(this.CloseAsync);
+            });
+            var result = await this.CremaHost.InvokeServiceAsync(() => this.service.Subscribe(authenticationToken));
+            await this.Dispatcher.InvokeAsync(() =>
+            {
                 var metaData = result.Value;
                 this.pingTimer = new PingTimer(this.service.IsAlive, timeout);
                 this.Initialize(metaData);
@@ -165,32 +163,6 @@ namespace Ntreev.Crema.Services.Data
                 throw;
             }
         }
-
-        //public void RenameDataBase(Authentication authentication, DataBase dataBase, string newDataBaseName)
-        //{
-        //    this.Dispatcher.VerifyAccess();
-        //    this.CremaHost.DebugMethod(authentication, this, nameof(RenameDataBase), dataBase, newDataBaseName);
-
-        //    var dataBaseName = dataBase.Name;
-        //    var result = this.service.Rename(dataBase.Name, newDataBaseName);
-        //    result.Validate(authentication);
-        //    this.ReplaceKeyBase(dataBaseName, newDataBaseName);
-        //    dataBase.Name = newDataBaseName;
-        //    this.InvokeItemsRenamedEvent(authentication, new DataBase[] { dataBase }, new string[] { dataBaseName });
-        //}
-
-        //public void DeleteDataBase(Authentication authentication, DataBase dataBase)
-        //{
-        //    this.Dispatcher.VerifyAccess();
-        //    this.CremaHost.DebugMethod(authentication, this, nameof(DeleteDataBase), dataBase);
-
-        //    var dataBaseName = dataBase.Name;
-        //    var result = this.service.Delete(dataBase.Name);
-        //    result.Validate(authentication);
-        //    this.RemoveBase(dataBase.Name);
-        //    dataBase.Delete();
-        //    this.InvokeItemsDeletedEvent(authentication, new DataBase[] { dataBase }, new string[] { dataBaseName, });
-        //}
 
         public async Task<DataBase> CopyDataBaseAsync(Authentication authentication, DataBase dataBase, string newDataBaseName, string comment, bool force)
         {
@@ -769,25 +741,6 @@ namespace Ntreev.Crema.Services.Data
                 var dataBase = new DataBase(this, dataBaseInfo);
                 this.AddBase(dataBase.Name, dataBase);
             }
-        }
-
-        //private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        //{
-        //    this.timer?.Stop();
-        //    try
-        //    {
-        //        await this.Dispatcher.InvokeAsync(() => this.service.IsAlive());
-        //        this.timer?.Start();
-        //    }
-        //    catch
-        //    {
-
-        //    }
-        //}
-
-        private async void Service_Faulted(object sender, EventArgs e)
-        {
-            await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
         }
 
         #region IDataBaseContextServiceCallback

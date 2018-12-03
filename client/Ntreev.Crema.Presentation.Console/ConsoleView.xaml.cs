@@ -84,6 +84,7 @@ namespace Ntreev.Crema.Presentation.Console
             try
             {
                 await Task.Run(() => this.commandContext.Execute(this.commandContext.Name + " " + commandLine));
+                this.SetPrompt();
             }
             catch (System.Reflection.TargetInvocationException e)
             {
@@ -157,25 +158,17 @@ namespace Ntreev.Crema.Presentation.Console
 
         private void CommandContext_Executed(object sender, EventArgs e)
         {
-            this.SetPrompt();
+            //this.SetPrompt();
         }
 
         private void CommandContext_PathChanged(object sender, EventArgs e)
         {
-            this.SetPrompt();
+            //this.SetPrompt();
         }
 
         private void Term_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            //var scrollViewer = this.Term.Template.FindName("PART_ContentHost", this.Term) as ScrollViewer;
-            //if (scrollViewer == null)
-            //    return;
-
-            //var presenter = scrollViewer.Template.FindName("PART_ScrollContentPresenter", scrollViewer) as ScrollContentPresenter;
-            //if (presenter == null)
-            //    return;
-
-            //Ntreev.Library.Commands.Terminal.BufferWidth = (int)presenter.ActualWidth / 6;
+            
         }
 
         private void TerminalControl_Executed(object sender, RoutedEventArgs e)

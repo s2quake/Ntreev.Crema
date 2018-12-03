@@ -21,31 +21,6 @@ namespace Ntreev.Crema.ApplicationHost.Controls
             TerminalColor.BackgroundColorChanged += TerminalColor_BackgroundColorChanged;
         }
 
-        private void TerminalColor_ForegroundColorChanged(object sender, EventArgs e)
-        {
-            var foregroundColor = TerminalColor.ForegroundColor;
-
-            this.control.Dispatcher.InvokeAsync(() =>
-            {
-                if (foregroundColor == null)
-                    this.control.OutputForeground = null;
-                else
-                    this.control.OutputForeground = (Brush)this.control.FindResource(TerminalColors.FindForegroundKey(foregroundColor));
-            });
-        }
-
-        private void TerminalColor_BackgroundColorChanged(object sender, EventArgs e)
-        {
-            var backgroundColor = TerminalColor.BackgroundColor;
-            this.control.Dispatcher.InvokeAsync(() =>
-            {
-                if (backgroundColor == null)
-                    this.control.OutputBackground = null;
-                else
-                    this.control.OutputBackground = (Brush)this.control.FindResource(TerminalColors.FindBackgroundKey(backgroundColor));
-            });
-        }
-
         public override void Write(char value)
         {
             base.Write(value);
@@ -68,6 +43,31 @@ namespace Ntreev.Crema.ApplicationHost.Controls
         {
             base.Write(value);
             this.control.Dispatcher.Invoke(() => this.control.Append(value));
+        }
+
+        private void TerminalColor_ForegroundColorChanged(object sender, EventArgs e)
+        {
+            var foregroundColor = TerminalColor.ForegroundColor;
+
+            this.control.Dispatcher.Invoke(() =>
+            {
+                if (foregroundColor == null)
+                    this.control.OutputForeground = null;
+                else
+                    this.control.OutputForeground = (Brush)this.control.FindResource(TerminalColors.FindForegroundKey(foregroundColor));
+            });
+        }
+
+        private void TerminalColor_BackgroundColorChanged(object sender, EventArgs e)
+        {
+            var backgroundColor = TerminalColor.BackgroundColor;
+            this.control.Dispatcher.Invoke(() =>
+            {
+                if (backgroundColor == null)
+                    this.control.OutputBackground = null;
+                else
+                    this.control.OutputBackground = (Brush)this.control.FindResource(TerminalColors.FindBackgroundKey(backgroundColor));
+            });
         }
     }
 }

@@ -55,5 +55,10 @@ namespace Ntreev.Crema.ApplicationHost.Dialogs.Views
                 this.passwordBinding.UpdateSource();
             });
         }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.UserID.Focus();
+        }
     }
 }

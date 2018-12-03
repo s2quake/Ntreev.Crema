@@ -70,23 +70,22 @@ namespace Ntreev.Crema.Services.Domains
                 var endPointAddress = new EndpointAddress($"net.tcp://{address}:{port}/DomainContextService");
                 var instanceContext = new InstanceContext(this);
                 this.service = new DomainContextServiceClient(instanceContext, binding, endPointAddress);
-                this.service.Open();
-                if (this.service is ICommunicationObject service)
-                {
-                    service.Faulted += Service_Faulted;
-                }
-
-                var result = this.service.Subscribe(authenticationToken);
+                this.service.Open(this.CloseAsync);
+            });
+            var result = await this.CremaHost.InvokeServiceAsync(() => this.service.Subscribe(authenticationToken));
+            await this.Dispatcher.InvokeAsync(() =>
+            {
                 var metaData = result.Value;
                 this.pingTimer = new PingTimer(this.service.IsAlive, timeout);
                 this.metaData = metaData;
                 this.Initialize(metaData);
-                this.CremaHost.DataBaseContext.Dispatcher.Invoke(() =>
-                {
-                    this.CremaHost.DataBaseContext.ItemsCreated += DataBaseContext_ItemsCreated;
-                    this.CremaHost.DataBaseContext.ItemsRenamed += DataBaseContext_ItemsRenamed;
-                    this.CremaHost.DataBaseContext.ItemsDeleted += DataBaseContext_ItemDeleted;
-                });
+            });
+            //  TODO: 데이터 베이스 변경은 서버에서 내용을 받아 갱신하는것으로 개선하는것이 좋을것 같음
+            await this.CremaHost.DataBaseContext.Dispatcher.InvokeAsync(() =>
+            {
+                this.CremaHost.DataBaseContext.ItemsCreated += DataBaseContext_ItemsCreated;
+                this.CremaHost.DataBaseContext.ItemsRenamed += DataBaseContext_ItemsRenamed;
+                this.CremaHost.DataBaseContext.ItemsDeleted += DataBaseContext_ItemDeleted;
             });
         }
 
@@ -451,25 +450,6 @@ namespace Ntreev.Crema.Services.Domains
                 }
             }
         }
-
-        private async void Service_Faulted(object sender, EventArgs e)
-        {
-            await this.CloseAsync(new CloseInfo(CloseReason.Faulted, string.Empty));
-        }
-
-        //private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        //{
-        //    this.pingTimer?.Stop();
-        //    try
-        //    {
-        //        await this.Dispatcher.InvokeAsync(() => this.service.IsAlive());
-        //        this.pingTimer?.Start();
-        //    }
-        //    catch
-        //    {
-
-        //    }
-        //}
 
         #region IDomainContextServiceCallback
 

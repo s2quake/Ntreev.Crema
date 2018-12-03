@@ -59,7 +59,7 @@ namespace Ntreev.Crema.ServiceModel
             ServiceItems = new ServiceItemInfo[] { },
         };
 
-        internal ServiceItemInfo GetServiceItem(string name)
+        public ServiceItemInfo GetServiceItem(string name)
         {
             foreach (var item in this.ServiceItems)
             {

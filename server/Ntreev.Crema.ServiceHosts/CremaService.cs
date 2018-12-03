@@ -35,6 +35,8 @@ using System.ServiceModel;
 using System.Diagnostics;
 using System.Globalization;
 using Ntreev.Library;
+using System.Net.NetworkInformation;
+using System.Net;
 
 namespace Ntreev.Crema.ServiceHosts
 {
@@ -44,9 +46,9 @@ namespace Ntreev.Crema.ServiceHosts
         private const string cremaString = "Crema";
         private readonly List<ServiceHost> hosts = new List<ServiceHost>();
         private readonly IServiceProvider serviceProvider;
+        private IServiceHostProvider[] hostProviders;
         private ServiceInfo serviceInfo;
         private ICremaHost cremaHost;
-        private ILogService logService;
         private IConfigurationCommitter configCommitter;
         private CremaHostServiceHost cremaHostServiceHost;
         private Guid token;
@@ -74,19 +76,36 @@ namespace Ntreev.Crema.ServiceHosts
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
+                this.ValidateOpen();
                 this.ServiceState = ServiceState.Opening;
                 this.OnOpening(EventArgs.Empty);
                 this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
+                this.hostProviders = (this.GetService(typeof(IEnumerable<IServiceHostProvider>)) as IEnumerable<IServiceHostProvider>).TopologicalSort().ToArray();
+                var serviceItemList = new List<ServiceItemInfo>(this.hostProviders.Length);
+                var port = this.Port;
+                foreach (var item in this.hostProviders)
+                {
+                    if (Environment.OSVersion.Platform == PlatformID.Unix)
+                        port++;
+                    serviceItemList.Add(new ServiceItemInfo()
+                    {
+                        Name = item.Name,
+                        Port = port,
+                    });
+                }
+                this.serviceInfo.Port = this.Port;
+                this.serviceInfo.Timeout = this.Timeout;
+                this.serviceInfo.Version = $"{new Version(FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).ProductVersion)}";
+                this.serviceInfo.PlatformID = $"{Environment.OSVersion.Platform}";
+                this.serviceInfo.Culture = $"{CultureInfo.CurrentCulture}";
+                this.serviceInfo.ServiceItems = serviceItemList.ToArray();
             });
             this.token = await this.cremaHost.OpenAsync();
             this.configCommitter = this.cremaHost.GetService(typeof(IRepositoryConfiguration)) as IConfigurationCommitter;
-            this.cremaHost.Closed += CremaHost_Closed;
-            await this.Dispatcher.InvokeAsync(() =>
+            await this.cremaHost.Dispatcher.InvokeAsync(() =>
             {
-                this.logService = this.cremaHost.GetService(typeof(ILogService)) as ILogService;
-                this.cremaHostServiceHost = new CremaHostServiceHost(this, this.Port);
-                this.cremaHostServiceHost.Open();
-                this.logService.Info(Resources.ServiceStart, nameof(CremaHostServiceHost));
+                this.cremaHost.CloseRequested += CremaHost_CloseRequested;
+                this.cremaHost.Closed += CremaHost_Closed;
             });
             await this.StartServicesAsync();
             await this.Dispatcher.InvokeAsync(() =>
@@ -100,15 +119,15 @@ namespace Ntreev.Crema.ServiceHosts
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
+                this.ValidateClose();
                 this.OnClosing(EventArgs.Empty);
             });
-            await this.StopServicesAsync();
-            await this.Dispatcher.InvokeAsync(() =>
+            await this.cremaHost.Dispatcher.InvokeAsync(() =>
             {
-                this.cremaHostServiceHost.Close();
-                this.cremaHostServiceHost = null;
-                this.logService.Info(Resources.ServiceStop, nameof(CremaHostServiceHost));
+                this.cremaHost.CloseRequested -= CremaHost_CloseRequested;
+                this.cremaHost.Closed -= CremaHost_Closed;
             });
+            await this.StopServicesAsync();
             await this.cremaHost.CloseAsync(this.token);
             this.configCommitter.Commit();
             this.configCommitter = null;
@@ -119,22 +138,11 @@ namespace Ntreev.Crema.ServiceHosts
             });
         }
 
-        public async Task RestartAsync()
-        {
-            await this.StopServicesAsync();
-            await this.cremaHost.CloseAsync(this.token);
-            this.configCommitter.Commit();
-            this.configCommitter = null;
-            this.token = await this.cremaHost.OpenAsync();
-            this.configCommitter = this.cremaHost.GetService(typeof(IRepositoryConfiguration)) as IConfigurationCommitter;
-            await this.StartServicesAsync();
-        }
-
         public int Port { get; set; } = AddressUtility.DefaultPort;
 
         public int Timeout { get; set; } = 60000;
 
-        public ServiceInfo ServiceInfo => this.serviceInfo;
+        public ServiceInfo ServiceInfo => this.ServiceState == ServiceState.Opened ?  this.serviceInfo : ServiceInfo.Empty;
 
         public CremaDispatcher Dispatcher { get; private set; }
 
@@ -168,11 +176,21 @@ namespace Ntreev.Crema.ServiceHosts
             this.Closed?.Invoke(this, e);
         }
 
+        protected ILogService LogService => this.cremaHost.GetService(typeof(ILogService)) as ILogService;
+
+        private static bool IsPortUsed(int port)
+        {
+            var properties = IPGlobalProperties.GetIPGlobalProperties();
+            var items = properties.GetActiveTcpListeners();
+            return items.Any(item => item.Port == port);
+        }
+
         private async void CremaHost_Opened(object sender, EventArgs e)
         {
             if (sender is ICremaHost cremaHost)
             {
-                cremaHost.Opened -= CremaHost_Opened;
+                this.cremaHost.Opened -= CremaHost_Opened;
+                this.configCommitter = this.cremaHost.GetService(typeof(IRepositoryConfiguration)) as IConfigurationCommitter;
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ServiceState = ServiceState.Opening;
@@ -185,34 +203,32 @@ namespace Ntreev.Crema.ServiceHosts
             }
         }
 
-        private async void CremaHost_Closed(object sender, ClosedEventArgs e)
+        private void CremaHost_CloseRequested(object sender, CloseRequestedEventArgs e)
         {
-            if (sender is ICremaHost cremaHost)
+            e.AddTask(InvokeAsync());
+
+            async Task InvokeAsync()
             {
-                if (e.Reason == CloseReason.Restart)
-                    cremaHost.Opened += CremaHost_Opened;
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.ServiceState = ServiceState.Closing;
                 });
                 await this.StopServicesAsync();
+            }
+        }
+
+        private async void CremaHost_Closed(object sender, ClosedEventArgs e)
+        {
+            if (sender is ICremaHost)
+            {
+                if (e.Reason == CloseReason.Restart)
+                    this.cremaHost.Opened += CremaHost_Opened;
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    if (e.Reason == CloseReason.Shutdown)
-                    {
-                        this.cremaHostServiceHost.Close();
-                        this.cremaHostServiceHost = null;
-                        this.logService.Info(Resources.ServiceStop, nameof(CremaHostServiceHost));
-                        this.configCommitter.Commit();
-                        this.configCommitter = null;
-                        this.token = Guid.Empty;
-                        this.ServiceState = ServiceState.Closed;
-                        this.OnClosed(e);
-                    }
-                    else
-                    {
-                        this.ServiceState = ServiceState.Closed;
-                    }
+                    this.configCommitter.Commit();
+                    this.configCommitter = null;
+                    this.ServiceState = ServiceState.Closed;
+                    this.OnClosed(e);
                 });
             }
         }
@@ -221,32 +237,18 @@ namespace Ntreev.Crema.ServiceHosts
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                var providers = this.GetService(typeof(IEnumerable<IServiceHostProvider>)) as IEnumerable<IServiceHostProvider>;
-                var items = providers.TopologicalSort().ToArray();
-                this.serviceInfo.Port = this.Port;
-                this.serviceInfo.Timeout = this.Timeout;
-                this.serviceInfo.Version = $"{new Version(FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).ProductVersion)}";
-                this.serviceInfo.PlatformID = $"{Environment.OSVersion.Platform}";
-                this.serviceInfo.Culture = $"{CultureInfo.CurrentCulture}";
-
-                var serviceItemList = new List<ServiceItemInfo>(items.Length);
-                var port = this.Port + 1;
-                foreach (var item in items)
+                this.cremaHostServiceHost = new CremaHostServiceHost(this, this.Port);
+                this.cremaHostServiceHost.Open();
+                this.LogService.Info(Resources.ServiceStart, nameof(CremaHostServiceHost));
+                foreach (var item in this.hostProviders)
                 {
-                    var host = item.CreateInstance(port);
+                    var serviceItemInfo = this.serviceInfo.GetServiceItem(item.Name);
+                    var host = item.CreateInstance(serviceItemInfo.Port);
                     host.Open();
                     this.hosts.Add(host);
-                    this.logService.Info(Resources.ServiceStart_Port, host.GetType().Name, port);
-                    serviceItemList.Add(new ServiceItemInfo()
-                    {
-                        Name = item.Name,
-                        Port = port,
-                    });
-                    if (Environment.OSVersion.Platform == PlatformID.Unix)
-                        port++;
+                    this.LogService.Info(Resources.ServiceStart_Port, host.GetType().Name, serviceItemInfo.Port);
                 }
-                this.serviceInfo.ServiceItems = serviceItemList.ToArray();
-                this.logService.Info(Resources.ServiceStart, cremaString);
+                this.LogService.Info(Resources.ServiceStart, cremaString);
             });
         }
 
@@ -260,13 +262,49 @@ namespace Ntreev.Crema.ServiceHosts
                 foreach (var item in this.hosts.Reverse<ServiceHost>())
                 {
                     item.Close();
-                    this.logService.Info(Resources.ServiceStop, item.GetType().Name);
+                    this.LogService.Info(Resources.ServiceStop, item.GetType().Name);
                 }
 
                 this.hosts.Clear();
                 this.serviceInfo = ServiceInfo.Empty;
-                this.logService.Info(Resources.ServiceStop, cremaString);
+                this.LogService.Info(Resources.ServiceStop, cremaString);
+
+                this.cremaHostServiceHost.Close();
+                this.cremaHostServiceHost = null;
+                this.LogService.Info(Resources.ServiceStop, nameof(CremaHostServiceHost));
             });
+        }
+
+        private void ValidateOpen()
+        {
+            if (this.ServiceState != ServiceState.None)
+                throw new InvalidOperationException();
+
+            var providers = (this.GetService(typeof(IEnumerable<IServiceHostProvider>)) as IEnumerable<IServiceHostProvider>).TopologicalSort().ToArray();
+            var serviceItemList = new List<ServiceItemInfo>(providers.Length);
+            var port = this.Port;
+            this.ValidatePort(port);
+            foreach (var item in providers)
+            {
+                if (Environment.OSVersion.Platform == PlatformID.Unix)
+                    port++;
+                this.ValidatePort(port);
+            }
+        }
+
+        private void ValidateClose()
+        {
+            if (this.ServiceState != ServiceState.Opened)
+                throw new InvalidOperationException();
+        }
+
+        private void ValidatePort(int port)
+        {
+
+            if (IsPortUsed(port) == true)
+            {
+                throw new InvalidOperationException($"port {port} can not use.");
+            }
         }
     }
 }

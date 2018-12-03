@@ -16,7 +16,7 @@ namespace Ntreev.Crema.ApplicationHost.Dialogs.ViewModels
 
         public LoginViewModel()
         {
-
+            this.DisplayName = "Login";
         }
 
         public void Login()
@@ -41,11 +41,11 @@ namespace Ntreev.Crema.ApplicationHost.Dialogs.ViewModels
             {
                 this.password = value;
                 this.NotifyOfPropertyChange(nameof(this.Password));
-                this.NotifyOfPropertyChange(nameof(this.CanCreate));
+                this.NotifyOfPropertyChange(nameof(this.CanLogin));
             }
         }
 
-        public bool CanCreate
+        public bool CanLogin
         {
             get
             {

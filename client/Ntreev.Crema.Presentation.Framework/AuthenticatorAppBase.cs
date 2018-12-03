@@ -34,11 +34,10 @@ namespace Ntreev.Crema.Presentation.Framework
         {
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Loaded += CremaAppHost_Loaded;
+            this.cremaAppHost.UnloadRequested += CremaAppHost_UnloadRequested;
             this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
             this.cremaAppHost.CloseRequested += CremaAppHost_CloseRequested;
         }
-
-
 
         protected AuthenticatorAppBase(ICremaAppHost cremaAppHost, string name)
             : base(name)
@@ -55,6 +54,11 @@ namespace Ntreev.Crema.Presentation.Framework
                 this.dataBase = dataBase;
                 await this.dataBase.EnterAsync(this);
             }
+        }
+
+        private void CremaAppHost_UnloadRequested(object sender, CloseRequestedEventArgs e)
+        {
+            e.AddTask(this.dataBase.LeaveAsync(this));
         }
 
         private void CremaAppHost_Unloaded(object sender, EventArgs e)
