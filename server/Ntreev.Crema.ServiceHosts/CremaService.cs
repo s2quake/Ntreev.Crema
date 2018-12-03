@@ -120,6 +120,7 @@ namespace Ntreev.Crema.ServiceHosts
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.ValidateClose();
+                this.ServiceState = ServiceState.Closing;
                 this.OnClosing(EventArgs.Empty);
             });
             await this.cremaHost.Dispatcher.InvokeAsync(() =>
@@ -134,6 +135,7 @@ namespace Ntreev.Crema.ServiceHosts
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.token = Guid.Empty;
+                this.ServiceState = ServiceState.Closed;
                 this.OnClosed(new ClosedEventArgs(CloseReason.Shutdown, string.Empty));
             });
         }
@@ -300,7 +302,6 @@ namespace Ntreev.Crema.ServiceHosts
 
         private void ValidatePort(int port)
         {
-
             if (IsPortUsed(port) == true)
             {
                 throw new InvalidOperationException($"port {port} can not use.");
