@@ -39,8 +39,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
         {
             this.commandContext = commandContext;
         }
-
-#if DEBUG
+        
         public async Task StartAsync(string authentication)
         {
             if (authentication != null)
@@ -51,13 +50,12 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
             this.SetPrompt();
             base.Start();
         }
-#else
+
         public new void Start()
         {
             this.SetPrompt();
             base.Start();
         }
-#endif
 
         public async Task CancelAsync()
         {

@@ -78,12 +78,15 @@ namespace Ntreev.Crema.ConsoleHost.Commands
 #if DEBUG
         [CommandProperty('l', IsExplicit = true)]
         [DefaultValue("admin:admin")]
+#else
+        [CommandProperty('l')]
+#endif
         public string LoginAuthentication
         {
             get;
             set;
         }
-#endif
+
 
         protected override Task OnExecuteAsync()
         {
@@ -104,12 +107,15 @@ namespace Ntreev.Crema.ConsoleHost.Commands
         {
             this.CommandContext.SetAddress(this.Address);
 
-#if DEBUG
-            await this.Terminal.StartAsync(this.LoginAuthentication);
-#else
-            await Task.Delay(1);
-            this.Terminal.Start();
-#endif
+            if (this.LoginAuthentication != null)
+            {
+                await this.Terminal.StartAsync(this.LoginAuthentication);
+            }
+            else
+            {
+                await Task.Delay(1);
+                this.Terminal.Start();
+            }
         }
 
         private ConsoleTerminal Terminal => this.terminal.Value;

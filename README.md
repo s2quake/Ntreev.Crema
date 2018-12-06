@@ -54,38 +54,42 @@
 * mac osx에서 사용가능
    * 터미널 기반 프로그램 한정
 
-## 프로그램 구성
-### cremaserver
-콘솔 기반 크레마 서버 구동 프로그램
+## 실행 방법
+### git 설치
+https://git-scm.com/ 에서 git 을 다운로드 받아 설치
 
+![Alt text](git-setup.png)
+
+    설치 옵션에서 꼭 위 옵션을 선택하여 윈도우 콘솔창에서 git 실행이 가능한 상태여야함
+
+### 저장소 생성
+
+    cremaserver.exe init "C:\Crema\repo" --force
+
+### 서버 실행
+#### 콘솔모드로 실행
 ![Alt text](cremaserver.png)
 
-    실행 예시
-    cremaserver.exe run repo-path
-### cremaserverApp
-GUI 기반 크레마 서버 구동 프로그램
+    cremaserver.exe run "C:\Crema\repo" --prompt -- master
 
+#### App 으로 실행
 ![Alt text](cremaserverApp.png)
 
-    실행 예시
-    cremaserverApp.exe --base-path repo-path --run
-### crema
-UI 기반 크레마 클라이언트 프로그램
+    cremaserverApp.exe --base-path "C:\Crema\repo" --run -- master
 
+
+### 클라이언트 실행 및 접속
+#### App 으로 접속
 ![Alt text](crema.png)
-### cremaconsole
-콘솔 기반 크레마 클라이언트 프로그램
 
-    실행 예시
-    cremaconsole.exe connect localhost
-    cremaconsole.exe run javascript.js
-### cremadev
-콘솔 기반 크레마 코드 및 바이너리 데이터 생성 프로그램
+    crema.exe --address "crema://admin:admin@localhost/master"
 
-    실행 예시
-    cremadev.exe get localhost outputPath --lang cs
-    cremadev.exe get localhost outputPath --lang ts
-    cremadev.exe get localhost outputPath --lang cpp
+#### 콘솔모드로 실행 및 접속 
+    cremaconsole.exe connect localhost -l admin:admin
+
+### 코드와 데이터 생성
+
+    cremadev.exe get localhost "C:\Crema\codes" --lang cs --database master
 
 ## Development Environment
 * Microsoft Visual Studio Community 2017
@@ -93,12 +97,6 @@ UI 기반 크레마 클라이언트 프로그램
 * .NET Framework 4.5
 * WPF(Windows Presentation Foundation)
 * WCF(Windows Communication Foundation)
-
-## 실행 필수 요소
-* [git](https://git-scm.com/)
-    * 미설치시 cremaserver 구동 불가능
-
-![Alt text](git-setup.png)
 
 ## 사용된 프로젝트
 * Second Earth
