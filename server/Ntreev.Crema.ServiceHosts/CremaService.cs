@@ -182,6 +182,8 @@ namespace Ntreev.Crema.ServiceHosts
 
         private static bool IsPortUsed(int port)
         {
+            if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+                return false;
             var properties = IPGlobalProperties.GetIPGlobalProperties();
             var items = properties.GetActiveTcpListeners();
             return items.Any(item => item.Port == port);
