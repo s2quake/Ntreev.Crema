@@ -64,32 +64,39 @@ https://git-scm.com/ 에서 git 을 다운로드 받아 설치
 
 ### 저장소 생성
 
-    cremaserver.exe init "C:\Crema\repo" --force
+    build 경로 기준
+    .\cremaserver\cremaserver.exe init "C:\Crema\repo" --force
 
 ### 서버 실행
 #### 콘솔모드로 실행
 ![Alt text](cremaserver.png)
 
-    cremaserver.exe run "C:\Crema\repo" --prompt -- master
+    build 경로에서
+    .\cremaserver\remaserver.exe run "C:\Crema\repo" --prompt -- master
 
 #### App 으로 실행
 ![Alt text](cremaserverApp.png)
 
-    cremaserverApp.exe --base-path "C:\Crema\repo" --run -- master
+    build 경로에서
+    .\cremaserverApp\cremaserverApp.exe --base-path "C:\Crema\repo" --run -- master
 
 
 ### 클라이언트 실행 및 접속
 #### App 으로 접속
 ![Alt text](crema.png)
 
-    crema.exe --address "crema://admin:admin@localhost/master"
+    build 경로에서
+    .\crema\crema.exe --address "crema://admin:admin@localhost/master"
 
 #### 콘솔모드로 실행 및 접속 
-    cremaconsole.exe connect localhost -l admin:admin
+
+    build 경로에
+    .\cremaconsole\cremaconsole.exe connect localhost -l admin:admin
 
 ### 코드와 데이터 생성
 
-    cremadev.exe get localhost "C:\Crema\codes" --lang cs --database master
+    build 경로에서
+    .\cremadev\cremadev.exe get localhost "C:\Crema\codes" --lang cs --database master
 
 ## Development Environment
 * Microsoft Visual Studio Community 2017
