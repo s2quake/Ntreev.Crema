@@ -50,12 +50,17 @@ namespace Ntreev.Crema.Services
 
         public static void CreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, bool force)
         {
+            CreateRepository(serviceProvider, basePath, repositoryModule, fileType, force, null);
+        }
+
+        public static void CreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, bool force, string dataBaseUrl)
+        {
             ValidateCreateRepository(serviceProvider, basePath, repositoryModule, fileType, force);
             var repositoryProvider = GetRepositoryProvider(serviceProvider, repositoryModule);
             var serializer = GetSerializer(serviceProvider, fileType);
 
             var tempPath = PathUtility.GetTempPath(true);
-            var repositoryPath = Path.Combine(basePath, CremaString.Repository);
+            var repositoryPath = Path.Combine(PathUtility.GetFullPath(basePath), CremaString.Repository);
 
             DirectoryUtility.Backup(repositoryPath);
             try
@@ -63,15 +68,22 @@ namespace Ntreev.Crema.Services
                 var usersRepo = DirectoryUtility.Prepare(repositoryPath, CremaString.Users);
                 var usersPath = DirectoryUtility.Prepare(tempPath, CremaString.Users);
                 var dataBasesRepo = DirectoryUtility.Prepare(repositoryPath, CremaString.DataBases);
-                var dataBasesPath = DirectoryUtility.Prepare(tempPath, CremaString.DataBases);
-                var dataSet = new CremaDataSet();
 
                 UserContext.GenerateDefaultUserInfos(usersPath, serializer);
                 repositoryProvider.InitializeRepository(usersRepo, usersPath, new LogPropertyInfo() { Key = LogPropertyInfo.VersionKey, Value = AppUtility.ProductVersion });
 
-                dataSet.WriteToDirectory(dataBasesPath);
-                FileUtility.WriteAllText($"{CremaSchema.MajorVersion}.{CremaSchema.MinorVersion}", dataBasesPath, ".version");
-                repositoryProvider.InitializeRepository(dataBasesRepo, dataBasesPath);
+                if (dataBaseUrl == null)
+                {
+                    var dataBasesPath = DirectoryUtility.Prepare(tempPath, CremaString.DataBases);
+                    var dataSet = new CremaDataSet();
+                    dataSet.WriteToDirectory(dataBasesPath);
+                    FileUtility.WriteAllText($"{CremaSchema.MajorVersion}.{CremaSchema.MinorVersion}", dataBasesPath, ".version");
+                    repositoryProvider.InitializeRepository(dataBasesRepo, dataBasesPath);
+                }
+                else
+                {
+                    repositoryProvider.InitializeRepository(dataBasesRepo, dataBaseUrl);
+                }
 
                 var repoModulePath = FileUtility.WriteAllText(repositoryProvider.Name, repositoryPath, CremaString.Repo);
                 var fileTypePath = FileUtility.WriteAllText(serializer.Name, repositoryPath, CremaString.File);

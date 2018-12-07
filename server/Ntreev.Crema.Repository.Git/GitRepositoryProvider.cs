@@ -342,6 +342,29 @@ namespace Ntreev.Crema.Repository.Git
 
         public void InitializeRepository(string basePath, string repositoryPath, params LogPropertyInfo[] properties)
         {
+            var cloneCommand = new GitCommand(null, "clone")
+            {
+                (GitPath)repositoryPath,
+                (GitPath)basePath,
+            };
+
+            try
+            {
+                cloneCommand.Run();
+                var fetchCommand = new GitCommand(basePath, "fetch")
+                {
+                    "origin",
+                    "refs/notes/commits:refs/notes/commits",
+                };
+                fetchCommand.Run();
+                return;
+            }
+            catch
+            {
+                DirectoryUtility.Delete(basePath);
+                DirectoryUtility.Create(basePath);
+            }
+
             var initCommand = new GitCommand(null, "init")
             {
                 (GitPath)basePath

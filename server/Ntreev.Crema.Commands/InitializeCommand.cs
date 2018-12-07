@@ -71,6 +71,13 @@ namespace Ntreev.Crema.Commands
             set;
         }
 
+        [CommandProperty("database-url")]
+        public string DataBaseUrl
+        {
+            get;
+            set;
+        }
+
         protected override void OnExecute()
         {
             var directoryInfo = new DirectoryInfo(this.Path);
@@ -82,7 +89,7 @@ namespace Ntreev.Crema.Commands
             {
                 throw new ArgumentException("Path is not an empty directory.", nameof(this.Path));
             }
-            CremaBootstrapper.CreateRepository(this.boot, this.Path, this.RepositoryModule, this.FileType, this.Force);
+            CremaBootstrapper.CreateRepository(this.boot, this.Path, this.RepositoryModule, this.FileType, this.Force, this.DataBaseUrl);
         }
     }
 }
