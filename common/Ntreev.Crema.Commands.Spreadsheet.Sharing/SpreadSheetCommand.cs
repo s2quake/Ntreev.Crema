@@ -61,12 +61,13 @@ namespace Ntreev.Crema.Commands.Spreadsheet
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         [CommandMethodStaticProperty(typeof(DataSetTypeProperties))]
-        [CommandMethodProperty(nameof(DataBase), nameof(OmitAttribute), nameof(OmitSignatureDate), nameof(Revision), nameof(SaveEach), nameof(IsForce))]
+        [CommandMethodProperty(nameof(DataBaseName), nameof(OmitAttribute), nameof(OmitSignatureDate), nameof(Revision), nameof(SaveEach), nameof(IsForce))]
         public async Task ExportAsync(string filename)
         {
             this.ValidateExport(filename);
+            var path = PathUtility.GetFullPath(filename, this.CommandContext.BaseDirectory);
             var authentication = this.CommandContext.GetAuthentication(this);
-            var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[this.DataBase]);
+            var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[this.DataBaseName]);
             var revision = dataBase.Dispatcher.Invoke(() => this.Revision ?? dataBase.DataBaseInfo.Revision);
             var dataSet = await dataBase.GetDataSetAsync(authentication, DataSetTypeProperties.DataSetType, FilterProperties.FilterExpression, revision);
             var settings = new SpreadsheetWriterSettings()
@@ -80,11 +81,11 @@ namespace Ntreev.Crema.Commands.Spreadsheet
                 settings.Sort = this.Comparison;
             settings.Properties.Add(nameof(Revision), revision);
             settings.Properties.Add(nameof(FilterProperties.FilterExpression), FilterProperties.FilterExpression);
-            settings.Properties.Add(nameof(DataBase), this.DataBase);
+            settings.Properties.Add(nameof(DataBaseName), this.DataBaseName);
             if (this.SaveEach == true)
-                this.WriteDataSetToDirectory(dataSet, filename, settings);
+                this.WriteDataSetToDirectory(dataSet, path, settings);
             else
-                this.WriteDataSet(dataSet, filename, settings);
+                this.WriteDataSet(dataSet, path, settings);
         }
 
         [CommandMethod]
@@ -92,10 +93,10 @@ namespace Ntreev.Crema.Commands.Spreadsheet
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         public async Task ImportAsync(string filename)
         {
-            var path = Path.GetFullPath(Path.Combine(this.CommandContext.BaseDirectory, filename));
+            var path = PathUtility.GetFullPath(filename, this.CommandContext.BaseDirectory);
             var sheetNames = SpreadsheetReader.ReadTableNames(path);
             var authentication = this.CommandContext.GetAuthentication(this);
-            var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[this.DataBase]);
+            var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[this.DataBaseName]);
             var tableNames = dataBase.Dispatcher.Invoke(() => dataBase.TableContext.Tables.Select(item => item.Name).ToArray());
             var query = from sheet in sheetNames
                         join table in tableNames on sheet equals SpreadsheetUtility.Ellipsis(table)
@@ -139,7 +140,7 @@ namespace Ntreev.Crema.Commands.Spreadsheet
         }
 
         [CommandProperty("database")]
-        public string DataBase
+        public string DataBaseName
         {
             get
             {
@@ -286,9 +287,10 @@ namespace Ntreev.Crema.Commands.Spreadsheet
 
         private void ValidateExport(string filename)
         {
-            if (this.SaveEach == false && File.Exists(filename) == true && this.IsForce == false)
+            var path = PathUtility.GetFullPath(filename, this.CommandContext.BaseDirectory);
+            if (this.SaveEach == false && File.Exists(path) == true && this.IsForce == false)
                 throw new InvalidOperationException("해당 파일이 이미 존재합니다.");
-            if (this.SaveEach == true && Directory.Exists(filename) == true && this.IsForce == false)
+            if (this.SaveEach == true && Directory.Exists(path) == true && this.IsForce == false)
                 throw new InvalidOperationException("해당 폴더가 이미 존재합니다.");
         }
 
