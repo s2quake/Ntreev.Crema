@@ -103,6 +103,12 @@ namespace Ntreev.Crema.Commands
             get; set;
         }
 
+        [CommandProperty("verbose", 'v')]
+        public bool Verbose
+        {
+            get; set;
+        }
+
         protected override async Task OnExecuteAsync()
         {
             if (this.Culture != string.Empty)
@@ -111,7 +117,7 @@ namespace Ntreev.Crema.Commands
                 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = new System.Globalization.CultureInfo(this.Culture);
             }
 
-            this.Out.WriteLine("receiving info");
+            this.WriteLine("receiving info");
             var metaData = await this.service.GetMetaDataAsync(this.Address, DataBaseSettings.DataBaseName, DataBaseSettings.Tags, FilterSettings.FilterExpression, this.Revision);
 
             var generationSettings = new CodeGenerationSettings()
@@ -137,24 +143,34 @@ namespace Ntreev.Crema.Commands
                 var compiler = this.compilers.FirstOrDefault(item => item.Name == CodeSettings.LanguageType);
                 if (compiler == null)
                     throw new InvalidOperationException($"'{CodeSettings.LanguageType}'은(는) 존재하지 언어입니다.");
-                this.Out.WriteLine("compiling code.");
+                this.WriteLine("compiling code.");
                 compiler.Compile(this.OutputPath, metaData.Item1, generationSettings, CodeSettings.BuildTarget);
-                this.Out.WriteLine("code compiled.");
+                this.WriteLine("code compiled.");
             }
             else
             {
-                this.Out.WriteLine("code generating.");
+                this.WriteLine("code generating.");
                 var generator = this.generators.FirstOrDefault(item => item.Name == CodeSettings.LanguageType);
                 if (generator == null)
                     throw new InvalidOperationException($"'{CodeSettings.LanguageType}'은(는) 존재하지 언어입니다.");
                 generator.Generate(this.OutputPath, metaData.Item1, generationSettings);
-                this.Out.WriteLine("code generated.");
+                this.WriteLine("code generated.");
             }
 
-            this.Out.WriteLine("data serializing.");
+            this.WriteLine("data serializing.");
             var serializer = this.serializers.FirstOrDefault(item => item.Name == this.DataType);
-            serializer.Serialize(Path.Combine(this.OutputPath, this.DataFilename), metaData.Item2);
-            this.Out.WriteLine("data serialized.");
+            var dataPath = Path.Combine(this.OutputPath, this.DataFilename);
+            serializer.Serialize(dataPath, metaData.Item2);
+            this.Out.WriteLine($"created: {dataPath}");
+            this.WriteLine("data serialized.");
+        }
+
+        private void WriteLine(string text)
+        {
+            if (this.Verbose == true)
+            {
+                this.Out.WriteLine(text);
+            }
         }
 
         private TextWriter Out

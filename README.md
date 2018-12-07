@@ -33,6 +33,10 @@
     * cremadev
     * cremaserver
 
+## Linux
+1. https://www.monodevelop.com 에서 운영체제에 맞는 MonoDevelop을 설치
+2. 이후 과정은 Mac OS 와 동일
+
 ## 주요 특징
 ### 게임 디자이너
 * 동시 편집
@@ -57,6 +61,8 @@
 ## 실행 방법
 ### git 설치
 https://git-scm.com/ 에서 git 을 다운로드 받아 설치
+
+    명령 프롬프트에서 git 실행이 가능하다면 설치가 필요하지 않습니다.
 
 ![Alt text](git-setup.png)
 
@@ -117,7 +123,7 @@ https://git-scm.com/ 에서 git 을 다운로드 받아 설치
 * [ClosedXML](https://github.com/ClosedXML/ClosedXML)
 * [DocumentFormat.OpenXml](https://github.com/OfficeDev/Open-XML-SDK)
 * [jint](https://github.com/sebastienros/jint)
-* [log4net](http://logging.apache.org/log4net/)
+* [log4net](http://logging.apacㄹhe.org/log4net/)
 * [ModernUI.WPF](https://github.com/firstfloorsoftware/mui)
 * [MahApps.Metro](https://github.com/MahApps/MahApps.Metro)
 * [Newtonsoft.Json](https://www.newtonsoft.com/json)
