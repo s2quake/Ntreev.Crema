@@ -59,6 +59,12 @@
    * 터미널 기반 프로그램 한정
 
 ## 실행 방법
+### Mac OS and Linux
+[Quick Start](../../wiki/QuickStartOnLinux)
+
+### Windows
+[Quick Start][Quick Start](../../wiki/QuickStart)
+
 ### git 설치
 https://git-scm.com/ 에서 git 을 다운로드 받아 설치
 
