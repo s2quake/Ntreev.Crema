@@ -73,7 +73,7 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
                 var codes = this.GenerateBaseCodes(generationInfo);
                 foreach (var item in codes)
                 {
-                    var codePath = FileUtility.WriteAllText(item.Value, Encoding.UTF8, outputPath, item.Key);
+                    var codePath = FileUtility.WriteAllText(item.Value, Encoding.UTF8, path, item.Key);
                     this.PrintResult(codePath);
                 }
             }
