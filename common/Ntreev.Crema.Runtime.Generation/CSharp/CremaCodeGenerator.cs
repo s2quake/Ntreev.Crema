@@ -55,14 +55,15 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
 
         public void Generate(string outputPath, GenerationSet metaData, CodeGenerationSettings settings)
         {
-            var generationInfo = new CodeGenerationInfo(outputPath, metaData, settings);
+            var path = PathUtility.GetFullPath(outputPath);
+            var generationInfo = new CodeGenerationInfo(path, metaData, settings);
 
             if (settings.Options.HasFlag(CodeGenerationOptions.OmitCode) == false)
             {
                 var codes = this.GenerateCodes(generationInfo);
                 foreach (var item in codes)
                 {
-                    var codePath = FileUtility.WriteAllText(item.Value, Encoding.UTF8, outputPath, item.Key);
+                    var codePath = FileUtility.WriteAllText(item.Value, Encoding.UTF8, path, item.Key);
                     this.PrintResult(codePath);
                 }
             }
@@ -80,16 +81,17 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
 
         public void Compile(string outputPath, GenerationSet metaData, CodeGenerationSettings settings, string target)
         {
-            var generationInfo = new CodeGenerationInfo(outputPath, metaData, settings);
+            var path = PathUtility.GetFullPath(outputPath);
+            var generationInfo = new CodeGenerationInfo(path, metaData, settings);
 
             if (settings.Options.HasFlag(CodeGenerationOptions.OmitCode) == false && settings.Options.HasFlag(CodeGenerationOptions.OmitBaseCode) == false)
             {
-                var filename = this.CompileAll(outputPath, generationInfo, target);
+                var filename = this.CompileAll(path, generationInfo, target);
                 this.PrintResult(filename);
             }
             else if (settings.Options.HasFlag(CodeGenerationOptions.OmitCode) == true)
             {
-                var filename = this.CompileBase(outputPath, generationInfo, target);
+                var filename = this.CompileBase(path, generationInfo, target);
                 this.PrintResult(filename);
             }
             else if (settings.Options.HasFlag(CodeGenerationOptions.OmitBaseCode) == true)
@@ -98,7 +100,7 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
                 try
                 {
                     var readerPath = this.CompileBase(tempPath, generationInfo, target);
-                    var filename = this.Compile(outputPath, readerPath, generationInfo, target);
+                    var filename = this.Compile(path, readerPath, generationInfo, target);
                     this.PrintResult(filename);
                 }
                 finally

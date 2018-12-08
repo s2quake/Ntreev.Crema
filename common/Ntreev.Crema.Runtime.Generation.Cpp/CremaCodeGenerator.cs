@@ -39,17 +39,18 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
     {
         public void Generate(string outputPath, GenerationSet metaData, CodeGenerationSettings settings)
         {
+            var path = PathUtility.GetFullPath(outputPath);
             var generationInfo = new CodeGenerationInfo(metaData, settings) { RelativePath = string.Empty, };
 
             if (settings.BasePath != string.Empty)
             {
-                var relativePath = UriUtility.MakeRelativeOfDirectory(new DirectoryInfo(outputPath).FullName, DirectoryUtility.GetAbsolutePath(outputPath, settings.BasePath));
+                var relativePath = UriUtility.MakeRelativeOfDirectory(path, DirectoryUtility.GetAbsolutePath(path, settings.BasePath));
                 generationInfo.RelativePath = relativePath + "/";
             }
 
             {
                 var codes = this.Generate(generationInfo);
-                var dirInfo = new DirectoryInfo(outputPath);
+                var dirInfo = new DirectoryInfo(path);
                 var rootPath = generationInfo.Namespace.Replace('.', Path.DirectorySeparatorChar);
                 foreach (var item in codes)
                 {
@@ -69,7 +70,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
             if (settings.Options.HasFlag(CodeGenerationOptions.OmitBaseCode) == false)
             {
                 var codes = this.GenerateBases(generationInfo);
-                var codesPath = DirectoryUtility.GetAbsolutePath(outputPath, settings.BasePath);
+                var codesPath = DirectoryUtility.GetAbsolutePath(path, settings.BasePath);
                 foreach (var item in codes)
                 {
                     var codePath = FileUtility.Prepare(codesPath, item.Key);
@@ -129,7 +130,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
 
         public bool SupportsCompile
         {
-            get { throw new NotImplementedException(); }
+            get { return false; }
         }
 
         public string Name
@@ -279,7 +280,7 @@ namespace Ntreev.Crema.Runtime.Generation.Cpp
         private void PrintResult(string path)
         {
             FileInfo fileInfo = new FileInfo(path);
-            Console.WriteLine("generated : {0}", fileInfo.FullName);
+            Console.WriteLine("created: {0}", fileInfo.FullName);
         }
     }
 }

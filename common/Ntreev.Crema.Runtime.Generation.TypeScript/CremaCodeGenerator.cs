@@ -53,7 +53,8 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
 
         public void Generate(string outputPath, GenerationSet metaData, CodeGenerationSettings settings)
         {
-            var generationInfo = new CodeGenerationInfo(outputPath, metaData, settings);
+            var path = PathUtility.GetFullPath(outputPath);
+            var generationInfo = new CodeGenerationInfo(path, metaData, settings);
 
             if (settings.Options.HasFlag(CodeGenerationOptions.OmitCode) == false)
             {
@@ -61,7 +62,7 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
 
                 foreach (var item in codes)
                 {
-                    var codePath = FileUtility.WriteAllText(item.Value, Encoding.UTF8, outputPath, item.Key);
+                    var codePath = FileUtility.WriteAllText(item.Value, Encoding.UTF8, path, item.Key);
                     this.PrintResult(codePath);
                 }
             }
@@ -72,7 +73,7 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
 
                 foreach (var item in codes)
                 {
-                    var codePath = FileUtility.WriteAllText(item.Value, Encoding.UTF8, outputPath, item.Key);
+                    var codePath = FileUtility.WriteAllText(item.Value, Encoding.UTF8, path, item.Key);
                     this.PrintResult(codePath);
                 }
             }
@@ -82,7 +83,8 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
         {
             if (target == null)
                 throw new ArgumentNullException(nameof(target));
-            var generationInfo = new CodeGenerationInfo(outputPath, metaData, settings);
+            var path = PathUtility.GetFullPath(outputPath);
+            var generationInfo = new CodeGenerationInfo(path, metaData, settings);
 
             var codes1 = this.GenerateCodes(generationInfo);
             var codes2 = this.GenerateBaseCodes(generationInfo);
@@ -90,12 +92,12 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
 
             var codes = TypeScriptCompiler.Compile(codes3, target == string.Empty ? "ES5" : target);
 
-            if (Directory.Exists(outputPath) == false)
-                Directory.CreateDirectory(outputPath);
+            if (Directory.Exists(path) == false)
+                Directory.CreateDirectory(path);
 
             foreach (var item in codes)
             {
-                string codePath = Path.Combine(outputPath, item.Key);
+                string codePath = Path.Combine(path, item.Key);
 
                 using (StreamWriter sw = new StreamWriter(codePath, false, Encoding.UTF8))
                 {
@@ -212,7 +214,7 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript
         private void PrintResult(string path)
         {
             FileInfo fileInfo = new FileInfo(path);
-            Console.WriteLine("generated : {0}", fileInfo.FullName);
+            Console.WriteLine("created: {0}", fileInfo.FullName);
         }
 
         private string GetResourceString(string name)
