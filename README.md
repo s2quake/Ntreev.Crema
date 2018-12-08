@@ -3,11 +3,12 @@
 게임 디자이너에게는 데이터를 생성 및 관리를 할 수 있게 UI를 제공하며
 게임 프로그래머에게는 데이터를 쉽게 사용할 수 있도록 코드와 바이너리 데이터 생성기능을 제공합니다.
 
-    1. Design Data
-    2. Generate Code and BinaryData
-    3. Include Code And BinaryData in your project.
-    4. Add codes to read and use (c#, typescript, c++)
-    5. Compile and Run
+    1. 크레마로 데이터를 디자인
+    2. 코드와 데이터 생성
+    3. 당신의 프로젝트에 코드와 데이터를 포함
+    4. 데이터를 읽어들이는 코드 추가 (new CremaData("crema.dat"))
+    5. 데이터 사용 코드 추가 (dataSet.Table1.Rows[0].ID)
+    6. 컴파일 및 실행
 
 # Build
 ## Windows
@@ -37,6 +38,13 @@
 1. https://www.monodevelop.com 에서 운영체제에 맞는 MonoDevelop을 설치
 2. 이후 과정은 Mac OS 와 동일
 
+## 실행 방법
+### Mac OS and Linux
+[Quick Start](../../wiki/QuickStartOnLinux)
+
+### Windows
+[Quick Start](../../wiki/QuickStart)
+
 ## 주요 특징
 ### 게임 디자이너
 * 동시 편집
@@ -58,57 +66,23 @@
 * mac osx에서 사용가능
    * 터미널 기반 프로그램 한정
 
-## 실행 방법
-### Mac OS and Linux
-[Quick Start](../../wiki/QuickStartOnLinux)
-
-### Windows
-[Quick Start][Quick Start](../../wiki/QuickStart)
-
-### git 설치
-https://git-scm.com/ 에서 git 을 다운로드 받아 설치
-
-    명령 프롬프트에서 git 실행이 가능하다면 설치가 필요하지 않습니다.
-
-![Alt text](git-setup.png)
-
-    설치 옵션에서 꼭 위 옵션을 선택하여 윈도우 콘솔창에서 git 실행이 가능한 상태여야함
-
-### 저장소 생성
-
-    build 경로 기준
-    .\cremaserver\cremaserver.exe init "C:\Crema\repo" --force
-
+## 프로그램 구성
 ### 서버 실행
-#### 콘솔모드로 실행
+#### 콘솔
 ![Alt text](cremaserver.png)
 
-    build 경로에서
-    .\cremaserver\remaserver.exe run "C:\Crema\repo" --prompt -- master
-
-#### App 으로 실행
+#### App
 ![Alt text](cremaserverApp.png)
 
-    build 경로에서
-    .\cremaserverApp\cremaserverApp.exe --base-path "C:\Crema\repo" --run -- master
-
-
-### 클라이언트 실행 및 접속
-#### App 으로 접속
+### 클라이언트
+#### App
 ![Alt text](crema.png)
 
-    build 경로에서
-    .\crema\crema.exe --address "crema://admin:admin@localhost/master"
+#### 콘솔
+![Alt text](cremaconsole.png)
 
-#### 콘솔모드로 실행 및 접속 
-
-    build 경로에
-    .\cremaconsole\cremaconsole.exe connect localhost -l admin:admin
-
-### 코드와 데이터 생성
-
-    build 경로에서
-    .\cremadev\cremadev.exe get localhost "C:\Crema\codes" --lang cs --database master
+### 코드와 바이너리 데이터 생성
+![Alt text](cremadev.png)
 
 ## Development Environment
 * Microsoft Visual Studio Community 2017
