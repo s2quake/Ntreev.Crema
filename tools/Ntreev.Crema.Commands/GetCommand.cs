@@ -159,7 +159,7 @@ namespace Ntreev.Crema.Commands
 
             this.WriteLine("data serializing.");
             var serializer = this.serializers.FirstOrDefault(item => item.Name == this.DataType);
-            var dataPath = Path.Combine(this.OutputPath, this.DataFilename);
+            var dataPath = Path.Combine(PathUtility.GetFullPath(this.OutputPath), this.DataFilename);
             serializer.Serialize(dataPath, metaData.Item2);
             this.Out.WriteLine($"created: {dataPath}");
             this.WriteLine("data serialized.");
