@@ -1,10 +1,10 @@
 $items = @("crema", "cremaconsole", "cremaserver", "cremaserverApp", "cremadev", "cremadevApp")
 $msbuildPath = ""
-$releasePath = ".\bin\Release"
-$deploymentPath = ".\build"
-$solutionPath = ".\crema.sln"
+$releasePath = "$PSScriptRoot\bin\Release"
+$deploymentPath = "$PSScriptRoot\build"
+$solutionPath = "$PSScriptRoot\crema.sln"
 
-foreach ($item in Invoke-Expression ".\vswhere.exe") {
+foreach ($item in Invoke-Expression "$PSScriptRoot\vswhere.exe") {
     if ($item -match "^installationPath: (.+)") {
         $msbuildPath = Join-Path $Matches[1] "\MSBuild\15.0\Bin\MSBuild.exe"
         break;
@@ -25,13 +25,14 @@ if ($msbuildPath -eq "") {
 Write-Host "Delete Release"
 foreach ($item in $items) {
     $path = Join-Path "$releasePath" $item
+    Write-Host $path
     if (Test-Path "$path") {
-        Remove-Item "$path" -Recurse
+        Remove-Item "$path" -Recurse -ErrorAction Stop
     }
 }
 
 if (Test-Path "$deploymentPath") {
-    Remove-Item "$deploymentPath" -Recurse
+    Remove-Item "$deploymentPath" -Recurse-ErrorAction Stop
 }
 
 Write-Host "Restore"
