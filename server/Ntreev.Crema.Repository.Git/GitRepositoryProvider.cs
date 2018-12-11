@@ -357,6 +357,7 @@ namespace Ntreev.Crema.Repository.Git
                     "refs/notes/commits:refs/notes/commits",
                 };
                 fetchCommand.Run();
+                GitConfig.SetValue(basePath, "receive.denyCurrentBranch", "ignore");
                 return;
             }
             catch
