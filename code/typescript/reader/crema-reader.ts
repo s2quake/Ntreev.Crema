@@ -570,9 +570,9 @@ class BinaryRow extends CremaRow {
             } else if (column.dataType === "uint32") {
                 return this._fieldbytes.readUInt32LE(offset);
             } else if (column.dataType === "int64") {
-                return this._fieldbytes.readIntLE(offset, 8);
+                return (this._fieldbytes.readInt32LE(offset + 4) << 8) + this._fieldbytes.readInt32LE(offset)
             } else if (column.dataType === "uint64") {
-                return this._fieldbytes.readUIntLE(offset, 8);
+                return (this._fieldbytes.readUInt32LE(offset + 4) << 8) + this._fieldbytes.readUInt32LE(offset);
             }
             throw new Error(column.dataType);
         }
@@ -757,13 +757,13 @@ class BufferReader {
     }
 
     public readInt64(): number {
-        let value: number = this.buffer.readIntLE(this.pos, 8);
+        let value: number = (this.buffer.readInt32LE(this.pos + 4) << 8) + this.buffer.readInt32LE(this.pos);
         this.pos += 8;
         return value;
     }
 
     public readUInt64(): number {
-        let value: number = this.buffer.readUIntLE(this.pos, 8);
+        let value: number = (this.buffer.readUInt32LE(this.pos + 4) << 8) + this.buffer.readUInt32LE(this.pos)
         this.pos += 8;
         return value;
     }

@@ -32,7 +32,7 @@ foreach ($item in $items) {
 }
 
 if (Test-Path "$deploymentPath") {
-    Remove-Item "$deploymentPath" -Recurse-ErrorAction Stop
+    Remove-Item "$deploymentPath" -Recurse -ErrorAction Stop
 }
 
 Write-Host "Restore"
