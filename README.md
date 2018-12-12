@@ -13,6 +13,7 @@
 # Build
 ## Windows
 1. https://visualstudio.microsoft.com/downloads 에서 Visual Studio Community 이상의 버전 설치
+    * 구성요소중 **.NET 데스크톱 개발** 이 설치되어야 합니다.
 2. 명령 프롬프트에서 `git clone https://github.com/s2quake/Crema.git --recursive` 을(를) 실행
 3. 명령 프롬프트에서 `cd Crema` 을(를) 실행하여 클론된 Crema 경로로 이동
 4. 명령 프롬프트에서 `.\build.bat` 을(를) 실행하여 빌드
@@ -39,11 +40,11 @@
 2. 이후 과정은 Mac OS 와 동일
 
 ## 실행 방법
-### Mac OS and Linux
-[Quick Start](../../wiki/QuickStartOnLinux)
-
 ### Windows
 [Quick Start](../../wiki/QuickStart)
+
+### Mac OS and Linux
+[Quick Start](../../wiki/QuickStartOnLinux)
 
 ## 주요 특징
 ### 게임 디자이너
