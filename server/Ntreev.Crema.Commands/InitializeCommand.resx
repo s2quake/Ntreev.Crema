@@ -120,9 +120,6 @@
   <data name="@InitializeCommand" xml:space="preserve">
     <value>저장소 생성 및 초기화합니다.</value>
   </data>
-  <data name="Force" xml:space="preserve">
-    <value>강제로 저장소를 생성합니다.</value>
-  </data>
   <data name="InitializeCommand" xml:space="preserve">
     <value>지정된 경로에 저장소를 생성합니다. 지정된 경로는 빈 폴더이여야만 합니다. 빈 폴더인지에 대한 여부와 상관없이 생성하려면 --force를 설정하십시오.</value>
   </data>

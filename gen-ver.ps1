@@ -42,5 +42,5 @@ else {
     throw "assembly path not found: $assemblyPath"
 }
 
-Set-Content version.txt $fileVersion
-Write-Host $fileVersion
+Set-Content version.txt $fileVersion -NoNewline
+Write-Host $fileVersion -NoNewline

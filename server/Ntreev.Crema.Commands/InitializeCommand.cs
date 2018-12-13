@@ -51,12 +51,6 @@ namespace Ntreev.Crema.Commands
             set;
         }
 
-        [CommandProperty]
-        public bool Force
-        {
-            get; set;
-        }
-
         [CommandProperty("repo-module")]
         public string RepositoryModule
         {
@@ -80,16 +74,7 @@ namespace Ntreev.Crema.Commands
 
         protected override void OnExecute()
         {
-            var directoryInfo = new DirectoryInfo(this.Path);
-            if (directoryInfo.Exists == false && this.Force == true)
-            {
-                DirectoryUtility.Create(directoryInfo.FullName);
-            }
-            if (DirectoryUtility.IsEmpty(directoryInfo.FullName) == false && this.Force == false)
-            {
-                throw new ArgumentException("Path is not an empty directory.", nameof(this.Path));
-            }
-            CremaBootstrapper.CreateRepository(this.boot, this.Path, this.RepositoryModule, this.FileType, this.Force, this.DataBaseUrl);
+            CremaBootstrapper.CreateRepository(this.boot, this.Path, this.RepositoryModule, this.FileType, this.DataBaseUrl);
         }
     }
 }

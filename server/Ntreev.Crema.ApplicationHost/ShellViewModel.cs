@@ -102,12 +102,13 @@ namespace Ntreev.Crema.ApplicationHost
             {
                 var basePath = dialog.FileName;
                 var isEmpty = DirectoryUtility.IsEmpty(basePath);
-                if (isEmpty == false && AppMessageBox.ShowProceed("대상 경로는 비어있지 않습니다. 그래도 생성하시겠습니까?") == false)
+                if (isEmpty == false)
                 {
+                    AppMessageBox.Show("대상 경로는 비어있지 않습니다.");
                     return;
                 }
 
-                CremaBootstrapper.CreateRepository(this.service, basePath, "git", "xml", !isEmpty);
+                CremaBootstrapper.CreateRepository(this.service, basePath, "git", "xml");
                 AppMessageBox.Show("저장소를 생성했습니다.");
                 this.BasePath = basePath;
             }

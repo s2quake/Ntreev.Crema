@@ -48,14 +48,14 @@ namespace Ntreev.Crema.Services
             this.Initialize();
         }
 
-        public static void CreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, bool force)
+        public static void CreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType)
         {
-            CreateRepository(serviceProvider, basePath, repositoryModule, fileType, force, null);
+            CreateRepository(serviceProvider, basePath, repositoryModule, fileType, null);
         }
 
-        public static void CreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, bool force, string dataBaseUrl)
+        public static void CreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, string dataBaseUrl)
         {
-            ValidateCreateRepository(serviceProvider, basePath, repositoryModule, fileType, force);
+            ValidateCreateRepository(serviceProvider, basePath, repositoryModule, fileType);
             var repositoryProvider = GetRepositoryProvider(serviceProvider, repositoryModule);
             var serializer = GetSerializer(serviceProvider, fileType);
 
@@ -451,7 +451,7 @@ namespace Ntreev.Crema.Services
             CremaLog.Debug("Initialized.");
         }
 
-        private static void ValidateCreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType, bool force)
+        private static void ValidateCreateRepository(IServiceProvider serviceProvider, string basePath, string repositoryModule, string fileType)
         {
             if (serviceProvider == null)
                 throw new ArgumentNullException(nameof(serviceProvider));
@@ -459,11 +459,11 @@ namespace Ntreev.Crema.Services
                 throw new ArgumentNullException(nameof(basePath));
 
             var directoryInfo = new DirectoryInfo(basePath);
-            if (directoryInfo.Exists == false && force == true)
+            if (directoryInfo.Exists == false)
             {
                 DirectoryUtility.Create(directoryInfo.FullName);
             }
-            if (DirectoryUtility.IsEmpty(directoryInfo.FullName) == false && force == false)
+            else if (DirectoryUtility.IsEmpty(directoryInfo.FullName) == false)
             {
                 throw new ArgumentException("Path is not an empty directory.", nameof(basePath));
             }
