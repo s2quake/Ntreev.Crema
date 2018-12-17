@@ -19,6 +19,8 @@ namespace Ntreev.Crema.Services
 {
     public enum CremaPath
     {
+        Repository,
+
         RepositoryUsers,
 
         RepositoryDataBases,

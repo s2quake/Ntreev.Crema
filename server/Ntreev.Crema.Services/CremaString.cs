@@ -30,5 +30,6 @@ namespace Ntreev.Crema.Services
         public const string DataBases = "databases";
         public const string Repo = "repo";
         public const string File = "file";
+        public const string Lock = "lock";
     }
 }

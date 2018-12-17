@@ -80,6 +80,7 @@
     <Compile Include="IObjectSerializer.cs" />
     <Compile Include="IRepositoryProviderExtensions.cs" />
     <Compile Include="RepositoryHostExtensions.cs" />
+    <Compile Include="RepositoryLocker.cs" />
     <Compile Include="RepositoryPath.cs" />
     <Compile Include="RepositorySettings.cs" />
     <Compile Include="RepositoryInfo.cs" />

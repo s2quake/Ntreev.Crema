@@ -45,8 +45,8 @@ namespace Ntreev.Crema.Services
         private readonly CremaSettings settings;
         private readonly IRepositoryProvider[] repositoryProviders;
         private readonly IObjectSerializer[] serializers;
-        private string databasesPath;
-        private string usersPath;
+        //private string databasesPath;
+        //private string usersPath;
         private LogService log;
         private Guid token;
         private ShutdownTimer shutdownTimer;
@@ -123,10 +123,9 @@ namespace Ntreev.Crema.Services
                     this.ServiceState = ServiceState.Opening;
                 });
                 this.BasePath = this.settings.BasePath;
+                this.RepositoryLocker = new RepositoryLocker(this);
                 this.RepositoryProvider = repositoryProviders.First(item => item.Name == this.settings.RepositoryModule);
                 this.Serializer = serializers.First(item => item.Name == this.settings.FileType);
-                this.databasesPath = this.settings.RepositoryDataBasesUrl;
-                this.usersPath = this.settings.RepositoryUsersUrl;
                 this.log = new LogService("log", this.GetPath(CremaPath.Logs), false)
                 {
                     Name = "repository",
@@ -208,6 +207,8 @@ namespace Ntreev.Crema.Services
                     this.OnClosed(new ClosedEventArgs(reason, message));
                 });
                 this.configs = null;
+                this.RepositoryLocker.Dispose();
+                this.RepositoryLocker = null;
                 await this.RepositoryDispatcher.DisposeAsync();
                 this.RepositoryDispatcher = null;
                 this.log.Dispose();
@@ -349,21 +350,15 @@ namespace Ntreev.Crema.Services
 
         public string GetPath(CremaPath pathType, params string[] paths)
         {
-            switch (pathType)
-            {
-                case CremaPath.RepositoryUsers:
-                    return this.usersPath;
-                case CremaPath.RepositoryDataBases:
-                    return this.databasesPath;
-                default:
-                    return GetPath(this.BasePath, pathType, paths);
-            }
+            return GetPath(this.BasePath, pathType, paths);
         }
 
         public static string GetPath(string basePath, CremaPath pathType, params string[] paths)
         {
             switch (pathType)
             {
+                case CremaPath.Repository:
+                    return Path.Combine(Path.Combine(basePath, CremaString.Repository), Path.Combine(paths));
                 case CremaPath.RepositoryUsers:
                     return Path.Combine(Path.Combine(basePath, CremaString.Repository, CremaString.Users), Path.Combine(paths));
                 case CremaPath.RepositoryDataBases:
@@ -374,6 +369,8 @@ namespace Ntreev.Crema.Services
 
             throw new NotImplementedException();
         }
+
+        public RepositoryLocker RepositoryLocker { get; private set; }
 
         public IRepositoryProvider RepositoryProvider { get; private set; }
 
