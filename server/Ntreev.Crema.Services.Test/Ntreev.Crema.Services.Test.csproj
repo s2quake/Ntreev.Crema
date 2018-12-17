@@ -128,9 +128,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="MSTest.TestAdapter">
       <Version>1.1.18</Version>
     </PackageReference>

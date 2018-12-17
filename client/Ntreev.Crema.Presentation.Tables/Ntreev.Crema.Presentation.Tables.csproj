@@ -168,8 +168,6 @@
     <Compile Include="ITableDocumentService.cs" />
     <Compile Include="IPropertyService.cs" />
     <Compile Include="ITableBrowser.cs" />
-    <None Include="app.config" />
-    <None Include="LayoutUpdateStrategy.cs" />
     <Compile Include="MenuItems\SelectInBrowserMenuItem.cs" />
     <Compile Include="MenuItems\CancelTemplateEditMenuItem.cs" />
     <Compile Include="MenuItems\CancelContentEditMenuItem.cs" />

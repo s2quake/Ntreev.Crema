@@ -50,9 +50,6 @@
     <Compile Include="ScriptMethodContext.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj">
       <Project>{04aeb614-3510-4064-99af-0aa807c7f957}</Project>
       <Name>Ntreev.Crema.Data</Name>

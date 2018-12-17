@@ -31,7 +31,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)CremaDataSetTypesCreator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaDataSetTagsCreator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaDataCreator.cs" />
-    <None Include="$(MSBuildThisFileDirectory)CremaDataBaseExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CremaRandomUtility.cs" />
   </ItemGroup>
 </Project>

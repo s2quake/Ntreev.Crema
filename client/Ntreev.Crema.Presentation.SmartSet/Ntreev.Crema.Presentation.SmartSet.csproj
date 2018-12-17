@@ -88,7 +88,6 @@
       <DependentUpon>TypeSmartSetBrowserView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ISmartSet.cs" />
-    <Compile Include="ITypeSmartSetBrowser.cs" />
     <Compile Include="ISmartSetBrowser.cs" />
     <Compile Include="ISmartSetCategory.cs" />
     <Compile Include="MenuItems\AddBookmarkTypeMenu.cs" />
@@ -133,7 +132,6 @@
     <Compile Include="Rules\ViewModels\StringCompareRuleItemViewModel.cs" />
     <Compile Include="IRule.cs" />
     <Compile Include="OperatorType.cs" />
-    <Compile Include="RuleCollection.cs" />
     <Compile Include="Rules\ViewModels\Tables\ColumnCountRuleViewModel.cs" />
     <Compile Include="Rules\ViewModels\Tables\ColumnDataTypeRuleViewModel.cs" />
     <Compile Include="Rules\ViewModels\Tables\ColumnNameRuleViewModel.cs" />

@@ -25,14 +25,8 @@ namespace Ntreev.Crema.Presentation.SmartSet
 {
     struct BookmarkItem
     {
-        Guid DataBaseID
-        {
-            get; set;
-        }
+        Guid DataBaseID { get; set; }
 
-        Guid ItemID
-        {
-            get; set;
-        }
+        Guid ItemID { get; set; }
     }
 }
