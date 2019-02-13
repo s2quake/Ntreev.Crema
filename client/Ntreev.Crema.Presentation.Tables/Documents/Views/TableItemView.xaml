@@ -24,7 +24,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:local="clr-namespace:Ntreev.Crema.Presentation.Tables.Documents.Views"
              xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
              xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Tables.Properties"
-             xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="400">
 
@@ -53,6 +52,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
+    
+    <UserControl.CommandBindings>
+        <CommandBinding Command="{x:Static local:TableItemView.InsertCommand}" Executed="Insert_Executed" CanExecute="Insert_CanExecute" />
+        <CommandBinding Command="{x:Static local:TableItemView.InsertManyCommand}" Executed="InsertMany_Executed" CanExecute="InsertMany_CanExecute" />
+    </UserControl.CommandBindings>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -64,8 +68,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
         <TextBlock Grid.Row="0" Text="{x:Static p:Resources.Message_IsReadOnly}" Style="{StaticResource ReadOnly_TextBlock_Style}" />
 
-        <nmfc:ExpandableToolBar Grid.Row="1">
-            <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/new.png" x:Name="NewRow" />
+        <nmfc:ExpandableToolBar Grid.Row="1" ItemsSource="{Binding ToolBarItems}">
+            <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/new.png" Style="{StaticResource ToolBar_IconButton_Style}"
+                             Command="{x:Static local:TableItemView.InsertCommand}" />
+            <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/insert-many.png" Style="{StaticResource ToolBar_IconButton_Style}"
+                             Command="{x:Static local:TableItemView.InsertManyCommand}" />
             <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/parent.png" x:Name="SelectParent" Style="{StaticResource SelectParent_IconButton_Style}" />
         </nmfc:ExpandableToolBar>
         <Border Grid.Row="2" BorderThickness="0 1 0 0" BorderBrush="{DynamicResource ItemBorder}">
@@ -77,7 +84,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                       SelectedItemIndex="{Binding SelectedItemIndex, Mode=TwoWay, Delay=100}"
                                       SelectedColumn="{Binding SelectedColumn, Mode=TwoWay, Delay=100}"
                                       SearchText="{Binding Filter, Mode=TwoWay, Delay=300}"
-                                      Domain="{Binding Domain}" />
+                                      Domain="{Binding Domain}"/>
+
         </Border>
         <Border Grid.Row="3" BorderThickness="0 1 0 0" BorderBrush="{DynamicResource ItemBorder}">
             <TextBox Grid.Row="2" x:Name="currentField" IsReadOnly="True" VerticalScrollBarVisibility="Auto"

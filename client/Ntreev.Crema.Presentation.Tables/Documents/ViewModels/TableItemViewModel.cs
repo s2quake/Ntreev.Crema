@@ -30,22 +30,37 @@ using System.Threading.Tasks;
 using System.Data;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels;
+using System.Windows.Input;
+using Ntreev.ModernUI.Framework;
+using Ntreev.Crema.Presentation.Framework.Controls;
+using System.ComponentModel.Composition;
+using Xceed.Wpf.DataGrid;
 
 namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 {
     class TableItemViewModel : TableListItemBase, ITableDocumentItem, ITableContentDescriptor
     {
         private readonly TableContentDescriptor contentDescriptor;
+        private readonly ICommand insertCommand;
         private CremaDataTable dataTable;
         private IDomain domain;
         private object selectedItem;
         private int selectedIndex;
         private string selectedColumn;
+        private DataGridContext currentContext;
+
+#pragma warning disable IDE0044 // 읽기 전용 한정자 추가
+        [Import]
+        private IServiceProvider serviceProvider = null;
+#pragma warning restore IDE0044 // 읽기 전용 한정자 추가
 
         public TableItemViewModel(Authentication authentication, TableDescriptor descriptor, object owner)
             : base(authentication, descriptor, owner)
         {
             this.contentDescriptor = descriptor.ContentDescriptor;
+
+            this.insertCommand = new DelegateCommand(async (p) => await this.NewRowAsync());
+
         }
 
         public async Task NewRowAsync()
@@ -68,6 +83,53 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 
             var dialog = await ChangeParentViewModel.CreateAsync(authentication, row);
             dialog.ShowDialog();
+        }
+
+        public async Task InsertManyAsync()
+        {
+                //var gridContext = DataGridControl.GetDataGridContext(this);
+                //var gridControl = gridContext.DataGridControl as TableSourceDataGridControl;
+                //var inserter = new DomainTextClipboardInserter(gridContext);
+
+                //var textData = ClipboardUtility.GetData(true);
+
+                //if (textData.Length == 1)
+                //{
+                //    //var textLine = textData.First();
+                //    //var index = gridContext.CurrentColumn == null ? -1 : gridContext.VisibleColumns.IndexOf(gridContext.CurrentColumn);
+
+                //    //for (var i = 0; i < textLine.Length; i++)
+                //    //{
+                //    //    var text = textLine[i];
+                //    //    var column = gridContext.VisibleColumns[index + i];
+                //    //    if (this.Cells[column] is TableSourceDataCell cell)
+                //    //    {
+                //    //        cell.BeginEdit();
+                //    //        cell.EditingContent = text;
+                //    //        cell.EndEdit();
+                //    //    }
+                //    //}
+                //}
+                //else
+                //{
+                //    inserter.Parse(textData);
+
+                //    var domainRows = inserter.DomainRows;
+                //    var domain = gridControl.Domain;
+                //    var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
+
+                //    (gridContext.Items as INotifyCollectionChanged).CollectionChanged += Items_CollectionChanged;
+                //    try
+                //    {
+                //        this.results = domain.Dispatcher.Invoke(() => domain.NewRow(authenticator, domainRows));
+                //    }
+                //    catch (Exception e)
+                //    {
+                //        this.results = null;
+                //        (gridContext.Items as INotifyCollectionChanged).CollectionChanged -= Items_CollectionChanged;
+                //        throw e;
+                //    }
+                //}
         }
 
         public override string DisplayName => this.descriptor.TableName;
@@ -132,6 +194,16 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 
         public bool CanSelectParent => this.selectedItem != null;
 
+        public virtual IEnumerable<IToolBarItem> ToolBarItems
+        {
+            get
+            {
+                if (this.serviceProvider == null)
+                    return Enumerable.Empty<IToolBarItem>();
+                return ToolBarItemUtility.GetToolBarItems(this, this.serviceProvider);
+            }
+        }
+
         protected override void OnDisposed(EventArgs e)
         {
             base.OnDisposed(e);
@@ -164,7 +236,6 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             }
         }
 
-
         #region ITableDocumentItem
 
         ITable ITableDocumentItem.Target => this.Target as ITable;
@@ -182,6 +253,12 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
         IDomain ITableContentDescriptor.TargetDomain => this.contentDescriptor.TargetDomain;
 
         ITableContent ITableContentDescriptor.Target => this.contentDescriptor.Target as ITableContent;
+
+        #endregion
+
+        #region Commands
+
+        public ICommand InsertCommand => this.insertCommand;
 
         #endregion
     }

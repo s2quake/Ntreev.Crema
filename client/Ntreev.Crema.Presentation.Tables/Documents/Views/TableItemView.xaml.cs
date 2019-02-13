@@ -38,6 +38,13 @@ using System.ComponentModel.Composition;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library;
 using Ntreev.Crema.Presentation.Tables.MenuItems.TableMenus;
+using Xceed.Wpf.DataGrid;
+using Ntreev.Crema.Presentation.Framework.Controls;
+using System.Collections.Specialized;
+using Ntreev.ModernUI.Framework;
+using Ntreev.Crema.Data;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Presentation.Tables.Documents.ToolBarItems;
 
 namespace Ntreev.Crema.Presentation.Tables.Documents.Views
 {
@@ -56,6 +63,16 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.Views
         private IStatusBarService statusBarService = null;
         private ILineInfo lineInfo;
 
+        //[Import]
+        //private InsertToolbarItem insertToolbarItem = null;
+
+        public static readonly RoutedCommand InsertCommand =
+            new RoutedUICommand("Insert...", nameof(InsertCommand), typeof(TableItemView),
+                new InputGestureCollection() { new KeyGesture(Key.F12) });
+
+        public static readonly RoutedCommand InsertManyCommand =
+            new RoutedUICommand("Insert Many", nameof(InsertManyCommand), typeof(TableItemView));
+
         public TableItemView()
         {
             InitializeComponent();
@@ -63,7 +80,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.Views
 
         public void Dispose()
         {
-            
+
         }
 
         public override void OnApplyTemplate()
@@ -120,8 +137,8 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.Views
         {
             if (sender is ModernDataGridControl gridControl)
             {
-                if (e.PropertyName == nameof(gridControl.GlobalCurrentItem) || 
-                    e.PropertyName == nameof(gridControl.GlobalCurrentColumn) || 
+                if (e.PropertyName == nameof(gridControl.GlobalCurrentItem) ||
+                    e.PropertyName == nameof(gridControl.GlobalCurrentColumn) ||
                     (e.PropertyName == nameof(gridControl.IsBeingEdited) && gridControl.IsBeingEdited == false))
                 {
                     if (gridControl.GlobalCurrentItem != null && gridControl.GlobalCurrentColumn != null)
@@ -138,6 +155,88 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.Views
                     }
                 }
             }
+        }
+
+        private void Insert_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        private void Insert_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void InsertMany_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.InsertManyAsync();
+            e.Handled = true;
+        }
+
+        private void InsertMany_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private async void InsertManyAsync()
+        {
+            var gridContext = DataGridControl.GetDataGridContext(this.gridControl);
+            var gridControl = gridContext.DataGridControl as TableSourceDataGridControl;
+            var inserter = new DomainTextClipboardInserter(gridContext);
+            var textData = ClipboardUtility.GetData(true);
+
+            try
+            {
+                inserter.Parse(textData);
+            }
+            catch (Exception e)
+            {
+                AppMessageBox.ShowError(e);
+                return;
+            }
+
+            var domainRows = inserter.DomainRows;
+            var domain = gridControl.Domain;
+            var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
+
+            try
+            {
+                var info = await (Task<DomainResultInfo<DomainRowInfo[]>>)domain.NewRowAsync(authenticator, domainRows);
+                this.Select(info.Value);
+            }
+            catch (Exception e)
+            {
+                AppMessageBox.ShowError(e);
+            }
+        }
+
+        private void Select(DomainRowInfo[] domainRows)
+        {
+            var gridContext = DataGridControl.GetDataGridContext(this.gridControl);
+            var gridControl = gridContext.DataGridControl as TableSourceDataGridControl;
+
+            var itemList = new List<object>(domainRows.Length);
+            foreach (var domainRow in domainRows)
+            {
+                for (var i = gridContext.Items.Count - 1; i >= 0; i--)
+                {
+                    var item = gridContext.Items.GetItemAt(i);
+                    var keys = CremaDataRowUtility.GetKeys(item);
+                    if (keys.SequenceEqual(domainRow.Keys) == true)
+                    {
+                        itemList.Add(item);
+                    }
+                }
+            }
+
+            gridContext.SelectedCellRanges.Clear();
+            foreach (var item in itemList)
+            {
+                var index = gridContext.Items.IndexOf(item);
+                gridContext.SelectedCellRanges.Add(new SelectionCellRange(index, 0, index, gridContext.VisibleColumns.Count - 1));
+            }
+            gridContext.CurrentItem = itemList.FirstOrDefault();
+            gridContext.FocusCurrent();
         }
     }
 }

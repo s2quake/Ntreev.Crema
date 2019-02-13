@@ -148,6 +148,7 @@
     <Compile Include="Documents\Assets\TableSourceControl.xaml.cs">
       <DependentUpon>TableSourceControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Documents\ToolBarItems\InsertToolbarItem.cs" />
     <Compile Include="Documents\ViewModels\FindResultItemViewModel.cs" />
     <Compile Include="Documents\ViewModels\TableDocumentBase.cs" />
     <Compile Include="Documents\ViewModels\TableViewerViewModel.cs" />
@@ -435,6 +436,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\parent.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\insert-many.png" />
   </ItemGroup>
   <Import Project="..\..\common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

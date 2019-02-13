@@ -4,7 +4,7 @@ $releasePath = "$PSScriptRoot\bin\Release"
 $deploymentPath = "$PSScriptRoot\build"
 $solutionPath = "$PSScriptRoot\crema.sln"
 
-foreach ($item in Invoke-Expression "$PSScriptRoot\vswhere.exe") {
+foreach ($item in Invoke-Expression "& '$PSScriptRoot\vswhere.exe'") {
     if ($item -match "^installationPath: (.+)") {
         $msbuildPath = Join-Path $Matches[1] "\MSBuild\15.0\Bin\MSBuild.exe"
         break;
