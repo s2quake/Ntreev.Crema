@@ -70,7 +70,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
         <nmfc:ExpandableToolBar Grid.Row="1" ItemsSource="{Binding ToolBarItems}">
             <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/new.png" Style="{StaticResource ToolBar_IconButton_Style}"
-                             Command="{x:Static local:TableItemView.InsertCommand}" />
+                             Command="{Binding InsertCommand}" />
             <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/insert-many.png" Style="{StaticResource ToolBar_IconButton_Style}"
                              Command="{x:Static local:TableItemView.InsertManyCommand}" />
             <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/parent.png" x:Name="SelectParent" Style="{StaticResource SelectParent_IconButton_Style}" />

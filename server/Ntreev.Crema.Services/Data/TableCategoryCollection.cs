@@ -71,6 +71,7 @@ namespace Ntreev.Crema.Services.Data
                         this.InvokeCategoriesCreatedEvent(authentication, items);
                         return category;
                     });
+                    await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
                     return result;
                 }
             }

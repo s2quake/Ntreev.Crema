@@ -45,8 +45,10 @@ namespace Ntreev.Crema.ResxGenerator
 
             try
             {
-                parser.Parse(Environment.CommandLine);
-                await WriteAsync(settings);
+                if (parser.Parse(Environment.CommandLine) == true)
+                {
+                    await WriteAsync(settings);
+                }
             }
             catch (Exception e)
             {
