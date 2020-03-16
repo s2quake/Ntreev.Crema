@@ -4,12 +4,7 @@ $releasePath = "$PSScriptRoot\bin\Release"
 $deploymentPath = "$PSScriptRoot\build"
 $solutionPath = "$PSScriptRoot\crema.sln"
 
-foreach ($item in Invoke-Expression "& '$PSScriptRoot\vswhere.exe'") {
-    if ($item -match "^installationPath: (.+)") {
-        $msbuildPath = Join-Path $Matches[1] "\MSBuild\15.0\Bin\MSBuild.exe"
-        break;
-    }
-}
+$msbuildPath = Invoke-Expression "$PSScriptRoot\vswhere.exe -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe"
 
 if ($msbuildPath -eq "") {
     if (Test-Path "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe") {    
@@ -36,14 +31,14 @@ if (Test-Path "$deploymentPath") {
 }
 
 Write-Host "Restore"
-Invoke-Expression "&`"$msbuildPath`" `"$solutionPath`" -t:restore -v:q" 
+Invoke-Expression "&'$msbuildPath' '$solutionPath' -t:restore -v:q -p:configuration=Release" 
 
 if (-Not $LASTEXITCODE -eq 0) {
     Write-Error "Restore failed." -ErrorAction Stop
 }
 
 Write-Host "Build"
-Invoke-Expression "&`"$msbuildPath`" `"$solutionPath`" -t:rebuild -v:q -p:Configuration=Release"
+Invoke-Expression "&'$msbuildPath' '$solutionPath' -t:build -v:q -p:configuration=Release"
 
 if (-Not $LASTEXITCODE -eq 0) {
     Write-Error "Build failed." -ErrorAction Stop
