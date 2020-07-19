@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ApplicationHost
 {
-    interface IShell
+    public interface IShell
     {
     }
 }

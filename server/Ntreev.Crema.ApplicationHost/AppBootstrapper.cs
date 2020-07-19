@@ -15,11 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Caliburn.Micro;
 using Ntreev.Crema.ServiceHosts;
 using Ntreev.Crema.Services;
+using Ntreev.Library.Linq;
 using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.Primitives;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -31,38 +36,20 @@ namespace Ntreev.Crema.ApplicationHost
 {
     class AppBootstrapper : AppBootstrapperBase
     {
-        public AppBootstrapper()
-            : base(new AppBootstrapperDescriptor())
-        {
-
-        }
-    }
-
-    class AppBootstrapperDescriptor : AppBootstrapperDescriptorBase
-    {
         private readonly static Dictionary<string, Uri> themes = new Dictionary<string, Uri>(StringComparer.CurrentCultureIgnoreCase);
-        private readonly CremaService service;
 
-        static AppBootstrapperDescriptor()
+        static AppBootstrapper()
         {
             themes.Add("dark", new Uri("/Ntreev.ModernUI.Framework;component/Assets/ModernUI.Dark.xaml", UriKind.Relative));
             themes.Add("light", new Uri("/Ntreev.ModernUI.Framework;component/Assets/ModernUI.Light.xaml", UriKind.Relative));
             //FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor = value;
         }
 
-        public AppBootstrapperDescriptor()
+        public AppBootstrapper()
+            : base(new AppBootstrapperDescriptor())
         {
-            //this.service = new CremaService(this);
+           
         }
-
-        public AppSettings Settings { get; } = new AppSettings();
-
-        public override Type ModelType => typeof(IShell);
-
-        //protected override void OnStartup(object sender, StartupEventArgs e)
-        //{
-        //    base.OnStartup(sender, e);
-        //}
 
         public bool ApplySettings()
         {
@@ -93,59 +80,9 @@ namespace Ntreev.Crema.ApplicationHost
             }
         }
 
+        public AppSettings Settings => this.Descriptor.Settings;
 
-        protected override void OnDispose()
-        {
-            this.service.Dispose();
-        }
-
-        protected override IEnumerable<Tuple<Type, object>> GetParts()
-        {
-            foreach (var item in base.GetParts())
-            {
-                yield return item;
-            }
-            yield return new Tuple<Type, object>(typeof(CremaService), this.service);
-            yield return new Tuple<Type, object>(typeof(ICremaService), this.service);
-            yield return new Tuple<Type, object>(typeof(AppSettings), this.Settings);
-        }
-
-        protected override object GetInstance(Type service, string key)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override IEnumerable<object> GetInstances(Type service)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void OnBuildUp(object instance)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void OnInitialize(IEnumerable<Assembly> assemblies, IEnumerable<Tuple<Type, object>> parts)
-        {
-            throw new NotImplementedException();
-        }
-
-        //protected override IEnumerable<string> SelectPath()
-        //{
-        //    var items = base.SelectPath().Concat(CremaBootstrapper.SelectPath(AppDomain.CurrentDomain.BaseDirectory)).Distinct();
-        //    foreach (var item in items)
-        //    {
-        //        yield return item;
-        //    }
-
-        //    if (this.Settings.PluginsPath != null)
-        //    {
-        //        foreach (var item in this.Settings.PluginsPath)
-        //        {
-        //            yield return item;
-        //        }
-        //    }
-        //}
+        protected new AppBootstrapperDescriptor Descriptor => base.Descriptor as AppBootstrapperDescriptor;
 
         //protected override bool AutoInitialize => false;
     }

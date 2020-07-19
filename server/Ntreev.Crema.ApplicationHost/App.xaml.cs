@@ -43,11 +43,11 @@ namespace Ntreev.Crema.ApplicationHost
         {
             if (this.FindResource("bootstrapper") is AppBootstrapper bootstrapper)
             {
-                //if (this.ParseCommandLine(bootstrapper.Settings) == false || bootstrapper.ApplySettings() == false)
-                //{
-                //    this.Shutdown();
-                //    return;
-                //}
+                if (this.ParseCommandLine(bootstrapper.Settings) == false || bootstrapper.ApplySettings() == false)
+                {
+                    this.Shutdown();
+                    return;
+                }
                 bootstrapper.Initialize();
             }
             base.OnStartup(e);
@@ -62,11 +62,11 @@ namespace Ntreev.Crema.ApplicationHost
                 {
                     Out = new StringWriter(sb)
                 };
-                //if (parser.Parse(Environment.CommandLine) == false)
-                //{
-                //    MessageBox.Show(sb.ToString(), "Usage", MessageBoxButton.OK, MessageBoxImage.Information);
-                //    return false;
-                //}
+                if (parser.TryParse(Environment.CommandLine) == false)
+                {
+                    MessageBox.Show(sb.ToString(), "Usage", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return false;
+                }
             }
             catch (Exception e)
             {

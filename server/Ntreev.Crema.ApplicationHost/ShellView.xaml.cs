@@ -40,7 +40,6 @@ namespace Ntreev.Crema.ApplicationHost
     /// <summary>
     /// ShellView.xaml에 대한 상호 작용 논리
     /// </summary>
-    [Export]
     public partial class ShellView : ModernWindow
     {
         private static LogTextWriter writer = new LogTextWriter();
@@ -62,58 +61,58 @@ namespace Ntreev.Crema.ApplicationHost
         public ShellView(ICremaHost cremaHost, ConsoleCommandContext commandContext)
         {
             InitializeComponent();
-            writer.TextBox = this.logBox;
-            this.cremaHost = cremaHost;
-            this.cremaHost.Opening += CremaHost_Opening;
-            this.cremaHost.Opened += CremaHost_Opened;
-            this.cremaHost.Closed += CremaHost_Closed;
-            this.commandContext = commandContext;
-            this.commandContext.Out = new ConsoleWriter(this.terminal);
-            this.terminal.CommandContext = this.commandContext;
-            this.SetPrompt();
-            this.Dispatcher.InvokeAsync(() => this.logBox.Focus());
+            //writer.TextBox = this.logBox;
+            //this.cremaHost = cremaHost;
+            //this.cremaHost.Opening += CremaHost_Opening;
+            //this.cremaHost.Opened += CremaHost_Opened;
+            //this.cremaHost.Closed += CremaHost_Closed;
+            //this.commandContext = commandContext;
+            //this.commandContext.Out = new ConsoleWriter(this.terminal);
+            //this.terminal.CommandContext = this.commandContext;
+            //this.SetPrompt();
+            //this.Dispatcher.InvokeAsync(() => this.logBox.Focus());
         }
 
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            this.terminal.ApplyTemplate();
+            //this.terminal.ApplyTemplate();
         }
 
         private readonly static string[] emptyStrings = new string[] { };
 
         public async void Run(string commandLine)
         {
-            try
-            {
-                await Task.Run(() => this.commandContext.Execute(this.commandContext.Name + " " + commandLine));
-                this.SetPrompt();
-            }
-            catch (System.Reflection.TargetInvocationException e)
-            {
-                if (e.InnerException != null)
-                    this.terminal.AppendLine(e.InnerException.Message);
-                else
-                    this.terminal.AppendLine(e.Message);
-            }
-            catch (Exception e)
-            {
-                this.terminal.AppendLine(e.Message);
-            }
-            finally
-            {
-                this.terminal.InsertPrompt();
-            }
+            //try
+            //{
+            //    await Task.Run(() => this.commandContext.Execute(this.commandContext.Name + " " + commandLine));
+            //    this.SetPrompt();
+            //}
+            //catch (System.Reflection.TargetInvocationException e)
+            //{
+            //    if (e.InnerException != null)
+            //        this.terminal.AppendLine(e.InnerException.Message);
+            //    else
+            //        this.terminal.AppendLine(e.Message);
+            //}
+            //catch (Exception e)
+            //{
+            //    this.terminal.AppendLine(e.Message);
+            //}
+            //finally
+            //{
+            //    this.terminal.InsertPrompt();
+            //}
         }
 
         public void Reset()
         {
-            this.terminal.Reset();
+            //this.terminal.Reset();
         }
 
         protected void SetPrompt()
         {
-            this.Dispatcher.InvokeAsync(() => this.terminal.Prompt = $"{this.commandContext.Prompt}> ");
+            //this.Dispatcher.InvokeAsync(() => this.terminal.Prompt = $"{this.commandContext.Prompt}> ");
         }
 
         private void CremaHost_Opening(object sender, EventArgs e)
@@ -140,7 +139,7 @@ namespace Ntreev.Crema.ApplicationHost
         private void TerminalControl_Executed(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
-            this.Run(this.terminal.Text);
+            //this.Run(this.terminal.Text);
         }
 
         private void CremaHost_Opened(object sender, EventArgs e)
@@ -149,8 +148,8 @@ namespace Ntreev.Crema.ApplicationHost
             {
                 this.SetPrompt();
 
-                this.terminal.AppendLine(Properties.Resources.Comment_Hello);
-                this.terminal.AppendLine(Properties.Resources.Comment_AvaliableCommands);
+                //this.terminal.AppendLine(Properties.Resources.Comment_Hello);
+                //this.terminal.AppendLine(Properties.Resources.Comment_AvaliableCommands);
 
                 //foreach (var item in this.commandContext.Commands)
                 //{
@@ -158,8 +157,8 @@ namespace Ntreev.Crema.ApplicationHost
                 //        continue;
                 //    this.terminal.AppendLine(" - " + item.Name);
                 //}
-                this.terminal.AppendLine(Properties.Resources.Comment_TypeHelp + Environment.NewLine);
-                this.terminal.AppendLine(Properties.Resources.Comment_TypeVersion);
+                //this.terminal.AppendLine(Properties.Resources.Comment_TypeHelp + Environment.NewLine);
+                //this.terminal.AppendLine(Properties.Resources.Comment_TypeVersion);
             });
         }
 
@@ -173,12 +172,12 @@ namespace Ntreev.Crema.ApplicationHost
 
         private void OpenService_Click(object sender, RoutedEventArgs e)
         {
-            this.logBox.Focus();
+            //this.logBox.Focus();
         }
 
         private void CloseService_Click(object sender, RoutedEventArgs e)
         {
-            this.logBox.Focus();
+            //this.logBox.Focus();
         }
     }
 }

@@ -37,7 +37,7 @@ using System.Windows;
 namespace Ntreev.Crema.ApplicationHost
 {
     [Export(typeof(IShell))]
-    class ShellViewModel : ScreenBase
+    class ShellViewModel : ScreenBase, IShell
     {
         private readonly CremaSettings settings;
         private readonly CremaService service;
