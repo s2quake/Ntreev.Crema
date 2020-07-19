@@ -48,10 +48,12 @@ namespace Ntreev.Crema.Javascript.Methods
 
         private int GetHashCode(DataBaseEventListener item)
         {
+#if NET45
             if (item.Target is System.Runtime.CompilerServices.Closure c)
             {
                 return c.Constants[0].GetHashCode();
             }
+#endif
             throw new NotImplementedException();
         }
     }

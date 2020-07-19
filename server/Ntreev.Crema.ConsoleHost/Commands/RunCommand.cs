@@ -59,7 +59,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             terminal.Cancel();
         }
 
-        [CommandProperty("path", IsRequired = true)]
+        [CommandPropertyRequired("path")]
         public string Path
         {
             get;
@@ -157,8 +157,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
 
 #if DEBUG
 
-        [CommandProperty('l', IsExplicit = true)]
-        [DefaultValue("admin:admin")]
+        [CommandProperty('l', DefaultValue = "admin:admin")]
         public string LoginAuthentication
         {
             get;

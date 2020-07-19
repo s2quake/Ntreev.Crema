@@ -41,15 +41,13 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
 
         }
 
-        [CommandProperty(IsRequired = true)]
-        [DefaultValue("")]
+        [CommandPropertyRequired(DefaultValue = "")]
         public string UserID
         {
             get; set;
         }
 
-        [CommandProperty(IsRequired = true)]
-        [DefaultValue("")]
+        [CommandPropertyRequired(DefaultValue = "")]
         public string Password
         {
             get; set;
