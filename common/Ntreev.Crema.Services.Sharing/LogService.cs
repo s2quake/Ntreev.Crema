@@ -102,7 +102,8 @@ namespace Ntreev.Crema.Services
 
         public LogService(string name, string path, bool isSingle)
         {
-            this.hierarchy = (Hierarchy)LogManager.GetRepository();
+            throw new NotImplementedException("아랫줄");
+            this.hierarchy = (Hierarchy)LogManager.GetRepository(name);
 
             var xmlLayout = new XmlLayoutSchemaLog4j()
             {
@@ -145,7 +146,8 @@ namespace Ntreev.Crema.Services
             this.hierarchy.Root.Level = Level.All;
             this.hierarchy.Configured = true;
 
-            this.log = log4net.LogManager.GetLogger(name);
+            throw new NotImplementedException("아랫줄");
+            this.log = log4net.LogManager.GetLogger(typeof(LogService));
             this.name = name;
         }
 

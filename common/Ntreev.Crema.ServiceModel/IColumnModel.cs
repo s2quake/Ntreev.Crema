@@ -55,7 +55,7 @@ namespace Ntreev.Crema.ServiceModel
             set;
         }
 
-        DataLocation DataLocation
+        string DataLocation
         {
             get;
             set;
