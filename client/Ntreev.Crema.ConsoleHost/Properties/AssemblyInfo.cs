@@ -18,9 +18,3 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
-[assembly: AssemblyTitle("CremaConsole")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("CremaConsole")]
-[assembly: ComVisible(false)]
-[assembly: Guid("019b8cea-2479-421f-bd4a-3751fc8131bd")]

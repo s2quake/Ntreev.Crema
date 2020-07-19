@@ -26,7 +26,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Text;
-using Ntreev.Crema.Services.Random;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Bot.Tasks

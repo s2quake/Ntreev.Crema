@@ -18,9 +18,3 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
-[assembly: AssemblyTitle("Ntreev.Crema.Runtime.Generation.TypeScript")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("Ntreev.Crema.Runtime.Generation.TypeScript")]
-[assembly: ComVisible(false)]
-[assembly: Guid("36876055-4307-4546-89e2-f1d42366b392")]

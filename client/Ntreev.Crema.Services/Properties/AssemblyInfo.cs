@@ -18,9 +18,3 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
-[assembly: AssemblyTitle("Ntreev.Crema.Services")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("Ntreev.Crema.Services")]
-[assembly: ComVisible(false)]
-[assembly: Guid("c8d364ce-e1d9-452b-af0f-b36e844760a7")]
