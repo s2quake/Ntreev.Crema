@@ -93,7 +93,7 @@ namespace Ntreev.Crema.Services
                 return this.log != null ? this : null;
             if (serviceType == typeof(IObjectSerializer))
                 return this.Serializer;
-            if (this.ServiceState == ServiceState.Opened && serviceType == typeof(IRepositoryConfiguration))
+            if (this.ServiceState == ServiceState.Open && serviceType == typeof(IRepositoryConfiguration))
                 return this.configs;
 
             if (this.container != null)
@@ -157,7 +157,7 @@ namespace Ntreev.Crema.Services
                         this.Info("Plugin : {0}", item.Name);
                     }
                     this.Info("Crema module has been started.");
-                    this.ServiceState = ServiceState.Opened;
+                    this.ServiceState = ServiceState.Open;
                     this.OnOpened(EventArgs.Empty);
                 });
                 await this.DataBaseContext.RestoreStateAsync(this.settings);
@@ -178,7 +178,7 @@ namespace Ntreev.Crema.Services
             {
                 var waiter = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    if (this.ServiceState != ServiceState.Opened)
+                    if (this.ServiceState != ServiceState.Open)
                         throw new InvalidOperationException();
                     this.ServiceState = ServiceState.Closing;
                     var closer = new InternalCloseRequestedEventArgs();
@@ -225,7 +225,7 @@ namespace Ntreev.Crema.Services
         {
             try
             {
-                if (this.ServiceState != ServiceState.Opened)
+                if (this.ServiceState != ServiceState.Open)
                     throw new InvalidOperationException();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -263,7 +263,7 @@ namespace Ntreev.Crema.Services
         {
             try
             {
-                if (this.ServiceState != ServiceState.Opened)
+                if (this.ServiceState != ServiceState.Open)
                     throw new InvalidOperationException();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
@@ -553,7 +553,7 @@ namespace Ntreev.Crema.Services
 
         string ILogService.FileName => this.log.FileName;
 
-        bool ILogService.IsEnabled => this.ServiceState == ServiceState.Opened;
+        bool ILogService.IsEnabled => this.ServiceState == ServiceState.Open;
 
         #endregion
 

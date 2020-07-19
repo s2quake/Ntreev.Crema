@@ -456,7 +456,7 @@ namespace Ntreev.Crema.Services.Data
                     }
                     catch
                     {
-                        this.SetServiceState(ServiceState.Opened);
+                        this.SetServiceState(ServiceState.Open);
                         throw;
                     }
                     await this.Dispatcher.InvokeAsync(() =>
@@ -491,7 +491,7 @@ namespace Ntreev.Crema.Services.Data
                     }
                     catch
                     {
-                        this.SetServiceState(ServiceState.Opened);
+                        this.SetServiceState(ServiceState.Open);
                         throw;
                     }
                     await this.Dispatcher.InvokeAsync(() =>
@@ -592,7 +592,7 @@ namespace Ntreev.Crema.Services.Data
                     item.Domain = domain;
                     item.DataTable = dataSet.Tables[item.Table.Name, item.Table.Category.Path];
                     item.Table.TableState = TableState.IsBeingEdited;
-                    item.ServiceState = ServiceState.Opened;
+                    item.ServiceState = ServiceState.Open;
                     item.IsModified = domain.ModifiedTables.Contains(item.dataTable.Name);
                 }
                 this.domain.Dispatcher.Invoke(this.AttachDomainEvent);

@@ -36,9 +36,9 @@ namespace Ntreev.Crema.ApplicationHost.Dialogs.ViewModels
             this.DisplayName = "Login";
         }
 
-        public void Login()
+        public Task LoginAsync()
         {
-            this.TryClose(true);
+            return this.TryCloseAsync(true);
         }
 
         public string UserID

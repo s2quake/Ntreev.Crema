@@ -48,7 +48,7 @@ namespace Ntreev.Crema.Bot
 
         public async Task CreateAutobotAsync(Authentication authentication, string autobotID, SecureString password)
         {
-            if (this.ServiceState != ServiceState.Opened)
+            if (this.ServiceState != ServiceState.Open)
                 throw new InvalidOperationException();
 
             await this.Dispatcher.InvokeAsync(() =>
@@ -98,7 +98,7 @@ namespace Ntreev.Crema.Bot
                 {
                     var autobots = CreateAutobots(autobotIDList.ToArray(), autobotPasswordList.ToArray());
                     this.StartAutobots(autobots);
-                    this.ServiceState = ServiceState.Opened;
+                    this.ServiceState = ServiceState.Open;
                 });
             }
             catch
@@ -112,7 +112,7 @@ namespace Ntreev.Crema.Bot
         {
             var tasks = await this.Dispatcher.InvokeAsync(() =>
             {
-                if (this.ServiceState != ServiceState.Opened)
+                if (this.ServiceState != ServiceState.Open)
                     throw new InvalidOperationException();
                 this.ServiceState = ServiceState.Closing;
                 return this.botByID.Values.Select(item => item.CancelAsync()).ToArray();
@@ -198,7 +198,7 @@ namespace Ntreev.Crema.Bot
 
         private async Task DisposeAsync()
         {
-            if (this.ServiceState == ServiceState.Opened)
+            if (this.ServiceState == ServiceState.Open)
             {
                 await this.StopAsync();
             }

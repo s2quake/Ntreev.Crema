@@ -74,7 +74,7 @@ namespace Ntreev.Crema.RuntimeService.Consoles
             this.CommandContext.WriteObject(info.ToDictionary(), FormatProperties.Format);
         }
 
-        public override bool IsEnabled => this.CremaHost.ServiceState == ServiceState.Opened;
+        public override bool IsEnabled => this.CremaHost.ServiceState == ServiceState.Open;
 
         private RuntimeService RuntimeService => this.runtimeService.Value;
 

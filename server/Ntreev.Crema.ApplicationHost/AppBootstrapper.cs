@@ -29,29 +29,40 @@ using System.Windows.Media;
 
 namespace Ntreev.Crema.ApplicationHost
 {
-    class AppBootstrapper : AppBootstrapper<IShell>
+    class AppBootstrapper : AppBootstrapperBase
+    {
+        public AppBootstrapper()
+            : base(new AppBootstrapperDescriptor())
+        {
+
+        }
+    }
+
+    class AppBootstrapperDescriptor : AppBootstrapperDescriptorBase
     {
         private readonly static Dictionary<string, Uri> themes = new Dictionary<string, Uri>(StringComparer.CurrentCultureIgnoreCase);
         private readonly CremaService service;
 
-        static AppBootstrapper()
+        static AppBootstrapperDescriptor()
         {
             themes.Add("dark", new Uri("/Ntreev.ModernUI.Framework;component/Assets/ModernUI.Dark.xaml", UriKind.Relative));
             themes.Add("light", new Uri("/Ntreev.ModernUI.Framework;component/Assets/ModernUI.Light.xaml", UriKind.Relative));
             //FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor = value;
         }
 
-        public AppBootstrapper()
+        public AppBootstrapperDescriptor()
         {
-            this.service = new CremaService(this);
+            //this.service = new CremaService(this);
         }
 
         public AppSettings Settings { get; } = new AppSettings();
 
-        protected override void OnStartup(object sender, StartupEventArgs e)
-        {
-            base.OnStartup(sender, e);
-        }
+        public override Type ModelType => typeof(IShell);
+
+        //protected override void OnStartup(object sender, StartupEventArgs e)
+        //{
+        //    base.OnStartup(sender, e);
+        //}
 
         public bool ApplySettings()
         {
@@ -82,9 +93,9 @@ namespace Ntreev.Crema.ApplicationHost
             }
         }
 
-        protected override void OnExit(object sender, EventArgs e)
+
+        protected override void OnDispose()
         {
-            base.OnExit(sender, e);
             this.service.Dispose();
         }
 
@@ -99,23 +110,43 @@ namespace Ntreev.Crema.ApplicationHost
             yield return new Tuple<Type, object>(typeof(AppSettings), this.Settings);
         }
 
-        protected override IEnumerable<string> SelectPath()
+        protected override object GetInstance(Type service, string key)
         {
-            var items = base.SelectPath().Concat(CremaBootstrapper.SelectPath(AppDomain.CurrentDomain.BaseDirectory)).Distinct();
-            foreach (var item in items)
-            {
-                yield return item;
-            }
-
-            if (this.Settings.PluginsPath != null)
-            {
-                foreach (var item in this.Settings.PluginsPath)
-                {
-                    yield return item;
-                }
-            }
+            throw new NotImplementedException();
         }
 
-        protected override bool AutoInitialize => false;
+        protected override IEnumerable<object> GetInstances(Type service)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void OnBuildUp(object instance)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void OnInitialize(IEnumerable<Assembly> assemblies, IEnumerable<Tuple<Type, object>> parts)
+        {
+            throw new NotImplementedException();
+        }
+
+        //protected override IEnumerable<string> SelectPath()
+        //{
+        //    var items = base.SelectPath().Concat(CremaBootstrapper.SelectPath(AppDomain.CurrentDomain.BaseDirectory)).Distinct();
+        //    foreach (var item in items)
+        //    {
+        //        yield return item;
+        //    }
+
+        //    if (this.Settings.PluginsPath != null)
+        //    {
+        //        foreach (var item in this.Settings.PluginsPath)
+        //        {
+        //            yield return item;
+        //        }
+        //    }
+        //}
+
+        //protected override bool AutoInitialize => false;
     }
 }

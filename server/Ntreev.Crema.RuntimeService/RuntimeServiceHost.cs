@@ -20,32 +20,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ServiceModel;
-using System.ServiceModel.Description;
 using Ntreev.Crema.ServiceHosts;
-using System.ServiceModel.Channels;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceHosts.Domains;
 using System.ComponentModel.Composition;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.RuntimeService
 {
-    class RuntimeServiceHost : ServiceHost
+    class RuntimeServiceHost : ServerServiceHostBase<IRuntimeServiceInternal>
     {
         private readonly RuntimeService service;
 
-        public RuntimeServiceHost(ICremaHost cremaHost, RuntimeService service, int port)
-            : base(service, new Uri($"net.tcp://localhost:{port}/{nameof(RuntimeService)}"))
+        public RuntimeServiceHost(ICremaHost cremaHost, RuntimeService service)
         {
-            this.service = service;
-            this.AddServiceEndpoint(typeof(IRuntimeServiceInternal), CremaServiceItemHost.CreateBinding(), string.Empty);
-
-#if DEBUG
-            if (Environment.OSVersion.Platform != PlatformID.Unix)
-            {
-                this.Description.Behaviors.Add(new ServiceMetadataBehavior());
-                this.AddServiceEndpoint(typeof(IMetadataExchange), MetadataExchangeBindings.CreateMexTcpBinding(), "mex");
-            }
-#endif
         }
     }
 }

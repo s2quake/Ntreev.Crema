@@ -32,10 +32,13 @@ namespace Ntreev.Crema.Services
 
         Opening,
 
-        Opened,
+        Open,
 
         Closing,
 
         Closed = None,
+
+        [Obsolete]
+        Opened = Open,
     }
 }

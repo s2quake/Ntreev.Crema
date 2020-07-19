@@ -26,23 +26,25 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.RuntimeService
 {
-    [ServiceContract(Namespace = CremaService.Namespace)]
-    [ServiceKnownType(typeof(DBNull))]
+    // [ServiceContract(Namespace = CremaService.Namespace)]
+    [ServiceContract]
+    // [ServiceKnownType(typeof(DBNull))]
     interface IRuntimeServiceInternal
     {
         [OperationContract]
-        [ServiceKnownType(typeof(DBNull))]
+        // [ServiceKnownType(typeof(DBNull))]
         ResultBase<GenerationSet> GetCodeGenerationData(string dataBaseName, string tags, string filterExpression, string revision);
 
         [OperationContract]
-        [ServiceKnownType(typeof(DBNull))]
+        // [ServiceKnownType(typeof(DBNull))]
         ResultBase<SerializationSet> GetDataGenerationData(string dataBaseName, string tags, string filterExpression, string revision);
 
         [OperationContract]
-        [ServiceKnownType(typeof(DBNull))]
+        // [ServiceKnownType(typeof(DBNull))]
         ResultBase<GenerationSet, SerializationSet> GetMetaData(string dataBaseName, string tags, string filterExpression, string revision);
 
         [OperationContract]

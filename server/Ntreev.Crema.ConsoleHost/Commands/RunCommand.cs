@@ -190,7 +190,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             Console.Title = $"{this.application.BasePath} --port {this.application.Port}";
             var cremaHost = this.application.GetService(typeof(ICremaHost)) as ICremaHost;
             await this.WaitAsync(cremaHost);
-            if (this.application.ServiceState == ServiceState.Opened)
+            if (this.application.ServiceState == ServiceState.Open)
             {
                 Console.WriteLine(Resources.StoppingServer);
                 await this.application.CloseAsync();

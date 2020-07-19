@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Microsoft.WindowsAPICodePack.Dialogs;
+//using Microsoft.WindowsAPICodePack.Dialogs;
 using Ntreev.Crema.ServiceHosts;
 using Ntreev.Crema.Services;
 using Ntreev.Library;
@@ -30,6 +30,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -66,12 +67,12 @@ namespace Ntreev.Crema.ApplicationHost
                 this.BeginProgress();
                 this.service.Port = this.port;
                 await this.service.OpenAsync();
-                this.ServiceState = ServiceState.Opened;
+                this.ServiceState = ServiceState.Open;
                 this.EndProgress();
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
                 this.ServiceState = ServiceState.None;
                 this.EndProgress();
             }
@@ -89,46 +90,46 @@ namespace Ntreev.Crema.ApplicationHost
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
-                this.ServiceState = ServiceState.Opened;
+                await AppMessageBox.ShowErrorAsync(e);
+                this.ServiceState = ServiceState.Open;
                 this.EndProgress();
             }
         }
 
         public void SelectBasePath()
         {
-            var dialog = new CommonOpenFileDialog()
-            {
-                IsFolderPicker = true,
-            };
+            //var dialog = new CommonOpenFileDialog()
+            //{
+            //    IsFolderPicker = true,
+            //};
 
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                this.BasePath = dialog.FileName;
-            }
+            //if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            //{
+            //    this.BasePath = dialog.FileName;
+            //}
         }
 
-        public void CreateRepository()
+        public async Task CreateRepositoryAsync()
         {
-            var dialog = new CommonOpenFileDialog()
-            {
-                IsFolderPicker = true,
-            };
+            //var dialog = new CommonOpenFileDialog()
+            //{
+            //    IsFolderPicker = true,
+            //};
 
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                var basePath = dialog.FileName;
-                var isEmpty = DirectoryUtility.IsEmpty(basePath);
-                if (isEmpty == false)
-                {
-                    AppMessageBox.Show("대상 경로는 비어있지 않습니다.");
-                    return;
-                }
+            //if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            //{
+            //    var basePath = dialog.FileName;
+            //    var isEmpty = DirectoryUtility.IsEmpty(basePath);
+            //    if (isEmpty == false)
+            //    {
+            //        await AppMessageBox.ShowAsync("대상 경로는 비어있지 않습니다.");
+            //        return;
+            //    }
 
-                CremaBootstrapper.CreateRepository(this.service, basePath, "git", "xml");
-                AppMessageBox.Show("저장소를 생성했습니다.");
-                this.BasePath = basePath;
-            }
+            //    CremaBootstrapper.CreateRepository(this.service, basePath, "git", "xml");
+            //    AppMessageBox.ShowAsync("저장소를 생성했습니다.");
+            //    this.BasePath = basePath;
+            //}
         }
 
         public bool CanOpenService
@@ -141,7 +142,7 @@ namespace Ntreev.Crema.ApplicationHost
             }
         }
 
-        public bool CanCloseService => this.serviceState == ServiceState.Opened;
+        public bool CanCloseService => this.serviceState == ServiceState.Open;
 
         [ConfigurationProperty]
         [DefaultValue("")]
@@ -185,9 +186,9 @@ namespace Ntreev.Crema.ApplicationHost
 
         protected override async Task<bool> CloseAsync()
         {
-            if (this.ServiceState == ServiceState.Opened)
+            if (this.ServiceState == ServiceState.Open)
             {
-                if (AppMessageBox.ShowProceed("서비스가 실행중입니다. 서비스 중지후 종료하시겠습니까?") == true)
+                if (await AppMessageBox.ShowProceedAsync("서비스가 실행중입니다. 서비스 중지후 종료하시겠습니까?") == true)
                 {
                     this.ServiceState = ServiceState.Closing;
                     try
@@ -196,7 +197,7 @@ namespace Ntreev.Crema.ApplicationHost
                     }
                     catch (Exception e)
                     {
-                        AppMessageBox.ShowError(e);
+                        await AppMessageBox.ShowErrorAsync(e);
                     }
                     finally
                     {
@@ -212,14 +213,14 @@ namespace Ntreev.Crema.ApplicationHost
             return true;
         }
 
-        public override void TryClose(bool? dialogResult = null)
+        public override Task TryCloseAsync(bool? dialogResult = null)
         {
-            base.TryClose(this.ServiceState != ServiceState.Opening && this.ServiceState != ServiceState.Closing);
+            return base.TryCloseAsync(this.ServiceState != ServiceState.Opening && this.ServiceState != ServiceState.Closing);
         }
 
-        protected override void OnDeactivate(bool close)
+        protected override async Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
-            base.OnDeactivate(close);
+            await base.OnDeactivateAsync(close, cancellationToken);
             this.configs.Commit(this);
         }
 

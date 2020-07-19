@@ -24,6 +24,7 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.RuntimeService
 {
@@ -45,9 +46,9 @@ namespace Ntreev.Crema.RuntimeService
             get { return nameof(RuntimeService); }
         }
 
-        public ServiceHost CreateInstance(int port)
+        public ServiceHostBase CreateInstance()
         {
-            return new RuntimeServiceHost(this.cremaHost, service, port);
+            return new RuntimeServiceHost(this.cremaHost, service);
         }
     }
 }

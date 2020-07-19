@@ -49,7 +49,7 @@ namespace Ntreev.Crema.ConsoleHost
             {
                 try
                 {
-                    this.Read(this.xmlPath);
+                    //this.Read(this.xmlPath);
                 }
                 catch (Exception e)
                 {
@@ -64,8 +64,8 @@ namespace Ntreev.Crema.ConsoleHost
             FileUtility.Backup(this.xmlPath);
             FileUtility.Prepare(this.xsdPath);
             FileUtility.Prepare(this.xmlPath);
-            this.WriteSchema(this.xsdPath);
-            this.Write(this.xmlPath, this.schemaLocation);
+            //this.WriteSchema(this.xsdPath);
+            //this.Write(this.xmlPath, this.schemaLocation);
         }
 
         public override string Name => "ConsoleConfigs";

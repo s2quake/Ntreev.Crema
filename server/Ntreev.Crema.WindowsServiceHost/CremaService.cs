@@ -37,7 +37,7 @@ using System.Threading.Tasks;
 using System.Threading;
 
 namespace Ntreev.Crema.WindowsServiceHost
-{
+{   
     public partial class WindowCremaService : ServiceBase
     {
         private CremaApplication cremaApp;
