@@ -26,11 +26,13 @@ using System.Threading.Tasks;
 using Ntreev.Library;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Data;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Domains
 {
-    [ServiceContract(Namespace = CremaService.Namespace, SessionMode = SessionMode.Required, CallbackContract = typeof(IDomainContextEventCallback))]
-    [ServiceKnownType(typeof(DBNull))]
+    // [ServiceContract(Namespace = CremaService.Namespace, SessionMode = SessionMode.Required, CallbackContract = typeof(IDomainContextEventCallback))]
+    // [ServiceKnownType(typeof(DBNull))]
+    [ServiceContract]
     public interface IDomainContextService
     {
         [OperationContract]
@@ -70,10 +72,10 @@ namespace Ntreev.Crema.ServiceHosts.Domains
         ResultBase SetOwner(Guid domainID, string userID);
 
         [OperationContract]
-        [ServiceKnownType(typeof(TableInfo))]
-        [ServiceKnownType(typeof(TableInfo[]))]
-        [ServiceKnownType(typeof(TypeInfo))]
-        [ServiceKnownType(typeof(TypeInfo[]))]
+        // [ServiceKnownType(typeof(TableInfo))]
+        // [ServiceKnownType(typeof(TableInfo[]))]
+        // [ServiceKnownType(typeof(TypeInfo))]
+        // [ServiceKnownType(typeof(TypeInfo[]))]
         ResultBase<object> DeleteDomain(Guid domainID, bool force);
 
         [OperationContract]

@@ -67,32 +67,33 @@ namespace Ntreev.Crema.Commands.Consoles.Properties
 
         public static void View(CremaDataTable dataTable, TextWriter writer)
         {
-            var columns = GetColumns();
-            var tableDataBuilder = new TableDataBuilder(columns);
-            var count = 0;
-            var rows = ViewProperties.Sort == string.Empty ? dataTable.Select(ViewProperties.Expression) : dataTable.Select(ViewProperties.Expression, ViewProperties.Sort);
-            foreach (var item in rows)
-            {
-                var items = columns.Select(i => $"{item[i]}").ToArray();
-                if (ViewProperties.Limit >= 0 && ViewProperties.Limit <= count)
-                    break;
-                tableDataBuilder.Add(items);
-                count++;
-            }
+            throw new NotImplementedException("dotnet");
+            // var columns = GetColumns();
+            // var tableDataBuilder = new TableDataBuilder(columns);
+            // var count = 0;
+            // var rows = ViewProperties.Sort == string.Empty ? dataTable.Select(ViewProperties.Expression) : dataTable.Select(ViewProperties.Expression, ViewProperties.Sort);
+            // foreach (var item in rows)
+            // {
+            //     var items = columns.Select(i => $"{item[i]}").ToArray();
+            //     if (ViewProperties.Limit >= 0 && ViewProperties.Limit <= count)
+            //         break;
+            //     tableDataBuilder.Add(items);
+            //     count++;
+            // }
 
-            writer.PrintTableData(tableDataBuilder.Data, true);
-            writer.WriteLine();
+            // writer.PrintTableData(tableDataBuilder.Data, true);
+            // writer.WriteLine();
 
-            string[] GetColumns()
-            {
-                var query = from item in dataTable.Columns
-                            where item.IsKey || StringUtility.GlobMany(item.ColumnName, ViewProperties.Columns)
-                            select item.ColumnName;
+            // string[] GetColumns()
+            // {
+            //     var query = from item in dataTable.Columns
+            //                 where item.IsKey || StringUtility.GlobMany(item.ColumnName, ViewProperties.Columns)
+            //                 select item.ColumnName;
 
-                if (ColumnLimit <= 0)
-                    return query.ToArray();
-                return query.Take(ColumnLimit).ToArray();
-            }
+            //     if (ColumnLimit <= 0)
+            //         return query.ToArray();
+            //     return query.Take(ColumnLimit).ToArray();
+            // }
         }
     }
 }

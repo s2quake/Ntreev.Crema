@@ -25,10 +25,12 @@ using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
 using Ntreev.Crema.Data;
 using Ntreev.Library;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Data
 {
-    [ServiceContract(Namespace = CremaService.Namespace, SessionMode = SessionMode.Required, CallbackContract = typeof(IDataBaseEventCallback))]
+    // [ServiceContract(Namespace = CremaService.Namespace, SessionMode = SessionMode.Required, CallbackContract = typeof(IDataBaseEventCallback))]
+    [ServiceContract]
     public interface IDataBaseService
     {
         /// <summary>

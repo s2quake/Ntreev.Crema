@@ -70,7 +70,7 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
                     }
                 }
 
-                this.CommandContext.Category = null;
+                // this.CommandContext.Category = null;
                 this.CommandContext.Target = null;
             }
         }

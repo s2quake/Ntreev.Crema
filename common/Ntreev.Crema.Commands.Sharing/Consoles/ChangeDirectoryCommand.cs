@@ -46,8 +46,7 @@ namespace Ntreev.Crema.Commands.Consoles
             return this.CommandContext.GetCompletion(completionContext.Find);
         }
 
-        [CommandProperty(IsRequired = true)]
-        [DefaultValue("")]
+        [CommandPropertyRequired(DefaultValue = "")]
         public string Path
         {
             get; set;
@@ -59,7 +58,7 @@ namespace Ntreev.Crema.Commands.Consoles
         {
             if (this.Path == string.Empty)
             {
-                this.CommandContext.WriteLine(this.CommandContext.Path);
+                this.CommandContext.Out.WriteLine(this.CommandContext.Path);
             }
             else
             {

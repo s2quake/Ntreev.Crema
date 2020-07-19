@@ -29,7 +29,7 @@ using Ntreev.Library;
 
 namespace Ntreev.Crema.ServiceHosts
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
+    // [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
     partial class CremaHostService : CremaServiceItemBase<ICremaHostEventCallback>, ICremaHostService
     {
         private Guid authenticationToken;

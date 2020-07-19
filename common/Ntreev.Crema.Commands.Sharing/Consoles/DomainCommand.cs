@@ -110,20 +110,23 @@ namespace Ntreev.Crema.Commands.Consoles
             {
                 foreach (var item in query)
                 {
-                    this.CommandContext.WriteLine($"{item.Key}:");
-                    this.CommandContext.WriteList(item.ToArray());
-                    this.CommandContext.WriteLine();
+                    this.CommandContext.Out.WriteLine($"{item.Key}:");
+                    foreach (var i in item)
+                    {
+                        this.CommandContext.Out.WriteLine(i);
+                    }
+                    this.CommandContext.Out.WriteLine();
                 }
             }
             else
             {
-                this.CommandContext.WriteLine("no domains");
+                this.CommandContext.Out.WriteLine("no domains");
             }
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public void Info([CommandCompletion(nameof(GetDomainIDs))]Guid domainID)
+        public void Info([CommandCompletion(nameof(GetDomainIDs))] Guid domainID)
         {
             var domain = this.GetDomain(domainID);
             var authentication = this.CommandContext.GetAuthentication(this);

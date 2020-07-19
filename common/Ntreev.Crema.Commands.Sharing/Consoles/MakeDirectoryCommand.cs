@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string Path
         {
             get; set;

@@ -41,7 +41,7 @@ namespace Ntreev.Crema.Commands
             this.boot = boot;
         }
 
-        [CommandProperty("path", IsRequired = true)]
+        [CommandPropertyRequired]
         public string Path
         {
             get;

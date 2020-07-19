@@ -42,16 +42,15 @@ namespace Ntreev.Crema.Commands.Consoles
 
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         [CommandCompletion(nameof(GetUserList))]
         public string UserID
         {
             get; set;
         }
 
-        [CommandProperty('m', true, IsRequired = true, IsExplicit = true)]
+        [CommandPropertyRequired('m', AllowName = true, IsExplicit = true, DefaultValue = "")]
         [CommandPropertyTrigger(nameof(Information), false)]
-        [DefaultValue("")]
         public string Message
         {
             get; set;
@@ -86,7 +85,7 @@ namespace Ntreev.Crema.Commands.Consoles
             {
                 if (this.Message == string.Empty)
                 {
-                    throw new ArgumentException($"'{this.GetDescriptor(nameof(this.Message)).DisplayPattern}' 가 필요합니다.");
+                    throw new ArgumentException($"'{this.GetDescriptor(nameof(this.Message))}' 가 필요합니다.");
                 }
                 await user.BanAsync(authentication, this.Message);
             }

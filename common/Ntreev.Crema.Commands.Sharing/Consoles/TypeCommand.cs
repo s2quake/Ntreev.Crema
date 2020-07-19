@@ -95,7 +95,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [ConsoleModeOnly]
         [CommandMethod]
-        public async Task EditAsync([CommandCompletion(nameof(GetTypeNames))]string typeName)
+        public async Task EditAsync([CommandCompletion(nameof(GetTypeNames))] string typeName)
         {
             var type = await this.GetTypeAsync(typeName);
             var template = type.Dispatcher.Invoke(() => type.Template);
@@ -123,7 +123,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task RenameAsync([CommandCompletion(nameof(GetTypeNames))]string typeName, string newTypeName)
+        public async Task RenameAsync([CommandCompletion(nameof(GetTypeNames))] string typeName, string newTypeName)
         {
             var type = await this.GetTypeAsync(typeName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -131,7 +131,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task MoveAsync([CommandCompletion(nameof(GetTypeNames))]string typeName, [CommandCompletion(nameof(GetCategoryPaths))]string categoryPath)
+        public async Task MoveAsync([CommandCompletion(nameof(GetTypeNames))] string typeName, [CommandCompletion(nameof(GetCategoryPaths))] string categoryPath)
         {
             var type = await this.GetTypeAsync(typeName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -139,7 +139,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task DeleteAsync([CommandCompletion(nameof(GetTypeNames))]string typeName)
+        public async Task DeleteAsync([CommandCompletion(nameof(GetTypeNames))] string typeName)
         {
             var type = await this.GetTypeAsync(typeName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -150,7 +150,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task SetTagsAsync([CommandCompletion(nameof(GetTypeNames))]string typeName, string tags)
+        public async Task SetTagsAsync([CommandCompletion(nameof(GetTypeNames))] string typeName, string tags)
         {
             var type = await this.GetTypeAsync(typeName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -170,7 +170,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodProperty(nameof(CategoryPath))]
-        public async Task CopyAsync([CommandCompletion(nameof(GetTypeNames))]string typeName, string newTypeName)
+        public async Task CopyAsync([CommandCompletion(nameof(GetTypeNames))] string typeName, string newTypeName)
         {
             var type = await this.GetTypeAsync(typeName);
             var categoryPath = this.CategoryPath ?? this.GetCurrentDirectory();
@@ -180,7 +180,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task ViewAsync([CommandCompletion(nameof(GetPaths))]string typeItemName, string revision = null)
+        public async Task ViewAsync([CommandCompletion(nameof(GetPaths))] string typeItemName, string revision = null)
         {
             var typeItem = await this.GetTypeItemAsync(typeItemName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -191,7 +191,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task LogAsync([CommandCompletion(nameof(GetPaths))]string typeItemName, string revision = null)
+        public async Task LogAsync([CommandCompletion(nameof(GetPaths))] string typeItemName, string revision = null)
         {
             var typeItem = await this.GetTypeItemAsync(typeItemName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -200,7 +200,7 @@ namespace Ntreev.Crema.Commands.Consoles
             foreach (var item in logs)
             {
                 this.CommandContext.WriteObject(item.ToDictionary(), FormatProperties.Format);
-                this.CommandContext.WriteLine();
+                this.CommandContext.Out.WriteLine();
             }
         }
 
@@ -210,12 +210,15 @@ namespace Ntreev.Crema.Commands.Consoles
         public void List()
         {
             var typeNames = this.GetTypeNames((TagInfo)TagsProperties.Tags, FilterProperties.FilterExpression);
-            this.CommandContext.WriteList(typeNames);
+            foreach (var item in typeNames)
+            {
+                this.CommandContext.Out.WriteLine(item);
+            }
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task InfoAsync([CommandCompletion(nameof(GetTypeNames))]string typeName)
+        public async Task InfoAsync([CommandCompletion(nameof(GetTypeNames))] string typeName)
         {
             var type = await this.GetTypeAsync(typeName);
             var typeInfo = type.Dispatcher.Invoke(() => type.TypeInfo);
@@ -254,7 +257,7 @@ namespace Ntreev.Crema.Commands.Consoles
             return category;
         }
 
-        private async Task<ITypeItem> GetTypeItemAsync([CommandCompletion(nameof(GetPaths))]string typeItemName)
+        private async Task<ITypeItem> GetTypeItemAsync([CommandCompletion(nameof(GetPaths))] string typeItemName)
         {
             var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
             var typeItem = await dataBase.Dispatcher.InvokeAsync(() =>

@@ -61,15 +61,19 @@ namespace Ntreev.Crema.Commands.Consoles
                         where StringUtility.GlobMany(userID, FilterProperties.FilterExpression)
                         where this.IsOnline == false || item.UserState == UserState.Online
                         where this.IsBanned == false || item.BanInfo.Path == item.Path
-                        select new TerminalUserItem(userID, item.BanInfo, item.UserState);
+                        // select new TerminalUserItem(userID, item.BanInfo, item.UserState);
+                        select userID;
 
             var metaItems = query.ToArray();
-            this.CommandContext.WriteList(metaItems);
+            foreach (var item in metaItems)
+            {
+                this.Out.WriteLine(item);
+            }
         }
 
         [CommandMethod]
         [CommandMethodProperty(nameof(Message))]
-        public async Task KickAsync([CommandCompletion(nameof(GetOnlineUserIDs))]string userID)
+        public async Task KickAsync([CommandCompletion(nameof(GetOnlineUserIDs))] string userID)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -78,7 +82,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodProperty(nameof(Message))]
-        public async Task BanAsync([CommandCompletion(nameof(GetUnbannedUserIDs))]string userID)
+        public async Task BanAsync([CommandCompletion(nameof(GetUnbannedUserIDs))] string userID)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -86,7 +90,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task UnbanAsync([CommandCompletion(nameof(GetBannedUserIDs))]string userID)
+        public async Task UnbanAsync([CommandCompletion(nameof(GetBannedUserIDs))] string userID)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -94,7 +98,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task PasswordAsync([CommandCompletion(nameof(GetUserIDs))]string userID)
+        public async Task PasswordAsync([CommandCompletion(nameof(GetUserIDs))] string userID)
         {
             var user = await this.GetUserAsync(userID);
             var password1 = this.CommandContext.ReadSecureString("Password1:");
@@ -105,7 +109,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task RenameAsync([CommandCompletion(nameof(GetUserIDs))]string userID, string newName = null)
+        public async Task RenameAsync([CommandCompletion(nameof(GetUserIDs))] string userID, string newName = null)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -114,7 +118,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task MoveAsync([CommandCompletion(nameof(GetUserIDs))]string userID, [CommandCompletion(nameof(GetCategoryPaths))]string categoryPath)
+        public async Task MoveAsync([CommandCompletion(nameof(GetUserIDs))] string userID, [CommandCompletion(nameof(GetCategoryPaths))] string categoryPath)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -122,7 +126,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod("authority")]
-        public async Task SetAuthorityAsync([CommandCompletion(nameof(GetUserIDs))]string userID, Authority authority)
+        public async Task SetAuthorityAsync([CommandCompletion(nameof(GetUserIDs))] string userID, Authority authority)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -131,7 +135,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task InfoAsync([CommandCompletion(nameof(GetUserIDs))]string userID)
+        public async Task InfoAsync([CommandCompletion(nameof(GetUserIDs))] string userID)
         {
             var user = await this.GetUserAsync(userID);
             var userInfo = await user.Dispatcher.InvokeAsync(() => user.UserInfo);
@@ -161,7 +165,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task DeleteAsync([CommandCompletion(nameof(GetUserIDs))]string userID)
+        public async Task DeleteAsync([CommandCompletion(nameof(GetUserIDs))] string userID)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -172,7 +176,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod("message")]
-        public async Task SendMessageAsync([CommandCompletion(nameof(GetUserIDs))]string userID, string message)
+        public async Task SendMessageAsync([CommandCompletion(nameof(GetUserIDs))] string userID, string message)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -191,7 +195,7 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty('m', true, IsRequired = true, IsExplicit = true)]
+        [CommandPropertyRequired('m', AllowName = true, IsExplicit = true)]
         public string Message
         {
             get; set;
@@ -288,48 +292,48 @@ namespace Ntreev.Crema.Commands.Consoles
             });
         }
 
-        #region classes
+        // #region classes
 
-        class TerminalUserItem : TerminalTextItem
-        {
-            private readonly string userID;
-            private readonly BanInfo banInfo;
-            private readonly UserState userState;
+        // class TerminalUserItem : TerminalTextItem
+        // {
+        //     private readonly string userID;
+        //     private readonly BanInfo banInfo;
+        //     private readonly UserState userState;
 
-            public TerminalUserItem(string userID, BanInfo banInfo, UserState userState)
-                : base(userID)
-            {
-                this.userID = userID;
-                this.banInfo = banInfo;
-                this.userState = userState;
-            }
+        //     public TerminalUserItem(string userID, BanInfo banInfo, UserState userState)
+        //         : base(userID)
+        //     {
+        //         this.userID = userID;
+        //         this.banInfo = banInfo;
+        //         this.userState = userState;
+        //     }
 
-            protected override void OnDraw(TextWriter writer, string text)
-            {
-                if (this.banInfo.Path != string.Empty)
-                {
-                    using (TerminalColor.SetForeground(ConsoleColor.Red))
-                    {
-                        base.OnDraw(writer, text);
-                    }
-                }
-                else if (this.userState != UserState.Online)
-                {
-                    //using (TerminalColor.SetForeground(ConsoleColor.Gray))
-                    {
-                        base.OnDraw(writer, text);
-                    }
-                }
-                else
-                {
-                    using (TerminalColor.SetForeground(ConsoleColor.Blue))
-                    {
-                        base.OnDraw(writer, text);
-                    }
-                }
-            }
-        }
+        //     protected override void OnDraw(TextWriter writer, string text)
+        //     {
+        //         if (this.banInfo.Path != string.Empty)
+        //         {
+        //             using (TerminalColor.SetForeground(ConsoleColor.Red))
+        //             {
+        //                 base.OnDraw(writer, text);
+        //             }
+        //         }
+        //         else if (this.userState != UserState.Online)
+        //         {
+        //             //using (TerminalColor.SetForeground(ConsoleColor.Gray))
+        //             {
+        //                 base.OnDraw(writer, text);
+        //             }
+        //         }
+        //         else
+        //         {
+        //             using (TerminalColor.SetForeground(ConsoleColor.Blue))
+        //             {
+        //                 base.OnDraw(writer, text);
+        //             }
+        //         }
+        //     }
+        // }
 
-        #endregion
+        // #endregion
     }
 }

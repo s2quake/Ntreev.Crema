@@ -55,7 +55,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task RenameAsync([CommandCompletion(nameof(GetTableNames))]string tableName, string newTableName)
+        public async Task RenameAsync([CommandCompletion(nameof(GetTableNames))] string tableName, string newTableName)
         {
             var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -63,7 +63,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task MoveAsync([CommandCompletion(nameof(GetTableNames))]string tableName, [CommandCompletion(nameof(GetCategoryPaths))]string categoryPath)
+        public async Task MoveAsync([CommandCompletion(nameof(GetTableNames))] string tableName, [CommandCompletion(nameof(GetCategoryPaths))] string categoryPath)
         {
             var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -71,7 +71,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task DeleteAsync([CommandCompletion(nameof(GetTableNames))]string tableName)
+        public async Task DeleteAsync([CommandCompletion(nameof(GetTableNames))] string tableName)
         {
             var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -82,7 +82,7 @@ namespace Ntreev.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task SetTagsAsync([CommandCompletion(nameof(GetTableNames))]string tableName, string tags)
+        public async Task SetTagsAsync([CommandCompletion(nameof(GetTableNames))] string tableName, string tags)
         {
             var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -102,7 +102,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodProperty(nameof(CategoryPath), nameof(CopyContent))]
-        public async Task CopyAsync([CommandCompletion(nameof(GetTableNames))]string tableName, string newTableName)
+        public async Task CopyAsync([CommandCompletion(nameof(GetTableNames))] string tableName, string newTableName)
         {
             var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -112,7 +112,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodProperty(nameof(CategoryPath), nameof(CopyContent))]
-        public async Task InheritAsync([CommandCompletion(nameof(GetTableNames))]string tableName, string newTableName)
+        public async Task InheritAsync([CommandCompletion(nameof(GetTableNames))] string tableName, string newTableName)
         {
             var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -122,7 +122,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task ViewAsync([CommandCompletion(nameof(GetPaths))]string tableItemName, string revision = null)
+        public async Task ViewAsync([CommandCompletion(nameof(GetPaths))] string tableItemName, string revision = null)
         {
             var tableItem = await this.GetTableItemAsync(tableItemName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -133,7 +133,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task LogAsync([CommandCompletion(nameof(GetPaths))]string tableItemName, string revision = null)
+        public async Task LogAsync([CommandCompletion(nameof(GetPaths))] string tableItemName, string revision = null)
         {
             var tableItem = await this.GetTableItemAsync(tableItemName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -142,7 +142,7 @@ namespace Ntreev.Crema.Commands.Consoles
             foreach (var item in logs)
             {
                 this.CommandContext.WriteObject(item.ToDictionary(), FormatProperties.Format);
-                this.CommandContext.WriteLine();
+                this.Out.WriteLine();
             }
         }
 
@@ -152,12 +152,15 @@ namespace Ntreev.Crema.Commands.Consoles
         public void List()
         {
             var tableNames = this.GetTableNames((TagInfo)TagsProperties.Tags, FilterProperties.FilterExpression);
-            this.CommandContext.WriteList(tableNames);
+            foreach (var item in tableNames)
+            {
+                this.Out.WriteLine(item);
+            }
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task InfoAsync([CommandCompletion(nameof(GetTableNames))]string tableName)
+        public async Task InfoAsync([CommandCompletion(nameof(GetTableNames))] string tableName)
         {
             var table = await this.GetTableAsync(tableName);
             var tableInfo = table.Dispatcher.Invoke(() => table.TableInfo);
@@ -168,19 +171,23 @@ namespace Ntreev.Crema.Commands.Consoles
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task ColumnList([CommandCompletion(nameof(GetTableNames))]string tableName)
+        public async Task ColumnList([CommandCompletion(nameof(GetTableNames))] string tableName)
         {
             var table = await this.GetTableAsync(tableName);
             var tableInfo = table.Dispatcher.Invoke(() => table.TableInfo);
             var columnList = tableInfo.Columns.Where(item => StringUtility.GlobMany(item.Name, FilterProperties.FilterExpression))
-                                              .Select(item => new ColumnItem(item)).ToArray();
-            this.CommandContext.WriteList(columnList);
+                                              .Select(item => item).ToArray();
+
+            foreach (var item in columnList)
+            {
+                this.Out.WriteLine(item);
+            }
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
-        public async Task ColumnInfo([CommandCompletion(nameof(GetTableNames))]string tableName)
+        public async Task ColumnInfo([CommandCompletion(nameof(GetTableNames))] string tableName)
         {
             var table = await this.GetTableAsync(tableName);
             var tableInfo = table.Dispatcher.Invoke(() => table.TableInfo);
@@ -281,7 +288,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [ConsoleModeOnly]
         [CommandMethod]
-        public async Task EditTemplateAsync([CommandCompletion(nameof(GetTableNames))]string tableName)
+        public async Task EditTemplateAsync([CommandCompletion(nameof(GetTableNames))] string tableName)
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             var table = await this.GetTableAsync(tableName);
@@ -312,7 +319,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         [ConsoleModeOnly]
         [CommandMethod]
-        public async Task EditAsync([CommandCompletion(nameof(GetTableNames))]string tableName)
+        public async Task EditAsync([CommandCompletion(nameof(GetTableNames))] string tableName)
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             var table = await this.GetTableAsync(tableName);
@@ -325,7 +332,8 @@ namespace Ntreev.Crema.Commands.Consoles
                 await content.EnterEditAsync(authentication);
             domain.Dispatcher.Invoke(() => domain.UserRemoved += Domain_UserRemoved);
 
-            this.CommandContext.Category = nameof(ITableContent);
+            throw new NotImplementedException("dotnet");
+            // this.CommandContext.Category = nameof(ITableContent);
             this.CommandContext.Target = content;
         }
 
@@ -374,7 +382,8 @@ namespace Ntreev.Crema.Commands.Consoles
             if (sender is IDomain domain && e.RemoveInfo.Reason == RemoveReason.Kick && e.DomainUserInfo.UserID == this.CommandContext.UserID)
             {
                 domain.UserRemoved -= Domain_UserRemoved;
-                this.CommandContext.Category = null;
+                throw new NotImplementedException("dotnet");
+                // this.CommandContext.Category = null;
                 this.CommandContext.Target = null;
             }
         }
@@ -484,39 +493,39 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
 
-        #region classes
+        // #region classes
 
-        class ColumnItem : TerminalTextItem
-        {
-            private readonly ColumnInfo columnInfo;
+        // class ColumnItem : TerminalTextItem
+        // {
+        //     private readonly ColumnInfo columnInfo;
 
-            public ColumnItem(ColumnInfo columnInfo)
-                : base(columnInfo)
-            {
-                this.columnInfo = columnInfo;
-            }
+        //     public ColumnItem(ColumnInfo columnInfo)
+        //         : base(columnInfo)
+        //     {
+        //         this.columnInfo = columnInfo;
+        //     }
 
-            public override string ToString()
-            {
-                return this.columnInfo.Name;
-            }
+        //     public override string ToString()
+        //     {
+        //         return this.columnInfo.Name;
+        //     }
 
-            protected override void OnDraw(TextWriter writer, string text)
-            {
-                if (this.columnInfo.IsKey == true)
-                {
-                    using (TerminalColor.SetForeground(ConsoleColor.Cyan))
-                    {
-                        base.OnDraw(writer, text);
-                    }
-                }
-                else
-                {
-                    base.OnDraw(writer, text);
-                }
-            }
-        }
+        //     protected override void OnDraw(TextWriter writer, string text)
+        //     {
+        //         if (this.columnInfo.IsKey == true)
+        //         {
+        //             using (TerminalColor.SetForeground(ConsoleColor.Cyan))
+        //             {
+        //                 base.OnDraw(writer, text);
+        //             }
+        //         }
+        //         else
+        //         {
+        //             base.OnDraw(writer, text);
+        //         }
+        //     }
+        // }
 
-        #endregion
+        // #endregion
     }
 }

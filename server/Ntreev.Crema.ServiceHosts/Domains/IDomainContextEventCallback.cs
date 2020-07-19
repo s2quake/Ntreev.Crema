@@ -25,65 +25,66 @@ using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
 using Ntreev.Library;
 using Ntreev.Crema.Data;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Domains
 {
-    [ServiceKnownType(typeof(DBNull))]
+    // [ServiceKnownType(typeof(DBNull))]
     public interface IDomainContextEventCallback
     {
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDomainsCreated(CallbackInfo callbackInfo, DomainMetaData[] metaDatas);
 
-        [OperationContract(IsOneWay = true)]
-        [ServiceKnownType(typeof(TableInfo))]
-        [ServiceKnownType(typeof(TableInfo[]))]
-        [ServiceKnownType(typeof(TypeInfo))]
-        [ServiceKnownType(typeof(TypeInfo[]))]
+        [OperationContract]
+        // [ServiceKnownType(typeof(TableInfo))]
+        // [ServiceKnownType(typeof(TableInfo[]))]
+        // [ServiceKnownType(typeof(TypeInfo))]
+        // [ServiceKnownType(typeof(TypeInfo[]))]
         void OnDomainsDeleted(CallbackInfo callbackInfo, Guid[] domainIDs, bool[] IsCanceleds, object[] results);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDomainInfoChanged(CallbackInfo callbackInfo, Guid domainID, DomainInfo domainInfo);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDomainStateChanged(CallbackInfo callbackInfo, Guid domainID, DomainState domainState);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUserAdded(CallbackInfo callbackInfo, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState, byte[] data, Guid taskID);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUserRemoved(CallbackInfo callbackInfo, Guid domainID, string userID, string ownerID, RemoveInfo removeInfo, Guid taskID);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUserLocationChanged(CallbackInfo callbackInfo, Guid domainID, DomainLocationInfo domainLocationInfo);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUserStateChanged(CallbackInfo callbackInfo, Guid domainID, DomainUserState domainUserState);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUserEditBegun(CallbackInfo callbackInfo, Guid domainID, DomainLocationInfo domainLocationInfo, Guid taskID);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUserEditEnded(CallbackInfo callbackInfo, Guid domainID, Guid taskID);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnOwnerChanged(CallbackInfo callbackInfo, Guid domainID, string ownerID, Guid taskID);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnRowAdded(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows, Guid taskID);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnRowChanged(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows, Guid taskID);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnRowRemoved(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows, Guid taskID);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnPropertyChanged(CallbackInfo callbackInfo, Guid domainID, string propertyName, object value, Guid taskID);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs);
     }
 }

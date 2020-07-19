@@ -20,37 +20,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ServiceModel;
-using System.ServiceModel.Description;
 using Ntreev.Crema.ServiceHosts;
 using Ntreev.Crema.Services;
-using System.ServiceModel.Channels;
 using System.Security.Cryptography.X509Certificates;
-using System.IdentityModel.Selectors;
 using Ntreev.Crema.ServiceHosts.Users;
 using System.ComponentModel.Composition;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Users
 {
-    class UserContextServiceHost : CremaServiceItemHost
+    class UserContextServiceHost : ServerServiceHostBase<IUserContextService, IUserContextEventCallback>
     {
-        public UserContextServiceHost(CremaService service, int port)
-            : base(service, typeof(UserContextService), $"net.tcp://localhost:{port}/{nameof(UserContextService)}", port)
+        public UserContextServiceHost(CremaService service)
         {
-            this.AddServiceEndpoint(typeof(IUserContextService), CreateBinding(), string.Empty);
-            this.Description.Behaviors.Add(new InstanceProviderBehavior());
-
-#if DEBUG
-            if (Environment.OSVersion.Platform != PlatformID.Unix)
-            {
-                this.Description.Behaviors.Add(new ServiceMetadataBehavior());
-                this.AddServiceEndpoint(typeof(IMetadataExchange), MetadataExchangeBindings.CreateMexTcpBinding(), "mex");
-            }
-#endif
         }
 
-        public override object CreateInstance(Message message)
+        protected override IUserContextService CreateService(IUserContextEventCallback callback)
         {
-            return new UserContextService(this.Service);
+            return new UserContextService(null);
         }
     }
 }

@@ -24,48 +24,49 @@ using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
 using Ntreev.Library;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Users
 {
     public interface IUserContextEventCallback
     {
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUsersChanged(CallbackInfo callbackInfo, UserInfo[] userInfos);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUsersStateChanged(CallbackInfo callbackInfo, string[] userIDs, UserState[] states);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUserItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, UserInfo?[] args);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUserItemsRenamed(CallbackInfo callbackInfo, string[] itemPaths, string[] newNames);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUserItemsMoved(CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUserItemsDeleted(CallbackInfo callbackInfo, string[] itemPaths);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUsersLoggedIn(CallbackInfo callbackInfo, string[] userIDs);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUsersLoggedOut(CallbackInfo callbackInfo, string[] userIDs, CloseInfo closeInfo);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUsersKicked(CallbackInfo callbackInfo, string[] userIDs, string[] comments);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnUsersBanChanged(CallbackInfo callbackInfo, BanInfo[] banInfos, BanChangeType changeType, string[] comments);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnMessageReceived(CallbackInfo callbackInfo, string[] userIDs, string message, MessageType messageType);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs);
     }
 }

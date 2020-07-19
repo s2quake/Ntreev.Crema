@@ -47,14 +47,14 @@ namespace Ntreev.Crema.Commands.Consoles
             return base.GetCompletions(completionContext);
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         [CommandCompletion(nameof(GetUserList))]
         public string UserID
         {
             get; set;
         }
 
-        [CommandProperty('m', true, IsRequired = true, IsExplicit = true)]
+        [CommandPropertyRequired('m', AllowName = true, IsExplicit = true)]
         public string Message
         {
             get; set;

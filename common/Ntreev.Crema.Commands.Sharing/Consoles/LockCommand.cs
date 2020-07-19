@@ -52,16 +52,14 @@ namespace Ntreev.Crema.Commands.Consoles
             return base.GetCompletions(completionContext);
         }
 
-        [CommandProperty(IsRequired = true)]
-        [DefaultValue("")]
+        [CommandPropertyRequired(DefaultValue = "")]
         public string Path
         {
             get; set;
         }
 
-        [CommandProperty('m', true, IsRequired = true, IsExplicit = true)]
+        [CommandPropertyRequired('m', AllowName = true, IsExplicit = true)]
         [CommandPropertyTrigger(nameof(Information), false)]
-        [DefaultValue("")]
         public string Message
         {
             get; set;
@@ -97,7 +95,7 @@ namespace Ntreev.Crema.Commands.Consoles
             {
                 if (this.Message == string.Empty)
                 {
-                    throw new ArgumentException($"'{this.GetDescriptor(nameof(this.Message)).DisplayPattern}' 가 필요합니다.");
+                    throw new ArgumentException($"'{this.GetDescriptor(nameof(this.Message))}' 가 필요합니다.");
                 }
                 await lockable.LockAsync(authentication, this.Message);
             }
