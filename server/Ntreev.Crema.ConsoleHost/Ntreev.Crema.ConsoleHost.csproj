@@ -2,6 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.0;net45</TargetFrameworks>
+    <OutputType>Exe</OutputType>
     <Version>5.0.20179.0842</Version>
     <AssemblyVersion>5.0</AssemblyVersion>
     <FileVersion>5.0.20179.0842</FileVersion>
@@ -12,6 +13,7 @@
     <RepositoryUrl>https://github.com/s2quake/Crema</RepositoryUrl>
     <PackageTags>Crema</PackageTags>
     <LangVersion>8.0</LangVersion>
+    <AssemblyName>cremaserver</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />

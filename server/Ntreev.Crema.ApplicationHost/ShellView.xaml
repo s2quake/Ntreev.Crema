@@ -38,7 +38,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         </Style>
 
         <Style x:Key="TabControl_Style" TargetType="{x:Type TabControl}" BasedOn="{StaticResource TabControl_Page_Style}">
-            <!--<Setter Property="ContentTemplate" Value="{StaticResource TabControl_ItemsSource_ContentTemplate}" />-->
+
         </Style>
         
     </mui:ModernWindow.Resources>

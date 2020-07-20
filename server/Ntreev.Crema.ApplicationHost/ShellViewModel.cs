@@ -16,7 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-//using Microsoft.WindowsAPICodePack.Dialogs;
+using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using Ntreev.Crema.ServiceHosts;
 using Ntreev.Crema.Services;
 using Ntreev.Library;
@@ -98,38 +99,38 @@ namespace Ntreev.Crema.ApplicationHost
 
         public void SelectBasePath()
         {
-            //var dialog = new CommonOpenFileDialog()
-            //{
-            //    IsFolderPicker = true,
-            //};
+            var dialog = new CommonOpenFileDialog()
+            {
+               IsFolderPicker = true,
+            };
 
-            //if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            //{
-            //    this.BasePath = dialog.FileName;
-            //}
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+               this.BasePath = dialog.FileName;
+            }
         }
 
         public async Task CreateRepositoryAsync()
         {
-            //var dialog = new CommonOpenFileDialog()
-            //{
-            //    IsFolderPicker = true,
-            //};
+            var dialog = new CommonOpenFileDialog()
+            {
+               IsFolderPicker = true,
+            };
 
-            //if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            //{
-            //    var basePath = dialog.FileName;
-            //    var isEmpty = DirectoryUtility.IsEmpty(basePath);
-            //    if (isEmpty == false)
-            //    {
-            //        await AppMessageBox.ShowAsync("대상 경로는 비어있지 않습니다.");
-            //        return;
-            //    }
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+               var basePath = dialog.FileName;
+               var isEmpty = DirectoryUtility.IsEmpty(basePath);
+               if (isEmpty == false)
+               {
+                   await AppMessageBox.ShowAsync("대상 경로는 비어있지 않습니다.");
+                   return;
+               }
 
-            //    CremaBootstrapper.CreateRepository(this.service, basePath, "git", "xml");
-            //    AppMessageBox.ShowAsync("저장소를 생성했습니다.");
-            //    this.BasePath = basePath;
-            //}
+               CremaBootstrapper.CreateRepository(this.service, basePath, "git", "xml");
+               await AppMessageBox.ShowAsync("저장소를 생성했습니다.");
+               this.BasePath = basePath;
+            }
         }
 
         public bool CanOpenService
