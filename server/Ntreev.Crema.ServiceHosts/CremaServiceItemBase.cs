@@ -29,27 +29,27 @@ namespace Ntreev.Crema.ServiceHosts
     public abstract class CremaServiceItemBase<T> : ICremaServiceItem, IDisposable
     {
         private readonly string sessionID;
-        private ServiceHostBase host;
+        // private ServiceHostBase host;
 
         protected CremaServiceItemBase(CremaService service)
         {
             this.Service = service;
             this.CremaHost = this.Service.GetService(typeof(ICremaHost)) as ICremaHost;
             this.LogService = this.CremaHost.GetService(typeof(ILogService)) as ILogService;
-            OperationContext.Current.Host.Closing += Host_Closing;
-            OperationContext.Current.Channel.Faulted += Channel_Faulted;
-            OperationContext.Current.Channel.Closed += Channel_Closed;
-            this.host = OperationContext.Current.Host;
-            this.Channel = OperationContext.Current.Channel;
-            this.sessionID = OperationContext.Current.Channel.SessionId;
-            this.Callback = OperationContext.Current.GetCallbackChannel<T>();
+            // OperationContext.Current.Host.Closing += Host_Closing;
+            // OperationContext.Current.Channel.Faulted += Channel_Faulted;
+            // OperationContext.Current.Channel.Closed += Channel_Closed;
+            // this.host = OperationContext.Current.Host;
+            // this.Channel = OperationContext.Current.Channel;
+            // this.sessionID = OperationContext.Current.Channel.SessionId;
+            // this.Callback = OperationContext.Current.GetCallbackChannel<T>();
         }
 
         private void Channel_Closed(object sender, EventArgs e)
         {
-            this.host.Closing -= Host_Closing;
-            this.host = null;
-            this.Channel = null;
+            // this.host.Closing -= Host_Closing;
+            // this.host = null;
+            // this.Channel = null;
             this.Callback = default(T);
             this.LogService.Debug($"[{this.OwnerID}] {this.GetType().Name} {nameof(ICremaServiceItem.CloseAsync)}");
         }
@@ -68,7 +68,7 @@ namespace Ntreev.Crema.ServiceHosts
 
         protected T Callback { get; private set; }
 
-        protected IContextChannel Channel { get; private set; }
+        // protected IContextChannel Channel { get; private set; }
 
         protected abstract void OnServiceClosed(SignatureDate signatureDate, CloseInfo closeInfo);
 
@@ -95,8 +95,8 @@ namespace Ntreev.Crema.ServiceHosts
 
         private void Channel_Faulted(object sender, EventArgs e)
         {
-            this.Channel.Abort();
-            this.Channel = null;
+            // this.Channel.Abort();
+            // this.Channel = null;
             this.Callback = default(T);
         }
 
@@ -107,13 +107,13 @@ namespace Ntreev.Crema.ServiceHosts
             await this.OnCloseAsync(disconnect);
             if (disconnect == true)
             {
-                if (this.Channel != null)
-                {
-                    this.Channel.Closed -= Channel_Closed;
-                    this.Channel.Faulted -= Channel_Faulted;
-                    this.Channel.Abort();
-                }
-                this.Channel = null;
+                // if (this.Channel != null)
+                // {
+                //     this.Channel.Closed -= Channel_Closed;
+                //     this.Channel.Faulted -= Channel_Faulted;
+                //     this.Channel.Abort();
+                // }
+                // this.Channel = null;
                 this.Callback = default(T);
             }
             this.LogService.Debug($"{this.GetType().Name}.{nameof(OnCloseAsync)}");

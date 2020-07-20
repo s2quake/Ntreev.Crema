@@ -77,7 +77,7 @@ namespace Ntreev.Crema.WindowsServiceHost
             this.service.CloseAsync().Wait();
         }
 
-        public ServiceState ServiceState => this.service.ServiceState;
+        // public JSSoft.Communication.ServiceState ServiceState => this.service.ServiceState;
 
         public event EventHandler Opening
         {

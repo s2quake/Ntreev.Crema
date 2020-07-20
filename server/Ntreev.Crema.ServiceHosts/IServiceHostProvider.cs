@@ -21,12 +21,13 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts
 {
     public interface IServiceHostProvider
     {
-        ServiceHost CreateInstance(int port);
+        ServiceHostBase CreateInstance();
 
         string Name { get; }
     }

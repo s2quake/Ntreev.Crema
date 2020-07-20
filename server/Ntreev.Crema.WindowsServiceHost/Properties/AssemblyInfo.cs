@@ -18,9 +18,3 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
-[assembly: AssemblyTitle("Ntreev.Crema.WindowsServiceHost")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("Ntreev.Crema.WindowsServiceHost")]
-[assembly: ComVisible(false)]
-[assembly: Guid("85ce1011-a1fa-4c83-8cb9-5c6fb8e73b9a")]

@@ -102,7 +102,7 @@ namespace Ntreev.Crema.Services.Data
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
-                    this.domainHost.SetServiceState(ServiceState.Opened);
+                    this.domainHost.SetServiceState(ServiceState.Open);
                     this.domainHost.InvokeEditBegunEvent(EventArgs.Empty);
                 });
             }
@@ -230,7 +230,7 @@ namespace Ntreev.Crema.Services.Data
         {
             if (this.Domain == null)
                 throw new InvalidOperationException();
-            if (this.ServiceState != ServiceState.Opened)
+            if (this.ServiceState != ServiceState.Open)
                 throw new InvalidOperationException();
         }
 
@@ -239,7 +239,7 @@ namespace Ntreev.Crema.Services.Data
         {
             if (this.Domain == null)
                 throw new InvalidOperationException();
-            if (this.ServiceState != ServiceState.Opened)
+            if (this.ServiceState != ServiceState.Open)
                 throw new InvalidOperationException();
         }
 
@@ -250,7 +250,7 @@ namespace Ntreev.Crema.Services.Data
 
             if (this.Domain == null)
                 throw new InvalidOperationException();
-            if (this.ServiceState != ServiceState.Opened)
+            if (this.ServiceState != ServiceState.Open)
                 throw new InvalidOperationException();
 
             this.Table.ValidateHasNotBeingEditedType();
@@ -266,7 +266,7 @@ namespace Ntreev.Crema.Services.Data
 
             if (this.Domain == null)
                 throw new InvalidOperationException();
-            if (this.ServiceState != ServiceState.Opened)
+            if (this.ServiceState != ServiceState.Open)
                 throw new InvalidOperationException();
         }
 

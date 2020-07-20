@@ -77,7 +77,7 @@ namespace Ntreev.Crema.Commands.Consoles
             var logService = this.GetLog(logName);
             if (verbose == null)
             {
-                this.CommandContext.WriteLine(logService.Verbose.ToString().ToLower());
+                this.CommandContext.Out.WriteLine(logService.Verbose.ToString().ToLower());
             }
             else
             {
@@ -108,13 +108,16 @@ namespace Ntreev.Crema.Commands.Consoles
                         { nameof(ILogService.FileName),item.FileName}
                     };
                     this.CommandContext.WriteObject(props, FormatProperties.Format);
-                    this.CommandContext.WriteLine();
+                    this.CommandContext.Out.WriteLine();
                 }
             }
             else
             {
                 var names = this.GetLogList().Select(item => item.Name).ToArray();
-                this.CommandContext.WriteList(names);
+                foreach (var item in names)
+                {
+                    this.CommandContext.Out.WriteLine(item);
+                }
             }
         }
 

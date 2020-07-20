@@ -35,10 +35,11 @@ namespace Ntreev.Crema.Services
             try
             {
                 var filename = this.itemName + ".xml";
-                if (File.Exists(filename) == true)
-                {
-                    this.Read(filename);
-                }
+                throw new NotImplementedException();
+                // if (File.Exists(filename) == true)
+                // {
+                //     this.Read(filename);
+                // }
             }
             catch (Exception e)
             {
@@ -52,8 +53,9 @@ namespace Ntreev.Crema.Services
         {
             try
             {
-                this.WriteSchema(this.itemName + ".xsd");
-                this.Write(this.itemName + ".xml", Path.GetFileName(this.itemName) + ".xsd");
+                throw new NotImplementedException();
+                // this.WriteSchema(this.itemName + ".xsd");
+                // this.Write(this.itemName + ".xml", Path.GetFileName(this.itemName) + ".xsd");
             }
             catch (Exception e)
             {

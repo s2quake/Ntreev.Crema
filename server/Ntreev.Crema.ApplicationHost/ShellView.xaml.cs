@@ -151,13 +151,12 @@ namespace Ntreev.Crema.ApplicationHost
 
                 this.terminal.AppendLine(Properties.Resources.Comment_Hello);
                 this.terminal.AppendLine(Properties.Resources.Comment_AvaliableCommands);
-
-                foreach (var item in this.commandContext.Commands)
-                {
-                    if (this.commandContext.IsCommandEnabled(item) == false)
-                        continue;
-                    this.terminal.AppendLine(" - " + item.Name);
-                }
+                //foreach (var item in this.commandContext.Commands)
+                //{
+                //    if (this.commandContext.IsCommandEnabled(item) == false)
+                //        continue;
+                //    this.terminal.AppendLine(" - " + item.Name);
+                //}
                 this.terminal.AppendLine(Properties.Resources.Comment_TypeHelp + Environment.NewLine);
                 this.terminal.AppendLine(Properties.Resources.Comment_TypeVersion);
             });
@@ -167,7 +166,7 @@ namespace Ntreev.Crema.ApplicationHost
         {
             this.Dispatcher.InvokeAsync(() =>
             {
-                //this.terminal.Reset();
+                this.terminal.Reset();
             });
         }
 

@@ -25,63 +25,64 @@ using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
 using Ntreev.Library;
 using Ntreev.Crema.Data;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Data
 {
     public interface IDataBaseEventCallback
     {
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTablesChanged(CallbackInfo callbackInfo, TableInfo[] tableInfos, string itemType);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTablesStateChanged(CallbackInfo callbackInfo, string[] tableNames, TableState[] states);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTableItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, TableInfo?[] args);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTableItemsRenamed(CallbackInfo callbackInfo, string[] itemPaths, string[] newNames);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTableItemsMoved(CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTableItemsDeleted(CallbackInfo callbackInfo, string[] itemPaths);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTableItemsAccessChanged(CallbackInfo callbackInfo, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTableItemsLockChanged(CallbackInfo callbackInfo, LockChangeType changeType, LockInfo[] lockInfos, string[] comments);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTypesChanged(CallbackInfo callbackInfo, TypeInfo[] typeInfos);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTypesStateChanged(CallbackInfo callbackInfo, string[] typeNames, TypeState[] states);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTypeItemsCreated(CallbackInfo callbackInfo, string[] itemPaths, TypeInfo?[] args);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTypeItemsRenamed(CallbackInfo callbackInfo, string[] itemPaths, string[] newNames);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTypeItemsMoved(CallbackInfo callbackInfo, string[] itemPaths, string[] parentPaths);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTypeItemsDeleted(CallbackInfo callbackInfo, string[] itemPaths);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTypeItemsAccessChanged(CallbackInfo callbackInfo, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTypeItemsLockChanged(CallbackInfo callbackInfo, LockChangeType changeType, LockInfo[] lockInfos, string[] comments);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs);
     }
 }

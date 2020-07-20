@@ -36,7 +36,7 @@ namespace Ntreev.Crema.RuntimeService
     [Export(typeof(IPlugin))]
     [Export(typeof(IRuntimeService))]
     [Export(typeof(RuntimeService))]
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Single)]
+    // [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Single)]
     partial class RuntimeService : IPlugin, IRuntimeService, IRuntimeServiceInternal
     {
         public const string ServiceID = "B8CD9F7C-58B8-4BDA-B6AE-B99ED216DA22";

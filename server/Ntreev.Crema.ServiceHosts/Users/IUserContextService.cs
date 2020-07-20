@@ -25,10 +25,12 @@ using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
 using Ntreev.Library;
 using System.Security;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Users
 {
-    [ServiceContract(Namespace = CremaService.Namespace, SessionMode = SessionMode.Required, CallbackContract = typeof(IUserContextEventCallback))]
+    // [ServiceContract(Namespace = CremaService.Namespace, SessionMode = SessionMode.Required, CallbackContract = typeof(IUserContextEventCallback))]
+    [ServiceContract]
     public partial interface IUserContextService
     {
         [OperationContract]

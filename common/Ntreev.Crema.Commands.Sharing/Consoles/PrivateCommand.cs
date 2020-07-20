@@ -51,8 +51,7 @@ namespace Ntreev.Crema.Commands.Consoles
             return base.GetCompletions(completionContext);
         }
 
-        [CommandProperty(IsRequired = true)]
-        [DefaultValue("")]
+        [CommandPropertyRequired(DefaultValue = "")]
         public string Path
         {
             get; set;

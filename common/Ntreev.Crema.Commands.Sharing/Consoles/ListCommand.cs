@@ -50,8 +50,7 @@ namespace Ntreev.Crema.Commands.Consoles
             return base.GetCompletions(completionContext);
         }
 
-        [CommandProperty(IsRequired = true)]
-        [DefaultValue("")]
+        [CommandPropertyRequired(DefaultValue = "")]
         public string PathName
         {
             get; set;
@@ -70,61 +69,62 @@ namespace Ntreev.Crema.Commands.Consoles
             if (allPath.Contains(path) == false)
                 throw new ArgumentException($"No such directory : {path}");
 
-            var query = from item in allPath
-                        where item.StartsWith(path)
-                        let text = item.Substring(path.Length)
-                        where StringUtility.Split(text, PathUtility.SeparatorChar).Length == 1
-                        let name = text.Trim(PathUtility.SeparatorChar)
-                        orderby name
-                        select new ItemObject(text);
+            throw new NotImplementedException("dotnet");
+            // var query = from item in allPath
+            //             where item.StartsWith(path)
+            //             let text = item.Substring(path.Length)
+            //             where StringUtility.Split(text, PathUtility.SeparatorChar).Length == 1
+            //             let name = text.Trim(PathUtility.SeparatorChar)
+            //             orderby name
+            //             select new ItemObject(text);
 
-            this.CommandContext.WriteList(query.ToArray());
+            // this.CommandContext.WriteList(query.ToArray());
         }
 
-        #region classes
+        // #region classes
 
-        class ItemObject : TerminalTextItem
-        {
-            private bool isCategory;
-            private string name;
-            public ItemObject(string path)
-                : base(path)
-            {
-                if (path.EndsWith(PathUtility.Separator) == true)
-                {
-                    this.name = path.Remove(path.Length - 1);
-                    this.isCategory = true;
-                }
-                else
-                {
-                    this.name = path;
-                    this.isCategory = false;
-                }
-            }
+        // class ItemObject : TerminalTextItem
+        // {
+        //     private bool isCategory;
+        //     private string name;
+        //     public ItemObject(string path)
+        //         : base(path)
+        //     {
+        //         if (path.EndsWith(PathUtility.Separator) == true)
+        //         {
+        //             this.name = path.Remove(path.Length - 1);
+        //             this.isCategory = true;
+        //         }
+        //         else
+        //         {
+        //             this.name = path;
+        //             this.isCategory = false;
+        //         }
+        //     }
 
-            public bool IsCategory { get { return this.isCategory; } }
+        //     public bool IsCategory { get { return this.isCategory; } }
 
-            protected override void OnDraw(TextWriter writer, string text)
-            {
-                if (this.isCategory == true)
-                {
-                    using (TerminalColor.SetForeground(ConsoleColor.Cyan))
-                    {
-                        base.OnDraw(writer, text);
-                    }
-                }
-                else
-                {
-                    base.OnDraw(writer, text);
-                }
-            }
+        //     protected override void OnDraw(TextWriter writer, string text)
+        //     {
+        //         if (this.isCategory == true)
+        //         {
+        //             using (TerminalColor.SetForeground(ConsoleColor.Cyan))
+        //             {
+        //                 base.OnDraw(writer, text);
+        //             }
+        //         }
+        //         else
+        //         {
+        //             base.OnDraw(writer, text);
+        //         }
+        //     }
 
-            public override string ToString()
-            {
-                return this.name;
-            }
-        }
+        //     public override string ToString()
+        //     {
+        //         return this.name;
+        //     }
+        // }
 
-        #endregion
+        // #endregion
     }
 }

@@ -32,8 +32,9 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
-    [Export(typeof(IConsoleCommandProvider))]
-    class DomainDeleteCommand : ConsoleCommandProviderBase, IConsoleCommandProvider
+    // [Export(typeof(IConsoleCommandProvider))]
+    [PartialCommand]
+    class DomainDeleteCommand : ConsoleCommandMethodBase
     {
         private readonly ICremaHost cremaHost;
 
@@ -58,8 +59,7 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        [CommandProperty(IsRequired = true)]
-        [DefaultValue("")]
+        [CommandPropertyRequired(DefaultValue = "")]
         //[CommandPropertyTrigger(nameof(DataBaseName), null)]
         [CommandCompletion(nameof(GetDomainIDs))]
         public string DomainID
@@ -79,7 +79,7 @@ namespace Ntreev.Crema.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty("database", IsRequired = true, IsExplicit = true)]
+        [CommandPropertyRequired("database", IsExplicit = true)]
         [CommandPropertyTrigger(nameof(DomainID), "")]
         [CommandCompletion(nameof(GetDataBaseNames))]
         public string DataBaseName

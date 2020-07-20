@@ -44,34 +44,34 @@ namespace Ntreev.Crema.Commands.Consoles
         private string path;
         private Authentication commission;
 
-        protected ConsoleCommandContextBase(IEnumerable<IConsoleDrive> driveItems, IEnumerable<IConsoleCommand> commands, IEnumerable<IConsoleCommandProvider> commandProviders)
-            : base(ConcatCommands(driveItems, commands), commandProviders.Select(item => item.CommandProvider))
+        protected ConsoleCommandContextBase(IEnumerable<IConsoleDrive> driveItems, IEnumerable<IConsoleCommand> commands)
+            : base(ConcatCommands(driveItems, commands))
         {
-            this.Name = string.Empty;
+            // this.Name = string.Empty;
             this.DriveItems = driveItems.ToArray();
-            foreach (var item in this.Commands)
-            {
-                if (item is ConsoleCommandBase command)
-                {
-                    command.CommandContext = this;
-                }
-                else if (item is ConsoleCommandAsyncBase asyncCommand)
-                {
-                    asyncCommand.CommandContext = this;
-                }
-                else if (item is ConsoleCommandMethodBase commandMethod)
-                {
-                    commandMethod.CommandContext = this;
-                }
-            }
+            // foreach (var item in this.Commands)
+            // {
+            //     if (item is ConsoleCommandBase command)
+            //     {
+            //         command.CommandContext = this;
+            //     }
+            //     else if (item is ConsoleCommandAsyncBase asyncCommand)
+            //     {
+            //         asyncCommand.CommandContext = this;
+            //     }
+            //     else if (item is ConsoleCommandMethodBase commandMethod)
+            //     {
+            //         commandMethod.CommandContext = this;
+            //     }
+            // }
 
-            foreach (var item in commandProviders)
-            {
-                if (item is ConsoleCommandProviderBase provider)
-                {
-                    provider.CommandContext = this;
-                }
-            }
+            // foreach (var item in commandProviders)
+            // {
+            //     if (item is ConsoleCommandProviderBase provider)
+            //     {
+            //         provider.CommandContext = this;
+            //     }
+            // }
             foreach (var item in driveItems)
             {
                 if (item.Name == Uri.UriSchemeFile)
@@ -153,7 +153,7 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        public override string ReadString(string title)
+        public string ReadString(string title)
         {
             try
             {
@@ -166,7 +166,7 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        public override SecureString ReadSecureString(string title)
+        public SecureString ReadSecureString(string title)
         {
             try
             {
@@ -246,18 +246,18 @@ namespace Ntreev.Crema.Commands.Consoles
             return this.commission;
         }
 
-        public Authentication GetAuthentication(IConsoleCommandProvider command)
-        {
-            if (this.commission != null)
-                throw new Exception("임시 인증이 발급되어 있습니다.");
-            this.commission = this.authentication.BeginCommission();
-            return this.commission;
-        }
+        // public Authentication GetAuthentication(IConsoleCommandProvider command)
+        // {
+        //     if (this.commission != null)
+        //         throw new Exception("임시 인증이 발급되어 있습니다.");
+        //     this.commission = this.authentication.BeginCommission();
+        //     return this.commission;
+        // }
 
         public void WriteObject(object value, TextSerializerType type)
         {
             var text = TextSerializer.Serialize(value, type);
-            this.WriteLine(text);
+            this.Out.WriteLine(text);
         }
 
         public bool IsOnline => this.authentication != null;
@@ -365,19 +365,19 @@ namespace Ntreev.Crema.Commands.Consoles
             this.PathChanged?.Invoke(this, e);
         }
 
-        protected override bool OnExecute(ICommand command, string arguments)
-        {
-            try
-            {
-                return base.OnExecute(command, arguments);
-            }
-            finally
-            {
-                if (this.commission != null)
-                    this.authentication.EndCommission(this.commission);
-                this.commission = null;
-            }
-        }
+        // protected override bool OnExecute(ICommand command, string arguments)
+        // {
+        //     try
+        //     {
+        //         return base.OnExecute(command, arguments);
+        //     }
+        //     finally
+        //     {
+        //         if (this.commission != null)
+        //             this.authentication.EndCommission(this.commission);
+        //         this.commission = null;
+        //     }
+        // }
 
         private static string SecureStringToString(SecureString value)
         {

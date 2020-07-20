@@ -48,13 +48,13 @@ namespace Ntreev.Crema.Commands.Consoles
             return base.GetCompletions(completionContext);
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string SourcePath
         {
             get; set;
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string DestPath
         {
             get; set;

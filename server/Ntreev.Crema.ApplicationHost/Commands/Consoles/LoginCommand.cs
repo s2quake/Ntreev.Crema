@@ -42,15 +42,13 @@ namespace Ntreev.Crema.ApplicationHost.Commands.Consoles
 
         }
 
-        [CommandProperty(IsRequired = true)]
-        [DefaultValue("")]
+        [CommandPropertyRequired(DefaultValue = "")]
         public string UserID
         {
             get; set;
         }
 
-        [CommandProperty(IsRequired = true)]
-        [DefaultValue("")]
+        [CommandPropertyRequired(DefaultValue = "")]
         public string Password
         {
             get; set;
@@ -65,7 +63,7 @@ namespace Ntreev.Crema.ApplicationHost.Commands.Consoles
             try
             {
                 var dialog = new LoginViewModel();
-                if (dialog.ShowDialog() != true)
+                if (await dialog.ShowDialogAsync() != true)
                     return;
                 await this.CommandContext.LoginAsync(dialog.UserID, dialog.Password);
             }

@@ -31,7 +31,7 @@ using Ntreev.Library;
 
 namespace Ntreev.Crema.ServiceHosts.Data
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
+    // [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
     partial class DataBaseContextService : CremaServiceItemBase<IDataBaseContextEventCallback>, IDataBaseContextService
     {
         private Authentication authentication;
@@ -451,7 +451,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             {
                 await this.DetachEventHandlersAsync();
                 this.authentication = null;
-                this.Channel.Abort();
+                // this.Channel.Abort();
             }
         }
 

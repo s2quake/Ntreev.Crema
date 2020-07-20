@@ -49,9 +49,8 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
         [ImportingConstructor]
         public ConsoleCommandContext(ICremaHost cremaHost,
             [ImportMany]IEnumerable<IConsoleDrive> rootItems,
-            [ImportMany]IEnumerable<IConsoleCommand> commands,
-            [ImportMany]IEnumerable<IConsoleCommandProvider> commandProviders)
-            : base(rootItems, commands, commandProviders)
+            [ImportMany]IEnumerable<IConsoleCommand> commands)
+            : base(rootItems, commands)
         {
             this.BaseDirectory = cremaHost.GetPath(CremaPath.Documents);
         }

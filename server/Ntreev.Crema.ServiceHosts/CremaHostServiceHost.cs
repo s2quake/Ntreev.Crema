@@ -18,39 +18,37 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
 using Ntreev.Crema.Services;
-using System.ServiceModel.Description;
-using Ntreev.Crema.ServiceModel;
 using System.ServiceModel;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts
 {
-    class CremaHostServiceHost : CremaServiceItemHost
+    class CremaHostServiceHost : ServerServiceHostBase<ICremaHostService>
     {
         private readonly CremaService service;
 
         public CremaHostServiceHost(CremaService service, int port)
-            : base(service, typeof(CremaHostService), $"net.tcp://localhost:{port}/{nameof(CremaHostService)}", port)
+            // : base(service, typeof(CremaHostService), $"net.tcp://localhost:{port}/{nameof(CremaHostService)}", port)
         {
-            this.service = service;
-            this.AddServiceEndpoint(typeof(ICremaHostService), CremaServiceItemHost.CreateBinding(), string.Empty);
-            this.Description.Behaviors.Add(new InstanceProviderBehavior());
+//             this.service = service;
+//             this.AddServiceEndpoint(typeof(ICremaHostService), CremaServiceItemHost.CreateBinding(), string.Empty);
+//             this.Description.Behaviors.Add(new InstanceProviderBehavior());
 
-#if DEBUG
-            if (Environment.OSVersion.Platform != PlatformID.Unix)
-            {
-                this.Description.Behaviors.Add(new ServiceMetadataBehavior());
-                this.AddServiceEndpoint(typeof(IMetadataExchange), MetadataExchangeBindings.CreateMexTcpBinding(), "mex");
-            }
-#endif
+// #if DEBUG
+//             if (Environment.OSVersion.Platform != PlatformID.Unix)
+//             {
+//                 this.Description.Behaviors.Add(new ServiceMetadataBehavior());
+//                 this.AddServiceEndpoint(typeof(IMetadataExchange), MetadataExchangeBindings.CreateMexTcpBinding(), "mex");
+//             }
+// #endif
         }
 
-        public override object CreateInstance(Message message)
-        {
-            return new CremaHostService(this.Service);
-        }
+        // public override object CreateInstance(Message message)
+        // {
+        //     return new CremaHostService(this.Service);
+        // }
     }
 }

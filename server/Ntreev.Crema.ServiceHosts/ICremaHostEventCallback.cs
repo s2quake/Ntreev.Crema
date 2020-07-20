@@ -25,15 +25,16 @@ using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
 using Ntreev.Library;
 using Ntreev.Crema.Data;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts
 {
     public interface ICremaHostEventCallback
     {
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo);
         
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs);
     }
 }

@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         protected override void OnExecute()
         {
-            this.CommandContext.WriteLine(this.CommandContext.Path);
+            this.CommandContext.Out.WriteLine(this.CommandContext.Path);
         }
     }
 }

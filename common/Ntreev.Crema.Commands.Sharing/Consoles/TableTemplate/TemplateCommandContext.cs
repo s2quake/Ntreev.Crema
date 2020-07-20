@@ -30,7 +30,7 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
         private readonly ITableTemplate template;
 
         public TemplateCommandContext(Authentication authentication, ITableTemplate template, IEnumerable<ITemplateCommand> commands)
-            : base(commands.Select(item => item.Command), Enumerable.Empty<ICommandProvider>())
+            : base(commands.Select(item => item.Command))
         {
             this.authentication = authentication;
             this.template = template;

@@ -20,38 +20,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ServiceModel;
-using System.ServiceModel.Description;
 using Ntreev.Crema.ServiceHosts;
-
-using System.ServiceModel.Channels;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceHosts.Domains;
 using System.ComponentModel.Composition;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Domains
 {
-    class DomainContextServiceHost : CremaServiceItemHost
+    class DomainContextServiceHost : ServerServiceHostBase<IDomainContextService, IDomainContextEventCallback>
     {
-        public DomainContextServiceHost(CremaService service, int port)
-            : base(service, typeof(DomainContextService), $"net.tcp://localhost:{port}/{nameof(DomainContextService)}", port)
+        public DomainContextServiceHost(CremaService service)
         {
-            var binding = CreateBinding();
-
-            this.AddServiceEndpoint(typeof(IDomainContextService), binding, string.Empty);
-            this.Description.Behaviors.Add(new InstanceProviderBehavior());
-
-#if DEBUG
-            if (Environment.OSVersion.Platform != PlatformID.Unix)
-            {
-                this.Description.Behaviors.Add(new ServiceMetadataBehavior());
-                this.AddServiceEndpoint(typeof(IMetadataExchange), MetadataExchangeBindings.CreateMexTcpBinding(), "mex");
-            }
-#endif
         }
 
-        public override object CreateInstance(Message message)
-        {
-            return new DomainContextService(this.Service);
-        }
+        // public override object CreateInstance(Message message)
+        // {
+        //     return new DomainContextService(this.Service);
+        // }
     }
 }

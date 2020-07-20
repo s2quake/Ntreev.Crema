@@ -34,7 +34,7 @@ using Ntreev.Crema.ServiceHosts.Properties;
 
 namespace Ntreev.Crema.ServiceHosts.Users
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
+    // [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
     partial class UserContextService : CremaServiceItemBase<IUserContextEventCallback>, IUserContextService
     {
         private Authentication authentication;

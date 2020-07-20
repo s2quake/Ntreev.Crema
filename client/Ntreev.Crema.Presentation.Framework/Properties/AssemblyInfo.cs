@@ -18,9 +18,3 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
-[assembly: AssemblyTitle("Ntreev.Crema.Presentation.Framework")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("Ntreev.Crema.Presentation.Framework")]
-[assembly: ComVisible(false)]
-[assembly: Guid("7a720ab5-ed24-40ad-b9ca-a64b7b9cbdbf")]

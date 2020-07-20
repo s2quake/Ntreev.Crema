@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Commands.Consoles
             this.Message = string.Empty;
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string Message
         {
             get; set;

@@ -22,10 +22,12 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts
 {
-    [ServiceContract(Namespace = CremaService.Namespace, SessionMode = SessionMode.Required, CallbackContract = typeof(ICremaHostEventCallback))]
+    // [ServiceContract(Namespace = CremaService.Namespace, SessionMode = SessionMode.Required, CallbackContract = typeof(ICremaHostEventCallback))]
+    [ServiceContract]
     public interface ICremaHostService
     {
         [OperationContract]

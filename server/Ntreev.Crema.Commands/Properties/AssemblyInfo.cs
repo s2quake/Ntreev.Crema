@@ -19,10 +19,4 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Ntreev.Crema.Command")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("Ntreev.Crema.Command")]
-[assembly: ComVisible(false)]
-[assembly: Guid("71b74dfe-dfe4-4f4f-99d3-201c5d066e1e")]
-
 [assembly: InternalsVisibleTo("Ntreev.Crema.Javascript")]

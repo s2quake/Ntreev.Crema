@@ -42,7 +42,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         [CommandCompletion(nameof(GetUserList))]
         public string UserID
         {

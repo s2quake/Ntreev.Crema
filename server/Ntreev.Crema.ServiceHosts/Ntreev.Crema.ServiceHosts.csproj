@@ -1,142 +1,39 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{A7BF94F7-94A5-46BA-A756-C04BDE65F47B}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ntreev.Crema.ServiceHosts</RootNamespace>
-    <AssemblyName>Ntreev.Crema.ServiceHosts</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;Mock</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <DelaySign>true</DelaySign>
+    <TargetFrameworks>netcoreapp3.0;net45</TargetFrameworks>
+    <Version>5.0.20179.0842</Version>
+    <AssemblyVersion>5.0</AssemblyVersion>
+    <FileVersion>5.0.20179.0842</FileVersion>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicense>https://github.com/s2quake/Crema/blob/master/LICENSE.md</PackageLicense>
+    <Copyright>Copyright © Ntreev Soft 2018</Copyright>
+    <Authors>s2quake</Authors>
+    <RepositoryUrl>https://github.com/s2quake/Crema</RepositoryUrl>
+    <PackageTags>Crema</PackageTags>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.IdentityModel" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuthenticationUtility.cs" />
-    <Compile Include="CremaHostServiceSync.cs" />
-    <Compile Include="Data\DataBaseContextServiceSync.cs" />
-    <Compile Include="Data\DataBaseServiceSync.cs" />
-    <Compile Include="CremaHostService.cs" />
-    <Compile Include="CremaHostServiceHost.cs" />
-    <Compile Include="CremaServiceItemHost.cs" />
-    <Compile Include="Data\DataBaseContextServiceHost.cs" />
-    <Compile Include="Data\DataBaseContextServiceHostProvider.cs" />
-    <Compile Include="Data\DataBaseServiceHost.cs" />
-    <Compile Include="Data\DataBaseContextService.cs" />
-    <Compile Include="Data\DataBaseService.cs" />
-    <Compile Include="Data\DataBaseServiceHostProvider.cs" />
-    <Compile Include="Data\IDataBaseContextEventCallback.cs" />
-    <Compile Include="Data\IDataBaseEventCallback.cs" />
-    <Compile Include="Data\IDataBaseContextService.cs" />
-    <Compile Include="Data\IDataBaseService.cs" />
-    <Compile Include="Domains\DomainContextServiceSync.cs" />
-    <Compile Include="Domains\DomainContextServiceHost.cs" />
-    <Compile Include="Domains\DomainContextService.cs" />
-    <Compile Include="Domains\DomainContextServiceHostProvider.cs" />
-    <Compile Include="Domains\IDomainContextEventCallback.cs" />
-    <Compile Include="Domains\IDomainContextService.cs" />
-    <Compile Include="CremaServiceItemBase.cs" />
-    <Compile Include="CremaService.cs" />
-    <Compile Include="ICremaHostService.cs" />
-    <Compile Include="ICremaService.cs" />
-    <Compile Include="ICremaServiceItem.cs" />
-    <Compile Include="ICremaHostEventCallback.cs" />
-    <Compile Include="InstanceProvider.cs" />
-    <Compile Include="InstanceProviderBehavior.cs" />
-    <Compile Include="IServiceHostProvider.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
+    <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Users\UserContextServiceSync.cs" />
-    <Compile Include="Users\UserContextServiceHost.cs" />
-    <Compile Include="Users\IUserContextEventCallback.cs" />
-    <Compile Include="Users\IUserContextService.cs" />
-    <Compile Include="Users\UserContextService.cs" />
-    <Compile Include="Users\UserContextServiceHostProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj">
-      <Project>{04aeb614-3510-4064-99af-0aa807c7f957}</Project>
-      <Name>Ntreev.Crema.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj">
-      <Project>{6478450a-dfa5-445d-890f-bc5f57c9a148}</Project>
-      <Name>Ntreev.Crema.ServiceModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library.Net45\Ntreev.Library.csproj">
-      <Project>{1918437f-4fbf-4731-ac5b-981a4a4cb1f1}</Project>
-      <Name>Ntreev.Library</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj">
-      <Project>{b7b4c207-7729-4147-96c4-b55e85647a66}</Project>
-      <Name>Ntreev.Crema.Services</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.ko-KR.resx" />
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <Import Project="..\..\common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems" Label="Shared" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
+    <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj" />
+    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
+    <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj" />
+    <ProjectReference Include="..\..\sub-modules\JSSoft.Communication\JSSoft.Communication\JSSoft.Communication.csproj" />
+  </ItemGroup>
 </Project>

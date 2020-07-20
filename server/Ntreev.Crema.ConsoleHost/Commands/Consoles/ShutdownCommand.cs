@@ -42,8 +42,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
             this.CremaHost = cremaHost;
         }
 
-        [CommandProperty(IsRequired = true)]
-        [DefaultValue("")]
+        [CommandPropertyRequired(DefaultValue = "")]
         public DateTimeValue Time
         {
             get; set;

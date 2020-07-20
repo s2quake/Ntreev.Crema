@@ -107,7 +107,7 @@ namespace Ntreev.Crema.Services.Data
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication);
-                    this.ServiceState = ServiceState.Opened;
+                    this.ServiceState = ServiceState.Open;
                     this.OnEditBegun(EventArgs.Empty);
                 });
             }
@@ -135,7 +135,7 @@ namespace Ntreev.Crema.Services.Data
                 }
                 catch
                 {
-                    await this.Dispatcher.InvokeAsync(() => this.ServiceState = ServiceState.Opened);
+                    await this.Dispatcher.InvokeAsync(() => this.ServiceState = ServiceState.Open);
                     throw;
                 }
                 await this.Dispatcher.InvokeAsync(() =>
@@ -169,7 +169,7 @@ namespace Ntreev.Crema.Services.Data
                 }
                 catch
                 {
-                    await this.Dispatcher.InvokeAsync(() => this.ServiceState = ServiceState.Opened);
+                    await this.Dispatcher.InvokeAsync(() => this.ServiceState = ServiceState.Open);
                     throw;
                 }
                 await this.Dispatcher.InvokeAsync(() =>
@@ -440,7 +440,7 @@ namespace Ntreev.Crema.Services.Data
             this.IsModified = this.domain.IsModified;
             this.domain.Dispatcher.Invoke(this.AttachDomainEvent);
             this.domain.Dispatcher.Invoke(this.RefreshEditors);
-            this.ServiceState = ServiceState.Opened;
+            this.ServiceState = ServiceState.Open;
         }
 
         protected virtual void OnDetach()
@@ -452,7 +452,7 @@ namespace Ntreev.Crema.Services.Data
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void ValidateAddNew(Authentication authentication)
         {
-            if (this.ServiceState != ServiceState.Opened)
+            if (this.ServiceState != ServiceState.Open)
                 throw new InvalidOperationException(Resources.Exception_TypeIsNotBeingEdited);
             this.OnValidateAddNew(authentication, this);
         }
@@ -473,7 +473,7 @@ namespace Ntreev.Crema.Services.Data
         {
             if (this.domain == null)
                 throw new InvalidOperationException(Resources.Exception_TableTemplateIsNotBeingEdited);
-            if (this.ServiceState != ServiceState.Opened)
+            if (this.ServiceState != ServiceState.Open)
                 throw new InvalidOperationException(Resources.Exception_TableTemplateIsNotBeingEdited);
             this.ValidateAccessType(authentication, AccessType.Developer);
             this.OnValidateEndEdit(authentication, this);
@@ -484,7 +484,7 @@ namespace Ntreev.Crema.Services.Data
         {
             if (this.domain == null || this.domain.Dispatcher == null)
                 throw new InvalidOperationException(Resources.Exception_TableTemplateIsNotBeingEdited);
-            if (this.ServiceState != ServiceState.Opened)
+            if (this.ServiceState != ServiceState.Open)
                 throw new InvalidOperationException(Resources.Exception_TableTemplateIsNotBeingEdited);
             this.ValidateAccessType(authentication, AccessType.Developer);
             this.OnValidateCancelEdit(authentication, this);

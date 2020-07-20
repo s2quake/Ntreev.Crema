@@ -24,6 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ServiceModel;
 using Ntreev.Library;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Domains
 {
@@ -40,9 +41,9 @@ namespace Ntreev.Crema.ServiceHosts.Domains
 
         public string Name => nameof(DomainContextService);
 
-        public ServiceHost CreateInstance(int port)
+        public ServiceHostBase CreateInstance()
         {
-            return new DomainContextServiceHost(this.service, port);
+            return new DomainContextServiceHost(this.service);
         }
     }
 }

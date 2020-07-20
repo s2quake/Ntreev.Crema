@@ -22,9 +22,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.ServiceModel;
-using System.ServiceModel.Channels;
-using System.ServiceModel.Configuration;
-using System.ServiceModel.Description;
 using System.Text;
 using System.Xml;
 using Ntreev.Crema.Services;
@@ -32,32 +29,20 @@ using Ntreev.Crema.ServiceHosts;
 using Ntreev.Crema.ServiceHosts.Data;
 using System.ComponentModel.Composition;
 using Ntreev.Library;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Data
 {
     [Dependency(typeof(Users.UserContextServiceHostProvider))]
-    class DataBaseContextServiceHost : CremaServiceItemHost
+    class DataBaseContextServiceHost : ServerServiceHostBase<IDataBaseService, IDataBaseEventCallback>
     {
-        public DataBaseContextServiceHost(CremaService service, int port)
-            : base(service, typeof(DataBaseContextService), $"net.tcp://localhost:{port}/{nameof(DataBaseContextService)}", port)
+        public DataBaseContextServiceHost(CremaService service)
         {
-            var binding = CreateBinding();
-
-            this.AddServiceEndpoint(typeof(IDataBaseContextService), binding, string.Empty);
-            this.Description.Behaviors.Add(new InstanceProviderBehavior());
-
-#if DEBUG
-            if (Environment.OSVersion.Platform != PlatformID.Unix)
-            {
-                this.Description.Behaviors.Add(new ServiceMetadataBehavior());
-                this.AddServiceEndpoint(typeof(IMetadataExchange), MetadataExchangeBindings.CreateMexTcpBinding(), "mex");
-            }
-#endif
         }
 
-        public override object CreateInstance(Message message)
-        {
-            return new DataBaseContextService(this.Service);
-        }
+        // public override object CreateInstance(Message message)
+        // {
+        //     return new DataBaseContextService(this.Service);
+        // }
     }
 }

@@ -24,54 +24,55 @@ using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
 using System.Threading.Tasks;
 using Ntreev.Library;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Data
 {
     public interface IDataBaseContextEventCallback
     {
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDataBasesCreated(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseInfo[] dataBaseInfos, string comment);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDataBasesRenamed(CallbackInfo callbackInfo, string[] dataBaseNames, string[] newDataBaseNames);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDataBasesDeleted(CallbackInfo callbackInfo, string[] dataBaseNames);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDataBasesLoaded(CallbackInfo callbackInfo, string[] dataBaseNames);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDataBasesUnloaded(CallbackInfo callbackInfo, string[] dataBaseNames);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDataBasesResetting(CallbackInfo callbackInfo, string[] dataBaseNames);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDataBasesReset(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseMetaData[] metaDatas);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDataBasesAuthenticationEntered(CallbackInfo callbackInfo, string[] dataBaseNames, AuthenticationInfo authenticationInfo);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDataBasesAuthenticationLeft(CallbackInfo callbackInfo, string[] dataBaseNames, AuthenticationInfo authenticationInfo);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDataBasesInfoChanged(CallbackInfo callbackInfo, DataBaseInfo[] dataBaseInfos);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDataBasesStateChanged(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseState[] dataBaseStates);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDataBasesAccessChanged(CallbackInfo callbackInfo, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnDataBasesLockChanged(CallbackInfo callbackInfo, LockChangeType changeType, LockInfo[] lockInfos, string[] comments);
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs);
     }
 }

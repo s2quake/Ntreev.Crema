@@ -34,7 +34,7 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.Commands.Consoles
 {
     [ResourceDescription("Resources", IsShared = true)]
-    [UsageBrowsable(false)]
+    // [UsageBrowsable(false)]
     class ChangeDriveCommand : ConsoleCommandBase
     {
         private readonly IConsoleDrive drive;

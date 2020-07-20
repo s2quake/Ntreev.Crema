@@ -17,9 +17,3 @@
 
 using System.Reflection;
 using System.Runtime.InteropServices;
-
-[assembly: AssemblyTitle("Crema Server")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyProduct("Crema Server")]
-[assembly: ComVisible(false)]
-[assembly: Guid("bef720b3-7e3f-44c3-b7a2-aa095f8058c8")]

@@ -1,222 +1,42 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B7B4C207-7729-4147-96C4-B55E85647A66}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ntreev.Crema.Services</RootNamespace>
-    <AssemblyName>Ntreev.Crema.Services</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;SERVER</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;SERVER</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>latest</LangVersion>
+    <TargetFrameworks>netcoreapp3.0;net45</TargetFrameworks>
+    <Version>5.0.20179.0842</Version>
+    <AssemblyVersion>5.0</AssemblyVersion>
+    <FileVersion>5.0.20179.0842</FileVersion>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicense>https://github.com/s2quake/Crema/blob/master/LICENSE.md</PackageLicense>
+    <Copyright>Copyright © Ntreev Soft 2018</Copyright>
+    <Authors>s2quake</Authors>
+    <RepositoryUrl>https://github.com/s2quake/Crema</RepositoryUrl>
+    <PackageTags>Crema</PackageTags>
+    <LangVersion>8.0</LangVersion>
+    <DefineConstants>SERVER</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.Entity" />
-    <Reference Include="System.Data.Linq" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AuthenticationToken.cs" />
-    <Compile Include="CremaString.cs" />
-    <Compile Include="Data\DataBaseImporter.cs" />
-    <Compile Include="Data\DataBaseSetOptions.cs" />
-    <Compile Include="Data\DataSetExtensions.cs" />
-    <Compile Include="Data\DataServiceItemInfo.cs" />
-    <Compile Include="Data\DataBaseSet.cs" />
-    <Compile Include="Data\TableContentGroup.cs" />
-    <Compile Include="Domains\Actions\EndUserEditAction.cs" />
-    <Compile Include="Domains\Actions\BeginUserEditAction.cs" />
-    <Compile Include="Domains\Actions\DeleteAction.cs" />
-    <Compile Include="Domains\Serializations\DomainCompleteSerializationInfo.cs" />
-    <Compile Include="Domains\Serializations\DomainCompleteItemSerializationInfo.cs" />
-    <Compile Include="Domains\Serializations\DomainPostSerializationInfo.cs" />
-    <Compile Include="Domains\Serializations\DomainPostItemSerializationInfo.cs" />
-    <Compile Include="Domains\Serializations\DomainPropertySerializationInfo.cs" />
-    <Compile Include="Domains\Serializations\DomainSerializationInfo.cs" />
-    <Compile Include="IRepositoryConfiguration.cs" />
-    <Compile Include="IRepositoryMigrator.cs" />
-    <Compile Include="ObjectSerializerSettings.cs" />
-    <Compile Include="LogServiceHost.cs" />
-    <Compile Include="CremaDataTableSerializerSettings.cs" />
-    <Compile Include="CremaDataSetSerializerSettings.cs" />
-    <Compile Include="IObjectSerializer.cs" />
-    <Compile Include="IRepositoryProviderExtensions.cs" />
-    <Compile Include="RepositoryHostExtensions.cs" />
-    <Compile Include="RepositoryLocker.cs" />
-    <Compile Include="RepositoryPath.cs" />
-    <Compile Include="RepositorySettings.cs" />
-    <Compile Include="RepositoryInfo.cs" />
-    <Compile Include="RepositoryConfiguration.cs" />
-    <Compile Include="CremaPath.cs" />
-    <Compile Include="CremaSettings.cs" />
-    <Compile Include="Data\Serializations\AccessMemberSerializationInfo.cs" />
-    <Compile Include="Data\Serializations\AccessSerializationInfo.cs" />
-    <Compile Include="Data\Serializations\DataBaseDataSerializationInfo.cs" />
-    <Compile Include="Data\Serializations\DataServiceItemSerializationInfo.cs" />
-    <Compile Include="Domains\Actions\LeaveAction.cs" />
-    <Compile Include="Domains\Actions\EnterAction.cs" />
-    <Compile Include="Domains\Actions\SetOwnerAction.cs" />
-    <Compile Include="Domains\Actions\KickAction.cs" />
-    <Compile Include="Data\DataServiceBase.cs" />
-    <Compile Include="Data\DataServiceItemBase.cs" />
-    <Compile Include="Data\DataBaseRepositoryHost.cs" />
-    <Compile Include="Data\Serializations\DataBaseSerializationInfo.cs" />
-    <Compile Include="Data\DataBaseTransaction.cs" />
-    <Compile Include="Data\DataFindServiceItem.cs" />
-    <Compile Include="Data\DataFindService.cs" />
-    <Compile Include="Data\DomainBasedRow.cs" />
-    <Compile Include="IRepositoryProvider.cs" />
-    <Compile Include="Data\NewTypeTemplate.cs" />
-    <Compile Include="Data\TypeMember.cs" />
-    <Compile Include="Data\TableRow.cs" />
-    <Compile Include="Data\TypeTemplateBase.cs" />
-    <Compile Include="Data\TableTemplateBase.cs" />
-    <Compile Include="Data\TableColumn.cs" />
-    <Compile Include="Data\TableContent.cs" />
-    <Compile Include="Data\NewTableTemplate.cs" />
-    <Compile Include="Data\TableTemplate.cs" />
-    <Compile Include="Data\TypeTemplate.cs" />
-    <Compile Include="Domains\Actions\SetPropertyAction.cs" />
-    <Compile Include="Domains\TypeDomain.cs" />
-    <Compile Include="Domains\TableTemplateDomain.cs" />
-    <Compile Include="Data\Serializations\FindTableSerializationInfo.cs" />
-    <Compile Include="Data\Serializations\FindRowSerializationInfo.cs" />
-    <Compile Include="Domains\DomainActionBase.cs" />
-    <Compile Include="Domains\Actions\NewRowAction.cs" />
-    <Compile Include="Domains\Actions\RemoveRowAction.cs" />
-    <Compile Include="Domains\Actions\SetRowAction.cs" />
-    <Compile Include="Domains\TableContentDomain.cs" />
-    <Compile Include="Authentication.cs" />
-    <Compile Include="Data\DataBaseContext.cs" />
-    <Compile Include="CremaHost.cs" />
-    <Compile Include="Data\DataBase.cs" />
-    <Compile Include="Data\Type.cs" />
-    <Compile Include="Data\Table.cs" />
-    <Compile Include="Data\TableCategory.cs" />
-    <Compile Include="Data\TableCategoryCollection.cs" />
-    <Compile Include="Data\TableCollection.cs" />
-    <Compile Include="Data\TableContext.cs" />
-    <Compile Include="Data\TypeCategory.cs" />
-    <Compile Include="Data\TypeCategoryCollection.cs" />
-    <Compile Include="Data\TypeCollection.cs" />
-    <Compile Include="Data\TypeContext.cs" />
-    <Compile Include="Domains\Domain.cs" />
-    <Compile Include="Domains\DomainCategory.cs" />
-    <Compile Include="Domains\DomainCategoryCollection.cs" />
-    <Compile Include="Domains\DomainCollection.cs" />
-    <Compile Include="Domains\DomainContext.cs" />
-    <Compile Include="Domains\DomainLogger.cs" />
-    <Compile Include="Domains\DomainRestorer.cs" />
-    <Compile Include="Domains\DomainUser.cs" />
-    <Compile Include="Domains\DomainUserCollection.cs" />
-    <Compile Include="CremaBootstrapper.cs" />
-    <Compile Include="IRepository.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
+    <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="AuthenticationProvider.cs" />
-    <Compile Include="RepositoryHost.cs" />
-    <Compile Include="RepositoryItemStatus.cs" />
-    <Compile Include="RepositoryItem.cs" />
-    <Compile Include="RepositoryMigrator.cs" />
-    <Compile Include="Users\Serializations\BanSerializationInfo.cs" />
-    <Compile Include="Users\Serializations\UserCategorySerializationInfoList.cs" />
-    <Compile Include="Users\Serializations\UserContextSerializationInfo.cs" />
-    <Compile Include="Users\Serializations\UserSerializationInfo.cs" />
-    <Compile Include="Users\UserContextSet.cs" />
-    <Compile Include="Users\UserSet.cs" />
-    <Compile Include="Users\User.cs" />
-    <Compile Include="Users\UserAuthenticationProvider.cs" />
-    <Compile Include="Users\UserCategory.cs" />
-    <Compile Include="Users\UserCategoryCollection.cs" />
-    <Compile Include="Users\UserCollection.cs" />
-    <Compile Include="Users\UserContext.cs" />
-    <Compile Include="Users\UserRepositoryHost.cs" />
-    <Compile Include="XmlObjectSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.ko-KR.resx" />
-    <EmbeddedResource Include="Properties\Resources.resx">
+    <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj">
-      <Project>{04aeb614-3510-4064-99af-0aa807c7f957}</Project>
-      <Name>Ntreev.Crema.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj">
-      <Project>{6478450a-dfa5-445d-890f-bc5f57c9a148}</Project>
-      <Name>Ntreev.Crema.ServiceModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library.Net45\Ntreev.Library.csproj">
-      <Project>{1918437f-4fbf-4731-ac5b-981a4a4cb1f1}</Project>
-      <Name>Ntreev.Library</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
+    <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj" />
+    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="log4net">
-      <Version>2.0.8</Version>
-    </PackageReference>
-    <PackageReference Include="System.ValueTuple">
-      <Version>4.5.0</Version>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project="..\..\common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems" Label="Shared" />
-  <Import Project="..\..\common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.projitems" Label="Shared" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+    <Import Project="..\..\common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.projitems" Label="Shared" />
 </Project>

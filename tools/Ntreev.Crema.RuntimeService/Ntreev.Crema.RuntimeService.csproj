@@ -1,162 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BDB528B8-1482-4FCB-8CAA-DADC8FAD5243}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ntreev.Crema.RuntimeService</RootNamespace>
-    <AssemblyName>Ntreev.Crema.RuntimeService</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TargetFrameworks>netcoreapp3.0;net45</TargetFrameworks>
+    <Version>5.0.20179.0842</Version>
+    <AssemblyVersion>5.0</AssemblyVersion>
+    <FileVersion>5.0.20179.0842</FileVersion>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicense>https://github.com/s2quake/Crema/blob/master/LICENSE.md</PackageLicense>
+    <Copyright>Copyright © Ntreev Soft 2018</Copyright>
+    <Authors>s2quake</Authors>
+    <RepositoryUrl>https://github.com/s2quake/Crema</RepositoryUrl>
+    <PackageTags>Crema</PackageTags>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RuntimeService.cs" />
-    <Compile Include="IRuntimeService.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RuntimeServiceFactory.cs" />
-    <Compile Include="Service References\CremaHostService\Reference.cs">
-      <AutoGen>True</AutoGen>
+    <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Compile>
-    <Compile Include="Service References\ServiceClient\Reference.cs">
       <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ServiceExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="Properties\DataSources\Ntreev.Crema.Runtime.Generation.GenerationSet.datasource" />
-    <None Include="Properties\DataSources\Ntreev.Crema.Runtime.Serialization.SerializationSet.datasource" />
-    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.DataBaseInfo.datasource" />
-    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.ResultBase.datasource" />
-    <None Include="Properties\DataSources\Ntreev.Crema.ServiceModel.ServiceInfo.datasource" />
-    <None Include="Service References\CremaHostService\Arrays1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\CremaHostService\schemas.ntreev.com1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\CremaHostService\service1.wsdl" />
-    <None Include="Service References\CremaHostService\service1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\CremaHostService\www.ntreev.com1.wsdl" />
-    <None Include="Service References\CremaHostService\www.ntreev.com1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\ServiceClient\schemas.ntreev.com.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\ServiceClient\service.wsdl" />
-    <None Include="Service References\ServiceClient\service.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\ServiceClient\System.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\ServiceClient\www.ntreev.com.wsdl" />
-    <None Include="Service References\ServiceClient\www.ntreev.com.xsd">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj">
-      <Project>{04aeb614-3510-4064-99af-0aa807c7f957}</Project>
-      <Name>Ntreev.Crema.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Runtime.Generation\Ntreev.Crema.Runtime.Generation.csproj">
-      <Project>{79aef7d1-93d1-4eeb-b09c-1595c82e7492}</Project>
-      <Name>Ntreev.Crema.Runtime.Generation</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Runtime.Serialization\Ntreev.Crema.Runtime.Serialization.csproj">
-      <Project>{279d3bbf-10a3-449f-aa73-545bc0b7baaf}</Project>
-      <Name>Ntreev.Crema.Runtime.Serialization</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj">
-      <Project>{6478450a-dfa5-445d-890f-bc5f57c9a148}</Project>
-      <Name>Ntreev.Crema.ServiceModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library.Net45\Ntreev.Library.csproj">
-      <Project>{1918437f-4fbf-4731-ac5b-981a4a4cb1f1}</Project>
-      <Name>Ntreev.Library</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Service References\CremaHostService\" />
-    <WCFMetadataStorage Include="Service References\ServiceClient\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\ServiceClient\configuration91.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\ServiceClient\configuration.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\ServiceClient\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\CremaHostService\configuration91.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\CremaHostService\configuration.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\CremaHostService\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <Import Project="..\..\common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems" Label="Shared" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

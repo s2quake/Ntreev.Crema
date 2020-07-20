@@ -129,7 +129,7 @@ namespace Ntreev.Crema.Commands.Consoles
                     if (object.Equals(value1, value2) == false)
                     {
                         this.Properties[item.Key].Value = value1;
-                        this.CommandContext.WriteLine($"{item.Key} : {value2} => {value1}");
+                        this.CommandContext.Out.WriteLine($"{item.Key} : {value2} => {value1}");
                     }
                 }
             }

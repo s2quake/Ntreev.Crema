@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Ntreev.Crema.ConsoleHost": {
+      "commandName": "Project",
+      "commandLineArgs": "help"
+    }
+  }
+}

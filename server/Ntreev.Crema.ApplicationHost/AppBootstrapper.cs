@@ -15,11 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Caliburn.Micro;
 using Ntreev.Crema.ServiceHosts;
 using Ntreev.Crema.Services;
+using Ntreev.Library.Linq;
 using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.ComponentModel.Composition.Hosting;
+using System.ComponentModel.Composition.Primitives;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -29,10 +34,9 @@ using System.Windows.Media;
 
 namespace Ntreev.Crema.ApplicationHost
 {
-    class AppBootstrapper : AppBootstrapper<IShell>
+    class AppBootstrapper : AppBootstrapperBase
     {
         private readonly static Dictionary<string, Uri> themes = new Dictionary<string, Uri>(StringComparer.CurrentCultureIgnoreCase);
-        private readonly CremaService service;
 
         static AppBootstrapper()
         {
@@ -42,15 +46,9 @@ namespace Ntreev.Crema.ApplicationHost
         }
 
         public AppBootstrapper()
+            : base(new AppBootstrapperDescriptor())
         {
-            this.service = new CremaService(this);
-        }
-
-        public AppSettings Settings { get; } = new AppSettings();
-
-        protected override void OnStartup(object sender, StartupEventArgs e)
-        {
-            base.OnStartup(sender, e);
+           
         }
 
         public bool ApplySettings()
@@ -82,40 +80,10 @@ namespace Ntreev.Crema.ApplicationHost
             }
         }
 
-        protected override void OnExit(object sender, EventArgs e)
-        {
-            base.OnExit(sender, e);
-            this.service.Dispose();
-        }
+        public AppSettings Settings => this.Descriptor.Settings;
 
-        protected override IEnumerable<Tuple<Type, object>> GetParts()
-        {
-            foreach (var item in base.GetParts())
-            {
-                yield return item;
-            }
-            yield return new Tuple<Type, object>(typeof(CremaService), this.service);
-            yield return new Tuple<Type, object>(typeof(ICremaService), this.service);
-            yield return new Tuple<Type, object>(typeof(AppSettings), this.Settings);
-        }
+        protected new AppBootstrapperDescriptor Descriptor => base.Descriptor as AppBootstrapperDescriptor;
 
-        protected override IEnumerable<string> SelectPath()
-        {
-            var items = base.SelectPath().Concat(CremaBootstrapper.SelectPath(AppDomain.CurrentDomain.BaseDirectory)).Distinct();
-            foreach (var item in items)
-            {
-                yield return item;
-            }
-
-            if (this.Settings.PluginsPath != null)
-            {
-                foreach (var item in this.Settings.PluginsPath)
-                {
-                    yield return item;
-                }
-            }
-        }
-
-        protected override bool AutoInitialize => false;
+        //protected override bool AutoInitialize => false;
     }
 }

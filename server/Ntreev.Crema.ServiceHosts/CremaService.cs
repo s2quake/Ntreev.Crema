@@ -37,6 +37,7 @@ using System.Globalization;
 using Ntreev.Library;
 using System.Net.NetworkInformation;
 using System.Net;
+using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts
 {
@@ -44,19 +45,29 @@ namespace Ntreev.Crema.ServiceHosts
     {
         public const string Namespace = "http://www.ntreev.com";
         private const string cremaString = "Crema";
-        private readonly List<ServiceHost> hosts = new List<ServiceHost>();
+        private readonly List<ServiceHostBase> hosts = new List<ServiceHostBase>();
         private readonly IServiceProvider serviceProvider;
         private IServiceHostProvider[] hostProviders;
+        private ServerContext serverContext;
         private ServiceInfo serviceInfo;
         private ICremaHost cremaHost;
         private IConfigurationCommitter configCommitter;
-        private CremaHostServiceHost cremaHostServiceHost;
+        // private CremaHostServiceHost cremaHostServiceHost;
         private Guid token;
+
+        class ServerContext : ServerContextBase
+        {
+            public ServerContext(params IServiceHost[] serviceHosts)
+                : base(serviceHosts)
+            {
+
+            }
+        }
 
         public CremaService(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
-            this.Dispatcher = new CremaDispatcher(typeof(CremaServiceItemHost));
+            this.Dispatcher = new CremaDispatcher(typeof(CremaService));
             AuthenticationUtility.Initialize(this);
         }
 
@@ -77,7 +88,7 @@ namespace Ntreev.Crema.ServiceHosts
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.ValidateOpen();
-                this.ServiceState = ServiceState.Opening;
+                this.ServiceState = Ntreev.Crema.Services.ServiceState.Opening;
                 this.OnOpening(EventArgs.Empty);
                 this.cremaHost = this.GetService(typeof(ICremaHost)) as ICremaHost;
                 this.hostProviders = (this.GetService(typeof(IEnumerable<IServiceHostProvider>)) as IEnumerable<IServiceHostProvider>).TopologicalSort().ToArray();
@@ -110,7 +121,7 @@ namespace Ntreev.Crema.ServiceHosts
             await this.StartServicesAsync();
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.ServiceState = ServiceState.Opened;
+                this.ServiceState = Ntreev.Crema.Services.ServiceState.Open;
                 this.OnOpened(EventArgs.Empty);
             });
         }
@@ -120,7 +131,7 @@ namespace Ntreev.Crema.ServiceHosts
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.ValidateClose();
-                this.ServiceState = ServiceState.Closing;
+                this.ServiceState = Ntreev.Crema.Services.ServiceState.Closing;
                 this.OnClosing(EventArgs.Empty);
             });
             await this.cremaHost.Dispatcher.InvokeAsync(() =>
@@ -135,7 +146,7 @@ namespace Ntreev.Crema.ServiceHosts
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.token = Guid.Empty;
-                this.ServiceState = ServiceState.Closed;
+                this.ServiceState = Ntreev.Crema.Services.ServiceState.Closed;
                 this.OnClosed(new ClosedEventArgs(CloseReason.Shutdown, string.Empty));
             });
         }
@@ -144,11 +155,11 @@ namespace Ntreev.Crema.ServiceHosts
 
         public int Timeout { get; set; } = 60000;
 
-        public ServiceInfo ServiceInfo => this.ServiceState == ServiceState.Opened ?  this.serviceInfo : ServiceInfo.Empty;
+        public ServiceInfo ServiceInfo => this.ServiceState == Ntreev.Crema.Services.ServiceState.Open ?  this.serviceInfo : ServiceInfo.Empty;
 
         public CremaDispatcher Dispatcher { get; private set; }
 
-        public ServiceState ServiceState { get; set; }
+        public Ntreev.Crema.Services.ServiceState ServiceState { get; set; }
 
         public event EventHandler Opening;
 
@@ -197,12 +208,12 @@ namespace Ntreev.Crema.ServiceHosts
                 this.configCommitter = this.cremaHost.GetService(typeof(IRepositoryConfiguration)) as IConfigurationCommitter;
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.ServiceState = ServiceState.Opening;
+                    this.ServiceState = Ntreev.Crema.Services.ServiceState.Opening;
                 });
                 await this.StartServicesAsync();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.ServiceState = ServiceState.Opened;
+                    this.ServiceState = Ntreev.Crema.Services.ServiceState.Open;
                 });
             }
         }
@@ -215,7 +226,7 @@ namespace Ntreev.Crema.ServiceHosts
             {
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.ServiceState = ServiceState.Closing;
+                    this.ServiceState = Ntreev.Crema.Services.ServiceState.Closing;
                 });
                 await this.StopServicesAsync();
             }
@@ -231,7 +242,7 @@ namespace Ntreev.Crema.ServiceHosts
                 {
                     this.configCommitter.Commit();
                     this.configCommitter = null;
-                    this.ServiceState = ServiceState.Closed;
+                    this.ServiceState = Ntreev.Crema.Services.ServiceState.Closed;
                     this.OnClosed(e);
                 });
             }
@@ -241,14 +252,14 @@ namespace Ntreev.Crema.ServiceHosts
         {
             return this.Dispatcher.InvokeAsync(() =>
             {
-                this.cremaHostServiceHost = new CremaHostServiceHost(this, this.Port);
-                this.cremaHostServiceHost.Open();
+                // this.cremaHostServiceHost = new CremaHostServiceHost(this, this.Port);
+                // this.cremaHostServiceHost.OpenAsync();
                 this.LogService.Info(Resources.ServiceStart, nameof(CremaHostServiceHost));
                 foreach (var item in this.hostProviders)
                 {
                     var serviceItemInfo = this.serviceInfo.GetServiceItem(item.Name);
-                    var host = item.CreateInstance(serviceItemInfo.Port);
-                    host.Open();
+                    var host = item.CreateInstance();
+                    // host.OpenAsync();
                     this.hosts.Add(host);
                     this.LogService.Info(Resources.ServiceStart_Port, host.GetType().Name, serviceItemInfo.Port);
                 }
@@ -263,9 +274,9 @@ namespace Ntreev.Crema.ServiceHosts
                 if (this.hosts.Any() == false)
                     return;
 
-                foreach (var item in this.hosts.Reverse<ServiceHost>())
+                foreach (var item in this.hosts.Reverse<ServiceHostBase>())
                 {
-                    item.Close();
+                    // item.CloseAsync();
                     this.LogService.Info(Resources.ServiceStop, item.GetType().Name);
                 }
 
@@ -273,15 +284,15 @@ namespace Ntreev.Crema.ServiceHosts
                 this.serviceInfo = ServiceInfo.Empty;
                 this.LogService.Info(Resources.ServiceStop, cremaString);
 
-                this.cremaHostServiceHost.Close();
-                this.cremaHostServiceHost = null;
+                // this.cremaHostServiceHost.CloseAsync();
+                // this.cremaHostServiceHost = null;
                 this.LogService.Info(Resources.ServiceStop, nameof(CremaHostServiceHost));
             });
         }
 
         private void ValidateOpen()
         {
-            if (this.ServiceState != ServiceState.None)
+            if (this.ServiceState != Ntreev.Crema.Services.ServiceState.None)
                 throw new InvalidOperationException();
 
             var providers = (this.GetService(typeof(IEnumerable<IServiceHostProvider>)) as IEnumerable<IServiceHostProvider>).TopologicalSort().ToArray();
@@ -298,7 +309,7 @@ namespace Ntreev.Crema.ServiceHosts
 
         private void ValidateClose()
         {
-            if (this.ServiceState != ServiceState.Opened)
+            if (this.ServiceState != Ntreev.Crema.Services.ServiceState.Open)
                 throw new InvalidOperationException();
         }
 

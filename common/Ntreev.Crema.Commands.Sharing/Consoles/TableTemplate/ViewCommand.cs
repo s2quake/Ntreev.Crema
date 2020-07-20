@@ -52,26 +52,27 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
 
         private void Draw(CremaTemplate template)
         {
-            var columns = GetColumns();
-            var tableDataBuilder = new TableDataBuilder(columns);
-            var count = 0;
+            throw new NotImplementedException("dotnet");
+            // var columns = GetColumns();
+            // var tableDataBuilder = new TableDataBuilder(columns);
+            // var count = 0;
 
-            foreach (var item in template.Columns)
-            {
-                var fieldList = new List<string>
-                {
-                    item.Name,
-                    item.IsKey ? "O" : string.Empty,
-                    item.DataTypeName,
-                    item.Comment
-                };
-                tableDataBuilder.Add(fieldList.ToArray());
-                count++;
-            }
+            // foreach (var item in template.Columns)
+            // {
+            //     var fieldList = new List<string>
+            //     {
+            //         item.Name,
+            //         item.IsKey ? "O" : string.Empty,
+            //         item.DataTypeName,
+            //         item.Comment
+            //     };
+            //     tableDataBuilder.Add(fieldList.ToArray());
+            //     count++;
+            // }
 
-            this.Out.WriteLine();
-            this.Out.PrintTableData(tableDataBuilder.Data, true);
-            this.Out.WriteLine();
+            // this.Out.WriteLine();
+            // this.Out.PrintTableData(tableDataBuilder.Data, true);
+            // this.Out.WriteLine();
 
             string[] GetColumns()
             {

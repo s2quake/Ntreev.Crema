@@ -15,6 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using JSSoft.Communication;
 using Ntreev.Crema.Services;
 using Ntreev.Library;
 using System;
@@ -41,9 +42,9 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         public string Name => nameof(DataBaseService);
 
-        public ServiceHost CreateInstance(int port)
+        public ServiceHostBase CreateInstance()
         {
-            return new DataBaseServiceHost(this.service, port);
+            return new DataBaseServiceHost(this.service);
         }
     }
 }
