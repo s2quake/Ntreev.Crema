@@ -139,7 +139,18 @@ namespace Ntreev.Crema.ApplicationHost
 
         protected virtual IEnumerable<string> SelectPath()
         {
-            yield break;
+            var items = CremaBootstrapper.SelectPath(AppDomain.CurrentDomain.BaseDirectory);
+            foreach (var item in items)
+            {
+                yield return item;
+            }
+            if (this.Settings.PluginsPath != null)
+            {
+                foreach (var item in this.Settings.PluginsPath)
+                {
+                    yield return item;
+                }
+            }
         }
 
         private ComposablePartCatalog CreateCatalog(IEnumerable<Assembly> assemblies)

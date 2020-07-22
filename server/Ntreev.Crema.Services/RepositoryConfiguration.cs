@@ -26,6 +26,7 @@ namespace Ntreev.Crema.Services
     {
         private readonly ILogService logService;
         private readonly string itemName;
+        private readonly IConfigurationSerializer serializer = new ConfigurationSerializer();
 
         public RepositoryConfiguration(ILogService logService, string itemName, IEnumerable<IConfigurationPropertyProvider> propertiesProvider)
             : base(typeof(IRepositoryConfiguration), propertiesProvider)
@@ -35,11 +36,8 @@ namespace Ntreev.Crema.Services
             try
             {
                 var filename = this.itemName + ".xml";
-                throw new NotImplementedException();
-                // if (File.Exists(filename) == true)
-                // {
-                //     this.Read(filename);
-                // }
+                using var stream = File.OpenRead(filename);
+                this.Read(stream, this.serializer);
             }
             catch (Exception e)
             {

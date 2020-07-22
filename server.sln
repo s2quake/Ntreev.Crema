@@ -103,7 +103,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.ModernUI.Framework",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.ApplicationHost", "server\Ntreev.Crema.ApplicationHost\Ntreev.Crema.ApplicationHost.csproj", "{0D972C0D-5134-4877-9DCD-8DCAF01E5E05}"
 	ProjectSection(ProjectDependencies) = postProject
+		{E0F76B09-4FE3-4A58-B16D-D136441DC1AE} = {E0F76B09-4FE3-4A58-B16D-D136441DC1AE}
 		{3FDD2B88-2C14-441A-B76A-48C31A6AC9F1} = {3FDD2B88-2C14-441A-B76A-48C31A6AC9F1}
+		{65CA35F5-A1C3-4F0C-8A02-08157E3F5E21} = {65CA35F5-A1C3-4F0C-8A02-08157E3F5E21}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Communication", "sub-modules\JSSoft.Communication\JSSoft.Communication\JSSoft.Communication.csproj", "{4A8417DD-9882-4FC1-B471-06905354545D}"
@@ -139,7 +141,6 @@ Global
 		{3FDD2B88-2C14-441A-B76A-48C31A6AC9F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FDD2B88-2C14-441A-B76A-48C31A6AC9F1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{520E5310-F4C2-4369-8A98-D6C74FD7E90D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{520E5310-F4C2-4369-8A98-D6C74FD7E90D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{520E5310-F4C2-4369-8A98-D6C74FD7E90D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{520E5310-F4C2-4369-8A98-D6C74FD7E90D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{520E5310-F4C2-4369-8A98-D6C74FD7E90D}.Release|Any CPU.Build.0 = Release|Any CPU
