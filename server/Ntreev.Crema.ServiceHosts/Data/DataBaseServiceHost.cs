@@ -34,15 +34,18 @@ using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Data
 {
-    class DataBaseServiceHost : ServerServiceHostBase<IDataBaseContextService, IDataBaseContextEventCallback>
+    class DataBaseServiceHost : ServerServiceHostBase<IDataBaseService, IDataBaseContextEventCallback>
     {
+        private readonly CremaService service;
+
         public DataBaseServiceHost(CremaService service)
         {
+            this.service = service;
         }
 
-        // public override object CreateInstance(Message message)
-        // {
-        //     return new DataBaseService(this.Service);
-        // }
+        protected override IDataBaseService CreateService(IDataBaseContextEventCallback callback)
+        {
+            return new DataBaseService(this.service);
+        }
     }
 }

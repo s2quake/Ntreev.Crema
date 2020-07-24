@@ -31,13 +31,16 @@ namespace Ntreev.Crema.ServiceHosts.Users
 {
     class UserContextServiceHost : ServerServiceHostBase<IUserContextService, IUserContextEventCallback>
     {
+        private readonly CremaService service;
+
         public UserContextServiceHost(CremaService service)
         {
+            this.service = service;
         }
 
         protected override IUserContextService CreateService(IUserContextEventCallback callback)
         {
-            return new UserContextService(null);
+            return new UserContextService(this.service);
         }
     }
 }

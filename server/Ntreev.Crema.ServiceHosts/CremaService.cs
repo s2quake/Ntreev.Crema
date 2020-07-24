@@ -248,9 +248,9 @@ namespace Ntreev.Crema.ServiceHosts
             }
         }
 
-        private Task StartServicesAsync()
+        private async Task StartServicesAsync()
         {
-            return this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 // this.cremaHostServiceHost = new CremaHostServiceHost(this, this.Port);
                 // this.cremaHostServiceHost.OpenAsync();
@@ -263,6 +263,11 @@ namespace Ntreev.Crema.ServiceHosts
                     this.hosts.Add(host);
                     this.LogService.Info(Resources.ServiceStart_Port, host.GetType().Name, serviceItemInfo.Port);
                 }
+            });
+            this.serverContext = await Task.Run(() => new ServerContext(this.hosts.ToArray()));
+            await this.serverContext.OpenAsync();
+            await this.Dispatcher.InvokeAsync(() =>
+            {
                 this.LogService.Info(Resources.ServiceStart, cremaString);
             });
         }

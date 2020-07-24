@@ -30,13 +30,16 @@ namespace Ntreev.Crema.ServiceHosts.Domains
 {
     class DomainContextServiceHost : ServerServiceHostBase<IDomainContextService, IDomainContextEventCallback>
     {
+        private readonly CremaService service;
+
         public DomainContextServiceHost(CremaService service)
         {
+            this.service = service;
         }
 
-        // public override object CreateInstance(Message message)
-        // {
-        //     return new DomainContextService(this.Service);
-        // }
+        protected override IDomainContextService CreateService(IDomainContextEventCallback callback)
+        {
+            return new DomainContextService(this.service);
+        }
     }
 }

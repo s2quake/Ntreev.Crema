@@ -25,6 +25,7 @@ using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceHosts.Domains;
 using System.ComponentModel.Composition;
 using JSSoft.Communication;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Ntreev.Crema.RuntimeService
 {
@@ -34,6 +35,12 @@ namespace Ntreev.Crema.RuntimeService
 
         public RuntimeServiceHost(ICremaHost cremaHost, RuntimeService service)
         {
+            this.service = service;
+        }
+
+        protected override IRuntimeServiceInternal CreateService()
+        {
+            return this.service;
         }
     }
 }
