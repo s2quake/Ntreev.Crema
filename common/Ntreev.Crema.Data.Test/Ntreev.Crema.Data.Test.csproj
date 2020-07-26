@@ -33,8 +33,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
-    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library.Random\Ntreev.Library.Random.csproj" />
+    <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
+    <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library.Random\Ntreev.Library.Random.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Data.Random\Ntreev.Crema.Data.Random.csproj" />
   </ItemGroup>

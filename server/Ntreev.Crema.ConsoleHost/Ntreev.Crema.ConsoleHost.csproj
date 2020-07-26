@@ -38,8 +38,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
     <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj" />
-    <ProjectReference Include="..\..\sub-modules\Ntreev.Library.Commands\Ntreev.Library.Commands\Ntreev.Library.Commands.csproj" />
-    <ProjectReference Include="..\..\sub-modules\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
+    <ProjectReference Include="..\..\..\Ntreev.Library.Commands\Ntreev.Library.Commands\Ntreev.Library.Commands.csproj" />
+    <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.csproj" />
