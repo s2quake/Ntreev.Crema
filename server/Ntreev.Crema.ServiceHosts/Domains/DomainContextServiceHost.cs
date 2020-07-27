@@ -39,7 +39,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
 
         protected override IDomainContextService CreateService(IDomainContextEventCallback callback)
         {
-            return new DomainContextService(this.service);
+            return new DomainContextService(this.service, callback);
         }
     }
 }

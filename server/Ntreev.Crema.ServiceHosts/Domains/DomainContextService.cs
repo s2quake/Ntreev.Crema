@@ -31,14 +31,13 @@ using Ntreev.Library;
 
 namespace Ntreev.Crema.ServiceHosts.Domains
 {
-    // [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    partial class DomainContextService : CremaServiceItemBase<IDomainContextEventCallback>, IDomainContextService
+    class DomainContextService : CremaServiceItemBase<IDomainContextEventCallback>, IDomainContextService
     {
         private Authentication authentication;
         private long index = 0;
 
-        public DomainContextService(CremaService service)
-            : base(service)
+        public DomainContextService(CremaService service, IDomainContextEventCallback callback)
+            : base(service, callback)
         {
             this.UserContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
             this.DomainContext = this.CremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
@@ -52,7 +51,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             try
             {
                 this.authentication = await this.UserContext.AuthenticateAsync(authenticationToken);
-                await this.authentication.AddRefAsync(this);
                 this.OwnerID = this.authentication.ID;
                 result.Value = await this.AttachEventHandlersAsync();
                 result.SignatureDate = this.authentication.SignatureDate;
@@ -71,7 +69,6 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             try
             {
                 await this.DetachEventHandlersAsync();
-                await this.authentication.RemoveRefAsync(this);
                 this.authentication = null;
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
                 this.LogService.Debug($"[{this.OwnerID}] {nameof(DomainContextService)} {nameof(UnsubscribeAsync)}");
@@ -280,7 +277,7 @@ namespace Ntreev.Crema.ServiceHosts.Domains
             if (this.authentication == null)
                 return false;
             this.LogService.Debug($"[{this.authentication}] {nameof(DomainContextService)}.{nameof(IsAliveAsync)} : {DateTime.Now}");
-            await this.authentication.PingAsync();
+            await Task.Delay(1);
             return true;
         }
 

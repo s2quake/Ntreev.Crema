@@ -35,14 +35,11 @@ namespace Ntreev.Crema.ApplicationHost
 
         }
 
-        public override Encoding Encoding
-        {
-            get { return Encoding.UTF8; }
-        }
+        public override Encoding Encoding => Encoding.UTF8;
 
         public TextBox TextBox
         {
-            get { return this.textBox; }
+            get => this.textBox;
             set
             {
                 this.textBox = value;

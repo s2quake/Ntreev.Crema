@@ -31,25 +31,19 @@ using Ntreev.Library;
 
 namespace Ntreev.Crema.ServiceHosts.Data
 {
-    // [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    partial class DataBaseContextService : CremaServiceItemBase<IDataBaseContextEventCallback>, IDataBaseContextService
+    class DataBaseContextService : CremaServiceItemBase<IDataBaseContextEventCallback>, IDataBaseContextService
     {
         private Authentication authentication;
         private readonly Dictionary<Guid, ITransaction> transactionByID = new Dictionary<Guid, ITransaction>();
         private long index = 0;
 
-        public DataBaseContextService(CremaService service)
-            : base(service)
+        public DataBaseContextService(CremaService service, IDataBaseContextEventCallback callback)
+            : base(service, callback)
         {
             this.DataBaseContext = this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
             this.UserContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
 
             this.LogService.Debug($"{nameof(DataBaseContextService)} Constructor");
-        }
-
-        public Task<ResultBase> DefinitionTypeAsync(LogInfo[] param1)
-        {
-            return Task.Run(() => new ResultBase());
         }
 
         public async Task<ResultBase<DataBaseContextMetaData>> SubscribeAsync(Guid authenticationToken)
@@ -58,7 +52,6 @@ namespace Ntreev.Crema.ServiceHosts.Data
             try
             {
                 this.authentication = await this.UserContext.AuthenticateAsync(authenticationToken);
-                await this.authentication.AddRefAsync(this);
                 this.OwnerID = this.authentication.ID;
                 result.Value = await this.AttachEventHandlersAsync();
                 result.SignatureDate = this.authentication.SignatureDate;
@@ -80,9 +73,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
                 await this.UserContext.Dispatcher.InvokeAsync(() =>
                 {
                     this.UserContext.Users.UsersLoggedOut -= Users_UsersLoggedOut;
-
                 });
-                await this.authentication.RemoveRefAsync(this);
                 this.authentication = null;
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
                 this.LogService.Debug($"[{this.OwnerID}] {nameof(DataBaseContextService)} {nameof(UnsubscribeAsync)}");
@@ -109,8 +100,6 @@ namespace Ntreev.Crema.ServiceHosts.Data
             }
             return result;
         }
-
-
 
         public async Task<ResultBase> SetPublicAsync(string dataBaseName)
         {
@@ -419,7 +408,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             if (this.authentication == null)
                 return false;
             this.LogService.Debug($"[{this.authentication}] {nameof(DataBaseContextService)}.{nameof(IsAliveAsync)} : {DateTime.Now}");
-            await this.authentication.PingAsync();
+            await Task.Delay(1);
             return true;
         }
 

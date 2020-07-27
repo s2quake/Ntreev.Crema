@@ -44,6 +44,11 @@ namespace Ntreev.Crema.ApplicationHost
             this.service = new CremaService(this);
         }
 
+        public object GetService(Type serviceType)
+        {
+            return AppBootstrapperBase.Current.GetService(serviceType);
+        }
+
         public override Type ModelType => typeof(IShell);
 
         public AppSettings Settings { get; } = new AppSettings();
@@ -132,11 +137,6 @@ namespace Ntreev.Crema.ApplicationHost
             return assembliesByName.Values.ToArray();
         }
 
-        public object GetService(Type serviceType)
-        {
-            return AppBootstrapperBase.Current.GetService(serviceType);
-        }
-
         protected virtual IEnumerable<string> SelectPath()
         {
             var items = CremaBootstrapper.SelectPath(AppDomain.CurrentDomain.BaseDirectory);
@@ -181,24 +181,5 @@ namespace Ntreev.Crema.ApplicationHost
             batch.AddExportedValue<ICompositionService>(container);
             return batch;
         }
-
-        //protected override IEnumerable<string> SelectPath()
-        //{
-        //    var items = base.SelectPath().Concat(CremaBootstrapper.SelectPath(AppDomain.CurrentDomain.BaseDirectory)).Distinct();
-        //    foreach (var item in items)
-        //    {
-        //        yield return item;
-        //    }
-
-        //    if (this.Settings.PluginsPath != null)
-        //    {
-        //        foreach (var item in this.Settings.PluginsPath)
-        //        {
-        //            yield return item;
-        //        }
-        //    }
-        //}
-
-        //protected override bool AutoInitialize => false;
     }
 }

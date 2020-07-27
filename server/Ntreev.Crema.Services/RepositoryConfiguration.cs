@@ -24,14 +24,12 @@ namespace Ntreev.Crema.Services
 {
     public class RepositoryConfiguration : ConfigurationBase, IRepositoryConfiguration, IConfigurationCommitter
     {
-        private readonly ILogService logService;
         private readonly string itemName;
         private readonly IConfigurationSerializer serializer = new ConfigurationSerializer();
 
-        public RepositoryConfiguration(ILogService logService, string itemName, IEnumerable<IConfigurationPropertyProvider> propertiesProvider)
+        public RepositoryConfiguration(string itemName, IEnumerable<IConfigurationPropertyProvider> propertiesProvider)
             : base(typeof(IRepositoryConfiguration), propertiesProvider)
         {
-            this.logService = logService;
             this.itemName = itemName;
             try
             {
@@ -51,13 +49,13 @@ namespace Ntreev.Crema.Services
         {
             try
             {
-                throw new NotImplementedException();
-                // this.WriteSchema(this.itemName + ".xsd");
-                // this.Write(this.itemName + ".xml", Path.GetFileName(this.itemName) + ".xsd");
+                var filename = this.itemName + ".xml";
+                using var stream = File.OpenWrite(filename);
+                this.Write(stream, this.serializer);
             }
             catch (Exception e)
             {
-                this.logService.Debug(e);
+                CremaLog.Error(e);
                 throw;
             }
         }

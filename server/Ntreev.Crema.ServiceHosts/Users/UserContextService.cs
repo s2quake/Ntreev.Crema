@@ -34,22 +34,16 @@ using Ntreev.Crema.ServiceHosts.Properties;
 
 namespace Ntreev.Crema.ServiceHosts.Users
 {
-    // [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    partial class UserContextService : CremaServiceItemBase<IUserContextEventCallback>, IUserContextService
+    class UserContextService : CremaServiceItemBase<IUserContextEventCallback>, IUserContextService
     {
         private Authentication authentication;
         private long index = 0;
 
-        public UserContextService(CremaService service)
-            : base(service)
+        public UserContextService(CremaService service, IUserContextEventCallback callback)
+            : base(service, callback)
         {
             this.UserContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
             this.LogService.Debug($"{nameof(UserContextService)} Constructor");
-        }
-
-        public ResultBase DefinitionType(SignatureDate p1)
-        {
-            return new ResultBase();
         }
 
         public async Task<ResultBase<UserContextMetaData>> SubscribeAsync(Guid authenticationToken)
@@ -58,7 +52,6 @@ namespace Ntreev.Crema.ServiceHosts.Users
             try
             {
                 this.authentication = await this.CremaHost.AuthenticateAsync(authenticationToken);
-                await this.authentication.AddRefAsync(this);
                 this.OwnerID = this.authentication.ID;
                 result.Value = await this.AttachEventHandlersAsync();
                 result.SignatureDate = this.authentication.SignatureDate;
@@ -77,7 +70,6 @@ namespace Ntreev.Crema.ServiceHosts.Users
             try
             {
                 await this.DetachEventHandlersAsync();
-                await this.authentication.RemoveRefAsync(this);
                 this.authentication = null;
                 this.LogService.Debug($"[{this.OwnerID}] {nameof(UserContextService)} {nameof(UnsubscribeAsync)}");
                 result.SignatureDate = new SignatureDateProvider(this.OwnerID).Provide();
@@ -277,7 +269,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
             if (this.authentication == null)
                 return false;
             this.LogService.Debug($"[{this.authentication}] {nameof(UserContextService)}.{nameof(IsAliveAsync)} : {DateTime.Now}");
-            await this.authentication.PingAsync();
+            await Task.Delay(1);
             return true;
         }
 

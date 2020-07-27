@@ -1,9 +1,9 @@
 ﻿//Released under the MIT License.
 //
-//Copyright (c) 2018 Ntreev Soft co., Ltd.
+//Copyright Async(c) 2018 Ntreev Soft co., Ltd.
 //
 //Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-//documentation files (the "Software"), to deal in the Software without restriction, including without limitation the 
+//documentation files Async(the "Software"), to deal in the Software without restriction, including without limitation the 
 //rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit 
 //persons to whom the Software is furnished to do so, subject to the following conditions:
 //
@@ -29,80 +29,73 @@ using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Data
 {
-    // [ServiceContract(Namespace = CremaService.Namespace, SessionMode = SessionMode.Required, CallbackContract = typeof(IDataBaseContextEventCallback))]
     [ServiceContract]
     public interface IDataBaseContextService
     {
-        /// <summary>
-        /// 특정 타입의 배열 형식이 메소드의 인자로 설정되지 않으면 반환값으로 사용될때 클라이언트의 코드에서 재사용되지 않고 임시 코드가 생성됨
-        /// </summary>
         [OperationContract]
-        ResultBase DefinitionType(LogInfo[] param1);
+        Task<ResultBase<DataBaseContextMetaData>> SubscribeAsync(Guid authenticationToken);
 
         [OperationContract]
-        ResultBase<DataBaseContextMetaData> Subscribe(Guid authenticationToken);
+        Task<ResultBase> UnsubscribeAsync();
 
         [OperationContract]
-        ResultBase Unsubscribe();
+        Task<ResultBase<CremaDataSet>> GetDataSetAsync(string dataBaseName, DataSetType dataSetType, string filterExpression, string revision);
 
         [OperationContract]
-        ResultBase<CremaDataSet> GetDataSet(string dataBaseName, DataSetType dataSetType, string filterExpression, string revision);
+        Task<ResultBase> SetPublicAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase SetPublic(string dataBaseName);
+        Task<ResultBase<AccessInfo>> SetPrivateAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase<AccessInfo> SetPrivate(string dataBaseName);
+        Task<ResultBase<AccessMemberInfo>> AddAccessMemberAsync(string dataBaseName, string memberID, AccessType accessType);
 
         [OperationContract]
-        ResultBase<AccessMemberInfo> AddAccessMember(string dataBaseName, string memberID, AccessType accessType);
+        Task<ResultBase<AccessMemberInfo>> SetAccessMemberAsync(string dataBaseName, string memberID, AccessType accessType);
 
         [OperationContract]
-        ResultBase<AccessMemberInfo> SetAccessMember(string dataBaseName, string memberID, AccessType accessType);
+        Task<ResultBase> RemoveAccessMemberAsync(string dataBaseName, string memberID);
 
         [OperationContract]
-        ResultBase RemoveAccessMember(string dataBaseName, string memberID);
+        Task<ResultBase<LockInfo>> LockAsync(string dataBaseName, string comment);
 
         [OperationContract]
-        ResultBase<LockInfo> Lock(string dataBaseName, string comment);
+        Task<ResultBase> UnlockAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase Unlock(string dataBaseName);
+        Task<ResultBase> LoadAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase Load(string dataBaseName);
+        Task<ResultBase> UnloadAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase Unload(string dataBaseName);
+        Task<ResultBase<DataBaseInfo>> CreateAsync(string dataBaseName, string comment);
 
         [OperationContract]
-        ResultBase<DataBaseInfo> Create(string dataBaseName, string comment);
+        Task<ResultBase<DataBaseInfo>> CopyAsync(string dataBaseName, string newDataBaseName, string comment, bool force);
 
         [OperationContract]
-        ResultBase<DataBaseInfo> Copy(string dataBaseName, string newDataBaseName, string comment, bool force);
+        Task<ResultBase> RenameAsync(string dataBaseName, string newDataBaseName);
 
         [OperationContract]
-        ResultBase Rename(string dataBaseName, string newDataBaseName);
+        Task<ResultBase> DeleteAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase Delete(string dataBaseName);
+        Task<ResultBase<LogInfo[]>> GetLogAsync(string dataBaseName, string revision);
 
         [OperationContract]
-        ResultBase<LogInfo[]> GetLog(string dataBaseName, string revision);
+        Task<ResultBase<DataBaseInfo>> RevertAsync(string dataBaseName, string revision);
 
         [OperationContract]
-        ResultBase<DataBaseInfo> Revert(string dataBaseName, string revision);
+        Task<ResultBase<Guid>> BeginTransactionAsync(string dataBaseName);
 
         [OperationContract]
-        ResultBase<Guid> BeginTransaction(string dataBaseName);
+        Task<ResultBase> EndTransactionAsync(Guid transactionID);
 
         [OperationContract]
-        ResultBase EndTransaction(Guid transactionID);
+        Task<ResultBase<DataBaseMetaData>> CancelTransactionAsync(Guid transactionID);
 
         [OperationContract]
-        ResultBase<DataBaseMetaData> CancelTransaction(Guid transactionID);
-
-        [OperationContract]
-        bool IsAlive();
+        Task<bool> IsAliveAsync();
     }
 }

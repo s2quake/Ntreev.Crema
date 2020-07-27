@@ -29,6 +29,7 @@ using JSSoft.Communication;
 namespace Ntreev.Crema.ServiceHosts.Domains
 {
     [Export(typeof(IServiceHostProvider))]
+    [Dependency(typeof(CremaHostServiceHostProvider))]
     class DomainContextServiceHostProvider : IServiceHostProvider
     {
         private readonly CremaService service;

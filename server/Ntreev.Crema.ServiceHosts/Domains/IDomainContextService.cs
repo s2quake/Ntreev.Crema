@@ -1,9 +1,9 @@
 ﻿//Released under the MIT License.
 //
-//Copyright (c) 2018 Ntreev Soft co., Ltd.
+//Copyright Async(c) 2018 Ntreev Soft co., Ltd.
 //
 //Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-//documentation files (the "Software"), to deal in the Software without restriction, including without limitation the 
+//documentation files Async(the "Software"), to deal in the Software without restriction, including without limitation the 
 //rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit 
 //persons to whom the Software is furnished to do so, subject to the following conditions:
 //
@@ -30,55 +30,49 @@ using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Domains
 {
-    // [ServiceContract(Namespace = CremaService.Namespace, SessionMode = SessionMode.Required, CallbackContract = typeof(IDomainContextEventCallback))]
-    // [ServiceKnownType(typeof(DBNull))]
     [ServiceContract]
     public interface IDomainContextService
     {
         [OperationContract]
-        ResultBase<DomainContextMetaData> Subscribe(Guid authenticationToken);
+        Task<ResultBase<DomainContextMetaData>> SubscribeAsync(Guid authenticationToken);
 
         [OperationContract]
-        ResultBase Unsubscribe();
+        Task<ResultBase> UnsubscribeAsync();
 
         [OperationContract]
-        ResultBase<DomainMetaData[]> GetMetaData(Guid dataBaseID);
+        Task<ResultBase<DomainMetaData[]>> GetMetaDataAsync(Guid dataBaseID);
 
         [OperationContract]
-        ResultBase SetUserLocation(Guid domainID, DomainLocationInfo location);
+        Task<ResultBase> SetUserLocationAsync(Guid domainID, DomainLocationInfo location);
 
         [OperationContract]
-        ResultBase<DomainRowInfo[]> NewRow(Guid domainID, DomainRowInfo[] rows);
+        Task<ResultBase<DomainRowInfo[]>> NewRowAsync(Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
-        ResultBase<DomainRowInfo[]> RemoveRow(Guid domainID, DomainRowInfo[] rows);
+        Task<ResultBase<DomainRowInfo[]>> RemoveRowAsync(Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
-        ResultBase<DomainRowInfo[]> SetRow(Guid domainID, DomainRowInfo[] rows);
+        Task<ResultBase<DomainRowInfo[]>> SetRowAsync(Guid domainID, DomainRowInfo[] rows);
 
         [OperationContract]
-        ResultBase SetProperty(Guid domainID, string propertyName, object value);
+        Task<ResultBase> SetPropertyAsync(Guid domainID, string propertyName, object value);
 
         [OperationContract]
-        ResultBase BeginUserEdit(Guid domainID, DomainLocationInfo location);
+        Task<ResultBase> BeginUserEditAsync(Guid domainID, DomainLocationInfo location);
 
         [OperationContract]
-        ResultBase EndUserEdit(Guid domainID);
+        Task<ResultBase> EndUserEditAsync(Guid domainID);
 
         [OperationContract]
-        ResultBase Kick(Guid domainID, string userID, string comment);
+        Task<ResultBase> KickAsync(Guid domainID, string userID, string comment);
 
         [OperationContract]
-        ResultBase SetOwner(Guid domainID, string userID);
+        Task<ResultBase> SetOwnerAsync(Guid domainID, string userID);
 
         [OperationContract]
-        // [ServiceKnownType(typeof(TableInfo))]
-        // [ServiceKnownType(typeof(TableInfo[]))]
-        // [ServiceKnownType(typeof(TypeInfo))]
-        // [ServiceKnownType(typeof(TypeInfo[]))]
-        ResultBase<object> DeleteDomain(Guid domainID, bool force);
+        Task<ResultBase<object>> DeleteDomainAsync(Guid domainID, bool force);
 
         [OperationContract]
-        bool IsAlive();
+        Task<bool> IsAliveAsync();
     }
 }

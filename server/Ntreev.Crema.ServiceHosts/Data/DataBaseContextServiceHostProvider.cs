@@ -17,6 +17,7 @@
 
 using JSSoft.Communication;
 using Ntreev.Crema.Services;
+using Ntreev.Library;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -28,6 +29,7 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.ServiceHosts.Data
 {
     [Export(typeof(IServiceHostProvider))]
+    [Dependency(typeof(CremaHostServiceHostProvider))]
     class DataBaseContextServiceHostProvider : IServiceHostProvider
     {
         private readonly CremaService service;

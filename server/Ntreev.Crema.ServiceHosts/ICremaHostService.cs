@@ -1,9 +1,9 @@
 ﻿//Released under the MIT License.
 //
-//Copyright (c) 2018 Ntreev Soft co., Ltd.
+//Copyright Async(c) 2018 Ntreev Soft co., Ltd.
 //
 //Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-//documentation files (the "Software"), to deal in the Software without restriction, including without limitation the 
+//documentation files Async(the "Software"), to deal in the Software without restriction, including without limitation the 
 //rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit 
 //persons to whom the Software is furnished to do so, subject to the following conditions:
 //
@@ -26,35 +26,34 @@ using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts
 {
-    // [ServiceContract(Namespace = CremaService.Namespace, SessionMode = SessionMode.Required, CallbackContract = typeof(ICremaHostEventCallback))]
     [ServiceContract]
     public interface ICremaHostService
     {
         [OperationContract]
-        ResultBase<Guid> Subscribe(string userID, byte[] password, string version, string platformID, string culture);
+        Task<ResultBase<Guid>> SubscribeAsync(string userID, byte[] password, string version, string platformID, string culture);
 
         [OperationContract]
-        ResultBase Unsubscribe();
+        Task<ResultBase> UnsubscribeAsync();
 
         [OperationContract]
-        ResultBase<string> GetVersion();
+        Task<ResultBase<string>> GetVersionAsync();
 
         [OperationContract]
-        ResultBase<bool> IsOnline(string userID, byte[] password);
+        Task<ResultBase<bool>> IsOnlineAsync(string userID, byte[] password);
 
         [OperationContract]
-        ResultBase<DataBaseInfo[]> GetDataBaseInfos();
+        Task<ResultBase<DataBaseInfo[]>> GetDataBaseInfosAsync();
 
         [OperationContract]
-        ResultBase<ServiceInfo> GetServiceInfo();
+        Task<ResultBase<ServiceInfo>> GetServiceInfoAsync();
 
         [OperationContract]
-        ResultBase Shutdown(int milliseconds, ShutdownType shutdownType, string message);
+        Task<ResultBase> ShutdownAsync(int milliseconds, ShutdownType shutdownType, string message);
 
         [OperationContract]
-        ResultBase CancelShutdown();
+        Task<ResultBase> CancelShutdownAsync();
 
         [OperationContract]
-        bool IsAlive();
+        Task<bool> IsAliveAsync();
     }
 }

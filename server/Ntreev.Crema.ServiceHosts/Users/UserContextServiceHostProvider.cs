@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.ServiceHosts.Users
 {
     [Export(typeof(IServiceHostProvider))]
-    [Order(0)]
+    [Dependency(typeof(CremaHostServiceHostProvider))]
     class UserContextServiceHostProvider : IServiceHostProvider
     {
         private readonly CremaService cremaService;

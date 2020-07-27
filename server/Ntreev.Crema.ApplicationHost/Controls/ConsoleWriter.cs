@@ -65,7 +65,6 @@ namespace Ntreev.Crema.ApplicationHost.Controls
         private void TerminalColor_ForegroundColorChanged(object sender, EventArgs e)
         {
             var foregroundColor = TerminalColor.ForegroundColor;
-
             this.control.Dispatcher.Invoke(() =>
             {
                 if (foregroundColor == null)

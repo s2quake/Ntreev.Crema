@@ -35,9 +35,6 @@ namespace Ntreev.Crema.ServiceModel
         [DataMember]
         public string Name { get; set; }
 
-        [DataMember]
-        public int Port { get; set; }
-
         public readonly static ServiceItemInfo Empty = new ServiceItemInfo()
         {
             Name = string.Empty,

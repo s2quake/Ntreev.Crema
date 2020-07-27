@@ -29,15 +29,14 @@ using Ntreev.Library;
 
 namespace Ntreev.Crema.ServiceHosts
 {
-    // [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    partial class CremaHostService : CremaServiceItemBase<ICremaHostEventCallback>, ICremaHostService
+    class CremaHostService : CremaServiceItemBase<ICremaHostEventCallback>, ICremaHostService
     {
         private Guid authenticationToken;
         private Authentication authentication;
         private long index = 0;
 
-        public CremaHostService(CremaService service)
-            : base(service)
+        public CremaHostService(CremaService service, ICremaHostEventCallback callback)
+            : base(service, callback)
         {
             this.LogService.Debug($"{nameof(CremaHostService)} Constructor");
             this.OwnerID = nameof(CremaHostService);
@@ -56,7 +55,6 @@ namespace Ntreev.Crema.ServiceHosts
 
                 this.authenticationToken = await this.CremaHost.LoginAsync(userID, ToSecureString(userID, password));
                 this.authentication = await this.CremaHost.AuthenticateAsync(this.authenticationToken);
-                await this.authentication.AddRefAsync(this, this.Service.Timeout, (a) => this.CremaHost.LogoutAsync(a));
                 this.OwnerID = this.authentication.ID;
                 result.Value = this.authenticationToken;
                 result.SignatureDate = this.authentication.SignatureDate;
@@ -193,7 +191,7 @@ namespace Ntreev.Crema.ServiceHosts
             if (this.authentication == null)
                 return false;
             this.LogService.Debug($"[{this.authentication}] {nameof(CremaHostService)}.{nameof(IsAliveAsync)} : {DateTime.Now}");
-            await this.authentication.PingAsync();
+            await Task.Delay(1);
             return true;
         }
 

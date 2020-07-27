@@ -1,9 +1,9 @@
 ﻿//Released under the MIT License.
 //
-//Copyright (c) 2018 Ntreev Soft co., Ltd.
+//Copyright Async(c) 2018 Ntreev Soft co., Ltd.
 //
 //Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-//documentation files (the "Software"), to deal in the Software without restriction, including without limitation the 
+//documentation files Async(the "Software"), to deal in the Software without restriction, including without limitation the 
 //rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit 
 //persons to whom the Software is furnished to do so, subject to the following conditions:
 //
@@ -29,50 +29,49 @@ using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Users
 {
-    // [ServiceContract(Namespace = CremaService.Namespace, SessionMode = SessionMode.Required, CallbackContract = typeof(IUserContextEventCallback))]
     [ServiceContract]
     public partial interface IUserContextService
     {
         [OperationContract]
-        ResultBase<UserContextMetaData> Subscribe(Guid authenticationToken);
+        Task<ResultBase<UserContextMetaData>> SubscribeAsync(Guid authenticationToken);
 
         [OperationContract]
-        ResultBase Unsubscribe();
+        Task<ResultBase> UnsubscribeAsync();
 
         [OperationContract]
-        ResultBase<UserInfo> NewUser(string userID, string categoryPath, byte[] password, string userName, Authority authority);
+        Task<ResultBase<UserInfo>> NewUserAsync(string userID, string categoryPath, byte[] password, string userName, Authority authority);
 
         [OperationContract]
-        ResultBase NewUserCategory(string categoryPath);
+        Task<ResultBase> NewUserCategoryAsync(string categoryPath);
 
         [OperationContract]
-        ResultBase RenameUserItem(string itemPath, string newName);
+        Task<ResultBase> RenameUserItemAsync(string itemPath, string newName);
 
         [OperationContract]
-        ResultBase MoveUserItem(string itemPath, string parentPath);
+        Task<ResultBase> MoveUserItemAsync(string itemPath, string parentPath);
 
         [OperationContract]
-        ResultBase DeleteUserItem(string itemPath);
+        Task<ResultBase> DeleteUserItemAsync(string itemPath);
 
         [OperationContract]
-        ResultBase<UserInfo> ChangeUserInfo(string userID, byte[] password, byte[] newPassword, string userName, Authority? authority);
+        Task<ResultBase<UserInfo>> ChangeUserInfoAsync(string userID, byte[] password, byte[] newPassword, string userName, Authority? authority);
 
         [OperationContract]
-        ResultBase Kick(string userID, string comment);
+        Task<ResultBase> KickAsync(string userID, string comment);
 
         [OperationContract]
-        ResultBase<BanInfo> Ban(string userID, string comment);
+        Task<ResultBase<BanInfo>> BanAsync(string userID, string comment);
 
         [OperationContract]
-        ResultBase Unban(string userID);
+        Task<ResultBase> UnbanAsync(string userID);
 
         [OperationContract]
-        ResultBase SendMessage(string userID, string message);
+        Task<ResultBase> SendMessageAsync(string userID, string message);
 
         [OperationContract]
-        ResultBase NotifyMessage(string[] userIDs, string message);
+        Task<ResultBase> NotifyMessageAsync(string[] userIDs, string message);
 
         [OperationContract]
-        bool IsAlive();
+        Task<bool> IsAliveAsync();
     }
 }

@@ -138,7 +138,7 @@ namespace Ntreev.Crema.Services
                     this.Info(Resources.Message_ProgramInfo, AppUtility.ProductName, AppUtility.ProductVersion);
                     this.Info("Repository module : {0}", this.settings.RepositoryModule);
                     this.Info(Resources.Message_ServiceStart);
-                    this.configs = new RepositoryConfiguration(this, Path.Combine(this.BasePath, "configs"), this.propertiesProviders);
+                    this.configs = new RepositoryConfiguration(Path.Combine(this.BasePath, "configs"), this.propertiesProviders);
                     this.UserContext = new UserContext(this);
                     this.DataBaseContext = new DataBaseContext(this);
                     this.DomainContext = new DomainContext(this);

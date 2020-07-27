@@ -61,13 +61,11 @@ namespace Ntreev.Crema.ConsoleHost
             }
             try
             {
-                using (var application = new CremaApplication())
-                {
-                    var configs = application.GetService(typeof(ConsoleConfiguration)) as ConsoleConfiguration;
-                    var commandContext = application.GetService(typeof(CommandContext)) as CommandContext;
-                    commandContext.Execute(Environment.CommandLine);
-                    configs.Write();
-                }
+                using var application = new CremaApplication();
+                var configs = application.GetService(typeof(ConsoleConfiguration)) as ConsoleConfiguration;
+                var commandContext = application.GetService(typeof(CommandContext)) as CommandContext;
+                commandContext.Execute(Environment.CommandLine);
+                configs.Write();
             }
             catch (Exception e)
             {

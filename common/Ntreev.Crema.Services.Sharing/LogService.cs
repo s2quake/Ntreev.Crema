@@ -153,7 +153,7 @@ namespace Ntreev.Crema.Services
             this.hierarchy.Root.Level = Level.All;
             this.hierarchy.Configured = true;
 
-            this.log = log4net.LogManager.GetLogger(typeof(LogService));
+            this.log = log4net.LogManager.GetLogger(name, typeof(LogService));
             this.name = name;
         }
 

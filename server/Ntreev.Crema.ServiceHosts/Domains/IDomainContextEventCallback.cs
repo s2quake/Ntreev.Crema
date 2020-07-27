@@ -29,7 +29,6 @@ using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Domains
 {
-    // [ServiceKnownType(typeof(DBNull))]
     public interface IDomainContextEventCallback
     {
         [OperationContract]

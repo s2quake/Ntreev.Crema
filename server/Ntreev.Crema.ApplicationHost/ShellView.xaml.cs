@@ -43,15 +43,9 @@ namespace Ntreev.Crema.ApplicationHost
     [Export]
     public partial class ShellView : ModernWindow
     {
-        private static LogTextWriter writer = new LogTextWriter();
-
+        private readonly LogTextWriter writer;
         private readonly ICremaHost cremaHost;
         private readonly ConsoleCommandContext commandContext;
-
-        static ShellView()
-        {
-            CremaLog.AddRedirection(writer, LogVerbose.Info);
-        }
 
         public ShellView()
         {
@@ -62,7 +56,7 @@ namespace Ntreev.Crema.ApplicationHost
         public ShellView(ICremaHost cremaHost, ConsoleCommandContext commandContext)
         {
             InitializeComponent();
-            writer.TextBox = this.logBox;
+            this.writer = new LogTextWriter() { TextBox = this.logBox };
             this.cremaHost = cremaHost;
             this.cremaHost.Opening += CremaHost_Opening;
             this.cremaHost.Opened += CremaHost_Opened;
@@ -72,6 +66,7 @@ namespace Ntreev.Crema.ApplicationHost
             this.terminal.CommandContext = this.commandContext;
             this.SetPrompt();
             this.Dispatcher.InvokeAsync(() => this.logBox.Focus());
+            CremaLog.AddRedirection(this.writer, LogVerbose.Info);
         }
 
         public override void OnApplyTemplate()
@@ -79,8 +74,6 @@ namespace Ntreev.Crema.ApplicationHost
             base.OnApplyTemplate();
             this.terminal.ApplyTemplate();
         }
-
-        private readonly static string[] emptyStrings = new string[] { };
 
         public async void Run(string commandLine)
         {
@@ -143,9 +136,9 @@ namespace Ntreev.Crema.ApplicationHost
             this.Run(this.terminal.Text);
         }
 
-        private void CremaHost_Opened(object sender, EventArgs e)
+        private async void CremaHost_Opened(object sender, EventArgs e)
         {
-            this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 this.SetPrompt();
 
@@ -162,9 +155,9 @@ namespace Ntreev.Crema.ApplicationHost
             });
         }
 
-        private void CremaHost_Closed(object sender, EventArgs e)
+        private async void CremaHost_Closed(object sender, EventArgs e)
         {
-            this.Dispatcher.InvokeAsync(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 this.terminal.Reset();
             });

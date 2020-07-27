@@ -26,29 +26,18 @@ using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts
 {
-    class CremaHostServiceHost : ServerServiceHostBase<ICremaHostService>
+    class CremaHostServiceHost : ServerServiceHostBase<ICremaHostService, ICremaHostEventCallback>
     {
         private readonly CremaService service;
 
-        public CremaHostServiceHost(CremaService service, int port)
-            // : base(service, typeof(CremaHostService), $"net.tcp://localhost:{port}/{nameof(CremaHostService)}", port)
+        public CremaHostServiceHost(CremaService service)
         {
-//             this.service = service;
-//             this.AddServiceEndpoint(typeof(ICremaHostService), CremaServiceItemHost.CreateBinding(), string.Empty);
-//             this.Description.Behaviors.Add(new InstanceProviderBehavior());
-
-// #if DEBUG
-//             if (Environment.OSVersion.Platform != PlatformID.Unix)
-//             {
-//                 this.Description.Behaviors.Add(new ServiceMetadataBehavior());
-//                 this.AddServiceEndpoint(typeof(IMetadataExchange), MetadataExchangeBindings.CreateMexTcpBinding(), "mex");
-//             }
-// #endif
+            this.service = service;
         }
 
-        // public override object CreateInstance(Message message)
-        // {
-        //     return new CremaHostService(this.Service);
-        // }
+        protected override ICremaHostService CreateService(ICremaHostEventCallback callback)
+        {
+            return new CremaHostService(this.service, callback);
+        }
     }
 }

@@ -53,7 +53,7 @@ namespace Ntreev.Crema.ApplicationHost.Dialogs.ViewModels
 
         public SecureString Password
         {
-            get { return this.password; }
+            get => this.password;
             set
             {
                 this.password = value;

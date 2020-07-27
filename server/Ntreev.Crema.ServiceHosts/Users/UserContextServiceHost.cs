@@ -40,7 +40,7 @@ namespace Ntreev.Crema.ServiceHosts.Users
 
         protected override IUserContextService CreateService(IUserContextEventCallback callback)
         {
-            return new UserContextService(this.service);
+            return new UserContextService(this.service, callback);
         }
     }
 }

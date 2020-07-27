@@ -2,7 +2,7 @@
   "profiles": {
     "Ntreev.Crema.ConsoleHost": {
       "commandName": "Project",
-      "commandLineArgs": "help"
+      "commandLineArgs": "run E:\\Crema\\resource_repo --prompt"
     }
   }
 }
