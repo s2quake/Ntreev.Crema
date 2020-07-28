@@ -17,6 +17,7 @@
 
 using Ntreev.Library;
 using Ntreev.Library.IO;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -32,8 +33,9 @@ namespace Ntreev.Crema.Services
         {
             this.xmlPath = path;
             this.schemaPath = Path.ChangeExtension(path, ".xsd");
-            if (File.Exists(this.xmlPath) == true)
-                this.Read(this.xmlPath);
+            throw new NotImplementedException();
+            //if (File.Exists(this.xmlPath) == true)
+            //    this.Read(this.xmlPath);
         }
 
         public override string Name => "UserConfigs";
@@ -41,8 +43,9 @@ namespace Ntreev.Crema.Services
         public void Commit()
         {
             FileUtility.Prepare(this.schemaPath);
-            this.WriteSchema(this.schemaPath);
-            this.Write(this.xmlPath);
+            throw new NotImplementedException();
+            //this.WriteSchema(this.schemaPath);
+            //this.Write(this.xmlPath);
         }
     }
 }

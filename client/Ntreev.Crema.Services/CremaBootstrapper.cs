@@ -57,32 +57,34 @@ namespace Ntreev.Crema.Services
 
         public static async Task<bool> IsOnlineAsync(string address, string userID, SecureString password)
         {
-            var serviceClient = CremaHostServiceFactory.CreateServiceClient(address);
-            serviceClient.Open();
-            try
-            {
-                var result = await InvokeServiceAsync(() => serviceClient.IsOnline(userID, UserContext.Encrypt(userID, password)));
-                return result.Value;
-            }
-            finally
-            {
-                serviceClient.CloseService(CloseReason.None);
-            }
+            throw new NotImplementedException();
+            //var serviceClient = CremaHostServiceFactory.CreateServiceClient(address);
+            //serviceClient.Open();
+            //try
+            //{
+            //    var result = await InvokeServiceAsync(() => serviceClient.IsOnline(userID, UserContext.Encrypt(userID, password)));
+            //    return result.Value;
+            //}
+            //finally
+            //{
+            //    serviceClient.CloseService(CloseReason.None);
+            //}
         }
 
         public static async Task<DataBaseInfo[]> GetDataBasesAsync(string address)
         {
-            var serviceClient = CremaHostServiceFactory.CreateServiceClient(address);
-            serviceClient.Open();
-            try
-            {
-                var result = await InvokeServiceAsync(() => serviceClient.GetDataBaseInfos());
-                return result.Value;
-            }
-            finally
-            {
-                serviceClient.CloseService(CloseReason.None);
-            }
+            throw new NotImplementedException();
+            //var serviceClient = CremaHostServiceFactory.CreateServiceClient(address);
+            //serviceClient.Open();
+            //try
+            //{
+            //    var result = await InvokeServiceAsync(() => serviceClient.GetDataBaseInfos());
+            //    return result.Value;
+            //}
+            //finally
+            //{
+            //    serviceClient.CloseService(CloseReason.None);
+            //}
         }
 
         public object GetService(System.Type serviceType)

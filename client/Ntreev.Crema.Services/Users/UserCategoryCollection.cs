@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceHosts.Users;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.UserContextService;
 using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 using System;
@@ -51,7 +51,7 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewAsync), this, name, parentPath);
                 });
                 var categoryName = new CategoryName(parentPath, name);
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Context.Service.NewUserCategory(categoryName));
+                var result = await this.Context.Service.NewUserCategoryAsync(categoryName);
                 //return await this.Dispatcher.InvokeAsync(() =>
                 //{
                 //    this.CremaHost.Sign(authentication, result);

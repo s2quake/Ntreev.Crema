@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceHosts.Users;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.UserContextService;
 using Ntreev.Library.Linq;
 using System;
 using System.Collections.Generic;
@@ -56,7 +56,7 @@ namespace Ntreev.Crema.Services.Users
                      var path = base.Path;
                      return (items, oldPaths, oldCategoryPaths, path);
                  });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.MoveUserItem(this.Path, categoryPath));
+                var result = await this.Service.MoveUserItemAsync(this.Path, categoryPath);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -81,7 +81,7 @@ namespace Ntreev.Crema.Services.Users
                     var path = base.Path;
                     return (items, oldPaths, path);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.DeleteUserItem(tuple.path));
+                var result = await this.Service.DeleteUserItemAsync(tuple.path);
                 await context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -105,7 +105,7 @@ namespace Ntreev.Crema.Services.Users
                     var id = this.ID;
                     return (items, comments, id);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.Kick(tuple.id, comment ?? string.Empty));
+                var result = await this.Service.KickAsync(tuple.id, comment ?? string.Empty);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -129,7 +129,7 @@ namespace Ntreev.Crema.Services.Users
                     var id = this.ID;
                     return (items, comments, id);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.Ban(tuple.id, comment ?? string.Empty));
+                var result = await this.Service.BanAsync(tuple.id, comment ?? string.Empty);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -152,7 +152,7 @@ namespace Ntreev.Crema.Services.Users
                     var id = this.ID;
                     return (items, id);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.Unban(tuple.id));
+                var result = await this.Service.UnbanAsync(tuple.id);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -179,7 +179,7 @@ namespace Ntreev.Crema.Services.Users
                     throw new ArgumentNullException(nameof(newPassword));
                 var p1 = password == null ? null : UserContext.Encrypt(userInfo.ID, password);
                 var p2 = newPassword == null ? null : UserContext.Encrypt(userInfo.ID, newPassword);
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.ChangeUserInfo(userInfo.ID, p1, p2, userName, authority));
+                var result = await this.Service.ChangeUserInfoAsync(userInfo.ID, p1, p2, userName, authority);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -200,7 +200,7 @@ namespace Ntreev.Crema.Services.Users
                     this.CremaHost.DebugMethod(authentication, this, nameof(SendMessageAsync), this, message);
                     return base.UserInfo;
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.SendMessage(userInfo.ID, message));
+                var result = await this.Service.SendMessageAsync(userInfo.ID, message);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }

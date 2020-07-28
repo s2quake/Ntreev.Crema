@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceHosts.Domains;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.DomainContextService;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Crema.Services.Users;
 using Ntreev.Library;
@@ -79,7 +79,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(DeleteAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, isCanceled);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.DeleteDomain(this.ID, isCanceled));
+                var result = await this.Service.DeleteDomainAsync(this.ID, isCanceled);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return new DomainResultInfo<object>() { ID = result.TaskID, Value = result.Value };
             }
@@ -99,7 +99,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(BeginUserEditAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.BeginUserEdit(this.ID, location));
+                var result = await this.Service.BeginUserEditAsync(this.ID, location);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -119,7 +119,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(EndUserEditAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EndUserEdit(this.ID));
+                var result = await this.Service.EndUserEditAsync(this.ID);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -139,7 +139,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(NewRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.NewRow(this.ID, rows));
+                var result = await this.Service.NewRowAsync(this.ID, rows);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return new DomainResultInfo<DomainRowInfo[]>() { ID = result.TaskID, Value = result.Value };
             }
@@ -159,7 +159,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.SetRow(this.ID, rows));
+                var result = await this.Service.SetRowAsync(this.ID, rows);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return new DomainResultInfo<DomainRowInfo[]>() { ID = result.TaskID, Value = result.Value };
             }
@@ -179,7 +179,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(RemoveRowAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.RemoveRow(this.ID, rows));
+                var result = await this.Service.RemoveRowAsync(this.ID, rows);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return new DomainResultInfo<DomainRowInfo[]>() { ID = result.TaskID, Value = result.Value };
             }
@@ -199,7 +199,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetPropertyAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, propertyName, value);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.SetProperty(this.ID, propertyName, value));
+                var result = await this.Service.SetPropertyAsync(this.ID, propertyName, value);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -220,7 +220,7 @@ namespace Ntreev.Crema.Services.Domains
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetUserLocationAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType);
                     return this.GetDomainUser(authentication);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.SetUserLocation(this.ID, location));
+                var result = await this.Service.SetUserLocationAsync(this.ID, location);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     domainUser.DomainLocationInfo = location;
@@ -242,7 +242,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(KickAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, userID, comment);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.Kick(this.ID, userID, comment));
+                var result = await this.Service.KickAsync(this.ID, userID, comment);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -262,7 +262,7 @@ namespace Ntreev.Crema.Services.Domains
                 {
                     this.CremaHost.DebugMethod(authentication, this, nameof(SetOwnerAsync), base.DomainInfo.ItemPath, base.DomainInfo.ItemType, userID);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.SetOwner(this.ID, userID));
+                var result = await this.Service.SetOwnerAsync(this.ID, userID);
                 await this.taskEvent.WaitAsync(result.TaskID);
                 return result.TaskID;
             }

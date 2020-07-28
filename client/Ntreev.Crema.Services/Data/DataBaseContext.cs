@@ -15,7 +15,6 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services.DataBaseContextService;
 using Ntreev.Crema.Services.Users;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library.ObjectModel;
@@ -30,15 +29,13 @@ using Ntreev.Library;
 using System.Timers;
 using System.Collections.Specialized;
 using Ntreev.Library.Threading;
+using Ntreev.Crema.ServiceHosts.Data;
 
 namespace Ntreev.Crema.Services.Data
 {
-    [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
-    class DataBaseContext : ContainerBase<DataBase>, IDataBaseContext, IDataBaseContextServiceCallback
+    class DataBaseContext : ContainerBase<DataBase>, IDataBaseContext, IDataBaseContextEventCallback
     {
-        private DataBaseContextServiceClient service;
         private bool isDisposed;
-        private PingTimer pingTimer;
 
         private ItemsCreatedEventHandler<IDataBase> itemsCreated;
         private ItemsRenamedEventHandler<IDataBase> itemsRenamed;
@@ -72,75 +69,66 @@ namespace Ntreev.Crema.Services.Data
             return this.taskEvent.WaitAsync(taskID);
         }
 
-        public async Task InitializeAsync(string address, Guid authenticationToken, int port, int timeout)
+        public async Task InitializeAsync(Guid authenticationToken)
         {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                var binding = CremaHost.CreateBinding();
-                var endPointAddress = new EndpointAddress($"net.tcp://{address}:{port}/DataBaseContextService");
-                var instanceContext = new InstanceContext(this);
-                this.service = new DataBaseContextServiceClient(instanceContext, binding, endPointAddress);
-                this.service.Open(this.CloseAsync);
-            });
-            var result = await this.CremaHost.InvokeServiceAsync(() => this.service.Subscribe(authenticationToken));
+            var result = await this.Service.SubscribeAsync(authenticationToken);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 var metaData = result.Value;
-                this.pingTimer = new PingTimer(this.service.IsAlive, timeout);
                 this.Initialize(metaData);
             });
         }
 
-        public LockInfo InvokeDataBaseLock(Authentication authentication, DataBase dataBase, string comment)
+        public async Task<LockInfo> InvokeDataBaseLock(Authentication authentication, DataBase dataBase, string comment)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseLock), dataBase, comment);
-            var result = this.service.Lock(dataBase.Name, comment);
+            var result = await this.Service.LockAsync(dataBase.Name, comment);
             result.Validate(authentication);
             return result.Value;
         }
 
-        public void InvokeDataBaseUnlock(Authentication authentication, DataBase dataBase)
+        public async Task InvokeDataBaseUnlock(Authentication authentication, DataBase dataBase)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseUnlock), dataBase);
-            var result = this.service.Unlock(dataBase.Name);
+            var result = await this.Service.UnlockAsync(dataBase.Name);
             result.Validate(authentication);
         }
 
-        public AccessInfo InvokeDataBaseSetPrivate(Authentication authentication, DataBase dataBase)
+        public async Task<AccessInfo> InvokeDataBaseSetPrivate(Authentication authentication, DataBase dataBase)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseSetPrivate), dataBase);
-            var result = this.service.SetPrivate(dataBase.Name);
+            var result = await this.Service.SetPrivateAsync(dataBase.Name);
             result.Validate(authentication);
             return result.Value;
         }
 
-        public void InvokeDataBaseSetPublic(Authentication authentication, DataBase dataBase)
+        public async Task InvokeDataBaseSetPublic(Authentication authentication, DataBase dataBase)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseSetPrivate), dataBase);
-            var result = this.service.SetPublic(dataBase.Name);
+            var result = await this.Service.SetPublicAsync(dataBase.Name);
             result.Validate(authentication);
         }
 
-        public AccessMemberInfo InvokeDataBaseAddAccessMember(Authentication authentication, DataBase dataBase, string memberID, AccessType accessType)
+        public async Task<AccessMemberInfo> InvokeDataBaseAddAccessMember(Authentication authentication, DataBase dataBase, string memberID, AccessType accessType)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseAddAccessMember), dataBase, memberID, accessType);
-            var result = this.service.AddAccessMember(dataBase.Name, memberID, accessType);
+            var result = await this.Service.AddAccessMemberAsync(dataBase.Name, memberID, accessType);
             result.Validate(authentication);
             return result.Value;
         }
 
-        public AccessMemberInfo InvokeDataBaseSetAccessMember(Authentication authentication, DataBase dataBase, string memberID, AccessType accessType)
+        public async Task<AccessMemberInfo> InvokeDataBaseSetAccessMember(Authentication authentication, DataBase dataBase, string memberID, AccessType accessType)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseSetAccessMember), dataBase, memberID, accessType);
-            var result = this.service.SetAccessMember(dataBase.Name, memberID, accessType);
+            var result = await this.Service.SetAccessMemberAsync(dataBase.Name, memberID, accessType);
             result.Validate(authentication);
             return result.Value;
         }
 
-        public void InvokeDataBaseRemoveAccessMember(Authentication authentication, DataBase dataBase, string memberID)
+        public async Task InvokeDataBaseRemoveAccessMember(Authentication authentication, DataBase dataBase, string memberID)
         {
             this.CremaHost.DebugMethod(authentication, this, nameof(InvokeDataBaseRemoveAccessMember), dataBase, memberID);
-            var result = this.service.RemoveAccessMember(dataBase.Name, memberID);
+            var result = await this.Service.RemoveAccessMemberAsync(dataBase.Name, memberID);
             result.Validate(authentication);
         }
 
@@ -153,7 +141,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(AddNewDataBaseAsync), dataBaseName, comment);
                 });
                 var taskID = GuidUtility.FromName(dataBaseName + comment);
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.service.Create(dataBaseName, comment));
+                var result = await this.Service.CreateAsync(dataBaseName, comment);
                 await this.WaitAsync(taskID);
                 return await this.Dispatcher.InvokeAsync(() => this[dataBaseName]);
             }
@@ -174,7 +162,7 @@ namespace Ntreev.Crema.Services.Data
                     return dataBase.Name;
                 });
                 var taskID = GuidUtility.FromName(newDataBaseName + comment);
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.service.Copy(name, newDataBaseName, comment, force));
+                var result = await this.Service.CopyAsync(name, newDataBaseName, comment, force);
                 await this.WaitAsync(taskID);
                 return await this.Dispatcher.InvokeAsync(() => this[newDataBaseName]);
             }
@@ -185,22 +173,22 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public LogInfo[] GetLog(Authentication authentication, DataBase dataBase, string revision)
+        public async Task<LogInfo[]> GetLog(Authentication authentication, DataBase dataBase, string revision)
         {
             this.Dispatcher.VerifyAccess();
             this.CremaHost.DebugMethod(authentication, this, nameof(GetLog), dataBase);
 
-            var result = this.service.GetLog(dataBase.Name, revision);
+            var result = await this.Service.GetLogAsync(dataBase.Name, revision);
             result.Validate(authentication);
             return result.Value ?? new LogInfo[] { };
         }
 
-        public void Revert(Authentication authentication, DataBase dataBase, string revision)
+        public async Task Revert(Authentication authentication, DataBase dataBase, string revision)
         {
             this.Dispatcher.VerifyAccess();
             this.CremaHost.DebugMethod(authentication, this, nameof(Revert), dataBase);
 
-            var result = this.service.Revert(dataBase.Name, revision);
+            var result = await this.Service.RevertAsync(dataBase.Name, revision);
             result.Validate(authentication);
             dataBase.SetDataBaseInfo(result.Value);
             this.InvokeItemsRevertedEvent(authentication, new DataBase[] { dataBase }, new string[] { revision });
@@ -424,27 +412,24 @@ namespace Ntreev.Crema.Services.Data
                 await item.CloseAsync(closeInfo);
             }
 
-            if (this.service == null)
+            if (this.Service == null)
                 return;
-            this.service.Unsubscribe(closeInfo.Reason);
-            this.pingTimer.Dispose();
-            this.pingTimer = null;
+            await this.Service.UnsubscribeAsync();
             await Task.Delay(100);
-            this.service.CloseService(closeInfo.Reason);
             await this.callbackEvent.DisposeAsync();
             await this.Dispatcher.DisposeAsync();
-            this.service = null;
+            this.Service = null;
             this.Dispatcher = null;
         }
 
-        public ResultBase LoadDataBase(DataBase dataBase)
+        public Task<ResultBase> LoadDataBase(DataBase dataBase)
         {
-            return this.service.Load(dataBase.Name);
+            return this.Service.LoadAsync(dataBase.Name);
         }
 
-        public ResultBase UnloadDataBase(DataBase dataBase)
+        public Task<ResultBase> UnloadDataBase(DataBase dataBase)
         {
-            return this.service.Unload(dataBase.Name);
+            return this.Service.UnloadAsync(dataBase.Name);
         }
 
         public new DataBase this[string dataBaseName] => base[dataBaseName];
@@ -457,7 +442,7 @@ namespace Ntreev.Crema.Services.Data
 
         public UserContext UserContext { get; }
 
-        public IDataBaseContextService Service => this.service;
+        public IDataBaseContextService Service { get; set; }
 
         public new int Count => base.Count;
 
@@ -743,14 +728,14 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        #region IDataBaseContextServiceCallback
+        #region IDataBaseContextEventCallback
 
-        async void IDataBaseContextServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
+        async void IDataBaseContextEventCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
             await this.CloseAsync(closeInfo);
         }
 
-        async void IDataBaseContextServiceCallback.OnDataBasesCreated(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseInfo[] dataBaseInfos, string comment)
+        async void IDataBaseContextEventCallback.OnDataBasesCreated(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseInfo[] dataBaseInfos, string comment)
         {
             try
             {
@@ -778,7 +763,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseContextServiceCallback.OnDataBasesRenamed(CallbackInfo callbackInfo, string[] dataBaseNames, string[] newDataBaseNames)
+        async void IDataBaseContextEventCallback.OnDataBasesRenamed(CallbackInfo callbackInfo, string[] dataBaseNames, string[] newDataBaseNames)
         {
             try
             {
@@ -807,7 +792,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseContextServiceCallback.OnDataBasesDeleted(CallbackInfo callbackInfo, string[] dataBaseNames)
+        async void IDataBaseContextEventCallback.OnDataBasesDeleted(CallbackInfo callbackInfo, string[] dataBaseNames)
         {
             try
             {
@@ -834,7 +819,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseContextServiceCallback.OnDataBasesLoaded(CallbackInfo callbackInfo, string[] dataBaseNames)
+        async void IDataBaseContextEventCallback.OnDataBasesLoaded(CallbackInfo callbackInfo, string[] dataBaseNames)
         {
             try
             {
@@ -861,7 +846,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseContextServiceCallback.OnDataBasesUnloaded(CallbackInfo callbackInfo, string[] dataBaseNames)
+        async void IDataBaseContextEventCallback.OnDataBasesUnloaded(CallbackInfo callbackInfo, string[] dataBaseNames)
         {
             try
             {
@@ -876,7 +861,7 @@ namespace Ntreev.Crema.Services.Data
                             var dataBaseName = dataBaseNames[i];
                             var dataBase = this[dataBaseName];
                             dataBases[i] = dataBase;
-                            dataBase.SetUnloaded(authentication);
+                            dataBase.SetUnloadedAsync(authentication).Wait();
                         }
                         this.InvokeItemsUnloadedEvent(authentication, dataBases);
                     });
@@ -888,7 +873,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseContextServiceCallback.OnDataBasesResetting(CallbackInfo callbackInfo, string[] dataBaseNames)
+        async void IDataBaseContextEventCallback.OnDataBasesResetting(CallbackInfo callbackInfo, string[] dataBaseNames)
         {
             try
             {
@@ -915,7 +900,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseContextServiceCallback.OnDataBasesReset(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseMetaData[] metaDatas)
+        async void IDataBaseContextEventCallback.OnDataBasesReset(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseMetaData[] metaDatas)
         {
             try
             {
@@ -943,7 +928,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseContextServiceCallback.OnDataBasesAuthenticationEntered(CallbackInfo callbackInfo, string[] dataBaseNames, AuthenticationInfo authenticationInfo)
+        async void IDataBaseContextEventCallback.OnDataBasesAuthenticationEntered(CallbackInfo callbackInfo, string[] dataBaseNames, AuthenticationInfo authenticationInfo)
         {
             try
             {
@@ -967,7 +952,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseContextServiceCallback.OnDataBasesAuthenticationLeft(CallbackInfo callbackInfo, string[] dataBaseNames, AuthenticationInfo authenticationInfo)
+        async void IDataBaseContextEventCallback.OnDataBasesAuthenticationLeft(CallbackInfo callbackInfo, string[] dataBaseNames, AuthenticationInfo authenticationInfo)
         {
             try
             {
@@ -993,7 +978,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseContextServiceCallback.OnDataBasesInfoChanged(CallbackInfo callbackInfo, DataBaseInfo[] dataBaseInfos)
+        async void IDataBaseContextEventCallback.OnDataBasesInfoChanged(CallbackInfo callbackInfo, DataBaseInfo[] dataBaseInfos)
         {
             try
             {
@@ -1020,7 +1005,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseContextServiceCallback.OnDataBasesStateChanged(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseState[] dataBaseStates)
+        async void IDataBaseContextEventCallback.OnDataBasesStateChanged(CallbackInfo callbackInfo, string[] dataBaseNames, DataBaseState[] dataBaseStates)
         {
             try
             {
@@ -1048,7 +1033,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseContextServiceCallback.OnDataBasesAccessChanged(CallbackInfo callbackInfo, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes)
+        async void IDataBaseContextEventCallback.OnDataBasesAccessChanged(CallbackInfo callbackInfo, AccessChangeType changeType, AccessInfo[] accessInfos, string[] memberIDs, AccessType[] accessTypes)
         {
             try
             {
@@ -1094,7 +1079,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseContextServiceCallback.OnDataBasesLockChanged(CallbackInfo callbackInfo, LockChangeType changeType, LockInfo[] lockInfos, string[] comments)
+        async void IDataBaseContextEventCallback.OnDataBasesLockChanged(CallbackInfo callbackInfo, LockChangeType changeType, LockInfo[] lockInfos, string[] comments)
         {
             try
             {
@@ -1110,7 +1095,7 @@ namespace Ntreev.Crema.Services.Data
                             var dataBase = this[lockInfo.Path];
                             if (changeType == LockChangeType.Unlock)
                                 lockInfo.Path = string.Empty;
-                            dataBase.SetLockInfo( lockInfo);
+                            dataBase.SetLockInfo(lockInfo);
                             dataBases[i] = dataBase;
                         }
                         switch (changeType)
@@ -1131,7 +1116,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        async void IDataBaseContextServiceCallback.OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs)
+        async void IDataBaseContextEventCallback.OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs)
         {
             try
             {

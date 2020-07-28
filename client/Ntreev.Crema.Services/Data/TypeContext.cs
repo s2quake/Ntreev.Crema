@@ -16,8 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
+using Ntreev.Crema.ServiceHosts.Data;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.DataBaseService;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Library.ObjectModel;
 using System;
@@ -181,20 +181,11 @@ namespace Ntreev.Crema.Services.Data
             this.OnItemsChanged(new ItemsEventArgs<ITypeItem>(authentication, items));
         }
 
-        public TypeCollection Types
-        {
-            get { return this.Items; }
-        }
+        public TypeCollection Types => this.Items;
 
-        public IDataBaseService Service
-        {
-            get { return this.DataBase.Service; }
-        }
+        public IDataBaseService Service => this.DataBase.Service;
 
-        public CremaHost CremaHost
-        {
-            get { return this.DataBase.CremaHost; }
-        }
+        public CremaHost CremaHost => this.DataBase.CremaHost;
 
         public DataBase DataBase
         {
@@ -206,15 +197,9 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.dataBase?.Dispatcher; }
-        }
+        public CremaDispatcher Dispatcher => this.dataBase?.Dispatcher;
 
-        public new ITypeItem this[string itemPath]
-        {
-            get { return base[itemPath] as ITypeItem; }
-        }
+        public new ITypeItem this[string itemPath] => base[itemPath] as ITypeItem;
 
         public event ItemsCreatedEventHandler<ITypeItem> ItemsCreated
         {

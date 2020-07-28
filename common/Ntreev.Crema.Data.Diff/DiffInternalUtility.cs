@@ -54,6 +54,8 @@ namespace Ntreev.Crema.Data.Diff
             diffSource2.EndLoadData();
         }
 
+        public static char[] WordSeparaters { get; } = { ' ', '\t', '.', '(', ')', '{', '}', ',', '!' };
+
         private static void FillMember(CremaDataType diffType, CremaDataType dataType, List<DiffPiece> lines)
         {
             var index = 0;
@@ -290,7 +292,7 @@ namespace Ntreev.Crema.Data.Diff
                 text = text.Replace(item.ToString(), $"%{(int)item}");
             }
 
-            foreach (var item in SideBySideDiffBuilder.WordSeparaters)
+            foreach (var item in WordSeparaters)
             {
                 text = text.Replace(item.ToString(), $"%{(int)item}");
             }

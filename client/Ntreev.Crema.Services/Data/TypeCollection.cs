@@ -16,8 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
+using Ntreev.Crema.ServiceHosts.Data;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.DataBaseService;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
 using Ntreev.Library.Linq;
@@ -74,7 +74,7 @@ namespace Ntreev.Crema.Services.Data
                     this.CremaHost.DebugMethod(authentication, this, nameof(CopyAsync), typeName, newTypeName, categoryPath);
                 });
                 var taskID = GuidUtility.FromName(categoryPath + newTypeName);
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Context.Service.CopyType(typeName, newTypeName, categoryPath));
+                var result = await this.Context.Service.CopyTypeAsync(typeName, newTypeName, categoryPath);
                 var typeInfo = result.Value;
                 await this.DataBase.WaitAsync(taskID);
                 return await this.Dispatcher.InvokeAsync(() => this[typeInfo.Name, typeInfo.CategoryPath]);

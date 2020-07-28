@@ -115,6 +115,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts.Sharing", "common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.shproj", "{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems*{0261747b-0a44-4fb0-8e27-2ce4baf2153b}*SharedItemsImports = 5
@@ -126,9 +128,11 @@ Global
 		common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.projitems*{24ecbee1-2859-4f09-969b-f382e6341814}*SharedItemsImports = 13
 		common\Ntreev.Crema.Bot.Sharing\Ntreev.Crema.Bot.Sharing.projitems*{35ad4803-bec1-4f3e-98ab-5c7961f2c261}*SharedItemsImports = 13
 		common\Ntreev.Crema.Commands.Sharing\Ntreev.Crema.Commands.Sharing.projitems*{3d3128aa-908d-44c4-9efd-0e1a903f5287}*SharedItemsImports = 13
+		common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.projitems*{6baf8a0b-5b3e-40ea-8e96-c667df63516c}*SharedItemsImports = 13
 		common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems*{97ad6c00-3b71-4e83-97c3-0201bc035471}*SharedItemsImports = 13
 		common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.projitems*{9ed00a26-bf13-4b1f-af6e-3009c666ae15}*SharedItemsImports = 5
 		common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.projitems*{a4955825-195f-4677-9695-5fc67362a449}*SharedItemsImports = 13
+		common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.projitems*{a7bf94f7-94a5-46ba-a756-c04bde65f47b}*SharedItemsImports = 5
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{ad0eba0c-d167-4722-a2a7-82b17e1fc9aa}*SharedItemsImports = 13
 		common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.projitems*{b7b4c207-7729-4147-96c4-b55e85647a66}*SharedItemsImports = 5
 	EndGlobalSection
@@ -295,6 +299,7 @@ Global
 		{0261747B-0A44-4FB0-8E27-2CE4BAF2153B} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
 		{20C3D3DD-DE99-4126-9449-BCA12E4D255D} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
 		{4A8417DD-9882-4FC1-B471-06905354545D} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
+		{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C} = {F24B626E-02A8-431A-9319-C71D978C7328}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {081892D7-815F-41E8-91E5-C26BA161204B}

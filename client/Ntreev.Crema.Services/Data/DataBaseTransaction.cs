@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceHosts.Data;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.DataBaseContextService;
 using Ntreev.Crema.Services.Domains;
 using System;
 using System.Threading.Tasks;
@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task BeginAsync(Authentication authentication)
         {
-            var result = await this.CremaHost.InvokeServiceAsync(() => this.service.BeginTransaction(this.dataBase.Name));
+            var result = await this.service.BeginTransactionAsync(this.dataBase.Name);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.CremaHost.Sign(authentication, result);
@@ -52,7 +52,7 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.service.EndTransaction(this.ID));
+                var result = await this.service.EndTransactionAsync(this.ID);
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -72,7 +72,7 @@ namespace Ntreev.Crema.Services.Data
             try
             {
                 this.ValidateExpired();
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.service.CancelTransaction(this.ID));
+                var result = await this.service.CancelTransactionAsync(this.ID);
 
                 await this.dataBase.Dispatcher.InvokeAsync(() =>
                 {

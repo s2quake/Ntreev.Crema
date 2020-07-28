@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceHosts.Data;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.DataBaseService;
 using Ntreev.Library;
 using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
@@ -53,7 +53,7 @@ namespace Ntreev.Crema.Services.Data
                     return new CategoryName(parentPath, name);
                 });
                 var taskID = GuidUtility.FromName(categoryName);
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.NewTypeCategory(categoryName));
+                var result = await this.Service.NewTypeCategoryAsync(categoryName);
                 await this.DataBase.WaitAsync(taskID);
                 return await this.Dispatcher.InvokeAsync(() => this[categoryName]);
             }

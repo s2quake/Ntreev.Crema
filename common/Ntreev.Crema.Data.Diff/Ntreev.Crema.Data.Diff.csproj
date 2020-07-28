@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;net45</TargetFrameworks>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <Version>5.0.20179.0842</Version>
     <AssemblyVersion>5.0</AssemblyVersion>
     <FileVersion>5.0.20179.0842</FileVersion>
@@ -14,7 +14,7 @@
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DiffPlex" Version="1.4.2" />
+    <PackageReference Include="DiffPlex" Version="1.6.3" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>

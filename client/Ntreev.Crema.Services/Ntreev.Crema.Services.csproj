@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;net45</TargetFrameworks>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <Version>5.0.20179.0842</Version>
     <AssemblyVersion>5.0</AssemblyVersion>
     <FileVersion>5.0.20179.0842</FileVersion>
@@ -12,9 +12,19 @@
     <RepositoryUrl>https://github.com/s2quake/Crema</RepositoryUrl>
     <PackageTags>Crema</PackageTags>
     <LangVersion>8.0</LangVersion>
+    <DefineConstants>CLIENT</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Microsoft.Win32.SystemEvents" Version="4.7.0" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="4.5.0" />
+    <PackageReference Include="log4net" Version="2.0.8" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\JSSoft.Communication\JSSoft.Communication\JSSoft.Communication.csproj" />
+    <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
+    <ProjectReference Include="..\..\common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
+    <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
@@ -29,4 +39,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <Import Project="..\..\common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.projitems" Label="Shared" />
+  <Import Project="..\..\common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.projitems" Label="Shared" />
 </Project>

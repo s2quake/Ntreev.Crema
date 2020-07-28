@@ -16,8 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
+using Ntreev.Crema.ServiceHosts.Data;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.DataBaseService;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
 using Ntreev.Library.Linq;
@@ -81,7 +81,7 @@ namespace Ntreev.Crema.Services.Data
                     return table.Name;
                 });
                 var taskID = GuidUtility.FromName(nameof(InheritAsync) + categoryPath + newTableName + copyContent);
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.InheritTable(name, newTableName, categoryPath, copyContent));
+                var result = await this.Service.InheritTableAsync(name, newTableName, categoryPath, copyContent);
                 var tableInfos = result.Value;
                 await this.DataBase.WaitAsync(taskID);
                 return await this.Dispatcher.InvokeAsync(() => tableInfos.Select(item => this[item.Name]).ToArray());
@@ -105,7 +105,7 @@ namespace Ntreev.Crema.Services.Data
                     return table.Name;
                 });
                 var taskID = GuidUtility.FromName(nameof(CopyAsync) + categoryPath + newTableName + copyContent);
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.CopyTable(name, newTableName, categoryPath, copyContent));
+                var result = await this.Service.CopyTableAsync(name, newTableName, categoryPath, copyContent);
                 var tableInfos = result.Value;
                 await this.DataBase.WaitAsync(taskID);
                 return await this.Dispatcher.InvokeAsync(() => tableInfos.Select(item => this[item.Name]).ToArray());

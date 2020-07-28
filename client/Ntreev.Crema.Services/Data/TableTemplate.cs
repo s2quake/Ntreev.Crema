@@ -16,8 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
+using Ntreev.Crema.ServiceHosts.Data;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.DataBaseService;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Library.Linq;
 using System;
@@ -81,17 +81,17 @@ namespace Ntreev.Crema.Services.Data
 
         protected override Task<ResultBase<DomainMetaData>> OnBeginDomainAsync(Authentication authentication)
         {
-            return this.CremaHost.InvokeServiceAsync(() => this.Service.BeginTableTemplateEdit(this.table.Name));
+            return this.Service.BeginTableTemplateEditAsync(this.table.Name);
         }
 
         protected override async Task<ResultBase<TableInfo[]>> OnEndDomainAsync(Authentication authentication)
         {
-            return await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTableTemplateEdit(this.Domain.ID));
+            return await this.Service.EndTableTemplateEditAsync(this.Domain.ID);
         }
 
         protected override async Task<ResultBase> OnCancelDomainAsync(Authentication authentication)
         {
-            return await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTableTemplateEdit(this.Domain.ID));
+            return await this.Service.CancelTableTemplateEditAsync(this.Domain.ID);
         }
 
         private TableCollection Container => this.table.Container;

@@ -38,22 +38,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         }
 
-        public virtual object Instance
-        {
-            get { return this; }
-        }
-
-        public ConsoleCommandContextBase CommandContext
-        {
-            get;
-            internal set;
-        }
-
-        [Obsolete]
-        public TextWriter Out
-        {
-            get { return this.CommandContext.Out; }
-        }
+        public new ConsoleCommandContextBase CommandContext => base.CommandContext as ConsoleCommandContextBase;
 
         #region IConsoleCommand
 
@@ -75,22 +60,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         }
 
-        public virtual object Instance
-        {
-            get { return this; }
-        }
-
-        public ConsoleCommandContextBase CommandContext
-        {
-            get;
-            internal set;
-        }
-
-        [Obsolete]
-        public TextWriter Out
-        {
-            get { return this.CommandContext.Out; }
-        }
+        public new ConsoleCommandContextBase CommandContext => base.CommandContext as ConsoleCommandContextBase;
 
         #region IConsoleCommand
 

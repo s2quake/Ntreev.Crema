@@ -22,8 +22,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ntreev.Crema.Data;
+using Ntreev.Crema.ServiceHosts.Data;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.DataBaseService;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Library;
 
@@ -186,7 +186,7 @@ namespace Ntreev.Crema.Services.Data
 
             public async Task<SignatureDate> BeginContentAsync(Authentication authentication, string name)
             {
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.BeginTableContentEdit(name));
+                var result = await this.Service.BeginTableContentEditAsync(name);
                 this.CremaHost.Sign(authentication, result);
                 if (this.domain == null)
                 {
@@ -222,7 +222,7 @@ namespace Ntreev.Crema.Services.Data
                 try
                 {
                     this.domain.Host = null;
-                    await this.CremaHost.InvokeServiceAsync(() => this.Service.EndTableContentEdit(this.domain.ID));
+                    await this.Service.EndTableContentEditAsync(this.domain.ID);
                     await this.DomainContext.WaitDeleteAsync(this.domain);
                 }
                 catch
@@ -237,7 +237,7 @@ namespace Ntreev.Crema.Services.Data
                 try
                 {
                     this.domain.Host = null;
-                    await this.CremaHost.InvokeServiceAsync(() => this.Service.CancelTableContentEdit(this.domain.ID));
+                    await this.Service.CancelTableContentEditAsync(this.domain.ID);
                     await this.DomainContext.WaitDeleteAsync(this.domain);
                 }
                 catch
@@ -297,7 +297,7 @@ namespace Ntreev.Crema.Services.Data
 
             public async Task EnterContentAsync(Authentication authentication)
             {
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.EnterTableContentEdit(this.domain.ID));
+                var result = await this.Service.EnterTableContentEditAsync(this.domain.ID);
                 await this.domain.Dispatcher.InvokeAsync(this.AttachDomainEvent);
                 await this.domain.WaitUserEnterAsync(authentication);
                 await this.domain.DataDispatcher.InvokeAsync(() =>
@@ -316,7 +316,7 @@ namespace Ntreev.Crema.Services.Data
 
             public async Task LeaveContentAsync(Authentication authentication)
             {
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.LeaveTableContentEdit(this.domain.ID));
+                var result = await this.Service.LeaveTableContentEditAsync(this.domain.ID);
                 await this.domain.WaitUserLeaveAsync(authentication);
                 await this.domain.Dispatcher.InvokeAsync(this.DetachDomainEvent);
                 await this.Dispatcher.InvokeAsync(() =>

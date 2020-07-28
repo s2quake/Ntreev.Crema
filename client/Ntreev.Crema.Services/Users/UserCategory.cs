@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceHosts.Users;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.UserContextService;
 using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 using System;
@@ -44,7 +44,7 @@ namespace Ntreev.Crema.Services.Users
                     var path = base.Path;
                     return (items, oldNames, oldPaths, path);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.RenameUserItem(tuple.path, name));
+                var result = await this.Service.RenameUserItemAsync(tuple.path, name);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -69,7 +69,7 @@ namespace Ntreev.Crema.Services.Users
                     var path = base.Path;
                     return (items, oldPaths, oldParentPaths, path);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.MoveUserItem(tuple.path, parentPath));
+                var result = await this.Service.MoveUserItemAsync(tuple.path, parentPath);
                 await this.Context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }
@@ -94,7 +94,7 @@ namespace Ntreev.Crema.Services.Users
                     var path = base.Path;
                     return (items, oldPaths, path);
                 });
-                var result = await this.CremaHost.InvokeServiceAsync(() => this.Service.DeleteUserItem(tuple.path));
+                var result = await this.Service.DeleteUserItemAsync(tuple.path);
                 await context.WaitAsync(result.TaskID);
                 return result.TaskID;
             }

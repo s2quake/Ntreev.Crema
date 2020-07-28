@@ -15,9 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceHosts.Domains;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Data;
-using Ntreev.Crema.Services.DomainContextService;
 using Ntreev.Crema.Services.Users;
 using Ntreev.Library;
 using Ntreev.Library.IO;
@@ -33,13 +33,10 @@ using System.Timers;
 
 namespace Ntreev.Crema.Services.Domains
 {
-    [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     class DomainContext : ItemContext<Domain, DomainCategory, DomainCollection, DomainCategoryCollection, DomainContext>,
-        IDomainContextServiceCallback, IDomainContext, IServiceProvider
+        IDomainContextEventCallback, IDomainContext, IServiceProvider
     {
-        private DomainContextServiceClient service;
         private bool isDisposed;
-        private PingTimer pingTimer;
 
         private ItemsCreatedEventHandler<IDomainItem> itemsCreated;
         private ItemsRenamedEventHandler<IDomainItem> itemsRenamed;
@@ -62,21 +59,12 @@ namespace Ntreev.Crema.Services.Domains
             this.callbackEvent = new IndexedDispatcher(this);
         }
 
-        public async Task InitializeAsync(string address, Guid authenticationToken, int port, int timeout)
+        public async Task InitializeAsync(Guid authenticationToken)
         {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                var binding = CremaHost.CreateBinding();
-                var endPointAddress = new EndpointAddress($"net.tcp://{address}:{port}/DomainContextService");
-                var instanceContext = new InstanceContext(this);
-                this.service = new DomainContextServiceClient(instanceContext, binding, endPointAddress);
-                this.service.Open(this.CloseAsync);
-            });
-            var result = await this.CremaHost.InvokeServiceAsync(() => this.service.Subscribe(authenticationToken));
+            var result = await this.Service.SubscribeAsync(authenticationToken);
             await this.Dispatcher.InvokeAsync(() =>
             {
                 var metaData = result.Value;
-                this.pingTimer = new PingTimer(this.service.IsAlive, timeout);
                 this.metaData = metaData;
                 this.Initialize(metaData);
             });
@@ -142,11 +130,8 @@ namespace Ntreev.Crema.Services.Domains
             if (result == false)
                 return;
 
-            this.service.Unsubscribe(closeInfo.Reason);
-            this.pingTimer.Dispose();
-            this.pingTimer = null;
+            await this.Service.UnsubscribeAsync();
             await Task.Delay(100);
-            this.service.CloseService(closeInfo.Reason);
             var tasks = await this.Dispatcher.InvokeAsync(() =>
             {
                 var taskList = new List<Task>(this.Domains.Count);
@@ -162,7 +147,6 @@ namespace Ntreev.Crema.Services.Domains
             await Task.WhenAll(tasks);
             await this.Dispatcher.DisposeAsync();
             await this.callbackEvent.DisposeAsync();
-            this.service = null;
             this.Dispatcher = null;
         }
 
@@ -245,7 +229,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public CremaDispatcher CallbackDispatcher { get; set; }
 
-        public IDomainContextService Service => this.service;
+        public IDomainContextService Service { get; set; }
 
         public event ItemsCreatedEventHandler<IDomainItem> ItemsCreated
         {
@@ -451,14 +435,14 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        #region IDomainContextServiceCallback
+        #region IDomainContextEventCallback
 
-        async void IDomainContextServiceCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
+        async void IDomainContextEventCallback.OnServiceClosed(CallbackInfo callbackInfo, CloseInfo closeInfo)
         {
             await this.CloseAsync(closeInfo);
         }
 
-        async void IDomainContextServiceCallback.OnDomainsCreated(CallbackInfo callbackInfo, DomainMetaData[] metaDatas)
+        async void IDomainContextEventCallback.OnDomainsCreated(CallbackInfo callbackInfo, DomainMetaData[] metaDatas)
         {
             try
             {
@@ -477,7 +461,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnDomainsDeleted(CallbackInfo callbackInfo, Guid[] domainIDs, bool[] isCanceleds, object[] results)
+        async void IDomainContextEventCallback.OnDomainsDeleted(CallbackInfo callbackInfo, Guid[] domainIDs, bool[] isCanceleds, object[] results)
         {
             try
             {
@@ -511,7 +495,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnDomainInfoChanged(CallbackInfo callbackInfo, Guid domainID, DomainInfo domainInfo)
+        async void IDomainContextEventCallback.OnDomainInfoChanged(CallbackInfo callbackInfo, Guid domainID, DomainInfo domainInfo)
         {
             try
             {
@@ -531,7 +515,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnDomainStateChanged(CallbackInfo callbackInfo, Guid domainID, DomainState domainState)
+        async void IDomainContextEventCallback.OnDomainStateChanged(CallbackInfo callbackInfo, Guid domainID, DomainState domainState)
         {
             try
             {
@@ -551,7 +535,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnUserAdded(CallbackInfo callbackInfo, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState, byte[] data, Guid taskID)
+        async void IDomainContextEventCallback.OnUserAdded(CallbackInfo callbackInfo, Guid domainID, DomainUserInfo domainUserInfo, DomainUserState domainUserState, byte[] data, Guid taskID)
         {
             try
             {
@@ -571,7 +555,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnUserRemoved(CallbackInfo callbackInfo, Guid domainID, string userID, string ownerID, RemoveInfo removeInfo, Guid taskID)
+        async void IDomainContextEventCallback.OnUserRemoved(CallbackInfo callbackInfo, Guid domainID, string userID, string ownerID, RemoveInfo removeInfo, Guid taskID)
         {
             try
             {
@@ -593,7 +577,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnUserLocationChanged(CallbackInfo callbackInfo, Guid domainID, DomainLocationInfo domainLocationInfo)
+        async void IDomainContextEventCallback.OnUserLocationChanged(CallbackInfo callbackInfo, Guid domainID, DomainLocationInfo domainLocationInfo)
         {
             try
             {
@@ -614,7 +598,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnUserStateChanged(CallbackInfo callbackInfo, Guid domainID, DomainUserState domainUserState)
+        async void IDomainContextEventCallback.OnUserStateChanged(CallbackInfo callbackInfo, Guid domainID, DomainUserState domainUserState)
         {
             try
             {
@@ -635,7 +619,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnUserEditBegun(CallbackInfo callbackInfo, Guid domainID, DomainLocationInfo domainLocationInfo, Guid taskID)
+        async void IDomainContextEventCallback.OnUserEditBegun(CallbackInfo callbackInfo, Guid domainID, DomainLocationInfo domainLocationInfo, Guid taskID)
         {
             try
             {
@@ -656,7 +640,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnUserEditEnded(CallbackInfo callbackInfo, Guid domainID, Guid taskID)
+        async void IDomainContextEventCallback.OnUserEditEnded(CallbackInfo callbackInfo, Guid domainID, Guid taskID)
         {
             try
             {
@@ -677,7 +661,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnOwnerChanged(CallbackInfo callbackInfo, Guid domainID, string ownerID, Guid taskID)
+        async void IDomainContextEventCallback.OnOwnerChanged(CallbackInfo callbackInfo, Guid domainID, string ownerID, Guid taskID)
         {
             try
             {
@@ -698,7 +682,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnRowAdded(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows, Guid taskID)
+        async void IDomainContextEventCallback.OnRowAdded(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows, Guid taskID)
         {
             try
             {
@@ -719,7 +703,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnRowChanged(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows, Guid taskID)
+        async void IDomainContextEventCallback.OnRowChanged(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows, Guid taskID)
         {
             try
             {
@@ -740,7 +724,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnRowRemoved(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows, Guid taskID)
+        async void IDomainContextEventCallback.OnRowRemoved(CallbackInfo callbackInfo, Guid domainID, DomainRowInfo[] rows, Guid taskID)
         {
             try
             {
@@ -761,7 +745,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnPropertyChanged(CallbackInfo callbackInfo, Guid domainID, string propertyName, object value, Guid taskID)
+        async void IDomainContextEventCallback.OnPropertyChanged(CallbackInfo callbackInfo, Guid domainID, string propertyName, object value, Guid taskID)
         {
             try
             {
@@ -782,7 +766,7 @@ namespace Ntreev.Crema.Services.Domains
             }
         }
 
-        async void IDomainContextServiceCallback.OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs)
+        async void IDomainContextEventCallback.OnTaskCompleted(CallbackInfo callbackInfo, Guid[] taskIDs)
         {
             try
             {

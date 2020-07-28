@@ -16,7 +16,6 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
-using Ntreev.Crema.Services.DataBaseService;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data;
 using Ntreev.Library.ObjectModel;
@@ -27,12 +26,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library.IO;
 using System.Collections.Generic;
 using Ntreev.Library;
 using Ntreev.Crema.Services.Properties;
+using Ntreev.Crema.ServiceHosts.Data;
 
 namespace Ntreev.Crema.Services.Data
 {
