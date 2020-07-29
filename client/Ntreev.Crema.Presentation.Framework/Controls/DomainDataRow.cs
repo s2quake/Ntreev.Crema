@@ -243,7 +243,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
         private async void Delete_Execute(object sender, ExecutedRoutedEventArgs e)
         {
-            if (AppMessageBox.ShowQuestion(Properties.Resources.Message_ConfirmToDeleteRow) == false)
+            if (await AppMessageBox.ShowQuestionAsync(Properties.Resources.Message_ConfirmToDeleteRow) == false)
                 return;
 
             try
@@ -252,7 +252,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
             catch (Exception ex)
             {
-                AppMessageBox.ShowError(ex);
+                await AppMessageBox.ShowErrorAsync(ex);
             }
         }
 

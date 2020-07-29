@@ -345,9 +345,9 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             e.CanExecute = this.CanReset;
         }
 
-        private void Reset_Execute(object sender, ExecutedRoutedEventArgs e)
+        private async void Reset_Execute(object sender, ExecutedRoutedEventArgs e)
         {
-            if (AppMessageBox.ShowQuestion(Properties.Resources.Message_ConfirmToResetField) == false)
+            if (await AppMessageBox.ShowQuestion(Properties.Resources.Message_ConfirmToResetField) == false)
                 return;
 
             this.RequestReset();
@@ -368,7 +368,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
@@ -386,7 +386,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
@@ -398,11 +398,11 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
             catch (Exception ex)
             {
-                AppMessageBox.ShowError(ex);
+                await AppMessageBox.ShowErrorAsync(ex);
             }
         }
 
-        private void RequestPasteFromClipboard()
+        private async void RequestPasteFromClipboard()
         {
             try
             {
@@ -410,7 +410,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
             catch (Exception ex)
             {
-                AppMessageBox.ShowError(ex);
+                await AppMessageBox.ShowErrorAsync(ex);
             }
         }
 
@@ -431,7 +431,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
                 this.DisplayContent = null;
                 this.EditingContent = this.Content;
                 this.IsContentUpdating = false;

@@ -133,7 +133,7 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

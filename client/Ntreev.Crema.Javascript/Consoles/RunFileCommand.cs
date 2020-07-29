@@ -41,8 +41,7 @@ namespace Ntreev.Crema.Javascript.Consoles
 
         }
 
-        [CommandProperty(IsRequired = true)]
-        [DefaultValue("")]
+        [CommandPropertyRequired(DefaultValue = "")]
         public string Filename
         {
             get; set;

@@ -74,12 +74,12 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
                 this.BeginProgress(Resources.Message_CopingDataBase);
                 await this.dataBase.CopyAsync(this.authentication, this.DataBaseName, this.Comment, false);
                 this.EndProgress();
-                this.TryClose(true);
-                AppMessageBox.Show(Resources.Message_CopiedDataBase);
+                await this.TryCloseAsync(true);
+                await AppMessageBox.ShowAsync(Resources.Message_CopiedDataBase);
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
                 this.EndProgress();
             }
         }
@@ -129,12 +129,6 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
                     return false;
                 return NameValidator.VerifyName(this.DataBaseName);
             }
-        }
-
-        protected override void OnProgress()
-        {
-            base.OnProgress();
-            this.NotifyOfPropertyChange(nameof(this.CanCopy));
         }
     }
 }

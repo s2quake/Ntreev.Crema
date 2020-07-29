@@ -64,7 +64,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
                 try
                 {
                     var dialog = await dataBase.Dispatcher.InvokeAsync(() => new LogViewModel(authentication, dataBase));
-                    if (dialog.ShowDialog() == true)
+                    if (await dialog.ShowDialogAsync() == true)
                         return dialog;
                     return null;
                 }
@@ -77,9 +77,9 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             throw new NotImplementedException();
         }
 
-        public void Close()
+        public async void Close()
         {
-            this.TryClose(true);
+            await this.TryCloseAsync(true);
         }
 
         //public void Preview()
@@ -143,8 +143,8 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
-                this.TryClose();
+                await AppMessageBox.ShowErrorAsync(e);
+                await this.TryCloseAsync();
             }
         }
 

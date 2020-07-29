@@ -30,29 +30,26 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
         [Import]
         private ICremaAppHost cremaAppHost = null;
 
-        public MoveAppViewModel(string currentPath, string[] targetPaths) 
+        public MoveAppViewModel(string currentPath, string[] targetPaths)
             : base(currentPath, targetPaths)
         {
         }
 
-        protected virtual ModalDialogAppScope Scope
-        {
-            get { return ModalDialogAppScope.Loaded; }
-        }
+        protected virtual ModalDialogAppScope Scope => ModalDialogAppScope.Loaded;
 
-        private void CremaAppHost_Unloaded(object sender, EventArgs e)
+        private async void CremaAppHost_Unloaded(object sender, EventArgs e)
         {
             if (this.cremaAppHost != null && this.Scope == ModalDialogAppScope.Loaded)
             {
-                this.Dispatcher.InvokeAsync(() => this.TryClose());
+                await this.TryCloseAsync();
             }
         }
 
-        private void CremaAppHost_Closed(object sender, EventArgs e)
+        private async void CremaAppHost_Closed(object sender, EventArgs e)
         {
             if (this.cremaAppHost != null)
             {
-                this.Dispatcher.InvokeAsync(() => this.TryClose());
+                await this.TryCloseAsync();
             }
         }
 

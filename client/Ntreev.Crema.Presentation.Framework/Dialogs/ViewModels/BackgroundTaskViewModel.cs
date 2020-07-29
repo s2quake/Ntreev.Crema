@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
@@ -41,7 +42,7 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 
         public void Hide()
         {
-            this.TryClose();
+            this.TryCloseAsync();
         }
 
         public void Cancel()
@@ -75,10 +76,9 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
             });
         }
 
-        protected override void OnDeactivate(bool close)
+        protected async override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
-            base.OnDeactivate(close);
-
+            await base.OnDeactivateAsync(close, cancellationToken);
             if (this.task != null && close == true)
             {
                 this.task.ProgressChanged -= Task_ProgressChanged;

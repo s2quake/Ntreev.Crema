@@ -40,19 +40,19 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
             this.PropertyChanged += LockAsyncViewModel_PropertyChanged;
         }
 
-        public async void Lock()
+        public async Task LockAsync()
         {
             try
             {
                 this.BeginProgress(Resources.Message_Locking);
                 await this.LockAsync(this.Comment);
                 this.EndProgress();
-                this.TryClose(true);
+                await this.TryCloseAsync(true);
             }
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
@@ -71,12 +71,6 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
         protected virtual Task LockAsync(string comment)
         {
             return Task.Delay(1);
-        }
-
-        protected override void OnProgress()
-        {
-            base.OnProgress();
-            this.NotifyOfPropertyChange(nameof(this.CanLock));
         }
 
         private void VerifyAction(bool isValid)

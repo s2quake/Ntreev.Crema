@@ -96,7 +96,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <RowDefinition Height="1" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <nmfc:ExpandableToolBar>
+            <nmfc:ModernToolBar>
                 <nmfc:IconButton Source="/Ntreev.Crema.Presentation;component/Images/arrow_up.png" Command="{x:Static ncpc:DiffCommands.PrevDifferenceItem}" />
                 <nmfc:IconButton Source="/Ntreev.Crema.Presentation;component/Images/arrow_down.png" Command="{x:Static ncpc:DiffCommands.NextDifferenceItem}" />
                 <nmfc:IconButton Source="/Ntreev.Crema.Presentation;component/Images/arrow_left.png" Command="{x:Static ncpc:DiffCommands.PrevDifferenceField}" />
@@ -109,7 +109,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <Separator />
                 <nmfc:IconButton Source="/Ntreev.Crema.Presentation;component/Images/merge.png" Command="{x:Static ncpc:DiffCommands.Merge}" />
                 <nmfc:IconButton Source="/Ntreev.Crema.Presentation;component/Images/resolve.png" Command="{x:Static ncpc:DiffCommands.Resolve}" />
-            </nmfc:ExpandableToolBar>
+            </nmfc:ModernToolBar>
             <Border Grid.Row="1" BorderThickness="1" BorderBrush="{DynamicResource DataGridGridLines}" />
             <Grid x:Name="grid" Grid.Row="3">
                 <Grid.ColumnDefinitions>

@@ -31,7 +31,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <UserControl.Resources>
        
-        <nmfc:ExpandableContextMenu x:Key="contextMenu"
+        <nmfc:ModernContextMenu x:Key="contextMenu"
                                     DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}"
                                     ItemsSource="{Binding ContextMenus}">
             <MenuItem x:Name="Copy" Style="{StaticResource Copy_MenuItem_Style}" />
@@ -42,7 +42,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <MenuItem x:Name="Unload" Style="{StaticResource Unload_MenuItem_Style}" />
             <Separator />
             <MenuItem x:Name="ViewLog" Style="{StaticResource ViewLog_MenuItem_Style}" />
-        </nmfc:ExpandableContextMenu>
+        </nmfc:ModernContextMenu>
 
         <Style TargetType="{x:Type xcdg:HierarchicalGroupByControl}" BasedOn="{StaticResource {x:Type xcdg:HierarchicalGroupByControl}}">
             <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
@@ -108,7 +108,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         </Grid.RowDefinitions>
 
         <Border BorderThickness="1 1 1 0" BorderBrush="{DynamicResource ItemBorder}">
-            <nmfc:ExpandableToolBar ItemsSource="{Binding ToolBarItems}" />
+            <nmfc:ModernToolBar ItemsSource="{Binding ToolBarItems}" />
         </Border>
 
         <nmgc:ModernDataGridControl x:Name="gridControl" Grid.Row="1" ItemsSource="{Binding ItemsSource}" ReadOnly="True" 

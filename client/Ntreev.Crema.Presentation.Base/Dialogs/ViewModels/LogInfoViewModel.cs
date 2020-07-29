@@ -68,7 +68,11 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 
         public new IEnumerable<IMenuItem> ContextMenus
         {
-            get { return MenuItemUtility.GetMenuItems<IMenuItem>(this, this.dataBase); }
+            get 
+            {
+                throw new NotImplementedException();
+                //return MenuItemUtility.GetMenuItems<IMenuItem>(this, this.dataBase); 
+            }
         }
 
         #region IInfoProvider

@@ -51,7 +51,7 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 
         public virtual void Rename()
         {
-            this.TryClose(this.CanLock);
+            this.TryCloseAsync(this.CanLock);
         }
 
         public string Comment

@@ -31,7 +31,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
         <DataTemplate x:Key="ListBox_ItemTemplate">
             <DataTemplate.Resources>
-                <nmfc:ExpandableContextMenu x:Key="ListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}" />
+                <nmfc:ModernContextMenu x:Key="ListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}" />
             </DataTemplate.Resources>
             <DockPanel Background="Transparent" Margin="2" ContextMenu="{StaticResource ListBoxItem_ContextMenu}">
                 <StackPanel Orientation="Horizontal">

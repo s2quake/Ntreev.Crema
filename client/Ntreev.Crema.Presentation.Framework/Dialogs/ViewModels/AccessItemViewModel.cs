@@ -51,7 +51,7 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 
         public async Task DeleteAsync()
         {
-            if (AppMessageBox.ConfirmDelete() == false)
+            if (await AppMessageBox.ConfirmDeleteAsync() == false)
                 return;
             try
             {
@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
@@ -120,7 +120,7 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
             catch (Exception e)
             {
                 this.accessType = oldValue;
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
             finally
             {

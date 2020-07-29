@@ -58,7 +58,8 @@ namespace Ntreev.Crema.Presentation.Framework.Converters
                     }
                     else if (propertyName == IsContentEditor)
                     {
-                        return TableDescriptorUtility.IsContentEditor(Authenticator.Current, descriptor);
+                        throw new NotImplementedException();
+                        //return TableDescriptorUtility.IsContentEditor(Authenticator.Current, descriptor);
                     }
                     else if (propertyName == IsBeingSetup)
                     {
@@ -66,7 +67,8 @@ namespace Ntreev.Crema.Presentation.Framework.Converters
                     }
                     else if (propertyName == IsTemplateEditor)
                     {
-                        return TableDescriptorUtility.IsTemplateEditor(Authenticator.Current, descriptor);
+                        throw new NotImplementedException();
+                        //return TableDescriptorUtility.IsTemplateEditor(Authenticator.Current, descriptor);
                     }
                     else if (propertyName == IsInherited)
                     {

@@ -16,9 +16,9 @@
     <OutputPath>..\..\bin\$(Configuration)\$(TargetFramework)\cremaserver\plugins\Spreadsheet</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.87.1" />
+    <PackageReference Include="ClosedXML" Version="0.95.0" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.11.0" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
@@ -37,4 +37,5 @@
     <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
   </ItemGroup>
+  <Import Project="..\Ntreev.Crema.Commands.Spreadsheet.Sharing\Ntreev.Crema.Commands.Spreadsheet.Sharing.projitems" Label="Shared" />
 </Project>

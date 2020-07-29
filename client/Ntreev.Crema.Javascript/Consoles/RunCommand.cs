@@ -41,10 +41,9 @@ namespace Ntreev.Crema.Javascript.Consoles
 
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired(DefaultValue = "")]
         [CommandPropertyTrigger(nameof(Filename), "")]
         [CommandPropertyTrigger(nameof(List), false)]
-        [DefaultValue("")]
         public string Scripts
         {
             get; set;

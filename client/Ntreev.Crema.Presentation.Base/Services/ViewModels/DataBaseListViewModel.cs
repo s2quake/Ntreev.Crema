@@ -49,12 +49,14 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
         {
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;
+            throw new NotImplementedException();
+            //protected override void OnPartImportsSatisfied() 밑에 주석
         }
 
         public async void SelectDataBase()
         {
             var dialog = new SelectDataBaseViewModel(this.authenticator, this.CremaAppHost);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             try
@@ -63,7 +65,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
@@ -78,7 +80,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
@@ -113,16 +115,17 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             }
         }
 
-        protected override void OnPartImportsSatisfied()
-        {
-            base.OnPartImportsSatisfied();
-            this.AttachPropertyService(this.propertyService);
-            this.Dispatcher.InvokeAsync(() =>
-            {
-                this.CremaAppHost.Loaded += CremaAppHost_Loaded;
-                this.CremaAppHost.Unloaded += CremaAppHost_Unloaded;
-            });
-        }
+        //TODO:
+        //protected override void OnPartImportsSatisfied()
+        //{
+        //    base.OnPartImportsSatisfied();
+        //    this.AttachPropertyService(this.propertyService);
+        //    this.Dispatcher.InvokeAsync(() =>
+        //    {
+        //        this.CremaAppHost.Loaded += CremaAppHost_Loaded;
+        //        this.CremaAppHost.Unloaded += CremaAppHost_Unloaded;
+        //    });
+        //}
 
         protected override void OnSelectionChanged(EventArgs e)
         {

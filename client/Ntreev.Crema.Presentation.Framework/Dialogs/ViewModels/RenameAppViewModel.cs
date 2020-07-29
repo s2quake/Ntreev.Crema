@@ -36,24 +36,21 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 
         }
 
-        protected virtual ModalDialogAppScope Scope
-        {
-            get { return ModalDialogAppScope.Loaded; }
-        }
+        protected virtual ModalDialogAppScope Scope => ModalDialogAppScope.Loaded;
 
-        private void CremaAppHost_Unloaded(object sender, EventArgs e)
+        private async void CremaAppHost_Unloaded(object sender, EventArgs e)
         {
             if (this.cremaAppHost != null && this.Scope == ModalDialogAppScope.Loaded)
             {
-                this.Dispatcher.InvokeAsync(() => this.TryClose());
+                await this.TryCloseAsync();
             }
         }
 
-        private void CremaAppHost_Closed(object sender, EventArgs e)
+        private async void CremaAppHost_Closed(object sender, EventArgs e)
         {
             if (this.cremaAppHost != null)
             {
-                this.Dispatcher.InvokeAsync(() => this.TryClose());
+                await this.TryCloseAsync();
             }
         }
 

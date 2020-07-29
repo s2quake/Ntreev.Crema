@@ -29,28 +29,28 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <DataTemplate DataType="{x:Type ncf:TableListItemBase}">
         <DataTemplate.Resources>
-            <nmfc:ExpandableContextMenu x:Key="TableListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}" />
+            <nmfc:ModernContextMenu x:Key="TableListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}" />
         </DataTemplate.Resources>
         <ContentControl Style="{StaticResource TableDescriptor_ContentControl_Style}" ContextMenu="{StaticResource TableListBoxItem_ContextMenu}" />
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type ncf:TypeListItemBase}">
         <DataTemplate.Resources>
-            <nmfc:ExpandableContextMenu x:Key="TypeListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}" />
+            <nmfc:ModernContextMenu x:Key="TypeListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}" />
         </DataTemplate.Resources>
         <ContentControl Style="{StaticResource TypeDescriptor_ContentControl_Style}" ContextMenu="{StaticResource TypeListBoxItem_ContextMenu}" />
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type ncf:DomainUserListItemBase}">
         <DataTemplate.Resources>
-            <nmfc:ExpandableContextMenu x:Key="DomainUserListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}" />
+            <nmfc:ModernContextMenu x:Key="DomainUserListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}" />
         </DataTemplate.Resources>
         <ContentControl Style="{StaticResource DomainUserDescriptor_ContentControl_Style}" ContextMenu="{StaticResource DomainUserListBoxItem_ContextMenu}" />
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type ncf:DomainListItemBase}">
         <DataTemplate.Resources>
-            <nmfc:ExpandableContextMenu x:Key="DomainListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}" />
+            <nmfc:ModernContextMenu x:Key="DomainListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}" />
         </DataTemplate.Resources>
         <ContentControl Style="{StaticResource DomainDescriptor_ContentControl_Style}" ContextMenu="{StaticResource DomainListBoxItem_ContextMenu}" />
     </DataTemplate>

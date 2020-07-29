@@ -57,7 +57,7 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
         protected async override void OnExecute(object parameter)
         {
             var dialog = new SelectDataBaseViewModel(this.authenticator, this.cremaAppHost);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             await DataBaseUtility.CopyAsync(this.authenticator, dialog.SelectedItem);

@@ -59,16 +59,16 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
         protected async override void OnExecute(object parameter)
         {
             var dialog = new SelectDataBaseViewModel(this.authenticator, this.cremaAppHost, (s) => DataBaseDescriptorUtility.IsLoaded(this.authenticator, s) == false);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             if (DataBaseDescriptorUtility.IsLoaded(this.authenticator, dialog.SelectedItem) == true)
             {
-                AppMessageBox.Show("현재 사용중인 데이터베이스는 삭제할 수 없습니다.");
+                await AppMessageBox.ShowAsync("현재 사용중인 데이터베이스는 삭제할 수 없습니다.");
                 return;
             }
 
-            if (new DeleteViewModel().ShowDialog() != true)
+            if (await new DeleteViewModel().ShowDialogAsync() != true)
                 return;
 
             await DataBaseUtility.DeleteAsync(this.authenticator, dialog.SelectedItem);

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Caliburn.Micro;
 
-namespace Ntreev.Crema.Client.Framework
+namespace Ntreev.Crema.Presentation.Framework
 {
     //public interface IDialogManager
     //{

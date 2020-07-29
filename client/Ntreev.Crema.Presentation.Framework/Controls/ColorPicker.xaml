@@ -25,7 +25,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <UserControl.Resources>
         <nmfv:ColorToBrushConverter x:Key="colorToBrushConverter" />
-        <Style TargetType="{x:Type nmfc:BrowserExpander}" BasedOn="{StaticResource {x:Type nmfc:BrowserExpander}}">
+        <Style TargetType="{x:Type nmfc:ModernExpander}" BasedOn="{StaticResource {x:Type nmfc:ModernExpander}}">
             <Setter Property="Background" Value="{Binding CurrentColor, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Converter={StaticResource colorToBrushConverter}}" />
         </Style>
         <Style x:Key="ButtonFocusVisual1">
@@ -161,7 +161,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     </UserControl.Resources>
     <Border BorderThickness="1">
         <StackPanel Orientation="Vertical">
-            <nmfc:BrowserExpander IsExpanded="True" Header="Modern Colors" Padding="0 3">
+            <nmfc:ModernExpander IsExpanded="True" Header="Modern Colors" Padding="0 3">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Button Style="{StaticResource ColorButtonStyleFirstRow}" Background="#a4c400" CommandParameter="#a4c400" Margin="3" />
@@ -188,8 +188,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                         <Button Style="{StaticResource ColorButtonStyleFirstRow}" Background="#87794e" CommandParameter="#87794e" Margin="3" />
                     </StackPanel>
                 </StackPanel>
-            </nmfc:BrowserExpander>
-            <nmfc:BrowserExpander IsExpanded="True" Header="Theme Colors" Padding="0 3">
+            </nmfc:ModernExpander>
+            <nmfc:ModernExpander IsExpanded="True" Header="Theme Colors" Padding="0 3">
                 <StackPanel>
                     <StackPanel SnapsToDevicePixels="True" x:Name="FirstRow" Margin="2,0,0,0" Orientation="Horizontal">
                         <Button Style="{StaticResource ColorButtonStyleFirstRow}" Background="#d08f25" CommandParameter="#d08f25" Margin="3,4,3,4" />
@@ -264,7 +264,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                         <Button Style="{StaticResource ColorButtonStyle}" Background="#974806" CommandParameter="#974806" Margin="3,0,3,0" />
                     </StackPanel>
                 </StackPanel>
-            </nmfc:BrowserExpander>
+            </nmfc:ModernExpander>
         </StackPanel>
     </Border>
 </UserControl>

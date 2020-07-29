@@ -42,8 +42,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         }
 
-        [CommandProperty(IsRequired = true)]
-        [DefaultValue("")]
+        [CommandPropertyRequired(DefaultValue = "")]
         public DateTimeValue Time
         {
             get; set;

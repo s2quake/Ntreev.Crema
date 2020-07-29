@@ -49,7 +49,7 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
 
         protected override async void OnExecute(object parameter)
         {
-            if (AppMessageBox.ShowQuestion(Resources.Message_Logout) == true)
+            if (await AppMessageBox.ShowQuestionAsync(Resources.Message_Logout) == true)
             {
                 await this.cremaAppHost.LogoutAsync();
             }

@@ -29,27 +29,27 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <HierarchicalDataTemplate DataType="{x:Type vm:UserCategoryTreeViewItemViewModel}" ItemsSource="{Binding Items}">
         <HierarchicalDataTemplate.Resources>
-            <nmfc:ExpandableContextMenu x:Key="Category_ContextMenu" ItemsSource="{Binding ContextMenus}">
+            <nmfc:ModernContextMenu x:Key="Category_ContextMenu" ItemsSource="{Binding ContextMenus}">
                 <MenuItem x:Name="NewFolder" Style="{StaticResource NewFolder_MenuItem_Style}" />
                 <MenuItem x:Name="NewUser" Style="{StaticResource NewUser_MenuItem_Style}" />
                 <MenuItem x:Name="Delete" Style="{StaticResource Delete_MenuItem_Style}" InputGestureText="Del" />
                 <MenuItem x:Name="Move" Style="{StaticResource Move_MenuItem_Style}" />
                 <MenuItem x:Name="Rename" Style="{StaticResource Rename_MenuItem_Style}" InputGestureText="F2" />
-            </nmfc:ExpandableContextMenu>
+            </nmfc:ModernContextMenu>
         </HierarchicalDataTemplate.Resources>
         <ContentControl Style="{StaticResource UserCategoryDescriptor_ContentControl_Style}" ContextMenu="{StaticResource Category_ContextMenu}" />
     </HierarchicalDataTemplate>
 
     <HierarchicalDataTemplate DataType="{x:Type vm:UserTreeViewItemViewModel}" ItemsSource="{Binding Items}">
         <HierarchicalDataTemplate.Resources>
-            <nmfc:ExpandableContextMenu x:Key="User_ContextMenu" ItemsSource="{Binding ContextMenus}">
+            <nmfc:ModernContextMenu x:Key="User_ContextMenu" ItemsSource="{Binding ContextMenus}">
                 <MenuItem x:Name="Change" Style="{StaticResource Change_MenuItem_Style}" />
                 <MenuItem x:Name="Move" Style="{StaticResource Move_MenuItem_Style}" />
                 <MenuItem x:Name="Delete" Style="{StaticResource Delete_MenuItem_Style}" InputGestureText="Del" />
                 <MenuItem x:Name="Kick" Style="{StaticResource Kick_MenuItem_Style}" />
                 <MenuItem x:Name="Ban" Style="{StaticResource Ban_MenuItem_Style}" />
                 <MenuItem x:Name="Unban" Style="{StaticResource Unban_MenuItem_Style}" />
-            </nmfc:ExpandableContextMenu>
+            </nmfc:ModernContextMenu>
         </HierarchicalDataTemplate.Resources>
         <ContentControl Style="{StaticResource UserDescriptor_ContentControl_Style}" ContextMenu="{StaticResource User_ContextMenu}" />
     </HierarchicalDataTemplate>

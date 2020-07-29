@@ -55,7 +55,8 @@ namespace Ntreev.Crema.Presentation.Framework.Converters
                     }
                     else if (propertyName == IsContentEditor)
                     {
-                        return TypeDescriptorUtility.IsContentEditor(Authenticator.Current, descriptor);
+                        throw new NotImplementedException();
+                        //return TypeDescriptorUtility.IsContentEditor(Authenticator.Current, descriptor);
                     }
                     else if (propertyName == IsFlag)
                     {

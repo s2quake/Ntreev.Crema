@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Ntreev.Crema.Client.Framework;
+using Ntreev.Crema.Presentation.Framework;
 using System.ComponentModel.Composition;
 using Caliburn.Micro;
 using System.Collections.ObjectModel;

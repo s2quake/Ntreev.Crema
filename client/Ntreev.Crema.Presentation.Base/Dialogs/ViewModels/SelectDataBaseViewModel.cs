@@ -74,9 +74,9 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             this.DisplayName = Resources.Title_SelectDataBase;
         }
 
-        public void OK()
+        public async Task OKAsync()
         {
-            this.TryClose(true);
+            await this.TryCloseAsync(true);
         }
 
         public ObservableCollection<DataBaseItemViewModel> ItemsSource
@@ -164,12 +164,12 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(Resources.Message_ConnectionFailed, e);
-                this.TryClose();
+                await AppMessageBox.ShowErrorAsync(Resources.Message_ConnectionFailed, e);
+                await this.TryCloseAsync();
             }
         }
 
-        private void Initialize(Authentication authentication, ICremaAppHost cremaAppHost)
+        private async void Initialize(Authentication authentication, ICremaAppHost cremaAppHost)
         {
             try
             {
@@ -200,8 +200,8 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(Resources.Message_ConnectionFailed, e);
-                this.TryClose();
+                await AppMessageBox.ShowErrorAsync(Resources.Message_ConnectionFailed, e);
+                await this.TryCloseAsync();
             }
         }
     }

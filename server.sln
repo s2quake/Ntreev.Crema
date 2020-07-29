@@ -131,6 +131,7 @@ Global
 		common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.projitems*{6baf8a0b-5b3e-40ea-8e96-c667df63516c}*SharedItemsImports = 13
 		common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems*{97ad6c00-3b71-4e83-97c3-0201bc035471}*SharedItemsImports = 13
 		common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.projitems*{9ed00a26-bf13-4b1f-af6e-3009c666ae15}*SharedItemsImports = 5
+		common\Ntreev.Crema.Commands.Spreadsheet.Sharing\Ntreev.Crema.Commands.Spreadsheet.Sharing.projitems*{a41e71c2-33f2-4ebf-b8e9-4050bb6c282d}*SharedItemsImports = 5
 		common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.projitems*{a4955825-195f-4677-9695-5fc67362a449}*SharedItemsImports = 13
 		common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.projitems*{a7bf94f7-94a5-46ba-a756-c04bde65f47b}*SharedItemsImports = 5
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{ad0eba0c-d167-4722-a2a7-82b17e1fc9aa}*SharedItemsImports = 13

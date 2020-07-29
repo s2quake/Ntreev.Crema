@@ -159,7 +159,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
                 this.ProgressMessage = Resources.Message_ConnectingToServer;
                 if (await CremaBootstrapper.IsOnlineAsync(address, userID, password) == true)
                 {
-                    if (AppMessageBox.ShowQuestion(Resources.Message_SameIDConnected) == false)
+                    if (await AppMessageBox.ShowQuestion(Resources.Message_SameIDConnected) == false)
                     {
                         this.ProgressMessage = string.Empty;
                         this.EndProgress();
@@ -187,16 +187,16 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             {
                 this.ErrorMessage = Resources.Message_ConnectionFailed;
             }
-            catch (EndpointNotFoundException)
-            {
-                this.ErrorMessage = Resources.Message_ConnectionFailed;
-            }
+            //catch (EndpointNotFoundException)
+            //{
+            //    this.ErrorMessage = Resources.Message_ConnectionFailed;
+            //}
             catch (Exception e)
             {
                 this.ErrorMessage = e.Message;
                 if (this.IsOpened == true)
                 {
-                    AppMessageBox.ShowError(e.Message);
+                    await AppMessageBox.ShowErrorAsync(e.Message);
                 }
             }
             finally
@@ -219,10 +219,10 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             this.NotifyOfPropertyChange(nameof(this.CanLogin));
         }
 
-        public void AddConnectionItem()
+        public async void AddConnectionItem()
         {
             var dialog = new ConnectionItemEditViewModel();
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 this.connectionItems.Add(dialog.ConnectionInfo);
                 this.connectionItems.Write();
@@ -238,9 +238,9 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             this.connectionItems.Remove(connectionItem);
         }
 
-        public void RemoveConnectionItem()
+        public async void RemoveConnectionItem()
         {
-            if (AppMessageBox.ConfirmDelete() == false)
+            if (await AppMessageBox.ConfirmDeleteAsync() == false)
                 return;
             this.RemoveConnectionItem(this.ConnectionItem);
         }
@@ -250,10 +250,10 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             this.EditConnectionItem(this.ConnectionItem);
         }
 
-        public void EditConnectionItem(ConnectionItemViewModel connectionItem)
+        public async void EditConnectionItem(ConnectionItemViewModel connectionItem)
         {
             var dialog = new ConnectionItemEditViewModel(connectionItem.Clone());
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 connectionItem.Assign(dialog.ConnectionInfo);
                 this.connectionItems.Write();
@@ -316,7 +316,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
                 this.EndProgress();
             }
         }

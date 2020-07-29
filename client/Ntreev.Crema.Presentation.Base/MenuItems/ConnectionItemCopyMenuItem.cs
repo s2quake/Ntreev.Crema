@@ -51,7 +51,7 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
             return false;
         }
 
-        protected override void OnExecute(object parameter)
+        protected async override void OnExecute(object parameter)
         {
             if (this.cremaAppHost.IsOpened == false && parameter is ConnectionItemViewModel connectionItem)
             {
@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
                     DisplayName = Resources.Title_CopyConnectionItem,
                     ConnectionInfo = connectionItem.Clone(),
                 };
-                if (dialog.ShowDialog() == true)
+                if (await dialog.ShowDialogAsync() == true)
                 {
                     this.cremaAppHost.ConnectionItems.Add(dialog.ConnectionInfo);
                 }

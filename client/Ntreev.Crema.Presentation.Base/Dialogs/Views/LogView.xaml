@@ -21,7 +21,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
              xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
              xmlns:nmgc="clr-namespace:Ntreev.ModernUI.Framework.DataGrid.Controls;assembly=Ntreev.ModernUI.Framework.DataGrid"
@@ -31,11 +30,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <UserControl.Resources>
 
-        <nmfc:ExpandableContextMenu x:Key="contextMenu" x:Shared="False"
+        <nmfc:ModernContextMenu x:Key="contextMenu" x:Shared="False"
                                     DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}"
                                     ItemsSource="{Binding ContextMenus}">
             <!--<MenuItem x:Name="Preview" Header="{x:Static p:Resources.MenuItem_Preview}" />-->
-        </nmfc:ExpandableContextMenu>
+        </nmfc:ModernContextMenu>
 
         <Style TargetType="{x:Type nmgc:ModernDataRow}" BasedOn="{StaticResource {x:Type nmgc:ModernDataRow}}">
             <Setter Property="ContextMenu" Value="{StaticResource contextMenu}" />
@@ -49,7 +48,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <nmfc:ExpandableToolBar ItemsSource="{Binding ToolBarItems}" />
+        <nmfc:ModernToolBar ItemsSource="{Binding ToolBarItems}" />
 
         <!--wpftoolkit 버그로 인해 예외가 발생하여 처음에는 Collapsed로 설정-->
         <nmgc:ModernDataGridControl x:Name="gridControl" Grid.Row="1" ReadOnly="True" SelectionMode="Single" SelectionUnit="Row" AutoCreateColumns="False"
@@ -65,11 +64,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <nmgc:ModernDataGridControl.View>
                 <xcdg:TableView Style="{StaticResource TableView_Style}" />
             </nmgc:ModernDataGridControl.View>
-            <i:Interaction.Triggers>
+            <!--<i:Interaction.Triggers>
                 <i:EventTrigger EventName="PreviewMouseDoubleClick">
                     <i:InvokeCommandAction Command="{Binding PreviewCommand}" />
                 </i:EventTrigger>
-            </i:Interaction.Triggers>
+            </i:Interaction.Triggers>-->
         </nmgc:ModernDataGridControl>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 5 0 0">

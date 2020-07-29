@@ -74,7 +74,7 @@ namespace Ntreev.Crema.Presentation.Controls
             BindingOperations.SetBinding(this.DataControl2, CremaDataTableItemControl.SourceProperty, new Binding($"{nameof(Source)}.{nameof(DiffDataTable.SourceItem2)}") { Source = this, });
         }
 
-        public void Resolve()
+        public async Task ResolveAsync()
         {
             try
             {
@@ -84,7 +84,7 @@ namespace Ntreev.Crema.Presentation.Controls
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
                 return;
             }
         }
@@ -167,12 +167,12 @@ namespace Ntreev.Crema.Presentation.Controls
             }
         }
 
-        private void Resolve_Execute(object sender, ExecutedRoutedEventArgs e)
+        private async void Resolve_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             if (this.ResolveCommand != null)
                 this.ResolveCommand.Execute(this.ResolveCommandParameter);
             else
-                this.Resolve();
+                await this.ResolveAsync();
         }
 
         private void Resolve_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -196,7 +196,7 @@ namespace Ntreev.Crema.Presentation.Controls
             }
         }
 
-        private void ExportLeft_Execute(object sender, ExecutedRoutedEventArgs e)
+        private async void ExportLeft_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             try
             {
@@ -207,7 +207,7 @@ namespace Ntreev.Crema.Presentation.Controls
             }
             catch (Exception ex)
             {
-                AppMessageBox.ShowError(ex);
+                await AppMessageBox.ShowErrorAsync(ex);
             }
         }
 
@@ -219,7 +219,7 @@ namespace Ntreev.Crema.Presentation.Controls
             }
         }
 
-        private void ExportRight_Execute(object sender, ExecutedRoutedEventArgs e)
+        private async void ExportRight_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             try
             {
@@ -230,7 +230,7 @@ namespace Ntreev.Crema.Presentation.Controls
             }
             catch (Exception ex)
             {
-                AppMessageBox.ShowError(ex);
+                await AppMessageBox.ShowErrorAsync(ex);
             }
         }
 

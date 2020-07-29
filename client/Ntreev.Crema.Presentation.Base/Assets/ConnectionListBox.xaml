@@ -19,7 +19,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 <ResourceDictionary x:Class="Ntreev.Crema.Presentation.Base.Assets.ConnectionListBox"
                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
                     xmlns:cal="http://www.caliburnproject.org"
                     xmlns:nmfv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework"
                     xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
@@ -115,7 +114,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         <Setter Property="Template" Value="{StaticResource ConnectionListBoxItem_Template}" />
         <Setter Property="ContextMenu">
             <Setter.Value>
-                <nmfc:ExpandableContextMenu ItemsSource="{Binding ContextMenus}" />
+                <nmfc:ModernContextMenu ItemsSource="{Binding ContextMenus}" />
             </Setter.Value>
         </Setter>
         <Style.Triggers>

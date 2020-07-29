@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Presentation.Framework.MenuItems.Domains
         {
             if (parameter is IDomainDescriptor descriptor && descriptor.Target is IDomain domain && this.authenticator.Authority == Authority.Admin)
             {
-                if (AppMessageBox.ShowProceed("편집을 종료합니다. 계속하시겠습니까?") == false)
+                if (await AppMessageBox.ShowProceedAsync("편집을 종료합니다. 계속하시겠습니까?") == false)
                     return;
 
                 try
@@ -63,7 +63,7 @@ namespace Ntreev.Crema.Presentation.Framework.MenuItems.Domains
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                 }
             }
         }

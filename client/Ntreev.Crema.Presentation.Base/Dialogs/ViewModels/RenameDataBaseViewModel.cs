@@ -27,6 +27,7 @@ using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services.Extensions;
+using System.Threading;
 
 namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 {
@@ -72,24 +73,23 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             isVerify(result);
         }
 
-        protected override Task RenameAsync(string newName)
+        protected override Task OnRenameAsync(string newName)
         {
             return this.dataBase.RenameAsync(this.authentication, newName);
         }
 
-        protected override void OnDeactivate(bool close)
+        protected async override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
-            base.OnDeactivate(close);
-
+            await base.OnDeactivateAsync(close, cancellationToken);
             if (close == true)
             {
                 this.authentication.Expired -= Authentication_Expired;
             }
         }
 
-        private void Authentication_Expired(object sender, EventArgs e)
+        private async void Authentication_Expired(object sender, EventArgs e)
         {
-            this.Dispatcher.InvokeAsync(() => this.TryClose());
+            await this.TryCloseAsync();
         }
     }
 }

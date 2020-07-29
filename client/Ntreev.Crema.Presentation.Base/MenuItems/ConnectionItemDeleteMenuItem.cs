@@ -46,11 +46,11 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
             return false;
         }
 
-        protected override void OnExecute(object parameter)
+        protected async override void OnExecute(object parameter)
         {
             if (parameter is ConnectionItemViewModel connectionItem)
             {
-                if (AppMessageBox.ConfirmDelete() == false)
+                if (await AppMessageBox.ConfirmDeleteAsync() == false)
                     return;
                 this.CremaAppHost.RemoveConnectionItem(connectionItem);
             }

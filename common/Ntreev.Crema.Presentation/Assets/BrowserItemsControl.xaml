@@ -25,9 +25,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     <ncpc:BrowserItemsControlItemTemplateSelector x:Key="BrowserItemsControl_ItemTemplateSelector" />
 
     <DataTemplate x:Key="BrowserItemsControl_ItemTemplate">
-        <nmfc:BrowserExpander x:Name="expander" Header="{Binding DisplayName}" IsExpanded="True">
+        <nmfc:ModernExpander x:Name="expander" Header="{Binding DisplayName}" IsExpanded="True">
             <ContentControl cal:View.Model="{Binding}" />
-        </nmfc:BrowserExpander>
+        </nmfc:ModernExpander>
     </DataTemplate>
 
     <Style x:Key="BrowserItemsControl_ItemContainerStyle" TargetType="{x:Type ContentPresenter}">

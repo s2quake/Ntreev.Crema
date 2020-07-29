@@ -35,36 +35,36 @@ namespace Ntreev.Crema.Presentation.Controls
             var viewType = ViewLocator.LocateTypeForModelType(item.GetType(), null, null);
             if (viewType != null)
             {
-                if (viewType.IsSubclassOf(typeof(BrowserExpander)) == true)
+                if (viewType.IsSubclassOf(typeof(ModernExpander)) == true)
                 {
                     var dataTemplate = new DataTemplate();
                     var element = new FrameworkElementFactory(viewType);
-                    element.SetBinding(BrowserExpander.HeaderProperty, new Binding("DisplayName"));
-                    element.SetBinding(BrowserExpander.IsExpandedProperty, new Binding()
+                    element.SetBinding(ModernExpander.HeaderProperty, new Binding("DisplayName"));
+                    element.SetBinding(ModernExpander.IsExpandedProperty, new Binding()
                     {
                         Path = new PropertyPath(BrowserItemsControl.IsExpandedProperty),
                         Source = container,
                         Mode = BindingMode.TwoWay,
                     });
                     element.SetBinding(Bind.ModelProperty, new Binding());
-                    element.AddHandler(BrowserExpander.ExpandedEvent, new RoutedEventHandler(BrowserExpander_RoutedEventHandler));
-                    element.AddHandler(BrowserExpander.CollapsedEvent, new RoutedEventHandler(BrowserExpander_RoutedEventHandler));
+                    element.AddHandler(ModernExpander.ExpandedEvent, new RoutedEventHandler(ModernExpander_RoutedEventHandler));
+                    element.AddHandler(ModernExpander.CollapsedEvent, new RoutedEventHandler(ModernExpander_RoutedEventHandler));
                     dataTemplate.VisualTree = element;
                     return dataTemplate;
                 }
                 else
                 {
                     var dataTemplate = new DataTemplate();
-                    var element = new FrameworkElementFactory(typeof(BrowserExpander));
-                    element.SetBinding(BrowserExpander.HeaderProperty, new Binding("DisplayName"));
-                    element.SetBinding(BrowserExpander.IsExpandedProperty, new Binding()
+                    var element = new FrameworkElementFactory(typeof(ModernExpander));
+                    element.SetBinding(ModernExpander.HeaderProperty, new Binding("DisplayName"));
+                    element.SetBinding(ModernExpander.IsExpandedProperty, new Binding()
                     {
                         Path = new PropertyPath(BrowserItemsControl.IsExpandedProperty),
                         Source = container,
                         Mode = BindingMode.TwoWay,
                     });
-                    element.AddHandler(BrowserExpander.ExpandedEvent, new RoutedEventHandler(BrowserExpander_RoutedEventHandler));
-                    element.AddHandler(BrowserExpander.CollapsedEvent, new RoutedEventHandler(BrowserExpander_RoutedEventHandler));
+                    element.AddHandler(ModernExpander.ExpandedEvent, new RoutedEventHandler(ModernExpander_RoutedEventHandler));
+                    element.AddHandler(ModernExpander.CollapsedEvent, new RoutedEventHandler(ModernExpander_RoutedEventHandler));
                     var contentElement = new FrameworkElementFactory(viewType);
                     contentElement.SetBinding(Bind.ModelProperty, new Binding());
                     element.AppendChild(contentElement);
@@ -75,9 +75,9 @@ namespace Ntreev.Crema.Presentation.Controls
 
             return base.SelectTemplate(item, container);
 
-            void BrowserExpander_RoutedEventHandler(object sender, RoutedEventArgs e)
+            void ModernExpander_RoutedEventHandler(object sender, RoutedEventArgs e)
             {
-                if (sender is BrowserExpander expander)
+                if (sender is ModernExpander expander)
                     BrowserItemsControl.SetIsExpanded(container, expander.IsExpanded);
             }
         }

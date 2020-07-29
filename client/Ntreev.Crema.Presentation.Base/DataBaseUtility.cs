@@ -86,7 +86,7 @@ namespace Ntreev.Crema.Presentation.Base
             if (serviceProvider.GetService(typeof(ICremaHost)) is ICremaHost cremaHost)
             {
                 var dialog = await CreateDataBaseViewModel.CreateInstanceAsync(authentication, cremaHost);
-                return dialog?.ShowDialog() == true;
+                return await dialog?.ShowDialogAsync() == true;
             }
             else
             {
@@ -97,13 +97,13 @@ namespace Ntreev.Crema.Presentation.Base
         public async static Task<bool> CopyAsync(Authentication authentication, IDataBaseDescriptor descriptor)
         {
             var dialog = await CopyDataBaseViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            return await dialog?.ShowDialogAsync() == true;
         }
 
         public async static Task<string> RenameAsync(Authentication authentication, IDataBaseDescriptor descriptor)
         {
             var dialog = await RenameDataBaseViewModel.CreateInstanceAsync(authentication, descriptor);
-            if (dialog?.ShowDialog() == true)
+            if (await dialog?.ShowDialogAsync() == true)
                 return dialog.NewName;
             return null;
         }
@@ -112,18 +112,18 @@ namespace Ntreev.Crema.Presentation.Base
         {
             if (descriptor.Target is IDataBase dataBase)
             {
-                if (new DeleteViewModel().ShowDialog() != true)
+                if (await new DeleteViewModel().ShowDialogAsync() != true)
                     return false;
 
                 try
                 {
                     await dataBase.DeleteAsync(authentication);
-                    AppMessageBox.Show(Resources.Message_Deleted);
+                    await AppMessageBox.ShowAsync(Resources.Message_Deleted);
                     return true;
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return false;
                 }
             }
@@ -144,7 +144,7 @@ namespace Ntreev.Crema.Presentation.Base
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return false;
                 }
             }
@@ -160,14 +160,14 @@ namespace Ntreev.Crema.Presentation.Base
             {
                 try
                 {
-                    if (descriptor.AuthenticationInfos.Any() == true && AppMessageBox.ShowProceed(Resources.Message_VerifyToCloseDataBase) == false)
+                    if (descriptor.AuthenticationInfos.Any() == true && await AppMessageBox.ShowProceedAsync(Resources.Message_VerifyToCloseDataBase) == false)
                         return false;
                     await dataBase.UnloadAsync(authentication);
                     return true;
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return false;
                 }
             }

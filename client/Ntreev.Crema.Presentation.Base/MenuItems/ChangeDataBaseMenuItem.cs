@@ -53,7 +53,7 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
             return this.cremaAppHost.IsLoaded == true;
         }
 
-        protected override void OnExecute(object parameter)
+        protected async override void OnExecute(object parameter)
         {
             var dialog = new SelectDataBaseViewModel(this.authenticator, this.cremaAppHost, (item) =>
             {
@@ -64,7 +64,7 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
             {
                 ConnectableOnly = true,
             };
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
             this.cremaAppHost.ConnectionItem = dialog.SelectedItem.ConnectionItem;
         }

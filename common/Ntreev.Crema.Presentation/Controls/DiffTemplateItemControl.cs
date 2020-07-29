@@ -65,7 +65,7 @@ namespace Ntreev.Crema.Presentation.Controls
             BindingOperations.SetBinding(this.DataControl2, CremaTemplateControl.SourceProperty, new Binding($"{nameof(Source)}.{nameof(DiffTemplate.SourceItem2)}") { Source = this, });
         }
 
-        public new void Merge()
+        public async Task MergeAsync()
         {
             try
             {
@@ -73,7 +73,7 @@ namespace Ntreev.Crema.Presentation.Controls
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
                 return;
             }
         }
@@ -94,7 +94,7 @@ namespace Ntreev.Crema.Presentation.Controls
             }
         }
 
-        public void Resolve()
+        public async Task ResolveAsync()
         {
             try
             {
@@ -105,7 +105,7 @@ namespace Ntreev.Crema.Presentation.Controls
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
                 return;
             }
         }
@@ -288,12 +288,12 @@ namespace Ntreev.Crema.Presentation.Controls
             e.CanExecute = this.CanMerge;
         }
 
-        private void Resolve_Execute(object sender, ExecutedRoutedEventArgs e)
+        private async void Resolve_Execute(object sender, ExecutedRoutedEventArgs e)
         {
             if (this.ResolveCommand != null)
                 this.ResolveCommand.Execute(this.ResolveCommandParameter);
             else
-                this.Resolve();
+                await this.ResolveAsync();
         }
 
         private void Resolve_CanExecute(object sender, CanExecuteRoutedEventArgs e)

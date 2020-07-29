@@ -69,7 +69,7 @@ namespace Ntreev.Crema.Presentation.Framework
         {
             if (descriptor.Target is IDomain domain)
             {
-                if (AppMessageBox.ShowProceed("편집을 취소합니다. 저장되지 않는 항목은 사라집니다. 계속하시겠습니까?") == false)
+                if (await AppMessageBox.ShowProceedAsync("편집을 취소합니다. 저장되지 않는 항목은 사라집니다. 계속하시겠습니까?") == false)
                     return false;
 
                 try
@@ -79,7 +79,7 @@ namespace Ntreev.Crema.Presentation.Framework
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return false;
                 }
             }
@@ -93,7 +93,7 @@ namespace Ntreev.Crema.Presentation.Framework
         {
             if (descriptor.Target is IDomain domain)
             {
-                if (AppMessageBox.ShowProceed("편집을 종료합니다. 계속하시겠습니까?") == false)
+                if (await AppMessageBox.ShowProceedAsync("편집을 종료합니다. 계속하시겠습니까?") == false)
                     return false;
 
                 try
@@ -103,7 +103,7 @@ namespace Ntreev.Crema.Presentation.Framework
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return false;
                 }
             }

@@ -32,9 +32,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <HierarchicalDataTemplate DataType="{x:Type vm:BookmarkRootTreeViewItemViewModel}" ItemsSource="{Binding Items}">
         <HierarchicalDataTemplate.Resources>
-            <nmfc:ExpandableContextMenu x:Key="Bookmark_ContextMenu" ItemsSource="{Binding ContextMenus}">
+            <nmfc:ModernContextMenu x:Key="Bookmark_ContextMenu" ItemsSource="{Binding ContextMenus}">
                 <MenuItem x:Name="NewFolder" Style="{StaticResource NewFolder_MenuItem_Style}" />
-            </nmfc:ExpandableContextMenu>
+            </nmfc:ModernContextMenu>
         </HierarchicalDataTemplate.Resources>
         <ContentControl Focusable="False" Margin="2" ContextMenu="{StaticResource Bookmark_ContextMenu}">
             <DockPanel Background="Transparent">
@@ -48,12 +48,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <HierarchicalDataTemplate DataType="{x:Type vm:BookmarkCategoryTreeViewItemViewModel}" ItemsSource="{Binding Items}">
         <HierarchicalDataTemplate.Resources>
-            <nmfc:ExpandableContextMenu x:Key="BookmarkCategory_ContextMenu" ItemsSource="{Binding ContextMenus}">
+            <nmfc:ModernContextMenu x:Key="BookmarkCategory_ContextMenu" ItemsSource="{Binding ContextMenus}">
                 <MenuItem x:Name="NewFolder" Style="{StaticResource NewFolder_MenuItem_Style}" />
                 <MenuItem x:Name="Delete" Header="{x:Static p:Resources.MenuItem_Delete}" Icon="{StaticResource delete_icon}" InputGestureText="Del" />
                 <MenuItem x:Name="Move" Header="{x:Static p:Resources.MenuItem_Move}" />
                 <MenuItem x:Name="Rename" Header="{x:Static p:Resources.MenuItem_Rename}" Icon="{StaticResource rename_icon}" InputGestureText="F2" />
-            </nmfc:ExpandableContextMenu>
+            </nmfc:ModernContextMenu>
         </HierarchicalDataTemplate.Resources>
         <ContentControl Focusable="False" Margin="2" ContextMenu="{StaticResource BookmarkCategory_ContextMenu}">
             <StackPanel Background="Transparent" Orientation="Horizontal">
@@ -79,10 +79,10 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <HierarchicalDataTemplate DataType="{x:Type vm:SmartSetContextTreeViewItemViewModel}" ItemsSource="{Binding Items}">
         <HierarchicalDataTemplate.Resources>
-            <nmfc:ExpandableContextMenu x:Key="SmartSet_ContextMenu" ItemsSource="{Binding ContextMenus}">
+            <nmfc:ModernContextMenu x:Key="SmartSet_ContextMenu" ItemsSource="{Binding ContextMenus}">
                 <MenuItem x:Name="NewFolder" Style="{StaticResource NewFolder_MenuItem_Style}" />
                 <MenuItem x:Name="NewSmartSet" Header="{x:Static p:Resources.MenuItem_NewSmartSet}" />
-            </nmfc:ExpandableContextMenu>
+            </nmfc:ModernContextMenu>
         </HierarchicalDataTemplate.Resources>
         <ContentControl Focusable="False" Margin="2" ContextMenu="{StaticResource SmartSet_ContextMenu}">
             <StackPanel Background="Transparent" Orientation="Horizontal">
@@ -95,12 +95,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <HierarchicalDataTemplate DataType="{x:Type vm:SmartSetCategoryTreeViewItemViewModel}" ItemsSource="{Binding Items}">
         <HierarchicalDataTemplate.Resources>
-            <nmfc:ExpandableContextMenu x:Key="Category_ContextMenu" ItemsSource="{Binding ContextMenus}">
+            <nmfc:ModernContextMenu x:Key="Category_ContextMenu" ItemsSource="{Binding ContextMenus}">
                 <MenuItem x:Name="NewFolder" Style="{StaticResource NewFolder_MenuItem_Style}" />
                 <MenuItem x:Name="NewSmartSet" Header="{x:Static p:Resources.MenuItem_NewSmartSet}" />
                 <MenuItem x:Name="Rename" Header="{x:Static p:Resources.MenuItem_Rename}" />
                 <MenuItem x:Name="Delete" Header="{x:Static p:Resources.MenuItem_Delete}" />
-            </nmfc:ExpandableContextMenu>
+            </nmfc:ModernContextMenu>
         </HierarchicalDataTemplate.Resources>
         <ContentControl Focusable="False" Margin="2" ContextMenu="{StaticResource Category_ContextMenu}">
             <StackPanel Background="Transparent" Orientation="Horizontal">
@@ -113,11 +113,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <HierarchicalDataTemplate DataType="{x:Type vm:SmartSetTreeViewItemViewModel}" ItemsSource="{Binding Items}">
         <HierarchicalDataTemplate.Resources>
-            <nmfc:ExpandableContextMenu x:Key="SmartSet_ContextMenu" ItemsSource="{Binding ContextMenus}">
+            <nmfc:ModernContextMenu x:Key="SmartSet_ContextMenu" ItemsSource="{Binding ContextMenus}">
                 <MenuItem x:Name="Rename" Header="{x:Static p:Resources.MenuItem_Rename}" />
                 <MenuItem x:Name="Edit" Header="{x:Static p:Resources.MenuItem_Edit}" />
                 <MenuItem x:Name="Delete" Header="{x:Static p:Resources.MenuItem_Delete}" />
-            </nmfc:ExpandableContextMenu>
+            </nmfc:ModernContextMenu>
         </HierarchicalDataTemplate.Resources>
         <ContentControl Focusable="False" Margin="2" ContextMenu="{StaticResource SmartSet_ContextMenu}">
             <DockPanel Background="Transparent">

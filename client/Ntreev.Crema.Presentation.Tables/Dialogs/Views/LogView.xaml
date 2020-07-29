@@ -31,11 +31,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <UserControl.Resources>
 
-        <nmfc:ExpandableContextMenu x:Key="contextMenu" x:Shared="False"
+        <nmfc:ModernContextMenu x:Key="contextMenu" x:Shared="False"
                                     DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}"
                                     ItemsSource="{Binding ContextMenus}">
             <MenuItem x:Name="Preview" Header="{x:Static p:Resources.MenuItem_Preview}" />
-        </nmfc:ExpandableContextMenu>
+        </nmfc:ModernContextMenu>
 
         <Style TargetType="{x:Type nmgc:ModernDataRow}" BasedOn="{StaticResource {x:Type nmgc:ModernDataRow}}">
             <Setter Property="ContextMenu" Value="{StaticResource contextMenu}" />

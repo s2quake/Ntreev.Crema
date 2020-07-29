@@ -39,7 +39,8 @@ namespace Ntreev.Crema.Presentation.Framework
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += CremaAppHost_Opened;
 
-            this.browserItems = MenuItemUtility.GetMenuItems(this, browserItems).ToArray();
+            throw new NotImplementedException();
+            //this.browserItems = MenuItemUtility.GetMenuItems(this, browserItems).ToArray();
         }
 
         public IEnumerable<IBrowserItem> Browsers

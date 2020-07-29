@@ -57,7 +57,8 @@ namespace Ntreev.Crema.Presentation.Framework.Converters
                     }
                     else if (propertyName == HasChanges)
                     {
-                        return DomainUserDescriptorUtility.HasChanges(Authenticator.Current, descriptor);
+                        throw new NotImplementedException();
+                        //return DomainUserDescriptorUtility.HasChanges(Authenticator.Current, descriptor);
                     }
                     else if (propertyName == IsOwner)
                     {

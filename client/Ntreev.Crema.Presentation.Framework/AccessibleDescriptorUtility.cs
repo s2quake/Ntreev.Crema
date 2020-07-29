@@ -101,7 +101,7 @@ namespace Ntreev.Crema.Presentation.Framework
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return false;
                 }
             }
@@ -122,7 +122,7 @@ namespace Ntreev.Crema.Presentation.Framework
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return false;
                 }
             }
@@ -135,7 +135,7 @@ namespace Ntreev.Crema.Presentation.Framework
         public static async Task<bool> SetAuthorityAsync(Authentication authentication, IAccessibleDescriptor descriptor)
         {
             var dialog = await AccessViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            return await dialog?.ShowDialogAsync() == true;
         }
     }
 }

@@ -1,6 +1,5 @@
-﻿using Ntreev.Crema.ServiceModel.Data;
-using Ntreev.Crema.ServiceModel.Data.Xml.Schema;
-using Ntreev.ModernUI.Framework.Controls;
+﻿using Ntreev.ModernUI.Framework.Controls;
+using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,7 +23,7 @@ using System.Windows.Threading;
 using System.Xml.Linq;
 using Xceed.Wpf.DataGrid;
 
-namespace Ntreev.Crema.Client.Framework.Controls
+namespace Ntreev.Crema.Presentation.Framework.Controls
 {
     /// <summary>
     /// DataTableControl.xaml에 대한 상호 작용 논리
@@ -99,32 +98,32 @@ namespace Ntreev.Crema.Client.Framework.Controls
             //var c1 = this.Resources["wer"];
             //var c2 = this.Resources["wer"];
             
-            foreach (var item in this.dataGridControl.DetailConfigurations)
-            {
-                //var relation = dataView.Table.DataSet.Relations[item.RelationName];
-                item.Title = XName.Get(item.RelationName).LocalName;
-                item.TitleTemplate = this.FindResource("Title_Template") as DataTemplate;
+            //foreach (var item in this.dataGridControl.DetailConfigurations)
+            //{
+            //    //var relation = dataView.Table.DataSet.Relations[item.RelationName];
+            //    item.Title = XName.Get(item.RelationName).LocalName;
+            //    item.TitleTemplate = this.FindResource("Title_Template") as DataTemplate;
 
 
-                item.Columns.Add(this.Resources["tagColumn"] as ColumnBase);
-                item.Columns.Add(this.Resources["enableColumn"] as ColumnBase);
-                item.Columns.Add(this.Resources["modifierColumn"] as ColumnBase);
-                item.Columns.Add(this.Resources["modifiedDateTimeColumn"] as ColumnBase);
+            //    item.Columns.Add(this.Resources["tagColumn"] as ColumnBase);
+            //    item.Columns.Add(this.Resources["enableColumn"] as ColumnBase);
+            //    item.Columns.Add(this.Resources["modifierColumn"] as ColumnBase);
+            //    item.Columns.Add(this.Resources["modifiedDateTimeColumn"] as ColumnBase);
 
-                //item.Columns.CollectionChanged += (s1, e1) =>
-                //{
-                //    int index = 0;
-                //    foreach (var item1 in relation.ChildTable.Columns.OrderedColumns())
-                //    {
-                //        var column = item.Columns[item1.ColumnName];
-                //        if (column != null)
-                //        {
-                //            column.VisiblePosition = index++;
-                //        }
-                //    }
-                //    item.SetValue(Xceed.Wpf.DataGrid.Views.TableView.FixedColumnCountProperty, relation.ChildTable.PrimaryKey.Length + 2);
-                //};
-            }
+            //    //item.Columns.CollectionChanged += (s1, e1) =>
+            //    //{
+            //    //    int index = 0;
+            //    //    foreach (var item1 in relation.ChildTable.Columns.OrderedColumns())
+            //    //    {
+            //    //        var column = item.Columns[item1.ColumnName];
+            //    //        if (column != null)
+            //    //        {
+            //    //            column.VisiblePosition = index++;
+            //    //        }
+            //    //    }
+            //    //    item.SetValue(Xceed.Wpf.DataGrid.Views.TableView.FixedColumnCountProperty, relation.ChildTable.PrimaryKey.Length + 2);
+            //    //};
+            //}
 
             //this.view.FixedColumnCount = dataView.Table.PrimaryKey.Length + 2;
             //this.dataGridControl.AdjustColumnsWidth();
@@ -136,12 +135,12 @@ namespace Ntreev.Crema.Client.Framework.Controls
             //this.dataGridControl.ExpandDetails(this.dataGridControl.Items[0]);
             //this.dataGridControl.CollapseDetails(this.dataGridControl.Items[0]);
 
-            foreach (var item in this.dataGridControl.DetailConfigurations)
-            {
-                item.Columns[CremaSchema.Modifier].VisiblePosition = item.Columns.Count - 1;
-                item.Columns[CremaSchema.ModifiedDateTime].VisiblePosition = item.Columns.Count - 1;
-                item.SetValue(Xceed.Wpf.DataGrid.Views.TableView.FixedColumnCountProperty, 3);
-            }
+            //foreach (var item in this.dataGridControl.DetailConfigurations)
+            //{
+            //    item.Columns[CremaSchema.Modifier].VisiblePosition = item.Columns.Count - 1;
+            //    item.Columns[CremaSchema.ModifiedDateTime].VisiblePosition = item.Columns.Count - 1;
+            //    item.SetValue(Xceed.Wpf.DataGrid.Views.TableView.FixedColumnCountProperty, 3);
+            //}
             
         }
 

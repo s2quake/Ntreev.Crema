@@ -31,7 +31,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <nmfc:ExpandableToolBar />
+        <nmfc:ModernToolBar />
         <ncfc:PropertyListBox Grid.Row="1" ItemsSource="{Binding Users}" SelectedItem="{Binding SelectedUser}" />
     </Grid>
     

@@ -48,11 +48,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
             <DataTemplate x:Key="ListBox_ItemTemplate">
                 <DataTemplate.Resources>
-                    <nmfc:ExpandableContextMenu x:Key="ListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}">
+                    <nmfc:ModernContextMenu x:Key="ListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}">
                         <MenuItem x:Name="SelectInBrowser" Header="선택" TextElement.FontWeight="Bold" />
                         <!--<MenuItem x:Name="Lock" Header="{x:Static p:Resources.MenuItem_Lock}" Visibility="{nmfm:VisibilityBinding CanLock}" />
                     <MenuItem x:Name="Unlock" Header="{x:Static p:Resources.MenuItem_Unlock}" Visibility="{nmfm:VisibilityBinding CanUnlock}" />-->
-                    </nmfc:ExpandableContextMenu>
+                    </nmfc:ModernContextMenu>
                 </DataTemplate.Resources>
                 <ContentControl Focusable="False" Margin="2" ContextMenu="{StaticResource ListBoxItem_ContextMenu}">
                     <DockPanel Background="Transparent">

@@ -41,7 +41,8 @@ namespace Ntreev.Crema.Presentation.Framework
             this.cremaAppHost.Opened += CremaAppHost_Opened;
             this.cremaAppHost.Closed += CremaAppHost_Closed;
 
-            this.propertyItems = MenuItemUtility.GetMenuItems(this, propertyItems).ToArray();
+            throw new NotImplementedException();
+            //this.propertyItems = MenuItemUtility.GetMenuItems(this, propertyItems).ToArray();
         }
 
         public object SelectedObject

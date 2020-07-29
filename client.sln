@@ -109,14 +109,18 @@ Global
 		common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.projitems*{0eac90ab-7c7e-47e3-9954-148b45521fcb}*SharedItemsImports = 5
 		common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.projitems*{0eac90ab-7c7e-47e3-9954-148b45521fcb}*SharedItemsImports = 5
 		common\Ntreev.Crema.Services.Random.Sharing\Ntreev.Crema.Services.Random.Sharing.projitems*{1f4a20ae-f955-4231-8636-27b7a38eb4b3}*SharedItemsImports = 13
+		common\Ntreev.Crema.Commands.Sharing\Ntreev.Crema.Commands.Sharing.projitems*{21901648-9205-46c1-91f0-2a3d7847bfc6}*SharedItemsImports = 5
 		common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.projitems*{24ecbee1-2859-4f09-969b-f382e6341814}*SharedItemsImports = 13
 		common\Ntreev.Crema.Bot.Sharing\Ntreev.Crema.Bot.Sharing.projitems*{35ad4803-bec1-4f3e-98ab-5c7961f2c261}*SharedItemsImports = 13
 		common\Ntreev.Crema.Commands.Sharing\Ntreev.Crema.Commands.Sharing.projitems*{3d3128aa-908d-44c4-9efd-0e1a903f5287}*SharedItemsImports = 13
 		common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems*{5a7af7db-03ca-4daa-9845-55721c0473dd}*SharedItemsImports = 5
 		common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.projitems*{6baf8a0b-5b3e-40ea-8e96-c667df63516c}*SharedItemsImports = 13
+		common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.projitems*{92ae7f66-00c6-4e96-8abf-cdecd55c004e}*SharedItemsImports = 5
 		common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems*{97ad6c00-3b71-4e83-97c3-0201bc035471}*SharedItemsImports = 13
+		common\Ntreev.Crema.Commands.Spreadsheet.Sharing\Ntreev.Crema.Commands.Spreadsheet.Sharing.projitems*{a41e71c2-33f2-4ebf-b8e9-4050bb6c282d}*SharedItemsImports = 5
 		common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.projitems*{a4955825-195f-4677-9695-5fc67362a449}*SharedItemsImports = 13
 		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{ad0eba0c-d167-4722-a2a7-82b17e1fc9aa}*SharedItemsImports = 13
+		common\Ntreev.Crema.Bot.Sharing\Ntreev.Crema.Bot.Sharing.projitems*{b56b66d4-1192-41ff-8be4-ff8a75be20fb}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -290,7 +294,7 @@ Global
 		{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C} = {728568E6-EB87-422E-970B-4B89D50CDBB7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.ExceptionHandling.6.0.1304.0\lib\NET45
 		SolutionGuid = {3A345B68-213C-4BA4-8420-8419E3900B67}
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.ExceptionHandling.6.0.1304.0\lib\NET45
 	EndGlobalSection
 EndGlobal

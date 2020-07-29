@@ -1,4 +1,5 @@
 ﻿using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Client.Framework.Controls
+namespace Ntreev.Crema.Presentation.Framework.Controls
 {
     /// <summary>
     /// UserControl1.xaml에 대한 상호 작용 논리
@@ -73,11 +74,6 @@ namespace Ntreev.Crema.Client.Framework.Controls
         }
 
         public event EventHandler PopupClosed;
-
-        protected override void OnMouseEnter(MouseEventArgs e)
-        {
-            base.OnMouseEnter(e);
-        }
 
         protected virtual void OnPopupClosed(EventArgs e)
         {

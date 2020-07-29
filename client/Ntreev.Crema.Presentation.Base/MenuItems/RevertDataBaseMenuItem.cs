@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
     }

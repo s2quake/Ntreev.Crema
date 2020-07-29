@@ -65,7 +65,7 @@ namespace Ntreev.Crema.Presentation.Framework
         public static async Task<bool> LockAsync(Authentication authentication, ILockableDescriptor descriptor)
         {
             var dialog = await LockLockableViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            return await dialog?.ShowDialogAsync() == true;
         }
 
         public static async Task<bool> UnlockAsync(Authentication authentication, ILockableDescriptor descriptor)
@@ -79,7 +79,7 @@ namespace Ntreev.Crema.Presentation.Framework
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return false;
                 }
             }

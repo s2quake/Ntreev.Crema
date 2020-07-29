@@ -54,36 +54,36 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             this.DisplayName = Resources.Title_EditConnectionItem;
         }
 
-        public void Change()
+        public async Task ChangeAsync()
         {
             if (this.isPasswordChanged == true)
             {
                 this.connectionItemInfo.Password = StringUtility.Encrypt(this.connectionItemInfo.Password, this.connectionItemInfo.ID);
             }
-            this.TryClose(true);
+            await this.TryCloseAsync(true);
         }
 
-        public void SelectDataBase()
+        public async Task SelectDataBaseAsync()
         {
             var dialog = new SelectDataBaseViewModel(this.ConnectionInfo.Address)
             {
                 SelectedValue = this.connectionItemInfo.DataBaseName,
             };
 
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync () == true)
             {
                 this.connectionItemInfo.DataBaseName = dialog.SelectedItem.Name;
             }
         }
 
-        public void SelectThemeColor()
+        public async Task SelectThemeColorAsync()
         {
             var dialog = new SelectColorViewModel()
             {
                 CurrentColor = this.connectionItemInfo.ThemeColor,
             };
 
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 this.connectionItemInfo.ThemeColor = dialog.CurrentColor;
             }

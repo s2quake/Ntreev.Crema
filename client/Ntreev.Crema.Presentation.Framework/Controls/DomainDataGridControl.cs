@@ -181,7 +181,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             base.OnKeyDown(e);
         }
 
-        protected override void OnCopyExecuted(object sender, ExecutedRoutedEventArgs e)
+        protected async override void OnCopyExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             try
             {
@@ -189,11 +189,11 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
             catch (Exception ex)
             {
-                AppMessageBox.ShowError(ex);
+                await AppMessageBox.ShowErrorAsync(ex);
             }
         }
 
-        protected override void OnCopyWithHeadersExecuted(object sender, ExecutedRoutedEventArgs e)
+        protected async override void OnCopyWithHeadersExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             try
             {
@@ -201,7 +201,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
             catch (Exception ex)
             {
-                AppMessageBox.ShowError(ex);
+                await AppMessageBox.ShowErrorAsync(ex);
             }
         }
 
@@ -321,11 +321,11 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
-        private void RequestResetFields(DomainRowInfo[] rows)
+        private async void RequestResetFields(DomainRowInfo[] rows)
         {
             try
             {
@@ -335,7 +335,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
@@ -362,7 +362,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
                         from item in this.CollectItems(gridContext, range.ItemRange)
                         select item;
 
-            if (AppMessageBox.ShowQuestion(Properties.Resources.Message_ConfirmToDeleteSelectedRows_Format, query.Count()) == false)
+            if (await AppMessageBox.ShowQuestion(Properties.Resources.Message_ConfirmToDeleteSelectedRows_Format, query.Count()) == false)
                 return;
 
             await this.RequestRemoveRowsAsync(query.ToArray());
@@ -373,9 +373,9 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             e.CanExecute = this.CanResetSelectedFields;
         }
 
-        private void ResetFields_Execute(object sender, ExecutedRoutedEventArgs e)
+        private async void ResetFields_Execute(object sender, ExecutedRoutedEventArgs e)
         {
-            if (AppMessageBox.ShowQuestion(Properties.Resources.Message_ConfirmToResetSelectedFields) == false)
+            if (await AppMessageBox.ShowQuestion(Properties.Resources.Message_ConfirmToResetSelectedFields) == false)
                 return;
 
             var query = from gridContext in this.SelectedContexts
@@ -403,7 +403,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             this.RequestPasteFromClipboard();
         }
 
-        private void RequestPasteFromClipboard()
+        private async Task RequestPasteFromClipboard()
         {
             try
             {
@@ -411,7 +411,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
             catch (Exception ex)
             {
-                AppMessageBox.ShowError(ex);
+                await AppMessageBox.ShowErrorAsync(ex);
             }
         }
     }

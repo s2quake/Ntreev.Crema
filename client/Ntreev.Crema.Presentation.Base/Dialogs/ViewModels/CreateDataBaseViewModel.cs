@@ -72,12 +72,12 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
                 this.BeginProgress(Resources.Message_CreatingNewDataBase);
                 await this.DataBaseContext.AddNewDataBaseAsync(this.authentication, this.DataBaseName, this.Comment);
                 this.EndProgress();
-                this.TryClose(true);
-                AppMessageBox.Show(Resources.Message_CreatedNewDataBase);
+                await this.TryCloseAsync(true);
+                await AppMessageBox.ShowAsync(Resources.Message_CreatedNewDataBase);
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
                 this.EndProgress();
             }
         }

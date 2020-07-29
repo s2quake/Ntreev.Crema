@@ -22,7 +22,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:cal="http://www.caliburnproject.org"
-             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
              xmlns:nmfm="clr-namespace:Ntreev.ModernUI.Framework.Markup;assembly=Ntreev.ModernUI.Framework"
              xmlns:ctrl="clr-namespace:Ntreev.Crema.Presentation.Base.Controls"
