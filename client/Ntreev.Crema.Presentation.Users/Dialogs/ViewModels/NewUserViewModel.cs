@@ -29,6 +29,7 @@ using Ntreev.ModernUI.Framework;
 using Ntreev.Library;
 using System.Security;
 using Ntreev.Crema.Presentation.Users.Properties;
+using System.Threading;
 
 namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 {
@@ -70,20 +71,20 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
             }
         }
 
-        public async void Create()
+        public async Task CreateAsync()
         {
             try
             {
                 this.BeginProgress(Resources.Message_NewUser);
                 await this.category.AddNewUserAsync(this.authentication, this.ID, this.Password, this.UserName, this.Authority);
                 this.EndProgress();
-                this.TryClose(true);
-                AppMessageBox.Show(Resources.Message_NewUserComplete);
+                await this.TryCloseAsync(true);
+                await AppMessageBox.ShowAsync(Resources.Message_NewUserComplete);
             }
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
@@ -155,19 +156,18 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
             }
         }
 
-        protected override void OnDeactivate(bool close)
+        protected async override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
-            base.OnDeactivate(close);
-
+            await base.OnDeactivateAsync(close, cancellationToken);
             if (close == true)
             {
                 this.authentication.Expired -= Authentication_Expired;
             }
         }
 
-        private void Authentication_Expired(object sender, EventArgs e)
+        private async void Authentication_Expired(object sender, EventArgs e)
         {
-            this.Dispatcher.InvokeAsync(() => this.TryClose());
+            await this.TryCloseAsync();
         }
     }
 }

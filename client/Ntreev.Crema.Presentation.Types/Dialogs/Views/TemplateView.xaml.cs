@@ -120,7 +120,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.Views
                 }
                 catch (Exception ex)
                 {
-                    AppMessageBox.ShowError(ex);
+                    await AppMessageBox.ShowErrorAsync(ex);
                 }
             }
         }

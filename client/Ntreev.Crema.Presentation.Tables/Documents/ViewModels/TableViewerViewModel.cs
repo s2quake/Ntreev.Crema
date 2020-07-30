@@ -75,7 +75,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             //if (e is DomainDeletedEventArgs ex)
             //{
             //    this.flashServie?.Flash();
-            //    AppMessageBox.ShowInfo("'{0}'에 의해서 편집이 종료되었습니다.", ex.UserID);
+            //    await AppMessageBox.ShowInfoAsync("'{0}'에 의해서 편집이 종료되었습니다.", ex.UserID);
             //}
             //this.TryClose();
         }
@@ -87,7 +87,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             //if (e is DomainDeletedEventArgs ex)
             //{
             //    this.flashServie?.Flash();
-            //    AppMessageBox.ShowInfo("'{0}'에 의해서 편집이 취소되었습니다.", ex.UserID);
+            //    await AppMessageBox.ShowInfoAsync("'{0}'에 의해서 편집이 취소되었습니다.", ex.UserID);
             //}
             //this.TryClose();
         }
@@ -99,7 +99,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             //this.flashServie?.Flash();
             //if (e is DomainUserRemovedEventArgs ex)
             //{
-            //    AppMessageBox.ShowInfo(ex.RemoveInfo.Message, "추방되었습니다.");
+            //    await AppMessageBox.ShowInfoAsync(ex.RemoveInfo.Message, "추방되었습니다.");
             //}
             //this.TryClose();
         }
@@ -119,11 +119,11 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
                 this.EndProgress();
                 this.DetachEvent();
                 this.Tables.Clear();
-                this.TryClose();
+                await this.TryCloseAsync();
                 return;
             }
 

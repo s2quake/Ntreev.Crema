@@ -90,7 +90,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             isVerify(result);
         }
 
-        protected override Task RenameAsync(string newName)
+        protected override Task OnRenameAsync(string newName)
         {
             return this.table.RenameAsync(this.authentication, newName);
         }

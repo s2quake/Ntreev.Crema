@@ -44,7 +44,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             this.Owner = browser;
         }
 
-        public void NewFolder()
+        public async Task NewFolderAsync()
         {
             var query = from item in this.Items
                         where item is BookmarkCategoryTreeViewItemViewModel
@@ -52,7 +52,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
                         select viewModel.DisplayName;
 
             var dialog = new NewCategoryViewModel(PathUtility.Separator, query.ToArray());
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             try
@@ -65,15 +65,15 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
         // 북마크 폴더 삭제
-        public void Delete()
+        public async Task DeleteAsync()
         {
             var dialog = new DeleteViewModel();
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 this.Parent.Items.Remove(this);
                 this.Browser.UpdateBookmarkItems();
@@ -81,11 +81,11 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
         }
 
         // 북마크 폴더 이름 변경
-        public void Rename()
+        public async Task RenameAsync()
         {
             var categoryPaths = this.Browser.GetBookmarkCategoryPaths();
             var dialog = new RenameBookmarkCategoryViewModel(this.categoryName.Path, categoryPaths);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             try
@@ -97,16 +97,16 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
         // 북마크 폴더 이동
-        public void Move()
+        public async Task MoveAsync()
         {
             var itemPaths = this.Browser.GetBookmarkItemPaths();
             var dialog = new MoveBookmarkItemViewModel(this.Path, itemPaths);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             try
@@ -118,7 +118,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

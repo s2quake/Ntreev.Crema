@@ -72,7 +72,9 @@ namespace Ntreev.Crema.Presentation.Users
                 {
                     var user = await userContext.Dispatcher.InvokeAsync(() => userContext.Users[descriptor.DomainUserInfo.UserID]);
                     var dialog = await user.Dispatcher.InvokeAsync(() => new SendMessageViewModel(authentication, user));
-                    return dialog?.ShowDialog() == true;
+                    if (dialog != null)
+                        return await dialog.ShowDialogAsync() == true;
+                    return false;
                 }
                 return false;
             }
@@ -94,7 +96,7 @@ namespace Ntreev.Crema.Presentation.Users
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return false;
                 }
             }
@@ -107,7 +109,9 @@ namespace Ntreev.Crema.Presentation.Users
         public static async Task<bool> KickAsync(Authentication authentication, IDomainUserDescriptor descriptor)
         {
             var dialog = await KickEditorViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            if (dialog != null)
+                return await dialog.ShowDialogAsync() == true;
+            return false;
         }
     }
 }

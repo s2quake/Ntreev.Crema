@@ -52,7 +52,7 @@ namespace Ntreev.Crema.Presentation.Differences.MenuItems
             return false;
         }
 
-        protected override void OnExecute(object parameter)
+        protected async override void OnExecute(object parameter)
         {
             var viewModel = parameter as LogInfoViewModel;
             var table = viewModel.Target as ITable;
@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Presentation.Differences.MenuItems
             {
                 DisplayName = Resources.Title_CompareWithLatestRevision,
             };
-            dialog.ShowDialog();
+            await dialog.ShowDialogAsync();
         }
 
         private async Task<DiffDataTable> Initialize(LogInfoViewModel viewModel, ITable table)

@@ -87,7 +87,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return null;
                 }
             }
@@ -104,13 +104,13 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
                 this.BeginProgress(Resources.Message_Change);
                 await this.user.ChangeUserInfoAsync(this.authentication, this.Password, this.NewPassword, null, null);
                 this.EndProgress();
-                this.TryClose(true);
-                AppMessageBox.ShowInfo(Resources.Message_ChangeComplete);
+                await this.TryCloseAsync(true);
+                await AppMessageBox.ShowInfoAsync(Resources.Message_ChangeComplete);
             }
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

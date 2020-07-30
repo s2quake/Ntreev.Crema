@@ -191,7 +191,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.Views
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
                 return;
             }
 
@@ -206,7 +206,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.Views
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

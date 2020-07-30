@@ -36,7 +36,7 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.Views
     /// <summary>
     /// TemplateColumnInfoView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class TemplateColumnInfoView : BrowserExpander
+    public partial class TemplateColumnInfoView : ModernExpander
     {
         public TemplateColumnInfoView()
         {

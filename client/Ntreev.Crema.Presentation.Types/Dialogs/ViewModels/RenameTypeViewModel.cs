@@ -71,7 +71,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             isVerify(result);
         }
 
-        protected override Task RenameAsync(string newName)
+        protected override Task OnRenameAsync(string newName)
         {
             return this.type.RenameAsync(this.authentication, newName);
         }

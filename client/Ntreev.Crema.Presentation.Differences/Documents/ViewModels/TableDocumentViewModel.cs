@@ -52,12 +52,12 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
                 item.PropertyChanged += DocumentItem_PropertyChanged;
             }
             this.undoService.Changed += UndoService_Changed;
-            this.resolveCommand = new DelegateCommand((p) => this.Resolve(), (p) => this.CanResolve);
+            this.resolveCommand = new DelegateCommand((p) => this.ResolveAsync(), (p) => this.CanResolve);
             this.SelectedItem = this.itemList.First();
             this.DisplayName = viewModel.DisplayName;
         }
 
-        public void Resolve()
+        public async Task ResolveAsync()
         {
             try
             {
@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

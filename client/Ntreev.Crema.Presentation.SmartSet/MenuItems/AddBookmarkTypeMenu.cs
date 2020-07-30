@@ -61,13 +61,13 @@ namespace Ntreev.Crema.Presentation.SmartSet.MenuItems
             return false;
         }
 
-        protected override void OnExecute(object parameter)
+        protected async override void OnExecute(object parameter)
         {
             if (parameter is ITypeDescriptor descriptor)
             {
                 var itemPaths = this.browser.GetBookmarkItemPaths();
                 var dialog = new AddBookmarkItemViewModel(this.authenticator, descriptor.Name, itemPaths);
-                if (dialog.ShowDialog() == true)
+                if (await dialog.ShowDialogAsync() == true)
                 {
                     this.browser.AddBookmarkItem(dialog.TargetPath, descriptor);
                 }

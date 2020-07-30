@@ -131,7 +131,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
 
             this.EndProgress();

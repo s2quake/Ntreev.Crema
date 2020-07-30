@@ -32,6 +32,7 @@ using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
 using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
@@ -80,31 +81,31 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             get { return this.smartSet; }
         }
 
-        public void Rename()
+        public async Task RenameAsync()
         {
             var dialog = new RenameViewModel(this.smartSet.Name, item => this.smartSet.Category.Items.ContainsKey(item) == false);
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 this.smartSet.Name = dialog.NewName;
             }
         }
 
-        public void Edit()
+        public async Task EditAsync()
         {
             var dialog = new SmartSetEditViewModel(this.SmartSet.RuleItems, this.browser.Rules)
             {
                 SmartSetName = this.smartSet.Name,
             };
 
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 this.smartSet.RuleItems = dialog.RuleItems;
             }
         }
 
-        public void Delete()
+        public async Task DeleteAsync()
         {
-            if (AppMessageBox.ConfirmDelete() == false)
+            if (await AppMessageBox.ConfirmDeleteAsync() == false)
                 return;
 
             this.smartSet.Dispose();

@@ -49,16 +49,16 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
         [Import]
         private Lazy<BrowserService> browserService = null;
 
-        public void Add()
+        public async Task AddAsync()
         {
-            var destDataBaseName = this.SelectDataBase();
+            var destDataBaseName = await this.SelectDataBaseAsync();
             if (destDataBaseName == null)
                 return;
 
             var task = new BackgroundViewModel(this.authenticator, this.cremaHost, this.cremaAppHost.DataBaseName, destDataBaseName);
             task.ProgressChanged += Task_ProgressChanged;
             var dialog = new BackgroundTaskViewModel(task) { DisplayName = "데이터 베이스 비교하기", };
-            dialog.ShowDialog();
+            await dialog.ShowDialogAsync();
         }
 
         public string DisplayName => "데이터 베이스 비교하기";
@@ -76,10 +76,10 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             }
         }
 
-        private string SelectDataBase()
+        private async Task<string> SelectDataBaseAsync()
         {
             var dialog = new SelectDataBaseViewModel(this.authenticator, this.cremaAppHost, (item) => item.Name != this.cremaAppHost.DataBaseName);
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 return dialog.SelectedValue;
             }

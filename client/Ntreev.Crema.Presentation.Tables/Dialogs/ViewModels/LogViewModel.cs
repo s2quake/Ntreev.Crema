@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             this.authentication = authentication;
             this.tableItem = tableItem;
             this.DisplayName = Resources.Title_ViewLog;
-            this.previewCommand = new DelegateCommand((p) => this.Preview(), (p) => this.CanPreview);
+            this.previewCommand = new DelegateCommand((p) => this.PreviewAsync(), (p) => this.CanPreview);
         }
 
         public static async Task<LogViewModel> ShowDialogAsync(Authentication authentication, ITableItemDescriptor descriptor)
@@ -69,7 +69,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
                 try
                 {
                     var dialog = await tableItem.Dispatcher.InvokeAsync(() => new LogViewModel(authentication, tableItem));
-                    if (dialog.ShowDialog() == true)
+                    if (await dialog.ShowDialogAsync() == true)
                         return dialog;
                     return null;
                 }
@@ -82,14 +82,14 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             throw new NotImplementedException();
         }
 
-        public void Close()
+        public Task CloseAsync()
         {
-            this.TryClose(true);
+            return this.TryCloseAsync(true);
         }
 
-        public void Preview()
+        public Task PreviewAsync()
         {
-            this.selectedItem.Preview();
+            return this.selectedItem.PreviewAsync();
         }
 
         public LogInfoViewModel SelectedItem
@@ -152,8 +152,8 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
-                this.TryClose();
+                await AppMessageBox.ShowErrorAsync(e);
+                await this.TryCloseAsync();
             }
         }
 

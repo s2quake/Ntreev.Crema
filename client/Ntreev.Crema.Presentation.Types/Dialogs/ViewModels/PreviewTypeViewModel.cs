@@ -64,8 +64,8 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
-                this.TryClose();
+                await AppMessageBox.ShowErrorAsync(e);
+                await this.TryCloseAsync();
             }
             finally
             {

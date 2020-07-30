@@ -99,22 +99,22 @@ namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
             }
         }
 
-        public void Save()
+        public async Task SaveAsync()
         {
             try
             {
                 this.ruleItems = this.ItemsSource.Select(item => item.RuleItem).ToArray();
-                this.TryClose(true);
+                await this.TryCloseAsync(true);
             }
             catch (Exception ex)
             {
-                AppMessageBox.ShowError(ex.Message);
+                await AppMessageBox.ShowErrorAsync(ex.Message);
             }
         }
 
-        public void Cancel()
+        public async Task CancelAsync()
         {
-            this.TryClose();
+            await this.TryCloseAsync();
         }
     }
 }

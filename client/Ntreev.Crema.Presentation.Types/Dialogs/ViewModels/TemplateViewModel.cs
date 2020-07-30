@@ -30,6 +30,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Ntreev.Library;
 using System.Collections;
+using System.Threading;
 
 namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 {
@@ -71,7 +72,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             this.DisplayName = Resources.Title_EditTypeTemplate;
         }
 
-        public async void Change()
+        public async Task ChangeAsync()
         {
             try
             {
@@ -87,12 +88,12 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
                 this.template = null;
                 this.isModified = false;
                 this.EndProgress();
-                this.TryClose(true);
+                await this.TryCloseAsync(true);
             }
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
@@ -105,7 +106,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
                 Name = name,
                 Value = items.Length,
             };
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 var member = await this.template.AddNewAsync(this.authentication);
                 await member.SetNameAsync(this.authentication, dialog.Name);
@@ -227,25 +228,24 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             }
         }
 
-        public async override void CanClose(Action<bool> callback)
+        public async override Task<bool> CanCloseAsync(CancellationToken cancellationToken)
         {
             if (this.template == null || this.IsModified == false)
             {
-                callback(true);
-                return;
+                return true;
             }
 
-            var result = AppMessageBox.ConfirmCreateOnClosing();
+            var result = await AppMessageBox.ConfirmCreateOnClosingAsync();
 
             if (result == null)
-                return;
+                return false;
 
             if (this.template != null && result == true)
             {
                 if (this.typeNameError != null)
                 {
-                    AppMessageBox.Show(this.typeNameError);
-                    return;
+                    await AppMessageBox.ShowAsync(this.typeNameError);
+                    return false;
                 }
                 this.BeginProgress(this.IsNew ? Resources.Message_Creating : Resources.Message_Changing);
                 try
@@ -262,20 +262,13 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     this.EndProgress();
-                    return;
+                    return false;
                 }
             }
 
-            this.DialogResult = result.Value;
-            callback(true);
-        }
-
-        protected override void OnProgress()
-        {
-            base.OnProgress();
-            this.NotifyOfPropertyChange(nameof(this.CanChange));
+            return result.Value;
         }
 
         protected abstract void Verify(Action<bool> isValid);
@@ -297,10 +290,9 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             this.Verify(this.VerifyAction);
         }
 
-        protected async override void OnDeactivate(bool close)
+        protected async override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
-            base.OnDeactivate(close);
-
+            await base.OnDeactivateAsync(close, cancellationToken);
             if (this.template != null)
             {
                 await this.template.CancelEditAsync(this.authentication);
@@ -332,9 +324,9 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.flashService?.Flash();
-                    AppMessageBox.ShowInfo(Resources.Message_ExitEditByUser_Format, ex.UserID);
-                    this.TryClose();
                 });
+                await AppMessageBox.ShowInfoAsync(Resources.Message_ExitEditByUser_Format, ex.UserID);
+                await this.TryCloseAsync();
             }
         }
 
@@ -350,9 +342,9 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.flashService?.Flash();
-                    AppMessageBox.ShowInfo(Resources.Message_ExitEditByUser_Format, ex.UserID);
-                    this.TryClose();
                 });
+                await AppMessageBox.ShowInfoAsync(Resources.Message_ExitEditByUser_Format, ex.UserID);
+                await this.TryCloseAsync();
             }
         }
 

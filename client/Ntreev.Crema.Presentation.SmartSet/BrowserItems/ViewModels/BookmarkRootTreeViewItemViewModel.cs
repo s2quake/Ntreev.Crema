@@ -51,7 +51,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             get { return this.Owner as SmartSetBrowserViewModel; }
         }
 
-        public void NewFolder()
+        public async Task NewFolderAsync()
         {
             var query = from item in this.Items
                         where item is BookmarkCategoryTreeViewItemViewModel
@@ -59,7 +59,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
                         select viewModel.DisplayName;
 
             var dialog = new NewCategoryViewModel(PathUtility.Separator, query.ToArray());
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             try
@@ -72,7 +72,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

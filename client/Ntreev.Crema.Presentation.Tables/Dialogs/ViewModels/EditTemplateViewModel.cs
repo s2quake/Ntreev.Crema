@@ -58,7 +58,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return null;
                 }
             }

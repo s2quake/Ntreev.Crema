@@ -94,11 +94,11 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             {
                 await this.row.Content.EndNewAsync(this.authentication, this.row);
                 this.keys = await this.row.GetKeysAsync();
-                this.TryClose(true);
+                await this.TryCloseAsync(true);
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

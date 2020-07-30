@@ -45,7 +45,7 @@ namespace Ntreev.Crema.Presentation.Differences.MenuItems
             this.DisplayName = Resources.MenuItem_CompareWithPreviousResivision;
         }
 
-        protected override void OnExecute(object parameter)
+        protected async override void OnExecute(object parameter)
         {
             var tableDescriptor = parameter as ITableDescriptor;
             var table = tableDescriptor.Target;
@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Presentation.Differences.MenuItems
             {
                 DisplayName = Resources.Title_CompareWithPreviousResivision,
             };
-            dialog.ShowDialog();
+            await dialog.ShowDialogAsync();
         }
 
         private async Task<DiffDataTable> Initialize(ITable table)

@@ -120,7 +120,7 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
 
             this.EndProgress();
@@ -165,9 +165,9 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
                 this.EndProgress();
-                this.TryClose();
+                await this.TryCloseAsync();
             }
         }
     }

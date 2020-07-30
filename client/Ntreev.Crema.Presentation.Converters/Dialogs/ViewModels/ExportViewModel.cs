@@ -228,11 +228,11 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
                     await Task.Run(() => this.selectedExporter.Export(null, dataSet));
                 }
                 this.configs.Commit(this);
-                AppMessageBox.Show(Resources.Message_Exported);
+                await AppMessageBox.ShowAsync(Resources.Message_Exported);
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
             finally
             {

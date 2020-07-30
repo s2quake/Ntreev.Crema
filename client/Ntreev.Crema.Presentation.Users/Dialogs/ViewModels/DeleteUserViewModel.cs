@@ -27,6 +27,7 @@ using System.Threading.Tasks;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Users.Properties;
+using System.Threading;
 
 namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 {
@@ -64,24 +65,23 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
             }
         }
 
-        protected override Task DeleteAsync()
+        protected override Task OnDeleteAsync()
         {
             return this.user.DeleteAsync(this.authentication);
         }
 
-        protected override void OnDeactivate(bool close)
+        protected async override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
-            base.OnDeactivate(close);
-
+            await base.OnDeactivateAsync(close, cancellationToken);
             if (close == true)
             {
                 this.authentication.Expired -= Authentication_Expired;
             }
         }
 
-        private void Authentication_Expired(object sender, EventArgs e)
+        private async void Authentication_Expired(object sender, EventArgs e)
         {
-            this.Dispatcher.InvokeAsync(() => this.TryClose());
+            await this.TryCloseAsync();
         }
     }
 }

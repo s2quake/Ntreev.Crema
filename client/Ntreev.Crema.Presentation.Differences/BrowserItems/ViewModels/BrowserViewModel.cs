@@ -57,14 +57,14 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
         public BrowserViewModel(DiffDataSet dataSet)
         {
             this.dataSet = dataSet;
-            this.closeCommand = new DelegateCommand((p) => this.Close(), (p) => this.CanClose);
+            this.closeCommand = new DelegateCommand((p) => this.CloseAsync(), (p) => this.CanClose);
             this.DisplayName = dataSet.Header1;
             this.Dispatcher.InvokeAsync(() => this.AttachPropertyService(this.propertyService));
         }
 
-        public async void Close()
+        public async Task CloseAsync()
         {
-            if (AppMessageBox.ConfirmDelete() == false)
+            if (await AppMessageBox.ConfirmDeleteAsync() == false)
                 return;
             this.BeginProgress();
             await this.CloseDocumentsAsync(false);
@@ -212,27 +212,27 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
                 var dataBaseName = this.cremaAppHost.DataBaseName;
                 var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[dataBaseName]);
 
-                var comment = this.GetComment(viewModel.DisplayName);
+                var comment = await this.GetCommentAsync(viewModel.DisplayName);
                 if (comment == null)
                     return;
 
                 var dialog = new ProgressViewModel();
                 dialog.DisplayName = viewModel.DisplayName;
-                dialog.ShowDialog(() => dataBase.ImportAsync(this.authenticator, dataTable.DataSet, comment));
+                await dialog.ShowDialogAsync(() => dataBase.ImportAsync(this.authenticator, dataTable.DataSet, comment));
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
-        private string GetComment(string displayName)
+        private async Task<string> GetCommentAsync(string displayName)
         {
             var dialog = new CommentViewModel()
             {
                 DisplayName = displayName,
             };
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
                 return dialog.Comment;
             return null;
         }

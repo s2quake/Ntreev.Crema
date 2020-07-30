@@ -34,6 +34,7 @@ using Ntreev.Crema.Presentation.Users.Dialogs.ViewModels;
 using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.Crema.Presentation.Users.Properties;
 using Ntreev.Library;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
 {
@@ -77,11 +78,12 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
             });
         }
 
-        public async void NotifyMessage()
+        public async Task NotifyMessageAsync()
         {
             var userContext = this.cremaAppHost.GetService(typeof(IUserContext)) as IUserContext;
             var dialog = await NotifyMessageViewModel.CreateInstanceAsync(this.authenticator, userContext);
-            dialog?.ShowDialog();
+            if (dialog != null)
+                await dialog.ShowDialogAsync();
         }
 
         public bool IsVisible => this.cremaAppHost.IsOpened;
@@ -132,10 +134,10 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
                 {
                     await this.Dispatcher.InvokeAsync(() =>
                     {
-                        var title = string.Format(Resources.Title_AdministratorMessage_Format, sendUserID);
-                        this.flashService?.Flash();
-                        AppMessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
                     });
+                    var title = string.Format(Resources.Title_AdministratorMessage_Format, sendUserID);
+                    this.flashService?.Flash();
+                    await AppMessageBox.ShowAsync(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             else if (messageType == MessageType.None)
@@ -144,10 +146,11 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
                 {
                     await this.Dispatcher.InvokeAsync(async () =>
                     {
-                        var userContext = this.cremaAppHost.GetService(typeof(IUserContext)) as IUserContext;
-                        var dialog = await ViewMessageViewModel.CreateInstanceAsync(this.authenticator, userContext, message, sendUserID);
-                        dialog?.ShowDialog();
                     });
+                    var userContext = this.cremaAppHost.GetService(typeof(IUserContext)) as IUserContext;
+                    var dialog = await ViewMessageViewModel.CreateInstanceAsync(this.authenticator, userContext, message, sendUserID);
+                    if (dialog != null)
+                        await dialog.ShowDialogAsync();
                 }
             }
         }

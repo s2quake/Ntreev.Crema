@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
@@ -37,7 +38,8 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
                 document = new PreviewTypeDocumentViewModel(dataType) { DisplayName = dataType.Name, };
                 this.Items.Add(document);
             }
-            this.ActivateItem(document);
+            var cancellation = new CancellationTokenSource();
+            this.ActivateItemAsync(document, cancellation.Token);
         }
     }
 }

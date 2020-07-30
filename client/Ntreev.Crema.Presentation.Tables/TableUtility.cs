@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xceed.Wpf.AvalonDock.Layout;
 
 namespace Ntreev.Crema.Presentation.Tables
 {
@@ -128,12 +129,10 @@ namespace Ntreev.Crema.Presentation.Tables
             var comment = await LockAsync(authentication, descriptor, nameof(ITable.RenameAsync));
             if (comment == null)
                 return false;
-
             var dialog = await RenameTableViewModel.CreateInstanceAsync(authentication, descriptor);
-            dialog?.ShowDialog();
-
+            var dialogResult = await ShowDialogAsync(dialog);
             await UnlockAsync(authentication, descriptor, comment);
-            return dialog?.DialogResult == true;
+            return dialogResult;
         }
 
         public static async Task<bool> MoveAsync(Authentication authentication, ITableDescriptor descriptor)
@@ -141,18 +140,17 @@ namespace Ntreev.Crema.Presentation.Tables
             var comment = await LockAsync(authentication, descriptor, nameof(ITable.MoveAsync));
             if (comment == null)
                 return false;
-
             var dialog = await MoveTableViewModel.CreateInstanceAsync(authentication, descriptor);
-            dialog?.ShowDialog();
-
+            var dialogResult = await ShowDialogAsync(dialog);
             await UnlockAsync(authentication, descriptor, comment);
-            return dialog?.DialogResult == true;
+            return dialogResult;
         }
 
         public static async Task<bool> DeleteAsync(Authentication authentication, ITableDescriptor descriptor)
         {
             var dialog = await DeleteTableViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            var dialogResult = await ShowDialogAsync(dialog);
+            return dialogResult;
         }
 
         public static async Task<bool> EditContentAsync(Authentication authentication, ITableDescriptor descriptor)
@@ -189,7 +187,7 @@ namespace Ntreev.Crema.Presentation.Tables
         {
             if (descriptor.Target is ITable table)
             {
-                if (AppMessageBox.ShowProceed("편집을 취소합니다. 저장되지 않는 항목은 사라집니다. 계속하시겠습니까?") == false)
+                if (await AppMessageBox.ShowProceedAsync("편집을 취소합니다. 저장되지 않는 항목은 사라집니다. 계속하시겠습니까?") == false)
                     return false;
 
                 try
@@ -199,7 +197,7 @@ namespace Ntreev.Crema.Presentation.Tables
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return false;
                 }
             }
@@ -213,7 +211,7 @@ namespace Ntreev.Crema.Presentation.Tables
         {
             if (descriptor.Target is ITable table)
             {
-                if (AppMessageBox.ShowProceed("편집을 종료합니다. 계속하시겠습니까?") == false)
+                if (await AppMessageBox.ShowProceedAsync("편집을 종료합니다. 계속하시겠습니까?") == false)
                     return false;
 
                 try
@@ -223,7 +221,7 @@ namespace Ntreev.Crema.Presentation.Tables
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return false;
                 }
             }
@@ -240,28 +238,25 @@ namespace Ntreev.Crema.Presentation.Tables
             //    return false;
 
             var dialog = await EditTemplateViewModel.CreateInstanceAsync(authentication, descriptor);
-            dialog?.ShowDialog();
-
-            //await UnlockAsync(authentication, descriptor, comment);
-            return dialog?.DialogResult == true;
+            return await ShowDialogAsync(dialog);
         }
 
         public static async Task<bool> ViewTemplateAsync(Authentication authentication, ITableDescriptor descriptor)
         {
             var dialog = await ViewTemplateViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            return await ShowDialogAsync(dialog);
         }
 
         public static async Task<bool> CopyAsync(Authentication authentication, ITableDescriptor descriptor)
         {
             var dialog = await CopyTableViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            return await ShowDialogAsync(dialog);
         }
 
         public static async Task<bool> InheritAsync(Authentication authentication, ITableDescriptor descriptor)
         {
             var dialog = await CopyTableViewModel.CreateInstanceAsync(authentication, descriptor, true);
-            return dialog?.ShowDialog() == true;
+            return await ShowDialogAsync(dialog);
         }
 
         public static async Task<bool> NewTableAsync(Authentication authentication, ITableDescriptor descriptor)
@@ -269,12 +264,10 @@ namespace Ntreev.Crema.Presentation.Tables
             var comment = await LockAsync(authentication, descriptor, nameof(ITable.NewTableAsync));
             if (comment == null)
                 return false;
-
             var dialog = await NewChildTableViewModel.CreateInstanceAsync(authentication, descriptor);
-            dialog?.ShowDialog();
-
+            var dialogResult = await ShowDialogAsync(dialog);
             await UnlockAsync(authentication, descriptor, comment);
-            return dialog?.DialogResult == true;
+            return dialogResult;
         }
 
         //public static async Task<bool> ViewLogAsync(Authentication authentication, ITableDescriptor descriptor)
@@ -299,7 +292,7 @@ namespace Ntreev.Crema.Presentation.Tables
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return null;
                 }
             }
@@ -326,7 +319,7 @@ namespace Ntreev.Crema.Presentation.Tables
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                 }
             }
             else
@@ -370,5 +363,12 @@ namespace Ntreev.Crema.Presentation.Tables
         //    }
         //    return null;
         //}
+
+        private static async Task<bool> ShowDialogAsync(ModalDialogBase dialog)
+        {
+            if (dialog != null)
+                return await dialog.ShowDialogAsync() == true;
+            return false;
+        }
     }
 }

@@ -31,6 +31,7 @@ using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
 using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
@@ -60,10 +61,10 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             this.category.Categories.CollectionChanged += Category_CategoriesChanged;
         }
 
-        public void NewFolder()
+        public async Task NewFolderAsync()
         {
             var dialog = new NewCategoryViewModel(this.category.Path, item => this.category.Categories.ContainsKey(item) == false);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             try
@@ -72,14 +73,14 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
-        public void NewSmartSet()
+        public async Task NewSmartSetAsync()
         {
             var dialog = new SmartSetEditViewModel(this.browser.Rules);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             try
@@ -89,14 +90,14 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
-        public void Rename()
+        public async Task RenameAsync()
         {
             var dialog = new RenameViewModel(this.category.Name, item => this.category.Parent.Categories.ContainsKey(item) == false);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             try
@@ -105,18 +106,18 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
-        public void Move()
+        public async Task MoveAsync()
         {
 
         }
 
-        public void Delete()
+        public async Task DeleteAsync()
         {
-            if (AppMessageBox.ConfirmDelete() == false)
+            if (await AppMessageBox.ConfirmDeleteAsync() == false)
                 return;
 
             try
@@ -125,7 +126,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

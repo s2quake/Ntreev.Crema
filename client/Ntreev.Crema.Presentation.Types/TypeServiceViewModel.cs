@@ -85,9 +85,9 @@ namespace Ntreev.Crema.Presentation.Types
             return Resources.Title_Type;
         }
 
-        public void Dispose()
+        public async void Dispose()
         {
-            this.documentService.TryClose();
+            await this.documentService.TryCloseAsync();
         }
 
         public IBrowserService BrowserService
@@ -234,13 +234,13 @@ namespace Ntreev.Crema.Presentation.Types
                         {
                             var category = dataBase.TypeContext[itemPath] as ITypeCategory;
                             var dialog = await category.Dispatcher.InvokeAsync(() => new NewTypeViewModel(this.authenticator, category, template));
-                            restoreList.Add(new System.Action(() => dialog.ShowDialog()));
+                            restoreList.Add(new System.Action(() => dialog.ShowDialogAsync()));
                         }
                         else if (itemType == "TypeTemplate")
                         {
                             var type = dataBase.TypeContext[itemPath] as IType;
                             var dialog = await type.Dispatcher.InvokeAsync(() => new EditTemplateViewModel(this.authenticator, type, template));
-                            restoreList.Add(new System.Action(() => dialog.ShowDialog()));
+                            restoreList.Add(new System.Action(() => dialog.ShowDialogAsync()));
                         }
                     }
                 }

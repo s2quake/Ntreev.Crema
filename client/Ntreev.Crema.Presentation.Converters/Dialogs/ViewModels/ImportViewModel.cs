@@ -76,7 +76,7 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
         }
 
         [Obsolete("Progress")]
-        public async void Import()
+        public async Task ImportAsync()
         {
             this.cancelToken = new CancellationTokenSource();
             this.CanImport = false;
@@ -90,11 +90,11 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
                 await Task.Run(() => this.selectedImporter.Import(dataSet));
                 await this.dataBase.ImportAsync(this.authentication, dataSet, this.Comment);
                 this.configs.Commit(this);
-                AppMessageBox.Show(Resources.Message_Imported);
+                await AppMessageBox.ShowAsync(Resources.Message_Imported);
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
             finally
             {

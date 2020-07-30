@@ -36,7 +36,7 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.Views
     /// <summary>
     /// BrowserView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class BrowserView : BrowserExpander
+    public partial class BrowserView : ModernExpander
     {
         public BrowserView()
         {

@@ -68,13 +68,13 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
         <TextBlock Grid.Row="0" Text="{x:Static p:Resources.Message_IsReadOnly}" Style="{StaticResource ReadOnly_TextBlock_Style}" />
 
-        <nmfc:ExpandableToolBar Grid.Row="1" ItemsSource="{Binding ToolBarItems}">
+        <nmfc:ModernToolBar Grid.Row="1" ItemsSource="{Binding ToolBarItems}">
             <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/new.png" Style="{StaticResource ToolBar_IconButton_Style}"
                              Command="{Binding InsertCommand}" />
             <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/insert-many.png" Style="{StaticResource ToolBar_IconButton_Style}"
                              Command="{x:Static local:TableItemView.InsertManyCommand}" />
             <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/parent.png" x:Name="SelectParent" Style="{StaticResource SelectParent_IconButton_Style}" />
-        </nmfc:ExpandableToolBar>
+        </nmfc:ModernToolBar>
         <Border Grid.Row="2" BorderThickness="0 1 0 0" BorderBrush="{DynamicResource ItemBorder}">
             <local:TableSourceControl x:Name="dataTableControl" 
                                       Loaded="DataTableControl_Loaded"

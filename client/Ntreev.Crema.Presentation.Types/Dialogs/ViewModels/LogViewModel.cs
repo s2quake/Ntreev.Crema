@@ -22,7 +22,6 @@ using System.Text;
 using Caliburn.Micro;
 using Ntreev.Crema.Services;
 using System.Collections.ObjectModel;
-using Ntreev.Crema.Services.DataBaseService;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data;
 using System.ComponentModel;
@@ -54,18 +53,18 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             this.authentication = authentication;
             this.typeItem = typeItem;
             this.DisplayName = Resources.Title_ViewLog;
-            this.previewCommand = new DelegateCommand((p) => this.Preview(), (p) => this.CanPreview);
+            this.previewCommand = new DelegateCommand((p) => this.PreviewAsync(), (p) => this.CanPreview);
             this.Initialize();
         }
 
-        public void Close()
+        public async Task CloseAsync()
         {
-            this.TryClose(true);
+            await this.TryCloseAsync(true);
         }
 
-        public void Preview()
+        public async Task PreviewAsync()
         {
-            this.selectedItem.Preview();
+            await this.selectedItem.PreviewAsync();
         }
 
         public LogInfoViewModel SelectedItem
@@ -119,8 +118,8 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
-                this.TryClose();
+                await AppMessageBox.ShowErrorAsync(e);
+                await this.TryCloseAsync();
             }
         }
     }

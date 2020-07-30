@@ -65,7 +65,7 @@ namespace Ntreev.Crema.Presentation.Tables.MenuItems
             {
                 if (parameter is ITableDescriptor descriptor && descriptor.Target is ITable table)
                 {
-                    if (AppMessageBox.ShowProceed(Resources.Message_ConfirmToCancelContentEditing) == false)
+                    if (await AppMessageBox.ShowProceedAsync(Resources.Message_ConfirmToCancelContentEditing) == false)
                         return;
 
                     await table.Content.CancelEditAsync(this.authenticator);
@@ -73,7 +73,7 @@ namespace Ntreev.Crema.Presentation.Tables.MenuItems
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
     }

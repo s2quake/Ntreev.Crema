@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Presentation.Tables.MenuItems.TreeViewItems.TagMenus
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

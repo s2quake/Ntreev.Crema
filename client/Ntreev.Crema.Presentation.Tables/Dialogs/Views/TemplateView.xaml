@@ -176,9 +176,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <nmfc:ExpandableToolBar Grid.Row="0">
+        <nmfc:ModernToolBar Grid.Row="0">
             <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/new.png" x:Name="NewColumn" />
-        </nmfc:ExpandableToolBar>
+        </nmfc:ModernToolBar>
         <nmfc:PropertyItemsControl Grid.Row="1">
             <TextBox x:Name="TableName" nmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_TableName}" 
                      Text="{Binding TableName, Mode=TwoWay, Delay=100, UpdateSourceTrigger=PropertyChanged}"

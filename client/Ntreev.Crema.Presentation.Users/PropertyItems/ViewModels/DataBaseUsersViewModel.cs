@@ -80,7 +80,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
         {
             var userIDs = this.users.Select(item => item.ID).ToArray();
             var dialog = await NotifyMessageViewModel.CreateInstanceAsync(this.authenticator, this.cremaAppHost, userIDs);
-            dialog.ShowDialog();
+            await dialog.ShowDialogAsync();
         }
 
         private void NotifyObject_PropertyChanged(object sender, PropertyChangedEventArgs e)

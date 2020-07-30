@@ -145,13 +145,13 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
                 var password = this.Password;
                 await this.user.ChangeUserInfoAsync(this.authentication, password, password, userName, authority);
                 this.EndProgress();
-                this.TryClose(true);
-                AppMessageBox.Show(Resources.Message_ChangeComplete);
+                await this.TryCloseAsync(true);
+                await AppMessageBox.ShowAsync(Resources.Message_ChangeComplete);
             }
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

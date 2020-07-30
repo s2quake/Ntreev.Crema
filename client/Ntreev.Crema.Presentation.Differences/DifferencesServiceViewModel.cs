@@ -74,9 +74,9 @@ namespace Ntreev.Crema.Presentation.Differences
             return Resources.Title_Differences;
         }
 
-        public void Dispose()
+        public async void Dispose()
         {
-            this.documentService.TryClose();
+            await this.documentService.TryCloseAsync();
         }
 
         public IBrowserService BrowserService

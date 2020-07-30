@@ -83,7 +83,7 @@ namespace Ntreev.Crema.Presentation.Types
         public static async Task<string> NewTypeAsync(Authentication authentication, ITypeCategoryDescriptor descriptor)
         {
             var dialog = await NewTypeViewModel.CreateInstanceAsync(authentication, descriptor);
-            if (dialog?.ShowDialog() == true)
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
                 return dialog.TypeName;
             return null;
         }
@@ -91,7 +91,7 @@ namespace Ntreev.Crema.Presentation.Types
         public static async Task<string> NewFolderAsync(Authentication authentication, ITypeCategoryDescriptor descriptor)
         {
             var dialog = await NewTypeCategoryViewModel.CreateInstanceAsync(authentication, descriptor);
-            if (dialog?.ShowDialog() == true)
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
                 return dialog.CategoryName;
             return null;
         }
@@ -101,12 +101,10 @@ namespace Ntreev.Crema.Presentation.Types
             var comment = await LockAsync(authentication, descriptor, nameof(ITypeCategory.RenameAsync));
             if (comment == null)
                 return false;
-
             var dialog = await RenameCategoryViewModel.CreateInstanceAsync(authentication, descriptor);
-            dialog?.ShowDialog();
-
+            var dialogResult = await ShowDialogAsync(dialog);
             await UnlockAsync(authentication, descriptor, comment);
-            return dialog?.DialogResult == true;
+            return dialogResult;
         }
 
         public static async Task<bool> MoveAsync(Authentication authentication, ITypeCategoryDescriptor descriptor)
@@ -114,18 +112,18 @@ namespace Ntreev.Crema.Presentation.Types
             var comment = await LockAsync(authentication, descriptor, nameof(ITypeCategory.MoveAsync));
             if (comment == null)
                 return false;
-
             var dialog = await MoveTypeCategoryViewModel.CreateInstanceAsync(authentication, descriptor);
-            dialog?.ShowDialog();
-
+            var dialogResult = await ShowDialogAsync(dialog);
             await UnlockAsync(authentication, descriptor, comment);
-            return dialog?.DialogResult == true;
+            return dialogResult;
         }
 
         public static async Task<bool> DeleteAsync(Authentication authentication, ITypeCategoryDescriptor descriptor)
         {
             var dialog = await DeleteTypeCategoryViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
+                return true;
+            return false;
         }
 
         public static async Task<bool> FindAsync(Authentication authentication, ITypeCategoryDescriptor descriptor)
@@ -151,8 +149,7 @@ namespace Ntreev.Crema.Presentation.Types
             if (descriptor.Target is ITypeCategory category)
             {
                 var dialog = new LogViewModel(authentication, category as ITypeItem);
-                dialog.ShowDialog();
-                return await Task.Run(() => dialog.DialogResult == true);
+                return await dialog.ShowDialogAsync() == true;
             }
             else
             {
@@ -177,7 +174,7 @@ namespace Ntreev.Crema.Presentation.Types
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return null;
                 }
             }
@@ -204,13 +201,20 @@ namespace Ntreev.Crema.Presentation.Types
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                 }
             }
             else
             {
                 throw new NotImplementedException();
             }
+        }
+
+        private static async Task<bool> ShowDialogAsync(ModalDialogBase dialog)
+        {
+            if (dialog != null)
+                return await dialog.ShowDialogAsync() == true;
+            return false;
         }
     }
 }

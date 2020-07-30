@@ -53,7 +53,7 @@ namespace Ntreev.Crema.Presentation.Converters.MenuItems
         protected async override void OnExecute(object parameter)
         {
             var dialog = await ExportViewModel.CreateInstanceAsync(this.authenticator, this.cremaAppHost);
-            dialog?.ShowDialog();
+            await dialog?.ShowDialogAsync();
         }
 
         protected override bool OnCanExecute(object parameter)

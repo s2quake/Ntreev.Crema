@@ -120,12 +120,10 @@ namespace Ntreev.Crema.Presentation.Types
             var comment = await LockAsync(authentication, descriptor, nameof(IType.RenameAsync));
             if (comment == null)
                 return false;
-
             var dialog = await RenameTypeViewModel.CreateInstanceAsync(authentication, descriptor);
-            dialog?.ShowDialog();
-
+            var dialogResult = await ShowDialogAsync(dialog);
             await UnlockAsync(authentication, descriptor, comment);
-            return dialog?.DialogResult == true;
+            return dialogResult;
         }
 
         public static async Task<bool> MoveAsync(Authentication authentication, ITypeDescriptor descriptor)
@@ -133,18 +131,18 @@ namespace Ntreev.Crema.Presentation.Types
             var comment = await LockAsync(authentication, descriptor, nameof(IType.MoveAsync));
             if (comment == null)
                 return false;
-
             var dialog = await MoveTypeViewModel.CreateInstanceAsync(authentication, descriptor);
-            dialog?.ShowDialog();
-
+            var dialogResult = await ShowDialogAsync(dialog);
             await UnlockAsync(authentication, descriptor, comment);
-            return dialog?.DialogResult == true;
+            return dialogResult;
         }
 
         public static async Task<bool> DeleteAsync(Authentication authentication, ITypeDescriptor descriptor)
         {
             var dialog = await DeleteTypeViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
+                return true;
+            return false;
         }
 
         public static async Task<bool> ViewTemplateAsync(Authentication authentication, ITypeDescriptor descriptor)
@@ -168,16 +166,15 @@ namespace Ntreev.Crema.Presentation.Types
                 return false;
 
             var dialog = await EditTemplateViewModel.CreateInstanceAsync(authentication, descriptor);
-            dialog?.ShowDialog();
-
+            var dialogResult = await ShowDialogAsync(dialog);
             await UnlockAsync(authentication, descriptor, comment);
-            return dialog?.DialogResult == true;
+            return dialogResult;
         }
 
         public static async Task<string> CopyAsync(Authentication authentication, ITypeDescriptor descriptor)
         {
             var dialog = await CopyTypeViewModel.CreateInstanceAsync(authentication, descriptor);
-            if (dialog?.ShowDialog() == true)
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
                 return dialog.NewName;
             return null;
         }
@@ -187,8 +184,7 @@ namespace Ntreev.Crema.Presentation.Types
             if (descriptor.Target is IType type)
             {
                 var dialog = new LogViewModel(authentication, type as ITypeItem);
-                dialog.ShowDialog();
-                return await Task.Run(() => dialog.DialogResult == true);
+                return await dialog.ShowDialogAsync() == true;
             }
             else
             {
@@ -213,7 +209,7 @@ namespace Ntreev.Crema.Presentation.Types
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return null;
                 }
             }
@@ -240,13 +236,20 @@ namespace Ntreev.Crema.Presentation.Types
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                 }
             }
             else
             {
                 throw new NotImplementedException();
             }
+        }
+
+        private static async Task<bool> ShowDialogAsync(ModalDialogBase dialog)
+        {
+            if (dialog != null)
+                return await dialog.ShowDialogAsync() == true;
+            return false;
         }
     }
 }

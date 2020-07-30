@@ -70,11 +70,11 @@ namespace Ntreev.Crema.Presentation.SmartSet.MenuItems
             return false;
         }
 
-        protected override void OnExecute(object parameter)
+        protected async override void OnExecute(object parameter)
         {
             var viewModel = parameter as TreeViewItemViewModel;
             var items = viewModel.Items.OfType<ITableDescriptor>().Select(item => item.Name);
-            AppMessageBox.Show(string.Join(Environment.NewLine, items));
+            await AppMessageBox.ShowAsync (string.Join(Environment.NewLine, items));
         }
     }
 }

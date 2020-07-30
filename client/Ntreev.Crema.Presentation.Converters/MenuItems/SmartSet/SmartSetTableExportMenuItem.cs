@@ -70,12 +70,13 @@ namespace Ntreev.Crema.Presentation.Converters.MenuItems.SmartSet
 
                 if (paths.Any() == false)
                 {
-                    AppMessageBox.Show(Resources.Message_NoneTablesToExport);
+                    await AppMessageBox.ShowAsync(Resources.Message_NoneTablesToExport);
                 }
                 else
                 {
                     var dialog = await ExportViewModel.CreateInstanceAsync(this.authenticator, this.cremaAppHost, paths);
-                    dialog?.ShowDialog();
+                    if (dialog != null)
+                        await dialog.ShowDialogAsync();
                 }
             }
         }

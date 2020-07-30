@@ -49,14 +49,14 @@ namespace Ntreev.Crema.Presentation.SmartSet.MenuItems
             return parameter is BookmarkTableTreeViewItemViewModel;
         }
 
-        protected override void OnExecute(object parameter)
+        protected async override void OnExecute(object parameter)
         {
             if (parameter is BookmarkTableTreeViewItemViewModel viewModel)
             {
                 var browser = viewModel.Browser;
                 var itemPaths = viewModel.Browser.GetBookmarkItemPaths();
                 var dialog = new MoveBookmarkItemViewModel(viewModel.BookmarkPath, itemPaths);
-                if (dialog.ShowDialog() == true)
+                if (await dialog.ShowDialogAsync() == true)
                 {
                     if (browser.GetBookmarkItem(dialog.TargetPath) is BookmarkCategoryTreeViewItemViewModel categoryViewModel)
                     {

@@ -53,15 +53,15 @@ namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
             this.DisplayName = Properties.Resources.Title_AddBookmark;
         }
 
-        public void Add()
+        public async Task AddAsync()
         {
             try
             {
-                this.TryClose(true);
+                await this.TryCloseAsync(true);
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

@@ -61,11 +61,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     <nmfc:HighlightTextBlock x:Name="textBox" Text="{Binding DisplayName}" />
                 </StackPanel>
             </DockPanel>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="PreviewMouseDoubleClick">
-                    <i:InvokeCommandAction Command="{Binding ExpandCommand}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
         </ContentControl>
         <HierarchicalDataTemplate.Triggers>
             <DataTrigger Binding="{Binding HasPattern}" Value="True">
@@ -91,11 +86,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     <nmfc:HighlightTextBlock x:Name="textBox" Margin="2 0" Text="{Binding DisplayName}" Padding="5 2" />
                 </StackPanel>
             </DockPanel>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="PreviewMouseDoubleClick">
-                    <i:InvokeCommandAction Command="{Binding ViewCommand}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
         </ContentControl>
         <HierarchicalDataTemplate.Triggers>
             <DataTrigger Binding="{Binding DiffState}" Value="Modified">
@@ -146,11 +136,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     <nmfc:HighlightTextBlock x:Name="textBox" Margin="2 0" Text="{Binding DisplayName}" Padding="5 2" />
                 </StackPanel>
             </DockPanel>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="PreviewMouseDoubleClick">
-                    <i:InvokeCommandAction Command="{Binding ViewCommand}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
         </ContentControl>
 
         <HierarchicalDataTemplate.Triggers>
@@ -202,11 +187,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     <nmfc:HighlightTextBlock x:Name="textBox" Margin="2 0" Text="{Binding DisplayName}" Padding="5 2" />
                 </StackPanel>
             </DockPanel>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="PreviewMouseDoubleClick">
-                    <i:InvokeCommandAction Command="{Binding ViewCommand}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
         </ContentControl>
         <HierarchicalDataTemplate.Triggers>
             <DataTrigger Binding="{Binding DiffState}" Value="Modified">

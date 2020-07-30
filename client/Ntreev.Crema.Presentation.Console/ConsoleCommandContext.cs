@@ -51,9 +51,8 @@ namespace Ntreev.Crema.Presentation.Console
         [ImportingConstructor]
         public ConsoleCommandContext(ICremaHost cremaHost,
             [ImportMany]IEnumerable<IConsoleDrive> driveItems,
-            [ImportMany]IEnumerable<IConsoleCommand> commands,
-            [ImportMany]IEnumerable<IConsoleCommandProvider> commandProviders)
-            : base(driveItems, commands, commandProviders)
+            [ImportMany]IEnumerable<IConsoleCommand> commands)
+            : base(driveItems, commands)
         {
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;

@@ -36,7 +36,7 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.Views
     /// <summary>
     /// TypeInfoView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class TypeInfoView : BrowserExpander
+    public partial class TypeInfoView : ModernExpander
     {
         public TypeInfoView()
         {

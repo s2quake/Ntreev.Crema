@@ -108,7 +108,7 @@ namespace Ntreev.Crema.Commands.Spreadsheet
             var dataSet = await dataBase.GetDataSetAsync(authentication, DataSetType.OmitContent, filterExpression, revision);
             this.ReadDataSet(dataSet, path);
             await dataBase.ImportAsync(authentication, dataSet, this.Message);
-            this.CommandContext.WriteLine($"importing data has been completed.");
+            this.Out.WriteLine($"importing data has been completed.");
         }
 
         public override bool IsEnabled => this.CommandContext.IsOnline;
@@ -127,13 +127,13 @@ namespace Ntreev.Crema.Commands.Spreadsheet
             set;
         }
 
-        [CommandProperty('m', true, IsRequired = true, IsExplicit = true)]
+        [CommandPropertyRequired('m', AllowName = true, IsExplicit = true)]
         public string Message
         {
             get; set;
         }
 
-        [CommandProperty('r', true)]
+        [CommandProperty('r', AllowName = true)]
         public string Revision
         {
             get; set;
@@ -238,7 +238,7 @@ namespace Ntreev.Crema.Commands.Spreadsheet
                     {
                         writer.Write(filename);
                     }
-                    this.CommandContext.WriteLine($"write type {ConsoleProgress.GetProgressString(i + 1, dataSet.Types.Count)} : {item.Name}");
+                    this.Out.WriteLine($"write type {ConsoleProgress.GetProgressString(i + 1, dataSet.Types.Count)} : {item.Name}");
                 }
             }
             if (settings.OmitTable == false)
@@ -251,7 +251,7 @@ namespace Ntreev.Crema.Commands.Spreadsheet
                     {
                         writer.Write(filename);
                     }
-                    this.CommandContext.WriteLine($"write type {ConsoleProgress.GetProgressString(i + 1, dataSet.Tables.Count)} : {item.Name}");
+                    this.Out.WriteLine($"write type {ConsoleProgress.GetProgressString(i + 1, dataSet.Tables.Count)} : {item.Name}");
                 }
             }
             this.WriteFooter(directory, settings);
@@ -265,7 +265,7 @@ namespace Ntreev.Crema.Commands.Spreadsheet
                 props.Add($"{item}", settings.Properties[item]);
             }
             props.Add("Path", path);
-            this.CommandContext.WriteLine();
+            this.Out.WriteLine();
             this.CommandContext.WriteObject(props, TextSerializerType.Yaml);
         }
 
@@ -273,15 +273,15 @@ namespace Ntreev.Crema.Commands.Spreadsheet
         {
             if (e.Target is CremaDataType dataType)
             {
-                this.CommandContext.WriteLine($"write type {ConsoleProgress.GetProgressString(e.Index + 1, e.Count)} : {dataType.Name}");
+                this.Out.WriteLine($"write type {ConsoleProgress.GetProgressString(e.Index + 1, e.Count)} : {dataType.Name}");
             }
             else if (e.Target is CremaDataTable dataTable)
             {
-                this.CommandContext.WriteLine($"write table {ConsoleProgress.GetProgressString(e.Index + 1, e.Count)} : {dataTable.Name}");
+                this.Out.WriteLine($"write table {ConsoleProgress.GetProgressString(e.Index + 1, e.Count)} : {dataTable.Name}");
             }
             else if (e.Target is IDictionary)
             {
-                this.CommandContext.WriteLine($"write header {ConsoleProgress.GetProgressString(e.Index + 1, e.Count)}");
+                this.Out.WriteLine($"write header {ConsoleProgress.GetProgressString(e.Index + 1, e.Count)}");
             }
         }
 

@@ -39,7 +39,8 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
                 this.Items.Add(document);
             }
             document.SelectedTable = dataTable;
-            this.ActivateItem(document);
+            var cancellation = new System.Threading.CancellationTokenSource();
+            this.ActivateItemAsync(document, cancellation.Token);
         }
     }
 }

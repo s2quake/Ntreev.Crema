@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -86,7 +87,8 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
                 var document = new TypeDataFinderViewModel(authentication, dataBase, itemPath);
                 this.compositionService?.SatisfyImportsOnce(document);
                 this.Items.Add(document);
-                this.ActivateItem(document);
+                var cancellation = new CancellationTokenSource();
+                this.ActivateItemAsync(document, cancellation.Token);
             }
         }
 
@@ -99,8 +101,8 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
                 this.compositionService?.SatisfyImportsOnce(document);
                 this.Items.Add(document);
             }
-
-            this.ActivateItem(document);
+            var cancellation = new CancellationTokenSource();
+            this.ActivateItemAsync(document, cancellation.Token);
             new SelectFieldStrategy(document, document.Source.TypeName, columnName, row);
         }
 
@@ -113,8 +115,8 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
                 this.compositionService?.SatisfyImportsOnce(document);
                 this.Items.Add(document);
             }
-
-            this.ActivateItem(document);
+            var cancellation = new CancellationTokenSource();
+            this.ActivateItemAsync(document, cancellation.Token);
         }
 
         protected override void OnSelectionChanged(EventArgs e)

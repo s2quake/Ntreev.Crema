@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
@@ -63,24 +64,23 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
             }
         }
 
-        protected override Task DeleteAsync()
+        protected override Task OnDeleteAsync()
         {
             return this.category.DeleteAsync(this.authentication);
         }
 
-        protected override void OnDeactivate(bool close)
+        protected async override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
-            base.OnDeactivate(close);
-
+            await base.OnDeactivateAsync(close, cancellationToken);
             if (close == true)
             {
                 this.authentication.Expired -= Authentication_Expired;
             }
         }
 
-        private void Authentication_Expired(object sender, EventArgs e)
+        private async void Authentication_Expired(object sender, EventArgs e)
         {
-            this.Dispatcher.InvokeAsync(() => this.TryClose());
+            await this.TryCloseAsync();
         }
     }
 }

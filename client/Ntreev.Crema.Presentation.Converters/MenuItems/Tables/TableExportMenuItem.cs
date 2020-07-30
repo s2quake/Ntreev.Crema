@@ -54,7 +54,7 @@ namespace Ntreev.Crema.Presentation.Converters.MenuItems.Tables
             if (parameter is ITableDescriptor descriptor)
             {
                 var dialog = await ExportViewModel.CreateInstanceAsync(this.authenticator, descriptor);
-                dialog?.ShowDialog();
+                await dialog?.ShowDialogAsync();
             }
         }
 

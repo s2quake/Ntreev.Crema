@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
@@ -53,7 +54,8 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
                 this.Items.Add(document);
             }
             document.SelectedName = $"{viewModel}";
-            this.ActivateItem(document);
+            var cancellation = new CancellationTokenSource();
+            this.ActivateItemAsync(document, cancellation.Token);
         }
 
         public void View(TemplateTreeViewItemViewModel viewModel)
@@ -66,7 +68,8 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
                 this.Items.Add(document);
             }
             document.SelectedName = $"{viewModel}";
-            this.ActivateItem(document);
+            var cancellation = new CancellationTokenSource();
+            this.ActivateItemAsync(document, cancellation.Token);
         }
 
         public void View(TypeTreeViewItemViewModel viewModel)
@@ -77,7 +80,8 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
                 document = new TypeDocumentViewModel(viewModel);
                 this.Items.Add(document);
             }
-            this.ActivateItem(document);
+            var cancellation = new CancellationTokenSource();
+            this.ActivateItemAsync(document, cancellation.Token);
         }
 
         protected override void OnSelectionChanged(EventArgs e)

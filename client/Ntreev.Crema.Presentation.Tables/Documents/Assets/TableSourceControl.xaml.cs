@@ -57,7 +57,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.Assets
                 }
                 catch (Exception ex)
                 {
-                    AppMessageBox.ShowError(ex);
+                    await AppMessageBox.ShowErrorAsync(ex);
                 }
             }
         }

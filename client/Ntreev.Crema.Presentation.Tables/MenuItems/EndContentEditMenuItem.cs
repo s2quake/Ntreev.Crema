@@ -65,14 +65,14 @@ namespace Ntreev.Crema.Presentation.Tables.MenuItems
             {
                 if (parameter is ITableDescriptor descriptor && descriptor.Target is ITable table)
                 {
-                    if (AppMessageBox.ShowProceed(Resources.Message_ConfirmToEndContentEditing) == false)
+                    if (await AppMessageBox.ShowProceedAsync(Resources.Message_ConfirmToEndContentEditing) == false)
                         return;
                     await table.Content.EndEditAsync(this.authenticator);
                 }
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
     }

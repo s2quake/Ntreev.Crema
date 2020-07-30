@@ -57,7 +57,8 @@ namespace Ntreev.Crema.Presentation.Users.MenuItems.FileMenus
         protected async override void OnExecute(object parameter)
         {
             var dialog = await ChangePasswordViewModel.CreateInstanceAsync(this.authenticator, this.cremaAppHost, this.authenticator.ID);
-            dialog?.ShowDialog();
+            if (dialog != null)
+                await dialog.ShowDialogAsync();
         }
     }
 }

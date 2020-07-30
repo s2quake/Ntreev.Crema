@@ -38,9 +38,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <Setter Property="ContentTemplate">
                 <Setter.Value>
                     <DataTemplate>
-                        <nmfc:BrowserExpander x:Name="expander" Header="{Binding DisplayName}" IsExpanded="True">
+                        <nmfc:ModernExpander x:Name="expander" Header="{Binding DisplayName}" IsExpanded="True">
                             <ContentControl cal:View.Model="{Binding}" />
-                        </nmfc:BrowserExpander>
+                        </nmfc:ModernExpander>
                     </DataTemplate>
                 </Setter.Value>
             </Setter>

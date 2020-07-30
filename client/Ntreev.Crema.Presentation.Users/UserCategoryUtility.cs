@@ -58,7 +58,7 @@ namespace Ntreev.Crema.Presentation.Users
         public static async Task<string> NewUserAsync(Authentication authentication, IUserCategoryDescriptor descriptor)
         {
             var dialog = await NewUserViewModel.CreateInstanceAsync(authentication, descriptor);
-            if (dialog?.ShowDialog() == true)
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
                 return dialog.UserName;
             return null;
         }
@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Presentation.Users
         public static async Task<string> NewFolderAsync(Authentication authentication, IUserCategoryDescriptor descriptor)
         {
             var dialog = await NewUserCategoryViewModel.CreateInstanceAsync(authentication, descriptor);
-            if (dialog?.ShowDialog() == true)
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
                 return dialog.CategoryName;
             return null;
         }
@@ -74,19 +74,25 @@ namespace Ntreev.Crema.Presentation.Users
         public static async Task<bool> RenameAsync(Authentication authentication, IUserCategoryDescriptor descriptor)
         {
             var dialog = await RenameCategoryViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
+                return true;
+            return false;
         }
 
         public static async Task<bool> MoveAsync(Authentication authentication, IUserCategoryDescriptor descriptor)
         {
             var dialog = await MoveUserCategoryViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
+                return true;
+            return false;
         }
 
         public static async Task<bool> DeleteAsync(Authentication authentication, IUserCategoryDescriptor descriptor)
         {
             var dialog = await DeleteUserCategoryViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
+                return true;
+            return false;
         }
     }
 }

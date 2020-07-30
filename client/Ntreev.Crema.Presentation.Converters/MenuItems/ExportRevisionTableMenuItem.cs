@@ -73,14 +73,14 @@ namespace Ntreev.Crema.Presentation.Converters.MenuItems
                             var dataSet = await tableItem.GetDataSetAsync(this.authenticator, revision);
                             var writer = new SpreadsheetWriter(dataSet);
                             writer.Write(dialog.FileName);
-                            AppMessageBox.Show(Resources.Message_Exported);
+                            await AppMessageBox.ShowAsync(Resources.Message_Exported);
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
     }

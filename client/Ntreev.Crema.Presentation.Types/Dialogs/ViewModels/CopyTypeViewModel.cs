@@ -75,20 +75,20 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             }
         }
 
-        public async void Copy()
+        public async Task CopyAsync()
         {
             try
             {
                 this.BeginProgress(Resources.Message_CopingType);
                 await this.type.CopyAsync(this.authentication, this.NewName, this.CategoryPath);
                 this.EndProgress();
-                this.TryClose(true);
-                AppMessageBox.Show(Resources.Message_TypeCopied);
+                await this.TryCloseAsync(true);
+                await AppMessageBox.ShowAsync(Resources.Message_TypeCopied);
             }
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
@@ -147,12 +147,6 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
                 return;
             var result = await this.categories.ContainsAsync(this.CategoryPath) == true;
             isValid(result);
-        }
-
-        protected override void OnProgress()
-        {
-            base.OnProgress();
-            this.NotifyOfPropertyChange(nameof(this.CanCopy));
         }
 
         private void VerifyAction(bool isValid)

@@ -87,12 +87,12 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
                 this.BeginProgress(Resources.Message_SendMessage);
                 await this.user.SendMessageAsync(this.authentication, this.Message);
                 this.EndProgress();
-                this.TryClose(true);
+                await this.TryCloseAsync(true);
             }
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

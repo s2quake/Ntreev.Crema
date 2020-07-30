@@ -63,7 +63,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             }
         }
 
-        protected override Task DeleteAsync()
+        protected override Task OnDeleteAsync()
         {
             return this.type.DeleteAsync(this.authentication);
         }

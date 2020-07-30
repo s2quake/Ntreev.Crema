@@ -96,12 +96,12 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
                 this.BeginProgress(Resources.Message_Changing);
                 await this.row.SetParentAsync(this.authentication, this.value.ID);
                 this.EndProgress();
-                this.TryClose(true);
+                await this.TryCloseAsync(true);
             }
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

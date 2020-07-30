@@ -54,10 +54,10 @@ namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
             this.Source = diffType;
         }
 
-        public void Merge()
+        public async Task MergeAsync()
         {
-            this.TryClose();
-            this.Dispatcher.InvokeAsync(() =>
+            await this.TryCloseAsync();
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 this.browserService.Add(this.diffType.DiffSet);
                 this.shell.SelectedService = this.service;
@@ -107,9 +107,9 @@ namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
             {
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    AppMessageBox.ShowError(e);
-                    this.TryClose();
                 }, DispatcherPriority.ApplicationIdle);
+                    await AppMessageBox.ShowErrorAsync(e);
+                    await this.TryCloseAsync();
             }
             finally
             {

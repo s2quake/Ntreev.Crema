@@ -86,9 +86,9 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             }
         }
 
-        public void Insert()
+        public async Task InsertAsync()
         {
-            this.TryClose(true);
+            await this.TryCloseAsync(true);
         }
     }
 }

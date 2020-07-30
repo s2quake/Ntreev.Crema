@@ -156,7 +156,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             }
         }
 
-        public async void Copy()
+        public async Task CopyAsync()
         {
             try
             {
@@ -166,19 +166,13 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
                 else
                     await this.table.CopyAsync(this.authentication, this.NewName, this.CategoryPath, this.CopyData);
                 this.EndProgress();
-                this.TryClose(true);
+                await this.TryCloseAsync(true);
             }
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
-        }
-
-        protected override void OnProgress()
-        {
-            base.OnProgress();
-            this.NotifyOfPropertyChange(nameof(this.CanCopy));
         }
 
         private async void VerfiyAction()

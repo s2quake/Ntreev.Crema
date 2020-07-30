@@ -68,12 +68,12 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
                 this.BeginProgress();
                 await this.user.BanAsync(this.authentication, this.Comment);
                 this.EndProgress();
-                this.TryClose(true);
+                await this.TryCloseAsync(true);
             }
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

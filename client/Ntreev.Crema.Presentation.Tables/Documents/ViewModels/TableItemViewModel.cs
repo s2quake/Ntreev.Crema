@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
         public async Task NewRowAsync()
         {
             var dialog = await NewRowViewModel.CreateAsync(this.authentication, this.descriptor.ContentDescriptor.Target as ITableContent);
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 this.SelectItem(dialog.Keys);
             }
@@ -82,7 +82,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
                 return;
 
             var dialog = await ChangeParentViewModel.CreateAsync(authentication, row);
-            dialog.ShowDialog();
+            await dialog.ShowDialogAsync();
         }
 
         public async Task InsertManyAsync()

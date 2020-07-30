@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
         {
             this.viewModel = viewModel;
             this.undoService.Changed += UndoService_Changed;
-            this.resolveCommand = new DelegateCommand((p) => this.Resolve(), (p) => this.CanResolve);
+            this.resolveCommand = new DelegateCommand((p) => this.ResolveAsync(), (p) => this.CanResolve);
             this.DisplayName = viewModel.DisplayName;
         }
 
@@ -48,7 +48,7 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
             return this.viewModel.ToString();
         }
 
-        public void Resolve()
+        public async Task ResolveAsync()
         {
             try
             {
@@ -57,7 +57,7 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

@@ -79,7 +79,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             isValid(result);
         }
 
-        protected override Task RenameAsync(string newName)
+        protected override Task OnRenameAsync(string newName)
         {
             return this.category.RenameAsync(this.authentication, newName);
         }

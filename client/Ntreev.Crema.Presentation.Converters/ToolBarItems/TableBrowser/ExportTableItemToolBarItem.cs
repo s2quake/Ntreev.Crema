@@ -58,12 +58,12 @@ namespace Ntreev.Crema.Presentation.Converters.ToolBarItems.TableBrowser
                 if (selector.SelectedItem is ITableCategoryDescriptor categoryDescriptor)
                 {
                     var dialog = await ExportViewModel.CreateInstanceAsync(this.authenticator, categoryDescriptor);
-                    dialog?.ShowDialog();
+                    await dialog?.ShowDialogAsync();
                 }
                 else if (selector.SelectedItem is ITableDescriptor tableDescriptor)
                 {
                     var dialog = await ExportViewModel.CreateInstanceAsync(this.authenticator, tableDescriptor);
-                    dialog?.ShowDialog();
+                    await dialog?.ShowDialogAsync();
                 }
             }
         }

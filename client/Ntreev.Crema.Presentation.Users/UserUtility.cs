@@ -101,13 +101,17 @@ namespace Ntreev.Crema.Presentation.Users
         public static async Task<bool> MoveAsync(Authentication authentication, IUserDescriptor descriptor)
         {
             var dialog = await MoveUserViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
+                return true;
+            return false;
         }
 
         public static async Task<bool> DeleteAsync(Authentication authentication, IUserDescriptor descriptor)
         {
             var dialog = await DeleteUserViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
+                return true;
+            return false;
         }
 
         public static async Task<bool> SendMessageAsync(Authentication authentication, IUserDescriptor descriptor)
@@ -115,7 +119,9 @@ namespace Ntreev.Crema.Presentation.Users
             if (descriptor.Target is IUser user)
             {
                 var dialog = await SendMessageViewModel.CreateInstanceAsync(authentication, descriptor);
-                return dialog?.ShowDialog() == true;
+                if (dialog != null && await dialog.ShowDialogAsync() == true)
+                    return true;
+                return false;
             }
             else
             {
@@ -126,19 +132,25 @@ namespace Ntreev.Crema.Presentation.Users
         public static async Task<bool> ChangeAsync(Authentication authentication, IUserDescriptor descriptor)
         {
             var dialog = await ChangeUserViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
+                return true;
+            return false;
         }
 
         public static async Task<bool> KickAsync(Authentication authentication, IUserDescriptor descriptor)
         {
             var dialog = await KickViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
+                return true;
+            return false;
         }
 
         public static async Task<bool> BanAsync(Authentication authentication, IUserDescriptor descriptor)
         {
             var dialog = await BanViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
+                return true;
+            return false;
         }
 
         public static async Task<bool> UnbanAsync(Authentication authentication, IUserDescriptor descriptor)
@@ -152,7 +164,7 @@ namespace Ntreev.Crema.Presentation.Users
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return false;
                 }
             }

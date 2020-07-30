@@ -88,16 +88,17 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
             }
         }
 
-        public async void Reply()
+        public async void ReplyAsync()
         {
-            this.TryClose();
+            await this.TryCloseAsync();
 
             var dialog = await this.userContext.Dispatcher.InvokeAsync(() =>
             {
                 var user = this.userContext.Users[this.sendUserID];
                 return new SendMessageViewModel(this.authentication, user);
             });
-            dialog?.ShowDialog();
+            if (dialog != null)
+                await dialog.ShowDialogAsync();
         }
 
         public bool CanReply

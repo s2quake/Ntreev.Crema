@@ -26,6 +26,7 @@ using System.Windows.Threading;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Users.Properties;
 using Ntreev.Crema.Presentation.Framework;
+using System.Threading;
 
 namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 {
@@ -81,19 +82,18 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
             return this.category.AddNewCategoryAsync(this.authentication, categoryName);
         }
 
-        protected override void OnDeactivate(bool close)
+        protected async override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
-            base.OnDeactivate(close);
-
+            await base.OnDeactivateAsync(close, cancellationToken);
             if (close == true)
             {
                 this.authentication.Expired -= Authentication_Expired;
             }
         }
 
-        private void Authentication_Expired(object sender, EventArgs e)
+        private async void Authentication_Expired(object sender, EventArgs e)
         {
-            this.Dispatcher.InvokeAsync(() => this.TryClose());
+            await this.TryCloseAsync();
         }
     }
 }

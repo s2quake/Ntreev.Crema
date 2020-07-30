@@ -94,7 +94,8 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
         public async Task BanAsync()
         {
             var dialog = await BanViewModel.CreateInstanceAsync(this.authentication, this);
-            dialog?.ShowDialog();
+            if (dialog != null)
+                await dialog.ShowDialogAsync();
         }
 
         public async Task UnbanAsync()

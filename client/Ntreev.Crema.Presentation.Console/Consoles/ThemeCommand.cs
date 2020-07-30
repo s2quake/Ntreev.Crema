@@ -40,7 +40,7 @@ namespace Ntreev.Crema.Presentation.Console.Consoles
             this.cremaAppHost = cremaAppHost;
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string Theme
         {
             get; set;

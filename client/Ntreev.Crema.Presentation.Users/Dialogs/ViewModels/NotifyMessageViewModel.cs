@@ -100,12 +100,12 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
                 this.BeginProgress(Resources.Message_SendMessage);
                 await this.userContext.NotifyMessageAsync(this.authentication, this.userIDs, this.Message);
                 this.EndProgress();
-                this.TryClose(true);
+                await this.TryCloseAsync(true);
             }
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

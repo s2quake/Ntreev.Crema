@@ -41,6 +41,7 @@ using System.IO;
 using Ntreev.Library.Serialization;
 using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.Library.ObjectModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
@@ -132,10 +133,10 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             }
         }
 
-        public void NewSmartSet()
+        public async Task NewSmartSetTask()
         {
             var viewModel = this.SelectedItem as SmartSetCategoryTreeViewItemViewModel;
-            viewModel.NewSmartSet();
+            await viewModel.NewSmartSetAsync();
         }
     
         public void SelectItem(TreeViewItemViewModel item)

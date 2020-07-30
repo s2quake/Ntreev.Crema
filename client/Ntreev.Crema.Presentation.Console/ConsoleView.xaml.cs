@@ -130,10 +130,9 @@ namespace Ntreev.Crema.Presentation.Console
             
             this.terminal.AppendLine(Properties.Resources.Comment_Hello);
             this.terminal.AppendLine(Properties.Resources.Comment_AvaliableCommands);
-
-            foreach (var item in this.commandContext.Commands)
+            foreach (var item in this.commandContext.Node.Commands)
             {
-                if (this.commandContext.IsCommandEnabled(item) == false)
+                if (item.IsEnabled == false)
                     continue;
                 this.terminal.AppendLine(" - " + item.Name);
             }

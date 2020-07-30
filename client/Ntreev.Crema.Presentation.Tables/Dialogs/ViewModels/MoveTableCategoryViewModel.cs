@@ -80,7 +80,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             isVerify(result);
         }
 
-        protected override Task MoveAsync(string targetPath)
+        protected override Task OnMoveAsync(string targetPath)
         {
             return this.category.MoveAsync(this.authentication, targetPath);
         }

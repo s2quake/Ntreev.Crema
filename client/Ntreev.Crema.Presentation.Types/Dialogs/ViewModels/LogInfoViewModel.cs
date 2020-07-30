@@ -41,17 +41,17 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             this.Target = typeItem;
         }
 
-        public void Preview()
+        public async Task PreviewAsync()
         {
             if (this.typeItem is IType type)
             {
                 var dialog = new PreviewTypeViewModel(this.authentication, type, this.logInfo.Revision);
-                dialog.ShowDialog();
+                await dialog.ShowDialogAsync();
             }
             else if (this.typeItem is ITypeCategory category)
             {
                 var dialog = new PreviewTypeCategoryViewModel(this.authentication, category, this.logInfo.Revision);
-                dialog.ShowDialog();
+                await dialog.ShowDialogAsync();
             }
         }
 

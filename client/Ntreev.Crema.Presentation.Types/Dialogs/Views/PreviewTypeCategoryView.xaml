@@ -23,7 +23,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
              xmlns:vm="clr-namespace:Ntreev.Crema.Presentation.Types.Dialogs.ViewModels"
-             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:avalonDock="http://schemas.xceed.com/wpf/xaml/avalondock"
              xmlns:avalonTheme="clr-namespace:Ntreev.Crema.Presentation.Assets;assembly=Ntreev.Crema.Presentation"
@@ -40,11 +39,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                         <nmfc:HighlightTextBlock x:Name="textBox" Text="{Binding DisplayName}" />
                     </StackPanel>
                 </DockPanel>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="PreviewMouseDoubleClick">
-                        <i:InvokeCommandAction Command="{Binding ExpandCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
             </ContentControl>
             <HierarchicalDataTemplate.Triggers>
                 <DataTrigger Binding="{Binding DisplayName}" Value="">
@@ -62,11 +56,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                         <nmfc:HighlightTextBlock x:Name="textBox" Text="{Binding DisplayName}" />
                     </StackPanel>
                 </DockPanel>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="PreviewMouseDoubleClick">
-                        <i:InvokeCommandAction Command="{Binding ViewCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
             </ContentControl>
         </HierarchicalDataTemplate>
 

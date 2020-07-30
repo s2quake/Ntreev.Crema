@@ -23,7 +23,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
@@ -67,12 +66,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                             <TextBlock x:Name="textBox" Text="{Binding DisplayName}" />
                         </StackPanel>
                     </DockPanel>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="PreviewMouseDoubleClick">
-                            <cal:ActionMessage MethodName="SelectInBrowserCommand" />
-                            <!--<i:InvokeCommandAction Command="{Binding SelectInBrowserCommand}" />-->
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
                 </ContentControl>
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding IsType}" Value="True">

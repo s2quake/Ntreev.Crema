@@ -69,7 +69,7 @@ namespace Ntreev.Crema.Presentation.Tables
         public static async Task<string> NewTableAsync(Authentication authentication, ITableCategoryDescriptor descriptor)
         {
             var dialog = await NewTableViewModel.CreateInstanceAsync(authentication, descriptor);
-            if (dialog?.ShowDialog() == true)
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
                 return dialog.TableName;
             return null;
         }
@@ -77,7 +77,7 @@ namespace Ntreev.Crema.Presentation.Tables
         public static async Task<string> NewFolderAsync(Authentication authentication, ITableCategoryDescriptor descriptor)
         {
             var dialog = await NewTableCategoryViewModel.CreateInstanceAsync(authentication, descriptor);
-            if (dialog?.ShowDialog() == true)
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
                 return dialog.CategoryName;
             return null;
         }
@@ -87,12 +87,10 @@ namespace Ntreev.Crema.Presentation.Tables
             var comment = await LockAsync(authentication, descriptor, nameof(ITableCategory.RenameAsync));
             if (comment == null)
                 return false;
-
             var dialog = await RenameCategoryViewModel.CreateInstanceAsync(authentication, descriptor);
-            dialog?.ShowDialog();
-
+            var dialogResult = await ShowDialogAsync(dialog);
             await UnlockAsync(authentication, descriptor, comment);
-            return dialog?.DialogResult == true;
+            return dialogResult;
         }
 
         public static async Task<bool> MoveAsync(Authentication authentication, ITableCategoryDescriptor descriptor)
@@ -100,18 +98,18 @@ namespace Ntreev.Crema.Presentation.Tables
             var comment = await LockAsync(authentication, descriptor, nameof(ITableCategory.MoveAsync));
             if (comment == null)
                 return false;
-
             var dialog = await MoveTableCategoryViewModel.CreateInstanceAsync(authentication, descriptor);
-            dialog?.ShowDialog();
-
+            var dialogResult = await ShowDialogAsync(dialog);
             await UnlockAsync(authentication, descriptor, comment);
-            return dialog?.DialogResult == true;
+            return dialogResult;
         }
 
         public static async Task<bool> DeleteAsync(Authentication authentication, ITableCategoryDescriptor descriptor)
         {
             var dialog = await DeleteTableCategoryViewModel.CreateInstanceAsync(authentication, descriptor);
-            return dialog?.ShowDialog() == true;
+            if (dialog != null && await dialog.ShowDialogAsync() == true)
+                return true;
+            return false;
         }
 
         private static async Task<string> LockAsync(Authentication authentication, ITableCategoryDescriptor descriptor, string comment)
@@ -131,7 +129,7 @@ namespace Ntreev.Crema.Presentation.Tables
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     return null;
                 }
             }
@@ -158,13 +156,20 @@ namespace Ntreev.Crema.Presentation.Tables
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                 }
             }
             else
             {
                 throw new NotImplementedException();
             }
+        }
+
+        private static async Task<bool> ShowDialogAsync(ModalDialogBase dialog)
+        {
+            if (dialog != null)
+                return await dialog.ShowDialogAsync() == true;
+            return false;
         }
     }
 }

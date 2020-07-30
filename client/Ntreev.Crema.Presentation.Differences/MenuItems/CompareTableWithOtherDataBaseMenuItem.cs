@@ -56,7 +56,7 @@ namespace Ntreev.Crema.Presentation.Differences.MenuItems
             var table = tableDescriptor.Target;
             var tableName = tableDescriptor.TableInfo.Name;
 
-            var dataBaseName = this.SelectDataBase();
+            var dataBaseName = await this.SelectDataBaseAsync();
             if (dataBaseName == null)
                 return;
 
@@ -74,18 +74,18 @@ namespace Ntreev.Crema.Presentation.Differences.MenuItems
                 {
                     DisplayName = Resources.Title_CompareWithOtherDataBase,
                 };
-                dialog.ShowDialog();
+                await dialog.ShowDialogAsync();
             }
             else
             {
-                AppMessageBox.Show(string.Format(Resources.Message_TableNotFound_Format, tableName));
+                await AppMessageBox.ShowAsync(string.Format(Resources.Message_TableNotFound_Format, tableName));
             }
         }
 
-        private string SelectDataBase()
+        private async Task<string> SelectDataBaseAsync()
         {
             var dialog = new SelectDataBaseViewModel(this.authenticator, this.cremaAppHost, (info) => info.Name != this.cremaAppHost.DataBaseName);
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 return dialog.SelectedValue;
             }

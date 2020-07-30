@@ -55,7 +55,8 @@ namespace Ntreev.Crema.Presentation.Converters.MenuItems
             if (this.cremaAppHost.GetService(typeof(IDataBase)) is IDataBase dataBase)
             {
                 var dialog = await ImportViewModel.CreateInstanceAsync(this.authenticator, dataBase);
-                dialog?.ShowDialog();
+                if (dialog != null)
+                    await dialog.ShowDialogAsync();
             }
         }
 

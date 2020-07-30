@@ -88,30 +88,21 @@ namespace Ntreev.Crema.Presentation.Tables
             return Resources.Title_Tables;
         }
 
-        public void Dispose()
+        public async void Dispose()
         {
-            this.contentsService.TryClose();
+            await this.contentsService.TryCloseAsync();
         }
 
-        public IBrowserService BrowserService
-        {
-            get { return this.browserService; }
-        }
+        public IBrowserService BrowserService => this.browserService;
 
-        public TableDocumentServiceViewModel DocumentService
-        {
-            get { return this.contentsService; }
-        }
+        public TableDocumentServiceViewModel DocumentService => this.contentsService;
 
-        public IPropertyService PropertyService
-        {
-            get { return this.propertyService; }
-        }
+        public IPropertyService PropertyService => this.propertyService;
 
         [ConfigurationProperty("isBrowserExpanded")]
         public bool IsBrowserExpanded
         {
-            get { return this.isBrowserExpanded; }
+            get => this.isBrowserExpanded;
             set
             {
                 this.isBrowserExpanded = value;
@@ -122,7 +113,7 @@ namespace Ntreev.Crema.Presentation.Tables
         [ConfigurationProperty("isPropertyExpanded")]
         public bool IsPropertyExpanded
         {
-            get { return this.isPropertyExpanded; }
+            get => this.isPropertyExpanded;
             set
             {
                 this.isPropertyExpanded = value;
@@ -133,7 +124,7 @@ namespace Ntreev.Crema.Presentation.Tables
         [ConfigurationProperty("browserDistance")]
         public double BrowserDistance
         {
-            get { return this.browserDistance; }
+            get => this.browserDistance;
             set
             {
                 this.browserDistance = value;
@@ -144,7 +135,7 @@ namespace Ntreev.Crema.Presentation.Tables
         [ConfigurationProperty("propertyDistance")]
         public double PropertyDistance
         {
-            get { return this.propertyDistance; }
+            get => this.propertyDistance;
             set
             {
                 this.propertyDistance = value;
@@ -154,7 +145,7 @@ namespace Ntreev.Crema.Presentation.Tables
 
         public bool IsVisible
         {
-            get { return this.isVisible; }
+            get => this.isVisible;
             set
             {
                 this.isVisible = value;
@@ -251,19 +242,19 @@ namespace Ntreev.Crema.Presentation.Tables
                         if (tableItem is ITableCategory category)
                         {
                             var dialog = await category.Dispatcher.InvokeAsync(() => new NewTableViewModel(this.authenticator, category, template));
-                            restoreList.Add(new System.Action(() => dialog.ShowDialog()));
+                            restoreList.Add(new System.Action(() => dialog.ShowDialogAsync()));
                         }
                         else if (tableItem is ITable table)
                         {
                             var dialog = await table.Dispatcher.InvokeAsync(() => new NewChildTableViewModel(this.authenticator, table, template));
-                            restoreList.Add(new System.Action(() => dialog.ShowDialog()));
+                            restoreList.Add(new System.Action(() => dialog.ShowDialogAsync()));
                         }
                     }
                     else if (itemType == "TableTemplate")
                     {
                         var table = dataBase.TableContext[itemPath] as ITable;
                         var dialog = await table.Dispatcher.InvokeAsync(() => new EditTemplateViewModel(this.authenticator, table, template));
-                        restoreList.Add(new System.Action(() => dialog.ShowDialog()));
+                        restoreList.Add(new System.Action(() => dialog.ShowDialogAsync()));
                     }
                 }
             }
