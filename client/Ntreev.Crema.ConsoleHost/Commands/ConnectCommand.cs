@@ -57,7 +57,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             terminal.Cancel();
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string Address
         {
             get;
@@ -76,8 +76,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
         }
 
 #if DEBUG
-        [CommandProperty('l', IsExplicit = true)]
-        [DefaultValue("admin:admin")]
+        [CommandProperty('l', DefaultValue = "admin:admin")]
 #else
         [CommandProperty('l')]
 #endif

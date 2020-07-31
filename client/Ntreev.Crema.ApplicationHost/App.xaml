@@ -26,11 +26,14 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <ResourceDictionary>
                     <local:AppBootstrapper x:Key="bootstrapper" />
                 </ResourceDictionary>
+                <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.xaml" />
+                <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.Dark.xaml" />
                 <ResourceDictionary Source="/Ntreev.ModernUI.Framework;component/Assets/ModernUI.xaml" />
+                <ResourceDictionary Source="/Ntreev.ModernUI.Framework;component/Assets/ModernUI.Dark.xaml" />
                 <ResourceDictionary Source="/Ntreev.Crema.Presentation;component/Assets/CremaUI.xaml" />
-                <ResourceDictionary Source="/Ntreev.Crema.Presentation;component/Assets/CremaUI.Dark.xaml" />
+                <!--<ResourceDictionary Source="/Ntreev.Crema.Presentation;component/Assets/CremaUI.Dark.xaml" />
                 <ResourceDictionary Source="/Ntreev.Crema.Presentation.Framework;component/Assets/CremaUI.xaml" />
-                <ResourceDictionary Source="/Ntreev.Crema.Presentation.Framework;component/Assets/CremaUI.Dark.xaml" />
+                <ResourceDictionary Source="/Ntreev.Crema.Presentation.Framework;component/Assets/CremaUI.Dark.xaml" />-->
                 <ResourceDictionary Source="/crema;component/Assets/ShellView.xaml" />
                 <!--<ResourceDictionary Source="/Ntreev.Crema.Presentation.Framework;component/Assets/CremaUI.Light.xaml" />-->
             </ResourceDictionary.MergedDictionaries>

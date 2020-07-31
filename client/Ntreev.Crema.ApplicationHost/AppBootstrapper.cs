@@ -43,27 +43,25 @@ using Ntreev.Library.IO;
 
 namespace Ntreev.Crema.ApplicationHost
 {
-    public class AppBootstrapper : AppBootstrapper<IShell>
+    class AppBootstrapper : AppBootstrapperBase
     {
-        private readonly AppSettings settings = new AppSettings();
-
         public AppBootstrapper()
+            : base(new AppBootstrapperDescriptor())
         {
             AppMessageBox.MessageSelector = MessageSelector;
         }
 
-        public AppSettings Settings
-        {
-            get { return this.settings; }
-        }
+        public AppSettings Settings => this.Descriptor.Settings;
+
+        protected new AppBootstrapperDescriptor Descriptor => base.Descriptor as AppBootstrapperDescriptor;
 
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
-            if (this.settings.Culture != string.Empty)
-            {
-                System.Globalization.CultureInfo.DefaultThreadCurrentCulture = new System.Globalization.CultureInfo(this.settings.Culture);
-                System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = new System.Globalization.CultureInfo(this.settings.Culture);
-            }
+            //if (this.settings.Culture != string.Empty)
+            //{
+            //    System.Globalization.CultureInfo.DefaultThreadCurrentCulture = new System.Globalization.CultureInfo(this.settings.Culture);
+            //    System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = new System.Globalization.CultureInfo(this.settings.Culture);
+            //}
 
             base.OnStartup(sender, e);
         }
@@ -73,26 +71,26 @@ namespace Ntreev.Crema.ApplicationHost
             base.OnExit(sender, e);
         }
 
-        protected override IEnumerable<string> SelectPath()
-        {
-            var pluginsPath = AppUtility.GetDocumentPath("plugins");
+        //protected override IEnumerable<string> SelectPath()
+        //{
+        //    var pluginsPath = AppUtility.GetDocumentPath("plugins");
 
-            if (this.settings.PluginsPath != null)
-            {
-                foreach (var item in this.settings.PluginsPath)
-                {
-                    yield return item;
-                }
-            }
+        //    if (this.settings.PluginsPath != null)
+        //    {
+        //        foreach (var item in this.settings.PluginsPath)
+        //        {
+        //            yield return item;
+        //        }
+        //    }
 
-            if (Directory.Exists(pluginsPath) == true)
-            {
-                foreach (var item in Directory.GetDirectories(pluginsPath))
-                {
-                    yield return item;
-                }
-            }
-        }
+        //    if (Directory.Exists(pluginsPath) == true)
+        //    {
+        //        foreach (var item in Directory.GetDirectories(pluginsPath))
+        //        {
+        //            yield return item;
+        //        }
+        //    }
+        //}
 
         protected override void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {

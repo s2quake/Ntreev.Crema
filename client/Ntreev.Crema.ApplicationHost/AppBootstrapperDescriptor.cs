@@ -16,8 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.ServiceHosts;
 using Ntreev.Crema.Services;
+using Ntreev.Library;
 using Ntreev.Library.Linq;
 using Ntreev.ModernUI.Framework;
 using System;
@@ -25,6 +27,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.ComponentModel.Composition.Primitives;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -36,12 +39,10 @@ namespace Ntreev.Crema.ApplicationHost
 {
     class AppBootstrapperDescriptor : AppBootstrapperDescriptorBase, IServiceProvider
     {
-        private readonly CremaService service;
         private CompositionContainer container;
 
         public AppBootstrapperDescriptor()
         {
-            this.service = new CremaService(this);
         }
 
         public object GetService(Type serviceType)
@@ -56,7 +57,7 @@ namespace Ntreev.Crema.ApplicationHost
         protected override void OnDispose()
         {
             this.container.Dispose();
-            this.service.Dispose();
+            //this.service.Dispose();
         }
 
         protected override IEnumerable<Tuple<Type, object>> GetParts()
@@ -65,8 +66,8 @@ namespace Ntreev.Crema.ApplicationHost
             {
                 yield return item;
             }
-            yield return new Tuple<Type, object>(typeof(CremaService), this.service);
-            yield return new Tuple<Type, object>(typeof(ICremaService), this.service);
+            //yield return new Tuple<Type, object>(typeof(CremaService), this.service);
+            //yield return new Tuple<Type, object>(typeof(ICremaService), this.service);
             yield return new Tuple<Type, object>(typeof(AppSettings), this.Settings);
         }
 
@@ -139,14 +140,18 @@ namespace Ntreev.Crema.ApplicationHost
 
         protected virtual IEnumerable<string> SelectPath()
         {
-            var items = CremaBootstrapper.SelectPath(AppDomain.CurrentDomain.BaseDirectory);
-            foreach (var item in items)
-            {
-                yield return item;
-            }
+            var pluginsPath = AppUtility.GetDocumentPath("plugins");
             if (this.Settings.PluginsPath != null)
             {
                 foreach (var item in this.Settings.PluginsPath)
+                {
+                    yield return item;
+                }
+            }
+
+            if (Directory.Exists(pluginsPath) == true)
+            {
+                foreach (var item in Directory.GetDirectories(pluginsPath))
                 {
                     yield return item;
                 }

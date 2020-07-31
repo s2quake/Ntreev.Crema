@@ -36,6 +36,7 @@ using Ntreev.Library.Linq;
 using Ntreev.ModernUI.Framework;
 using System.Diagnostics;
 using System.Windows.Input;
+using System.Threading;
 
 #pragma warning disable 0649
 namespace Ntreev.Crema.ApplicationHost.ViewModels
@@ -74,9 +75,9 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             this.cremaAppHost.Closed += CremaAppHost_Closed;
         }
 
-        public void Close()
+        public async void Close()
         {
-            this.TryClose();
+            await this.TryCloseAsync();
         }
 
         public double Left
@@ -266,16 +267,15 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             this.OnLoaded(EventArgs.Empty);
         }
 
-        protected override void OnActivate()
+        protected async override Task OnActivateAsync(CancellationToken cancellationToken)
         {
-            base.OnActivate();
+            await base.OnActivateAsync(cancellationToken);
             this.selectedService = this.cremaAppHost;
         }
 
-        protected override void OnDeactivate(bool close)
+        protected async override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
-            base.OnDeactivate(close);
-
+            await base.OnDeactivateAsync(close, cancellationToken);
             Ntreev.Crema.ApplicationHost.Properties.Settings.Default.ThemeColor = this.cremaAppHost.ThemeColor;
             Ntreev.Crema.ApplicationHost.Properties.Settings.Default.Save();
             this.OnClosed(EventArgs.Empty);

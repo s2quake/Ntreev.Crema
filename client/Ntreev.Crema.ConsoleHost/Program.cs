@@ -53,9 +53,6 @@ namespace Ntreev.Crema.ConsoleHost
                 {
                     var configs = application.GetService(typeof(ConsoleConfiguration)) as ConsoleConfiguration;
                     var commandContext = application.GetService(typeof(CommandContext)) as CommandContext;
-#if DEBUG
-                    commandContext.VerifyName = false;
-#endif
                     commandContext.Execute(Environment.CommandLine);
                     configs.Commit();
                 }

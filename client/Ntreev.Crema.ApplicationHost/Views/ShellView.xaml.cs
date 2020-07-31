@@ -188,7 +188,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
                         {
                             FlashWindowUtility.FlashWindow(this);
                         }
-                        AppMessageBox.Show(comments[i], Properties.Resources.Message_KickedByAdministrator);
+                        AppMessageBox.ShowAsync(comments[i], Properties.Resources.Message_KickedByAdministrator);
                         break;
                     }
                 }
@@ -207,7 +207,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
                         {
                             FlashWindowUtility.FlashWindow(this);
                         }
-                        AppMessageBox.Show(item.BanInfo.Comment, Properties.Resources.Message_BannedByAdministrator);
+                        AppMessageBox.ShowAsync(item.BanInfo.Comment, Properties.Resources.Message_BannedByAdministrator);
                     });
                     break;
                 }
@@ -244,7 +244,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
                 }
             }
 
-            foreach (var item in menuItem.ItemsSource)
+            foreach (var item in menuItem.MenuItems)
             {
                 this.SetInputBindings(item);
             }
@@ -311,7 +311,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                 }
             }
         }

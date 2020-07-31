@@ -37,7 +37,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
     [Export(typeof(ICommand))]
     [Export]
     [ResourceDescription]
-    class RunCommand : CommandBase, Ntreev.Library.Commands.IUnknownArgument
+    class RunCommand : CommandBase
     {
         private readonly CremaBootstrapper application;
         private readonly ICremaHost cremaHost;
@@ -53,7 +53,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
 
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         [CommandPropertyTrigger(nameof(List), false)]
         [DefaultValue("")]
         public string ScriptPath
