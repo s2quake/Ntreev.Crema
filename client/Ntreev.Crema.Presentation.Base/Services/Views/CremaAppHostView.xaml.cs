@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.Presentation.Base.Controls;
 using Ntreev.Crema.Presentation.Base.Services.ViewModels;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.ModernUI.Framework.Controls;
 using System;
 using System.Collections.Generic;
@@ -33,14 +34,21 @@ using System.Windows.Threading;
 
 namespace Ntreev.Crema.Presentation.Base.Services.Views
 {
+    [Export]
     partial class CremaAppHostView : UserControl
     {
-        [Import]
-        private Lazy<CremaAppHostViewModel> cremaAppHost = null;
+        private readonly ICremaAppHost cremaAppHost;
 
         public CremaAppHostView()
         {
             this.InitializeComponent();
+        }
+
+        [ImportingConstructor]
+        public CremaAppHostView(ICremaAppHost cremaAppHost)
+        {
+            this.InitializeComponent();
+            this.cremaAppHost = cremaAppHost;
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -71,8 +79,6 @@ namespace Ntreev.Crema.Presentation.Base.Services.Views
 
         private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            var cremaAppHost = this.cremaAppHost.Value;
-            cremaAppHost.PropertyChanged += CremaAppHost_PropertyChanged;
             this.Dispatcher.InvokeAsync(() =>
             {
                 if (this.serverList.SelectedItem != null)
@@ -97,8 +103,10 @@ namespace Ntreev.Crema.Presentation.Base.Services.Views
         private void PasswordBox_PasswordChanged(object sender, System.Windows.RoutedEventArgs e)
         {
             var passwordBox = sender as PasswordBox;
-            var cremaAppHost = this.cremaAppHost.Value;
-            cremaAppHost.SetPassword(passwordBox.Password, false);
+            if (this.cremaAppHost is CremaAppHostViewModel viewModel)
+            {
+                viewModel.SetPassword(passwordBox.Password, false);
+            }
         }
 
         private void SetPassword(string password)

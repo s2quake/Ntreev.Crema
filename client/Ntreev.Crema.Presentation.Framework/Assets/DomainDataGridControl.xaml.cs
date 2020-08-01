@@ -28,11 +28,6 @@ namespace Ntreev.Crema.Presentation.Framework.Assets
 {
     partial class DomainDataGridControl : ResourceDictionary
     {
-        public DomainDataGridControl()
-        {
-            this.InitializeComponent();
-        }
-
         //private void TableViewItemsHost_Loaded(object sender, RoutedEventArgs e)
         //{
         //    int qwr = 0;

@@ -22,10 +22,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     xmlns:ncf="clr-namespace:Ntreev.Crema.Presentation.Framework"
                     xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Descriptors.xaml" />
-    </ResourceDictionary.MergedDictionaries>
-
     <HierarchicalDataTemplate DataType="{x:Type ncf:UserCategoryTreeItemBase}" ItemsSource="{Binding Items}">
         <HierarchicalDataTemplate.Resources>
             <nmfc:ModernContextMenu x:Key="Category_ContextMenu" ItemsSource="{Binding ContextMenus}" />

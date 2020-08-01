@@ -41,13 +41,12 @@ namespace Ntreev.Crema.Presentation.Framework
             this.cremaAppHost.Opened += CremaAppHost_Opened;
             this.cremaAppHost.Closed += CremaAppHost_Closed;
 
-            throw new NotImplementedException();
-            //this.propertyItems = MenuItemUtility.GetMenuItems(this, propertyItems).ToArray();
+            this.propertyItems = ParentItemUtility.GetItems(this, propertyItems).ToArray();
         }
 
         public object SelectedObject
         {
-            get { return this.selectedObject; }
+            get => this.selectedObject;
             set
             {
                 if (this.selectedObject == value)

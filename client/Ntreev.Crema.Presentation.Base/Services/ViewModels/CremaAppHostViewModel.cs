@@ -80,7 +80,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
         private Lazy<DataBaseServiceViewModel> dataBaseService = null;
         [Import]
         private Lazy<DataBaseListViewModel> dataBaseSelections = null;
-        private ICompositionService compositionService;
+        private IBuildUp buildUp;
         private IDataBase dataBase;
 
         [Import]
@@ -102,17 +102,17 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
         }
 
         [ImportingConstructor]
-        public CremaAppHostViewModel(ICremaHost cremaHost, IAppConfiguration configs, ICompositionService compositionService)
+        public CremaAppHostViewModel(ICremaHost cremaHost, IAppConfiguration configs, IBuildUp buildUp)
         {
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;
             this.configs = configs;
-            this.compositionService = compositionService;
+            this.buildUp = buildUp;
             this.theme = Themes.Keys.FirstOrDefault();
             this.themeColor = FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor;
             this.loginCommand = new DelegateCommand((p) => this.LoginAsync(), (p) => this.CanLogin);
             this.connectionItems = ConnectionItemCollection.Read(AppUtility.GetDocumentFilename("ConnectionList.xml"));
-            this.compositionService.SatisfyImportsOnce(this.connectionItems);
+            this.buildUp.BuildUp(this.connectionItems);
             this.ConnectionItem = this.connectionItems.FirstOrDefault(item => item.IsDefault);
             this.authenticator = this.cremaHost.GetService(typeof(Authenticator)) as Authenticator;
             this.configs.Update(this);

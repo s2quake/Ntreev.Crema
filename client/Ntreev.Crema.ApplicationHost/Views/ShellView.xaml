@@ -22,6 +22,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                   xmlns:mui="http://firstfloorsoftware.com/ModernUI"
                   xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
                   xmlns:nmfm="clr-namespace:Ntreev.ModernUI.Framework.Markup;assembly=Ntreev.ModernUI.Framework"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                  mc:Ignorable="d"
                   LogoData="F1M78.073,72.619C83.524,72.537,89.33,73.251,95.793,75.294L102.486,77.8 101.16,88.5C98.373,111 96.143,129 96.143,129 96.143,129 16.857,129 16.857,129 16.857,129 14.627,111 11.84,88.5L10.514,77.8 17.655,79.432C42.888,83.932,58.088,72.92,78.073,72.619z M1,1C1,1 112,1 112,1 112,1 108.965,25.5 105.55,53.062L104.073,64.985 104.654,60.3C105.211,55.8 105.657,52.2 105.657,52.2 73.906,32.389 41.879,60.843 12.627,50.678L6.837,48.114 6.017,41.5C3.23,19,1,1,1,1z"
                   Left="{Binding Left, Mode=TwoWay}"
                   Top="{Binding Top, Mode=TwoWay}"
@@ -29,10 +32,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                   Height="{Binding Height, Mode=TwoWay}"
                   WindowState="{Binding WindowState, Mode=TwoWay}"
                   Title="{Binding Title}"
-                  Style="{StaticResource ShellView}"
                   TaskbarItemInfo="{Binding StatusBarService.TaskbarItemInfo}" Activated="ModernWindow_Activated"
                   Initialized="ModernWindow_Initialized"
-                  Loaded="ModernWindow_Loaded" DataContextChanged="ModernWindow_DataContextChanged">
+                  Loaded="ModernWindow_Loaded" DataContextChanged="ModernWindow_DataContextChanged" d:DesignWidth="800" d:DesignHeight="600">
 
     <mui:ModernWindow.Resources>
 
@@ -43,7 +45,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TabItem}">
-                        <Border Name="Bd" Margin="2 0" MinWidth="50" BorderThickness="1 1 1 0" SnapsToDevicePixels="True" Padding="8 4" 
+                        <Border x:Name="Bd" Margin="2 0" MinWidth="50" BorderThickness="1 1 1 0" SnapsToDevicePixels="True" Padding="8 4" 
                                 BorderBrush="{DynamicResource ButtonTextDisabled}" Background="{TemplateBinding Background}">
                             <Grid>
                                 <ContentPresenter x:Name="ContentSite" HorizontalAlignment="Center" RecognizesAccessKey="True" 
@@ -103,21 +105,21 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                             </Border>
                             <StackPanel Orientation="Horizontal" >
                                 <TabPanel DockPanel.Dock="Top" HorizontalAlignment="Left" IsItemsHost="true" Margin="2 2 2 0" VerticalAlignment="Bottom" />
-                                <Menu ItemsSource="{Binding MenuService.ItemsSource}" VerticalAlignment="Bottom" Margin="0 2" >
-                                    <Menu.ItemContainerStyle>
+                                <nmfc:ModernMenu ItemsSource="{Binding MenuService.ItemsSource}" VerticalAlignment="Bottom" Margin="0 2" >
+                                    <nmfc:ModernMenu.ItemContainerStyle>
                                         <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MenuItem_Style}">
                                             <Setter Property="Margin" Value="0" />
                                             <Setter Property="MinWidth" Value="50" />
                                         </Style>
-                                    </Menu.ItemContainerStyle>
-                                </Menu>
+                                    </nmfc:ModernMenu.ItemContainerStyle>
+                                </nmfc:ModernMenu>
                             </StackPanel>
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
             <Setter Property="ItemContainerStyle" Value="{StaticResource Tabs_TabItem_Style}" />
-            <Setter Property="ContentTemplate" Value="{StaticResource TabControl_Modern_ContentTemplate}" />
+            <Setter Property="ContentTemplate" Value="{StaticResource TabControl_ItemsSource_ContentTemplate}" />
         </Style>
 
     </mui:ModernWindow.Resources>

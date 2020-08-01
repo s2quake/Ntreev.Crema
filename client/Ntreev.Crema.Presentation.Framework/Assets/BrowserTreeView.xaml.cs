@@ -26,11 +26,6 @@ namespace Ntreev.Crema.Presentation.Framework.Assets
 {
     partial class BrowserTreeView : ResourceDictionary
     {
-        public BrowserTreeView()
-        {
-            InitializeComponent();
-        }
-
         private void BrowserTreeViewItem_Selected(object sender, RoutedEventArgs e)
         {
             if (sender is Controls.BrowserTreeViewItem item)

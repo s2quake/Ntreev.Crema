@@ -34,9 +34,5 @@ namespace Ntreev.Crema.Presentation.Assets
 {
     public partial class DiffDataTypeControl : ResourceDictionary
     {
-        public DiffDataTypeControl()
-        {
-            this.InitializeComponent();
-        }
     }
 }

@@ -103,10 +103,7 @@ namespace Ntreev.Crema.ApplicationHost
                 Environment.Exit(-1);
         }
 
-        protected override bool AutoInitialize
-        {
-            get { return false; }
-        }
+        protected override bool AutoInitialize => false;
 
         private void PublishException(DispatcherUnhandledExceptionEventArgs e)
         {

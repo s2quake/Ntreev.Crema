@@ -22,13 +22,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     xmlns:ncf="clr-namespace:Ntreev.Crema.Presentation.Framework"
                     xmlns:ncfc="clr-namespace:Ntreev.Crema.Presentation.Framework.Controls">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="IconImage.xaml" />
-        <ResourceDictionary Source="MenuItem.xaml" />
-        <ResourceDictionary Source="TextBlock.xaml" />
-        <ResourceDictionary Source="HighlightTextBlock.xaml" />
-    </ResourceDictionary.MergedDictionaries>
-
     <Style x:Key="DomainUserDescriptor_ContentControl_Style" TargetType="{x:Type ContentControl}">
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Margin" Value="2" />

@@ -29,33 +29,28 @@ namespace Ntreev.Crema.Presentation.Assets
 {
     partial class CremaDataControl : ResourceDictionary
     {
-        public CremaDataControl()
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
-            this.InitializeComponent();
+            var checkBox = sender as CheckBox;
+            var cell = checkBox.Tag as ModernDataCell;
+            if (cell != null && cell.IsBeingEdited == true)
+                cell.EndEdit();
         }
 
-        //private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
-        //{
-        //    var checkBox = sender as CheckBox;
-        //    var cell = checkBox.Tag as ModernDataCell;
-        //    if (cell != null && cell.IsBeingEdited == true)
-        //        cell.EndEdit();
-        //}
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            var checkBox = sender as CheckBox;
+            var cell = checkBox.Tag as ModernDataCell;
+            if (cell != null && cell.IsBeingEdited == true)
+                cell.EndEdit();
+        }
 
-        //private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        //{
-        //    var checkBox = sender as CheckBox;
-        //    var cell = checkBox.Tag as ModernDataCell;
-        //    if (cell != null && cell.IsBeingEdited == true)
-        //        cell.EndEdit();
-        //}
-
-        //private void TagSelector_PopupClosed(object sender, EventArgs e)
-        //{
-        //    var tagSelector = sender as TagSelector;
-        //    var cell = tagSelector.Tag as ModernDataCell;
-        //    if (cell != null && cell.IsBeingEdited == true)
-        //        cell.EndEdit();
-        //}
+        private void TagSelector_PopupClosed(object sender, EventArgs e)
+        {
+            var tagSelector = sender as TagSelector;
+            var cell = tagSelector.Tag as ModernDataCell;
+            if (cell != null && cell.IsBeingEdited == true)
+                cell.EndEdit();
+        }
     }
 }

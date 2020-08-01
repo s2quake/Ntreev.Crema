@@ -33,9 +33,5 @@ namespace Ntreev.Crema.Presentation.Assets
 {
     public partial class DiffTemplateItemControl : ResourceDictionary
     {
-        public DiffTemplateItemControl()
-        {
-            this.InitializeComponent();
-        }
     }
 }

@@ -38,7 +38,6 @@ using System.Diagnostics;
 using System.Windows.Input;
 using System.Threading;
 
-#pragma warning disable 0649
 namespace Ntreev.Crema.ApplicationHost.ViewModels
 {
     [Export(typeof(IShell))]
@@ -61,7 +60,8 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
         private string selectedServiceType;
 
         [ImportingConstructor]
-        public ShellViewModel(ICremaHost cremaHost, ICremaAppHost cremaAppHost)
+        public ShellViewModel(ICremaHost cremaHost, ICremaAppHost cremaAppHost, IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += (s, e) =>
@@ -153,7 +153,7 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             {
                 string productName = AppUtility.ProductName;
 
-                if (cremaHost.ServiceState == ServiceState.Opened)
+                if (cremaHost.ServiceState == ServiceState.Open)
                     return $"{productName} - {this.cremaAppHost.DataBaseName} ({cremaHost.Address} - {cremaHost.UserID})";
                 else
                     return productName;
@@ -215,15 +215,15 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             get { return this.cremaAppHost; }
         }
 
-        public virtual IEnumerable<IToolBarItem> ToolBarItems
-        {
-            get
-            {
-                if (this.serviceProvider == null)
-                    return Enumerable.Empty<IToolBarItem>();
-                return ToolBarItemUtility.GetToolBarItems(this, this.serviceProvider);
-            }
-        }
+        //public virtual IEnumerable<IToolBarItem> ToolBarItems
+        //{
+        //    get
+        //    {
+        //        if (this.serviceProvider == null)
+        //            return Enumerable.Empty<IToolBarItem>();
+        //        return ToolBarItemUtility.GetToolBarItems(this, this.serviceProvider);
+        //    }
+        //}
 
         protected async override Task<bool> CloseAsync()
         {

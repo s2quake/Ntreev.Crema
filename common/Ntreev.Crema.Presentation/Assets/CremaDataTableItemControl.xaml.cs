@@ -29,11 +29,6 @@ namespace Ntreev.Crema.Presentation.Assets
 {
     partial class CremaDataTableItemControl : ResourceDictionary
     {
-        public CremaDataTableItemControl()
-        {
-            this.InitializeComponent();
-        }
-
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             var checkBox = sender as CheckBox;

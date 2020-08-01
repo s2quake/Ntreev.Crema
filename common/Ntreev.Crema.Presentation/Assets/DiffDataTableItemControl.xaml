@@ -22,11 +22,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
                     xmlns:ncpc="clr-namespace:Ntreev.Crema.Presentation.Controls">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Ntreev.Crema.Presentation;component/Assets/CremaDataTableItemControl.xaml" />
-        <ResourceDictionary Source="/Ntreev.Crema.Presentation;component/Assets/DiffDataGridControl.xaml" />
-    </ResourceDictionary.MergedDictionaries>
-
     <DataTemplate x:Key="DiffDataTableItemControl_HeaderTempalte">
         <Label Content="{Binding}" Margin="4" HorizontalAlignment="Center" />
     </DataTemplate>

@@ -28,11 +28,6 @@ namespace Ntreev.Crema.Presentation.Assets
 {
     partial class DiffDataGridControl : ResourceDictionary
     {
-        public DiffDataGridControl()
-        {
-            InitializeComponent();
-        }
-
         private void UndoListBox_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (sender is System.Windows.Controls.ListBox listBox && listBox.Tag is ModernUI.Framework.Controls.IconButton button)

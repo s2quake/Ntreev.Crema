@@ -28,9 +28,5 @@ namespace Ntreev.Crema.Presentation.Framework.Assets
 {
     partial class CremaUI : ResourceDictionary
     {
-        public CremaUI()
-        {
-            this.InitializeComponent();
-        }
     }
 }

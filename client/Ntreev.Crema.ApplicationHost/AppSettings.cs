@@ -65,7 +65,7 @@ namespace Ntreev.Crema.ApplicationHost
         }
 
         [CommandProperty]
-        [DefaultValue("")]
+        [DefaultValue(false)]
         public bool ReportDetails
         {
             get; set;

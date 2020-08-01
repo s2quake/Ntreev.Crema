@@ -91,7 +91,8 @@ namespace Ntreev.Crema.ApplicationHost
                     {
                         Out = new StringWriter(sb)
                     };
-                    if (parser.TryParse(Environment.CommandLine) == false)
+                    var (name, arguments) = CommandStringUtility.Split(Environment.CommandLine);
+                    if (parser.TryParse(name, arguments) == false && arguments != string.Empty)
                     {
                         MessageBox.Show(sb.ToString(), "Usage", MessageBoxButton.OK, MessageBoxImage.Information);
                         return false;

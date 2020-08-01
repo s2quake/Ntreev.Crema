@@ -49,8 +49,12 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
         {
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;
-            throw new NotImplementedException();
-            //protected override void OnPartImportsSatisfied() 밑에 주석
+            this.AttachPropertyService(this.propertyService);
+            this.Dispatcher.InvokeAsync(() =>
+            {
+                this.CremaAppHost.Loaded += CremaAppHost_Loaded;
+                this.CremaAppHost.Unloaded += CremaAppHost_Unloaded;
+            });
         }
 
         public async void SelectDataBase()

@@ -16,6 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
+using Ntreev.Crema.ApplicationHost.ViewModels;
+using Ntreev.Crema.ApplicationHost.Views;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.ServiceHosts;
 using Ntreev.Crema.Services;
@@ -67,8 +69,8 @@ namespace Ntreev.Crema.ApplicationHost
                 yield return item;
             }
             //yield return new Tuple<Type, object>(typeof(CremaService), this.service);
-            //yield return new Tuple<Type, object>(typeof(ICremaService), this.service);
             yield return new Tuple<Type, object>(typeof(AppSettings), this.Settings);
+            //yield return new Tuple<Type, object>(typeof(ICompositionService), this);
         }
 
         protected override object GetInstance(Type service, string key)
@@ -103,7 +105,7 @@ namespace Ntreev.Crema.ApplicationHost
         {
             var assemblyList = new List<Assembly>(base.GetAssemblies())
             {
-                Assembly.GetExecutingAssembly()
+                Assembly.GetExecutingAssembly(),
             };
 
             var assembliesByName = new Dictionary<string, Assembly>();

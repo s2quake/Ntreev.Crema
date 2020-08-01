@@ -21,10 +21,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:ncfc="clr-namespace:Ntreev.Crema.Presentation.Framework.Controls">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Ntreev.ModernUI.Framework;component/Assets/TreeView.xaml" />
-    </ResourceDictionary.MergedDictionaries>
-
     <Style x:Key="BrowserTreeViewItem_Style" TargetType="{x:Type ncfc:BrowserTreeViewItem}" BasedOn="{StaticResource TreeViewItem_Style}">
         <EventSetter Event="Selected" Handler="BrowserTreeViewItem_Selected" />
     </Style>

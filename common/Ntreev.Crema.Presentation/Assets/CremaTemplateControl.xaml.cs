@@ -39,11 +39,6 @@ namespace Ntreev.Crema.Presentation.Assets
         //private bool isDragDrop;
         //private int scrollDirection;
 
-        public CremaTemplateControl()
-        {
-            this.InitializeComponent();
-        }
-
         //private void RowSelector_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         //{
         //    this.startSelector = sender as RowSelector;

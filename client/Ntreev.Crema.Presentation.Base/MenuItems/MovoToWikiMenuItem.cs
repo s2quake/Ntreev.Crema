@@ -41,7 +41,7 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
         public MovoToWikiMenuItem(CremaAppHostViewModel cremaAppHost)
         {
             this.cremaAppHost = cremaAppHost;
-            this.Icon = "/Ntreev.Crema.Presentation.Base;component/Images/wiki.png";
+            this.Icon = "Images/wiki.png";
             this.DisplayName = Resources.Label_MoveToWiki;
         }
 

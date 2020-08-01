@@ -23,10 +23,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     xmlns:ncf="clr-namespace:Ntreev.Crema.Presentation.Framework"
                     xmlns:ncfc="clr-namespace:Ntreev.Crema.Presentation.Framework.Controls">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Descriptors.xaml" />
-    </ResourceDictionary.MergedDictionaries>
-
     <DataTemplate DataType="{x:Type ncf:TableListItemBase}">
         <DataTemplate.Resources>
             <nmfc:ModernContextMenu x:Key="TableListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}" />

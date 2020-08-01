@@ -21,26 +21,29 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <ResourceDictionary.MergedDictionaries>
 
-        <ResourceDictionary Source="FlowExpander.xaml" />
-        <ResourceDictionary Source="DockPanelSplitter.xaml" />
-        <ResourceDictionary Source="ContentServiceControl.xaml" />
+        <ResourceDictionary Source="/Ntreev.ModernUI.Framework;component/Assets/ModernUI.xaml" />
+        <ResourceDictionary Source="/Ntreev.ModernUI.Framework.DataGrid;component/Assets/DataGridUI.xaml" />
+
         <ResourceDictionary Source="BrowserItemsControl.xaml" />
+        <ResourceDictionary Source="ContentServiceControl.xaml" />
+        <ResourceDictionary Source="CremaDataControl.xaml" />
+        <ResourceDictionary Source="CremaDataTableControl.xaml" />
+        <ResourceDictionary Source="CremaDataTableItemControl.xaml" />
+        <ResourceDictionary Source="CremaDataTypeControl.xaml" />
+        <ResourceDictionary Source="CremaTemplateControl.xaml" />
+        <ResourceDictionary Source="DiffDataGridControl.xaml" />
+        <ResourceDictionary Source="DiffDataTableControl.xaml" />
+        <ResourceDictionary Source="DiffDataTableItemControl.xaml" />
+        <ResourceDictionary Source="DiffDataTypeControl.xaml" />
+        <ResourceDictionary Source="DiffHorzMinimap.xaml" />
+        <ResourceDictionary Source="DiffHorzScrollBar.xaml" />
+        <ResourceDictionary Source="DiffTemplateItemControl.xaml" />
+        <ResourceDictionary Source="DiffVertMinimap.xaml" />
+        <ResourceDictionary Source="DiffVertScrollBar.xaml" />
+        <ResourceDictionary Source="DockPanelSplitter.xaml" />
+        <ResourceDictionary Source="FlowExpander.xaml" />
         <ResourceDictionary Source="HeaderedContentList.xaml" />
         <ResourceDictionary Source="TagSelector.xaml" />
-        <ResourceDictionary Source="CremaDataControl.xaml" />
-        <!--<ResourceDictionary Source="CremaDataTypeControl.xaml" />
-        <ResourceDictionary Source="CremaTemplateControl.xaml" />
-        <ResourceDictionary Source="CremaDataTableItemControl.xaml" />
-        <ResourceDictionary Source="CremaDataTableControl.xaml" />
-        <ResourceDictionary Source="DiffHorzMinimap.xaml" />
-        <ResourceDictionary Source="DiffVertMinimap.xaml" />
-        <ResourceDictionary Source="DiffDataGridControl.xaml" />
-        <ResourceDictionary Source="DiffDataTableItemControl.xaml" />
-        <ResourceDictionary Source="DiffDataTableControl.xaml" />
-        <ResourceDictionary Source="DiffDataTypeControl.xaml" />
-        <ResourceDictionary Source="DiffTemplateItemControl.xaml" />
-        <ResourceDictionary Source="DiffHorzScrollBar.xaml" />
-        <ResourceDictionary Source="DiffVertScrollBar.xaml" />-->
 
     </ResourceDictionary.MergedDictionaries>
 

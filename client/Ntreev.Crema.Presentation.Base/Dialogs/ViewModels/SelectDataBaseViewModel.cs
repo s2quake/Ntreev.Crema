@@ -28,6 +28,7 @@ using Ntreev.Crema.Presentation.Base.Properties;
 using System.ComponentModel.Composition;
 using Ntreev.Crema.Presentation.Base.Services.ViewModels;
 using Ntreev.Crema.Presentation.Framework;
+using System.Threading;
 
 namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 {
@@ -127,10 +128,10 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             get { return this.supportsDescriptor; }
         }
 
-        protected override void OnInitialize()
+        protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {
-            base.OnInitialize();
-            this.Dispatcher.InvokeAsync(() => this.action());
+            await base.OnInitializeAsync(cancellationToken);
+            await this.Dispatcher.InvokeAsync(() => this.action());
         }
 
         private async void Initialize(string address)

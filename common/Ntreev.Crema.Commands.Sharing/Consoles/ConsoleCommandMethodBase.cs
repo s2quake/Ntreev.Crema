@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         }
 
-        public new ConsoleCommandContextBase CommandContext => base.CommandContext as ConsoleCommandContextBase;
+        public ConsoleCommandContextBase CommandContext => (this as ICommandHost).CommandContext as ConsoleCommandContextBase;
 
         #region IConsoleCommand
 

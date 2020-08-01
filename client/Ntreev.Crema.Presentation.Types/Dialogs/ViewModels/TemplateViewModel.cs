@@ -273,9 +273,9 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 
         protected abstract void Verify(Action<bool> isValid);
 
-        protected async override void OnInitialize()
+        protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {
-            base.OnInitialize();
+            await base.OnInitializeAsync(cancellationToken);
             await this.template.Dispatcher.InvokeAsync(() =>
             {
                 this.domain = this.template.Domain;

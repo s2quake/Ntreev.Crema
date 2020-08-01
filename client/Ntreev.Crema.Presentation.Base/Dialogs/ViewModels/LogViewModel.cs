@@ -118,10 +118,9 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
         //    get { return this.previewCommand; }
         //}
 
-        protected async override void OnInitialize()
+        protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {
-            base.OnInitialize();
-
+            await base.OnInitializeAsync(cancellationToken);
             try
             {
                 this.BeginProgress(Resources.Message_ReceivingInfo);
