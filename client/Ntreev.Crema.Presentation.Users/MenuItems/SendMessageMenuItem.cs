@@ -46,7 +46,7 @@ namespace Ntreev.Crema.Presentation.Users.MenuItems
 
         public SendMessageMenuItem()
         {
-            this.Icon = "/Ntreev.Crema.Presentation.Users;component/Images/message.png";
+            this.Icon = "Images/message.png";
             this.DisplayName = Resources.MenuItem_SendMessage;
         }
 

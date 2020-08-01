@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Presentation.Framework
         private readonly object owner;
 
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         public DomainUserListBase(Authentication authentication, IDomain domain, bool IsSubscriptable, object owner)
         {
@@ -105,7 +105,7 @@ namespace Ntreev.Crema.Presentation.Framework
         private void AddDescriptor(DomainUserDescriptor descriptor)
         {
             var viewModel = descriptor.Host == null ? this.CreateInstance(this.authentication, descriptor, this.owner) : descriptor.Host as DomainUserListItemBase;
-            this.compositionService?.SatisfyImportsOnce(viewModel);
+            this.buildUp?.BuildUp(viewModel);
             this.users.Add(viewModel);
         }
 
@@ -126,7 +126,7 @@ namespace Ntreev.Crema.Presentation.Framework
         {
             foreach (var item in this.users)
             {
-                this.compositionService.SatisfyImportsOnce(item);
+                this.buildUp.BuildUp(item);
             }
         }
 

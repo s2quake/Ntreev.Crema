@@ -42,14 +42,13 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
         private readonly IDataBase dataBase;
         private LogInfoViewModel[] itemsSource;
         private LogInfoViewModel selectedItem;
-        //private readonly ICommand previewCommand;
 
         private LogViewModel(Authentication authentication, IDataBase dataBase)
+            : base(dataBase)
         {
             this.authentication = authentication;
             this.dataBase = dataBase;
             this.DisplayName = Resources.Title_ViewLog;
-            //this.previewCommand = new DelegateCommand((p) => this.Preview(), (p) => this.CanPreview);
         }
 
         public static async Task<LogViewModel> ShowDialogAsync(Authentication authentication, IDataBaseDescriptor descriptor)
@@ -77,19 +76,14 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             throw new NotImplementedException();
         }
 
-        public async void Close()
+        public async Task CloseAsync()
         {
             await this.TryCloseAsync(true);
         }
 
-        //public void Preview()
-        //{
-        //    this.selectedItem.Preview();
-        //}
-
         public LogInfoViewModel SelectedItem
         {
-            get { return this.selectedItem; }
+            get => this.selectedItem;
             set
             {
                 this.selectedItem = value;

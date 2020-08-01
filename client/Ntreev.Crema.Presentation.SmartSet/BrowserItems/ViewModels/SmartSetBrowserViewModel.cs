@@ -55,7 +55,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
         [Import]
         private IAppConfiguration configs = null;
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         private bool isVisible = true;
 
@@ -240,7 +240,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             this.Items.Add(new SmartSetContextTreeViewItemViewModel(this.Root, this));
             foreach (var item in this.Items)
             {
-                this.compositionService.SatisfyImportsOnce(item);
+                this.buildUp.BuildUp(item);
             }
             this.OnLoaded(EventArgs.Empty);
             this.Dispatcher.InvokeAsync((System.Action)(() =>
@@ -330,7 +330,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 
         void IPartImportsSatisfiedNotification.OnImportsSatisfied()
         {
-            this.compositionService.SatisfyImportsOnce(this.bookmarkCategory);
+            this.buildUp.BuildUp(this.bookmarkCategory);
         }
 
         #endregion

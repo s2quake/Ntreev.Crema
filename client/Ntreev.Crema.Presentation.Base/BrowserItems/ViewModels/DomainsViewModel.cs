@@ -43,7 +43,7 @@ namespace Ntreev.Crema.Presentation.Base.BrowserItems.ViewModels
         private DomainCategoryTreeViewItemViewModel root;
 
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
         [Import]
         private Authenticator authenticator = null;
         [Import]
@@ -78,7 +78,7 @@ namespace Ntreev.Crema.Presentation.Base.BrowserItems.ViewModels
 
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.compositionService.SatisfyImportsOnce(this.root);
+                    this.buildUp.BuildUp(this.root);
                     foreach (var item in this.root.Items)
                     {
                         this.Items.Add(item);

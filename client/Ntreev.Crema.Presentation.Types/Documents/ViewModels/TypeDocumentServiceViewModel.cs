@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
         private readonly ICremaAppHost cremaAppHost;
 
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         [ImportingConstructor]
         public TypeDocumentServiceViewModel(ICremaAppHost cremaAppHost)
@@ -85,7 +85,7 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
             if (this.cremaAppHost.GetService(typeof(IDataBase)) is IDataBase dataBase)
             {
                 var document = new TypeDataFinderViewModel(authentication, dataBase, itemPath);
-                this.compositionService?.SatisfyImportsOnce(document);
+                this.buildUp?.BuildUp(document);
                 this.Items.Add(document);
                 var cancellation = new CancellationTokenSource();
                 this.ActivateItemAsync(document, cancellation.Token);
@@ -98,7 +98,7 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
             if (document == null)
             {
                 document = new TypeViewModel(authentication, type);
-                this.compositionService?.SatisfyImportsOnce(document);
+                this.buildUp?.BuildUp(document);
                 this.Items.Add(document);
             }
             var cancellation = new CancellationTokenSource();
@@ -112,7 +112,7 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
             if (document == null)
             {
                 document = new TypeViewModel(authentication, type);
-                this.compositionService?.SatisfyImportsOnce(document);
+                this.buildUp?.BuildUp(document);
                 this.Items.Add(document);
             }
             var cancellation = new CancellationTokenSource();

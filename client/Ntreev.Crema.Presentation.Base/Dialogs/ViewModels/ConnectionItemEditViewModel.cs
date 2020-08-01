@@ -35,13 +35,12 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
         private ConnectionItemViewModel connectionItemInfo;
         private bool isModified;
         private bool isPasswordChanged;
-        private bool isNew;
 
         public ConnectionItemEditViewModel()
         {
             this.connectionItemInfo = new ConnectionItemViewModel();
             this.connectionItemInfo.PropertyChanged += ConnectionItemInfo_PropertyChanged;
-            this.isNew = true;
+            this.IsNew = true;
             this.DisplayName = Resources.Title_AddConnectionItem;
         }
 
@@ -70,7 +69,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
                 SelectedValue = this.connectionItemInfo.DataBaseName,
             };
 
-            if (await dialog.ShowDialogAsync () == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 this.connectionItemInfo.DataBaseName = dialog.SelectedItem.Name;
             }
@@ -91,7 +90,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 
         public ConnectionItemViewModel ConnectionInfo
         {
-            get { return this.connectionItemInfo; }
+            get => this.connectionItemInfo;
             set
             {
                 if (this.connectionItemInfo != null)
@@ -105,10 +104,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             }
         }
 
-        public IEnumerable<string> Themes
-        {
-            get { return CremaAppHostViewModel.Themes.Keys; }
-        }
+        public IEnumerable<string> Themes => CremaAppHostViewModel.Themes.Keys;
 
         public bool CanSelectDataBase
         {
@@ -134,10 +130,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             }
         }
 
-        public bool IsNew
-        {
-            get { return this.isNew; }
-        }
+        public bool IsNew { get; }
 
         private void ConnectionItemInfo_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

@@ -26,6 +26,7 @@ using System.ComponentModel.Composition;
 using System.Windows;
 using Ntreev.Crema.Data.Diff;
 using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
+using Ntreev.ModernUI.Framework;
 
 namespace Ntreev.Crema.Presentation.Differences
 {
@@ -35,7 +36,7 @@ namespace Ntreev.Crema.Presentation.Differences
     class BrowserService : BrowserServiceBase, IBrowserService
     {
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         [ImportingConstructor]
         public BrowserService(ICremaAppHost cremaAppHost, [ImportMany]IEnumerable<IBrowserItem> browserItems)
@@ -47,7 +48,7 @@ namespace Ntreev.Crema.Presentation.Differences
         public void Add(DiffDataSet dataSet)
         {
             var browserItem = new BrowserViewModel(dataSet);
-            this.compositionService.SatisfyImportsOnce(browserItem);
+            this.buildUp.BuildUp(browserItem);
             browserItem.UpdateItemsSource();
             this.ItemsSource.Add(browserItem);
             //this.Browsers.ElementAtOrDefault()

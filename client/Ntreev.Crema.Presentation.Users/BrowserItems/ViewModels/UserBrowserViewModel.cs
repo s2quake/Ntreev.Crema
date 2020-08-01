@@ -42,7 +42,7 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
     [Export(typeof(UserBrowserViewModel))]
     [ParentType("Ntreev.Crema.Presentation.Tables.IBrowserService, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
     [ParentType("Ntreev.Crema.Presentation.Types.IBrowserService, Ntreev.Crema.Presentation.Types, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Presentation.Base.IBrowserService, Ntreev.Crema.Presentation.Base, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Base.IBrowserService, Ntreev.Crema.Presentation.Base, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class UserBrowserViewModel : TreeViewBase, IBrowserItem
     {
         private readonly ICremaAppHost cremaAppHost;
@@ -59,7 +59,7 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
         [Import]
         private IFlashService flashService = null;
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         [ImportingConstructor]
         public UserBrowserViewModel(ICremaAppHost cremaAppHost)
@@ -114,7 +114,7 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
                     return new UserCategoryTreeViewItemViewModel(this.authenticator, userContext.Root, this);
                 });
 
-                this.compositionService.SatisfyImportsOnce(viewModel);
+                this.buildUp.BuildUp(viewModel);
                 this.Items.Add(viewModel);
 
                 this.cremaAppHost.UserConfigs.Update(this);

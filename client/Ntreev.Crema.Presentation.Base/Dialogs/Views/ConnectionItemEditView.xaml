@@ -22,7 +22,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-             xmlns:ncfc="clr-namespace:Ntreev.Crema.Presentation.Framework.Controls;assembly=Ntreev.Crema.Presentation.Framework"
              xmlns:nmfv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework"
              xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Base.Properties"
              mc:Ignorable="d">
@@ -60,8 +59,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <Border Width="4" />
                 <ComboBox x:Name="ThemeComboBox" Width="122" ItemsSource="{Binding Themes}" SelectedItem="{Binding ConnectionInfo.Theme}" />
             </StackPanel>
-            <!--<CheckBox Content="{x:Static p:Resources.Label_SavePassword}" IsChecked="{Binding IsPasswordRememberable}" />-->
-            <!--<CheckBox Content="서버에 접속하면 [서버 목록]에 추가" IsChecked="{Binding IsServerItemAddable}" />-->
         </nmfc:PropertyItemsControl>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <Button x:Name="Change" IsDefault="True" Style="{DynamicResource ChangeButton_Style}" />

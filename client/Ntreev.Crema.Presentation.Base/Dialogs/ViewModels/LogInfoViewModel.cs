@@ -31,49 +31,25 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
     {
         private readonly Authentication authentication;
         private readonly IDataBase dataBase;
-        private readonly LogInfo logInfo;
 
         internal LogInfoViewModel(Authentication authentication, IDataBase dataBase, LogInfo logInfo)
+            : base(dataBase)
         {
             this.authentication = authentication;
             this.dataBase = dataBase;
-            this.logInfo = logInfo;
+            this.LogInfo = logInfo;
             this.Target = dataBase;
         }
 
-        public LogInfo LogInfo
-        {
-            get { return this.logInfo; }
-        }
+        public LogInfo LogInfo { get; }
 
-        public string UserID
-        {
-            get { return this.logInfo.UserID; }
-        }
+        public string UserID => this.LogInfo.UserID;
 
-        public string Revision
-        {
-            get { return this.logInfo.Revision; }
-        }
+        public string Revision => this.LogInfo.Revision;
 
-        public string Message
-        {
-            get { return this.logInfo.Comment; }
-        }
+        public string Message => this.LogInfo.Comment;
 
-        public DateTime DateTime
-        {
-            get { return this.logInfo.DateTime; }
-        }
-
-        public new IEnumerable<IMenuItem> ContextMenus
-        {
-            get 
-            {
-                throw new NotImplementedException();
-                //return MenuItemUtility.GetMenuItems<IMenuItem>(this, this.dataBase); 
-            }
-        }
+        public DateTime DateTime => this.LogInfo.DateTime;
 
         #region IInfoProvider
 

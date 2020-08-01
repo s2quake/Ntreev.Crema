@@ -15,7 +15,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Jint" Version="3.0.0-beta-1828" />
+    <PackageReference Include="Jint" Version="2.11.58" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj" />

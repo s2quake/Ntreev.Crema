@@ -47,7 +47,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly ICommand previewCommand;
 
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         private LogViewModel(Authentication authentication, ITableItem tableItem)
         {
@@ -141,7 +141,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
                 });
                 foreach (var item in this.itemsSource)
                 {
-                    this.compositionService?.SatisfyImportsOnce(item);
+                    this.buildUp?.BuildUp(item);
                 }
                 this.selectedItem = null;
                 this.EndProgress();

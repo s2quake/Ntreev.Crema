@@ -38,6 +38,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
         private string comment;
 
         private CreateDataBaseViewModel(Authentication authentication, ICremaHost cremaHost)
+            : base(cremaHost)
         {
             this.authentication = authentication;
             this.cremaHost = cremaHost;
@@ -67,24 +68,21 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 
         public async Task CreateAsync()
         {
-            try
+            await new ProgressAction(this)
             {
-                this.BeginProgress(Resources.Message_CreatingNewDataBase);
-                await this.DataBaseContext.AddNewDataBaseAsync(this.authentication, this.DataBaseName, this.Comment);
-                this.EndProgress();
-                await this.TryCloseAsync(true);
-                await AppMessageBox.ShowAsync(Resources.Message_CreatedNewDataBase);
-            }
-            catch (Exception e)
-            {
-                await AppMessageBox.ShowErrorAsync(e);
-                this.EndProgress();
-            }
+                BeginMessage = Resources.Message_CreatingNewDataBase,
+                Try = async () =>
+                {
+                    await this.DataBaseContext.AddNewDataBaseAsync(this.authentication, this.DataBaseName, this.Comment);
+                    await this.TryCloseAsync(true);
+                    await AppMessageBox.ShowAsync(Resources.Message_CreatedNewDataBase);
+                }
+            }.RunAsync();
         }
 
         public string DataBaseName
         {
-            get { return this.dataBaseName ?? string.Empty; }
+            get => this.dataBaseName ?? string.Empty;
             set
             {
                 if (this.dataBaseName == value)
@@ -98,7 +96,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 
         public string Comment
         {
-            get { return this.comment ?? string.Empty; }
+            get => this.comment ?? string.Empty;
             set
             {
                 if (this.comment == value)

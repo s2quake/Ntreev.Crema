@@ -43,7 +43,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
         private readonly ICremaAppHost cremaAppHost;
 
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
         [Import]
         private Lazy<TableBrowserViewModel> browser = null;
 
@@ -96,7 +96,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
         public TableDataFinderViewModel AddFinder(Authentication authentication, ITableItemDescriptor descriptor)
         {
             var document = new TableDataFinderViewModel(authentication, this.Browser, descriptor);
-            this.compositionService?.SatisfyImportsOnce(document);
+            this.buildUp?.BuildUp(document);
             this.Items.Add(document);
             return document;
         }
@@ -171,7 +171,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
         //public TableDataFinderViewModel AddFinder(Authentication authentication, string itemPath)
         //{
         //    var document = new TableDataFinderViewModel(authentication, this.Browser, itemPath);
-        //    this.compositionService?.SatisfyImportsOnce(document);
+        //    this.buildUp?.BuildUp(document);
         //    this.Items.Add(document);
         //    return document;
         //}
@@ -243,7 +243,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             this.ValidateOpenTable(authentication, descriptor);
             var document = new TableEditorViewModel(authentication, descriptor);
             document.SelectedTable = document.Tables.FirstOrDefault(item => item.TableName == tableName);
-            this.compositionService?.SatisfyImportsOnce(document);
+            this.buildUp?.BuildUp(document);
             this.Items.Add(document);
             return document;
         }
@@ -264,7 +264,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             this.ValidateViewTable(authentication, descriptor);
             var document = new TableViewerViewModel(authentication, descriptor);
             document.SelectedTable = document.Tables.FirstOrDefault(item => item.TableName == tableName);
-            this.compositionService?.SatisfyImportsOnce(document);
+            this.buildUp?.BuildUp(document);
             this.Items.Add(document);
             return document;
         }

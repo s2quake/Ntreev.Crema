@@ -157,7 +157,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             //            select item;
 
             //var rootPath = BookmarkCategoryTreeViewItemViewModel.FromItems(query.ToArray());
-            //this.compositionService.SatisfyImportsOnce(rootPath);
+            //this.buildUp.BuildUp(rootPath);
 
             //foreach (var item in rootPath.ItemsSource)
             //{

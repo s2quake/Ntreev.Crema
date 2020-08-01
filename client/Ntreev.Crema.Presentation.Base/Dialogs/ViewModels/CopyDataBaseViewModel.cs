@@ -34,16 +34,16 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
     {
         private readonly IDataBase dataBase;
         private readonly Authentication authentication;
-        private readonly string sourceDataBaseName;
         private string dataBaseName;
         private string comment;
 
         private CopyDataBaseViewModel(Authentication authentication, IDataBase dataBase)
+            : base(dataBase)
         {
             this.authentication = authentication;
             this.dataBase = dataBase;
             this.dataBase.Dispatcher.VerifyAccess();
-            this.sourceDataBaseName = this.dataBase.Name;
+            this.SourceDataBaseName = this.dataBase.Name;
             this.DisplayName = Resources.Title_CopyDataBase;
         }
 
@@ -69,48 +69,40 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 
         public async Task CopyAsync()
         {
-            try
+            await new ProgressAction(this)
             {
-                this.BeginProgress(Resources.Message_CopingDataBase);
-                await this.dataBase.CopyAsync(this.authentication, this.DataBaseName, this.Comment, false);
-                this.EndProgress();
-                await this.TryCloseAsync(true);
-                await AppMessageBox.ShowAsync(Resources.Message_CopiedDataBase);
-            }
-            catch (Exception e)
-            {
-                await AppMessageBox.ShowErrorAsync(e);
-                this.EndProgress();
-            }
+                BeginMessage = Resources.Message_CopingDataBase,
+                Try = async()=>
+                {
+                    await this.dataBase.CopyAsync(this.authentication, this.DataBaseName, this.Comment, false);
+                    await this.TryCloseAsync(true);
+                    await AppMessageBox.ShowAsync(Resources.Message_CopiedDataBase);
+                }
+            }.RunAsync();
         }
 
         public string DataBaseName
         {
-            get { return this.dataBaseName ?? string.Empty; }
+            get => this.dataBaseName ?? string.Empty;
             set
             {
                 if (this.dataBaseName == value)
                     return;
-
                 this.dataBaseName = value;
                 this.NotifyOfPropertyChange(nameof(this.DataBaseName));
                 this.NotifyOfPropertyChange(nameof(this.CanCopy));
             }
         }
 
-        public string SourceDataBaseName
-        {
-            get { return this.sourceDataBaseName; }
-        }
+        public string SourceDataBaseName { get; }
 
         public string Comment
         {
-            get { return this.comment ?? string.Empty; }
+            get => this.comment ?? string.Empty;
             set
             {
                 if (this.comment == value)
                     return;
-
                 this.comment = value;
                 this.NotifyOfPropertyChange(nameof(this.Comment));
                 this.NotifyOfPropertyChange(nameof(this.CanCopy));

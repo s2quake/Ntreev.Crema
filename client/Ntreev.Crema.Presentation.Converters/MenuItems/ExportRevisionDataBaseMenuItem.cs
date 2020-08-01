@@ -32,7 +32,7 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.Presentation.Converters.MenuItems
 {
     [Export(typeof(IMenuItem))]
-    [ParentType("Ntreev.Crema.Presentation.Base.Dialogs.ViewModels.LogInfoViewModel, Ntreev.Crema.Presentation.Base, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Base.Dialogs.ViewModels.LogInfoViewModel, Ntreev.Crema.Presentation.Base, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ExportRevisionDataBaseMenuItem : MenuItemBase
     {
         [Import]
@@ -40,7 +40,7 @@ namespace Ntreev.Crema.Presentation.Converters.MenuItems
 
         public ExportRevisionDataBaseMenuItem()
         {
-            this.Icon = "/Ntreev.Crema.Presentation.Converters;component/Images/spreadsheet.png";
+            this.Icon = "Images/spreadsheet.png";
             this.DisplayName = Resources.MenuItem_Export;
         }
 

@@ -30,11 +30,6 @@ namespace Ntreev.Crema.Presentation.Assets.AvalonDocks
 {
     partial class Theme : ResourceDictionary
     {
-        public Theme()
-        {
-            this.InitializeComponent();
-        }
-
         private void IconImage_Loaded(object sender, RoutedEventArgs e)
         {
             var iconImage = sender as IconImage;

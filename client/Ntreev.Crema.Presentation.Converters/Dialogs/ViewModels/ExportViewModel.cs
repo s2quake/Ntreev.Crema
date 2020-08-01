@@ -53,8 +53,9 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
         private TableRootTreeViewItemViewModel root;
 
         private ExportViewModel(Authentication authentication, IDataBase dataBase, string[] selectedPaths)
-            : base(Resources.Title_Export)
+            : base(dataBase)
         {
+            this.DisplayName = Resources.Title_Export;
             this.authentication = authentication;
             this.dataBase = dataBase;
             this.dataBase.Dispatcher.VerifyAccess();

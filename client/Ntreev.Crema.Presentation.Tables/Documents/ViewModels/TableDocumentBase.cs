@@ -34,7 +34,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
         private TableItemViewModel selectedTable;
 
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         protected TableDocumentBase()
         {
@@ -86,7 +86,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
                     {
                         foreach (var item in e.NewItems)
                         {
-                            this.compositionService?.SatisfyImportsOnce(item);
+                            this.buildUp?.BuildUp(item);
                         }
                     }
                     break;
@@ -123,7 +123,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
         {
             foreach (var item in this.tables)
             {
-                this.compositionService.SatisfyImportsOnce(item);
+                this.buildUp.BuildUp(item);
             }
         }
 

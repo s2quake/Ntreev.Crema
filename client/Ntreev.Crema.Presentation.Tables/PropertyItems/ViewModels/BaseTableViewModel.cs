@@ -49,7 +49,7 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
         private TableListBoxItemViewModel[] tables;
         private TableListBoxItemViewModel selectedTable;
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         public override bool CanSupport(object obj)
         {
@@ -78,7 +78,7 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
                     else
                     {
                         var viewModel = new TableListBoxItemViewModel(this.authenticator, item, this);
-                        this.compositionService.SatisfyImportsOnce(viewModel);
+                        this.buildUp.BuildUp(viewModel);
                         viewModelList.Add(viewModel);
                     }
                 }

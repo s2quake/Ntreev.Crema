@@ -37,14 +37,11 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
         private readonly Authentication authentication;
         private DataBaseItemViewModel selectedItem;
         private string selectedValue;
-        private readonly ObservableCollection<DataBaseItemViewModel> itemsSource = new ObservableCollection<DataBaseItemViewModel>();
         private Func<DataBaseItemViewModel, bool> predicate;
-        private bool supportsDescriptor;
-
         [Import]
         private CremaAppHostViewModel cremaAppHost = null;
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
         private Action action;
 
         public SelectDataBaseViewModel(string address)
@@ -63,7 +60,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
         public SelectDataBaseViewModel(Authentication authentication, ICremaAppHost cremaAppHost)
             : this(authentication, cremaAppHost, (s) => true)
         {
-            
+
         }
 
         public SelectDataBaseViewModel(Authentication authentication, ICremaAppHost cremaAppHost, Func<DataBaseItemViewModel, bool> predicate)
@@ -71,7 +68,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             this.authentication = authentication;
             this.predicate = predicate;
             this.action = new Action(() => this.Initialize(authentication, cremaAppHost));
-            this.supportsDescriptor = true;
+            this.SupportsDescriptor = true;
             this.DisplayName = Resources.Title_SelectDataBase;
         }
 
@@ -80,14 +77,11 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             await this.TryCloseAsync(true);
         }
 
-        public ObservableCollection<DataBaseItemViewModel> ItemsSource
-        {
-            get { return this.itemsSource; }
-        }
+        public ObservableCollection<DataBaseItemViewModel> ItemsSource { get; } = new ObservableCollection<DataBaseItemViewModel>();
 
         public DataBaseItemViewModel SelectedItem
         {
-            get { return this.selectedItem; }
+            get => this.selectedItem;
             set
             {
                 if (this.selectedItem != null)
@@ -104,8 +98,8 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 
         public string SelectedValue
         {
-            get { return this.selectedValue ?? string.Empty; }
-            set { this.selectedValue = value; }
+            get => this.selectedValue ?? string.Empty;
+            set => this.selectedValue = value;
         }
 
         public bool CanOK
@@ -123,10 +117,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             get; set;
         }
 
-        public bool SupportsDescriptor
-        {
-            get { return this.supportsDescriptor; }
-        }
+        public bool SupportsDescriptor { get; }
 
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {
@@ -155,10 +146,10 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
                     {
                         viewModel.ConnectionItem = query.FirstOrDefault(i => i.DataBaseName == item.Name);
                     }
-                    this.compositionService?.SatisfyImportsOnce(viewModel);
-                    this.itemsSource.Add(viewModel);
+                    this.buildUp?.BuildUp(viewModel);
+                    this.ItemsSource.Add(viewModel);
                 }
-                this.selectedItem = this.itemsSource.FirstOrDefault(item => item.Name == this.selectedValue);
+                this.selectedItem = this.ItemsSource.FirstOrDefault(item => item.Name == this.selectedValue);
                 this.EndProgress();
                 this.Refresh();
             }
@@ -191,10 +182,10 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
                     {
                         viewModel.ConnectionItem = query.FirstOrDefault(i => i.DataBaseName == item.DataBaseInfo.Name);
                     }
-                    this.compositionService?.SatisfyImportsOnce(viewModel);
-                    this.itemsSource.Add(viewModel);
+                    this.buildUp?.BuildUp(viewModel);
+                    this.ItemsSource.Add(viewModel);
                 }
-                this.selectedItem = this.itemsSource.FirstOrDefault(item => item.Name == this.selectedValue);
+                this.selectedItem = this.ItemsSource.FirstOrDefault(item => item.Name == this.selectedValue);
                 this.EndProgress();
                 this.Refresh();
             }

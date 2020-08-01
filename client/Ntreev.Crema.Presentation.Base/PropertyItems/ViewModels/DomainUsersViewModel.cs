@@ -42,7 +42,7 @@ namespace Ntreev.Crema.Presentation.Base.PropertyItems.ViewModels
         [Import]
         private Authenticator authenticator = null;
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         public DomainUsersViewModel()
         {
@@ -70,7 +70,7 @@ namespace Ntreev.Crema.Presentation.Base.PropertyItems.ViewModels
                 else
                 {
                     var listBase = await domain.Dispatcher.InvokeAsync(() => new DomainUserListBase(this.authenticator, domain, true, this));
-                    this.compositionService?.SatisfyImportsOnce(listBase);
+                    this.buildUp?.BuildUp(listBase);
                     this.Users = listBase.Users;
                 }
 

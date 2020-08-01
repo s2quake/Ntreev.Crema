@@ -42,7 +42,7 @@ namespace Ntreev.Crema.Presentation.Base.PropertyItems.ViewModels
         private IDataBaseDescriptor descriptor;
 
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
         [Import]
         private Authenticator authenticator = null;
 
@@ -135,7 +135,7 @@ namespace Ntreev.Crema.Presentation.Base.PropertyItems.ViewModels
 
                 foreach (var item in items)
                 {
-                    this.compositionService?.SatisfyImportsOnce(item);
+                    this.buildUp?.BuildUp(item);
                     this.domains.Add(item);
                 }
             }
@@ -177,7 +177,7 @@ namespace Ntreev.Crema.Presentation.Base.PropertyItems.ViewModels
                     var viewModel = domain.Dispatcher.Invoke(() => new DomainListItemBase(this.authenticator, domain, true, this));
                     this.Dispatcher.InvokeAsync(() =>
                     {
-                        this.compositionService?.SatisfyImportsOnce(viewModel);
+                        this.buildUp?.BuildUp(viewModel);
                         this.domains.Add(viewModel);
                     });
                 }

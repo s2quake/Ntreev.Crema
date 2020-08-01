@@ -34,7 +34,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [ParentType("Ntreev.Crema.Presentation.Base.IPropertyService, Ntreev.Crema.Presentation.Base, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Base.IPropertyService, Ntreev.Crema.Presentation.Base, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class DomainsViewModel : PropertyItemBase
     {
         private readonly ICremaAppHost cremaAppHost;
@@ -44,7 +44,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
         private IUserDescriptor descriptor;
 
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
         [Import]
         private Authenticator authenticator = null;
 
@@ -135,7 +135,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 
                 foreach (var item in items)
                 {
-                    this.compositionService?.SatisfyImportsOnce(item);
+                    this.buildUp?.BuildUp(item);
                     this.domains.Add(item);
                 }
             }
@@ -176,7 +176,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
                     var viewModel = domain.Dispatcher.Invoke(() => new DomainTreeItemBase(this.authenticator, domain, true, this));
                     this.Dispatcher.InvokeAsync(() =>
                     {
-                        this.compositionService?.SatisfyImportsOnce(viewModel);
+                        this.buildUp?.BuildUp(viewModel);
                         this.domains.Add(viewModel);
                     });
                 }

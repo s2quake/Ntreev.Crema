@@ -49,7 +49,7 @@ namespace Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels
         private TypeListBoxItemViewModel[] types;
         private TypeListBoxItemViewModel selectedType;
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         public ReferencedTypesViewModel()
         {
@@ -85,7 +85,7 @@ namespace Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels
                     else
                     {
                         var viewModel = new TypeListBoxItemViewModel(this.authenticator, item, this);
-                        this.compositionService.SatisfyImportsOnce(viewModel);
+                        this.buildUp.BuildUp(viewModel);
                         viewModelList.Add(viewModel);
                     }
                 }

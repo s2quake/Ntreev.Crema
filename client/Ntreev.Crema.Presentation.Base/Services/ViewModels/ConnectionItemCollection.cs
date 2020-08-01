@@ -42,7 +42,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         private string filename;
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         static ConnectionItemCollection()
         {
@@ -95,7 +95,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
                     return;
             }
             base.Add(viewModel);
-            this.compositionService.SatisfyImportsOnce(viewModel);
+            this.buildUp.BuildUp(viewModel);
         }
 
         //public void RemoveEquale(ConnectionItemViewModel viewModel)
@@ -189,7 +189,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             {
                 foreach (var item in this)
                 {
-                    this.compositionService.SatisfyImportsOnce(item);
+                    this.buildUp.BuildUp(item);
                 }
             });
         }

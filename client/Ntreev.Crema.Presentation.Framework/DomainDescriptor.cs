@@ -46,7 +46,7 @@ namespace Ntreev.Crema.Presentation.Framework
         private DomainState domainState;
 
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         public DomainDescriptor(Authentication authentication, IDomainDescriptor descriptor, bool isSubscriptable, object owner)
             : base(authentication, descriptor.Target, descriptor, isSubscriptable)
@@ -163,7 +163,7 @@ namespace Ntreev.Crema.Presentation.Framework
             var viewModel = new DomainUserDescriptor(this.authentication, domainUser, this.descriptorTypes, this.owner);
             this.Dispatcher.InvokeAsync(() =>
             {
-                this.compositionService?.SatisfyImportsOnce(viewModel);
+                this.buildUp?.BuildUp(viewModel);
                 this.domainUsers.Add(viewModel);
             });
         }
@@ -231,7 +231,7 @@ namespace Ntreev.Crema.Presentation.Framework
         {
             foreach (var item in this.domainUsers)
             {
-                this.compositionService.SatisfyImportsOnce(item);
+                this.buildUp.BuildUp(item);
             }
         }
 

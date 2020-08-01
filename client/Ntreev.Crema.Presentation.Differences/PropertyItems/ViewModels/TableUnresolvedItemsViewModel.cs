@@ -40,7 +40,7 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
     class TableUnresolvedItemsViewModel : PropertyItemBase
     {
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         private TableTreeViewItemViewModel viewModel;
         private ObservableCollection<TableUnresolvedItemListBoxItemViewModel> itemList = new ObservableCollection<TableUnresolvedItemListBoxItemViewModel>();
@@ -83,7 +83,7 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
 
                 foreach (var item in itemList)
                 {
-                    this.compositionService.SatisfyImportsOnce(item);
+                    this.buildUp.BuildUp(item);
                 }
 
                 this.viewModel = viewModel;

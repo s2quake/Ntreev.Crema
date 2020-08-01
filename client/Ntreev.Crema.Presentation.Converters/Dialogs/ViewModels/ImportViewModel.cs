@@ -56,8 +56,9 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
         private string comment;
 
         private ImportViewModel(Authentication authentication, IDataBase dataBase)
-            : base(Resources.Title_Import)
+            : base(dataBase)
         {
+            this.DisplayName = Resources.Title_Import;
             this.authentication = authentication;
             this.dataBase = dataBase;
             this.dataBase.Dispatcher.VerifyAccess();

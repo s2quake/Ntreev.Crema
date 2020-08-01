@@ -62,7 +62,7 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
         [Import]
         private Authenticator authenticator = null;
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         [ImportingConstructor]
         public TableBrowserViewModel(ICremaAppHost cremaAppHost)
@@ -244,7 +244,7 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
                 {
                     return new TableRootTreeViewItemViewModel(this.authenticator, dataBase, this);
                 });
-                this.compositionService.SatisfyImportsOnce(viewModel);
+                this.buildUp.BuildUp(viewModel);
                 this.Items.Add(viewModel);
             };
 

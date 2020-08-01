@@ -13,6 +13,8 @@
     <PackageTags>Crema</PackageTags>
     <UseWPF>true</UseWPF>
     <LangVersion>latest</LangVersion>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>..\..\bin\$(Configuration)\$(TargetFramework)\crema</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
@@ -23,6 +25,10 @@
     <ProjectReference Include="..\Ntreev.Crema.Presentation.Framework\Ntreev.Crema.Presentation.Framework.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Presentation.Tables\Ntreev.Crema.Presentation.Tables.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Presentation.Types\Ntreev.Crema.Presentation.Types.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Images\**\*.png" />
+    <Resource Include="Images\**\*.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">

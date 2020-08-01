@@ -34,12 +34,11 @@ namespace Ntreev.Crema.Presentation.Framework
 
         protected ModalDialogAppBase()
         {
-
         }
 
-        protected ModalDialogAppBase(string displayName)
+        protected ModalDialogAppBase(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
-
         }
 
         protected async override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)

@@ -33,7 +33,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [ParentType("Ntreev.Crema.Presentation.Base.IPropertyService, Ntreev.Crema.Presentation.Base, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Base.IPropertyService, Ntreev.Crema.Presentation.Base, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class DataBaseUsersViewModel : PropertyItemBase
     {
         private readonly ObservableCollection<DataBaseUserItemViewModel> users = new ObservableCollection<DataBaseUserItemViewModel>();
@@ -42,7 +42,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
         private INotifyPropertyChanged notifyObject;
 
         [Import]
-        private ICompositionService compositionService = null;
+        private IBuildUp buildUp = null;
 
         [Import]
         private Authenticator authenticator = null;
@@ -127,7 +127,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
                 if (this.users.Any(i => i.ID == item.ID) == false)
                 {
                     var viewModel = new DataBaseUserItemViewModel(item);
-                    this.compositionService?.SatisfyImportsOnce(viewModel);
+                    this.buildUp?.BuildUp(viewModel);
                     this.users.Add(viewModel);
                 }
             }
