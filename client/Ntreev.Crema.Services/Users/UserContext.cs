@@ -57,6 +57,13 @@ namespace Ntreev.Crema.Services.Users
             this.callbackEvent = new IndexedDispatcher(this);
         }
 
+        public void Dispose()
+        {
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
+            this.callbackEvent.Dispose();
+        }
+
         public async Task InitializeAsync(string userID, Guid authenticationToken)
         {
             var result = await this.Service.SubscribeAsync(authenticationToken);

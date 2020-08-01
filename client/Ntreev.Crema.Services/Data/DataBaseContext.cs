@@ -64,6 +64,13 @@ namespace Ntreev.Crema.Services.Data
             this.callbackEvent = new IndexedDispatcher(this);
         }
 
+        public void Dispose()
+        {
+            this.Dispatcher.Dispose();
+            this.Dispatcher = null;
+            this.callbackEvent.Dispose();
+        }
+
         public Task WaitAsync(Guid taskID)
         {
             return this.taskEvent.WaitAsync(taskID);

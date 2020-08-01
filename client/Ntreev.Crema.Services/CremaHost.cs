@@ -171,7 +171,7 @@ namespace Ntreev.Crema.Services
                         this.authentications.Add(authentication);
                         item.Initialize(authentication);
                     }
-                    this.ServiceState = ServiceState.Opened;
+                    this.ServiceState = ServiceState.Open;
                     this.OnOpened(EventArgs.Empty);
                     this.token = Guid.NewGuid();
                     CremaLog.Debug($"Crema opened : {address} {userID}");
@@ -212,7 +212,7 @@ namespace Ntreev.Crema.Services
             {
                 if (this.token != token)
                     throw new ArgumentException(Resources.Exception_InvalidToken, nameof(token));
-                if (this.ServiceState != ServiceState.Opened)
+                if (this.ServiceState != ServiceState.Open)
                     throw new InvalidOperationException(Resources.Exception_NotConnected);
                 await this.CloseAsync(CloseInfo.Empty);
 
@@ -270,11 +270,17 @@ namespace Ntreev.Crema.Services
         {
             this.ValidateDispose();
 
-            if (Environment.ExitCode != 0 && this.ServiceState == ServiceState.Opened)
+            if (Environment.ExitCode != 0 && this.ServiceState == ServiceState.Open)
             {
                 throw new InvalidOperationException("server is not closed.");
             }
             this.log?.Dispose();
+            this.DataBaseContext.Dispose();
+            this.DataBaseContext = null;
+            this.DomainContext.Dispose();
+            this.DomainContext = null;
+            this.UserContext.Dispose();
+            this.UserContext = null;
             this.Dispatcher.Dispose();
             this.Dispatcher = null;
             this.OnDisposed(EventArgs.Empty);
@@ -418,7 +424,7 @@ namespace Ntreev.Crema.Services
 
         private void ValidateDispose()
         {
-            if (Environment.ExitCode == 0 && this.ServiceState == ServiceState.Opened)
+            if (Environment.ExitCode == 0 && this.ServiceState == ServiceState.Open)
                 throw new InvalidOperationException(Resources.Exception_NotClosed);
             if (this.Dispatcher == null)
                 throw new InvalidOperationException(Resources.Exception_AlreadyDisposed);
@@ -462,7 +468,7 @@ namespace Ntreev.Crema.Services
         {
             var waiter = await this.Dispatcher.InvokeAsync(() =>
             {
-                if (this.ServiceState != ServiceState.Opened)
+                if (this.ServiceState != ServiceState.Open)
                     throw new InvalidOperationException();
                 this.ServiceState = ServiceState.Closing;
                 var closer = new InternalCloseRequestedEventArgs();
@@ -564,7 +570,7 @@ namespace Ntreev.Crema.Services
 
         string ILogService.FileName => this.log.FileName;
 
-        bool ILogService.IsEnabled => this.ServiceState == ServiceState.Opened;
+        bool ILogService.IsEnabled => this.ServiceState == ServiceState.Open;
 
         #endregion
 
