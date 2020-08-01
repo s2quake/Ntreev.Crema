@@ -36,12 +36,6 @@ namespace Ntreev.Crema.ApplicationHost.Commands.Consoles
     [ResourceDescription("Resources", IsShared = true)]
     class LoginCommand : ConsoleCommandAsyncBase
     {
-        public LoginCommand()
-            : base("login")
-        {
-
-        }
-
         [CommandPropertyRequired(DefaultValue = "")]
         public string UserID
         {

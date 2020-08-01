@@ -86,12 +86,6 @@ namespace Ntreev.Crema.ApplicationHost.Commands.Consoles
 
         public override ICremaHost CremaHost => this.cremaHost;
 
-        public override string Address
-        {
-            get
-            {
-                return AddressUtility.GetDisplayAddress($"localhost:{this.service.Port}");
-            }
-        }
+        public override string Address => AddressUtility.GetDisplayAddress($"localhost:{this.service.Port}");
     }
 }

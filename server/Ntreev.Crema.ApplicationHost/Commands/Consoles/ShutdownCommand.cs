@@ -37,7 +37,6 @@ namespace Ntreev.Crema.ApplicationHost.Commands.Consoles
     {
         [ImportingConstructor]
         public ShutdownCommand(ICremaHost cremaHost)
-            : base("shutdown")
         {
             this.CremaHost = cremaHost;
         }

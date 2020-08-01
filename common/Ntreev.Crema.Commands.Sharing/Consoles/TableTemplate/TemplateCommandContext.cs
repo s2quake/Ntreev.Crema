@@ -26,32 +26,15 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
 {
     class TemplateCommandContext : CommandContextBase
     {
-        private readonly Authentication authentication;
-        private readonly ITableTemplate template;
-
         public TemplateCommandContext(Authentication authentication, ITableTemplate template, IEnumerable<ITemplateCommand> commands)
             : base(commands.Select(item => item.Command))
         {
-            this.authentication = authentication;
-            this.template = template;
-
-            foreach (var item in commands)
-            {
-                if (item is TemplateCommandBase command)
-                {
-                    command.CommandContext = this;
-                }
-            }
+            this.Authentication = authentication;
+            this.Template = template;
         }
 
-        public Authentication Authentication
-        {
-            get { return this.authentication; }
-        }
+        public Authentication Authentication { get; }
 
-        public ITableTemplate Template
-        {
-            get { return this.template; }
-        }
+        public ITableTemplate Template { get; }
     }
 }

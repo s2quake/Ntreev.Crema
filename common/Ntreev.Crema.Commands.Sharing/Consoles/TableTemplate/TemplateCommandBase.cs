@@ -33,31 +33,16 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
 
         }
 
-        public virtual object Instance
-        {
-            get { return this; }
-        }
+        public virtual object Instance => this;
 
-        public virtual bool IsVisible
-        {
-            get { return true; }
-        }
+        public virtual bool IsVisible => true;
 
         public virtual string[] GetCompletions(string find)
         {
             return null;
         }
 
-        public TemplateCommandContext CommandContext
-        {
-            get;
-            internal set;
-        }
-
-        public TextWriter Out
-        {
-            get { return this.CommandContext.Out; }
-        }
+        public new TemplateCommandContext CommandContext => base.CommandContext as TemplateCommandContext;
 
         #region ITemplateCommand
 

@@ -62,39 +62,39 @@ namespace Ntreev.Crema.ApplicationHost
 
         public async Task OpenServiceAsync()
         {
-            this.ServiceState = ServiceState.Opening;
-            try
+            await new ProgressAction(this)
             {
-                this.BeginProgress();
-                this.service.Port = this.port;
-                await this.service.OpenAsync();
-                this.ServiceState = ServiceState.Open;
-                this.EndProgress();
-            }
-            catch (Exception e)
-            {
-                await AppMessageBox.ShowErrorAsync(e);
-                this.ServiceState = ServiceState.None;
-                this.EndProgress();
-            }
+                Try = async () =>
+                {
+                    this.ServiceState = ServiceState.Opening;
+                    this.service.Port = this.port;
+                    await this.service.OpenAsync();
+                    this.ServiceState = ServiceState.Open;
+                },
+                Catch = async (e) =>
+                {
+                    this.ServiceState = ServiceState.None;
+                    await Task.FromException(e);
+                }
+            }.RunAsync();
         }
 
         public async Task CloseServiceAsync()
         {
-            this.ServiceState = ServiceState.Closing;
-            try
+            await new ProgressAction(this)
             {
-                this.BeginProgress();
-                await this.service.CloseAsync();
-                this.ServiceState = ServiceState.None;
-                this.EndProgress();
-            }
-            catch (Exception e)
-            {
-                await AppMessageBox.ShowErrorAsync(e);
-                this.ServiceState = ServiceState.Open;
-                this.EndProgress();
-            }
+                Try = async () =>
+                {
+                    this.ServiceState = ServiceState.Closing;
+                    await this.service.CloseAsync();
+                    this.ServiceState = ServiceState.None;
+                },
+                Catch = async (e) =>
+                {
+                    this.ServiceState = ServiceState.Open;
+                    await Task.FromException(e);
+                }
+            }.RunAsync();
         }
 
         public void SelectBasePath()
