@@ -28,6 +28,6 @@ namespace Ntreev.Crema.Presentation.Framework
 {
     public interface IMenuService
     {
-        IEnumerable<IMenuItem> ItemsSource { get; }
+        IEnumerable<IMenuItem> MenuItems { get; }
     }
 }

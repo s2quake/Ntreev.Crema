@@ -18,12 +18,7 @@
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Base.Properties;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Ntreev.Crema.Presentation.Base.Services.ViewModels;
 
 namespace Ntreev.Crema.Presentation.Base.ToolBarItems
@@ -38,13 +33,13 @@ namespace Ntreev.Crema.Presentation.Base.ToolBarItems
         public MovoToWikiToolBarItem(CremaAppHostViewModel cremaAppHost)
         {
             this.cremaAppHost = cremaAppHost;
-            this.Icon = "/Ntreev.Crema.Presentation.Base;component/Images/wiki.png";
+            this.Icon = "Images/wiki.png";
             this.DisplayName = Resources.Label_MoveToWiki;
         }
 
-        protected override void OnExecute(object parameter)
+        protected override async void OnExecute(object parameter)
         {
-            this.cremaAppHost.MoveToWiki();
+            await this.cremaAppHost.MoveToWikiAsync();
         }
     }
 }

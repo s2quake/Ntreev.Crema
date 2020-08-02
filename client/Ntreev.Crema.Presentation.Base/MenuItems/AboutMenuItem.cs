@@ -34,6 +34,7 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
     [ParentType(typeof(HelpMenuItem))]
     class AboutMenuItem : MenuItemBase
     {
+        [ImportingConstructor]
         public AboutMenuItem()
         {
             this.DisplayName = Resources.MenuItem_About;
@@ -41,8 +42,7 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
 
         protected async override void OnExecute(object parameter)
         {
-            var dialog = new AboutViewModel();
-            await dialog.ShowDialogAsync();
+            await new AboutViewModel().ShowDialogAsync();
         }
     }
 }

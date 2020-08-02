@@ -19,18 +19,12 @@ using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ApplicationHost.ViewModels
 {
     class BackgroundTaskItemViewModel : PropertyChangedBase
     {
         private readonly IBackgroundTask task;
-        private double progressValue;
-        private string progressMessage;
 
         public BackgroundTaskItemViewModel(IBackgroundTask task)
         {
@@ -42,8 +36,8 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
 
         private void Task_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            this.progressValue = e.Value * 100;
-            this.progressMessage = e.Message;
+            this.ProgressValue = e.Value * 100;
+            this.ProgressMessage = e.Message;
             this.Dispatcher.InvokeAsync(() =>
             {
                 this.NotifyOfPropertyChange(nameof(this.ProgressValue));
@@ -55,20 +49,11 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             });
         }
 
-        public string DisplayName
-        {
-            get { return this.task.DisplayName; }
-        }
+        public string DisplayName => this.task.DisplayName;
 
-        public double ProgressValue
-        {
-            get { return this.progressValue; }
-        }
+        public double ProgressValue { get; private set; }
 
-        public string ProgressMessage
-        {
-            get { return this.progressMessage; }
-        }
+        public string ProgressMessage { get; private set; }
 
         public event EventHandler Disposed;
 

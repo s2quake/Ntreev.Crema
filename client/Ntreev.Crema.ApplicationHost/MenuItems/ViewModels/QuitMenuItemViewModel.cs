@@ -37,18 +37,19 @@ namespace Ntreev.Crema.ApplicationHost.MenuItems.ViewModels
     [ParentType(typeof(FileMenuItem))]
     class QuitMenuItemViewModel : MenuItemBase
     {
-        [Import]
-        private Lazy<IShell> shell = null;
+        private readonly IShell shell;
 
-        public QuitMenuItemViewModel()
+        [ImportingConstructor]
+        public QuitMenuItemViewModel(IShell shell)
         {
+            this.shell = shell;
             this.DisplayName = Resources.MenuItem_Exit;
             this.InputGesture = new KeyGesture(Key.X, ModifierKeys.Alt);
         }
 
-        protected override void OnExecute(object parameter)
+        protected override async void OnExecute(object parameter)
         {
-            this.shell.Value.Close();
+            await this.shell.CloseAsync();
         }
     }
 }

@@ -38,7 +38,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
     {
         private static Color DefaultColor = Color.FromArgb(0xff, 0x1b, 0xa1, 0xe2);
 
-        private static DependencyPropertyKey ThemePropertyKey = 
+        private static readonly DependencyPropertyKey ThemePropertyKey =
             DependencyProperty.RegisterReadOnly(nameof(Theme), typeof(Brush), typeof(SplashWindow),
                 new PropertyMetadata(new SolidColorBrush(DefaultColor)));
         public static DependencyProperty ThemeProperty = ThemePropertyKey.DependencyProperty;
@@ -57,19 +57,16 @@ namespace Ntreev.Crema.ApplicationHost.Views
 
         public Color ThemeColor
         {
-            get { return (Color)this.GetValue(ThemeColorProperty); }
-            set { this.SetValue(ThemeColorProperty, value); }
+            get => (Color)this.GetValue(ThemeColorProperty);
+            set => this.SetValue(ThemeColorProperty, value);
         }
 
-        public Brush Theme
-        {
-            get { return (Brush)this.GetValue(ThemeProperty); }
-        }
+        public Brush Theme => (Brush)this.GetValue(ThemeProperty);
 
         public string Message
         {
-            get { return (string)this.GetValue(MessageProperty); }
-            set { this.SetValue(MessageProperty, value); }
+            get => (string)this.GetValue(MessageProperty);
+            set => this.SetValue(MessageProperty, value);
         }
 
         private static void ThemeColorPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)

@@ -29,10 +29,7 @@ namespace Ntreev.Crema.ApplicationHost
     [Export(typeof(IExceptionPublisher))]
     class FileExceptionPublisher : ExceptionPublisherBase
     {
-        protected virtual string FileName
-        {
-            get { return AppUtility.GetDocumentFilename($"errors\\{DateTime.Now.ToString("yyyy-MM-dd_HH_mm")}.log"); }
-        }
+        protected virtual string FileName => AppUtility.GetDocumentFilename($"errors\\{DateTime.Now:yyyy-MM-dd_HH_mm}.log");
 
         protected override void OnPublish(object exceptionObject, string exceptionMessage)
         {

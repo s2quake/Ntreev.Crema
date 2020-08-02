@@ -15,45 +15,42 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Ntreev.Crema.Presentation.Base.Properties;
-using System.ComponentModel.Composition;
 using Ntreev.Crema.Presentation.Base.Services.ViewModels;
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Services;
+using Ntreev.ModernUI.Framework;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel.Composition;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 {
     public class SelectDataBaseViewModel : ModalDialogBase
     {
         private readonly Authentication authentication;
+        private readonly ICremaAppHost cremaAppHost;
+        private readonly Func<DataBaseItemViewModel, bool> predicate;
         private DataBaseItemViewModel selectedItem;
         private string selectedValue;
-        private Func<DataBaseItemViewModel, bool> predicate;
-        [Import]
-        private CremaAppHostViewModel cremaAppHost = null;
         [Import]
         private IBuildUp buildUp = null;
-        private Action action;
+        private Func<Task> actionAsync;
 
-        public SelectDataBaseViewModel(string address)
-            : this(address, (s) => true)
+        public SelectDataBaseViewModel(ICremaAppHost cremaAppHost, string address)
+            : this(cremaAppHost, address, (s) => true)
         {
 
         }
 
-        public SelectDataBaseViewModel(string address, Func<DataBaseItemViewModel, bool> predicate)
+        public SelectDataBaseViewModel(ICremaAppHost cremaAppHost, string address, Func<DataBaseItemViewModel, bool> predicate)
         {
+            this.cremaAppHost = cremaAppHost;
             this.predicate = predicate;
-            this.action = new Action(() => this.Initialize(address));
+            this.actionAsync = () => this.InitializeAsync(address);
             this.DisplayName = Resources.Title_SelectDataBase;
         }
 
@@ -64,10 +61,11 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
         }
 
         public SelectDataBaseViewModel(Authentication authentication, ICremaAppHost cremaAppHost, Func<DataBaseItemViewModel, bool> predicate)
+            : base(cremaAppHost)
         {
             this.authentication = authentication;
             this.predicate = predicate;
-            this.action = new Action(() => this.Initialize(authentication, cremaAppHost));
+            this.actionAsync = () => this.InitializeAsync(authentication, cremaAppHost);
             this.SupportsDescriptor = true;
             this.DisplayName = Resources.Title_SelectDataBase;
         }
@@ -122,16 +120,15 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {
             await base.OnInitializeAsync(cancellationToken);
-            await this.Dispatcher.InvokeAsync(() => this.action());
+            await this.actionAsync();
         }
 
-        private async void Initialize(string address)
+        private async Task InitializeAsync(string address)
         {
             try
             {
                 this.BeginProgress(Resources.Message_ReceivingInformation);
                 var dataBaseInfos = await Task.Run(() => CremaBootstrapper.GetDataBasesAsync(address));
-
                 var query = from connectionItem in this.cremaAppHost.ConnectionItems
                             where connectionItem.Address == this.cremaAppHost.ConnectionItem.Address &&
                                   connectionItem.ID == this.cremaAppHost.ConnectionItem.ID &&
@@ -161,7 +158,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             }
         }
 
-        private async void Initialize(Authentication authentication, ICremaAppHost cremaAppHost)
+        private async Task InitializeAsync(Authentication authentication, ICremaAppHost cremaAppHost)
         {
             try
             {

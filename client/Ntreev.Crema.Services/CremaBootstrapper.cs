@@ -15,6 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using JSSoft.Communication;
+using Ntreev.Crema.ServiceHosts;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Users;
 using Ntreev.Library.Linq;
@@ -73,18 +75,22 @@ namespace Ntreev.Crema.Services
 
         public static async Task<DataBaseInfo[]> GetDataBasesAsync(string address)
         {
-            throw new NotImplementedException();
-            //var serviceClient = CremaHostServiceFactory.CreateServiceClient(address);
-            //serviceClient.Open();
-            //try
-            //{
-            //    var result = await InvokeServiceAsync(() => serviceClient.GetDataBaseInfos());
-            //    return result.Value;
-            //}
-            //finally
-            //{
-            //    serviceClient.CloseService(CloseReason.None);
-            //}
+            var serviceHost = new CremaHostServiceHost(null);
+            var clientContext = new ClientContext(serviceHost)
+            {
+                Host = AddressUtility.GetIPAddress(address),
+                Port = AddressUtility.GetPort(address)
+            };
+            var token = Guid.Empty;
+            try
+            {
+                token = await clientContext.OpenAsync();
+                return await serviceHost.GetDataBaseInfosAsync();
+            }
+            finally
+            {
+                await clientContext.CloseAsync(token);
+            }
         }
 
         public object GetService(System.Type serviceType)
@@ -248,5 +254,27 @@ namespace Ntreev.Crema.Services
         }
 
         internal static TimeSpan DefaultInactivityTimeout { get; set; }
+
+        class CremaHostServiceHost : ClientServiceHostBase<ICremaHostService>
+        {
+            private readonly CremaHost cremaHost;
+            private ICremaHostService service;
+
+            public CremaHostServiceHost(CremaHost cremaHost)
+            {
+                this.cremaHost = cremaHost;
+            }
+
+            public async Task<DataBaseInfo[]> GetDataBaseInfosAsync()
+            {
+                return (await this.service.GetDataBaseInfosAsync()).Value;
+            }
+
+            protected override void OnServiceCreated(ICremaHostService service)
+            {
+                base.OnServiceCreated(service);
+                this.service = service;
+            }
+        }
     }
 }

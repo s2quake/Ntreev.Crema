@@ -43,64 +43,51 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
     [Export(typeof(IShell))]
     public class ShellViewModel : ScreenBase, IShell
     {
-        private readonly ICremaHost cremaHost;
-        private readonly ICremaAppHost cremaAppHost;
-        [ImportMany]
-        private IEnumerable<IContentService> contentServices;
-        [ImportMany]
-        private IEnumerable<IBrowserItem> browsers;
-        [Import]
-        private IStatusBarService statusbarService;
-        [Import]
-        private Lazy<IMenuService> menuService;
-        [Import]
-        private IServiceProvider serviceProvider = null;
+        private readonly Lazy<ICremaHost> cremaHost;
+        private readonly Lazy<ICremaAppHost> cremaAppHost;
+        private readonly Lazy<IStatusBarService> statusBarService;
+        private readonly Lazy<IMenuService> menuService;
+        private readonly IEnumerable<Lazy<IContentService>> contentServices;
+        private readonly IEnumerable<Lazy<IBrowserItem>> browsers;
         private object selectedService;
 
-        private string selectedServiceType;
-
         [ImportingConstructor]
-        public ShellViewModel(ICremaHost cremaHost, ICremaAppHost cremaAppHost, IServiceProvider serviceProvider)
+        public ShellViewModel(IServiceProvider serviceProvider,
+            Lazy<ICremaHost> cremaHost,
+            Lazy<ICremaAppHost> cremaAppHost,
+            Lazy<IStatusBarService> statusBarService,
+            Lazy<IMenuService> menuService,
+            [ImportMany]IEnumerable<Lazy<IContentService>> contentServices,
+            [ImportMany]IEnumerable<Lazy<IBrowserItem>> browsers)
             : base(serviceProvider)
         {
             this.cremaHost = cremaHost;
-            this.cremaHost.Opened += (s, e) =>
-            {
-                this.UserConfigs.Update(this);
-            };
             this.cremaAppHost = cremaAppHost;
-            this.cremaAppHost.Opened += CremaAppHost_Opened;
-            this.cremaAppHost.Loaded += CremaAppHost_Loaded;
-            this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
-            this.cremaAppHost.Closed += CremaAppHost_Closed;
-        }
-
-        public async void Close()
-        {
-            await this.TryCloseAsync();
+            this.statusBarService = statusBarService;
+            this.menuService = menuService;
+            this.contentServices = contentServices;
+            this.browsers = browsers;
         }
 
         public double Left
         {
-            get { return Ntreev.Crema.ApplicationHost.Properties.Settings.Default.X; }
+            get => Properties.Settings.Default.X;
             set
             {
                 if (this.WindowState == WindowState.Maximized)
                     return;
-
-                Ntreev.Crema.ApplicationHost.Properties.Settings.Default.X = value;
+                Properties.Settings.Default.X = value;
             }
         }
 
         public double Top
         {
-            get { return Ntreev.Crema.ApplicationHost.Properties.Settings.Default.Y; }
+            get => Properties.Settings.Default.Y;
             set
             {
                 if (this.WindowState == WindowState.Maximized)
                     return;
-
-                Ntreev.Crema.ApplicationHost.Properties.Settings.Default.Y = value;
+                Properties.Settings.Default.Y = value;
             }
         }
 
@@ -110,14 +97,13 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             {
                 if (Keyboard.IsKeyDown(Key.LeftShift) == true)
                     return 700;
-                return Ntreev.Crema.ApplicationHost.Properties.Settings.Default.Width;
+                return Properties.Settings.Default.Width;
             }
             set
             {
                 if (this.WindowState == WindowState.Maximized)
                     return;
-
-                Ntreev.Crema.ApplicationHost.Properties.Settings.Default.Width = value;
+                Properties.Settings.Default.Width = value;
             }
         }
 
@@ -127,69 +113,48 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             {
                 if (Keyboard.IsKeyDown(Key.LeftShift) == true)
                     return 525;
-                return Ntreev.Crema.ApplicationHost.Properties.Settings.Default.Height;
+                return Properties.Settings.Default.Height;
             }
             set
             {
                 if (this.WindowState == WindowState.Maximized)
                     return;
-
-                Ntreev.Crema.ApplicationHost.Properties.Settings.Default.Height = value;
+                Properties.Settings.Default.Height = value;
             }
         }
 
         public WindowState WindowState
         {
-            get { return Ntreev.Crema.ApplicationHost.Properties.Settings.Default.WindowState; }
-            set
-            {
-                Ntreev.Crema.ApplicationHost.Properties.Settings.Default.WindowState = value;
-            }
+            get => Properties.Settings.Default.WindowState;
+            set => Properties.Settings.Default.WindowState = value;
         }
 
         public string Title
         {
             get
             {
-                string productName = AppUtility.ProductName;
-
-                if (cremaHost.ServiceState == ServiceState.Open)
-                    return $"{productName} - {this.cremaAppHost.DataBaseName} ({cremaHost.Address} - {cremaHost.UserID})";
+                if (this.CremaHost.ServiceState == ServiceState.Open)
+                    return $"{AppUtility.ProductName} - {this.CremaAppHost.DataBaseName} ({this.CremaHost.Address} - {this.CremaHost.UserID})";
                 else
-                    return productName;
+                    return AppUtility.ProductName;
             }
         }
 
-        public IEnumerable Browsers
-        {
-            get { return this.browsers; }
-        }
+        public IEnumerable Browsers => this.browsers.Select(item => item.Value).ToArray();
 
-        public IStatusBarService StatusBarService
-        {
-            get { return this.statusbarService; }
-        }
+        public IStatusBarService StatusBarService => this.statusBarService.Value;
 
-        public IMenuService MenuService
-        {
-            get { return this.menuService.Value; }
-        }
+        public IMenuService MenuService => this.menuService.Value;
 
-        public IEnumerable Services
-        {
-            get
-            {
-                //yield return this.cremaAppHost;
-                foreach (var item in EnumerableUtility.OrderByAttribute(this.contentServices))
-                {
-                    yield return item;
-                }
-            }
-        }
+        public IEnumerable Services => EnumerableUtility.OrderByAttribute(this.contentServices.Select(item => item.Value)).ToArray();
+
+        public ICremaHost CremaHost => this.cremaHost.Value;
+
+        public ICremaAppHost CremaAppHost => this.cremaAppHost.Value;
 
         public object SelectedService
         {
-            get { return this.selectedService; }
+            get => this.selectedService;
             set
             {
                 if (this.selectedService == value)
@@ -198,11 +163,11 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
                 this.selectedService = value;
                 this.NotifyOfPropertyChange(nameof(this.SelectedService));
 
-                if (this.selectedService is IContentService && this.cremaAppHost.IsLoaded == true)
+                if (this.selectedService is IContentService && this.CremaAppHost.IsLoaded == true)
                 {
                     var contentService = this.selectedService as IContentService;
                     //this.ActivateItem(contentService);
-                    this.selectedServiceType = contentService.GetType().FullName;
+                    this.SelectedServiceType = contentService.GetType().FullName;
                     this.UserConfigs.Commit(this);
                 }
 
@@ -210,28 +175,21 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             }
         }
 
-        public object Content
-        {
-            get { return this.cremaAppHost; }
-        }
+        public object Content => this.cremaAppHost;
 
-        //public virtual IEnumerable<IToolBarItem> ToolBarItems
-        //{
-        //    get
-        //    {
-        //        if (this.serviceProvider == null)
-        //            return Enumerable.Empty<IToolBarItem>();
-        //        return ToolBarItemUtility.GetToolBarItems(this, this.serviceProvider);
-        //    }
-        //}
+        public event EventHandler Loaded;
+
+        public event EventHandler Closed;
+
+        public event EventHandler ServiceChanged;
 
         protected async override Task<bool> CloseAsync()
         {
             var closed = false;
-            if (this.cremaAppHost.IsOpened == true)
+            if (this.CremaAppHost.IsOpened == true)
             {
-                this.cremaAppHost.Closed += (s, e) => closed = true;
-                await this.cremaAppHost.LogoutAsync();
+                this.CremaAppHost.Closed += (s, e) => closed = true;
+                await this.CremaAppHost.LogoutAsync();
                 while (closed == false)
                 {
                     await Task.Delay(1);
@@ -239,12 +197,6 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             }
             return true;
         }
-
-        public event EventHandler Loaded;
-
-        public event EventHandler Closed;
-
-        public event EventHandler ServiceChanged;
 
         protected virtual void OnLoaded(EventArgs e)
         {
@@ -264,20 +216,27 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
         protected override void OnViewLoaded(object view)
         {
             base.OnViewLoaded(view);
-            this.OnLoaded(EventArgs.Empty);
+            this.SelectedService = this.CremaAppHost;
+            this.Refresh();
         }
 
         protected async override Task OnActivateAsync(CancellationToken cancellationToken)
         {
             await base.OnActivateAsync(cancellationToken);
-            this.selectedService = this.cremaAppHost;
+            this.CremaHost.Opened += (s, e) => this.UserConfigs.Update(this);
+            this.CremaAppHost.Opened += CremaAppHost_Opened;
+            this.CremaAppHost.Loaded += CremaAppHost_Loaded;
+            this.CremaAppHost.Unloaded += CremaAppHost_Unloaded;
+            this.CremaAppHost.Closed += CremaAppHost_Closed;
+
+            this.OnLoaded(EventArgs.Empty);
         }
 
         protected async override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
             await base.OnDeactivateAsync(close, cancellationToken);
-            Ntreev.Crema.ApplicationHost.Properties.Settings.Default.ThemeColor = this.cremaAppHost.ThemeColor;
-            Ntreev.Crema.ApplicationHost.Properties.Settings.Default.Save();
+            Properties.Settings.Default.ThemeColor = this.CremaAppHost.ThemeColor;
+            Properties.Settings.Default.Save();
             this.OnClosed(EventArgs.Empty);
         }
 
@@ -289,7 +248,7 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
         private void CremaAppHost_Loaded(object sender, EventArgs e)
         {
             this.NotifyOfPropertyChange(nameof(this.Title));
-            var selectedService = this.contentServices.FirstOrDefault(item => item.GetType().FullName == this.selectedServiceType);
+            var selectedService = this.contentServices.FirstOrDefault(item => item.GetType().FullName == this.SelectedServiceType);
             if (selectedService == null)
             {
                 selectedService = EnumerableUtility.OrderByAttribute(this.contentServices).First();
@@ -310,12 +269,17 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
         }
 
         [ConfigurationProperty]
-        private string SelectedServiceType
+        private string SelectedServiceType { get; set; }
+
+        private IUserConfiguration UserConfigs => this.CremaHost.GetService(typeof(IUserConfiguration)) as IUserConfiguration;
+
+        #region
+
+        async Task IShell.CloseAsync()
         {
-            get { return this.selectedServiceType; }
-            set { this.selectedServiceType = value; }
+            await this.TryCloseAsync();
         }
 
-        private IUserConfiguration UserConfigs => this.cremaHost.GetService(typeof(IUserConfiguration)) as IUserConfiguration;
+        #endregion
     }
 }

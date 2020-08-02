@@ -17,35 +17,37 @@
 
 using Ntreev.Crema.Presentation.Base.Properties;
 using Ntreev.Crema.Presentation.Base.Services.ViewModels;
-using Ntreev.Crema.Services;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 {
     class ConnectionItemEditViewModel : ModalDialogBase
     {
+        private readonly ICremaAppHost cremaAppHost;
         private ConnectionItemViewModel connectionItemInfo;
         private bool isModified;
         private bool isPasswordChanged;
 
-        public ConnectionItemEditViewModel()
+        public ConnectionItemEditViewModel(ICremaAppHost cremaAppHost)
         {
+            this.cremaAppHost = cremaAppHost;
             this.connectionItemInfo = new ConnectionItemViewModel();
             this.connectionItemInfo.PropertyChanged += ConnectionItemInfo_PropertyChanged;
             this.IsNew = true;
             this.DisplayName = Resources.Title_AddConnectionItem;
         }
 
-        public ConnectionItemEditViewModel(ConnectionItemViewModel connectionItemInfo)
+        public ConnectionItemEditViewModel(ICremaAppHost cremaAppHost, ConnectionItemViewModel connectionItemInfo)
         {
+            this.cremaAppHost = cremaAppHost;
             this.connectionItemInfo = connectionItemInfo ?? throw new ArgumentNullException(nameof(connectionItemInfo));
             if (this.connectionItemInfo.IsTemporary == true)
                 throw new ArgumentException();
@@ -64,7 +66,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 
         public async Task SelectDataBaseAsync()
         {
-            var dialog = new SelectDataBaseViewModel(this.ConnectionInfo.Address)
+            var dialog = new SelectDataBaseViewModel(this.cremaAppHost, this.ConnectionInfo.Address)
             {
                 SelectedValue = this.connectionItemInfo.DataBaseName,
             };

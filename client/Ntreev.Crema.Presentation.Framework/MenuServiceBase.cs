@@ -33,9 +33,6 @@ namespace Ntreev.Crema.Presentation.Framework
             this.menuItems = menuItems.ToArray();
         }
 
-        public IEnumerable<IMenuItem> ItemsSource
-        {
-            get { return MenuItemUtility.GetMenuItems(this, this.menuItems); }
-        }
+        public IEnumerable<IMenuItem> MenuItems => MenuItemUtility.GetMenuItems(this, this.menuItems);
     }
 }

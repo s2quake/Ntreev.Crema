@@ -31,8 +31,6 @@ namespace Ntreev.Crema.Presentation.Framework
     [Export(typeof(Authenticator))]
     class Authenticator : AuthenticatorAppBase
     {
-        private static Authenticator current;
-
         [ImportingConstructor]
         public Authenticator(ICremaAppHost cremaAppHost)
             : base(cremaAppHost)
@@ -40,21 +38,18 @@ namespace Ntreev.Crema.Presentation.Framework
 
         }
 
-        public static Authenticator Current
-        {
-            get { return current; }
-        }
+        public static Authenticator Current { get; private set; }
 
         protected override void OnInitialize(Authentication authentication)
         {
             base.OnInitialize(authentication);
-            current = this;
+            Current = this;
         }
 
         protected override void OnRelease()
         {
             base.OnRelease();
-            current = null;
+            Current = null;
         }
     }
 }

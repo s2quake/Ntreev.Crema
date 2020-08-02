@@ -36,22 +36,23 @@ namespace Ntreev.Crema.ApplicationHost.MenuItems.ViewModels
     [ParentType(typeof(IToolMenuItem))]
     class LogViewMenuItemViewModel : MenuItemBase, IPartImportsSatisfiedNotification
     {
-        [Import]
-        private Lazy<ShellView> shellView = null;
+        private readonly ShellView shellView;
 
-        public LogViewMenuItemViewModel()
+        [ImportingConstructor]
+        public LogViewMenuItemViewModel(ShellView shellView)
         {
+            this.shellView = shellView;
             this.InputGesture = new KeyGesture(Key.F12, ModifierKeys.Shift);
         }
 
         protected override void OnExecute(object parameter)
         {
-            this.shellView.Value.IsLogVisible = !this.shellView.Value.IsLogVisible;
+            this.shellView.IsLogVisible = !this.shellView.IsLogVisible;
         }
 
         private void RefreshDisplayName()
         {
-            if (this.shellView.Value.IsLogVisible == true)
+            if (this.shellView.IsLogVisible == true)
             {
                 this.DisplayName = Resources.MenuItem_HideLogWindow;
             }
@@ -63,7 +64,7 @@ namespace Ntreev.Crema.ApplicationHost.MenuItems.ViewModels
 
         private void ShellView_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(this.shellView.Value.IsLogVisible))
+            if (e.PropertyName == nameof(this.shellView.IsLogVisible))
             {
                 this.RefreshDisplayName();
             }
@@ -73,7 +74,7 @@ namespace Ntreev.Crema.ApplicationHost.MenuItems.ViewModels
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.shellView.Value.PropertyChanged += ShellView_PropertyChanged;
+                this.shellView.PropertyChanged += ShellView_PropertyChanged;
                 this.RefreshDisplayName();
             }, DispatcherPriority.ContextIdle);
         }

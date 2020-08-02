@@ -58,9 +58,9 @@ namespace Ntreev.Crema.ApplicationHost.Views
             DependencyProperty.Register(nameof(LogViewHeight), typeof(double), typeof(ShellView),
                 new FrameworkPropertyMetadata(50.0));
 
-        private readonly IMenuService menuService;
-        private readonly ICremaHost cremaHost;
-        private readonly ICremaAppHost cremaAppHost;
+        private IMenuService menuService;
+        private ICremaHost cremaHost;
+        private ICremaAppHost cremaAppHost;
 
         [Import]
         private IAppConfiguration configs = null;
@@ -76,44 +76,47 @@ namespace Ntreev.Crema.ApplicationHost.Views
         }
 
         [ImportingConstructor]
-        public ShellView(IMenuService menuService, ICremaHost cremaHost, ICremaAppHost cremaAppHost)
+        public ShellView(Lazy<IMenuService> menuService, Lazy<ICremaHost> cremaHost, Lazy<ICremaAppHost> cremaAppHost)
         {
             InitializeComponent();
 
-            this.menuService = menuService;
-            this.cremaHost = cremaHost;
-            this.cremaAppHost = cremaAppHost;
-            foreach (var item in this.menuService.ItemsSource)
+            this.Dispatcher.InvokeAsync(() =>
             {
-                this.SetInputBindings(item);
-            }
-            this.cremaHost.Opened += CremaHost_Opened;
-            this.cremaHost.Closing += CremaHost_Closing;
-            this.cremaAppHost.Loaded += CremaAppHost_Loaded;
-            this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
+                this.menuService = menuService.Value;
+                this.cremaHost = cremaHost.Value;
+                this.cremaAppHost = cremaAppHost.Value;
+                foreach (var item in this.menuService.MenuItems)
+                {
+                    this.SetInputBindings(item);
+                }
+                this.cremaHost.Opened += CremaHost_Opened;
+                this.cremaHost.Closing += CremaHost_Closing;
+                this.cremaAppHost.Loaded += CremaAppHost_Loaded;
+                this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
 
-            App.Writer.TextBox = this.logView;
-            this.InitializeFromSettings();
+                App.Writer.TextBox = this.logView;
+                this.InitializeFromSettings();
+            }, DispatcherPriority.Render);
         }
 
         public ToolBar Tools
         {
-            get { return (ToolBar)this.GetValue(ToolsProperty); }
-            set { this.SetValue(ToolsProperty, value); }
+            get => (ToolBar)this.GetValue(ToolsProperty);
+            set => this.SetValue(ToolsProperty, value);
         }
 
         [ConfigurationProperty("isLogVisible")]
         public bool IsLogVisible
         {
-            get { return (bool)this.GetValue(IsLogVisibleProperty); }
-            set { this.SetValue(IsLogVisibleProperty, value); }
+            get => (bool)this.GetValue(IsLogVisibleProperty);
+            set => this.SetValue(IsLogVisibleProperty, value);
         }
 
         [ConfigurationProperty("logViewHeight")]
         public double LogViewHeight
         {
-            get { return (double)this.GetValue(LogViewHeightProperty); }
-            set { this.SetValue(LogViewHeightProperty, value); }
+            get => (double)this.GetValue(LogViewHeightProperty);
+            set => this.SetValue(LogViewHeightProperty, value);
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)

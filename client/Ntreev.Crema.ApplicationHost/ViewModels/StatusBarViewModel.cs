@@ -38,13 +38,10 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
     [Export(typeof(IStatusBarService))]
     class StatusBarViewModel : PropertyChangedBase, IStatusBarService
     {
+        private readonly ObservableCollection<BackgroundTaskItemViewModel> taskItemList = new ObservableCollection<BackgroundTaskItemViewModel>();
         private readonly ICremaAppHost cremaAppHost;
-
-        private TaskbarItemInfo taskbarItemInfo;
         private string message;
         private ILineInfo lineInfo;
-        private ObservableCollection<BackgroundTaskItemViewModel> taskItemList = new ObservableCollection<BackgroundTaskItemViewModel>();
-        private ReadOnlyObservableCollection<BackgroundTaskItemViewModel> taskItems;
         private BackgroundTaskItemViewModel selectedTask;
 
         [ImportingConstructor]
@@ -53,9 +50,11 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Loaded += CremaAppHost_Loaded;
             this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
-            this.taskItems = new ReadOnlyObservableCollection<BackgroundTaskItemViewModel>(this.taskItemList);
-            this.taskbarItemInfo = new TaskbarItemInfo();
-            this.taskbarItemInfo.Description = "Crema Desc";
+            this.TaskItems = new ReadOnlyObservableCollection<BackgroundTaskItemViewModel>(this.taskItemList);
+            this.TaskbarItemInfo = new TaskbarItemInfo
+            {
+                Description = "Crema Desc"
+            };
         }
 
         public void AddTask(IBackgroundTask task)
@@ -69,14 +68,11 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             taskViewModel.Disposed += TaskViewModel_Disposed;
         }
 
-        public TaskbarItemInfo TaskbarItemInfo
-        {
-            get { return taskbarItemInfo; }
-        }
+        public TaskbarItemInfo TaskbarItemInfo { get; }
 
         public string Message
         {
-            get { return this.message ?? Resources.Label_Ready; }
+            get => this.message ?? Resources.Label_Ready;
             set
             {
                 this.message = value;
@@ -86,7 +82,7 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
 
         public ILineInfo LineInfo
         {
-            get { return this.lineInfo; }
+            get => this.lineInfo;
             set
             {
                 this.lineInfo = value;
@@ -94,14 +90,11 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             }
         }
 
-        public ReadOnlyObservableCollection<BackgroundTaskItemViewModel> TaskItems
-        {
-            get { return this.taskItems; }
-        }
+        public ReadOnlyObservableCollection<BackgroundTaskItemViewModel> TaskItems { get; }
 
         public BackgroundTaskItemViewModel SelectedTask
         {
-            get { return this.selectedTask; }
+            get => this.selectedTask;
             set
             {
                 this.selectedTask = value;

@@ -36,7 +36,8 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
     public class FileMenuItem : MenuItemBase, IFileMenuItem
     {
         [ImportingConstructor]
-        public FileMenuItem()
+        public FileMenuItem(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
             this.DisplayName = Resources.MenuItem_File;
         }

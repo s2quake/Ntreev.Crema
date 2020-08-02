@@ -29,22 +29,20 @@ namespace Ntreev.Crema.ApplicationHost
     [Export(typeof(IFlashService))]
     class FlashService : IFlashService
     {
-        [Import]
-        private Lazy<ShellView> shellView = null;
+        private readonly ShellView shellView;
 
-        public FlashService()
+        [ImportingConstructor]
+        public FlashService(ShellView shellView)
         {
-
+            this.shellView = shellView;
         }
 
         public void Flash()
         {
-            if (this.ShellView?.IsActive == false)
+            if (this.shellView.IsActive == false)
             {
-                FlashWindowUtility.FlashWindow(this.ShellView);
+                FlashWindowUtility.FlashWindow(this.shellView);
             }
         }
-
-        private ShellView ShellView => this.shellView.Value;
     }
 }

@@ -15,18 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Ntreev.Crema.ServiceModel;
-using System.Windows;
+using Ntreev.Crema.Services;
 using System.Windows.Media;
-using Ntreev.ModernUI.Framework.ViewModels;
 
 namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
 {
@@ -35,13 +27,11 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
         public DataBaseItemViewModel(Authentication authentication, DataBaseInfo dataBaseInfo, object owner)
             : base(authentication, new DataBaseDescriptor(authentication, dataBaseInfo), owner)
         {
-
         }
 
         public DataBaseItemViewModel(Authentication authentication, IDataBaseDescriptor descriptor, object owner)
             : base(authentication, new DataBaseDescriptor(authentication, descriptor, false, owner), owner)
         {
-
         }
 
         public IConnectionItem ConnectionItem { get; internal set; }

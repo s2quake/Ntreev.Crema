@@ -118,25 +118,25 @@ namespace Ntreev.Crema.Presentation.Framework
         public bool IsLoaded => DataBaseDescriptorUtility.IsLoaded(Authenticator.Current, this);
 
         [DescriptorProperty]
-        public bool IsLocked => LockableDescriptorUtility.IsLocked(this.authentication, this);
+        public bool IsLocked => this.authentication != null ? LockableDescriptorUtility.IsLocked(this.authentication, this) : false;
 
         [DescriptorProperty]
-        public bool IsLockInherited => LockableDescriptorUtility.IsLockInherited(this.authentication, this);
+        public bool IsLockInherited => this.authentication != null ? LockableDescriptorUtility.IsLockInherited(this.authentication, this) : false;
 
         [DescriptorProperty]
-        public bool IsLockOwner => LockableDescriptorUtility.IsLockOwner(this.authentication, this);
+        public bool IsLockOwner => this.authentication != null ? LockableDescriptorUtility.IsLockOwner(this.authentication, this) : false;
 
         [DescriptorProperty]
-        public bool IsPrivate => AccessibleDescriptorUtility.IsPrivate(this.authentication, this);
+        public bool IsPrivate => this.authentication != null ? AccessibleDescriptorUtility.IsPrivate(this.authentication, this) : false;
 
         [DescriptorProperty]
-        public bool IsAccessInherited => AccessibleDescriptorUtility.IsAccessInherited(this.authentication, this);
+        public bool IsAccessInherited => this.authentication != null ? AccessibleDescriptorUtility.IsAccessInherited(this.authentication, this) : false;
 
         [DescriptorProperty]
-        public bool IsAccessOwner => AccessibleDescriptorUtility.IsAccessOwner(this.authentication, this);
+        public bool IsAccessOwner => this.authentication != null ? AccessibleDescriptorUtility.IsAccessOwner(this.authentication, this) : false;
 
         [DescriptorProperty]
-        public bool IsAccessMember => AccessibleDescriptorUtility.IsAccessMember(this.authentication, this);
+        public bool IsAccessMember => this.authentication != null ? AccessibleDescriptorUtility.IsAccessMember(this.authentication, this) : false;
 
         protected async override void OnDisposed(EventArgs e)
         {

@@ -53,10 +53,8 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
     [Export(typeof(IContentService))]
     class CremaAppHostViewModel : ViewModelBase, ICremaAppHost, IPartImportsSatisfiedNotification, IContentService
     {
-        private readonly static Dictionary<string, Uri> themes = new Dictionary<string, Uri>(StringComparer.CurrentCultureIgnoreCase);
-        private readonly ConnectionItemCollection connectionItems;
         private ConnectionItemViewModel connectionItem;
-        private ICommand loginCommand;
+        private readonly ICommand loginCommand;
         private SecureString securePassword;
 
         private bool hasError;
@@ -72,7 +70,6 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
         private Guid token;
         private Color themeColor;
         private string theme;
-        private Authority authority;
         private string address;
         private IConfigurationCommitter userConfigCommitter;
 
@@ -92,14 +89,11 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         static CremaAppHostViewModel()
         {
-            themes.Add("Dark", new Uri("/Ntreev.Crema.Presentation.Framework;component/Assets/CremaUI.Dark.xaml", UriKind.Relative));
-            themes.Add("Light", new Uri("/Ntreev.Crema.Presentation.Framework;component/Assets/CremaUI.Light.xaml", UriKind.Relative));
+            Themes.Add("Dark", new Uri("/Ntreev.Crema.Presentation.Framework;component/Assets/CremaUI.Dark.xaml", UriKind.Relative));
+            Themes.Add("Light", new Uri("/Ntreev.Crema.Presentation.Framework;component/Assets/CremaUI.Light.xaml", UriKind.Relative));
         }
 
-        public static Dictionary<string, Uri> Themes
-        {
-            get { return themes; }
-        }
+        public static Dictionary<string, Uri> Themes { get; } = new Dictionary<string, Uri>(StringComparer.CurrentCultureIgnoreCase);
 
         [ImportingConstructor]
         public CremaAppHostViewModel(ICremaHost cremaHost, IAppConfiguration configs, IBuildUp buildUp)
@@ -111,9 +105,9 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             this.theme = Themes.Keys.FirstOrDefault();
             this.themeColor = FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor;
             this.loginCommand = new DelegateCommand((p) => this.LoginAsync(), (p) => this.CanLogin);
-            this.connectionItems = ConnectionItemCollection.Read(AppUtility.GetDocumentFilename("ConnectionList.xml"));
-            this.buildUp.BuildUp(this.connectionItems);
-            this.ConnectionItem = this.connectionItems.FirstOrDefault(item => item.IsDefault);
+            this.ConnectionItems = ConnectionItemCollection.Read(AppUtility.GetDocumentFilename("ConnectionList.xml"));
+            this.buildUp.BuildUp(this.ConnectionItems);
+            this.ConnectionItem = this.ConnectionItems.FirstOrDefault(item => item.IsDefault);
             this.authenticator = this.cremaHost.GetService(typeof(Authenticator)) as Authenticator;
             this.configs.Update(this);
             this.PropertyChanged += (s, e) =>
@@ -134,14 +128,38 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             return Resources.Title_Start;
         }
 
-        public void MoveToWiki()
+        public async Task MoveToWikiAsync()
         {
-            Process.Start("https://github.com/s2quake/Crema/wiki");
+            try
+            {
+                Process.Start("https://github.com/s2quake/Crema/wiki");
+            }
+            catch (Win32Exception noBrowser)
+            {
+                if (noBrowser.ErrorCode == -2147467259)
+                    await AppMessageBox.ShowErrorAsync(noBrowser.Message);
+            }
+            catch (Exception e)
+            {
+                await AppMessageBox.ShowErrorAsync(e.Message);
+            }
         }
 
-        public void ShowHelp()
+        public async Task ShowHelpAsync()
         {
-            Process.Start("https://github.com/s2quake/Crema/wiki");
+            try
+            {
+                Process.Start("https://github.com/s2quake/Crema/wiki");
+            }
+            catch (Win32Exception noBrowser)
+            {
+                if (noBrowser.ErrorCode == -2147467259)
+                    await AppMessageBox.ShowErrorAsync(noBrowser.Message);
+            }
+            catch (Exception e)
+            {
+                await AppMessageBox.ShowErrorAsync(e.Message);
+            }
         }
 
         public Task LoginAsync()
@@ -221,11 +239,11 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         public async void AddConnectionItem()
         {
-            var dialog = new ConnectionItemEditViewModel();
+            var dialog = new ConnectionItemEditViewModel(this);
             if (await dialog.ShowDialogAsync() == true)
             {
-                this.connectionItems.Add(dialog.ConnectionInfo);
-                this.connectionItems.Write();
+                this.ConnectionItems.Add(dialog.ConnectionInfo);
+                this.ConnectionItems.Write();
             }
         }
 
@@ -235,7 +253,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             {
                 this.ConnectionItem = null;
             }
-            this.connectionItems.Remove(connectionItem);
+            this.ConnectionItems.Remove(connectionItem);
         }
 
         public async void RemoveConnectionItem()
@@ -252,15 +270,15 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         public async void EditConnectionItem(ConnectionItemViewModel connectionItem)
         {
-            var dialog = new ConnectionItemEditViewModel(connectionItem.Clone());
+            var dialog = new ConnectionItemEditViewModel(this, connectionItem.Clone());
             if (await dialog.ShowDialogAsync() == true)
             {
                 connectionItem.Assign(dialog.ConnectionInfo);
-                this.connectionItems.Write();
+                this.ConnectionItems.Write();
                 if (this.ConnectionItem == connectionItem)
                 {
                     FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor = connectionItem.ThemeColor;
-                    FirstFloor.ModernUI.Presentation.AppearanceManager.Current.ThemeSource = themes[connectionItem.Theme];
+                    FirstFloor.ModernUI.Presentation.AppearanceManager.Current.ThemeSource = Themes[connectionItem.Theme];
                     this.SetPassword(this.ConnectionItem.Password, true);
                 }
             }
@@ -375,7 +393,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         public bool IsLoaded
         {
-            get { return this.isLoaded; }
+            get => this.isLoaded;
             private set
             {
                 this.isLoaded = value;
@@ -386,7 +404,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         public bool IsOpened
         {
-            get { return this.isOpened; }
+            get => this.isOpened;
             private set
             {
                 this.isOpened = value;
@@ -397,7 +415,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         public bool HasError
         {
-            get { return this.hasError; }
+            get => this.hasError;
             set
             {
                 this.hasError = value;
@@ -407,7 +425,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         public string ErrorMessage
         {
-            get { return this.ProgressMessage; }
+            get => this.ProgressMessage;
             set
             {
                 this.ProgressMessage = value;
@@ -416,19 +434,13 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             }
         }
 
-        public string DataBaseName
-        {
-            get { return this.dataBaseName ?? string.Empty; }
-        }
+        public string DataBaseName => this.dataBaseName ?? string.Empty;
 
-        public string Address
-        {
-            get { return this.address ?? string.Empty; }
-        }
+        public string Address => this.address ?? string.Empty;
 
         public Color ThemeColor
         {
-            get { return this.themeColor; }
+            get => this.themeColor;
             set
             {
                 this.themeColor = value;
@@ -439,7 +451,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         public string Theme
         {
-            get { return this.theme; }
+            get => this.theme;
             set
             {
                 var themeValue = Themes[value];
@@ -449,29 +461,17 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             }
         }
 
-        public Authority Authority
-        {
-            get { return this.authority; }
-        }
+        public Authority Authority { get; private set; }
 
-        public bool IsVisible
-        {
-            get { return this.IsOpened; }
-        }
+        public bool IsVisible => this.IsOpened;
 
-        public DataBaseServiceViewModel DataBaseService
-        {
-            get { return this.dataBaseService.Value; }
-        }
+        public DataBaseServiceViewModel DataBaseService => this.dataBaseService.Value;
 
-        public ConnectionItemCollection ConnectionItems
-        {
-            get { return this.connectionItems; }
-        }
+        public ConnectionItemCollection ConnectionItems { get; }
 
         public ConnectionItemViewModel ConnectionItem
         {
-            get { return this.connectionItem; }
+            get => this.connectionItem;
             set
             {
                 if (this.connectionItem == value)
@@ -499,10 +499,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             }
         }
 
-        public IEnumerable<IDataBaseDescriptor> DataBases
-        {
-            get { return this.dataBaseSelections.Value.Items; }
-        }
+        public IEnumerable<IDataBaseDescriptor> DataBases => this.dataBaseSelections.Value.Items;
 
         public bool CanLogin
         {
@@ -518,19 +515,13 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             }
         }
 
-        public bool CanRemoveConnectionItem
-        {
-            get { return this.ConnectionItem != null; }
-        }
+        public bool CanRemoveConnectionItem => this.ConnectionItem != null;
 
-        public bool CanEditConnectionItem
-        {
-            get { return this.ConnectionItem != null; }
-        }
+        public bool CanEditConnectionItem => this.ConnectionItem != null;
 
         public string FilterExpression
         {
-            get { return this.filterExpression ?? string.Empty; }
+            get => this.filterExpression ?? string.Empty;
             set
             {
                 if (this.filterExpression == value)
@@ -538,7 +529,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
                 if (this.FilterExpression == string.Empty)
                 {
-                    foreach (var item in this.connectionItems)
+                    foreach (var item in this.ConnectionItems)
                     {
                         item.IsVisible = true;
                         item.Pattern = string.Empty;
@@ -549,7 +540,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
                 if (this.FilterExpression == string.Empty)
                 {
-                    foreach (var item in this.connectionItems)
+                    foreach (var item in this.ConnectionItems)
                     {
                         item.IsVisible = true;
                         item.Pattern = string.Empty;
@@ -557,7 +548,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
                 }
                 else
                 {
-                    foreach (var item in this.connectionItems)
+                    foreach (var item in this.ConnectionItems)
                     {
                         item.IsVisible = this.Filter(item);
                         item.Pattern = this.FilterExpression;
@@ -574,7 +565,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         public bool CaseSensitive
         {
-            get { return this.caseSensitive; }
+            get => this.caseSensitive;
             set
             {
                 this.caseSensitive = value;
@@ -584,7 +575,7 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
 
         public bool GlobPattern
         {
-            get { return this.globPattern; }
+            get => this.globPattern;
             set
             {
                 this.globPattern = value;
@@ -697,27 +688,13 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
         private async void CremaHost_Opened(object sender, EventArgs e)
         {
             this.isOpened = true;
-            this.authority = this.cremaHost.Authority;
+            this.Authority = this.cremaHost.Authority;
             this.cremaHost.Closed += CremaHost_Closed;
             await this.Dispatcher.InvokeAsync((System.Action)(() =>
             {
                 this.configs.Commit(this);
                 this.Refresh();
             }));
-        }
-
-        private static string SecureStringToString(SecureString value, string userID)
-        {
-            var valuePtr = IntPtr.Zero;
-            try
-            {
-                valuePtr = Marshal.SecureStringToGlobalAllocUnicode(value);
-                return StringUtility.Encrypt(Marshal.PtrToStringUni(valuePtr), userID);
-            }
-            finally
-            {
-                Marshal.ZeroFreeGlobalAllocUnicode(valuePtr);
-            }
         }
 
         private async void DataBase_Unloaded(object sender, EventArgs e)
@@ -924,14 +901,11 @@ namespace Ntreev.Crema.Presentation.Base.Services.ViewModels
             await this.LoginAsync();
         }
 
-        IEnumerable<IConnectionItem> ICremaAppHost.ConnectionItems
-        {
-            get { return this.ConnectionItems; }
-        }
+        IEnumerable<IConnectionItem> ICremaAppHost.ConnectionItems => this.ConnectionItems;
 
         IConnectionItem ICremaAppHost.ConnectionItem
         {
-            get { return this.ConnectionItem; }
+            get => this.ConnectionItem;
             set
             {
                 if (value is ConnectionItemViewModel connectionItem)

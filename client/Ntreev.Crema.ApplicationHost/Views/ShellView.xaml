@@ -105,14 +105,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                             </Border>
                             <StackPanel Orientation="Horizontal" >
                                 <TabPanel DockPanel.Dock="Top" HorizontalAlignment="Left" IsItemsHost="true" Margin="2 2 2 0" VerticalAlignment="Bottom" />
-                                <nmfc:ModernMenu ItemsSource="{Binding MenuService.ItemsSource}" VerticalAlignment="Bottom" Margin="0 2" >
-                                    <nmfc:ModernMenu.ItemContainerStyle>
-                                        <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource MenuItem_Style}">
-                                            <Setter Property="Margin" Value="0" />
-                                            <Setter Property="MinWidth" Value="50" />
-                                        </Style>
-                                    </nmfc:ModernMenu.ItemContainerStyle>
-                                </nmfc:ModernMenu>
+                                <nmfc:ModernMenu ItemsSource="{Binding MenuService.MenuItems}" VerticalAlignment="Bottom" Margin="0 2" />
                             </StackPanel>
                         </Grid>
                     </ControlTemplate>

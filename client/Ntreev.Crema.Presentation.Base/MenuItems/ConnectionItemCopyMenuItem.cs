@@ -55,7 +55,7 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
         {
             if (this.cremaAppHost.IsOpened == false && parameter is ConnectionItemViewModel connectionItem)
             {
-                var dialog = new ConnectionItemEditViewModel()
+                var dialog = new ConnectionItemEditViewModel(this.cremaAppHost)
                 {
                     DisplayName = Resources.Title_CopyConnectionItem,
                     ConnectionInfo = connectionItem.Clone(),

@@ -59,7 +59,6 @@ namespace Ntreev.Crema.ApplicationHost
         protected override void OnDispose()
         {
             this.container.Dispose();
-            //this.service.Dispose();
         }
 
         protected override IEnumerable<Tuple<Type, object>> GetParts()
@@ -68,9 +67,7 @@ namespace Ntreev.Crema.ApplicationHost
             {
                 yield return item;
             }
-            //yield return new Tuple<Type, object>(typeof(CremaService), this.service);
             yield return new Tuple<Type, object>(typeof(AppSettings), this.Settings);
-            //yield return new Tuple<Type, object>(typeof(ICompositionService), this);
         }
 
         protected override object GetInstance(Type service, string key)

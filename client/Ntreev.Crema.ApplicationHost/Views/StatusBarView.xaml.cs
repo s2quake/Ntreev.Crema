@@ -35,15 +35,19 @@ namespace Ntreev.Crema.ApplicationHost.Views
     [Export]
     partial class StatusBarView : UserControl, INotifyPropertyChanged
     {
-        [Import]
-        private ICremaHost cremaHost = null;
-        [Import]
-        private ICremaAppHost cremaAppHost = null;
-
-        public event PropertyChangedEventHandler PropertyChanged;
+        private readonly Lazy<ICremaHost> cremaHost;
+        private readonly Lazy<ICremaAppHost> cremaAppHost;
 
         public StatusBarView()
         {
+            this.InitializeComponent();
+        }
+
+        [ImportingConstructor]
+        public StatusBarView(Lazy<ICremaHost> cremaHost, Lazy<ICremaAppHost> cremaAppHost)
+        {
+            this.cremaHost = cremaHost;
+            this.cremaAppHost = cremaAppHost;
             this.InitializeComponent();
         }
 
@@ -51,16 +55,16 @@ namespace Ntreev.Crema.ApplicationHost.Views
         {
             base.OnApplyTemplate();
 
-            if (this.cremaAppHost != null)
+            if (this.CremaAppHost != null)
             {
-                this.cremaAppHost.Loaded += CremaAppHost_Loaded;
-                this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
+                this.CremaAppHost.Loaded += CremaAppHost_Loaded;
+                this.CremaAppHost.Unloaded += CremaAppHost_Unloaded;
             }
 
-            if (this.cremaHost != null)
+            if (this.CremaHost != null)
             {
-                this.cremaHost.Opened += CremaHost_Opened;
-                this.cremaHost.Closed += CremaHost_Closed;
+                this.CremaHost.Opened += CremaHost_Opened;
+                this.CremaHost.Closed += CremaHost_Closed;
             }
 
             this.dataBaseButton.Visibility = System.Windows.Visibility.Hidden;
@@ -70,24 +74,25 @@ namespace Ntreev.Crema.ApplicationHost.Views
         {
             get
             {
-                if (this.cremaAppHost == null)
+                if (this.CremaAppHost == null)
                     return string.Empty;
-                if (this.cremaAppHost.DataBaseName == string.Empty)
+                if (this.CremaAppHost.DataBaseName == string.Empty)
                     return Properties.Resources.Label_SelectDataBase;
-                return this.cremaAppHost.DataBaseName;
+                return this.CremaAppHost.DataBaseName;
             }
         }
 
-        public ICremaAppHost CremaAppHost
-        {
-            get { return this.cremaAppHost; }
-        }
+        public ICremaHost CremaHost => this.cremaHost.Value;
+
+        public ICremaAppHost CremaAppHost => this.cremaAppHost.Value;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private async void CremaHost_Opened(object sender, EventArgs e)
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.dataBaseButton.Visibility = System.Windows.Visibility.Visible;
+                this.dataBaseButton.Visibility = Visibility.Visible;
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.DataBaseName)));
             });
         }
@@ -96,7 +101,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
         {
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.dataBaseButton.Visibility = System.Windows.Visibility.Hidden;
+                this.dataBaseButton.Visibility = Visibility.Hidden;
             });
         }
 
@@ -113,11 +118,11 @@ namespace Ntreev.Crema.ApplicationHost.Views
         private void DataBaseButton_Click(object sender, RoutedEventArgs e)
         {
             var contextMenu = new ContextMenu();
-            var items = this.cremaAppHost.DataBases.Select(item => item.Name).ToArray();
-            var query = from connectionItem in this.cremaAppHost.ConnectionItems
-                        where connectionItem.Address == this.cremaAppHost.ConnectionItem.Address &&
-                              connectionItem.ID == this.cremaAppHost.ConnectionItem.ID &&
-                              connectionItem.PasswordID == this.cremaAppHost.ConnectionItem.PasswordID
+            var items = this.CremaAppHost.DataBases.Select(item => item.Name).ToArray();
+            var query = from connectionItem in this.CremaAppHost.ConnectionItems
+                        where connectionItem.Address == this.CremaAppHost.ConnectionItem.Address &&
+                              connectionItem.ID == this.CremaAppHost.ConnectionItem.ID &&
+                              connectionItem.PasswordID == this.CremaAppHost.ConnectionItem.PasswordID
                         join item in items on connectionItem.DataBaseName equals item
                         select connectionItem;
 
@@ -127,8 +132,8 @@ namespace Ntreev.Crema.ApplicationHost.Views
                 var menuItem = new MenuItem()
                 {
                     Header = connectionItem,
-                    IsChecked = this.cremaAppHost.DataBaseName == connectionItem.DataBaseName,
-                    IsEnabled = this.cremaAppHost.DataBaseName != connectionItem.DataBaseName && connectionItem is DisabledConnectionItem == false,
+                    IsChecked = this.CremaAppHost.DataBaseName == connectionItem.DataBaseName,
+                    IsEnabled = this.CremaAppHost.DataBaseName != connectionItem.DataBaseName && connectionItem is DisabledConnectionItem == false,
                 };
                 menuItem.HeaderTemplate = this.FindResource("DataBase_MenuItem_HeaderTemplate") as DataTemplate;
                 menuItem.Click += DataBaseMenuItem_Click;
@@ -147,12 +152,12 @@ namespace Ntreev.Crema.ApplicationHost.Views
             {
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.cremaAppHost.SelectDataBase(connectionItem.DataBaseName);
+                    this.CremaAppHost.SelectDataBase(connectionItem.DataBaseName);
                 });
             }
         }
 
-        #region classes
+        #region DisabledConnectionItem
 
         class DisabledConnectionItem : IConnectionItem
         {

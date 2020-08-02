@@ -45,9 +45,9 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
             this.DisplayName = Resources.Label_MoveToWiki;
         }
 
-        protected override void OnExecute(object parameter)
+        protected override async void OnExecute(object parameter)
         {
-            this.cremaAppHost.MoveToWiki();
+            await this.cremaAppHost.MoveToWikiAsync();
         }
     }
 }

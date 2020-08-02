@@ -27,22 +27,19 @@ namespace Ntreev.Crema.ApplicationHost
 {
     class LogWriter : TextWriter
     {
+        private readonly StringBuilder sb = new StringBuilder();
         private TextBox textBox;
-        private StringBuilder sb = new StringBuilder();
 
         public LogWriter()
         {
 
         }
 
-        public override Encoding Encoding
-        {
-            get { return Encoding.UTF8; }
-        }
+        public override Encoding Encoding => Encoding.UTF8;
 
         public TextBox TextBox
         {
-            get { return this.textBox; }
+            get => this.textBox;
             set
             {
                 this.textBox = value;

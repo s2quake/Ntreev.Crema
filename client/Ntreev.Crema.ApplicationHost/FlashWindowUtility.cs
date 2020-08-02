@@ -29,10 +29,10 @@ namespace Ntreev.Crema.ApplicationHost
     static class FlashWindowUtility
     {
         private const UInt32 FLASHW_STOP = 0; //Stop flashing. The system restores the window to its original state.        private const UInt32 FLASHW_CAPTION = 1; //Flash the window caption.        
-        private const UInt32 FLASHW_TRAY = 2; //Flash the taskbar button.        
+        //private const UInt32 FLASHW_TRAY = 2; //Flash the taskbar button.        
         private const UInt32 FLASHW_ALL = 3; //Flash both the window caption and taskbar button.        
         private const UInt32 FLASHW_TIMER = 4; //Flash continuously, until the FLASHW_STOP flag is set.        
-        private const UInt32 FLASHW_TIMERNOFG = 12; //Flash continuously until the window comes to the foreground.  
+        //private const UInt32 FLASHW_TIMERNOFG = 12; //Flash continuously until the window comes to the foreground.  
 
         [StructLayout(LayoutKind.Sequential)]
         private struct FLASHWINFO
@@ -70,8 +70,10 @@ namespace Ntreev.Crema.ApplicationHost
         public static void StopFlashingWindow(this Window win)
         {
             WindowInteropHelper h = new WindowInteropHelper(win);
-            FLASHWINFO info = new FLASHWINFO();
-            info.hwnd = h.Handle;
+            FLASHWINFO info = new FLASHWINFO
+            {
+                hwnd = h.Handle
+            };
             info.cbSize = Convert.ToUInt32(Marshal.SizeOf(info));
             info.dwFlags = FLASHW_STOP;
             info.uCount = UInt32.MaxValue;

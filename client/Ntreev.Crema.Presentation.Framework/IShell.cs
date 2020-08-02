@@ -15,21 +15,19 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Caliburn.Micro;
-using Ntreev.Crema.Presentation.Framework;
 using System;
 using System.Collections;
-using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Framework
 {
     public interface IShell
     {
+        Task CloseAsync();
+
         bool IsProgressing { get; set; }
 
         string ProgressMessage { get; set; }
-
-        void Close();
 
         object SelectedService { get; set; }
 

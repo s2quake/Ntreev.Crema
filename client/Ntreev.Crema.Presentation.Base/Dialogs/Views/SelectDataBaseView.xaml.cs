@@ -41,13 +41,20 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.Views
     /// <summary>
     /// SelectDataBaseView.xaml에 대한 상호 작용 논리
     /// </summary>
-    //[Export]
+    [Export]
     public partial class SelectDataBaseView : UserControl
     {
-        [Import]
-        private IAppConfiguration configs = null;
+        private readonly IAppConfiguration configs;
+
         public SelectDataBaseView()
         {
+            InitializeComponent();
+        }
+
+        [ImportingConstructor]
+        public SelectDataBaseView(IAppConfiguration configs)
+        {
+            this.configs = configs;
             InitializeComponent();
             this.Loaded += DataBaseListView_Loaded;
             this.Unloaded += DataBaseListView_Unloaded;

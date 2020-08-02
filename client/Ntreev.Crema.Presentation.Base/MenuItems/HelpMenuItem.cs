@@ -37,7 +37,8 @@ namespace Ntreev.Crema.Presentation.Base.MenuItems
     public class HelpMenuItem : MenuItemBase, IHelpMenuItem
     {
         [ImportingConstructor]
-        public HelpMenuItem()
+        public HelpMenuItem(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
             this.DisplayName = Resources.MenuItem_Help;
         }

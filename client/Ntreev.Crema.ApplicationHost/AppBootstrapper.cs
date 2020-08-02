@@ -57,11 +57,11 @@ namespace Ntreev.Crema.ApplicationHost
 
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
-            //if (this.settings.Culture != string.Empty)
-            //{
-            //    System.Globalization.CultureInfo.DefaultThreadCurrentCulture = new System.Globalization.CultureInfo(this.settings.Culture);
-            //    System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = new System.Globalization.CultureInfo(this.settings.Culture);
-            //}
+            if (this.Settings.Culture != string.Empty)
+            {
+                CultureInfo.DefaultThreadCurrentCulture = new CultureInfo(this.Settings.Culture);
+                CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(this.Settings.Culture);
+            }
 
             base.OnStartup(sender, e);
         }
@@ -70,27 +70,6 @@ namespace Ntreev.Crema.ApplicationHost
         {
             base.OnExit(sender, e);
         }
-
-        //protected override IEnumerable<string> SelectPath()
-        //{
-        //    var pluginsPath = AppUtility.GetDocumentPath("plugins");
-
-        //    if (this.settings.PluginsPath != null)
-        //    {
-        //        foreach (var item in this.settings.PluginsPath)
-        //        {
-        //            yield return item;
-        //        }
-        //    }
-
-        //    if (Directory.Exists(pluginsPath) == true)
-        //    {
-        //        foreach (var item in Directory.GetDirectories(pluginsPath))
-        //        {
-        //            yield return item;
-        //        }
-        //    }
-        //}
 
         protected override void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
