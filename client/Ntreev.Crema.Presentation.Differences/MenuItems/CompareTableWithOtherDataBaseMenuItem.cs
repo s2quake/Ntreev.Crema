@@ -15,7 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Base.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Differences.Properties;
 using Ntreev.Crema.Presentation.Framework;

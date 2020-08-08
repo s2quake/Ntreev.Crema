@@ -52,7 +52,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         <Style TargetType="{x:Type nmfc:IconButton}" BasedOn="{StaticResource ToolBar_IconButton_Style}" />
 
         <Style x:Key="NotifyIconButton_Style" TargetType="{x:Type nmfc:IconButton}" BasedOn="{StaticResource ToolBar_IconButton_Style}">
-            <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Base;component/Images/message.png" />
+            <Setter Property="Source" Value="/Ntreev.Crema.Presentation.Home;component/Images/message.png" />
             <Setter Property="ToolTip" Value="{x:Static p:Resources.Tooltip_Notify}" />
         </Style>
 

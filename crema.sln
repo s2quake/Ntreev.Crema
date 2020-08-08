@@ -45,7 +45,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Library", "..\Ntreev
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Presentation.Users", "client\Ntreev.Crema.Presentation.Users\Ntreev.Crema.Presentation.Users.csproj", "{ABC6F21C-0B20-4070-A09A-94990EA0DB2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Presentation.Base", "client\Ntreev.Crema.Presentation.Base\Ntreev.Crema.Presentation.Base.csproj", "{5775FED7-233E-48B2-8F83-538DC1123527}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ntreev.Crema.Presentation.Home", "client\Ntreev.Crema.Presentation.Home\Ntreev.Crema.Presentation.Home.csproj", "{5775FED7-233E-48B2-8F83-538DC1123527}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "version", "version", "{F159D190-2B68-49A5-9B54-ED6970FFEA6F}"
 EndProject

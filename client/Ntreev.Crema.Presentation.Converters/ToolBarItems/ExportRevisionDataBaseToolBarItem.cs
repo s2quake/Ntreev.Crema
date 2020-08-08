@@ -32,7 +32,7 @@ using System.Threading.Tasks;
 namespace Ntreev.Crema.Presentation.Converters.ToolBarItems
 {
     [Export(typeof(IToolBarItem))]
-    [ParentType("Ntreev.Crema.Presentation.Base.Dialogs.ViewModels.LogViewModel, Ntreev.Crema.Presentation.Base, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Home.Dialogs.ViewModels.LogViewModel, Ntreev.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ExportRevisionDataBaseToolBarItem : ToolBarItemBase
     {
         [Import]

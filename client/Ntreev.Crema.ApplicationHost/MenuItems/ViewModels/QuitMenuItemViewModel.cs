@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ApplicationHost.Properties;
-using Ntreev.Crema.Presentation.Base.MenuItems;
+using Ntreev.Crema.Presentation.Home.MenuItems;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;

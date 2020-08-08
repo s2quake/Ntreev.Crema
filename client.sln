@@ -43,7 +43,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.ModernUI.Framework",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Presentation.Users", "client\Ntreev.Crema.Presentation.Users\Ntreev.Crema.Presentation.Users.csproj", "{ABC6F21C-0B20-4070-A09A-94990EA0DB2D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Presentation.Base", "client\Ntreev.Crema.Presentation.Base\Ntreev.Crema.Presentation.Base.csproj", "{5775FED7-233E-48B2-8F83-538DC1123527}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Presentation.Home", "client\Ntreev.Crema.Presentation.Home\Ntreev.Crema.Presentation.Home.csproj", "{5775FED7-233E-48B2-8F83-538DC1123527}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Library.Random", "..\Ntreev.Library\Ntreev.Library.Random\Ntreev.Library.Random.csproj", "{83F1180F-F170-48CF-BE1E-CA60D6851800}"
 EndProject

@@ -15,7 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Base.Services.ViewModels;
+using Ntreev.Crema.Presentation.Home.Services.ViewModels;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
@@ -34,7 +34,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [ParentType("Ntreev.Crema.Presentation.Base.IPropertyService, Ntreev.Crema.Presentation.Base, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Home.IPropertyService, Ntreev.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class DomainsViewModel : PropertyItemBase
     {
         private readonly ICremaAppHost cremaAppHost;

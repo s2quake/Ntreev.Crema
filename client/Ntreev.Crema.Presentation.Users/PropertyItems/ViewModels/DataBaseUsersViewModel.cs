@@ -33,7 +33,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [ParentType("Ntreev.Crema.Presentation.Base.IPropertyService, Ntreev.Crema.Presentation.Base, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Home.IPropertyService, Ntreev.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class DataBaseUsersViewModel : PropertyItemBase
     {
         private readonly ObservableCollection<DataBaseUserItemViewModel> users = new ObservableCollection<DataBaseUserItemViewModel>();
