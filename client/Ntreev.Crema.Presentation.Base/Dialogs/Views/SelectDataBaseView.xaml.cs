@@ -34,6 +34,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Xceed.Wpf.DataGrid;
 
 namespace Ntreev.Crema.Presentation.Base.Dialogs.Views
@@ -95,12 +96,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.Views
                     this.gridControl.Columns["AccessInfo"].Visible = false;
                     this.gridControl.Columns["IsLoaded"].Visible = false;
                 }
-            });
-        }
-
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            this.gridControl.Visibility = Visibility.Visible;
+            }, DispatcherPriority.Background);
         }
     }
 }

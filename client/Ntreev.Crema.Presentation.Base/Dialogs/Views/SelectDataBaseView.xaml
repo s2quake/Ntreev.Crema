@@ -28,26 +28,24 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Base.Properties"
              mc:Ignorable="d" nmfc:DialogWindow.DesiredWidth="500" nmfc:DialogWindow.DesiredHeight="250" 
              Tag="{Binding SupportsDescriptor}"
-             nmfc:DialogWindow.DesiredResizeMode="CanResizeWithGrip"
-             Loaded="UserControl_Loaded">
+             nmfc:DialogWindow.DesiredResizeMode="CanResizeWithGrip">
 
     <UserControl.Resources>
 
-        <Style TargetType="{x:Type xcdg:HierarchicalGroupByControl}" BasedOn="{StaticResource {x:Type xcdg:HierarchicalGroupByControl}}">
+        <!--<Style TargetType="{x:Type xcdg:HierarchicalGroupByControl}" BasedOn="{StaticResource {x:Type xcdg:HierarchicalGroupByControl}}">
             <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
-            <!--<Setter Property="Visibility" Value="Collapsed" />-->
+            <Setter Property="Visibility" Value="Collapsed" />
             <Setter Property="BorderThickness" Value="0 0 0 1" />
             <Setter Property="BorderBrush" Value="{DynamicResource ItemBorder}" />
         </Style>
 
         <Style TargetType="{x:Type xcdg:GroupLevelIndicatorPane}" BasedOn="{StaticResource {x:Type xcdg:GroupLevelIndicatorPane}}">
-            <!--<Setter Property="Visibility" Value="Collapsed" />-->
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>-->
 
-        </Style>
-
-        <Style TargetType="{x:Type xcdg:ColumnManagerRow}" BasedOn="{StaticResource {x:Type xcdg:ColumnManagerRow}}">
+        <!--<Style TargetType="{x:Type xcdg:ColumnManagerRow}" BasedOn="{StaticResource {x:Type xcdg:ColumnManagerRow}}">
             <Setter Property="BorderThickness" Value="0" />
-        </Style>
+        </Style>-->
 
         <Style TargetType="{x:Type nmgc:ModernDataRow}" BasedOn="{StaticResource {x:Type nmgc:ModernDataRow}}">
             <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
@@ -97,13 +95,17 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         </Grid.RowDefinitions>
 
         <!--wpftoolkit 버그로 인해 예외가 발생하여 처음에는 Collapsed로 설정-->
-        <nmgc:ModernDataGridControl x:Name="gridControl"  
+        <nmgc:ModernDataGridControl x:Name="gridControl"  Grid.Row="0" ItemsSource="{Binding ItemsSource}" ReadOnly="True" 
+                                    BorderThickness="1" BorderBrush="{DynamicResource ItemBorder}"
+                                    AutoCreateColumns="False" SelectionUnit="Row" 
+                                    SelectionMode="Single"
+                                    SelectedItem="{Binding SelectedItem}" Tag="{Binding ConnectableOnly}" 
                                     DataContextChanged="GridControl_DataContextChanged">
-            <!--<nmgc:ModernDataGridControl.Columns>
+            <nmgc:ModernDataGridControl.Columns>
                 <xcdg:Column FieldName="Color"
                              MaxWidth="30" MinWidth="30"
                              CellContentTemplate="{StaticResource Color_ContentTemplate}" />
-                <xcdg:Column FieldName="LockInfo" Title="L"
+                <xcdg:Column FieldName="LockInfo" Title="L" 
                              MaxWidth="30" MinWidth="30"
                              CellContentTemplate="{StaticResource LockInfo_ContentTemplate}" />
                 <xcdg:Column FieldName="AccessInfo" Title="S"
@@ -120,9 +122,18 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <xcdg:Column FieldName="DataBaseInfo.ModificationInfo.ID" Title="{x:Static p:Resources.Label_Modifier}" />
                 <xcdg:Column FieldName="DataBaseInfo.ModificationInfo.DateTime" Title="{x:Static p:Resources.Label_ModifiedDateTime}" CellContentTemplate="{StaticResource DateTime_DataTemplate}" />
             </nmgc:ModernDataGridControl.Columns>
-            <nmgc:ModernDataGridControl.View>
-                <xcdg:TableView AllowDrop="True" Style="{StaticResource TableView_Style}"/>
-            </nmgc:ModernDataGridControl.View>-->
+            <nmgc:ModernDataGridControl.View >
+                <xcdg:TableView AllowDrop="True" UseDefaultHeadersFooters="False">
+                    <xcdg:TableView.FixedHeaders>
+                        <DataTemplate>
+                            <xcdg:HierarchicalGroupByControl/>
+                        </DataTemplate>
+                        <DataTemplate>
+                            <nmgc:ModernColumnManagerRow x:Name="ColumnManagerRow" />
+                        </DataTemplate>
+                    </xcdg:TableView.FixedHeaders>
+                </xcdg:TableView>
+            </nmgc:ModernDataGridControl.View>
         </nmgc:ModernDataGridControl>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button x:Name="OK" Content="{x:Static p:Resources.Button_OK}" Padding="8 4" Style="{DynamicResource Dialog_Button_Style}" />

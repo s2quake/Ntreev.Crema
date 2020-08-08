@@ -36,9 +36,8 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
         private readonly Func<DataBaseItemViewModel, bool> predicate;
         private DataBaseItemViewModel selectedItem;
         private string selectedValue;
-        [Import]
-        private IBuildUp buildUp = null;
-        private Func<Task> actionAsync;
+        private readonly Func<Task> actionAsync;
+        private readonly IBuildUp buildUp = null;
 
         public SelectDataBaseViewModel(ICremaAppHost cremaAppHost, string address)
             : this(cremaAppHost, address, (s) => true)
@@ -47,6 +46,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
         }
 
         public SelectDataBaseViewModel(ICremaAppHost cremaAppHost, string address, Func<DataBaseItemViewModel, bool> predicate)
+            : base(cremaAppHost)
         {
             this.cremaAppHost = cremaAppHost;
             this.predicate = predicate;
@@ -110,10 +110,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             }
         }
 
-        public bool ConnectableOnly
-        {
-            get; set;
-        }
+        public bool ConnectableOnly { get; set; }
 
         public bool SupportsDescriptor { get; }
 
@@ -128,7 +125,7 @@ namespace Ntreev.Crema.Presentation.Base.Dialogs.ViewModels
             try
             {
                 this.BeginProgress(Resources.Message_ReceivingInformation);
-                var dataBaseInfos = await Task.Run(() => CremaBootstrapper.GetDataBasesAsync(address));
+                var dataBaseInfos = await CremaBootstrapper.GetDataBasesAsync(address);
                 var query = from connectionItem in this.cremaAppHost.ConnectionItems
                             where connectionItem.Address == this.cremaAppHost.ConnectionItem.Address &&
                                   connectionItem.ID == this.cremaAppHost.ConnectionItem.ID &&
