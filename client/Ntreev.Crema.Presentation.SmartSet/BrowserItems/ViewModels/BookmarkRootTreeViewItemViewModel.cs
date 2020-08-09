@@ -34,15 +34,9 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             this.Owner = browser ?? throw new ArgumentNullException(nameof(browser));
         }
 
-        public override string DisplayName
-        {
-            get { return Resources.Title_Bookmark; }
-        }
+        public override string DisplayName => Resources.Title_Bookmark;
 
-        public SmartSetBrowserViewModel Browser
-        {
-            get { return this.Owner as SmartSetBrowserViewModel; }
-        }
+        public SmartSetBrowserViewModel Browser => this.Owner as SmartSetBrowserViewModel;
 
         public async Task NewFolderAsync()
         {

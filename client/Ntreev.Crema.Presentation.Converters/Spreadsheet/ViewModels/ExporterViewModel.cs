@@ -117,15 +117,12 @@ namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.ViewModels
             }
         }
 
-        public string Name
-        {
-            get { return "Excel Exporter"; }
-        }
+        public string Name => "Excel Exporter";
 
         [ConfigurationProperty("outputPath")]
         public string OutputPath
         {
-            get { return this.outputPath; }
+            get => this.outputPath;
             set
             {
                 this.outputPath = value;
@@ -135,10 +132,7 @@ namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.ViewModels
         }
 
         [ConfigurationProperty("omitSignatureDate")]
-        public ExporterSettings Settings
-        {
-            get { return this.settings; }
-        }
+        public ExporterSettings Settings => this.settings;
 
         public bool CanExport
         {

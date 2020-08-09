@@ -31,10 +31,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels.Tables
             this.DisplayName = Resources.Title_TableTags;
         }
 
-        public override Type SupportType
-        {
-            get { return typeof(ITableDescriptor); }
-        }
+        public override Type SupportType => typeof(ITableDescriptor);
 
         protected override TagInfo GetTargetValue(object target)
         {

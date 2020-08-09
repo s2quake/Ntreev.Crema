@@ -28,8 +28,8 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.Views
 
         public bool CanInsert
         {
-            get { return (bool)this.GetValue(CanInsertProperty); }
-            set { this.SetValue(CanInsertProperty, value); }
+            get => (bool)this.GetValue(CanInsertProperty);
+            set => this.SetValue(CanInsertProperty, value);
         }
 
         protected override bool IsItemItsOwnContainerOverride(object item)

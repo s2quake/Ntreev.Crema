@@ -100,14 +100,11 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
             this.cancelToken.Cancel();
         }
 
-        public ObservableCollection<IImporter> Importers
-        {
-            get { return this.importers; }
-        }
+        public ObservableCollection<IImporter> Importers => this.importers;
 
         public IImporter SelectedImporter
         {
-            get { return this.selectedImporter; }
+            get => this.selectedImporter;
             set
             {
                 if (this.selectedImporter != null && this.selectedImporter is INotifyPropertyChanged == true)
@@ -127,7 +124,7 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
 
         public string Comment
         {
-            get { return this.comment ?? string.Empty; }
+            get => this.comment ?? string.Empty;
             set
             {
                 this.comment = value;
@@ -158,23 +155,11 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
             }
         }
 
-        public bool CanTryClose
-        {
-            get
-            {
-                return this.isImporting == false;
-            }
-        }
+        public bool CanTryClose => this.isImporting == false;
 
-        public bool CanCancel
-        {
-            get { return this.isImporting == true; }
-        }
+        public bool CanCancel => this.isImporting == true;
 
-        public bool IsImporting
-        {
-            get { return this.isImporting == true; }
-        }
+        public bool IsImporting => this.isImporting == true;
 
         private void SelectedImporter_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

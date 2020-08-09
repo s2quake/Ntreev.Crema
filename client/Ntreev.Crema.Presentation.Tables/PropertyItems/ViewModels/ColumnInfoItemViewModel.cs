@@ -44,39 +44,18 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
             }
         }
 
-        public string Name
-        {
-            get { return this.columnInfo.Name; }
-        }
+        public string Name => this.columnInfo.Name;
 
-        public string DataType
-        {
-            get { return this.dataType; }
-        }
+        public string DataType => this.dataType;
 
-        public string CategoryName
-        {
-            get { return this.categoryName; }
-        }
+        public string CategoryName => this.categoryName;
 
-        public string Comment
-        {
-            get { return this.columnInfo.Comment; }
-        }
+        public string Comment => this.columnInfo.Comment;
 
-        public TagInfo Tags
-        {
-            get { return this.columnInfo.DerivedTags; }
-        }
+        public TagInfo Tags => this.columnInfo.DerivedTags;
 
-        public bool IsKey
-        {
-            get { return this.columnInfo.IsKey; }
-        }
+        public bool IsKey => this.columnInfo.IsKey;
 
-        public bool IsUnique
-        {
-            get { return this.columnInfo.IsUnique; }
-        }
+        public bool IsUnique => this.columnInfo.IsUnique;
     }
 }

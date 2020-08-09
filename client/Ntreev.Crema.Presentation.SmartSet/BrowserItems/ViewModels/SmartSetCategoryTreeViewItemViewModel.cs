@@ -132,10 +132,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             return base.CompareTo(obj);
         }
 
-        public override string DisplayName
-        {
-            get { return category.Name; }
-        }
+        public override string DisplayName => category.Name;
 
         private void AddViewModel(ISmartSet smartSet)
         {

@@ -51,29 +51,14 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             }
         }
 
-        public LogInfo LogInfo
-        {
-            get { return this.logInfo; }
-        }
+        public LogInfo LogInfo => this.logInfo;
 
-        public string UserID
-        {
-            get { return this.logInfo.UserID; }
-        }
+        public string UserID => this.logInfo.UserID;
 
-        public string Revision
-        {
-            get { return this.logInfo.Revision; }
-        }
+        public string Revision => this.logInfo.Revision;
 
-        public string Message
-        {
-            get { return this.logInfo.Comment; }
-        }
+        public string Message => this.logInfo.Comment;
 
-        public DateTime DateTime
-        {
-            get { return this.logInfo.DateTime; }
-        }
+        public DateTime DateTime => this.logInfo.DateTime;
     }
 }

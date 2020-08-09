@@ -30,29 +30,17 @@ namespace Ntreev.Crema.Presentation.SmartSet
 
         #region ISmartSetCategory
 
-        ISmartSetCategory ISmartSetCategory.Parent
-        {
-            get { return this.Parent; }
-        }
+        ISmartSetCategory ISmartSetCategory.Parent => this.Parent;
 
-        IContainer<ISmartSetCategory> ISmartSetCategory.Categories
-        {
-            get { return this.Categories; }
-        }
+        IContainer<ISmartSetCategory> ISmartSetCategory.Categories => this.Categories;
 
-        IContainer<ISmartSet> ISmartSetCategory.Items
-        {
-            get { return this.Items; }
-        }
+        IContainer<ISmartSet> ISmartSetCategory.Items => this.Items;
 
 
         string ISmartSetCategory.ParentPath
         {
-            get { return this.Parent.Path; }
-            set
-            {
-                this.Parent = this.Container[value];
-            }
+            get => this.Parent.Path;
+            set => this.Parent = this.Container[value];
         }
 
         ISmartSetCategory ISmartSetCategory.CreateCategory(string name)

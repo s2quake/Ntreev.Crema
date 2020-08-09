@@ -32,10 +32,7 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public static readonly DependencyProperty IsModifiedProperty = IsModifiedPropertyKey.DependencyProperty;
 
-        public bool IsModified
-        {
-            get { return (bool)this.GetValue(IsModifiedProperty); }
-        }
+        public bool IsModified => (bool)this.GetValue(IsModifiedProperty);
 
         protected override void OnPreviewMouseRightButtonDown(MouseButtonEventArgs e)
         {

@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Presentation.Converters
         [ConfigurationProperty(nameof(isSeparable))]
         public bool IsSeparable
         {
-            get { return this.isSeparable; }
+            get => this.isSeparable;
             set
             {
                 this.isSeparable = value;
@@ -49,7 +49,7 @@ namespace Ntreev.Crema.Presentation.Converters
         [ConfigurationProperty(nameof(isOneTableToOneFile))]
         public bool IsOneTableToOneFile
         {
-            get { return this.isOneTableToOneFile; }
+            get => this.isOneTableToOneFile;
             set
             {
                 this.isOneTableToOneFile = value;
@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Presentation.Converters
         [ConfigurationProperty(nameof(isIncludeDate))]
         public bool IsIncludeDate
         {
-            get { return this.isIncludeDate; }
+            get => this.isIncludeDate;
             set
             {
                 this.isIncludeDate = value;
@@ -71,7 +71,7 @@ namespace Ntreev.Crema.Presentation.Converters
         [ConfigurationProperty(nameof(omitAttribute))]
         public bool OmitAttribute
         {
-            get { return this.omitAttribute; }
+            get => this.omitAttribute;
             set
             {
                 this.omitAttribute = value;
@@ -82,7 +82,7 @@ namespace Ntreev.Crema.Presentation.Converters
         [ConfigurationProperty(nameof(omitSignatureDate))]
         public bool OmitSignatureDate
         {
-            get { return this.omitSignatureDate; }
+            get => this.omitSignatureDate;
             set
             {
                 this.omitSignatureDate = value;
@@ -93,7 +93,7 @@ namespace Ntreev.Crema.Presentation.Converters
         [ConfigurationProperty(nameof(outputDateFormat))]
         public string OutputDateFormat
         {
-            get { return this.outputDateFormat; }
+            get => this.outputDateFormat;
             set
             {
                 this.outputDateFormat = value;

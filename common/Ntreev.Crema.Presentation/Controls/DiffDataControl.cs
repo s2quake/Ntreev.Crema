@@ -182,60 +182,45 @@ namespace Ntreev.Crema.Presentation.Controls
             }
         }
 
-        public Control DataControl1
-        {
-            get { return this.dataGrid1; }
-        }
+        public Control DataControl1 => this.dataGrid1;
 
-        public Control DataControl2
-        {
-            get { return this.dataGrid2; }
-        }
+        public Control DataControl2 => this.dataGrid2;
 
         public DataTemplate DataContentTemplate
         {
-            get { return (DataTemplate)this.GetValue(DataContentTemplateProperty); }
-            set { this.SetValue(DataContentTemplateProperty, value); }
+            get => (DataTemplate)this.GetValue(DataContentTemplateProperty);
+            set => this.SetValue(DataContentTemplateProperty, value);
         }
 
         public bool ReadOnly
         {
-            get { return (bool)this.GetValue(ReadOnlyProperty); }
-            set { this.SetValue(ReadOnlyProperty, value); }
+            get => (bool)this.GetValue(ReadOnlyProperty);
+            set => this.SetValue(ReadOnlyProperty, value);
         }
 
-        public bool ReadOnly1
-        {
-            get { return (bool)this.GetValue(ReadOnly1Property); }
-        }
+        public bool ReadOnly1 => (bool)this.GetValue(ReadOnly1Property);
 
-        public bool ReadOnly2
-        {
-            get { return (bool)this.GetValue(ReadOnly2Property); }
-        }
+        public bool ReadOnly2 => (bool)this.GetValue(ReadOnly2Property);
 
         public object Header1
         {
-            get { return (object)this.GetValue(Header1Property); }
-            set { this.SetValue(Header1Property, value); }
+            get => (object)this.GetValue(Header1Property);
+            set => this.SetValue(Header1Property, value);
         }
 
         public object Header2
         {
-            get { return (object)this.GetValue(Header2Property); }
-            set { this.SetValue(Header2Property, value); }
+            get => (object)this.GetValue(Header2Property);
+            set => this.SetValue(Header2Property, value);
         }
 
         public bool IsModified
         {
-            get { return (bool)this.GetValue(IsModifiedProperty); }
-            set { this.SetValue(IsModifiedProperty, value); }
+            get => (bool)this.GetValue(IsModifiedProperty);
+            set => this.SetValue(IsModifiedProperty, value);
         }
 
-        public virtual bool CanMerge
-        {
-            get { return false; }
-        }
+        public virtual bool CanMerge => false;
 
         protected void Merge()
         {

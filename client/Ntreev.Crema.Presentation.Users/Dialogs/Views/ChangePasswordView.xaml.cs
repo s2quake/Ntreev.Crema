@@ -82,14 +82,8 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.Views
             });
         }
 
-        private SecureString Password
-        {
-            get { return (SecureString)this.GetValue(PasswordProperty); }
-        }
+        private SecureString Password => (SecureString)this.GetValue(PasswordProperty);
 
-        private SecureString NewPassword
-        {
-            get { return (SecureString)this.GetValue(NewPasswordProperty); }
-        }
+        private SecureString NewPassword => (SecureString)this.GetValue(NewPasswordProperty);
     }
 }

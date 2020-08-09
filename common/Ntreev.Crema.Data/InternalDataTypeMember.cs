@@ -102,23 +102,17 @@ namespace Ntreev.Crema.Data
             set => this.SetField(this.Table.columnComment, value);
         }
 
-        public TypeMemberInfo TypeMemberInfo
+        public TypeMemberInfo TypeMemberInfo => new TypeMemberInfo()
         {
-            get
-            {
-                return new TypeMemberInfo()
-                {
-                    ID = this.ID,
-                    Tags = this.Tags,
-                    DerivedTags = this.DerivedTags,
-                    IsEnabled = this.IsEnabled,
-                    Name = this.Name,
-                    Value = this.Value,
-                    Comment = this.Comment,
-                    CreationInfo = this.CreationInfo,
-                    ModificationInfo = this.ModificationInfo
-                };
-            }
-        }
+            ID = this.ID,
+            Tags = this.Tags,
+            DerivedTags = this.DerivedTags,
+            IsEnabled = this.IsEnabled,
+            Name = this.Name,
+            Value = this.Value,
+            Comment = this.Comment,
+            CreationInfo = this.CreationInfo,
+            ModificationInfo = this.ModificationInfo
+        };
     }
 }

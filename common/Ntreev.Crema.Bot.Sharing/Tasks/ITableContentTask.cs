@@ -136,14 +136,8 @@ namespace Ntreev.Crema.Bot.Tasks
             return await content.AddNewAsync(authentication, null);
         }
 
-        public Type TargetType
-        {
-            get { return typeof(ITableContent); }
-        }
+        public Type TargetType => typeof(ITableContent);
 
-        public bool IsEnabled
-        {
-            get { return false; }
-        }
+        public bool IsEnabled => false;
     }
 }

@@ -29,10 +29,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             this.Descriptor.PropertyChanged += Descriptor_PropertyChanged;
         }
 
-        public string BookmarkPath
-        {
-            get { return TreeViewItemViewModel.BuildRelativePath(this.Browser.BookmarkCategory, this, item => false); }
-        }
+        public string BookmarkPath => TreeViewItemViewModel.BuildRelativePath(this.Browser.BookmarkCategory, this, item => false);
 
         public SmartSetBrowserViewModel Browser => this.Owner as SmartSetBrowserViewModel;
 

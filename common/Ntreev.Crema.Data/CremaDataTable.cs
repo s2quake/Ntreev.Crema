@@ -798,10 +798,7 @@ namespace Ntreev.Crema.Data
 
         public CremaDataColumn[] PrimaryKey
         {
-            get
-            {
-                return this.InternalObject.PrimaryKey.Cast<InternalDataColumn>().Select(item => item.Target).ToArray();
-            }
+            get => this.InternalObject.PrimaryKey.Cast<InternalDataColumn>().Select(item => item.Target).ToArray();
             set
             {
                 if (value == null)
@@ -1368,10 +1365,7 @@ namespace Ntreev.Crema.Data
 
         #region IListSource
 
-        bool IListSource.ContainsListCollection
-        {
-            get { return (this.InternalObject as IListSource).ContainsListCollection; }
-        }
+        bool IListSource.ContainsListCollection => (this.InternalObject as IListSource).ContainsListCollection;
 
         IList IListSource.GetList()
         {

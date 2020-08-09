@@ -47,15 +47,15 @@ namespace Ntreev.Crema.ServiceModel
         [DataMember]
         public string ExceptionType
         {
-            get { return this.exceptionType; }
-            set { this.exceptionType = value; }
+            get => this.exceptionType;
+            set => this.exceptionType = value;
         }
 
         [DataMember]
         public string Message
         {
-            get { return this.message; }
-            set { this.message = value; }
+            get => this.message;
+            set => this.message = value;
         }
     }
 }

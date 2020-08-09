@@ -33,29 +33,14 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             this.itemName = new ItemName(resultInfo.Path);
         }
 
-        public string CategoryName
-        {
-            get { return this.itemName.CategoryPath.Trim(PathUtility.SeparatorChar); }
-        }
+        public string CategoryName => this.itemName.CategoryPath.Trim(PathUtility.SeparatorChar);
 
-        public string TableName
-        {
-            get { return this.itemName.Name; }
-        }
+        public string TableName => this.itemName.Name;
 
-        public string ColumnName
-        {
-            get { return this.resultInfo.ColumnName; }
-        }
+        public string ColumnName => this.resultInfo.ColumnName;
 
-        public int Row
-        {
-            get { return this.resultInfo.Row; }
-        }
+        public int Row => this.resultInfo.Row;
 
-        public string Value
-        {
-            get { return this.resultInfo.Value; }
-        }
+        public string Value => this.resultInfo.Value;
     }
 }

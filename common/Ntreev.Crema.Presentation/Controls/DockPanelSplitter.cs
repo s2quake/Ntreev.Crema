@@ -84,8 +84,8 @@ namespace Ntreev.Crema.Presentation.Controls
         /// </summary>
         public bool ProportionalResize
         {
-            get { return (bool)GetValue(ProportionalResizeProperty); }
-            set { SetValue(ProportionalResizeProperty, value); }
+            get => (bool)GetValue(ProportionalResizeProperty);
+            set => SetValue(ProportionalResizeProperty, value);
         }
 
         public static readonly DependencyProperty ProportionalResizeProperty =
@@ -97,8 +97,8 @@ namespace Ntreev.Crema.Presentation.Controls
         /// </summary>
         public double Thickness
         {
-            get { return (double)GetValue(ThicknessProperty); }
-            set { SetValue(ThicknessProperty, value); }
+            get => (double)GetValue(ThicknessProperty);
+            set => SetValue(ThicknessProperty, value);
         }
 
         public static readonly DependencyProperty ThicknessProperty =

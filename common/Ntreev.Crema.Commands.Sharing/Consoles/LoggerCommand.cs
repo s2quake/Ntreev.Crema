@@ -40,7 +40,7 @@ namespace Ntreev.Crema.Commands.Consoles
         private string viewerArguments;
 
         [ImportingConstructor]
-        public LoggerCommand(Lazy<ICremaHost> cremaHost, [ImportMany]IEnumerable<Lazy<ILogService>> logServices)
+        public LoggerCommand(Lazy<ICremaHost> cremaHost, [ImportMany] IEnumerable<Lazy<ILogService>> logServices)
         {
             this.cremaHost = cremaHost;
             this.logServices = logServices;

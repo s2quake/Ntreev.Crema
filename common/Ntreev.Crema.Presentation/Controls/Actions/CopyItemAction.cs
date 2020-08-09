@@ -88,9 +88,9 @@ namespace Ntreev.Crema.Presentation.Controls.Actions
                 }
             }
 
-            public object Item { get => this.dataItem; }
+            public object Item => this.dataItem;
 
-            public object[] Fields { get => this.fields; }
+            public object[] Fields => this.fields;
 
             public void Redo()
             {

@@ -33,20 +33,11 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
             this.DisplayName = Resources.Title_TableInfo;
         }
 
-        public TableInfo? TableInfo
-        {
-            get { return this.tableInfo; }
-        }
+        public TableInfo? TableInfo => this.tableInfo;
 
-        public override bool IsVisible
-        {
-            get { return this.tableInfo != null; }
-        }
+        public override bool IsVisible => this.tableInfo != null;
 
-        public override object SelectedObject
-        {
-            get { return this.viewModel; }
-        }
+        public override object SelectedObject => this.viewModel;
 
         public override bool CanSupport(object obj)
         {

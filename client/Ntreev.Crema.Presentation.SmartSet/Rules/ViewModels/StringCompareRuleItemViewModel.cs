@@ -25,7 +25,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
 
         public bool CaseSensitive
         {
-            get { return this.caseSensitive; }
+            get => this.caseSensitive;
             set
             {
                 this.caseSensitive = value;
@@ -35,7 +35,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
 
         public bool GlobPattern
         {
-            get { return this.globPattern; }
+            get => this.globPattern;
             set
             {
                 this.globPattern = value;
@@ -45,7 +45,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
 
         public string Value
         {
-            get { return this.value; }
+            get => this.value;
             set
             {
                 this.value = value;

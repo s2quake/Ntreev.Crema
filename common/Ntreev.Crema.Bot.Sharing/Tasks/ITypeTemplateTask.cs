@@ -104,10 +104,7 @@ namespace Ntreev.Crema.Bot.Tasks
             }
         }
 
-        public Type TargetType
-        {
-            get { return typeof(ITypeTemplate); }
-        }
+        public Type TargetType => typeof(ITypeTemplate);
 
         [TaskMethod(Weight = 10)]
         public async Task SetTypeNameAsync(ITypeTemplate template, TaskContext context)

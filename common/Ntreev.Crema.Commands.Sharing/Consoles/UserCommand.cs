@@ -202,10 +202,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.Drive is UsersConsoleDrive;
 
-        protected IUserContext UserContext
-        {
-            get { return this.cremaHost.GetService(typeof(IUserContext)) as IUserContext; }
-        }
+        protected IUserContext UserContext => this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
 
         private Task<IUser> GetUserAsync(string userID)
         {

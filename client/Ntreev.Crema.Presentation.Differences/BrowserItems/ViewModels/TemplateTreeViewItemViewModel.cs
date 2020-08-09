@@ -83,44 +83,23 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             }
         }
 
-        public DiffState DiffState
-        {
-            get { return this.diffTemplate.DiffState; }
-        }
+        public DiffState DiffState => this.diffTemplate.DiffState;
 
-        public bool IsResolved
-        {
-            get { return this.diffTemplate.IsResolved; }
-        }
+        public bool IsResolved => this.diffTemplate.IsResolved;
 
-        public bool IsActivated
-        {
-            get { return this.isActivated; }
-        }
+        public bool IsActivated => this.isActivated;
 
-        public DiffTemplate Source
-        {
-            get { return this.diffTemplate; }
-        }
+        public DiffTemplate Source => this.diffTemplate;
 
-        public CremaTemplate Source1
-        {
-            get { return this.diffTemplate.SourceItem1; }
-        }
+        public CremaTemplate Source1 => this.diffTemplate.SourceItem1;
 
-        public CremaTemplate Source2
-        {
-            get { return this.diffTemplate.SourceItem2; }
-        }
+        public CremaTemplate Source2 => this.diffTemplate.SourceItem2;
 
-        public IEnumerable<object> UnresolvedItems
-        {
-            get { return this.diffTemplate.UnresolvedItems; }
-        }
+        public IEnumerable<object> UnresolvedItems => this.diffTemplate.UnresolvedItems;
 
         public string Header1
         {
-            get { return this.header1 ?? string.Empty; }
+            get => this.header1 ?? string.Empty;
             set
             {
                 this.header1 = value;
@@ -130,7 +109,7 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
 
         public string Header2
         {
-            get { return this.header2; }
+            get => this.header2;
             set
             {
                 this.header2 = value;
@@ -138,10 +117,7 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             }
         }
 
-        public ICommand ViewCommand
-        {
-            get { return this.viewCommand; }
-        }
+        public ICommand ViewCommand => this.viewCommand;
 
         private void DiffTemplate_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

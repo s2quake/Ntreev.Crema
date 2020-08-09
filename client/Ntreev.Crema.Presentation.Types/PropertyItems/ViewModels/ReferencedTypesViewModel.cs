@@ -107,14 +107,11 @@ namespace Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels
             }
         }
 
-        public override object SelectedObject
-        {
-            get { return this.descriptor; }
-        }
+        public override object SelectedObject => this.descriptor;
 
         public TypeListBoxItemViewModel[] Types
         {
-            get { return this.types; }
+            get => this.types;
             set
             {
                 this.types = value;
@@ -124,7 +121,7 @@ namespace Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels
 
         public TypeListBoxItemViewModel SelectedType
         {
-            get { return this.selectedType; }
+            get => this.selectedType;
             set
             {
                 if (this.selectedType != null)
@@ -142,8 +139,8 @@ namespace Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels
 
         object ISelector.SelectedItem
         {
-            get { return this.SelectedType; }
-            set { this.SelectedType = value as TypeListBoxItemViewModel; }
+            get => this.SelectedType;
+            set => this.SelectedType = value as TypeListBoxItemViewModel;
         }
 
         #endregion

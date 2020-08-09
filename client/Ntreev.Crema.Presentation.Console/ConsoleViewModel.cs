@@ -56,7 +56,7 @@ namespace Ntreev.Crema.Presentation.Console
 
         public bool IsVisible
         {
-            get { return this.isVisible; }
+            get => this.isVisible;
             set
             {
                 this.isVisible = value;

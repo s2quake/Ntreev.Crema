@@ -28,7 +28,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
 
         public long SelectedType
         {
-            get { return this.selectedType; }
+            get => this.selectedType;
             set
             {
                 this.selectedType = value;
@@ -47,10 +47,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
             }
         }
 
-        public bool CanSetValue
-        {
-            get { return this.selectedType == 2; }
-        }
+        public bool CanSetValue => this.selectedType == 2;
 
         public override DateTime Value
         {
@@ -62,10 +59,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
                     return DateTime.Today;
                 return base.Value;
             }
-            set
-            {
-                base.Value = value;
-            }
+            set => base.Value = value;
         }
 
         protected override void OnReadXml(XmlReader reader)

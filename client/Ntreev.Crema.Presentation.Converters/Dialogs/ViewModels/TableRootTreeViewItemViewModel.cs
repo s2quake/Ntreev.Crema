@@ -31,9 +31,6 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
             this.IsExpanded = true;
         }
 
-        public override string DisplayName
-        {
-            get { return this.dataBaseName; }
-        }
+        public override string DisplayName => this.dataBaseName;
     }
 }

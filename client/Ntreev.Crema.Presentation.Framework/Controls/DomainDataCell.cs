@@ -94,43 +94,40 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
         public object DisplayContent
         {
-            get { return (object)this.GetValue(DisplayContentProperty); }
-            private set { this.SetValue(DisplayContentPropertyKey, value); }
+            get => (object)this.GetValue(DisplayContentProperty);
+            private set => this.SetValue(DisplayContentPropertyKey, value);
         }
 
         public bool IsContentUpdating
         {
-            get { return (bool)this.GetValue(IsContentUpdatingProperty); }
-            private set { this.SetValue(IsContentUpdatingPropertyKey, value); }
+            get => (bool)this.GetValue(IsContentUpdatingProperty);
+            private set => this.SetValue(IsContentUpdatingPropertyKey, value);
         }
 
-        public IEnumerable Users
-        {
-            get { return this.users; }
-        }
+        public IEnumerable Users => this.users;
 
         public Brush UserBrush
         {
-            get { return (Brush)this.GetValue(UserBrushProperty); }
-            private set { this.SetValue(UserBrushProperty, value); }
+            get => (Brush)this.GetValue(UserBrushProperty);
+            private set => this.SetValue(UserBrushProperty, value);
         }
 
         public bool HasUser
         {
-            get { return (bool)this.GetValue(HasUserProperty); }
-            private set { this.SetValue(HasUserProperty, value); }
+            get => (bool)this.GetValue(HasUserProperty);
+            private set => this.SetValue(HasUserProperty, value);
         }
 
         public bool IsUserEditing
         {
-            get { return (bool)this.GetValue(IsUserEditingProperty); }
-            private set { this.SetValue(IsUserEditingProperty, value); }
+            get => (bool)this.GetValue(IsUserEditingProperty);
+            private set => this.SetValue(IsUserEditingProperty, value);
         }
 
         public bool IsClientAlone
         {
-            get { return (bool)this.GetValue(IsClientAloneProperty); }
-            private set { this.SetValue(IsClientAloneProperty, value); }
+            get => (bool)this.GetValue(IsClientAloneProperty);
+            private set => this.SetValue(IsClientAloneProperty, value);
         }
 
         public bool CanReset
@@ -162,10 +159,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             }
         }
 
-        public new DomainDataGridControl GridControl
-        {
-            get { return (DomainDataGridControl)base.GridControl; }
-        }
+        public new DomainDataGridControl GridControl => (DomainDataGridControl)base.GridControl;
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {

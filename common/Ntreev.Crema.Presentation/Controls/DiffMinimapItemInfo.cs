@@ -32,10 +32,7 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public DataGridContext GridContext { get; set; }
 
-        public Brush Background
-        {
-            get { return GetBackgroundBrush(DiffState); }
-        }
+        public Brush Background => GetBackgroundBrush(DiffState);
 
         public static DiffMinimapItemInfo[] CollectMinimapItems(DataGridContext gridContext)
         {

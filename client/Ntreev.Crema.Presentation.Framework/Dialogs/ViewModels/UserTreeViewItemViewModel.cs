@@ -33,9 +33,6 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 
         }
 
-        public string DisplayPath
-        {
-            get { return this.descriptor.UserID; }
-        }
+        public string DisplayPath => this.descriptor.UserID;
     }
 }

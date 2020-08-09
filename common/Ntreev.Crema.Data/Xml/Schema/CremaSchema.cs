@@ -203,10 +203,7 @@ namespace Ntreev.Crema.Data.Xml.Schema
             Trace.WriteLine(e.Message);
         }
 
-        public static string[] ReservedNames
-        {
-            get { return reservedNames; }
-        }
+        public static string[] ReservedNames => reservedNames;
 
         internal static void WriteAppInfo(this XmlSchemaAnnotated annotated, string nodeName, string attributeName, bool value, string ns)
         {

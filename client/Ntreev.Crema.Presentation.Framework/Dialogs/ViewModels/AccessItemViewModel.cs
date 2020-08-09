@@ -61,15 +61,9 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
             }
         }
 
-        public IEnumerable UserItems
-        {
-            get { return this.viewMdoel.UserItems; }
-        }
+        public IEnumerable UserItems => this.viewMdoel.UserItems;
 
-        public string MemberID
-        {
-            get { return this.memberID; }
-        }
+        public string MemberID => this.memberID;
 
         public IEnumerable AccessTypes
         {
@@ -84,16 +78,13 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 
         public AccessType AccessType
         {
-            get { return this.accessType; }
-            set
-            {
-                this.SetAccessTypeAsync(value);
-            }
+            get => this.accessType;
+            set => this.SetAccessTypeAsync(value);
         }
 
         public bool CanChange
         {
-            get { return this.canChange; }
+            get => this.canChange;
             private set
             {
                 this.canChange = value;

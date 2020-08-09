@@ -47,10 +47,7 @@ namespace Ntreev.Crema.Bot.Tasks
             await Task.Delay(0);
         }
 
-        public Type TargetType
-        {
-            get { return typeof(IType); }
-        }
+        public Type TargetType => typeof(IType);
 
         [TaskMethod]
         public async Task GetAccessTypeAsync(IType type, TaskContext context)

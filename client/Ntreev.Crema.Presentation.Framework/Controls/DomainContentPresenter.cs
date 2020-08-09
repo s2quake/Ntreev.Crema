@@ -33,31 +33,39 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             //TextElement.FontStyleProperty.OverrideMetadata(typeof(DomainContentPresenter), new FrameworkPropertyMetadata(new PropertyChangedCallback(DomainContentPresenter.InvalidateMinHeight)));
             //TextElement.FontWeightProperty.OverrideMetadata(typeof(DomainContentPresenter), new FrameworkPropertyMetadata(new PropertyChangedCallback(DomainContentPresenter.InvalidateMinHeight)));
 
-            m_sContentBinding = new Binding();
-            m_sContentBinding.RelativeSource = RelativeSource.TemplatedParent;
-            m_sContentBinding.Mode = BindingMode.OneWay;
-            m_sContentBinding.Path = new PropertyPath(DomainDataCell.DisplayContentProperty);
+            m_sContentBinding = new Binding
+            {
+                RelativeSource = RelativeSource.TemplatedParent,
+                Mode = BindingMode.OneWay,
+                Path = new PropertyPath(DomainDataCell.DisplayContentProperty)
+            };
 
-            m_sContentTemplateBinding = new Binding();
-            m_sContentTemplateBinding.RelativeSource = RelativeSource.TemplatedParent;
-            m_sContentTemplateBinding.Mode = BindingMode.OneWay;
-            m_sContentTemplateBinding.Path = new PropertyPath(Cell.CoercedContentTemplateProperty);
+            m_sContentTemplateBinding = new Binding
+            {
+                RelativeSource = RelativeSource.TemplatedParent,
+                Mode = BindingMode.OneWay,
+                Path = new PropertyPath(Cell.CoercedContentTemplateProperty)
+            };
 
-            Binding trimmingBinding = new Binding();
-            trimmingBinding.Path = new PropertyPath("(0).(1).(2)",
+            Binding trimmingBinding = new Binding
+            {
+                Path = new PropertyPath("(0).(1).(2)",
               Cell.ParentCellProperty,
               Cell.ParentColumnProperty,
-              ColumnBase.TextTrimmingProperty);
-            trimmingBinding.Mode = BindingMode.OneWay;
-            trimmingBinding.RelativeSource = new RelativeSource(RelativeSourceMode.Self);
+              ColumnBase.TextTrimmingProperty),
+                Mode = BindingMode.OneWay,
+                RelativeSource = new RelativeSource(RelativeSourceMode.Self)
+            };
 
-            Binding wrappingBinding = new Binding();
-            wrappingBinding.Path = new PropertyPath("(0).(1).(2)",
+            Binding wrappingBinding = new Binding
+            {
+                Path = new PropertyPath("(0).(1).(2)",
               Cell.ParentCellProperty,
               Cell.ParentColumnProperty,
-              ColumnBase.TextWrappingProperty);
-            wrappingBinding.Mode = BindingMode.OneWay;
-            wrappingBinding.RelativeSource = new RelativeSource(RelativeSourceMode.Self);
+              ColumnBase.TextWrappingProperty),
+                Mode = BindingMode.OneWay,
+                RelativeSource = new RelativeSource(RelativeSourceMode.Self)
+            };
 
             m_sTextBlockStyle = new Style(typeof(TextBlock));
             m_sTextBlockStyle.Setters.Add(new Setter(TextBlock.TextTrimmingProperty, trimmingBinding));

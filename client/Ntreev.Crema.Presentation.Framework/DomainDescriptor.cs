@@ -104,10 +104,7 @@ namespace Ntreev.Crema.Presentation.Framework
         [DescriptorProperty]
         public bool IsModified => DomainDescriptorUtility.IsModified(this.authentication, this);
 
-        public ReadOnlyObservableCollection<DomainUserDescriptor> Users
-        {
-            get { return this.domainUsersReadonly; }
-        }
+        public ReadOnlyObservableCollection<DomainUserDescriptor> Users => this.domainUsersReadonly;
 
         protected async override void OnDisposed(EventArgs e)
         {

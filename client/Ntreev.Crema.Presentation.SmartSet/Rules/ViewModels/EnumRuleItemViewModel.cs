@@ -30,7 +30,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
 
         public long Value
         {
-            get { return this.value; }
+            get => this.value;
             set
             {
                 this.value = value;

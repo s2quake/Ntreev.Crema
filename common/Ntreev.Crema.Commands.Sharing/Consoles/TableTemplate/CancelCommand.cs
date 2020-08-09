@@ -49,8 +49,8 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
             }
         }
 
-        private ITableTemplate Template { get { return this.CommandContext.Template; } }
+        private ITableTemplate Template => this.CommandContext.Template;
 
-        private Authentication Authentication { get { return this.CommandContext.Authentication; } }
+        private Authentication Authentication => this.CommandContext.Authentication;
     }
 }

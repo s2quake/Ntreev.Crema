@@ -35,8 +35,8 @@ namespace Ntreev.Crema.Bot
 
         public Authentication Authentication
         {
-            get { return this.authentication; }
-            internal set { this.authentication = value; }
+            get => this.authentication;
+            internal set => this.authentication = value;
         }
 
         public void Push(object target)

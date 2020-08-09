@@ -49,7 +49,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 
         public CremaDataSet Source
         {
-            get { return this.source; }
+            get => this.source;
             private set
             {
                 var builder = new PreviewTreeViewItemViewModelBuilder(this.documents.ViewType);
@@ -68,14 +68,11 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             }
         }
 
-        public IEnumerable ItemsSource
-        {
-            get { return this.itemsSource; }
-        }
+        public IEnumerable ItemsSource => this.itemsSource;
 
         public object SelectedItem
         {
-            get { return this.selectedItem; }
+            get => this.selectedItem;
             set
             {
                 this.selectedItem = value;
@@ -83,10 +80,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             }
         }
 
-        public IDocumentService Documents
-        {
-            get { return this.documents; }
-        }
+        public IDocumentService Documents => this.documents;
 
         private async void Initialize()
         {

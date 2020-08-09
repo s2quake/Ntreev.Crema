@@ -127,7 +127,7 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
 
         public bool IsVisible
         {
-            get { return this.isVisible; }
+            get => this.isVisible;
             set
             {
                 this.isVisible = value;
@@ -135,15 +135,9 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
             }
         }
 
-        public ICommand RenameCommand
-        {
-            get { return this.renameCommand; }
-        }
+        public ICommand RenameCommand => this.renameCommand;
 
-        public ICommand DeleteCommand
-        {
-            get { return this.deleteCommand; }
-        }
+        public ICommand DeleteCommand => this.deleteCommand;
 
         private void CremaAppHost_Loaded(object sender, EventArgs e)
         {
@@ -250,10 +244,7 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
 
         object ISelector.SelectedItem
         {
-            get
-            {
-                return this.SelectedItem;
-            }
+            get => this.SelectedItem;
             set
             {
                 if (value is TreeViewItemViewModel viewModel)
@@ -263,10 +254,7 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
             }
         }
 
-        IEnumerable ITableBrowser.Items
-        {
-            get { return this.Items; }
-        }
+        IEnumerable ITableBrowser.Items => this.Items;
 
         #endregion
     }

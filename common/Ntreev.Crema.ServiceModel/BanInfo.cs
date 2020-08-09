@@ -35,13 +35,13 @@ namespace Ntreev.Crema.ServiceModel
         public string Comment { get; set; }
 
         [IgnoreDataMember]
-        public string UserID { get { return this.SignatureDate.ID; } }
+        public string UserID => this.SignatureDate.ID;
 
         [IgnoreDataMember]
-        public DateTime DateTime { get { return this.SignatureDate.DateTime; } }
+        public DateTime DateTime => this.SignatureDate.DateTime;
 
         [IgnoreDataMember]
-        public bool IsBanned { get { return this.Path != string.Empty; } }
+        public bool IsBanned => this.Path != string.Empty;
 
         public static bool operator ==(BanInfo x, BanInfo y)
         {

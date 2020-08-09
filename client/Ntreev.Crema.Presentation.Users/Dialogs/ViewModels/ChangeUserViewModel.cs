@@ -73,7 +73,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 
         public string ID
         {
-            get { return this.userID ?? string.Empty; }
+            get => this.userID ?? string.Empty;
             set
             {
                 this.userID = value;
@@ -85,7 +85,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 
         public SecureString Password
         {
-            get { return this.password; }
+            get => this.password;
             set
             {
                 this.password = value;
@@ -97,7 +97,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 
         public string UserName
         {
-            get { return this.userName ?? string.Empty; }
+            get => this.userName ?? string.Empty;
             set
             {
                 this.userName = value;
@@ -109,7 +109,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 
         public Authority Authority
         {
-            get { return this.authority; }
+            get => this.authority;
             set
             {
                 this.authority = value;
@@ -119,18 +119,9 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
             }
         }
 
-        public bool IsCurrentUser
-        {
-            get { return this.authentication.ID == this.userID; }
-        }
+        public bool IsCurrentUser => this.authentication.ID == this.userID;
 
-        public IEnumerable<Authority> Authorities
-        {
-            get
-            {
-                return Enum.GetValues(typeof(Authority)).Cast<Authority>();
-            }
-        }
+        public IEnumerable<Authority> Authorities => Enum.GetValues(typeof(Authority)).Cast<Authority>();
 
         public async Task ChangeAsync()
         {

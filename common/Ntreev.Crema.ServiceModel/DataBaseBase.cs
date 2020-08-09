@@ -738,10 +738,7 @@ namespace Ntreev.Crema.ServiceModel
 
         #region ILockParent
 
-        string ILockParent.Path
-        {
-            get { return this.Name; }
-        }
+        string ILockParent.Path => this.Name;
 
         #endregion
     }

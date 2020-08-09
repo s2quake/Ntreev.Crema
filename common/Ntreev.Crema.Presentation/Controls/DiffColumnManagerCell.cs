@@ -39,15 +39,9 @@ namespace Ntreev.Crema.Presentation.Controls
 
         }
 
-        public DiffState DiffState
-        {
-            get { return (DiffState)this.GetValue(DiffStateProperty); }
-        }
+        public DiffState DiffState => (DiffState)this.GetValue(DiffStateProperty);
 
-        public bool IsDummy
-        {
-            get { return (bool)this.GetValue(IsDummyProperty); }
-        }
+        public bool IsDummy => (bool)this.GetValue(IsDummyProperty);
 
         protected override void PrepareContainer(DataGridContext dataGridContext, object item)
         {

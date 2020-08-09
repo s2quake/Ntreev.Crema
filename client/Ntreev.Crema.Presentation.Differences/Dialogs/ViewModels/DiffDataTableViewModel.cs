@@ -64,14 +64,11 @@ namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
             });
         }
 
-        public IEnumerable ItemsSource
-        {
-            get { return this.itemList; }
-        }
+        public IEnumerable ItemsSource => this.itemList;
 
         public object SelectedItem
         {
-            get { return this.selectedItem; }
+            get => this.selectedItem;
             set
             {
                 this.selectedItem = value;
@@ -81,7 +78,7 @@ namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
 
         public string SelectedName
         {
-            get { return $"{this.selectedItem}"; }
+            get => $"{this.selectedItem}";
             set
             {
                 var query = from item in this.itemList
@@ -97,7 +94,7 @@ namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
 
         public DiffDataTable Source
         {
-            get { return this.diffTable; }
+            get => this.diffTable;
             private set
             {
                 this.diffTable = value;
@@ -121,7 +118,7 @@ namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
 
         public string Header1
         {
-            get { return this.header1 ?? string.Empty; }
+            get => this.header1 ?? string.Empty;
             set
             {
                 this.header1 = value;
@@ -131,7 +128,7 @@ namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
 
         public string Header2
         {
-            get { return this.header2 ?? string.Empty; }
+            get => this.header2 ?? string.Empty;
             set
             {
                 this.header2 = value;

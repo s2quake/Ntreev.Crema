@@ -53,10 +53,7 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
             this.TryCloseAsync();
         }
 
-        protected virtual ModalDialogAppScope Scope
-        {
-            get { return ModalDialogAppScope.Loaded; }
-        }
+        protected virtual ModalDialogAppScope Scope => ModalDialogAppScope.Loaded;
 
         private void CremaAppHost_Unloaded(object sender, EventArgs e)
         {

@@ -30,10 +30,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels.Types
             this.DisplayName = Resources.Title_TypeModifiedDateTime;
         }
 
-        public override Type SupportType
-        {
-            get { return typeof(ITypeDescriptor); }
-        }
+        public override Type SupportType => typeof(ITypeDescriptor);
 
         protected override DateTime GetObjectValue(object obj)
         {

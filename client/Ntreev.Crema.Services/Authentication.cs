@@ -102,18 +102,12 @@ namespace Ntreev.Crema.Services
             }
         }
 
-        public AuthenticationInfo AuthenticationInfo
+        public AuthenticationInfo AuthenticationInfo => new AuthenticationInfo()
         {
-            get
-            {
-                return new AuthenticationInfo()
-                {
-                    ID = this.ID,
-                    Name = this.Name,
-                    Authority = this.Authority,
-                };
-            }
-        }
+            ID = this.ID,
+            Name = this.Name,
+            Authority = this.Authority,
+        };
 
         public event EventHandler Expired
         {

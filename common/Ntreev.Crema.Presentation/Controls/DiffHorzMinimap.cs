@@ -51,8 +51,8 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public DiffDataGridControl GridControl
         {
-            get { return (DiffDataGridControl)this.GetValue(GridControlProperty); }
-            set { this.SetValue(GridControlProperty, value); }
+            get => (DiffDataGridControl)this.GetValue(GridControlProperty);
+            set => this.SetValue(GridControlProperty, value);
         }
 
         protected override Size MeasureOverride(Size constraint)

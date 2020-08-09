@@ -126,10 +126,7 @@ namespace Ntreev.Crema.ServiceModel
             this.OnLockChanged(EventArgs.Empty);
         }
 
-        public bool IsPublic
-        {
-            get { return this.IsPrivate == false; }
-        }
+        public bool IsPublic => this.IsPrivate == false;
 
         public bool IsPrivate
         {
@@ -217,7 +214,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public ILockParent LockParent
         {
-            get { return this.lockParent; }
+            get => this.lockParent;
             set
             {
                 this.lockParent = value;
@@ -227,7 +224,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public IAccessParent AccessParent
         {
-            get { return this.accessParent; }
+            get => this.accessParent;
             set
             {
                 this.accessParent = value;

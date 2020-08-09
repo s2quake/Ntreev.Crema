@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Presentation.Framework
 
         public string DisplayName
         {
-            get { return this.displayName ?? this.ToString(); }
+            get => this.displayName ?? this.ToString();
             set
             {
                 this.displayName = value;
@@ -81,10 +81,7 @@ namespace Ntreev.Crema.Presentation.Framework
             }
         }
 
-        public bool CanCancel
-        {
-            get { return this.cancellation.IsCancellationRequested == false; }
-        }
+        public bool CanCancel => this.cancellation.IsCancellationRequested == false;
 
         public bool IsCancellationRequested => this.cancellation.IsCancellationRequested;
 

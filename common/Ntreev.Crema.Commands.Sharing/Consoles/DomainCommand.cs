@@ -151,10 +151,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.Drive is DomainsConsoleDrive;
 
-        public IDomainContext DomainContext
-        {
-            get { return this.cremaHost.GetService(typeof(IDomainContext)) as IDomainContext; }
-        }
+        public IDomainContext DomainContext => this.cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
 
         private string[] GetDataBaseNames()
         {

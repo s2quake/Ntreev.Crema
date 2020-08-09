@@ -31,7 +31,7 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
 
         }
 
-        public ITableContent Content { get => this.CommandContext.Target as ITableContent; }
+        public ITableContent Content => this.CommandContext.Target as ITableContent;
 
         internal JSchema CreateSchema(ColumnInfo[] columns)
         {

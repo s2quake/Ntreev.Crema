@@ -91,20 +91,14 @@ namespace Ntreev.Crema.Presentation.SmartSet
             this.OnBookmarkChanged(EventArgs.Empty);
         }
 
-        public ICremaAppHost CremaAppHost
-        {
-            get { return this.cremaAppHost; }
-        }
+        public ICremaAppHost CremaAppHost => this.cremaAppHost;
 
-        public IRule[] Rules
-        {
-            get { return this.rules; }
-        }
+        public IRule[] Rules => this.rules;
 
         [ConfigurationProperty("bookmarkItems")]
         public string[] BookmarkItems
         {
-            get { return this.bookmarks.ToArray(); }
+            get => this.bookmarks.ToArray();
             set
             {
                 this.bookmarks.Clear();
@@ -122,10 +116,7 @@ namespace Ntreev.Crema.Presentation.SmartSet
             return EnumerableUtility.Descendants<TreeViewItemViewModel, ITableDescriptor>(this.tableBrowser.Items.OfType<TreeViewItemViewModel>(), item => item.Items).ToArray();
         }
 
-        public Dispatcher Dispatcher
-        {
-            get { return Application.Current.Dispatcher; }
-        }
+        public Dispatcher Dispatcher => Application.Current.Dispatcher;
 
         public event EventHandler Loaded;
 

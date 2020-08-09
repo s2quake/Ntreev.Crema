@@ -801,10 +801,7 @@ namespace Ntreev.Crema.Data
 
         #region IListSource
 
-        bool IListSource.ContainsListCollection
-        {
-            get { return (this.InternalObject as IListSource).ContainsListCollection; }
-        }
+        bool IListSource.ContainsListCollection => (this.InternalObject as IListSource).ContainsListCollection;
 
         System.Collections.IList IListSource.GetList()
         {

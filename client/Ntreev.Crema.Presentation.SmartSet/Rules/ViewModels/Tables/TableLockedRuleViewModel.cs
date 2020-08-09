@@ -37,9 +37,6 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels.Tables
             return false;
         }
 
-        public override Type SupportType
-        {
-            get { return typeof(ITableDescriptor); }
-        }
+        public override Type SupportType => typeof(ITableDescriptor);
     }
 }

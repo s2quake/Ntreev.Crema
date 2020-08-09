@@ -86,35 +86,23 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public DiffDataGridControl GridControl1
         {
-            get { return (DiffDataGridControl)this.GetValue(GridControl1Property); }
-            set { this.SetValue(GridControl1Property, value); }
+            get => (DiffDataGridControl)this.GetValue(GridControl1Property);
+            set => this.SetValue(GridControl1Property, value);
         }
 
         public DiffDataGridControl GridControl2
         {
-            get { return (DiffDataGridControl)this.GetValue(GridControl2Property); }
-            set { this.SetValue(GridControl2Property, value); }
+            get => (DiffDataGridControl)this.GetValue(GridControl2Property);
+            set => this.SetValue(GridControl2Property, value);
         }
 
-        public double LinePosition1
-        {
-            get { return (double)this.GetValue(LinePosition1Property); }
-        }
+        public double LinePosition1 => (double)this.GetValue(LinePosition1Property);
 
-        public double LinePosition2
-        {
-            get { return (double)this.GetValue(LinePosition2Property); }
-        }
+        public double LinePosition2 => (double)this.GetValue(LinePosition2Property);
 
-        public Visibility LinePositionVisibility1
-        {
-            get { return (Visibility)this.GetValue(LinePositionVisibility1Property); }
-        }
+        public Visibility LinePositionVisibility1 => (Visibility)this.GetValue(LinePositionVisibility1Property);
 
-        public Visibility LinePositionVisibility2
-        {
-            get { return (Visibility)this.GetValue(LinePositionVisibility2Property); }
-        }
+        public Visibility LinePositionVisibility2 => (Visibility)this.GetValue(LinePositionVisibility2Property);
 
         private void ScrollToPoint_Executed(object sender, ExecutedRoutedEventArgs e)
         {

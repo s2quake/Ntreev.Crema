@@ -110,7 +110,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 
         public SecureString Password
         {
-            get { return this.password; }
+            get => this.password;
             set
             {
                 this.password = value;
@@ -122,7 +122,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 
         public SecureString NewPassword
         {
-            get { return this.newPassword; }
+            get => this.newPassword;
             set
             {
                 this.newPassword = value;

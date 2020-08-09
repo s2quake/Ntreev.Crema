@@ -31,9 +31,6 @@ namespace Ntreev.Crema.ServiceModel
 
         }
 
-        public IContainer<_I> Domains
-        {
-            get { return this.Items; }
-        }
+        public IContainer<_I> Domains => this.Items;
     }
 }

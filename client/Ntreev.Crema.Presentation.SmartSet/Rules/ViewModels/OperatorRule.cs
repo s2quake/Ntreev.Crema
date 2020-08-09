@@ -72,10 +72,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
             set;
         }
 
-        public Type ValueType
-        {
-            get { return typeof(T); }
-        }
+        public Type ValueType => typeof(T);
 
         public string DisplayName
         {
@@ -91,10 +88,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
             return item;
         }
 
-        public string Name
-        {
-            get { return this.GetType().Name; }
-        }
+        public string Name => this.GetType().Name;
 
         protected virtual OperatorRuleItemViewModel<T> OnCreateItem()
         {

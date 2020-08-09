@@ -72,48 +72,27 @@ namespace Ntreev.Crema.Data.Diff
             return Task.Run(() => new DiffDataSet(dataSet1, dataSet2, mergeType, progress));
         }
 
-        public DiffDataTable[] Tables
-        {
-            get { return this.tables; }
-        }
+        public DiffDataTable[] Tables => this.tables;
 
-        public DiffDataType[] Types
-        {
-            get { return this.types; }
-        }
+        public DiffDataType[] Types => this.types;
 
-        public CremaDataSet DataSet1
-        {
-            get { return this.diffSet1; }
-        }
+        public CremaDataSet DataSet1 => this.diffSet1;
 
-        public CremaDataSet DataSet2
-        {
-            get { return this.diffSet2; }
-        }
+        public CremaDataSet DataSet2 => this.diffSet2;
 
         public string Header1
         {
-            get { return this.header1 ?? string.Empty; }
-            set
-            {
-                this.header1 = value;
-            }
+            get => this.header1 ?? string.Empty;
+            set => this.header1 = value;
         }
 
         public string Header2
         {
-            get { return this.header2 ?? string.Empty; }
-            set
-            {
-                this.header2 = value;
-            }
+            get => this.header2 ?? string.Empty;
+            set => this.header2 = value;
         }
 
-        public DiffMergeTypes MergeType
-        {
-            get { return this.mergeType; }
-        }
+        public DiffMergeTypes MergeType => this.mergeType;
 
         private void InitializeTables(IProgress progress)
         {

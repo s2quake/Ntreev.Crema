@@ -30,10 +30,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
         private bool isFistColumn;
         private DataGridContext gridContext;
 
-        protected override object ClipboardData
-        {
-            get { return this.sb.ToString(); }
-        }
+        protected override object ClipboardData => this.sb.ToString();
 
         protected override void ResetExporter()
         {

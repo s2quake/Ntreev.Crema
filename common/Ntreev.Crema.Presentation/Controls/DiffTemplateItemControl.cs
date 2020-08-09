@@ -119,20 +119,20 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public DiffTemplate Source
         {
-            get { return (DiffTemplate)this.GetValue(SourceProperty); }
-            set { this.SetValue(SourceProperty, value); }
+            get => (DiffTemplate)this.GetValue(SourceProperty);
+            set => this.SetValue(SourceProperty, value);
         }
 
         public ICommand ResolveCommand
         {
-            get { return (ICommand)this.GetValue(ResolveCommandProperty); }
-            set { this.SetValue(ResolveCommandProperty, value); }
+            get => (ICommand)this.GetValue(ResolveCommandProperty);
+            set => this.SetValue(ResolveCommandProperty, value);
         }
 
         public object ResolveCommandParameter
         {
-            get { return (object)this.GetValue(ResolveCommandParameterProperty); }
-            set { this.SetValue(ResolveCommandParameterProperty, value); }
+            get => (object)this.GetValue(ResolveCommandParameterProperty);
+            set => this.SetValue(ResolveCommandParameterProperty, value);
         }
 
         protected override void RefreshDiffState()

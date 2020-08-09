@@ -36,29 +36,14 @@ namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
             return this.source.ToString();
         }
 
-        public string DisplayName
-        {
-            get { return this.Source.ToString(); }
-        }
+        public string DisplayName => this.Source.ToString();
 
-        public bool IsResolved
-        {
-            get { return this.source.IsResolved; }
-        }
+        public bool IsResolved => this.source.IsResolved;
 
-        public DiffDataTable Source
-        {
-            get { return this.source; }
-        }
+        public DiffDataTable Source => this.source;
 
-        public string Header1
-        {
-            get { return this.viewModel.Header1; }
-        }
+        public string Header1 => this.viewModel.Header1;
 
-        public string Header2
-        {
-            get { return this.viewModel.Header2; }
-        }
+        public string Header2 => this.viewModel.Header2;
     }
 }

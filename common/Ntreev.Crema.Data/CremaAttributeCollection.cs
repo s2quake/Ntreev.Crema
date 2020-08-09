@@ -39,10 +39,7 @@ namespace Ntreev.Crema.Data
             this.columns.CollectionChanged += Columns_CollectionChanged;
         }
 
-        public CremaAttribute this[int index]
-        {
-            get { return this.itemList[index].Target; }
-        }
+        public CremaAttribute this[int index] => this.itemList[index].Target;
 
         public CremaAttribute this[string attributeName]
         {
@@ -145,10 +142,7 @@ namespace Ntreev.Crema.Data
             this.table.RemoveAttribute(item);
         }
 
-        public int Count
-        {
-            get { return this.itemList.Count; }
-        }
+        public int Count => this.itemList.Count;
 
         public event CollectionChangeEventHandler CollectionChanged;
 

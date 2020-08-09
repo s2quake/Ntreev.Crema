@@ -135,7 +135,7 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 
         public string Comment
         {
-            get { return this.comment ?? string.Empty; }
+            get => this.comment ?? string.Empty;
             set
             {
                 this.comment = value;
@@ -158,14 +158,11 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
             }
         }
 
-        public IEnumerable UserItems
-        {
-            get { return this.userItems; }
-        }
+        public IEnumerable UserItems => this.userItems;
 
         public string Path
         {
-            get { return this.path ?? string.Empty; }
+            get => this.path ?? string.Empty;
             set
             {
                 this.path = value;
@@ -174,10 +171,7 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
             }
         }
 
-        public ObservableCollection<AccessItemViewModel> ItemsSource
-        {
-            get { return this.itemsSource; }
-        }
+        public ObservableCollection<AccessItemViewModel> ItemsSource => this.itemsSource;
 
         public IEnumerable AccessTypes
         {
@@ -193,7 +187,7 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 
         public AccessType AccessType
         {
-            get { return this.accessType; }
+            get => this.accessType;
             set
             {
                 this.accessType = value;
@@ -217,19 +211,10 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
             }
         }
 
-        internal IAccessible Accessible
-        {
-            get { return this.accessible; }
-        }
+        internal IAccessible Accessible => this.accessible;
 
-        internal new Dispatcher Dispatcher
-        {
-            get { return base.Dispatcher; }
-        }
+        internal new Dispatcher Dispatcher => base.Dispatcher;
 
-        internal Authentication Authentication
-        {
-            get { return this.authentication; }
-        }
+        internal Authentication Authentication => this.authentication;
     }
 }

@@ -29,9 +29,6 @@ namespace Ntreev.Crema.Services.Random
             this.weight = weight;
         }
 
-        public int Weight
-        {
-            get { return this.weight; }
-        }
+        public int Weight => this.weight;
     }
 }

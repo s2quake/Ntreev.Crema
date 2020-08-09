@@ -42,8 +42,8 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.Views
 
         public IDomain Domain
         {
-            get { return (IDomain)this.GetValue(DomainProperty); }
-            set { this.SetValue(DomainProperty, value); }
+            get => (IDomain)this.GetValue(DomainProperty);
+            set => this.SetValue(DomainProperty, value);
         }
 
         private void PART_DataGridControl_Loaded(object sender, RoutedEventArgs e)

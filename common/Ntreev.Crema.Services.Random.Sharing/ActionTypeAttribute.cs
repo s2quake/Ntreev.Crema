@@ -35,9 +35,6 @@ namespace Ntreev.Crema.Services.Random
             this.types = types;
         }
 
-        public ActionTypes Types
-        {
-            get { return this.types; }
-        }
+        public ActionTypes Types => this.types;
     }
 }

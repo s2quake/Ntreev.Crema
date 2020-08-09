@@ -58,7 +58,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
 
         public string TargetPath
         {
-            get { return this.targetPath ?? string.Empty; }
+            get => this.targetPath ?? string.Empty;
             set
             {
                 this.targetPath = value;

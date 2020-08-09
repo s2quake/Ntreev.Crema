@@ -33,8 +33,8 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public DiffState DiffState
         {
-            get { return (DiffState)this.GetValue(DiffStateProperty); }
-            set { this.SetValue(DiffStateProperty, value); }
+            get => (DiffState)this.GetValue(DiffStateProperty);
+            set => this.SetValue(DiffStateProperty, value);
         }
     }
 }

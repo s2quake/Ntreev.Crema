@@ -29,9 +29,6 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
             this.target = target;
         }
 
-        public DifferenceTreeViewItemViewModel Target
-        {
-            get { return this.target; }
-        }
+        public DifferenceTreeViewItemViewModel Target => this.target;
     }
 }

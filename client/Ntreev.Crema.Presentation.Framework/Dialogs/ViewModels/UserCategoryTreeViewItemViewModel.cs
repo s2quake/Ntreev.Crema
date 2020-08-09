@@ -33,10 +33,7 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 
         }
 
-        public string DisplayPath
-        {
-            get { return this.descriptor.Path; }
-        }
+        public string DisplayPath => this.descriptor.Path;
 
         protected override UserCategoryTreeItemBase CreateInstance(Authentication authentication, UserCategoryDescriptor descriptor, object owner)
         {

@@ -82,19 +82,13 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             }
         }
 
-        public string[] Categories
-        {
-            get { return this.categoryPaths; }
-        }
+        public string[] Categories => this.categoryPaths;
 
-        public string TableName
-        {
-            get { return this.tableName; }
-        }
+        public string TableName => this.tableName;
 
         public string NewName
         {
-            get { return this.newName ?? string.Empty; }
+            get => this.newName ?? string.Empty;
             set
             {
                 this.newName = value;
@@ -105,7 +99,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 
         public string CategoryPath
         {
-            get { return this.categoryPath ?? string.Empty; }
+            get => this.categoryPath ?? string.Empty;
             set
             {
                 this.categoryPath = value;
@@ -133,7 +127,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 
         public bool UseTemplate
         {
-            get { return this.useTemplate; }
+            get => this.useTemplate;
             set
             {
                 this.useTemplate = value;
@@ -145,7 +139,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 
         public bool CopyData
         {
-            get { return this.copyData; }
+            get => this.copyData;
             set
             {
                 this.copyData = value;

@@ -48,15 +48,9 @@ namespace Ntreev.Crema.Bot.Tasks
             return Task.Delay(0);
         }
 
-        public Type TargetType
-        {
-            get { return typeof(IUser); }
-        }
+        public Type TargetType => typeof(IUser);
 
-        public bool IsEnabled
-        {
-            get { return true; }
-        }
+        public bool IsEnabled => true;
 
         [TaskMethod]
         public async Task MoveAsync(IUser user, TaskContext context)

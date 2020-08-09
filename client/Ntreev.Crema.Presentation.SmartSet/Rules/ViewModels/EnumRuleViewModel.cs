@@ -35,10 +35,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
             set;
         }
 
-        public string Name
-        {
-            get { return this.GetType().Name; }
-        }
+        public string Name => this.GetType().Name;
 
         public abstract Type EnumType
         {

@@ -54,14 +54,11 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
             this.Attach();
         }
 
-        public override object SelectedObject
-        {
-            get { return this.descriptor; }
-        }
+        public override object SelectedObject => this.descriptor;
 
         public TableInfo TableInfo
         {
-            get { return this.tableInfo; }
+            get => this.tableInfo;
             set
             {
                 this.tableInfo = value;
@@ -72,7 +69,7 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 
         public ColumnInfoItemViewModel[] Columns
         {
-            get { return this.columns; }
+            get => this.columns;
             set
             {
                 this.columns = value;
@@ -80,10 +77,7 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
             }
         }
 
-        public override bool IsVisible
-        {
-            get { return this.descriptor != null; }
-        }
+        public override bool IsVisible => this.descriptor != null;
 
         private void Descriptor_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

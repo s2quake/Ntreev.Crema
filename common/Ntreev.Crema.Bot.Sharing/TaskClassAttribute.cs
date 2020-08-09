@@ -31,7 +31,7 @@ namespace Ntreev.Crema.Bot
 
         public int Weight
         {
-            get { return this.weight; }
+            get => this.weight;
             set
             {
                 if (value > 100 || value < 0)

@@ -64,23 +64,20 @@ namespace Ntreev.Crema.Presentation.Controls
             base.PrepareContainerForItemOverride(element, item);
         }
 
-        public double HeaderActualWidth
-        {
-            get { return (double)GetValue(HeaderActualWidthPropertyKey.DependencyProperty); }
-        }
+        public double HeaderActualWidth => (double)GetValue(HeaderActualWidthPropertyKey.DependencyProperty);
 
         [TypeConverter(typeof(GridLengthConverter))]
         public GridLength HeaderWidth
         {
-            get { return (GridLength)this.GetValue(HeaderWidthProperty); }
-            set { this.SetValue(HeaderWidthProperty, value); }
+            get => (GridLength)this.GetValue(HeaderWidthProperty);
+            set => this.SetValue(HeaderWidthProperty, value);
         }
 
         [TypeConverter(typeof(LengthConverter))]
         public double HeaderMinWidth
         {
-            get { return (double)this.GetValue(HeaderMinWidthProperty); }
-            set { this.SetValue(HeaderMinWidthProperty, value); }
+            get => (double)this.GetValue(HeaderMinWidthProperty);
+            set => this.SetValue(HeaderMinWidthProperty, value);
         }
 
         protected override Size MeasureOverride(Size constraint)

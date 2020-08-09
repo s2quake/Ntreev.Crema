@@ -29,9 +29,6 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
             this.dataBaseName = dataBase.Name;
         }
 
-        public override string DisplayName
-        {
-            get { return this.dataBaseName; }
-        }
+        public override string DisplayName => this.dataBaseName;
     }
 }

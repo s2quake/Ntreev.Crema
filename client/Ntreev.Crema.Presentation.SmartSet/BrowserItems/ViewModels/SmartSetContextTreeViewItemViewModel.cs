@@ -27,9 +27,6 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 
         }
 
-        public override string DisplayName
-        {
-            get { return Resources.Title_SmartSet; }
-        }
+        public override string DisplayName => Resources.Title_SmartSet;
     }
 }

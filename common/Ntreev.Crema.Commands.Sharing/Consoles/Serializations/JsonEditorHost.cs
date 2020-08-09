@@ -118,18 +118,9 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
             return obj;
         }
 
-        public string Filename
-        {
-            get { return this.jsonPath; }
-        }
+        public string Filename => this.jsonPath;
 
-        public bool IsModified
-        {
-            get
-            {
-                return this.hash != HashUtility.GetHashValueFromFile(jsonPath);
-            }
-        }
+        public bool IsModified => this.hash != HashUtility.GetHashValueFromFile(jsonPath);
 
         public string ReadText()
         {

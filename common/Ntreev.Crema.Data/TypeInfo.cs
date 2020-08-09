@@ -172,13 +172,7 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        public string CategoryName
-        {
-            get
-            {
-                return this.CategoryPath.Trim(PathUtility.SeparatorChar);
-            }
-        }
+        public string CategoryName => this.CategoryPath.Trim(PathUtility.SeparatorChar);
 
         public static readonly TypeInfo Empty;
 

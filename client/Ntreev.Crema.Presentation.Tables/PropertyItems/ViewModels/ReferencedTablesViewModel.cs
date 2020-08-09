@@ -104,14 +104,11 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
             }
         }
 
-        public override object SelectedObject
-        {
-            get { return this.descriptor; }
-        }
+        public override object SelectedObject => this.descriptor;
 
         public TableListBoxItemViewModel[] Tables
         {
-            get { return this.tables; }
+            get => this.tables;
             set
             {
                 this.tables = value;
@@ -121,7 +118,7 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 
         public TableListBoxItemViewModel SelectedTable
         {
-            get { return this.selectedTable; }
+            get => this.selectedTable;
             set
             {
                 if (this.selectedTable != null)
@@ -139,8 +136,8 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 
         object ISelector.SelectedItem
         {
-            get { return this.SelectedTable; }
-            set { this.SelectedTable = value as TableListBoxItemViewModel; }
+            get => this.SelectedTable;
+            set => this.SelectedTable = value as TableListBoxItemViewModel;
         }
 
         #endregion

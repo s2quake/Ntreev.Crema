@@ -80,7 +80,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
         public static Dictionary<string, Uri> Themes { get; } = new Dictionary<string, Uri>(StringComparer.CurrentCultureIgnoreCase);
 
         [ImportingConstructor]
-        public CremaAppHostViewModel(ICremaHost cremaHost, IAppConfiguration configs, IBuildUp buildUp, 
+        public CremaAppHostViewModel(ICremaHost cremaHost, IAppConfiguration configs, IBuildUp buildUp,
             Lazy<DataBaseServiceViewModel> dataBaseService, Lazy<DataBaseListViewModel> dataBaseSelections, Lazy<IShell> shell)
         {
             this.cremaHost = cremaHost;

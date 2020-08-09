@@ -80,10 +80,7 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             }
         }
 
-        public bool CanClose
-        {
-            get { return true; }
-        }
+        public bool CanClose => true;
 
         public bool CanImport
         {

@@ -204,19 +204,13 @@ namespace Ntreev.Crema.Data
             return false;
         }
 
-        public new CremaTemplate Target
-        {
-            get { return base.Target as CremaTemplate; }
-        }
+        public new CremaTemplate Target => base.Target as CremaTemplate;
 
-        public override bool IsLoading
-        {
-            get { return this.IsDiffMode; }
-        }
+        public override bool IsLoading => this.IsDiffMode;
 
         public InternalDataTable TargetTable
         {
-            get { return this.InternalTargetTable; }
+            get => this.InternalTargetTable;
             set
             {
                 this.InternalTypes = null;

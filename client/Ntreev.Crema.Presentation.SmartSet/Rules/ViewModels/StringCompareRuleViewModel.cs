@@ -63,9 +63,6 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
         }
 
 
-        public string Name
-        {
-            get { return this.GetType().Name; }
-        }
+        public string Name => this.GetType().Name;
     }
 }

@@ -32,9 +32,6 @@ namespace Ntreev.Crema.Presentation.Converters
             this.exporters = exporters.ToArray();
         }
 
-        public IEnumerable<IExporter> Exporters
-        {
-            get { return this.exporters; }
-        }
+        public IEnumerable<IExporter> Exporters => this.exporters;
     }
 }

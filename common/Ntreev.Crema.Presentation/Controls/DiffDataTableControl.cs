@@ -43,25 +43,22 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public DiffDataTable Source
         {
-            get { return (DiffDataTable)this.GetValue(SourceProperty); }
-            set { this.SetValue(SourceProperty, value); }
+            get => (DiffDataTable)this.GetValue(SourceProperty);
+            set => this.SetValue(SourceProperty, value);
         }
 
-        public DiffDataTable[] Tables
-        {
-            get { return (DiffDataTable[])this.GetValue(TablesProperty); }
-        }
+        public DiffDataTable[] Tables => (DiffDataTable[])this.GetValue(TablesProperty);
 
         public DiffDataTable SelectedTable
         {
-            get { return (DiffDataTable)this.GetValue(SelectedTableProperty); }
-            set { this.SetValue(SelectedTableProperty, value); }
+            get => (DiffDataTable)this.GetValue(SelectedTableProperty);
+            set => this.SetValue(SelectedTableProperty, value);
         }
 
         public bool ReadOnly
         {
-            get { return (bool)this.GetValue(ReadOnlyProperty); }
-            set { this.SetValue(ReadOnlyProperty, value); }
+            get => (bool)this.GetValue(ReadOnlyProperty);
+            set => this.SetValue(ReadOnlyProperty, value);
         }
 
         private static void SourcePropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)

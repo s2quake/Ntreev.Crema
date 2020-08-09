@@ -32,10 +32,10 @@ namespace Ntreev.Crema.ServiceModel
         public AccessType AccessType { get; set; }
 
         [IgnoreDataMember]
-        public string UserID { get { return this.SignatureDate.ID; } }
+        public string UserID => this.SignatureDate.ID;
 
         [IgnoreDataMember]
-        public DateTime DateTime { get { return this.SignatureDate.DateTime; } }
+        public DateTime DateTime => this.SignatureDate.DateTime;
 
         public static bool operator ==(AccessMemberInfo x, AccessMemberInfo y)
         {

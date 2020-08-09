@@ -41,7 +41,7 @@ namespace Ntreev.Crema.Presentation.SmartSet
 
         public IRuleItem[] RuleItems
         {
-            get { return this.ruleItems; }
+            get => this.ruleItems;
             set
             {
                 this.ruleItems = value;
@@ -49,10 +49,7 @@ namespace Ntreev.Crema.Presentation.SmartSet
             }
         }
 
-        public ObservableCollection<ITableDescriptor> Items
-        {
-            get { return this.items; }
-        }
+        public ObservableCollection<ITableDescriptor> Items => this.items;
 
         public void Refresh()
         {
@@ -168,22 +165,13 @@ namespace Ntreev.Crema.Presentation.SmartSet
 
         string ISmartSet.CategoryPath
         {
-            get { return this.Category.Path; }
-            set
-            {
-                this.Category = this.Context.Categories[value];
-            }
+            get => this.Category.Path;
+            set => this.Category = this.Context.Categories[value];
         }
 
-        ISmartSetCategory ISmartSet.Category
-        {
-            get { return this.Category; }
-        }
+        ISmartSetCategory ISmartSet.Category => this.Category;
 
-        IEnumerable ISmartSet.Items
-        {
-            get { return this.items; }
-        }
+        IEnumerable ISmartSet.Items => this.items;
 
         #endregion
 

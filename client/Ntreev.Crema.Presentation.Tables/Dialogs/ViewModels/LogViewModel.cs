@@ -84,7 +84,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 
         public LogInfoViewModel SelectedItem
         {
-            get { return this.selectedItem; }
+            get => this.selectedItem;
             set
             {
                 this.selectedItem = value;
@@ -103,15 +103,9 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             }
         }
 
-        public IEnumerable<LogInfoViewModel> Items
-        {
-            get { return this.itemsSource; }
-        }
+        public IEnumerable<LogInfoViewModel> Items => this.itemsSource;
 
-        public ICommand PreviewCommand
-        {
-            get { return this.previewCommand; }
-        }
+        public ICommand PreviewCommand => this.previewCommand;
 
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {

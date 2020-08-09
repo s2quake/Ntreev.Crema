@@ -30,10 +30,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels.Tables
             this.DisplayName = Resources.Title_TableCreatedDateTime;
         }
 
-        public override Type SupportType
-        {
-            get { return typeof(ITableDescriptor); }
-        }
+        public override Type SupportType => typeof(ITableDescriptor);
 
         protected override DateTime GetObjectValue(object obj)
         {

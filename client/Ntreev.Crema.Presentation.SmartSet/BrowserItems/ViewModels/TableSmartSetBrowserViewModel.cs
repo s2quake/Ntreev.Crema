@@ -79,10 +79,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             return new BookmarkTableRootTreeViewItemViewModel(this);
         }
 
-        public override ISmartSetCategory Root
-        {
-            get { return this.smartSetContext.Root; }
-        }
+        public override ISmartSetCategory Root => this.smartSetContext.Root;
 
         protected override void OnLoaded(EventArgs e)
         {

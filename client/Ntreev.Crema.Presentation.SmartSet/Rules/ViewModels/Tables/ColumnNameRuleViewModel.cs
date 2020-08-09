@@ -31,10 +31,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels.Tables
             this.DisplayName = Resources.Title_ColumnName;
         }
 
-        public override Type SupportType
-        {
-            get { return typeof(ITableDescriptor); }
-        }
+        public override Type SupportType => typeof(ITableDescriptor);
 
         public override bool Verify(object target, IRuleItem arguments)
         {

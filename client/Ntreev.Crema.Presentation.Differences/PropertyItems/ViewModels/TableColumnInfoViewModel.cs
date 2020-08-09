@@ -35,20 +35,11 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
             this.DisplayName = Resources.Title_ColumnInfo;
         }
 
-        public TableColumnInfoItemViewModel[] Columns
-        {
-            get { return this.columns; }
-        }
+        public TableColumnInfoItemViewModel[] Columns => this.columns;
 
-        public override bool IsVisible
-        {
-            get { return this.columns.Any(); }
-        }
+        public override bool IsVisible => this.columns.Any();
 
-        public override object SelectedObject
-        {
-            get { return this.viewModel; }
-        }
+        public override object SelectedObject => this.viewModel;
 
         public override bool CanSupport(object obj)
         {

@@ -1072,10 +1072,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.dateTime = signatureDate.DateTime;
             }
 
-            public DateTime DateTime
-            {
-                get { return this.dateTime; }
-            }
+            public DateTime DateTime => this.dateTime;
 
             protected override DateTime GetTime()
             {

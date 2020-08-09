@@ -26,8 +26,8 @@ namespace Ntreev.Crema.Presentation.Framework.Markup
 
         public object TargetNullValue
         {
-            get { return this.binding.TargetNullValue; }
-            set { this.binding.TargetNullValue = value; }
+            get => this.binding.TargetNullValue;
+            set => this.binding.TargetNullValue = value;
         }
     }
 }

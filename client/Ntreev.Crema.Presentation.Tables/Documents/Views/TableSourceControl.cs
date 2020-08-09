@@ -77,14 +77,14 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.Views
 
         public IDomain Domain
         {
-            get { return (IDomain)GetValue(DomainProperty); }
-            set { SetValue(DomainProperty, value); }
+            get => (IDomain)GetValue(DomainProperty);
+            set => SetValue(DomainProperty, value);
         }
 
         public string SearchText
         {
-            get { return (string)this.GetValue(SearchTextProperty); }
-            set { this.SetValue(SearchTextProperty, value); }
+            get => (string)this.GetValue(SearchTextProperty);
+            set => this.SetValue(SearchTextProperty, value);
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)

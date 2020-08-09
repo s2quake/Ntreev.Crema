@@ -107,38 +107,38 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public bool IsBrowserExpanded
         {
-            get { return (bool)this.GetValue(IsBrowserExpandedProperty); }
-            set { this.SetValue(IsBrowserExpandedProperty, value); }
+            get => (bool)this.GetValue(IsBrowserExpandedProperty);
+            set => this.SetValue(IsBrowserExpandedProperty, value);
         }
 
         public bool IsPropertyExpanded
         {
-            get { return (bool)this.GetValue(IsPropertyExpandedProperty); }
-            set { this.SetValue(IsPropertyExpandedProperty, value); }
+            get => (bool)this.GetValue(IsPropertyExpandedProperty);
+            set => this.SetValue(IsPropertyExpandedProperty, value);
         }
 
         public double BrowserDistance
         {
-            get { return (double)this.GetValue(BrowserDistanceProperty); }
-            set { this.SetValue(BrowserDistanceProperty, value); }
+            get => (double)this.GetValue(BrowserDistanceProperty);
+            set => this.SetValue(BrowserDistanceProperty, value);
         }
 
         public double PropertyDistance
         {
-            get { return (double)this.GetValue(PropertyDistanceProperty); }
-            set { this.SetValue(PropertyDistanceProperty, value); }
+            get => (double)this.GetValue(PropertyDistanceProperty);
+            set => this.SetValue(PropertyDistanceProperty, value);
         }
 
         public object BrowserContent
         {
-            get { return this.GetValue(BrowserContentProperty); }
-            set { this.SetValue(BrowserContentProperty, value); }
+            get => this.GetValue(BrowserContentProperty);
+            set => this.SetValue(BrowserContentProperty, value);
         }
 
         public object PropertyContent
         {
-            get { return this.GetValue(PropertyContentProperty); }
-            set { this.SetValue(PropertyContentProperty, value); }
+            get => this.GetValue(PropertyContentProperty);
+            set => this.SetValue(PropertyContentProperty, value);
         }
 
         private static void IsBrowserExpandedPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)

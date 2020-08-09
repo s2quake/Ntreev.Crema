@@ -76,7 +76,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 
         public string Comment
         {
-            get { return this.comment ?? string.Empty; }
+            get => this.comment ?? string.Empty;
             set
             {
                 this.comment = value;

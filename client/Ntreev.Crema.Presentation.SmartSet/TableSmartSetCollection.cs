@@ -26,9 +26,6 @@ namespace Ntreev.Crema.Presentation.SmartSet
 
         }
 
-        public override bool SupportsNonUniqueName
-        {
-            get { return true; }
-        }
+        public override bool SupportsNonUniqueName => true;
     }
 }

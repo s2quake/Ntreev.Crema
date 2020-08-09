@@ -250,11 +250,8 @@ namespace Ntreev.Crema.Javascript
 
         public TextWriter Out
         {
-            get { return this.writer ?? Console.Out; }
-            set
-            {
-                this.writer = value;
-            }
+            get => this.writer ?? Console.Out;
+            set => this.writer = value;
         }
 
         protected abstract IScriptMethod[] CreateMethods();
@@ -277,10 +274,7 @@ namespace Ntreev.Crema.Javascript
             this.authentication = null;
         }
 
-        protected Authentication Authentication
-        {
-            get { return this.authentication; }
-        }
+        protected Authentication Authentication => this.authentication;
 
 #if SERVER
         private void Authentication_Expired(object sender, EventArgs e)

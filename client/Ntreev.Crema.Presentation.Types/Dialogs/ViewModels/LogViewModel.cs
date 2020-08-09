@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 
         public LogInfoViewModel SelectedItem
         {
-            get { return this.selectedItem; }
+            get => this.selectedItem;
             set
             {
                 this.selectedItem = value;
@@ -79,15 +79,9 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             }
         }
 
-        public IEnumerable<LogInfoViewModel> Items
-        {
-            get { return this.itemsSource; }
-        }
+        public IEnumerable<LogInfoViewModel> Items => this.itemsSource;
 
-        public ICommand PreviewCommand
-        {
-            get { return this.previewCommand; }
-        }
+        public ICommand PreviewCommand => this.previewCommand;
 
         private async void Initialize()
         {

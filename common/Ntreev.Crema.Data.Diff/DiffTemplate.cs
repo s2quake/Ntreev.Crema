@@ -210,15 +210,9 @@ namespace Ntreev.Crema.Data.Diff
             return false;
         }
 
-        public CremaTemplate SourceItem1
-        {
-            get { return this.diffSource1; }
-        }
+        public CremaTemplate SourceItem1 => this.diffSource1;
 
-        public CremaTemplate SourceItem2
-        {
-            get { return this.diffSource2; }
-        }
+        public CremaTemplate SourceItem2 => this.diffSource2;
 
         public string ItemName1
         {
@@ -258,7 +252,7 @@ namespace Ntreev.Crema.Data.Diff
 
         public TagInfo Tags1
         {
-            get { return this.diffSource1.Tags; }
+            get => this.diffSource1.Tags;
             set
             {
                 this.diffSource1.Tags = value;
@@ -268,7 +262,7 @@ namespace Ntreev.Crema.Data.Diff
 
         public TagInfo Tags2
         {
-            get { return this.diffSource2.Tags; }
+            get => this.diffSource2.Tags;
             set
             {
                 this.diffSource2.Tags = value;
@@ -278,7 +272,7 @@ namespace Ntreev.Crema.Data.Diff
 
         public string Comment1
         {
-            get { return this.diffSource1.Comment; }
+            get => this.diffSource1.Comment;
             set
             {
                 this.diffSource1.Comment = value;
@@ -288,7 +282,7 @@ namespace Ntreev.Crema.Data.Diff
 
         public string Comment2
         {
-            get { return this.diffSource2.Comment; }
+            get => this.diffSource2.Comment;
             set
             {
                 this.diffSource2.Comment = value;
@@ -304,10 +298,7 @@ namespace Ntreev.Crema.Data.Diff
                     return this.DiffTable.Header1;
                 return this.header1 ?? string.Empty;
             }
-            set
-            {
-                this.header1 = value;
-            }
+            set => this.header1 = value;
         }
 
         public string Header2
@@ -318,10 +309,7 @@ namespace Ntreev.Crema.Data.Diff
                     return this.DiffTable.Header2;
                 return this.header2 ?? string.Empty;
             }
-            set
-            {
-                this.header2 = value;
-            }
+            set => this.header2 = value;
         }
 
         public DiffMergeTypes MergeType
@@ -340,25 +328,13 @@ namespace Ntreev.Crema.Data.Diff
             internal set;
         }
 
-        public IReadOnlyList<DiffTemplateColumn> Items
-        {
-            get { return this.itemList; }
-        }
+        public IReadOnlyList<DiffTemplateColumn> Items => this.itemList;
 
-        public bool IsResolved
-        {
-            get { return this.isResolved; }
-        }
+        public bool IsResolved => this.isResolved;
 
-        public DiffState DiffState
-        {
-            get { return this.diffState; }
-        }
+        public DiffState DiffState => this.diffState;
 
-        public IEnumerable<object> UnresolvedItems
-        {
-            get { return this.unresolvedItemList; }
-        }
+        public IEnumerable<object> UnresolvedItems => this.unresolvedItemList;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

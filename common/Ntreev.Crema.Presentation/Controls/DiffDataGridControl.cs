@@ -93,20 +93,20 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public DiffDataGridControl DestControl
         {
-            get { return (DiffDataGridControl)this.GetValue(DestControlProperty); }
-            set { this.SetValue(DestControlProperty, value); }
+            get => (DiffDataGridControl)this.GetValue(DestControlProperty);
+            set => this.SetValue(DestControlProperty, value);
         }
 
         public ScrollBar VerticalSyncScrollBar
         {
-            get { return (ScrollBar)this.GetValue(VerticalSyncScrollBarProperty); }
-            set { this.SetValue(VerticalSyncScrollBarProperty, value); }
+            get => (ScrollBar)this.GetValue(VerticalSyncScrollBarProperty);
+            set => this.SetValue(VerticalSyncScrollBarProperty, value);
         }
 
         public ScrollBar HorizontalSyncScrollBar
         {
-            get { return (ScrollBar)this.GetValue(HorizontalSyncScrollBarProperty); }
-            set { this.SetValue(HorizontalSyncScrollBarProperty, value); }
+            get => (ScrollBar)this.GetValue(HorizontalSyncScrollBarProperty);
+            set => this.SetValue(HorizontalSyncScrollBarProperty, value);
         }
 
         public ScrollViewer DestScrollViewer

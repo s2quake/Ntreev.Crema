@@ -57,7 +57,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
 
         public string SmartSetName
         {
-            get { return this.smartSetName; }
+            get => this.smartSetName;
             set
             {
                 this.smartSetName = value;
@@ -66,33 +66,15 @@ namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
             }
         }
 
-        public IEnumerable<RuleListItemViewModel> ItemsSource
-        {
-            get { return this.itemsSource; }
-        }
+        public IEnumerable<RuleListItemViewModel> ItemsSource => this.itemsSource;
 
-        public IEnumerable<IRule> Rules
-        {
-            get { return this.rules; }
-        }
+        public IEnumerable<IRule> Rules => this.rules;
 
-        public IRuleItem[] RuleItems
-        {
-            get { return this.ruleItems; }
-        }
+        public IRuleItem[] RuleItems => this.ruleItems;
 
-        public bool CanRename
-        {
-            get { return this.canRename; }
-        }
+        public bool CanRename => this.canRename;
 
-        public bool CanSave
-        {
-            get
-            {
-                return !string.IsNullOrEmpty(this.SmartSetName);
-            }
-        }
+        public bool CanSave => !string.IsNullOrEmpty(this.SmartSetName);
 
         public async Task SaveAsync()
         {

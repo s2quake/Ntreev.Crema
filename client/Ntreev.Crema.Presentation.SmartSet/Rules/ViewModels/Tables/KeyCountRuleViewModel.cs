@@ -36,9 +36,6 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels.Tables
             return (obj as ITableDescriptor).TableInfo.Columns.Where(item => item.IsKey).Count();
         }
 
-        public override Type SupportType
-        {
-            get { return typeof(ITableDescriptor); }
-        }
+        public override Type SupportType => typeof(ITableDescriptor);
     }
 }

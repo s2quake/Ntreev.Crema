@@ -68,7 +68,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 
         public string Message
         {
-            get { return this.message ?? string.Empty; }
+            get => this.message ?? string.Empty;
             set
             {
                 this.message = value;
@@ -77,18 +77,9 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
             }
         }
 
-        public string[] TargetUserIDs
-        {
-            get { return this.userIDs; }
-        }
+        public string[] TargetUserIDs => this.userIDs;
 
-        public string TargetUserID
-        {
-            get
-            {
-                return this.userIDs.Any() == false ? "All Users" : string.Join(",", this.userIDs);
-            }
-        }
+        public string TargetUserID => this.userIDs.Any() == false ? "All Users" : string.Join(",", this.userIDs);
 
         public async Task NotifyAsync()
         {

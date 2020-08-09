@@ -29,7 +29,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
 
         public virtual T Value
         {
-            get { return this.value; }
+            get => this.value;
             set
             {
                 this.value = value;
@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
 
         public OperatorType OperatorType
         {
-            get { return this.operatorType; }
+            get => this.operatorType;
             set
             {
                 this.operatorType = value;

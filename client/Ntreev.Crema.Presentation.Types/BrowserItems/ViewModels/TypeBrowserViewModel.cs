@@ -80,7 +80,7 @@ namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
 
         public bool IsVisible
         {
-            get { return this.isVisible; }
+            get => this.isVisible;
             set
             {
                 this.isVisible = value;
@@ -88,15 +88,9 @@ namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
             }
         }
 
-        public ICommand RenameCommand
-        {
-            get { return this.renameCommand; }
-        }
+        public ICommand RenameCommand => this.renameCommand;
 
-        public ICommand DeleteCommand
-        {
-            get { return this.deleteCommand; }
-        }
+        public ICommand DeleteCommand => this.deleteCommand;
 
         private void CremaAppHost_Loaded(object sender, EventArgs e)
         {
@@ -196,31 +190,19 @@ namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
         [ConfigurationProperty(ScopeType = typeof(IUserConfiguration))]
         private string[] Settings
         {
-            get { return this.GetSettings(); }
-            set
-            {
-                this.SetSettings(value);
-            }
+            get => this.GetSettings();
+            set => this.SetSettings(value);
         }
 
         #region ITypeBrowser
 
         object ITypeBrowser.SelectedItem
         {
-            get
-            {
-                return this.SelectedItem;
-            }
-            set
-            {
-                this.SelectedItem = value as TreeViewItemViewModel;
-            }
+            get => this.SelectedItem;
+            set => this.SelectedItem = value as TreeViewItemViewModel;
         }
 
-        IEnumerable ITypeBrowser.Items
-        {
-            get { return this.Items; }
-        }
+        IEnumerable ITypeBrowser.Items => this.Items;
 
         #endregion
     }

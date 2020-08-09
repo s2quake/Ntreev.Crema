@@ -39,10 +39,7 @@ namespace Ntreev.Crema.Services.Domains
                     return this.Parent.DataBase;
                 return null;
             }
-            set
-            {
-                this.dataBase = value;
-            }
+            set => this.dataBase = value;
         }
 
         #region IDomainCategory

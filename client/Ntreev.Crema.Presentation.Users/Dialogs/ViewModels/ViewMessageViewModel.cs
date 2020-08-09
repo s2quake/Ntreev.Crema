@@ -65,7 +65,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 
         public string Message
         {
-            get { return this.message ?? string.Empty; }
+            get => this.message ?? string.Empty;
             set
             {
                 this.message = value;
@@ -75,7 +75,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 
         public string SendUserID
         {
-            get { return this.sendUserID ?? string.Empty; }
+            get => this.sendUserID ?? string.Empty;
             set
             {
                 this.sendUserID = value;
@@ -96,13 +96,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
                 await dialog.ShowDialogAsync();
         }
 
-        public bool CanReply
-        {
-            get
-            {
-                return this.SendUserID != string.Empty;
-            }
-        }
+        public bool CanReply => this.SendUserID != string.Empty;
 
         protected override void OnViewLoaded(object view)
         {

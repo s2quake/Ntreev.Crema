@@ -90,10 +90,7 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
             await UserUtility.UnbanAsync(this.authentication, this);
         }
 
-        public override string DisplayName
-        {
-            get { return this.descriptor.UserInfo.ID + " [" + this.descriptor.UserInfo.Name + "]"; }
-        }
+        public override string DisplayName => this.descriptor.UserInfo.ID + " [" + this.descriptor.UserInfo.Name + "]";
 
         public ICommand ModifyCommand => this.modifyCommand;
 

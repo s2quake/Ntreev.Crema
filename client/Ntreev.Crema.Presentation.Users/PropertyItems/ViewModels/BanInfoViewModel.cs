@@ -44,10 +44,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
             this.Attach();
         }
 
-        public override object SelectedObject
-        {
-            get { return this.descriptor; }
-        }
+        public override object SelectedObject => this.descriptor;
 
         public override bool IsVisible
         {
@@ -61,7 +58,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 
         public BanInfo BanInfo
         {
-            get { return this.lockInfo; }
+            get => this.lockInfo;
             private set
             {
                 this.lockInfo = value;

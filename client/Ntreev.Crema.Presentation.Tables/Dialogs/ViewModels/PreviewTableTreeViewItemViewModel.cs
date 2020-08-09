@@ -41,10 +41,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             this.viewAction(this);
         }
 
-        public ICommand ViewCommand
-        {
-            get { return this.viewCommand; }
-        }
+        public ICommand ViewCommand => this.viewCommand;
 
         public override string DisplayName => NameUtility.GetName(base.DisplayName);
     }

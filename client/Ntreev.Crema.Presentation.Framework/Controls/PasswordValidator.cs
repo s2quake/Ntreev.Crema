@@ -37,14 +37,14 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
         public PasswordBox Box1
         {
-            get { return (PasswordBox)this.GetValue(Box1Property); }
-            set { this.SetValue(Box1Property, value); }
+            get => (PasswordBox)this.GetValue(Box1Property);
+            set => this.SetValue(Box1Property, value);
         }
 
         public PasswordBox Box2
         {
-            get { return (PasswordBox)this.GetValue(Box2Property); }
-            set { this.SetValue(Box2Property, value); }
+            get => (PasswordBox)this.GetValue(Box2Property);
+            set => this.SetValue(Box2Property, value);
         }
 
         private static void Box1PropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)

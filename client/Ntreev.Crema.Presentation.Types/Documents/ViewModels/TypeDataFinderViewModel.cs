@@ -59,7 +59,7 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
 
         public string FindingText
         {
-            get { return this.findingText ?? string.Empty; }
+            get => this.findingText ?? string.Empty;
             set
             {
                 this.findingText = value;
@@ -68,14 +68,11 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
             }
         }
 
-        public string[] FindingTargets
-        {
-            get { return this.findingTargets; }
-        }
+        public string[] FindingTargets => this.findingTargets;
 
         public string FindingTarget
         {
-            get { return this.findingTarget ?? string.Empty; }
+            get => this.findingTarget ?? string.Empty;
             set
             {
                 this.findingTarget = value;
@@ -109,14 +106,11 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
             this.EndProgress();
         }
 
-        public ObservableCollection<FindResultItemViewModel> ItemsSource
-        {
-            get { return this.itemsSource; }
-        }
+        public ObservableCollection<FindResultItemViewModel> ItemsSource => this.itemsSource;
 
         public FindResultItemViewModel SelectedItem
         {
-            get { return this.selectedItem; }
+            get => this.selectedItem;
             set
             {
                 this.selectedItem = value;
@@ -124,13 +118,7 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
             }
         }
 
-        public bool CanFind
-        {
-            get
-            {
-                return this.IsProgressing == false && this.FindingText != string.Empty;
-            }
-        }
+        public bool CanFind => this.IsProgressing == false && this.FindingText != string.Empty;
 
         private async void Initialize()
         {

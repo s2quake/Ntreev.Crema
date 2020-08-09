@@ -114,7 +114,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 
         public bool IsReadOnly
         {
-            get { return this.isReadOnly; }
+            get => this.isReadOnly;
             set
             {
                 this.isReadOnly = value;
@@ -122,29 +122,17 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             }
         }
 
-        public bool IsNew
-        {
-            get { return this.isNew; }
-        }
+        public bool IsNew => this.isNew;
 
-        public ITypeTemplate Template
-        {
-            get { return this.template; }
-        }
+        public ITypeTemplate Template => this.template;
 
-        public object Source
-        {
-            get { return this.source; }
-        }
+        public object Source => this.source;
 
-        public IDomain Domain
-        {
-            get { return this.domain; }
-        }
+        public IDomain Domain => this.domain;
 
         public string TypeName
         {
-            get { return this.typeName ?? string.Empty; }
+            get => this.typeName ?? string.Empty;
             set
             {
                 this.typeName = value;
@@ -172,7 +160,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 
         public string Comment
         {
-            get { return this.comment ?? string.Empty; }
+            get => this.comment ?? string.Empty;
             set
             {
                 this.comment = value;
@@ -200,7 +188,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 
         public bool IsModified
         {
-            get { return this.isModified; }
+            get => this.isModified;
             set
             {
                 this.isModified = value;
@@ -211,7 +199,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 
         public bool IsFlag
         {
-            get { return this.isFlag; }
+            get => this.isFlag;
             set
             {
                 InvokeAsync();

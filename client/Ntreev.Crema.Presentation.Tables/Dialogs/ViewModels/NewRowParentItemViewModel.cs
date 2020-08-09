@@ -60,7 +60,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 
         public object Value
         {
-            get { return this.value; }
+            get => this.value;
             set
             {
                 Invoke();

@@ -143,10 +143,7 @@ namespace Ntreev.Crema.Commands.Spreadsheet
                     return drive.DataBaseName;
                 return null;
             }
-            set
-            {
-                this.dataBaseName = value;
-            }
+            set => this.dataBaseName = value;
         }
 
         [CommandProperty]

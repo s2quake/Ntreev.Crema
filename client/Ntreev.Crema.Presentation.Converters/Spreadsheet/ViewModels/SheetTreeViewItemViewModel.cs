@@ -26,22 +26,13 @@ namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.ViewModels
             this.SheetName = sheetName;
         }
 
-        public override string DisplayName
-        {
-            get { return this.SheetName; }
-        }
+        public override string DisplayName => this.SheetName;
 
         public string SheetName { get; }
 
-        public bool IsBaseTemplate
-        {
-            get { return false; }
-        }
+        public bool IsBaseTemplate => false;
 
-        public bool IsInherited
-        {
-            get { return false; }
-        }
+        public bool IsInherited => false;
 
         public string Path
         {

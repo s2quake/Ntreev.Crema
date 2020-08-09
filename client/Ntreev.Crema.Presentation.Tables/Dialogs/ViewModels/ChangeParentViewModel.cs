@@ -106,7 +106,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 
         public RowItemByKey Value
         {
-            get { return this.value; }
+            get => this.value;
             set
             {
                 Invoke();

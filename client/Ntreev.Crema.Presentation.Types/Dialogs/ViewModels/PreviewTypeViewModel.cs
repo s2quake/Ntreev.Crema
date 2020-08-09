@@ -41,7 +41,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 
         public CremaDataType Source
         {
-            get { return this.source; }
+            get => this.source;
             private set
             {
                 this.source = value;

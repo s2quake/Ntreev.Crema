@@ -182,7 +182,7 @@ namespace Ntreev.Crema.Data
                     return -1;
                 return this.Field<int>(this.table.attributeIndex);
             }
-            set { this.SetField(this.table.attributeIndex, value); }
+            set => this.SetField(this.table.attributeIndex, value);
         }
 
         public RowBase ParentRow

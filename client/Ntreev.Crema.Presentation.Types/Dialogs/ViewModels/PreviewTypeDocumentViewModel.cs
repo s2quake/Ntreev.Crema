@@ -30,14 +30,11 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             this.dataType = dataType;
         }
 
-        public CremaDataType Source
-        {
-            get { return this.dataType; }
-        }
+        public CremaDataType Source => this.dataType;
 
         public CremaDataType SelectedType
         {
-            get { return this.selectedType; }
+            get => this.selectedType;
             set
             {
                 this.selectedType = value;

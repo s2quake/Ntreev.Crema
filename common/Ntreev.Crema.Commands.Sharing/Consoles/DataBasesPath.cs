@@ -61,24 +61,12 @@ namespace Ntreev.Crema.Commands.Consoles
             return this.path;
         }
 
-        public string Path
-        {
-            get { return this.path; }
-        }
+        public string Path => this.path;
 
-        public string DataBaseName
-        {
-            get { return this.dataBaseName ?? string.Empty; }
-        }
+        public string DataBaseName => this.dataBaseName ?? string.Empty;
 
-        public string Context
-        {
-            get { return this.context ?? string.Empty; }
-        }
+        public string Context => this.context ?? string.Empty;
 
-        public string ItemPath
-        {
-            get { return this.itemPath ?? string.Empty; }
-        }
+        public string ItemPath => this.itemPath ?? string.Empty;
     }
 }

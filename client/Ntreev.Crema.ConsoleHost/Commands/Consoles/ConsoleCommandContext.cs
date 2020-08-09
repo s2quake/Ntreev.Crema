@@ -44,10 +44,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
             this.BaseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         }
 
-        public override string Address
-        {
-            get { return this.address; }
-        }
+        public override string Address => this.address;
 
         public override ICremaHost CremaHost => this.cremaHost;
 

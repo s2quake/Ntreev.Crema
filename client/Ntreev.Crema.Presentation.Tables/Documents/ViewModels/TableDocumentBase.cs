@@ -44,14 +44,11 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             protected set;
         }
 
-        public ObservableCollection<TableItemViewModel> Tables
-        {
-            get { return this.tables; }
-        }
+        public ObservableCollection<TableItemViewModel> Tables => this.tables;
 
         public TableItemViewModel SelectedTable
         {
-            get { return this.selectedTable; }
+            get => this.selectedTable;
             set
             {
                 if (this.selectedTable != null)

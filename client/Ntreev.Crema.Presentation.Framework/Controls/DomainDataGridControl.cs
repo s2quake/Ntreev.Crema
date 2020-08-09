@@ -91,8 +91,8 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
         public IDomain Domain
         {
-            get { return (IDomain)this.GetValue(DomainProperty); }
-            set { this.SetValue(DomainProperty, value); }
+            get => (IDomain)this.GetValue(DomainProperty);
+            set => this.SetValue(DomainProperty, value);
         }
 
         public bool CanDeleteSelectedItems

@@ -45,19 +45,16 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
         public Color ThemeColor
         {
-            get { return (Color)this.GetValue(ThemeColorProperty); }
-            set { this.SetValue(ThemeColorProperty, value); }
+            get => (Color)this.GetValue(ThemeColorProperty);
+            set => this.SetValue(ThemeColorProperty, value);
         }
 
-        public Brush Theme
-        {
-            get { return (Brush)this.GetValue(ThemeProperty); }
-        }
+        public Brush Theme => (Brush)this.GetValue(ThemeProperty);
 
         public string Title
         {
-            get { return (string)this.GetValue(TitleProperty); }
-            set { this.SetValue(TitleProperty, value); }
+            get => (string)this.GetValue(TitleProperty);
+            set => this.SetValue(TitleProperty, value);
         }
 
         private static void ThemeColorPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)

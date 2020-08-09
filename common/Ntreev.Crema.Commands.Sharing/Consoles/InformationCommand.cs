@@ -60,10 +60,7 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        public ICremaHost CremaHost
-        {
-            get { return this.cremaHost.Value; }
-        }
+        public ICremaHost CremaHost => this.cremaHost.Value;
 
         public override bool IsEnabled => this.CommandContext.IsOnline;
 

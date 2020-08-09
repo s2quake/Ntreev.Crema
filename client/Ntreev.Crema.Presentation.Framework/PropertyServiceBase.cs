@@ -67,10 +67,7 @@ namespace Ntreev.Crema.Presentation.Framework
             }
         }
 
-        public IEnumerable<IPropertyItem> Properties
-        {
-            get { return this.itemsSource; }
-        }
+        public IEnumerable<IPropertyItem> Properties => this.itemsSource;
 
         public event EventHandler SelectionChanged;
 

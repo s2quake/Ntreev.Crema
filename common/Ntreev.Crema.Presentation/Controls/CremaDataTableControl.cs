@@ -43,25 +43,22 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public CremaDataTable Source
         {
-            get { return (CremaDataTable)this.GetValue(SourceProperty); }
-            set { this.SetValue(SourceProperty, value); }
+            get => (CremaDataTable)this.GetValue(SourceProperty);
+            set => this.SetValue(SourceProperty, value);
         }
 
-        public CremaDataTable[] Tables
-        {
-            get { return (CremaDataTable[])this.GetValue(TablesProperty); }
-        }
+        public CremaDataTable[] Tables => (CremaDataTable[])this.GetValue(TablesProperty);
 
         public CremaDataTable SelectedTable
         {
-            get { return (CremaDataTable)this.GetValue(SelectedTableProperty); }
-            set { this.SetValue(SelectedTableProperty, value); }
+            get => (CremaDataTable)this.GetValue(SelectedTableProperty);
+            set => this.SetValue(SelectedTableProperty, value);
         }
 
         public bool ReadOnly
         {
-            get { return (bool)this.GetValue(ReadOnlyProperty); }
-            set { this.SetValue(ReadOnlyProperty, value); }
+            get => (bool)this.GetValue(ReadOnlyProperty);
+            set => this.SetValue(ReadOnlyProperty, value);
         }
 
         private static void SourcePropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)

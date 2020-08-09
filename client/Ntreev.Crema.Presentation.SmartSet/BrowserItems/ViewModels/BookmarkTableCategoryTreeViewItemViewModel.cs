@@ -25,9 +25,6 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 
         }
 
-        public new TableSmartSetBrowserViewModel Browser
-        {
-            get { return this.Owner as TableSmartSetBrowserViewModel; }
-        }
+        public new TableSmartSetBrowserViewModel Browser => this.Owner as TableSmartSetBrowserViewModel;
     }
 }

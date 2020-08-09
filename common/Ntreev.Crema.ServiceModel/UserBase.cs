@@ -57,10 +57,7 @@ namespace Ntreev.Crema.ServiceModel
             this.OnUserBanInfoChanged(EventArgs.Empty);
         }
 
-        public UserInfo UserInfo
-        {
-            get { return this.userInfo; }
-        }
+        public UserInfo UserInfo => this.userInfo;
 
         public BanInfo BanInfo
         {
@@ -81,7 +78,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public UserState UserState
         {
-            get { return this.userState; }
+            get => this.userState;
             set
             {
                 if (this.userState == value)
@@ -91,14 +88,11 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
-        public Authority Authority
-        {
-            get { return this.userInfo.Authority; }
-        }
+        public Authority Authority => this.userInfo.Authority;
 
         public bool IsOnline
         {
-            get { return this.UserState.HasFlag(UserState.Online); }
+            get => this.UserState.HasFlag(UserState.Online);
             set
             {
                 if (value == true)

@@ -52,46 +52,25 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             }
         }
 
-        public LogInfo LogInfo
-        {
-            get { return this.logInfo; }
-        }
+        public LogInfo LogInfo => this.logInfo;
 
-        public string UserID
-        {
-            get { return this.logInfo.UserID; }
-        }
+        public string UserID => this.logInfo.UserID;
 
-        public string Revision
-        {
-            get { return this.logInfo.Revision; }
-        }
+        public string Revision => this.logInfo.Revision;
 
-        public string Message
-        {
-            get { return this.logInfo.Comment; }
-        }
+        public string Message => this.logInfo.Comment;
 
-        public DateTime DateTime
-        {
-            get { return this.logInfo.DateTime; }
-        }
+        public DateTime DateTime => this.logInfo.DateTime;
 
         #region IInfoProvider
 
-        IDictionary<string, object> IInfoProvider.Info
-        {
-            get
-            {
-                return new Dictionary<string, object>()
+        IDictionary<string, object> IInfoProvider.Info => new Dictionary<string, object>()
                 {
                     { nameof(UserID), this.UserID },
                     { nameof(Revision), this.Revision },
                     { nameof(Message), this.Message },
                     { nameof(DateTime), this.DateTime }
                 };
-            }
-        }
 
         #endregion
     }

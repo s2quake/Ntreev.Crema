@@ -34,7 +34,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 
         public UserInfo UserInfo
         {
-            get { return this.userInfo; }
+            get => this.userInfo;
             set
             {
                 this.userInfo = value;
@@ -42,15 +42,9 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
             }
         }
 
-        public override bool IsVisible
-        {
-            get { return this.descriptor != null; }
-        }
+        public override bool IsVisible => this.descriptor != null;
 
-        public override object SelectedObject
-        {
-            get { return this.descriptor; }
-        }
+        public override object SelectedObject => this.descriptor;
 
         public override bool CanSupport(object obj)
         {

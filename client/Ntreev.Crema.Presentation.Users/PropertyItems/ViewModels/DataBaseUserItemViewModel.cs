@@ -33,16 +33,13 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 
         public string Name => this.authenticationInfo.Name;
 
-        public override string DisplayName
-        {
-            get { return this.authenticationInfo.ID + " [" + this.authenticationInfo.Name + "]"; }
-        }
+        public override string DisplayName => this.authenticationInfo.ID + " [" + this.authenticationInfo.Name + "]";
 
         public Authority Authority => this.authenticationInfo.Authority;
 
         public AuthenticationInfo AuthenticationInfo
         {
-            get { return this.authenticationInfo; }
+            get => this.authenticationInfo;
             set
             {
                 this.authenticationInfo = value;

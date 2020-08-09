@@ -63,25 +63,13 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
             }
         }
 
-        public override bool IsThreeState
-        {
-            get { return false; }
-        }
+        public override bool IsThreeState => false;
 
-        public override bool DependsOnChilds
-        {
-            get { return false; }
-        }
+        public override bool DependsOnChilds => false;
 
-        public override bool DependsOnParent
-        {
-            get { return this.parent != null; }
-        }
+        public override bool DependsOnParent => this.parent != null;
 
-        public override string DisplayName
-        {
-            get { return this.TableName; }
-        }
+        public override string DisplayName => this.TableName;
 
         public string Name => this.descriptor.Name;
 

@@ -139,14 +139,11 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
             }
         }
 
-        public ObservableCollection<IExporter> Exporters
-        {
-            get { return this.exporters; }
-        }
+        public ObservableCollection<IExporter> Exporters => this.exporters;
 
         public IExporter SelectedExporter
         {
-            get { return this.selectedExporter; }
+            get => this.selectedExporter;
             set
             {
                 if (this.selectedExporter != null && this.selectedExporter is INotifyPropertyChanged == true)
@@ -164,10 +161,7 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
             }
         }
 
-        public IEnumerable Categories
-        {
-            get { return this.categories; }
-        }
+        public IEnumerable Categories => this.categories;
 
         public async Task ExportAsync()
         {
@@ -266,20 +260,11 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
             }
         }
 
-        public bool CanTryClose
-        {
-            get { return this.isExporting == false; }
-        }
+        public bool CanTryClose => this.isExporting == false;
 
-        public bool CanCancel
-        {
-            get { return this.isExporting == true; }
-        }
+        public bool CanCancel => this.isExporting == true;
 
-        public bool IsExporting
-        {
-            get { return this.isExporting == true; }
-        }
+        public bool IsExporting => this.isExporting == true;
 
         private IEnumerable<TableCategoryTreeViewItemViewModel> GetCategories(TreeViewItemViewModel treeViewItem)
         {
@@ -351,7 +336,7 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
         [ConfigurationProperty("SelectedExporter")]
         private string SelectedExporterName
         {
-            get { return this.selectedExporter?.Name; }
+            get => this.selectedExporter?.Name;
             set
             {
                 if (value != null)

@@ -58,10 +58,7 @@ namespace Ntreev.Crema.Bot
             return new Autobot(this, this.cremaHost.Address, autobotID, password);
         }
 
-        public string Name
-        {
-            get { return "bot"; }
-        }
+        public string Name => "bot";
 
         public Guid ID => GuidUtility.FromName(this.Name);
     }

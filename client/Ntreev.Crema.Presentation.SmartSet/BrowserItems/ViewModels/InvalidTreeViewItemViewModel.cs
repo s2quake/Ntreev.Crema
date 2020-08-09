@@ -44,20 +44,11 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             this.deleteAction(this);
         }
 
-        public override string DisplayName
-        {
-            get { return this.displayName; }
-        }
+        public override string DisplayName => this.displayName;
 
-        public string DisplayPath
-        {
-            get { return this.displayPath; }
-        }
+        public string DisplayPath => this.displayPath;
 
-        public bool CanDelete
-        {
-            get { return this.deleteAction != null; }
-        }
+        public bool CanDelete => this.deleteAction != null;
 
         public string Path => this.path;
     }

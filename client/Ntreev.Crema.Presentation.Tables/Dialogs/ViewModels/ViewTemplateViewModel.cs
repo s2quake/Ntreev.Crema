@@ -63,24 +63,12 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             }
         }
 
-        public object Source
-        {
-            get { return this.template; }
-        }
+        public object Source => this.template;
 
-        public string TableName
-        {
-            get { return this.tableName ?? string.Empty; }
-        }
+        public string TableName => this.tableName ?? string.Empty;
 
-        public string Comment
-        {
-            get { return this.comment ?? string.Empty; }
-        }
+        public string Comment => this.comment ?? string.Empty;
 
-        public TagInfo Tags
-        {
-            get { return this.tags; }
-        }
+        public TagInfo Tags => this.tags;
     }
 }

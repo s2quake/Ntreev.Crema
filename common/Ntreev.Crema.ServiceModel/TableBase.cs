@@ -623,7 +623,7 @@ namespace Ntreev.Crema.ServiceModel
 
         TableInfo ITableInfoProvider.TableInfo
         {
-            get { return this.TableInfo; }
+            get => this.TableInfo;
             set
             {
                 this.tableInfo = value;

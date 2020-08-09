@@ -194,10 +194,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
             }
         }
 
-        private CremaAppHostViewModel CremaAppHost
-        {
-            get { return this.cremaAppHost.Value; }
-        }
+        private CremaAppHostViewModel CremaAppHost => this.cremaAppHost.Value;
 
         private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }

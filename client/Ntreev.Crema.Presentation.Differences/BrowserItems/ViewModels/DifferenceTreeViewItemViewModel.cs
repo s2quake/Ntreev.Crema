@@ -28,9 +28,6 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             this.browser = browser;
         }
 
-        public BrowserViewModel Browser
-        {
-            get { return this.browser; }
-        }
+        public BrowserViewModel Browser => this.browser;
     }
 }

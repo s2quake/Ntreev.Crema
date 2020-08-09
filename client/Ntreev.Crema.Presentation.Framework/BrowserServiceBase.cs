@@ -37,15 +37,9 @@ namespace Ntreev.Crema.Presentation.Framework
             this.browserItems = ParentItemUtility.GetItems(this, browserItems).ToArray();
         }
 
-        public IEnumerable<IBrowserItem> Browsers
-        {
-            get { return this.itemsSource; }
-        }
+        public IEnumerable<IBrowserItem> Browsers => this.itemsSource;
 
-        public ObservableCollection<IBrowserItem> ItemsSource
-        {
-            get { return this.itemsSource; }
-        }
+        public ObservableCollection<IBrowserItem> ItemsSource => this.itemsSource;
 
         private async void CremaAppHost_Opened(object sender, EventArgs e)
         {

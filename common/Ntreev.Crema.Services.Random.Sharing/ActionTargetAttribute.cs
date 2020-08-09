@@ -35,9 +35,6 @@ namespace Ntreev.Crema.Services.Random
             this.targets = targets;
         }
 
-        public ActionTargets Targets
-        {
-            get { return this.targets; }
-        }
+        public ActionTargets Targets => this.targets;
     }
 }

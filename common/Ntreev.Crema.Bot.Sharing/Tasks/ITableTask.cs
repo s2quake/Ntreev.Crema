@@ -50,15 +50,9 @@ namespace Ntreev.Crema.Bot.Tasks
             }
         }
 
-        public Type TargetType
-        {
-            get { return typeof(ITable); }
-        }
+        public Type TargetType => typeof(ITable);
 
-        public bool IsEnabled
-        {
-            get { return false; }
-        }
+        public bool IsEnabled => false;
 
         //[TaskMethod]
         public void GetAccessType(ITable table, TaskContext context)

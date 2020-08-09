@@ -30,10 +30,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels.Tables
             this.DisplayName = Resources.Title_ColumnCount;
         }
 
-        public override Type SupportType
-        {
-            get { return typeof(ITableDescriptor); }
-        }
+        public override Type SupportType => typeof(ITableDescriptor);
 
         protected override int GetObjectValue(object obj)
         {

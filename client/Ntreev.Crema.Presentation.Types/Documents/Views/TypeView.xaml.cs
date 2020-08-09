@@ -90,8 +90,8 @@ namespace Ntreev.Crema.Presentation.Types.Documents.Views
 
         public string SearchText
         {
-            get { return (string)this.GetValue(SearchTextProperty); }
-            set { this.SetValue(SearchTextProperty, value); }
+            get => (string)this.GetValue(SearchTextProperty);
+            set => this.SetValue(SearchTextProperty, value);
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)

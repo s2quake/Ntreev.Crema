@@ -50,7 +50,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public DomainUser Owner
         {
-            get { return this.owner; }
+            get => this.owner;
             set
             {
                 if (this.owner != null)

@@ -32,15 +32,9 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels.Tables
             this.DisplayName = Resources.Title_TableStates;
         }
 
-        public override Type EnumType
-        {
-            get { return typeof(TableState); }
-        }
+        public override Type EnumType => typeof(TableState);
 
-        public override Type SupportType
-        {
-            get { return typeof(ITableDescriptor); }
-        }
+        public override Type SupportType => typeof(ITableDescriptor);
 
         protected override Enum GetTargetValue(object target)
         {

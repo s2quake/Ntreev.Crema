@@ -44,7 +44,7 @@ namespace Ntreev.Crema.Presentation.Framework
 
         public string DisplayName
         {
-            get { return this.displayName ?? string.Empty; }
+            get => this.displayName ?? string.Empty;
             set
             {
                 this.displayName = value;
@@ -52,15 +52,9 @@ namespace Ntreev.Crema.Presentation.Framework
             }
         }
 
-        public object Row
-        {
-            get { return this.row; }
-        }
+        public object Row => this.row;
 
-        public object Column
-        {
-            get { return this.column; }
-        }
+        public object Column => this.column;
 
         private void GridControl_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {

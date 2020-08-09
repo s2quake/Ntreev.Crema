@@ -31,9 +31,6 @@ namespace Ntreev.Crema.ServiceModel
 
         }
 
-        public IContainer<_I> Users
-        {
-            get { return this.Items; }
-        }
+        public IContainer<_I> Users => this.Items;
     }
 }

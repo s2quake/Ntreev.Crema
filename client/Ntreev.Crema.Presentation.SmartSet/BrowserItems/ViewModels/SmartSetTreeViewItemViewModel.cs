@@ -61,15 +61,9 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             return base.CompareTo(obj);
         }
 
-        public override string DisplayName
-        {
-            get { return this.smartSet.Name; }
-        }
+        public override string DisplayName => this.smartSet.Name;
 
-        public ISmartSet SmartSet
-        {
-            get { return this.smartSet; }
-        }
+        public ISmartSet SmartSet => this.smartSet;
 
         public async Task RenameAsync()
         {

@@ -108,26 +108,26 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public DiffDataTable Source
         {
-            get { return (DiffDataTable)this.GetValue(SourceProperty); }
-            set { this.SetValue(SourceProperty, value); }
+            get => (DiffDataTable)this.GetValue(SourceProperty);
+            set => this.SetValue(SourceProperty, value);
         }
 
         public ICommand ResolveCommand
         {
-            get { return (ICommand)this.GetValue(ResolveCommandProperty); }
-            set { this.SetValue(ResolveCommandProperty, value); }
+            get => (ICommand)this.GetValue(ResolveCommandProperty);
+            set => this.SetValue(ResolveCommandProperty, value);
         }
 
         public bool IsDateTimeIncluded
         {
-            get { return (bool)this.GetValue(IsDateTimeIncludedProperty); }
-            set { this.SetValue(IsDateTimeIncludedProperty, value); }
+            get => (bool)this.GetValue(IsDateTimeIncludedProperty);
+            set => this.SetValue(IsDateTimeIncludedProperty, value);
         }
 
         public object ResolveCommandParameter
         {
-            get { return (object)this.GetValue(ResolveCommandParameterProperty); }
-            set { this.SetValue(ResolveCommandParameterProperty, value); }
+            get => (object)this.GetValue(ResolveCommandParameterProperty);
+            set => this.SetValue(ResolveCommandParameterProperty, value);
         }
 
         private static void IsDateTimeIncludedPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)

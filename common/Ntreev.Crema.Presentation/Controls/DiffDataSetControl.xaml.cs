@@ -47,8 +47,8 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public DiffDataSet Source
         {
-            get { return (DiffDataSet)this.GetValue(SourceProperty); }
-            set { this.SetValue(SourceProperty, value); }
+            get => (DiffDataSet)this.GetValue(SourceProperty);
+            set => this.SetValue(SourceProperty, value);
         }
 
         private static void SelectedItemPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -88,14 +88,14 @@ namespace Ntreev.Crema.Presentation.Controls
 
         private IEnumerable ItemsSource
         {
-            get { return (IEnumerable)this.GetValue(ItemsSourceProperty); }
-            set { this.SetValue(ItemsSourceProperty, value); }
+            get => (IEnumerable)this.GetValue(ItemsSourceProperty);
+            set => this.SetValue(ItemsSourceProperty, value);
         }
 
         private object SelectedItem
         {
-            get { return (object)this.GetValue(SelectedItemProperty); }
-            set { this.SetValue(SelectedItemProperty, value); }
+            get => (object)this.GetValue(SelectedItemProperty);
+            set => this.SetValue(SelectedItemProperty, value);
         }
 
         #region classes
@@ -125,26 +125,20 @@ namespace Ntreev.Crema.Presentation.Controls
                 return this.diffTable.ToString();
             }
 
-            public DiffState DiffState
-            {
-                get { return this.diffState; }
-            }
+            public DiffState DiffState => this.diffState;
 
-            public DiffDataTable Source
-            {
-                get { return this.diffTable; }
-            }
+            public DiffDataTable Source => this.diffTable;
 
             public bool ReadOnly
             {
-                get { return (bool)this.GetValue(ReadOnlyProperty); }
-                set { this.SetValue(ReadOnlyProperty, value); }
+                get => (bool)this.GetValue(ReadOnlyProperty);
+                set => this.SetValue(ReadOnlyProperty, value);
             }
 
             public bool IsVisible
             {
-                get { return (bool)this.GetValue(IsVisibleProperty); }
-                set { this.SetValue(IsVisibleProperty, value); }
+                get => (bool)this.GetValue(IsVisibleProperty);
+                set => this.SetValue(IsVisibleProperty, value);
             }
         }
 

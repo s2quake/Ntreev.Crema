@@ -26,7 +26,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
 
         public TagInfo Value
         {
-            get { return this.value; }
+            get => this.value;
             set
             {
                 this.value = value;

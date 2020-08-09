@@ -40,7 +40,7 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 
         public TableInfo TableInfo
         {
-            get { return this.tableInfo; }
+            get => this.tableInfo;
             set
             {
                 this.tableInfo = value;
@@ -48,15 +48,9 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
             }
         }
 
-        public override bool IsVisible
-        {
-            get { return this.descriptor != null; }
-        }
+        public override bool IsVisible => this.descriptor != null;
 
-        public override object SelectedObject
-        {
-            get { return this.descriptor; }
-        }
+        public override object SelectedObject => this.descriptor;
 
         public override bool CanSupport(object obj)
         {

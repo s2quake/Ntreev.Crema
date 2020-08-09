@@ -203,15 +203,9 @@ namespace Ntreev.Crema.Data.Diff
             internal set;
         }
 
-        public CremaDataTable SourceItem1
-        {
-            get { return this.diffSource1; }
-        }
+        public CremaDataTable SourceItem1 => this.diffSource1;
 
-        public CremaDataTable SourceItem2
-        {
-            get { return this.diffSource2; }
-        }
+        public CremaDataTable SourceItem2 => this.diffSource2;
 
         public TableInfo TableInfo1
         {
@@ -235,14 +229,14 @@ namespace Ntreev.Crema.Data.Diff
 
         public string ItemName1
         {
-            get { return DiffUtility.GetOriginalName(this.diffSource1.TableName); }
-            set { this.diffSource1.TableName = value; }
+            get => DiffUtility.GetOriginalName(this.diffSource1.TableName);
+            set => this.diffSource1.TableName = value;
         }
 
         public string ItemName2
         {
-            get { return DiffUtility.GetOriginalName(this.diffSource2.TableName); }
-            set { this.diffSource2.TableName = value; }
+            get => DiffUtility.GetOriginalName(this.diffSource2.TableName);
+            set => this.diffSource2.TableName = value;
         }
 
         public string Header1
@@ -253,10 +247,7 @@ namespace Ntreev.Crema.Data.Diff
                     return this.DiffSet.Header1;
                 return this.header1 ?? string.Empty;
             }
-            set
-            {
-                this.header1 = value;
-            }
+            set => this.header1 = value;
         }
 
         public string Header2
@@ -267,59 +258,32 @@ namespace Ntreev.Crema.Data.Diff
                     return this.DiffSet.Header2;
                 return this.header2 ?? string.Empty;
             }
-            set
-            {
-                this.header2 = value;
-            }
+            set => this.header2 = value;
         }
 
-        public DiffState DiffState
-        {
-            get { return this.diffState; }
-        }
+        public DiffState DiffState => this.diffState;
 
-        public IReadOnlyList<DiffDataRow> Rows
-        {
-            get { return this.itemList; }
-        }
+        public IReadOnlyList<DiffDataRow> Rows => this.itemList;
 
-        public bool IsResolved
-        {
-            get { return this.isResolved; }
-        }
+        public bool IsResolved => this.isResolved;
 
         public DiffTemplate Template
         {
-            get { return this.template; }
-            internal set
-            {
-                this.template = value;
-            }
+            get => this.template;
+            internal set => this.template = value;
         }
 
-        public DiffDataTable TemplatedParent
-        {
-            get { return this.templatedParent; }
-        }
+        public DiffDataTable TemplatedParent => this.templatedParent;
 
-        public DiffDataTable[] DerivedTables
-        {
-            get { return this.derivedTables; }
-        }
+        public DiffDataTable[] DerivedTables => this.derivedTables;
 
-        public DiffDataTable[] Childs
-        {
-            get { return this.childs; }
-        }
+        public DiffDataTable[] Childs => this.childs;
 
-        public IEnumerable<object> UnresolvedItems
-        {
-            get { return this.unresolvedItemList; }
-        }
+        public IEnumerable<object> UnresolvedItems => this.unresolvedItemList;
 
         public string[] Filters
         {
-            get { return this.filters ?? new string[] { }; }
+            get => this.filters ?? new string[] { };
             set
             {
                 this.filters = value;

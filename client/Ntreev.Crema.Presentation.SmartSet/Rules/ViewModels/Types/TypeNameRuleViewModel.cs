@@ -30,10 +30,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels.Types
             this.DisplayName = Resources.Title_TypeName;
         }
 
-        public override Type SupportType
-        {
-            get { return typeof(ITypeDescriptor); }
-        }
+        public override Type SupportType => typeof(ITypeDescriptor);
 
         protected override string GetSourceValue(object target)
         {

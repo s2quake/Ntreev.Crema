@@ -36,7 +36,7 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
 
         public TableInfo TableInfo
         {
-            get { return this.tableInfo; }
+            get => this.tableInfo;
             set
             {
                 this.tableInfo = value;
@@ -44,15 +44,9 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
             }
         }
 
-        public override bool IsVisible
-        {
-            get { return this.viewModel != null; }
-        }
+        public override bool IsVisible => this.viewModel != null;
 
-        public override object SelectedObject
-        {
-            get { return this.viewModel; }
-        }
+        public override object SelectedObject => this.viewModel;
 
         public override bool CanSupport(object obj)
         {

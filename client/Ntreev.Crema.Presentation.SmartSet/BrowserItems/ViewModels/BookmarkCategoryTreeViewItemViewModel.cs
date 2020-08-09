@@ -117,34 +117,16 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             }
         }
 
-        public override string DisplayName
-        {
-            get { return this.categoryName.Name; }
-        }
+        public override string DisplayName => this.categoryName.Name;
 
-        public string DisplayPath
-        {
-            get { return this.categoryName.Path; }
-        }
+        public string DisplayPath => this.categoryName.Path;
 
-        public string Path
-        {
-            get { return this.categoryName.Path; }
-        }
+        public string Path => this.categoryName.Path;
 
-        public string Name
-        {
-            get { return categoryName.Name; }
-        }
+        public string Name => categoryName.Name;
 
-        public override int Order
-        {
-            get { return 1; }
-        }
+        public override int Order => 1;
 
-        public SmartSetBrowserViewModel Browser
-        {
-            get { return this.Owner as SmartSetBrowserViewModel; }
-        }
+        public SmartSetBrowserViewModel Browser => this.Owner as SmartSetBrowserViewModel;
     }
 }

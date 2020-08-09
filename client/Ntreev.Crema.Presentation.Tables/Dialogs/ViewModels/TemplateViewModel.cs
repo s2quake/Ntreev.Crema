@@ -147,7 +147,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 
         public string TableName
         {
-            get { return this.tableName ?? string.Empty; }
+            get => this.tableName ?? string.Empty;
             set
             {
                 this.tableName = value;
@@ -175,10 +175,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         public string Comment
         {
             get => this.comment ?? string.Empty;
-            set
-            {
-                this.comment = value;
-            }
+            set => this.comment = value;
         }
 
         public bool CanChange

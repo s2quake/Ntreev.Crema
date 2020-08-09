@@ -33,29 +33,29 @@ namespace Ntreev.Crema.ServiceModel
         [IgnoreDataMember]
         public object[] Fields
         {
-            get { return this.fields; }
-            set { this.fields = value; }
+            get => this.fields;
+            set => this.fields = value;
         }
 
         [IgnoreDataMember]
         public object[] Keys
         {
-            get { return this.keys; }
-            set { this.keys = value; }
+            get => this.keys;
+            set => this.keys = value;
         }
 
         [DataMember]
         public DomainFieldInfo[] FieldInfos
         {
-            get { return this.fields != null ? this.fields.Select(item => new DomainFieldInfo(item)).ToArray() : new DomainFieldInfo[] { }; }
-            set { this.fields = value?.Select(item => item.ToValue()).ToArray(); }
+            get => this.fields != null ? this.fields.Select(item => new DomainFieldInfo(item)).ToArray() : new DomainFieldInfo[] { };
+            set => this.fields = value?.Select(item => item.ToValue()).ToArray();
         }
 
         [DataMember]
         public DomainFieldInfo[] KeyInfos
         {
-            get { return this.keys != null ? this.keys.Select(item => new DomainFieldInfo(item)).ToArray() : new DomainFieldInfo[] { }; }
-            set { this.keys = value?.Select(item => item.ToValue()).ToArray(); }
+            get => this.keys != null ? this.keys.Select(item => new DomainFieldInfo(item)).ToArray() : new DomainFieldInfo[] { };
+            set => this.keys = value?.Select(item => item.ToValue()).ToArray();
         }
 
         [IgnoreDataMember]

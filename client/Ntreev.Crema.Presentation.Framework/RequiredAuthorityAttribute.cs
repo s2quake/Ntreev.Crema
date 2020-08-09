@@ -29,9 +29,6 @@ namespace Ntreev.Crema.Presentation.Framework
             this.authority = authority;
         }
 
-        public Authority Authority
-        {
-            get { return this.authority; }
-        }
+        public Authority Authority => this.authority;
     }
 }

@@ -103,15 +103,9 @@ namespace Ntreev.Crema.Bot.Tasks
             }
         }
 
-        public Type TargetType
-        {
-            get { return typeof(ITableTemplate); }
-        }
+        public Type TargetType => typeof(ITableTemplate);
 
-        public bool IsEnabled
-        {
-            get { return false; }
-        }
+        public bool IsEnabled => false;
 
         [TaskMethod(Weight = 10)]
         public async Task SetTableNameAsync(ITableTemplate template, TaskContext context)

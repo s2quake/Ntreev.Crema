@@ -31,10 +31,7 @@ namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
             this.diffSet = diffSet;
         }
 
-        public DiffDataSet Source
-        {
-            get { return this.diffSet; }
-        }
+        public DiffDataSet Source => this.diffSet;
     }
 }
 

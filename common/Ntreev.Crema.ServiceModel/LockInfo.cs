@@ -38,10 +38,10 @@ namespace Ntreev.Crema.ServiceModel
         public string Comment { get; set; }
 
         [IgnoreDataMember]
-        public string UserID { get { return this.SignatureDate.ID; } }
+        public string UserID => this.SignatureDate.ID;
 
         [IgnoreDataMember]
-        public DateTime DateTime { get { return this.SignatureDate.DateTime; } }
+        public DateTime DateTime => this.SignatureDate.DateTime;
 
         public static bool operator ==(LockInfo x, LockInfo y)
         {
@@ -120,15 +120,9 @@ namespace Ntreev.Crema.ServiceModel
         };
 
         [IgnoreDataMember]
-        public bool IsInherited
-        {
-            get { return this.ParentPath != string.Empty; }
-        }
+        public bool IsInherited => this.ParentPath != string.Empty;
 
         [IgnoreDataMember]
-        public bool IsLocked
-        {
-            get { return this.UserID != string.Empty; }
-        }
+        public bool IsLocked => this.UserID != string.Empty;
     }
 }

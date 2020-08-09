@@ -332,7 +332,7 @@ namespace Ntreev.Crema.Services
 
         public LogVerbose Verbose
         {
-            get { return this.verbose; }
+            get => this.verbose;
             set
             {
                 if (this.verbose == value)
@@ -383,8 +383,8 @@ namespace Ntreev.Crema.Services
 
         public string Name
         {
-            get { return this.name; }
-            set { this.name = value; }
+            get => this.name;
+            set => this.name = value;
         }
 
         public string FileName

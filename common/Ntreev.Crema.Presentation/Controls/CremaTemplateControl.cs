@@ -84,32 +84,32 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public CremaTemplate Source
         {
-            get { return (CremaTemplate)GetValue(SourceProperty); }
-            set { SetValue(SourceProperty, value); }
+            get => (CremaTemplate)GetValue(SourceProperty);
+            set => SetValue(SourceProperty, value);
         }
 
         public bool ReadOnly
         {
-            get { return (bool)GetValue(ReadOnlyProperty); }
-            set { SetValue(ReadOnlyProperty, value); }
+            get => (bool)GetValue(ReadOnlyProperty);
+            set => SetValue(ReadOnlyProperty, value);
         }
 
         public IEnumerable SelectableTypes
         {
-            get { return (IEnumerable)this.GetValue(SelectableTypesProperty); }
-            set { this.SetValue(SelectableTypesProperty, value); }
+            get => (IEnumerable)this.GetValue(SelectableTypesProperty);
+            set => this.SetValue(SelectableTypesProperty, value);
         }
 
         public bool IsVerticalScrollBarOnLeftSide
         {
-            get { return (bool)this.GetValue(IsVerticalScrollBarOnLeftSideProperty); }
-            set { this.SetValue(IsVerticalScrollBarOnLeftSideProperty, value); }
+            get => (bool)this.GetValue(IsVerticalScrollBarOnLeftSideProperty);
+            set => this.SetValue(IsVerticalScrollBarOnLeftSideProperty, value);
         }
 
         public IEnumerable ItemsSource
         {
-            get { return (IEnumerable)this.GetValue(ItemsSourceProperty); }
-            set { this.SetValue(ItemsSourceProperty, value); }
+            get => (IEnumerable)this.GetValue(ItemsSourceProperty);
+            set => this.SetValue(ItemsSourceProperty, value);
         }
 
         public override void OnApplyTemplate()

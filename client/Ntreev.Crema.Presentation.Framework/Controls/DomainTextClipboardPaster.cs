@@ -90,10 +90,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             this.selectedColumns = targetColumns;
         }
 
-        public DomainRowInfo[] DomainRows
-        {
-            get { return this.domainRows; }
-        }
+        public DomainRowInfo[] DomainRows => this.domainRows;
 
         public void SelectRange()
         {

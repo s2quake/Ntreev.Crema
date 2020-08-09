@@ -30,14 +30,11 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
             this.dataTable = dataTable;
         }
 
-        public CremaDataTable Source
-        {
-            get { return this.dataTable; }
-        }
+        public CremaDataTable Source => this.dataTable;
 
         public CremaDataTable SelectedTable
         {
-            get { return this.selectedTable; }
+            get => this.selectedTable;
             set
             {
                 this.selectedTable = value;

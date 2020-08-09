@@ -36,20 +36,20 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public object Header
         {
-            get { return (object)this.GetValue(HeaderProperty); }
-            set { this.SetValue(HeaderProperty, value); }
+            get => (object)this.GetValue(HeaderProperty);
+            set => this.SetValue(HeaderProperty, value);
         }
 
         public DataTemplate HeaderTemplate
         {
-            get { return (DataTemplate)this.GetValue(HeaderTemplateProperty); }
-            set { this.SetValue(HeaderTemplateProperty, value); }
+            get => (DataTemplate)this.GetValue(HeaderTemplateProperty);
+            set => this.SetValue(HeaderTemplateProperty, value);
         }
 
         public DataTemplateSelector HeaderTemplateSelector
         {
-            get { return (DataTemplateSelector)this.GetValue(HeaderTemplateSelectorProperty); }
-            set { this.SetValue(HeaderTemplateSelectorProperty, value); }
+            get => (DataTemplateSelector)this.GetValue(HeaderTemplateSelectorProperty);
+            set => this.SetValue(HeaderTemplateSelectorProperty, value);
         }
 
         private static void HeaderPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)

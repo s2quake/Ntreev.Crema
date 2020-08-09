@@ -72,23 +72,14 @@ namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.ViewModels
             this.configs.Commit(this);
         }
 
-        public string Name
-        {
-            get { return "Excel Importer"; }
-        }
+        public string Name => "Excel Importer";
 
-        public IEnumerable ItemsSource
-        {
-            get
-            {
-                return this.itemsSource;
-            }
-        }
+        public IEnumerable ItemsSource => this.itemsSource;
 
         [ConfigurationProperty("InputPath")]
         public string InputPath
         {
-            get { return this.inputPath ?? string.Empty; }
+            get => this.inputPath ?? string.Empty;
             set
             {
                 this.inputPath = value;
@@ -180,14 +171,11 @@ namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.ViewModels
             throw new NotImplementedException();
         }
 
-        public bool HasError
-        {
-            get { return this.ErrorMessage != string.Empty; }
-        }
+        public bool HasError => this.ErrorMessage != string.Empty;
 
         public string ErrorMessage
         {
-            get { return this.errorMessage ?? string.Empty; }
+            get => this.errorMessage ?? string.Empty;
             private set
             {
                 this.errorMessage = value;
@@ -265,11 +253,8 @@ namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.ViewModels
         [ConfigurationProperty]
         private string[] ImportedItems
         {
-            get { return this.importedItems; }
-            set
-            {
-                this.importedItems = value ?? new string[] { };
-            }
+            get => this.importedItems;
+            set => this.importedItems = value ?? new string[] { };
         }
     }
 }

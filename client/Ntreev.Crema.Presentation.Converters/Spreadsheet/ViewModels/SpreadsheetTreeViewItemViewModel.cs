@@ -41,24 +41,15 @@ namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.ViewModels
             }
         }
 
-        public override string DisplayName
-        {
-            get { return this.path; }
-        }
+        public override string DisplayName => this.path;
 
-        public string Path
-        {
-            get { return this.path; }
-        }
+        public string Path => this.path;
 
-        public bool IsEnabled
-        {
-            get { return string.IsNullOrEmpty(this.errorString) == true; }
-        }
+        public bool IsEnabled => string.IsNullOrEmpty(this.errorString) == true;
 
         public string ErrorString
         {
-            get { return this.errorString; }
+            get => this.errorString;
             set
             {
                 this.errorString = value;

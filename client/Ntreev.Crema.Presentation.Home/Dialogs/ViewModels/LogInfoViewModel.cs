@@ -49,19 +49,13 @@ namespace Ntreev.Crema.Presentation.Home.Dialogs.ViewModels
 
         #region IInfoProvider
 
-        IDictionary<string, object> IInfoProvider.Info
-        {
-            get
-            {
-                return new Dictionary<string, object>()
+        IDictionary<string, object> IInfoProvider.Info => new Dictionary<string, object>()
                 {
                     { nameof(UserID), this.UserID },
                     { nameof(Revision), this.Revision },
                     { nameof(Message), this.Message },
                     { nameof(DateTime), this.DateTime }
                 };
-            }
-        }
 
         #endregion
     }

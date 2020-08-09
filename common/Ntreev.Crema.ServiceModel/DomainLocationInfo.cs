@@ -39,15 +39,15 @@ namespace Ntreev.Crema.ServiceModel
         [IgnoreDataMember]
         public object[] Keys
         {
-            get { return this.keys; }
-            set { this.keys = value; }
+            get => this.keys;
+            set => this.keys = value;
         }
 
         [DataMember]
         public DomainFieldInfo[] KeyInfos
         {
-            get { return this.keys != null ? this.keys.Select(item => new DomainFieldInfo(item)).ToArray() : new DomainFieldInfo[] { }; }
-            set { this.keys = value?.Select(item => item.ToValue()).ToArray(); }
+            get => this.keys != null ? this.keys.Select(item => new DomainFieldInfo(item)).ToArray() : new DomainFieldInfo[] { };
+            set => this.keys = value?.Select(item => item.ToValue()).ToArray();
         }
 
         public static readonly DomainLocationInfo Empty = new DomainLocationInfo() { Keys = new object[] { } };

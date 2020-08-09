@@ -25,7 +25,7 @@ namespace Ntreev.Crema.Presentation.Framework
 
         public string DisplayName
         {
-            get { return this.displayName; }
+            get => this.displayName;
             set
             {
                 this.displayName = value;

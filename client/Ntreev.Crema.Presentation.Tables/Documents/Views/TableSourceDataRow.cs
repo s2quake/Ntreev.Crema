@@ -38,8 +38,8 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.Views
 
         public bool IsItemEnabled
         {
-            get { return (bool)this.GetValue(IsItemEnabledProperty); }
-            set { this.SetValue(IsItemEnabledProperty, value); }
+            get => (bool)this.GetValue(IsItemEnabledProperty);
+            set => this.SetValue(IsItemEnabledProperty, value);
         }
 
         protected override Cell CreateCell(ColumnBase column)

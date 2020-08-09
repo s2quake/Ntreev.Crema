@@ -69,7 +69,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 
         public string FindingText
         {
-            get { return this.findingText ?? string.Empty; }
+            get => this.findingText ?? string.Empty;
             set
             {
                 this.findingText = value;
@@ -93,7 +93,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 
         public string FindingTarget
         {
-            get { return this.findingTarget ?? string.Empty; }
+            get => this.findingTarget ?? string.Empty;
             set
             {
                 this.findingTarget = value;
@@ -125,14 +125,11 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             this.EndProgress();
         }
 
-        public ObservableCollection<FindResultItemViewModel> Items
-        {
-            get { return this.items; }
-        }
+        public ObservableCollection<FindResultItemViewModel> Items => this.items;
 
         public FindResultItemViewModel SelectedItem
         {
-            get { return this.selectedItem; }
+            get => this.selectedItem;
             set
             {
                 this.selectedItem = value;
@@ -140,13 +137,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             }
         }
 
-        public bool CanFind
-        {
-            get
-            {
-                return this.IsProgressing == false && this.FindingText != string.Empty;
-            }
-        }
+        public bool CanFind => this.IsProgressing == false && this.FindingText != string.Empty;
 
         #region IPartImportsSatisfiedNotification
 

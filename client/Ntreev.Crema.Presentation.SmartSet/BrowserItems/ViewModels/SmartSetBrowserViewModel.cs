@@ -134,7 +134,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 
         public bool IsVisible
         {
-            get { return this.isVisible; }
+            get => this.isVisible;
             set
             {
                 this.isVisible = value;
@@ -142,20 +142,11 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             }
         }
 
-        public bool CanNewSmartSet
-        {
-            get { return this.SelectedItem is SmartSetCategoryTreeViewItemViewModel; }
-        }
+        public bool CanNewSmartSet => this.SelectedItem is SmartSetCategoryTreeViewItemViewModel;
 
-        public BookmarkRootTreeViewItemViewModel BookmarkCategory
-        {
-            get { return this.bookmarkCategory; }
-        }
+        public BookmarkRootTreeViewItemViewModel BookmarkCategory => this.bookmarkCategory;
 
-        public IRule[] Rules
-        {
-            get { return this.rules; }
-        }
+        public IRule[] Rules => this.rules;
 
         public abstract ISmartSetCategory Root
         {
@@ -166,15 +157,9 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 
         public abstract BookmarkRootTreeViewItemViewModel CreateBookmarkRootViewModel();
 
-        public ICommand RenameCommand
-        {
-            get { return this.renameCommand; }
-        }
+        public ICommand RenameCommand => this.renameCommand;
 
-        public ICommand DeleteCommand
-        {
-            get { return this.deleteCommand; }
-        }
+        public ICommand DeleteCommand => this.deleteCommand;
 
         private void InitializeBookmarkItems()
         {

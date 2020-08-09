@@ -62,10 +62,7 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
             }
         }
 
-        public override string DisplayName
-        {
-            get { return this.Name; }
-        }
+        public override string DisplayName => this.Name;
 
         public override bool CanCheck => this.descriptor.AccessType >= AccessType.Guest;
 

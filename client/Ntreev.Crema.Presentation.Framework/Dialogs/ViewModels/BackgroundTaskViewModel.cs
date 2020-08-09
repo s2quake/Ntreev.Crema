@@ -48,18 +48,9 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
             this.NotifyOfPropertyChange(nameof(this.CanCancel));
         }
 
-        public bool CanCancel
-        {
-            get
-            {
-                return this.task.IsBusy && this.task.IsCancellationRequested == false;
-            }
-        }
+        public bool CanCancel => this.task.IsBusy && this.task.IsCancellationRequested == false;
 
-        public bool CanHide
-        {
-            get { return true; }
-        }
+        public bool CanHide => true;
 
         protected override void OnViewLoaded(object view)
         {

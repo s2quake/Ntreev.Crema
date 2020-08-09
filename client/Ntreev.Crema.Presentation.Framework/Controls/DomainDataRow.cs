@@ -48,10 +48,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             return domain.RemoveRowAsync(authenticator, item);
         }
 
-        public new DomainDataGridControl GridControl
-        {
-            get { return (DomainDataGridControl)base.GridControl; }
-        }
+        public new DomainDataGridControl GridControl => (DomainDataGridControl)base.GridControl;
 
         public bool CanDelete
         {

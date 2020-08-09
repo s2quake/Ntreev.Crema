@@ -34,8 +34,8 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
         public bool HasScrollViewer
         {
-            get { return (bool)this.GetValue(HasScrollViewerProperty); }
-            set { this.SetValue(HasScrollViewerProperty, value); }
+            get => (bool)this.GetValue(HasScrollViewerProperty);
+            set => this.SetValue(HasScrollViewerProperty, value);
         }
 
         protected override System.Windows.DependencyObject GetContainerForItemOverride()

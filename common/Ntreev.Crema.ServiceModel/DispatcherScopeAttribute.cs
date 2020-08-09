@@ -36,10 +36,7 @@ namespace Ntreev.Crema.ServiceModel
             this.scopeTypeName = scopeTypeName;
         }
 
-        public string ScopeTypeName
-        {
-            get { return this.scopeTypeName; }
-        }
+        public string ScopeTypeName => this.scopeTypeName;
 
         internal Type ScopeType
         {

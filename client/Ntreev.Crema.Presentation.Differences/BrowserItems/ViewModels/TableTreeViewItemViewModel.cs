@@ -89,44 +89,23 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             }
         }
 
-        public DiffState DiffState
-        {
-            get { return this.diffTable.DiffState; }
-        }
+        public DiffState DiffState => this.diffTable.DiffState;
 
-        public bool IsResolved
-        {
-            get { return this.diffTable.IsResolved; }
-        }
+        public bool IsResolved => this.diffTable.IsResolved;
 
-        public bool IsActivated
-        {
-            get { return this.isActivated; }
-        }
+        public bool IsActivated => this.isActivated;
 
-        public DiffDataTable Source
-        {
-            get { return this.diffTable; }
-        }
+        public DiffDataTable Source => this.diffTable;
 
-        public CremaDataTable Source1
-        {
-            get { return this.diffTable.SourceItem1; }
-        }
+        public CremaDataTable Source1 => this.diffTable.SourceItem1;
 
-        public CremaDataTable Source2
-        {
-            get { return this.diffTable.SourceItem2; }
-        }
+        public CremaDataTable Source2 => this.diffTable.SourceItem2;
 
-        public IEnumerable<object> UnresolvedItems
-        {
-            get { return this.diffTable.UnresolvedItems; }
-        }
+        public IEnumerable<object> UnresolvedItems => this.diffTable.UnresolvedItems;
 
         public string Header1
         {
-            get { return this.header1 ?? string.Empty; }
+            get => this.header1 ?? string.Empty;
             set
             {
                 this.header1 = value;
@@ -136,7 +115,7 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
 
         public string Header2
         {
-            get { return this.header2; }
+            get => this.header2;
             set
             {
                 this.header2 = value;
@@ -144,10 +123,7 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             }
         }
 
-        public ICommand ViewCommand
-        {
-            get { return this.viewCommand; }
-        }
+        public ICommand ViewCommand => this.viewCommand;
 
         public bool IsInherited => false;
 

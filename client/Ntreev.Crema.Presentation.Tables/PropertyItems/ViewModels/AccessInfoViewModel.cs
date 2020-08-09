@@ -51,10 +51,7 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
             this.Attach();
         }
 
-        public override object SelectedObject
-        {
-            get { return this.descriptor; }
-        }
+        public override object SelectedObject => this.descriptor;
 
         public override bool IsVisible
         {
@@ -68,7 +65,7 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 
         public AccessInfo AccessInfo
         {
-            get { return this.accessInfo; }
+            get => this.accessInfo;
             private set
             {
                 this.accessInfo = value;

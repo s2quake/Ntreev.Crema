@@ -533,51 +533,39 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        public ColumnInfo ColumnInfo
+        public ColumnInfo ColumnInfo => new ColumnInfo()
         {
-            get
-            {
-                return new ColumnInfo()
-                {
-                    ID = this.ColumnID,
-                    IsKey = this.IsKey,
-                    IsUnique = this.Unique,
-                    AllowNull = this.AllowDBNull,
-                    DataType = this.DataTypeName,
-                    Tags = this.Tags,
-                    DerivedTags = this.DerivedTags,
-                    DefaultValue = this.DefaultString,
-                    AutoIncrement = this.AutoIncrement,
-                    Comment = this.Comment,
-                    Name = this.ColumnName,
-                    CreationInfo = this.CreationInfo,
-                    ModificationInfo = this.ModificationInfo,
-                };
-            }
-        }
+            ID = this.ColumnID,
+            IsKey = this.IsKey,
+            IsUnique = this.Unique,
+            AllowNull = this.AllowDBNull,
+            DataType = this.DataTypeName,
+            Tags = this.Tags,
+            DerivedTags = this.DerivedTags,
+            DefaultValue = this.DefaultString,
+            AutoIncrement = this.AutoIncrement,
+            Comment = this.Comment,
+            Name = this.ColumnName,
+            CreationInfo = this.CreationInfo,
+            ModificationInfo = this.ModificationInfo,
+        };
 
-        public ColumnInfo DiffColumnInfo
+        public ColumnInfo DiffColumnInfo => new ColumnInfo()
         {
-            get
-            {
-                return new ColumnInfo()
-                {
-                    ID = this.ColumnID,
-                    IsKey = this.IsKey,
-                    IsUnique = this.Unique,
-                    AllowNull = this.AllowDBNull,
-                    DataType = this.ExtendedProperties.ContainsKey(nameof(this.DataTypeName)) ? this.ExtendedProperties[nameof(this.DataTypeName)] as string : this.DataTypeName,
-                    Tags = this.Tags,
-                    DerivedTags = this.DerivedTags,
-                    DefaultValue = this.DefaultString,
-                    AutoIncrement = this.AutoIncrement,
-                    Comment = this.Comment,
-                    Name = this.ColumnName,
-                    CreationInfo = this.CreationInfo,
-                    ModificationInfo = this.ModificationInfo,
-                };
-            }
-        }
+            ID = this.ColumnID,
+            IsKey = this.IsKey,
+            IsUnique = this.Unique,
+            AllowNull = this.AllowDBNull,
+            DataType = this.ExtendedProperties.ContainsKey(nameof(this.DataTypeName)) ? this.ExtendedProperties[nameof(this.DataTypeName)] as string : this.DataTypeName,
+            Tags = this.Tags,
+            DerivedTags = this.DerivedTags,
+            DefaultValue = this.DefaultString,
+            AutoIncrement = this.AutoIncrement,
+            Comment = this.Comment,
+            Name = this.ColumnName,
+            CreationInfo = this.CreationInfo,
+            ModificationInfo = this.ModificationInfo,
+        };
 
         public object Editor { get; set; }
 

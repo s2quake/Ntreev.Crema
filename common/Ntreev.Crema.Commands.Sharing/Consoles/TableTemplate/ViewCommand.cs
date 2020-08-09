@@ -35,7 +35,7 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
 
         }
 
-        public ITableTemplate Template { get => this.CommandContext.Template; }
+        public ITableTemplate Template => this.CommandContext.Template;
 
         protected override Task OnExecuteAsync()
         {

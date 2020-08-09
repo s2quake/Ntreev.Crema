@@ -29,9 +29,6 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
             this.version = AppUtility.ProductVersion;
         }
 
-        public string Version
-        {
-            get { return this.version; }
-        }
+        public string Version => this.version;
     }
 }

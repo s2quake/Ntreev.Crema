@@ -71,44 +71,23 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             }
         }
 
-        public DiffState DiffState
-        {
-            get { return this.diffType.DiffState; }
-        }
+        public DiffState DiffState => this.diffType.DiffState;
 
-        public bool IsResolved
-        {
-            get { return this.diffType.IsResolved; }
-        }
+        public bool IsResolved => this.diffType.IsResolved;
 
-        public bool IsActivated
-        {
-            get { return this.isActivated; }
-        }
+        public bool IsActivated => this.isActivated;
 
-        public DiffDataType Source
-        {
-            get { return this.diffType; }
-        }
+        public DiffDataType Source => this.diffType;
 
-        public CremaDataType Source1
-        {
-            get { return this.diffType.SourceItem1; }
-        }
+        public CremaDataType Source1 => this.diffType.SourceItem1;
 
-        public CremaDataType Source2
-        {
-            get { return this.diffType.SourceItem2; }
-        }
+        public CremaDataType Source2 => this.diffType.SourceItem2;
 
-        public IEnumerable<object> UnresolvedItems
-        {
-            get { return new object[] { }; }
-        }
+        public IEnumerable<object> UnresolvedItems => new object[] { };
 
         public string Header1
         {
-            get { return this.header1 ?? string.Empty; }
+            get => this.header1 ?? string.Empty;
             set
             {
                 this.header1 = value;
@@ -118,7 +97,7 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
 
         public string Header2
         {
-            get { return this.header2; }
+            get => this.header2;
             set
             {
                 this.header2 = value;
@@ -126,15 +105,9 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             }
         }
 
-        public ICommand ViewCommand
-        {
-            get { return this.viewCommand; }
-        }
+        public ICommand ViewCommand => this.viewCommand;
 
-        public bool IsFlag
-        {
-            get { return this.Source2.IsFlag; }
-        }
+        public bool IsFlag => this.Source2.IsFlag;
 
         private void DiffType_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

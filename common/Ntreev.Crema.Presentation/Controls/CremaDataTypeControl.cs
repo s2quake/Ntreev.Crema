@@ -112,38 +112,38 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public CremaDataType Source
         {
-            get { return (CremaDataType)GetValue(SourceProperty); }
-            set { SetValue(SourceProperty, value); }
+            get => (CremaDataType)GetValue(SourceProperty);
+            set => SetValue(SourceProperty, value);
         }
 
         public bool ReadOnly
         {
-            get { return (bool)GetValue(ReadOnlyProperty); }
-            set { SetValue(ReadOnlyProperty, value); }
+            get => (bool)GetValue(ReadOnlyProperty);
+            set => SetValue(ReadOnlyProperty, value);
         }
 
         public object SelectedItem
         {
-            get { return (object)this.GetValue(SelectedItemProperty); }
-            set { this.SetValue(SelectedItemProperty, value); }
+            get => (object)this.GetValue(SelectedItemProperty);
+            set => this.SetValue(SelectedItemProperty, value);
         }
 
         public string SelectedColumn
         {
-            get { return (string)this.GetValue(SelectedColumnProperty); }
-            set { this.SetValue(SelectedColumnProperty, value); }
+            get => (string)this.GetValue(SelectedColumnProperty);
+            set => this.SetValue(SelectedColumnProperty, value);
         }
 
         public bool IsVerticalScrollBarOnLeftSide
         {
-            get { return (bool)this.GetValue(IsVerticalScrollBarOnLeftSideProperty); }
-            set { this.SetValue(IsVerticalScrollBarOnLeftSideProperty, value); }
+            get => (bool)this.GetValue(IsVerticalScrollBarOnLeftSideProperty);
+            set => this.SetValue(IsVerticalScrollBarOnLeftSideProperty, value);
         }
 
         public IEnumerable ItemsSource
         {
-            get { return (IEnumerable)this.GetValue(ItemsSourceProperty); }
-            set { this.SetValue(ItemsSourceProperty, value); }
+            get => (IEnumerable)this.GetValue(ItemsSourceProperty);
+            set => this.SetValue(ItemsSourceProperty, value);
         }
 
         public new bool Focus()

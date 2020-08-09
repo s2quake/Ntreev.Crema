@@ -91,14 +91,11 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             }
         }
 
-        public string[] CategoryPaths
-        {
-            get { return this.categoryPaths; }
-        }
+        public string[] CategoryPaths => this.categoryPaths;
 
         public string NewName
         {
-            get { return this.newName ?? string.Empty; }
+            get => this.newName ?? string.Empty;
             set
             {
                 this.newName = value;
@@ -109,7 +106,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 
         public string CategoryPath
         {
-            get { return this.categoryPath ?? string.Empty; }
+            get => this.categoryPath ?? string.Empty;
             set
             {
                 this.categoryPath = value;
@@ -118,10 +115,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
             }
         }
 
-        public string TypeName
-        {
-            get { return this.typeName; }
-        }
+        public string TypeName => this.typeName;
 
         public bool CanCopy
         {

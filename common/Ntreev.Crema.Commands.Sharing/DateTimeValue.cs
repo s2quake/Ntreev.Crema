@@ -62,9 +62,6 @@ namespace Ntreev.Crema.Commands
             return this.text;
         }
 
-        public int Milliseconds
-        {
-            get => this.milliseconds;
-        }
+        public int Milliseconds => this.milliseconds;
     }
 }

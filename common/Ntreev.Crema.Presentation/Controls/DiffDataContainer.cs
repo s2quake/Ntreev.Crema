@@ -60,20 +60,11 @@ namespace Ntreev.Crema.Presentation.Controls
             return this.diffFields.Contains(fieldName);
         }
 
-        public DiffState DiffState
-        {
-            get { return (DiffState)this.GetValue(DiffStateProperty); }
-        }
+        public DiffState DiffState => (DiffState)this.GetValue(DiffStateProperty);
 
-        public bool IsStartSelection
-        {
-            get { return (bool)this.GetValue(IsStartSelectionProperty); }
-        }
+        public bool IsStartSelection => (bool)this.GetValue(IsStartSelectionProperty);
 
-        public bool IsEndSelection
-        {
-            get { return (bool)this.GetValue(IsEndSelectionProperty); }
-        }
+        public bool IsEndSelection => (bool)this.GetValue(IsEndSelectionProperty);
 
         public DiffDataContainer DestContainer
         {
@@ -124,10 +115,7 @@ namespace Ntreev.Crema.Presentation.Controls
             }
         }
 
-        public new DiffDataGridControl GridControl
-        {
-            get { return base.GridControl as DiffDataGridControl; }
-        }
+        public new DiffDataGridControl GridControl => base.GridControl as DiffDataGridControl;
 
         protected override Cell CreateCell(ColumnBase column)
         {

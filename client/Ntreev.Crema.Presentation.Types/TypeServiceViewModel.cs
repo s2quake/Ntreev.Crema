@@ -83,26 +83,17 @@ namespace Ntreev.Crema.Presentation.Types
             await this.documentService.TryCloseAsync();
         }
 
-        public IBrowserService BrowserService
-        {
-            get { return this.browserService; }
-        }
+        public IBrowserService BrowserService => this.browserService;
 
-        public TypeDocumentServiceViewModel DocumentService
-        {
-            get { return this.documentService; }
-        }
+        public TypeDocumentServiceViewModel DocumentService => this.documentService;
 
-        public IPropertyService PropertyService
-        {
-            get { return this.propertyService; }
-        }
+        public IPropertyService PropertyService => this.propertyService;
 
         [ConfigurationProperty("isBrowserExpanded")]
         [DefaultValue(true)]
         public bool IsBrowserExpanded
         {
-            get { return this.isBrowserExpanded; }
+            get => this.isBrowserExpanded;
             set
             {
                 this.isBrowserExpanded = value;
@@ -114,7 +105,7 @@ namespace Ntreev.Crema.Presentation.Types
         [DefaultValue(true)]
         public bool IsPropertyExpanded
         {
-            get { return this.isPropertyExpanded; }
+            get => this.isPropertyExpanded;
             set
             {
                 this.isPropertyExpanded = value;
@@ -126,7 +117,7 @@ namespace Ntreev.Crema.Presentation.Types
         [DefaultValue(250.0)]
         public double BrowserDistance
         {
-            get { return this.browserDistance; }
+            get => this.browserDistance;
             set
             {
                 this.browserDistance = value;
@@ -138,7 +129,7 @@ namespace Ntreev.Crema.Presentation.Types
         [DefaultValue(250.0)]
         public double PropertyDistance
         {
-            get { return this.propertyDistance; }
+            get => this.propertyDistance;
             set
             {
                 this.propertyDistance = value;
@@ -148,7 +139,7 @@ namespace Ntreev.Crema.Presentation.Types
 
         public bool IsVisible
         {
-            get { return this.isVisible; }
+            get => this.isVisible;
             set
             {
                 this.isVisible = value;

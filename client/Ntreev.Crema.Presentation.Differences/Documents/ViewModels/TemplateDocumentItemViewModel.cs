@@ -43,7 +43,7 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
 
         public bool IsModified
         {
-            get { return this.isModified; }
+            get => this.isModified;
             set
             {
                 this.isModified = value;
@@ -62,24 +62,12 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
             }
         }
 
-        public bool IsResolved
-        {
-            get { return this.viewModel.IsResolved; }
-        }
+        public bool IsResolved => this.viewModel.IsResolved;
 
-        public DiffTemplate Source
-        {
-            get { return this.viewModel.Source; }
-        }
+        public DiffTemplate Source => this.viewModel.Source;
 
-        public string Header1
-        {
-            get { return this.viewModel.Header1; }
-        }
+        public string Header1 => this.viewModel.Header1;
 
-        public string Header2
-        {
-            get { return this.viewModel.Header2; }
-        }
+        public string Header2 => this.viewModel.Header2;
     }
 }

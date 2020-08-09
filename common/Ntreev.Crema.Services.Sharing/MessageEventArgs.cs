@@ -31,14 +31,8 @@ namespace Ntreev.Crema.Services
             this.messageType = messageType;
         }
 
-        public string Message
-        {
-            get { return this.message; }
-        }
+        public string Message => this.message;
 
-        public MessageType MessageType
-        {
-            get { return this.messageType; }
-        }
+        public MessageType MessageType => this.messageType;
     }
 }

@@ -46,15 +46,12 @@ namespace Ntreev.Crema.Presentation.Controls
             base.OnApplyTemplate();
         }
 
-        public double FixedSize
-        {
-            get { return (double)this.GetValue(FixedSizeProperty); }
-        }
+        public double FixedSize => (double)this.GetValue(FixedSizeProperty);
 
         public DiffDataGridControl GridControl
         {
-            get { return (DiffDataGridControl)this.GetValue(GridControlProperty); }
-            set { this.SetValue(GridControlProperty, value); }
+            get => (DiffDataGridControl)this.GetValue(GridControlProperty);
+            set => this.SetValue(GridControlProperty, value);
         }
 
         protected override Size MeasureOverride(Size constraint)

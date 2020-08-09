@@ -36,29 +36,14 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
             this.typeName = itemName.Name;
         }
 
-        public string CategoryName
-        {
-            get { return this.categoryName; }
-        }
+        public string CategoryName => this.categoryName;
 
-        public string TypeName
-        {
-            get { return this.typeName; }
-        }
+        public string TypeName => this.typeName;
 
-        public string ColumnName
-        {
-            get { return this.resultInfo.ColumnName; }
-        }
+        public string ColumnName => this.resultInfo.ColumnName;
 
-        public int Row
-        {
-            get { return this.resultInfo.Row; }
-        }
+        public int Row => this.resultInfo.Row;
 
-        public string Value
-        {
-            get { return this.resultInfo.Value; }
-        }
+        public string Value => this.resultInfo.Value;
     }
 }

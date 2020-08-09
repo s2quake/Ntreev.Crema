@@ -32,7 +32,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.PropertyItems.ViewModels
 
         public string Name
         {
-            get { return this.name; }
+            get => this.name;
             set
             {
                 if (this.name != value)
@@ -45,7 +45,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.PropertyItems.ViewModels
 
         public string Expression
         {
-            get { return this.expression; }
+            get => this.expression;
             set
             {
                 if (this.expression != value)

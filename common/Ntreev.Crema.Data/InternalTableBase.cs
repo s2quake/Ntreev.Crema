@@ -438,7 +438,7 @@ namespace Ntreev.Crema.Data
                     return dataSet.SignatureDateProvider;
                 return this.signatureDateProvider ?? SignatureDateProvider.Default;
             }
-            set { this.signatureDateProvider = value; }
+            set => this.signatureDateProvider = value;
         }
 
         public virtual bool IsLoading
@@ -495,10 +495,7 @@ namespace Ntreev.Crema.Data
                     return this.templatedParent.OmitSignatureDate;
                 return this.omitSignatureDate;
             }
-            set
-            {
-                this.omitSignatureDate.Field = value;
-            }
+            set => this.omitSignatureDate.Field = value;
         }
 
         public bool ReadOnly { get; set; }
@@ -1162,10 +1159,7 @@ namespace Ntreev.Crema.Data
             }
         }
 
-        internal IFieldStack<bool> AcceptChangesStack
-        {
-            get { return this.acceptChangesStack; }
-        }
+        internal IFieldStack<bool> AcceptChangesStack => this.acceptChangesStack;
 
         public object Target1 { get => Target; set => Target = value; }
     }

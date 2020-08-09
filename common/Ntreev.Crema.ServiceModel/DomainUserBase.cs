@@ -35,7 +35,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public DomainUserInfo DomainUserInfo
         {
-            get { return this.domainUserInfo; }
+            get => this.domainUserInfo;
             set
             {
                 this.domainUserInfo = value;
@@ -45,7 +45,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public DomainLocationInfo DomainLocationInfo
         {
-            get { return this.domainLocationInfo; }
+            get => this.domainLocationInfo;
             set
             {
                 this.domainLocationInfo = value;
@@ -55,7 +55,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public DomainUserState DomainUserState
         {
-            get { return this.domainUserState; }
+            get => this.domainUserState;
             set
             {
                 this.domainUserState = value;
@@ -65,7 +65,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public bool IsBeingEdited
         {
-            get { return this.DomainUserState.HasFlag(DomainUserState.IsBeingEdited); }
+            get => this.DomainUserState.HasFlag(DomainUserState.IsBeingEdited);
             set
             {
                 if (value == true)
@@ -77,7 +77,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public bool IsModified
         {
-            get { return this.DomainUserState.HasFlag(DomainUserState.IsModified); }
+            get => this.DomainUserState.HasFlag(DomainUserState.IsModified);
             set
             {
                 if (value == true)
@@ -89,7 +89,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public bool IsOnline
         {
-            get { return this.DomainUserState.HasFlag(DomainUserState.Online); }
+            get => this.DomainUserState.HasFlag(DomainUserState.Online);
             set
             {
                 if (value == true)
@@ -101,7 +101,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public bool IsOwner
         {
-            get { return this.DomainUserState.HasFlag(DomainUserState.IsOwner); }
+            get => this.DomainUserState.HasFlag(DomainUserState.IsOwner);
             set
             {
                 if (value == true)
@@ -111,15 +111,9 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
-        public bool CanRead
-        {
-            get { return this.domainUserInfo.AccessType.HasFlag(DomainAccessType.Read); }
-        }
+        public bool CanRead => this.domainUserInfo.AccessType.HasFlag(DomainAccessType.Read);
 
-        public bool CanWrite
-        {
-            get { return this.domainUserInfo.AccessType.HasFlag(DomainAccessType.ReadWrite); }
-        }
+        public bool CanWrite => this.domainUserInfo.AccessType.HasFlag(DomainAccessType.ReadWrite);
 
         [Browsable(false)]
         public PropertyCollection ExtendedProperties

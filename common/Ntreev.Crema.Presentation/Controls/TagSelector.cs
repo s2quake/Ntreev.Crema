@@ -60,26 +60,26 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public TagInfo? Value
         {
-            get { return (TagInfo?)this.GetValue(ValueProperty); }
-            set { this.SetValue(ValueProperty, value); }
+            get => (TagInfo?)this.GetValue(ValueProperty);
+            set => this.SetValue(ValueProperty, value);
         }
 
         public TagInfo Filter
         {
-            get { return (TagInfo)this.GetValue(FilterProperty); }
-            set { this.SetValue(FilterProperty, value); }
+            get => (TagInfo)this.GetValue(FilterProperty);
+            set => this.SetValue(FilterProperty, value);
         }
 
         public bool IsPopupOpen
         {
-            get { return (bool)this.GetValue(IsPopupOpenProperty); }
-            set { this.SetValue(IsPopupOpenProperty, value); }
+            get => (bool)this.GetValue(IsPopupOpenProperty);
+            set => this.SetValue(IsPopupOpenProperty, value);
         }
 
         public bool IsReadOnly
         {
-            get { return (bool)this.GetValue(IsReadOnlyProperty); }
-            set { this.SetValue(IsReadOnlyProperty, value); }
+            get => (bool)this.GetValue(IsReadOnlyProperty);
+            set => this.SetValue(IsReadOnlyProperty, value);
         }
 
 

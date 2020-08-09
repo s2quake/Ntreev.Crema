@@ -65,20 +65,11 @@ namespace Ntreev.Crema.Data
 
         public string Path => this.CategoryPath + this.Name;
 
-        public string ParentName
-        {
-            get { return CremaDataTable.GetParentName(this.Name); }
-        }
+        public string ParentName => CremaDataTable.GetParentName(this.Name);
 
-        public string CategoryName
-        {
-            get { return this.CategoryPath.Trim(PathUtility.SeparatorChar); }
-        }
+        public string CategoryName => this.CategoryPath.Trim(PathUtility.SeparatorChar);
 
-        public string TableName
-        {
-            get { return CremaDataTable.GetTableName(this.Name); }
-        }
+        public string TableName => CremaDataTable.GetTableName(this.Name);
 
         [DataMember]
         public string HashValue

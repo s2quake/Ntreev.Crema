@@ -41,14 +41,11 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
             this.Initialize();
         }
 
-        public IType Target
-        {
-            get { return this.type; }
-        }
+        public IType Target => this.type;
 
         public CremaDataType Source
         {
-            get { return this.dataType; }
+            get => this.dataType;
             private set
             {
                 this.dataType = value;
@@ -59,7 +56,7 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
 
         public object SelectedItem
         {
-            get { return this.selectedItem; }
+            get => this.selectedItem;
             set
             {
                 this.selectedItem = value;
@@ -85,7 +82,7 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
 
         public string SelectedColumn
         {
-            get { return this.selectedColumn; }
+            get => this.selectedColumn;
             set
             {
                 this.selectedColumn = value;

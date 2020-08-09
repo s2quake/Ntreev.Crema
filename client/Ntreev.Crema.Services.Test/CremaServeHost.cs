@@ -31,10 +31,7 @@ namespace Ntreev.Crema.Services.Test
             get; private set;
         }
 
-        public static string OutputString
-        {
-            get { return sb.ToString(); }
-        }
+        public static string OutputString => sb.ToString();
 
         public static void Run(params object[] args)
         {

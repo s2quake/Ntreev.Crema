@@ -55,20 +55,17 @@ namespace Ntreev.Crema.Data.Diff
 
         public CremaDataRow Item1
         {
-            get { return this.item1; }
-            internal set { this.item1 = value; }
+            get => this.item1;
+            internal set => this.item1 = value;
         }
 
         public CremaDataRow Item2
         {
-            get { return this.item2; }
-            internal set { this.item2 = value; }
+            get => this.item2;
+            internal set => this.item2 = value;
         }
 
-        public int Index
-        {
-            get { return this.index; }
-        }
+        public int Index => this.index;
 
         public DiffState DiffState1 => DiffUtility.GetDiffState(this.Item1);
 

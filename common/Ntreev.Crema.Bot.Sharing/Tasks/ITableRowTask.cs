@@ -84,15 +84,9 @@ namespace Ntreev.Crema.Bot.Tasks
             }
         }
 
-        public Type TargetType
-        {
-            get { return typeof(ITableRow); }
-        }
+        public Type TargetType => typeof(ITableRow);
 
-        public bool IsEnabled
-        {
-            get { return false; }
-        }
+        public bool IsEnabled => false;
 
         [TaskMethod(Weight = 1)]
         public async Task DeleteAsync(ITableRow row, TaskContext context)
