@@ -179,10 +179,8 @@ namespace Ntreev.Crema.Reader
             var items = dic.Select(i => string.Format("{0}=\"{1}\"", i.Key, i.Value)).ToArray();
             var name = string.Join(";", items);
 
-            using (var stream = new RemoteStream(ipAddress, port + 1, name))
-            {
-                return CremaReader.Read(stream);
-            }
+            using var stream = new RemoteStream(ipAddress, port + 1, name);
+            return CremaReader.Read(stream);
         }
 
         public static IDataSet Read(string filename)
@@ -609,11 +607,10 @@ namespace Ntreev.Crema.Reader
             public static T[] ReadValues<T>(this BinaryReader reader, int count)
                 where T : struct
             {
-                List<T> list = new List<T>(count);
-                for (int i = 0; i < count; i++)
+                var list = new List<T>(count);
+                for (var i = 0; i < count; i++)
                 {
-                    T value;
-                    reader.ReadValue(out value);
+                    reader.ReadValue(out T value);
                     list.Add(value);
                 }
                 return list.ToArray();
@@ -1416,14 +1413,11 @@ namespace Ntreev.Crema.Reader
 
             private CremaBinaryTable ReadTable(BinaryReader reader, long offset)
             {
-                TableHeader tableHeader;
-                TableInfo tableInfo;
-
                 reader.Seek(offset, SeekOrigin.Begin);
-                reader.ReadValue(out tableHeader);
+                reader.ReadValue(out TableHeader tableHeader);
 
                 reader.Seek(tableHeader.TableInfoOffset + offset, SeekOrigin.Begin);
-                reader.ReadValue(out tableInfo);
+                reader.ReadValue(out TableInfo tableInfo);
 
                 var table = new CremaBinaryTable(this, tableInfo.RowCount, this.options);
 
@@ -1463,7 +1457,7 @@ namespace Ntreev.Crema.Reader
                     var columninfo = reader.ReadValue<ColumnInfo>();
                     var columnName = StringResource.GetString(columninfo.ColumnName);
                     var typeName = StringResource.GetString(columninfo.DataType);
-                    var isKey = columninfo.Iskey == 0 ? false : true;
+                    var isKey = columninfo.Iskey != 0;
 
                     var column = new CremaBinaryColumn(columnName, Utility.NameToType(typeName), isKey);
                     columns.Add(column);

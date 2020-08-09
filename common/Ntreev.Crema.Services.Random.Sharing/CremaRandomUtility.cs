@@ -614,27 +614,9 @@ namespace Ntreev.Crema.Services.Random
             });
         }
 
-        //public static IDataBase RandomDataBase(this ICremaHost cremaHost)
-        //{
-        //    var dataBase = cremaHost.DataBases.Random();
-        //    //if (dataBase.IsLoaded == false)
-        //    //    dataBase.Load();
-        //    return dataBase;
-        //}
-
         public static TagInfo RandomTags()
         {
             return tags.Random();
-        }
-
-        private static bool Contains(ITableContent content, string columnName, object value)
-        {
-            foreach (var item in content)
-            {
-                if (object.Equals(item[columnName], value) == true)
-                    return true;
-            }
-            return false;
         }
 
         private static int GetLevel<T>(T category, Func<T, T> parentFunc)

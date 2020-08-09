@@ -47,7 +47,7 @@ namespace Ntreev.Crema.Data.Random
 
         public static CremaDataTable CreateDerivedTable(this CremaDataTable dataTable, string prefix, string postfix)
         {
-            var tableName = string.Empty;
+            string tableName;
             do
             {
                 tableName = IdentifierUtility.Next(prefix, postfix);
@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Data.Random
 
         public static CremaDataRow AddRandomRow(this CremaDataTable dataTable, bool throwOnError)
         {
-            var dataRow = null as CremaDataRow;
+            CremaDataRow dataRow;
             if (dataTable.Parent != null)
             {
                 var parentRow = dataTable.Parent.Rows.RandomOrDefault();

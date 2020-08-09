@@ -46,42 +46,40 @@ namespace Ntreev.Crema.Repository.Svn
 
         public static SvnStatusInfo[] Parse(string text)
         {
-            using (var sr = new StringReader(text))
+            using var sr = new StringReader(text);
+            var doc = XDocument.Load(sr);
+            var itemList = new List<SvnStatusInfo>();
+
+            foreach (var element in doc.XPathSelectElements("/status/target/entry"))
             {
-                var doc = XDocument.Load(sr);
-                var itemList = new List<SvnStatusInfo>();
+                var path = element.Attribute("path").Value;
+                var status = element.XPathSelectElement("wc-status").Attribute("item").Value;
 
-                foreach (var element in doc.XPathSelectElements("/status/target/entry"))
+                var item = new SvnStatusInfo()
                 {
-                    var path = element.Attribute("path").Value;
-                    var status = element.XPathSelectElement("wc-status").Attribute("item").Value;
+                    Path = path,
+                };
 
-                    var item = new SvnStatusInfo()
-                    {
-                        Path = path,
-                    };
-
-                    if (status == "added")
-                    {
-                        item.Status = RepositoryItemStatus.Added;
-                    }
-                    else if (status == "deleted")
-                    {
-                        item.Status = RepositoryItemStatus.Deleted;
-                    }
-                    else if (status == "modified")
-                    {
-                        item.Status = RepositoryItemStatus.Modified;
-                    }
-                    else if (status == "unversioned")
-                    {
-                        item.Status = RepositoryItemStatus.Untracked;
-                    }
-                    itemList.Add(item);
+                if (status == "added")
+                {
+                    item.Status = RepositoryItemStatus.Added;
                 }
-
-                return itemList.ToArray();
+                else if (status == "deleted")
+                {
+                    item.Status = RepositoryItemStatus.Deleted;
+                }
+                else if (status == "modified")
+                {
+                    item.Status = RepositoryItemStatus.Modified;
+                }
+                else if (status == "unversioned")
+                {
+                    item.Status = RepositoryItemStatus.Untracked;
+                }
+                itemList.Add(item);
             }
+
+            return itemList.ToArray();
         }
     }
 }

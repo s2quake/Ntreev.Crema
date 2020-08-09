@@ -35,9 +35,6 @@ namespace Ntreev.Crema.Repository.Svn
     {
         private const string propertyPrefix = "prop:";
 
-        [Import]
-        private readonly Lazy<ICremaHost> cremaHost = null;
-
         [ImportingConstructor]
         public SvnRepositoryProvider()
         {
@@ -71,7 +68,7 @@ namespace Ntreev.Crema.Repository.Svn
             }
 
             var repositoryInfo = this.GetRepositoryInfo(settings.BasePath, repositoryName);
-            return new SvnRepository(this, settings.LogService, settings.WorkingPath, settings.TransactionPath, repositoryInfo);
+            return new SvnRepository(settings.LogService, settings.WorkingPath, settings.TransactionPath, repositoryInfo);
         }
 
         public void InitializeRepository(string basePath, string initPath, params LogPropertyInfo[] properties)
@@ -308,8 +305,6 @@ namespace Ntreev.Crema.Repository.Svn
             var baseUri = new Uri(basePath);
             return UriUtility.Combine(baseUri, SvnString.Branches, repositoryName);
         }
-
-        private ICremaHost CremaHost => this.cremaHost.Value;
 
         private IEnumerable<string> EnumerateRepositories(string basePath)
         {

@@ -239,9 +239,9 @@ namespace Ntreev.Crema.Repository.Svn
 
         private static SvnLogInfo Parse(XElement element)
         {
+            LogPropertyInfo[] props = null;
             var commentValue = element.XPathSelectElement("msg").Value;
             var comment = null as string;
-            var props = null as LogPropertyInfo[];
 
             var obj = new SvnLogInfo()
             {

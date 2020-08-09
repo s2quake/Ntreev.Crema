@@ -30,21 +30,15 @@ namespace Ntreev.Crema.Services.Data
 {
     public abstract class DataServiceItemBase : IDisposable
     {
-        //private const string jsonExtension = ".json";
         private const string dataDirectory = "data";
         private const string infoDirectory = "info";
-        private Guid dataBaseID;
         private readonly ILogService logService;
-        private readonly IObjectSerializer serializer;
         private bool initialized;
         private string workingPath;
         private Dictionary<string, TableInfo> tableInfos = new Dictionary<string, TableInfo>();
         private Dictionary<string, TypeInfo> typeInfos = new Dictionary<string, TypeInfo>();
         private Dictionary<string, object> tableDatas = new Dictionary<string, object>();
         private Dictionary<string, object> typeDatas = new Dictionary<string, object>();
-        //private Dictionary<string, object> tableDomainDatas = new Dictionary<string, object>();
-        //private Dictionary<string, object> typeDomainDatas = new Dictionary<string, object>();
-        //private Dictionary<string, IDomain> domainItems = new Dictionary<string, IDomain>();
         private DataServiceItemInfo info;
 
         protected DataServiceItemBase(IDataBase dataBase)
@@ -55,7 +49,7 @@ namespace Ntreev.Crema.Services.Data
             this.DataBase.Renamed += DataBase_Renamed;
             this.DataBase.Unloaded += DataBase_Unloaded;
             this.logService = dataBase.GetService(typeof(ILogService)) as ILogService;
-            this.serializer = dataBase.GetService(typeof(IObjectSerializer)) as IObjectSerializer;
+            this.Serializer = dataBase.GetService(typeof(IObjectSerializer)) as IObjectSerializer;
 
             if (dataBase is DataBase dataBaseInternal)
             {
@@ -184,9 +178,11 @@ namespace Ntreev.Crema.Services.Data
 
         public DataServiceItemInfo DataServiceItemInfo => this.info;
 
-        public IObjectSerializer Serializer => this.serializer;
+        public IObjectSerializer Serializer { get; }
 
         public event EventHandler Changed;
+
+        public Guid DataBaseID { get; private set; }
 
         protected virtual void OnChanged(EventArgs e)
         {
@@ -206,14 +202,6 @@ namespace Ntreev.Crema.Services.Data
         protected abstract object GetObject(CremaDataTable dataTable);
 
         protected abstract object GetObject(CremaDataType dataType);
-
-        //protected abstract void OnSerializeTable(Stream stream, object tableData);
-
-        //protected abstract void OnSerializeType(Stream stream, object tableData);
-
-        //protected abstract object OnDeserializeTable(Stream stream);
-
-        //protected abstract object OnDeserializeType(Stream stream);
 
         protected abstract System.Type TableDataType { get; }
 
@@ -271,7 +259,7 @@ namespace Ntreev.Crema.Services.Data
                     this.DataBase.TableContext.ItemsMoved += TableContext_ItemMoved;
                     this.DataBase.TableContext.ItemsDeleted += TableContext_ItemDeleted;
                     this.DataBase.TableContext.ItemsChanged += TableContext_ItemsChanged;
-                    this.dataBaseID = this.DataBase.ID;
+                    this.DataBaseID = this.DataBase.ID;
                 });
                 this.NoCache = dataBase.CremaHost.NoCache;
             }
@@ -361,48 +349,6 @@ namespace Ntreev.Crema.Services.Data
                 this.initialized = false;
             });
         }
-
-        //private void Domains_DomainsDeleted(object sender, DomainsEventArgs e)
-        //{
-        //    if (e.DomainInfo.DataBaseID != this.dataBaseID)
-        //        return;
-
-        //    var domainInfo = e.DomainInfo;
-        //    if (domainInfo.ItemType == nameof(TableContent))
-        //    {
-        //        this.Dispatcher?.InvokeAsync(() =>
-        //        {
-        //            foreach (var item in this.domainItems.ToArray())
-        //            {
-        //                if (item.Value.DataBaseID == domainInfo.DataBaseID)
-        //                {
-        //                    this.domainItems.Remove(item.Key);
-        //                }
-        //            }
-        //        });
-        //    }
-        //}
-
-        //private void Domains_DomainsCreated(object sender, DomainEventArgs e)
-        //{
-        //    var domains = sender as IDomainCollection;
-        //    var domain = domains[e.DomainInfo.DomainID];
-        //    if (domain == null || domain.DataBaseID != this.dataBaseID)
-        //        return;
-
-        //    if (domain.Host is TableContent content)
-        //    {
-        //        var contents = EnumerableUtility.Friends(content, content.Childs);
-        //        var tableNames = contents.Select(item => item.Table.Name).ToArray();
-        //        this.Dispatcher.InvokeAsync(() =>
-        //        {
-        //            foreach (var item in tableNames)
-        //            {
-        //                this.domainItems.Add(item, domain);
-        //            }
-        //        });
-        //    }
-        //}
 
         private void DeleteDomainFiles(DomainInfo domainInfo)
         {
@@ -664,29 +610,6 @@ namespace Ntreev.Crema.Services.Data
 
             this.typeInfos = typeInfos;
             this.typeDatas = typeDatas;
-        }
-
-        private void Serialize(IDomain domain)
-        {
-            this.Dispatcher.VerifyAccess();
-
-            var dataSet = domain.Dispatcher.Invoke(() => (domain.Source as CremaDataSet).Copy());
-
-            foreach (var item in dataSet.Tables.OrderBy(i => i.Name))
-            {
-                if (this.CanSerialize(item) == true)
-                {
-                    //this.tableDomainDatas[item.Name] = this.GetObject(item);
-                }
-            }
-
-            foreach (var item in dataSet.Types.OrderBy(i => i.Name))
-            {
-                if (this.CanSerialize(item) == true)
-                {
-                    //this.typeDomainDatas[item.Name] = this.GetObject(item);
-                }
-            }
         }
 
         private void WriteInfo()

@@ -53,8 +53,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
             }
             else if (NameValidator.VerifyItemPath(parentPath) == true)
             {
-                var table = dataBase.TableContext[parentPath] as ITable;
-                if (table == null)
+                if (!(dataBase.TableContext[parentPath] is ITable table))
                     throw new CategoryNotFoundException(parentPath);
                 var authentication = this.Context.GetAuthentication(this);
                 var template = await table.NewTableAsync(authentication);
@@ -62,8 +61,7 @@ namespace Ntreev.Crema.Javascript.Methods.TableTemplate
             }
             else
             {
-                var table = dataBase.TableContext.Tables[parentPath] as ITable;
-                if (table == null)
+                if (!(dataBase.TableContext.Tables[parentPath] is ITable table))
                     throw new CategoryNotFoundException(parentPath);
                 var authentication = this.Context.GetAuthentication(this);
                 var template = await table.NewTableAsync(authentication);

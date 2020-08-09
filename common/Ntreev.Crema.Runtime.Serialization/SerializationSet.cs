@@ -132,19 +132,15 @@ namespace Ntreev.Crema.Runtime.Serialization
         private static string GetTypesHashValue(SerializationSet dataSet)
         {
             var args = dataSet.Types.Select(item => item.HashValue).ToArray();
-            using (var algorithm = HashAlgorithm.Create("SHA1"))
-            {
-                return HashUtility.GetHashValue(algorithm, args);
-            }
+            using var algorithm = HashAlgorithm.Create("SHA1");
+            return HashUtility.GetHashValue(algorithm, args);
         }
 
         private static string GetTablesHashValue(SerializationSet dataSet)
         {
             var args = dataSet.Tables.Select(item => item.HashValue).ToArray();
-            using (var algorithm = HashAlgorithm.Create("SHA1"))
-            {
-                return HashUtility.GetHashValue(algorithm, args);
-            }
+            using var algorithm = HashAlgorithm.Create("SHA1");
+            return HashUtility.GetHashValue(algorithm, args);
         }
 
         #region Invisibles

@@ -30,6 +30,7 @@ namespace Ntreev.Crema.ObjectSerializer.Yaml
         private const string extensions = ".yaml";
 
         private static readonly ISerializer propertySerializer;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:읽지 않은 private 멤버 제거", Justification = "<보류 중>")]
         private static readonly Deserializer propertyDeserializer = new Deserializer();
 
         static YamlObjectSerializer()

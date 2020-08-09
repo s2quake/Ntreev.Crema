@@ -158,28 +158,6 @@ namespace Ntreev.Crema.Runtime.Serialization.Binary
             }
         }
 
-        private void AdjustSeek(BinaryWriter writer, Type type, ref int position)
-        {
-            if (type == typeof(bool))
-            {
-                position += sizeof(bool);
-            }
-            else if (type == typeof(short))
-            {
-                writer.Seek(position % 2, SeekOrigin.Current);
-                position += sizeof(short);
-            }
-            else if (type == typeof(long))
-            {
-                writer.Seek(position % 8, SeekOrigin.Current);
-                position += sizeof(short);
-            }
-            else
-            {
-                writer.Seek(position % 4, SeekOrigin.Current);
-            }
-        }
-
         private void WriteRows(BinaryWriter writer, SerializationRow[] rows, SerializationColumn[] columns, SerializationType[] types)
         {
             foreach (var item in rows)

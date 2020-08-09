@@ -32,7 +32,6 @@ namespace Ntreev.Crema.ConsoleHost
     {
         private readonly string xsdPath;
         private readonly string xmlPath;
-        private readonly string schemaLocation;
 
         [ImportingConstructor]
         public ConsoleConfiguration([ImportMany] IEnumerable<IConfigurationPropertyProvider> propertiesProvider)
@@ -40,7 +39,7 @@ namespace Ntreev.Crema.ConsoleHost
         {
             this.xmlPath = AppUtility.GetDocumentFilename("configs") + ".xml";
             this.xsdPath = AppUtility.GetDocumentFilename("configs") + ".xsd";
-            this.schemaLocation = UriUtility.MakeRelative(this.xmlPath, this.xsdPath);
+            this.SchemaLocation = UriUtility.MakeRelative(this.xmlPath, this.xsdPath);
             if (File.Exists(this.xmlPath) == true)
             {
                 try
@@ -65,5 +64,7 @@ namespace Ntreev.Crema.ConsoleHost
         }
 
         public override string Name => "ConsoleConfigs";
+
+        public string SchemaLocation { get; }
     }
 }

@@ -35,17 +35,12 @@ namespace Ntreev.Crema.RuntimeService
         private readonly Dictionary<string, SerializationSet> caches = new Dictionary<string, SerializationSet>();
         private readonly CremaDispatcher dispatcher;
         private readonly Authentication authentication;
-        //private readonly BinaryFormatter formatter = new BinaryFormatter();
-        private readonly ILogService logService;
-
-        private readonly Dictionary<long, CremaDataSet> cachesByRevison = new Dictionary<long, CremaDataSet>();
 
         public RuntimeServiceItem(IDataBase dataBase, CremaDispatcher dispatcher, Authentication authentication)
             : base(dataBase)
         {
             this.dispatcher = dispatcher;
             this.authentication = authentication;
-            this.logService = dataBase.GetService(typeof(ILogService)) as ILogService;
         }
 
         public Task<GenerationSet> GernerationAsync(TagInfo tags, string filterExpression, string revision)
@@ -219,44 +214,6 @@ namespace Ntreev.Crema.RuntimeService
                 items.Add(this.ReadType(typeName));
             }
             return items.ToArray();
-        }
-
-        private bool FilterTable(string tableName, string filterExpression)
-        {
-            if (string.IsNullOrEmpty(filterExpression) == true)
-                return true;
-
-            return tableName.GlobMany(filterExpression);
-        }
-
-        private bool FilterType(string typeName, string filterExpression, SerializationTable[] tables)
-        {
-            if (string.IsNullOrEmpty(filterExpression) == true)
-                return true;
-
-            var query = from table in tables
-                        from column in table.Columns
-                        where NameValidator.VerifyItemPath(column.DataType)
-                        let itemName = new ItemName(column.DataType)
-                        where itemName.Name == typeName
-                        select table;
-
-            return query.Any();
-        }
-
-        private bool FilterType(string typeName, string filterExpression, TableInfo[] tables)
-        {
-            if (string.IsNullOrEmpty(filterExpression) == true)
-                return true;
-
-            var query = from table in tables
-                        from column in table.Columns
-                        where NameValidator.VerifyItemPath(column.DataType)
-                        let itemName = new ItemName(column.DataType)
-                        where itemName.Name == typeName
-                        select table;
-
-            return query.Any();
         }
     }
 }

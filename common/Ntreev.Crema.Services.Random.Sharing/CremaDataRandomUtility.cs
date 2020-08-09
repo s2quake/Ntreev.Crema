@@ -584,28 +584,5 @@ namespace Ntreev.Crema.Services.Random
                 }
             }
         }
-
-        private static bool Contains(CremaDataTable dataTable, string columnName, object value)
-        {
-            foreach (var item in dataTable.Rows)
-            {
-                if (object.Equals(item[columnName], value) == true)
-                    return true;
-            }
-            return false;
-        }
-
-        private static int GetLevel<T>(T category, Func<T, T> parentFunc)
-        {
-            int level = 0;
-
-            var parent = parentFunc(category);
-            while (parent != null)
-            {
-                level++;
-                parent = parentFunc(parent);
-            }
-            return level;
-        }
     }
 }

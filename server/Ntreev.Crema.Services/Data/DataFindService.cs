@@ -28,7 +28,6 @@ namespace Ntreev.Crema.Services.Data
     {
         public const string ServiceID = "44343501-B6B7-444D-8A5E-7CAE32F054A4";
         private readonly ICremaHost cremaHost;
-        private readonly IDomainContext domainContext;
         private Authentication authentication;
 
         private readonly Dictionary<Guid, DataFindServiceItem> items = new Dictionary<Guid, DataFindServiceItem>();
@@ -37,8 +36,6 @@ namespace Ntreev.Crema.Services.Data
         public DataFindService(ICremaHost cremaHost)
         {
             this.cremaHost = cremaHost;
-            this.domainContext = cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
-
             this.cremaHost.CloseRequested += CremaHost_CloseRequested;
             this.cremaHost.Closed += CremaHost_Closed;
             this.cremaHost.Opened += CremaHost_Opened;

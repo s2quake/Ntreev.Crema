@@ -2,9 +2,5 @@
 {
     partial class Program
     {
-        static void RegisterLicense()
-        {
-
-        }
     }
 }

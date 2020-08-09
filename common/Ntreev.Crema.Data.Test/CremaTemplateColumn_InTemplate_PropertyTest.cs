@@ -135,7 +135,7 @@ namespace Ntreev.Crema.Data.Test
             this.column.DefaultValue = null;
             Assert.AreEqual(DBNull.Value, this.column.DefaultValue);
 
-            bool Predicate(CremaTemplateColumn item)
+            static bool Predicate(CremaTemplateColumn item)
             {
                 if (CremaDataTypeUtility.IsBaseType(item.DataTypeName) == false)
                     return false;

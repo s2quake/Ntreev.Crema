@@ -67,24 +67,22 @@ namespace Ntreev.Crema.Services.Users
                 });
                 var taskID = GuidUtility.FromName(categoryPath + userID);
                 var userSet = await this.CreateDataForCreateAsync(authentication, userID, categoryPath, password, userName, authority);
-                using (var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, true))
+                using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, true);
+                var userPaths = new string[] { categoryPath + userID };
+                var userNames = new string[] { userName };
+                await this.InvokeUserCreateAsync(authentication, userPaths, userNames, userContextSet);
+                var newUser = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var userPaths = new string[] { categoryPath + userID };
-                    var userNames = new string[] { userName };
-                    await this.InvokeUserCreateAsync(authentication, userPaths, userNames, userContextSet);
-                    var newUser = await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        var user = this.BaseAddNew(userID, categoryPath, null);
-                        var userInfo = userContextSet.GetUserInfo(categoryPath + userID);
-                        user.Initialize((UserInfo)userInfo, (BanInfo)userInfo.BanInfo);
-                        user.Password = UserContext.StringToSecureString(userInfo.Password);
-                        this.CremaHost.Sign(authentication);
-                        this.InvokeUsersCreatedEvent(authentication, new User[] { user });
-                        this.Context.InvokeTaskCompletedEvent(authentication, taskID);
-                        return user;
-                    });
-                    return newUser;
-                }
+                    var user = this.BaseAddNew(userID, categoryPath, null);
+                    var userInfo = userContextSet.GetUserInfo(categoryPath + userID);
+                    user.Initialize((UserInfo)userInfo, (BanInfo)userInfo.BanInfo);
+                    user.Password = UserContext.StringToSecureString(userInfo.Password);
+                    this.CremaHost.Sign(authentication);
+                    this.InvokeUsersCreatedEvent(authentication, new User[] { user });
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                    return user;
+                });
+                return newUser;
             }
             catch (Exception e)
             {

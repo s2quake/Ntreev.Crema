@@ -130,22 +130,6 @@ namespace Ntreev.Crema.Bot.Tasks
             await template.SetCommentAsync(authentication, comment);
         }
 
-        private bool CanEdit(ITypeTemplate template)
-        {
-            var type = template.Type;
-            var tables = type.GetService(typeof(ITableCollection)) as ITableCollection;
-
-            var query = from table in tables
-                        from column in table.TableInfo.Columns
-                        where column.DataType == type.Path
-                        where table.TableState != TableState.None
-                        select table;
-
-            if (query.Any() == true)
-                return false;
-            return true;
-        }
-
         private Task<ITable[]> GetTablesAsync(ITypeTemplate template, Func<ITable, bool> predicate)
         {
             return template.Dispatcher.InvokeAsync(() =>

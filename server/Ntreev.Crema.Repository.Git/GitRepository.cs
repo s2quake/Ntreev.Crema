@@ -34,11 +34,7 @@ namespace Ntreev.Crema.Repository.Git
     class GitRepository : IRepository
     {
         private static readonly ISerializer propertySerializer = new SerializerBuilder().Build();
-        private static readonly Deserializer propertyDeserializer = new Deserializer();
-
-        private readonly string repositoryPath;
         private readonly string transactionPath;
-        private readonly GitRepositoryProvider repositoryProvider;
         private readonly ILogService logService;
         private readonly GitCommand resetCommand;
         private readonly GitCommand cleanCommand;
@@ -49,23 +45,22 @@ namespace Ntreev.Crema.Repository.Git
         private string transactionPatchPath;
         private RepositoryInfo repositoryInfo;
 
-        public GitRepository(GitRepositoryProvider repositoryProvider, ILogService logService, string repositoryPath, string transactionPath, RepositoryInfo repositoryInfo)
+        public GitRepository(ILogService logService, string repositoryPath, string transactionPath, RepositoryInfo repositoryInfo)
         {
-            this.repositoryProvider = repositoryProvider;
             this.logService = logService;
-            this.repositoryPath = repositoryPath;
+            this.BasePath = repositoryPath;
             this.transactionPath = transactionPath;
             this.repositoryInfo = repositoryInfo;
-            this.resetCommand = new GitCommand(this.repositoryPath, "reset")
+            this.resetCommand = new GitCommand(this.BasePath, "reset")
             {
                 new GitCommandItem("hard")
             };
-            this.cleanCommand = new GitCommand(this.repositoryPath, "clean")
+            this.cleanCommand = new GitCommand(this.BasePath, "clean")
             {
                 new GitCommandItem('f'),
                 new GitCommandItem('d')
             };
-            var statusCommand = new GitCommand(this.repositoryPath, "status")
+            var statusCommand = new GitCommand(this.BasePath, "status")
             {
                 new GitCommandItem('s'),
             };
@@ -85,11 +80,11 @@ namespace Ntreev.Crema.Repository.Git
 
         public RepositoryInfo RepositoryInfo => this.repositoryInfo;
 
-        public string BasePath => this.repositoryPath;
+        public string BasePath { get; }
 
         public void Add(string path)
         {
-            var addCommand = new GitCommand(this.repositoryPath, "add");
+            var addCommand = new GitCommand(this.BasePath, "add");
 
             if (DirectoryUtility.IsDirectory(path) == true)
             {
@@ -121,17 +116,17 @@ namespace Ntreev.Crema.Repository.Git
         public void EndTransaction()
         {
             var transactionMessage = string.Join(Environment.NewLine, this.transactionMessageList);
-            var statusCommand = new GitCommand(this.repositoryPath, "status")
+            var statusCommand = new GitCommand(this.BasePath, "status")
             {
                 new GitCommandItem('s')
             };
             var items = statusCommand.ReadLines(true);
             if (items.Length != 0)
             {
-                var commitCommand = new GitCommitCommand(this.repositoryPath, this.transactionAuthor, transactionMessage);
+                var commitCommand = new GitCommitCommand(this.BasePath, this.transactionAuthor, transactionMessage);
                 var result = commitCommand.Run(this.logService);
                 this.logService?.Debug(result);
-                var log = GitLogInfo.GetLatestLog(this.repositoryPath);
+                var log = GitLogInfo.GetLatestLog(this.BasePath);
                 this.repositoryInfo.Revision = log.CommitID;
                 this.repositoryInfo.ModificationInfo = new SignatureDate(this.transactionAuthor, log.CommitDate);
                 this.SetNotes(this.transactionPropertyList.ToArray());
@@ -167,7 +162,7 @@ namespace Ntreev.Crema.Repository.Git
         {
             if (this.transactionName != null)
             {
-                var diffCommand = new GitCommand(this.repositoryPath, "diff")
+                var diffCommand = new GitCommand(this.BasePath, "diff")
                 {
                     "HEAD",
                     new GitCommandItem("stat"),
@@ -181,7 +176,7 @@ namespace Ntreev.Crema.Repository.Git
 
             try
             {
-                var statusCommand = new GitCommand(this.repositoryPath, "status")
+                var statusCommand = new GitCommand(this.BasePath, "status")
                 {
                     new GitCommandItem('s')
                 };
@@ -189,13 +184,13 @@ namespace Ntreev.Crema.Repository.Git
                 if (items.Length != 0)
                 {
                     var authorValue = new GitAuthor(author);
-                    GitConfig.SetValue(this.repositoryPath, "user.email", authorValue.Email == string.Empty ? "<>" : authorValue.Email);
-                    GitConfig.SetValue(this.repositoryPath, "user.name", authorValue.Name);
+                    GitConfig.SetValue(this.BasePath, "user.email", authorValue.Email == string.Empty ? "<>" : authorValue.Email);
+                    GitConfig.SetValue(this.BasePath, "user.name", authorValue.Name);
 
-                    var commitCommand = new GitCommitCommand(this.repositoryPath, author, comment);
+                    var commitCommand = new GitCommitCommand(this.BasePath, author, comment);
                     var result = commitCommand.Run(this.logService);
                     this.logService?.Debug(result);
-                    var log = GitLogInfo.GetLatestLog(this.repositoryPath);
+                    var log = GitLogInfo.GetLatestLog(this.BasePath);
                     this.repositoryInfo.Revision = log.CommitID;
                     this.repositoryInfo.ModificationInfo = new SignatureDate(author, log.CommitDate);
 
@@ -207,7 +202,7 @@ namespace Ntreev.Crema.Repository.Git
                 }
                 else
                 {
-                    this.logService?.Debug("repository no changes. \"{0}\"", this.repositoryPath);
+                    this.logService?.Debug("repository no changes. \"{0}\"", this.BasePath);
                 }
             }
             catch (Exception e)
@@ -225,7 +220,7 @@ namespace Ntreev.Crema.Repository.Git
             }
             else
             {
-                var copyCommand = new GitCommand(this.repositoryPath, "add")
+                var copyCommand = new GitCommand(this.BasePath, "add")
                 {
                     (GitPath)toPath
                 };
@@ -236,7 +231,7 @@ namespace Ntreev.Crema.Repository.Git
 
         public void Delete(string path)
         {
-            var removeCommand = new GitCommand(this.repositoryPath, "rm")
+            var removeCommand = new GitCommand(this.BasePath, "rm")
             {
                 (GitPath)path,
             };
@@ -276,8 +271,8 @@ namespace Ntreev.Crema.Repository.Git
                     Directory.CreateDirectory(exportPath);
                 if (DirectoryUtility.IsEmpty(exportPath) == true)
                     new CremaDataSet().WriteToDirectory(exportPath);
-                var relativePath = UriUtility.MakeRelativeOfDirectory(this.repositoryPath, path);
-                var archiveCommand = new GitCommand(this.repositoryPath, "archive")
+                var relativePath = UriUtility.MakeRelativeOfDirectory(this.BasePath, path);
+                var archiveCommand = new GitCommand(this.BasePath, "archive")
                 {
                     new GitCommandItem($"output={(GitPath)tempPath}"),
                     new GitCommandItem("format=zip"),
@@ -298,7 +293,7 @@ namespace Ntreev.Crema.Repository.Git
 
         public LogInfo[] GetLog(string[] paths, string revision)
         {
-            var logs = GitLogInfo.GetLogs(this.repositoryPath, revision, paths);
+            var logs = GitLogInfo.GetLogs(this.BasePath, revision, paths);
             return logs.Select(item => (LogInfo)item).ToArray();
         }
 
@@ -316,7 +311,7 @@ namespace Ntreev.Crema.Repository.Git
 
         public void Move(string srcPath, string toPath)
         {
-            var moveCommand = new GitCommand(this.repositoryPath, "mv")
+            var moveCommand = new GitCommand(this.BasePath, "mv")
             {
                 (GitPath)srcPath,
                 (GitPath)toPath,
@@ -331,7 +326,7 @@ namespace Ntreev.Crema.Repository.Git
 
             if (File.Exists(this.transactionPatchPath) == true)
             {
-                var applyCommand = new GitCommand(this.repositoryPath, "apply")
+                var applyCommand = new GitCommand(this.BasePath, "apply")
                 {
                     (GitPath)transactionPatchPath,
                     new GitCommandItem("index")
@@ -342,14 +337,14 @@ namespace Ntreev.Crema.Repository.Git
 
         public RepositoryItem[] Status(params string[] paths)
         {
-            var items = GitItemStatusInfo.Run(this.repositoryPath, paths);
+            var items = GitItemStatusInfo.Run(this.BasePath, paths);
             var itemList = new List<RepositoryItem>(items.Length);
             foreach (var item in items)
             {
                 var repositoryItem = new RepositoryItem()
                 {
-                    Path = new Uri(UriUtility.Combine(this.repositoryPath, item.Path)).LocalPath,
-                    OldPath = new Uri(UriUtility.Combine(this.repositoryPath, item.OldPath)).LocalPath,
+                    Path = new Uri(UriUtility.Combine(this.BasePath, item.Path)).LocalPath,
+                    OldPath = new Uri(UriUtility.Combine(this.BasePath, item.OldPath)).LocalPath,
                     Status = item.Status,
                 };
 
@@ -360,26 +355,26 @@ namespace Ntreev.Crema.Repository.Git
 
         private void Pull()
         {
-            var pullCommand = new GitCommand(this.repositoryPath, "pull");
+            var pullCommand = new GitCommand(this.BasePath, "pull");
             pullCommand.Run(this.logService);
         }
 
         private void Push()
         {
-            var pushCommand = new GitCommand(this.repositoryPath, "push");
+            var pushCommand = new GitCommand(this.BasePath, "push");
             pushCommand.Run(this.logService);
         }
 
         private void PullNotes()
         {
-            var fetchCommand = new GitCommand(this.repositoryPath, "fetch")
+            var fetchCommand = new GitCommand(this.BasePath, "fetch")
             {
                 "origin",
                 "refs/notes/commits:refs/notes/origin/commits",
             };
             fetchCommand.Run();
 
-            var mergeCommand = new GitCommand(this.repositoryPath, "notes")
+            var mergeCommand = new GitCommand(this.BasePath, "notes")
             {
                 "merge",
                 new GitCommandItem('v'),
@@ -392,7 +387,7 @@ namespace Ntreev.Crema.Repository.Git
         {
             var props = properties.Select(item => (GitPropertyValue)item).ToArray();
             var propText = propertySerializer.Serialize(props);
-            var notesCommand = new GitCommand(this.repositoryPath, "notes")
+            var notesCommand = new GitCommand(this.BasePath, "notes")
             {
                 "add",
                 GitCommandItem.FromMessage(propText),
@@ -402,7 +397,7 @@ namespace Ntreev.Crema.Repository.Git
 
         private void PushNotes()
         {
-            var pushNotesCommand = new GitCommand(this.repositoryPath, "push")
+            var pushNotesCommand = new GitCommand(this.BasePath, "push")
             {
                 "origin",
                 "refs/notes/commits",

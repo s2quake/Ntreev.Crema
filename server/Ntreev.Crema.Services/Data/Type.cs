@@ -273,18 +273,16 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var taskID = Guid.NewGuid();
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                using (var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet))
+                using var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet);
+                await this.Container.InvokeTypeRenameAsync(authentication, tuple.typeInfo, name, dataBaseSet);
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    await this.Container.InvokeTypeRenameAsync(authentication, tuple.typeInfo, name, dataBaseSet);
-                    await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        this.CremaHost.Sign(authentication);
-                        base.Rename(authentication, name);
-                        this.Container.InvokeTypesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, dataSet);
-                        this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
-                    });
-                    return taskID;
-                }
+                    this.CremaHost.Sign(authentication);
+                    base.Rename(authentication, name);
+                    this.Container.InvokeTypesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths, dataSet);
+                    this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
+                });
+                return taskID;
             }
             catch (Exception e)
             {
@@ -311,18 +309,16 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var taskID = Guid.NewGuid();
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                using (var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet))
+                using var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet);
+                await this.Container.InvokeTypeMoveAsync(authentication, tuple.typeInfo, categoryPath, dataBaseSet);
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    await this.Container.InvokeTypeMoveAsync(authentication, tuple.typeInfo, categoryPath, dataBaseSet);
-                    await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        this.CremaHost.Sign(authentication);
-                        base.Move(authentication, categoryPath);
-                        this.Container.InvokeTypesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths, dataSet);
-                        this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
-                    });
-                    return taskID;
-                }
+                    this.CremaHost.Sign(authentication);
+                    base.Move(authentication, categoryPath);
+                    this.Container.InvokeTypesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldCategoryPaths, dataSet);
+                    this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
+                });
+                return taskID;
             }
             catch (Exception e)
             {
@@ -352,18 +348,16 @@ namespace Ntreev.Crema.Services.Data
                 });
                 var taskID = Guid.NewGuid();
                 var dataSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                using (var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet))
+                using var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet);
+                await this.Container.InvokeTypeDeleteAsync(authentication, tuple.typeInfo, dataBaseSet);
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    await this.Container.InvokeTypeDeleteAsync(authentication, tuple.typeInfo, dataBaseSet);
-                    await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        base.Delete(authentication);
-                        cremaHost.Sign(authentication);
-                        container.InvokeTypesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
-                        dataBase.InvokeTaskCompletedEvent(authentication, taskID);
-                    });
-                    return taskID;
-                }
+                    base.Delete(authentication);
+                    cremaHost.Sign(authentication);
+                    container.InvokeTypesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
+                    dataBase.InvokeTaskCompletedEvent(authentication, taskID);
+                });
+                return taskID;
             }
             catch (Exception e)
             {

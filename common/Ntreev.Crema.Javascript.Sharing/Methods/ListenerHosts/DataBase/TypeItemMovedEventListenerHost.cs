@@ -24,13 +24,10 @@ namespace Ntreev.Crema.Javascript.Methods.ListenerHosts.DataBases
     [PartCreationPolicy(CreationPolicy.NonShared)]
     class TypeItemMovedEventListenerHost : DataBaseEventListenerHost
     {
-        private readonly ICremaHost cremaHost;
-
         [ImportingConstructor]
-        public TypeItemMovedEventListenerHost(ICremaHost cremaHost)
+        public TypeItemMovedEventListenerHost()
             : base(DataBaseEvents.TypeStateChanged)
         {
-            this.cremaHost = cremaHost;
         }
 
         protected override void OnSubscribe(IDataBase dataBase)

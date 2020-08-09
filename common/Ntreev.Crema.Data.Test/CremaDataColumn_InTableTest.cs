@@ -27,7 +27,6 @@ namespace Ntreev.Crema.Data.Test
     public class CremaDataColumn_InTableTest
     {
         private CremaDataSet dataSet;
-        private CremaDataTable table;
         private CremaDataColumn[] columns;
 
         public CremaDataColumn_InTableTest()
@@ -41,7 +40,6 @@ namespace Ntreev.Crema.Data.Test
             Random.CremaDataTableExtensions.MaxRowCount = 100;
             this.dataSet = new CremaDataSet();
             this.dataSet.AddRandoms(10);
-            this.table = this.dataSet.Tables.Random();
             this.columns = this.dataSet.Tables.SelectMany(item => item.Columns).ToArray();
         }
 

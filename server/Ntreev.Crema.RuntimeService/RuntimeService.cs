@@ -95,13 +95,11 @@ namespace Ntreev.Crema.RuntimeService
             var result = new ResultBase<GenerationSet>();
             try
             {
-                using (var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication))
-                {
-                    var dataBaseID = dataBaseItem.DataBase.ID;
-                    var project = this.GetServiceItem(dataBaseID);
-                    var tagInfo = new TagInfo(tags);
-                    result.Value = await project.GernerationAsync(tagInfo, filterExpression, revision);
-                }
+                using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
+                var dataBaseID = dataBaseItem.DataBase.ID;
+                var project = this.GetServiceItem(dataBaseID);
+                var tagInfo = new TagInfo(tags);
+                result.Value = await project.GernerationAsync(tagInfo, filterExpression, revision);
             }
             catch (Exception e)
             {
@@ -116,13 +114,11 @@ namespace Ntreev.Crema.RuntimeService
             var result = new ResultBase<SerializationSet>();
             try
             {
-                using (var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication))
-                {
-                    var dataBaseID = dataBaseItem.DataBase.ID;
-                    var project = this.GetServiceItem(dataBaseID);
-                    var tagInfo = (TagInfo)tags;
-                    result.Value = await project.SerializeAsync(tagInfo, filterExpression, revision);
-                }
+                using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
+                var dataBaseID = dataBaseItem.DataBase.ID;
+                var project = this.GetServiceItem(dataBaseID);
+                var tagInfo = (TagInfo)tags;
+                result.Value = await project.SerializeAsync(tagInfo, filterExpression, revision);
             }
             catch (Exception e)
             {
@@ -137,14 +133,12 @@ namespace Ntreev.Crema.RuntimeService
             var result = new ResultBase<GenerationSet, SerializationSet>();
             try
             {
-                using (var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication))
-                {
-                    var dataBaseID = dataBaseItem.DataBase.ID;
-                    var project = this.GetServiceItem(dataBaseID);
-                    var tagInfo = (TagInfo)tags;
-                    result.Value1 = await project.GernerationAsync(tagInfo, filterExpression, revision);
-                    result.Value2 = await project.SerializeAsync(tagInfo, filterExpression, revision);
-                }
+                using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
+                var dataBaseID = dataBaseItem.DataBase.ID;
+                var project = this.GetServiceItem(dataBaseID);
+                var tagInfo = (TagInfo)tags;
+                result.Value1 = await project.GernerationAsync(tagInfo, filterExpression, revision);
+                result.Value2 = await project.SerializeAsync(tagInfo, filterExpression, revision);
             }
             catch (Exception e)
             {
@@ -160,12 +154,10 @@ namespace Ntreev.Crema.RuntimeService
 
             try
             {
-                using (var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication))
-                {
-                    var dataBaseID = dataBaseItem.DataBase.ID;
-                    var project = this.GetServiceItem(dataBaseID);
-                    await project.ResetAsync();
-                }
+                using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
+                var dataBaseID = dataBaseItem.DataBase.ID;
+                var project = this.GetServiceItem(dataBaseID);
+                await project.ResetAsync();
             }
             catch (Exception e)
             {
@@ -181,11 +173,9 @@ namespace Ntreev.Crema.RuntimeService
 
             try
             {
-                using (var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication))
-                {
-                    var dataBase = dataBaseItem.DataBase;
-                    result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo.Revision);
-                }
+                using var dataBaseItem = await UsingDataBase.SetAsync(this.cremaHost, dataBaseName, this.authentication);
+                var dataBase = dataBaseItem.DataBase;
+                result.Value = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo.Revision);
             }
             catch (Exception e)
             {

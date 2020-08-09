@@ -96,8 +96,7 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
             {
                 foreach (PropertyDescriptor item in TypeDescriptor.GetProperties(type))
                 {
-                    var attr = item.Attributes[typeof(JsonPropertyAttribute)] as JsonPropertyAttribute;
-                    if (attr == null)
+                    if (!(item.Attributes[typeof(JsonPropertyAttribute)] is JsonPropertyAttribute attr))
                         continue;
                     var name = attr.PropertyName ?? item.Name;
                     if (name == propertyName)

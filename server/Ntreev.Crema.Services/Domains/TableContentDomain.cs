@@ -33,7 +33,6 @@ namespace Ntreev.Crema.Services.Domains
     class TableContentDomain : Domain
     {
         private readonly CremaDataSet dataSet;
-        private readonly List<FindResultInfo> findResults = new List<FindResultInfo>(100);
         private readonly Dictionary<string, DataView> views = new Dictionary<string, DataView>();
         private byte[] data;
 

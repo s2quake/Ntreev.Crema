@@ -97,7 +97,7 @@ namespace Ntreev.Crema.Data.Xml.Schema
 
         public void Read(TextReader reader)
         {
-            this.Read(reader, new CremaXmlResolver(this.DataSet));
+            this.Read(reader, new CremaXmlResolver());
         }
 
         public void Read(Stream stream)
@@ -107,12 +107,12 @@ namespace Ntreev.Crema.Data.Xml.Schema
                 this.hashValue = HashUtility.GetHashValue(stream);
                 stream.Seek(0, SeekOrigin.Begin);
             }
-            this.Read(stream, new CremaXmlResolver(this.DataSet));
+            this.Read(stream, new CremaXmlResolver());
         }
 
         public void Read(XmlReader reader)
         {
-            this.Read(reader, new CremaXmlResolver(this.DataSet));
+            this.Read(reader, new CremaXmlResolver());
         }
 
         public void Read(Stream stream, XmlResolver resolver)
@@ -664,8 +664,7 @@ namespace Ntreev.Crema.Data.Xml.Schema
             }
             else
             {
-                var categoryPath = PathUtility.Separator;
-
+                string categoryPath;
                 if (simpleType.QualifiedName.Namespace == CremaSchema.BaseNamespace)
                 {
                     if (this.version >= new Version(3, 5))
@@ -674,8 +673,7 @@ namespace Ntreev.Crema.Data.Xml.Schema
                     }
                     else
                     {
-                        var xmlRestriction = simpleType.Content as XmlSchemaSimpleTypeRestriction;
-                        if (xmlRestriction == null)
+                        if (!(simpleType.Content is XmlSchemaSimpleTypeRestriction xmlRestriction))
                         {
                             if (simpleType.Content is XmlSchemaSimpleTypeList == true)
                             {
@@ -711,8 +709,6 @@ namespace Ntreev.Crema.Data.Xml.Schema
         {
             if (this.DataSet != null && this.DataSet.Types.Contains(simpleType.Name) == true)
                 return;
-
-            var contentType = simpleType;
             var restriction = simpleType.Content as XmlSchemaSimpleTypeRestriction;
             var dataType = this.dataType ?? new CremaDataType();
             dataType.InternalName = simpleType.Name;
@@ -720,7 +716,7 @@ namespace Ntreev.Crema.Data.Xml.Schema
 
             if (restriction == null && simpleType.Content is XmlSchemaSimpleTypeList == true)
             {
-                contentType = (simpleType.Content as XmlSchemaSimpleTypeList).BaseItemType;
+                XmlSchemaSimpleType contentType = (simpleType.Content as XmlSchemaSimpleTypeList).BaseItemType;
                 restriction = contentType.Content as XmlSchemaSimpleTypeRestriction;
                 dataType.IsFlag = true;
             }
@@ -952,52 +948,6 @@ namespace Ntreev.Crema.Data.Xml.Schema
                 throw new CremaDataException();
             }
             return XmlConvert.DecodeName(name);
-        }
-
-        [Obsolete("for 1.0")]
-        /// <summary>
-        /// for 1.0
-        /// </summary>
-        private bool ReadTableInfoVersion1(XmlSchemaElement element, CremaDataTable dataTable)
-        {
-            var modifier = element.ReadAppInfoAsString(CremaSchema.TableInfo, CremaSchema.Modifier);
-            if (modifier != null)
-            {
-                string modifiedDateTime = element.ReadAppInfoAsString(CremaSchema.TableInfo, CremaSchema.ModifiedDateTime);
-                if (DateTime.TryParse(modifiedDateTime, out DateTime dateTime) == true)
-                {
-                    dataTable.InternalModificationInfo = new SignatureDate(modifier, dateTime);
-                }
-            }
-
-            var creator = element.ReadAppInfoAsString(CremaSchema.TableInfo, CremaSchema.Creator);
-            if (creator == null)
-                creator = element.ReadAppInfoAsString(CremaSchema.TableInfo, CremaSchemaObsolete.CreatorObsolete);
-            if (creator != null)
-            {
-                var createdDateTime = element.ReadAppInfoAsString(CremaSchema.TableInfo, CremaSchema.CreatedDateTime);
-                if (DateTime.TryParse(createdDateTime, out DateTime dateTime) == true)
-                {
-                    dataTable.InternalCreationInfo = new SignatureDate(creator, dateTime);
-                }
-            }
-
-            if (modifier != null || creator != null)
-            {
-                var properties = new PropertyCollection();
-                this.ReadExtendedProperties(element, properties);
-                if (properties.ContainsKey(CremaSchemaObsolete.DataLocation) == true)
-                {
-                    dataTable.InternalTags = new TagInfo(properties[CremaSchemaObsolete.DataLocation] as string);
-                    properties.Remove(CremaSchemaObsolete.DataLocation);
-                }
-                foreach (DictionaryEntry item in properties)
-                {
-                    dataTable.ExtendedProperties.Add(item.Key, item.Value);
-                }
-            }
-
-            return modifier != null || creator != null;
         }
 
         //[Obsolete("for 2.0")]

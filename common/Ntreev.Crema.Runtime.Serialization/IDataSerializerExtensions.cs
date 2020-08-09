@@ -28,10 +28,8 @@ namespace Ntreev.Crema.Runtime.Serialization
             try
             {
                 FileUtility.Prepare(filename);
-                using (var stream = File.OpenWrite(filename))
-                {
-                    serializer.Serialize(stream, dataSet);
-                }
+                using var stream = File.OpenWrite(filename);
+                serializer.Serialize(stream, dataSet);
             }
             catch
             {

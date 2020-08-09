@@ -355,18 +355,13 @@ namespace Ntreev.Crema.Services
 
         public static string GetPath(string basePath, CremaPath pathType, params string[] paths)
         {
-            switch (pathType)
+            return pathType switch
             {
-                case CremaPath.Repository:
-                    return Path.Combine(Path.Combine(basePath, CremaString.Repository), Path.Combine(paths));
-                case CremaPath.RepositoryUsers:
-                    return Path.Combine(Path.Combine(basePath, CremaString.Repository, CremaString.Users), Path.Combine(paths));
-                case CremaPath.RepositoryDataBases:
-                    return Path.Combine(Path.Combine(basePath, CremaString.Repository, CremaString.DataBases), Path.Combine(paths));
-                default:
-                    return Path.Combine(Path.Combine(basePath, $"{pathType}".ToLower()), Path.Combine(paths));
-            }
-
+                CremaPath.Repository => Path.Combine(Path.Combine(basePath, CremaString.Repository), Path.Combine(paths)),
+                CremaPath.RepositoryUsers => Path.Combine(Path.Combine(basePath, CremaString.Repository, CremaString.Users), Path.Combine(paths)),
+                CremaPath.RepositoryDataBases => Path.Combine(Path.Combine(basePath, CremaString.Repository, CremaString.DataBases), Path.Combine(paths)),
+                _ => Path.Combine(Path.Combine(basePath, $"{pathType}".ToLower()), Path.Combine(paths)),
+            };
             throw new NotImplementedException();
         }
 

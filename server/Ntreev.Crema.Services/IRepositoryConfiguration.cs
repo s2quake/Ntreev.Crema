@@ -59,7 +59,7 @@ namespace Ntreev.Crema.Services
                 }
             }
 
-            value = default(T);
+            value = default;
             return false;
         }
 

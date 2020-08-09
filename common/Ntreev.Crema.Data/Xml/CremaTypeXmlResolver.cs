@@ -27,12 +27,11 @@ namespace Ntreev.Crema.Data.Xml
     public class CremaTypeXmlResolver : XmlResolver
     {
         private readonly CremaDataSet dataSet;
-        private readonly string tableNamespace;
 
         public CremaTypeXmlResolver(CremaDataSet dataSet, string tableNamespace)
         {
             this.dataSet = dataSet;
-            this.tableNamespace = tableNamespace;
+            this.TableNamespace = tableNamespace;
         }
 
         public override object GetEntity(Uri absoluteUri, string role, Type ofObjectToReturn)
@@ -65,5 +64,7 @@ namespace Ntreev.Crema.Data.Xml
 
             return new Uri(new Uri(tableNamespace), relativeUri);
         }
+
+        public string TableNamespace { get; }
     }
 }

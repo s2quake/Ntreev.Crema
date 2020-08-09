@@ -29,12 +29,6 @@ namespace Ntreev.Crema.Services.Domains
 {
     class DomainRestorer
     {
-        private readonly static XmlReaderSettings readerSettings = new XmlReaderSettings()
-        {
-            ConformanceLevel = ConformanceLevel.Fragment,
-            IgnoreWhitespace = true,
-        };
-
         private readonly DomainContext domainContext;
         private readonly string workingPath;
         private readonly Dictionary<long, DomainCompleteItemSerializationInfo> completedList = new Dictionary<long, DomainCompleteItemSerializationInfo>();

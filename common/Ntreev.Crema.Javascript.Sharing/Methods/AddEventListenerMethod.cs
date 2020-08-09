@@ -27,14 +27,12 @@ namespace Ntreev.Crema.Javascript.Methods
     [PartCreationPolicy(CreationPolicy.NonShared)]
     class AddEventListenerMethod : ScriptMethodBase
     {
-        private readonly ICremaHost cremaHost;
         private readonly CremaEventListenerHost[] eventListeners;
         private CremaEventListenerContext eventListenerContext;
 
         [ImportingConstructor]
-        public AddEventListenerMethod(ICremaHost cremaHost, [ImportMany] IEnumerable<CremaEventListenerHost> eventListeners)
+        public AddEventListenerMethod([ImportMany] IEnumerable<CremaEventListenerHost> eventListeners)
         {
-            this.cremaHost = cremaHost;
             this.eventListeners = eventListeners.ToArray();
         }
 

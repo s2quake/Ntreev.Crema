@@ -26,20 +26,12 @@ namespace Ntreev.Crema.Data.Xml
 {
     public class CremaXmlResolver : XmlResolver
     {
-        private readonly string filename;
-        private readonly CremaDataSet dataSet;
-        private readonly Dictionary<string, SchemaBuilder> nameToBuilder = new Dictionary<string, SchemaBuilder>();
-
         public static CremaXmlResolver Default = new CremaXmlResolver();
+        private readonly string filename;
 
         public CremaXmlResolver()
         {
 
-        }
-
-        public CremaXmlResolver(CremaDataSet dataSet)
-        {
-            this.dataSet = dataSet;
         }
 
         public CremaXmlResolver(string filename)

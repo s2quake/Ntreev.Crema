@@ -98,21 +98,19 @@ namespace Ntreev.Crema.Services.Data
                 var dataSet = await type.ReadDataForCopyAsync(authentication, categoryPath);
                 var dataType = dataSet.Types[itemName.Name, itemName.CategoryPath];
                 var newDataType = dataType.Copy(targetName);
-                using (var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, DataBaseSetOptions.AllowTypeCreation))
+                using var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, DataBaseSetOptions.AllowTypeCreation);
+                var typePaths = new string[] { categoryPath + newTypeName };
+                await this.InvokeTypeCreateAsync(authentication, typePaths, dataBaseSet);
+                var result = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    var typePaths = new string[] { categoryPath + newTypeName };
-                    await this.InvokeTypeCreateAsync(authentication, typePaths, dataBaseSet);
-                    var result = await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        this.CremaHost.Sign(authentication);
-                        var newType = this.BaseAddNew(newTypeName, categoryPath, authentication);
-                        newType.Initialize(newDataType.TypeInfo);
-                        this.InvokeTypesCreatedEvent(authentication, new Type[] { newType }, dataSet);
-                        this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
-                        return newType;
-                    });
-                    return result;
-                }
+                    this.CremaHost.Sign(authentication);
+                    var newType = this.BaseAddNew(newTypeName, categoryPath, authentication);
+                    newType.Initialize(newDataType.TypeInfo);
+                    this.InvokeTypesCreatedEvent(authentication, new Type[] { newType }, dataSet);
+                    this.DataBase.InvokeTaskCompletedEvent(authentication, taskID);
+                    return newType;
+                });
+                return result;
             }
             catch (Exception e)
             {

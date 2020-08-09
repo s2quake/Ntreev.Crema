@@ -29,18 +29,14 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
         public EnumStringGenerationProvider(params object[] args)
         {
             this.propertyName = (string)args.FirstOrDefault();
-            //this.propertyName = propertyName;
         }
 
         public override JSchema GetSchema(JSchemaTypeGenerationContext context)
         {
             var definedType = context.ParentContract.CreatedType;
             var schema = JsonSchemaUtility.GetSchema(context.ObjectType);
-
             var propertyInfo = definedType.GetProperty(this.propertyName);
-            var items = propertyInfo.GetValue(null) as string[];
-
-            if (items != null)
+            if (propertyInfo.GetValue(null) is string[] items)
             {
                 schema.Enum.Clear();
                 foreach (var item in items)
@@ -48,37 +44,6 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
                     schema.Enum.Add(JValue.CreateString(item));
                 }
             }
-
-
-            //int qwr = 0;
-
-            //bool isNullable = ReflectionUtils.IsNullableType(context.ObjectType);
-            //Type t = context.ObjectType;
-
-            //var schema = new JSchema
-            //{
-            //    Title = context.SchemaTitle,
-            //    Description = context.SchemaDescription,
-            //    Type = JSchemaType.String
-            //};
-
-            //context.g
-
-            //if (isNullable && context.Required != Required.Always && context.Required != Required.DisallowNull)
-            //{
-            //    schema.Type |= JSchemaType.Null;
-            //    schema.Enum.Add(JValue.CreateNull());
-            //}
-
-            //string[] names = Enum.GetNames(t);
-
-            //foreach (string name in names)
-            //{
-            //    string finalName = EnumUtils.ToEnumName(t, name, CamelCaseText);
-
-            //    schema.Enum.Add(JValue.CreateString(finalName));
-            //}
-
             return schema;
         }
     }

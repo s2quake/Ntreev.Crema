@@ -123,8 +123,8 @@ namespace Ntreev.Crema.Repository.Svn
         private string[] GetLines(string text)
         {
             var sr = new StringReader(text);
-            var line = null as string;
             var lineList = new List<string>();
+            string line;
             while ((line = sr.ReadLine()) != null)
             {
                 lineList.Add(line);

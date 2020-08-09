@@ -529,11 +529,10 @@ namespace Ntreev.Crema.Data.Xml
         private void ReadValue(CremaDataRow dataRow, CremaDataColumn dataColumn, string textValue)
         {
             var dataType = dataColumn.DataType;
-            var value = textValue as object;
 
             try
             {
-                value = CremaXmlConvert.ToValue(textValue, dataType);
+                var value = CremaXmlConvert.ToValue(textValue, dataType);
                 if (dataColumn.CremaType != null)
                 {
                     if (long.TryParse(textValue, out long v) == true)
@@ -553,11 +552,10 @@ namespace Ntreev.Crema.Data.Xml
         private void ReadValue(CremaDataRow dataRow, DataColumn dataColumn, string textValue)
         {
             var dataType = dataColumn.DataType;
-            var value = textValue as object;
 
             try
             {
-                value = CremaXmlConvert.ToValue(textValue, dataType);
+                var value = CremaXmlConvert.ToValue(textValue, dataType);
                 dataRow.SetField(dataColumn.ColumnName, value);
             }
             catch (Exception e)

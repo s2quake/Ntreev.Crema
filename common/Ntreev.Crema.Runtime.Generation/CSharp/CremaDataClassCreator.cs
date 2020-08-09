@@ -437,36 +437,6 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
             return ccs;
         }
 
-        private static CodeStatement CreateCompareTypesHashValueStatement(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
-        {
-            var ccs = new CodeConditionStatement();
-
-            var left = new CodePrimitiveExpression(generationInfo.TypesHashValue);
-            var right = new CodePropertyReferenceExpression(new CodeVariableReferenceExpression("dataSet"), "TypesHashValue");
-            ccs.Condition = new CodeBinaryOperatorExpression(left, CodeBinaryOperatorType.IdentityInequality, right);
-
-            var message = string.Format("타입 해시값이 '{0}'이 아닙니다.", generationInfo.TypesHashValue);
-            var exception = new CodeObjectCreateExpression(typeof(Exception), new CodePrimitiveExpression(message));
-            ccs.TrueStatements.Add(new CodeThrowExceptionStatement(exception));
-
-            return ccs;
-        }
-
-        private static CodeStatement CreateCompareTablesHashValueStatement(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
-        {
-            var ccs = new CodeConditionStatement();
-
-            var left = new CodePrimitiveExpression(generationInfo.TablesHashValue);
-            var right = new CodePropertyReferenceExpression(new CodeVariableReferenceExpression("dataSet"), "TablesHashValue");
-            ccs.Condition = new CodeBinaryOperatorExpression(left, CodeBinaryOperatorType.IdentityInequality, right);
-
-            var message = string.Format("테이블 해시값이 '{0}'이 아닙니다.", generationInfo.TablesHashValue);
-            var exception = new CodeObjectCreateExpression(typeof(Exception), new CodePrimitiveExpression(message));
-            ccs.TrueStatements.Add(new CodeThrowExceptionStatement(exception));
-
-            return ccs;
-        }
-
         public static CodeStatement CreateTryCatchStatement(CodeTypeDeclaration classType, CodeStatement statement, CodeGenerationInfo generationInfo)
         {
             var tryStatement = new CodeTryCatchFinallyStatement();

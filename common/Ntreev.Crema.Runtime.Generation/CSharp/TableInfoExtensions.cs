@@ -26,7 +26,6 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
     static class TableInfoExtensions
     {
         private const string separator = "";
-        private const string tablePrefix = "";
         private const string rowPostfix = "Row";
 
         public static string GetFieldName(this TableInfo tableInfo)

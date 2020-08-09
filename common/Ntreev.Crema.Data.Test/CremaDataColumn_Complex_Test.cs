@@ -30,13 +30,11 @@ namespace Ntreev.Crema.Data.Test
     {
         private readonly CremaDataSet dataSet = new CremaDataSet();
         private readonly CremaDataTable table;
-        private readonly CremaDataColumn[] columns;
 
         public CremaDataColumn_Complex_Test()
         {
             this.dataSet.AddRandoms(10);
             this.table = this.dataSet.Tables.Random();
-            this.columns = this.dataSet.Tables.SelectMany(item => item.Columns).ToArray();
         }
 
         /// <summary>

@@ -29,7 +29,6 @@ namespace Ntreev.Crema.Bot
     {
         public const string ServiceID = "40781F6B-C048-4319-9D6F-77486740BE33";
         private readonly ICremaHost cremaHost;
-        private Authentication authentication;
 
         [ImportingConstructor]
         public AutobotService(ICremaHost cremaHost, [ImportMany] IEnumerable<ITaskProvider> taskProviders)
@@ -40,7 +39,7 @@ namespace Ntreev.Crema.Bot
 
         public void Initialize(Authentication authentication)
         {
-            this.authentication = authentication;
+            this.Authentication = authentication;
         }
 
         public void Release()
@@ -51,6 +50,8 @@ namespace Ntreev.Crema.Bot
         public string Name => "bot";
 
         public Guid ID => Guid.Parse(ServiceID);
+
+        public Authentication Authentication { get; private set; }
 
         protected override AutobotBase CreateInstance(string autobotID, SecureString password)
         {

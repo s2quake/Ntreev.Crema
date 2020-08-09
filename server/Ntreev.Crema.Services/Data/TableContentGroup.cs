@@ -80,7 +80,6 @@ namespace Ntreev.Crema.Services.Data
                     var itemAccessType = item.GetAccessType(authentication);
                     if (itemAccessType < accessType)
                     {
-                        itemAccessType = accessType;
                     }
                 }
                 return accessType;

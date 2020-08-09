@@ -292,10 +292,8 @@ namespace Ntreev.Crema.Data.Test
                 }
                 catch
                 {
-                    using (StringReader sr = new StringReader(schemaWriter.ToString()))
-                    {
-                        testSet.ReadXmlSchema(sr, new CremaTypeXmlResolver(dataSet, item.Namespace));
-                    }
+                    using StringReader sr = new StringReader(schemaWriter.ToString());
+                    testSet.ReadXmlSchema(sr, new CremaTypeXmlResolver(dataSet, item.Namespace));
                 }
 
                 using (StringReader sr = new StringReader(xmlWriter.ToString()))
@@ -346,11 +344,9 @@ namespace Ntreev.Crema.Data.Test
                 }
                 catch
                 {
-                    using (StringReader sr = new StringReader(schemaBuilder.ToString()))
-                    using (XmlReader reader = XmlReader.Create(sr))
-                    {
-                        testSet.ReadXmlSchema(reader, new CremaTypeXmlResolver(dataSet, item.Namespace));
-                    }
+                    using StringReader sr = new StringReader(schemaBuilder.ToString());
+                    using XmlReader reader = XmlReader.Create(sr);
+                    testSet.ReadXmlSchema(reader, new CremaTypeXmlResolver(dataSet, item.Namespace));
                 }
 
                 using (StringReader sr = new StringReader(xmlBuilder.ToString()))

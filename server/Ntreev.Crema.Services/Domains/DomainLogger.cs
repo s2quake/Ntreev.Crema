@@ -34,8 +34,6 @@ namespace Ntreev.Crema.Services.Domains
         public const string PostedItemPath = "posted";
         public const string CompletedItemPath = "completed";
 
-        private static readonly XmlWriterSettings writerSettings = new XmlWriterSettings() { OmitXmlDeclaration = true, Indent = true };
-
         private readonly string basePath;
 
         private readonly string headerPath;
@@ -44,26 +42,24 @@ namespace Ntreev.Crema.Services.Domains
         private readonly string completedPath;
 
         private readonly IObjectSerializer serializer;
-        private readonly DomainSerializationInfo domainInfo;
-        private readonly object source;
-
-        private DomainPostItemSerializationInfo currentPost;
         private readonly List<DomainPostItemSerializationInfo> postedList = new List<DomainPostItemSerializationInfo>();
         private readonly List<DomainCompleteItemSerializationInfo> completedList = new List<DomainCompleteItemSerializationInfo>();
+
+        private DomainPostItemSerializationInfo currentPost;
 
         public DomainLogger(IObjectSerializer serializer, Domain domain)
         {
             this.serializer = serializer;
-            this.domainInfo = domain.GetSerializationInfo();
-            this.source = domain.Source;
+            this.DomainInfo = domain.GetSerializationInfo();
+            this.Source = domain.Source;
             this.basePath = DirectoryUtility.Prepare(domain.Context.BasePath, domain.DataBaseID.ToString(), domain.Name);
             this.headerPath = Path.Combine(this.basePath, HeaderItemPath);
             this.sourcePath = Path.Combine(this.basePath, SourceItemPath);
             this.postedPath = Path.Combine(this.basePath, PostedItemPath);
             this.completedPath = Path.Combine(this.basePath, CompletedItemPath);
 
-            this.serializer.Serialize(this.headerPath, this.domainInfo, ObjectSerializerSettings.Empty);
-            this.serializer.Serialize(this.sourcePath, this.source, ObjectSerializerSettings.Empty);
+            this.serializer.Serialize(this.headerPath, this.DomainInfo, ObjectSerializerSettings.Empty);
+            this.serializer.Serialize(this.sourcePath, this.Source, ObjectSerializerSettings.Empty);
             this.postedList = new List<DomainPostItemSerializationInfo>();
             this.completedList = new List<DomainCompleteItemSerializationInfo>();
             this.Dispatcher = new CremaDispatcher(this);
@@ -78,8 +74,8 @@ namespace Ntreev.Crema.Services.Domains
             this.postedPath = Path.Combine(this.basePath, PostedItemPath);
             this.completedPath = Path.Combine(this.basePath, CompletedItemPath);
 
-            this.domainInfo = (DomainSerializationInfo)this.serializer.Deserialize(this.headerPath, typeof(DomainSerializationInfo), ObjectSerializerSettings.Empty);
-            this.source = this.serializer.Deserialize(this.sourcePath, Type.GetType(this.domainInfo.SourceType), ObjectSerializerSettings.Empty);
+            this.DomainInfo = (DomainSerializationInfo)this.serializer.Deserialize(this.headerPath, typeof(DomainSerializationInfo), ObjectSerializerSettings.Empty);
+            this.Source = this.serializer.Deserialize(this.sourcePath, Type.GetType(this.DomainInfo.SourceType), ObjectSerializerSettings.Empty);
 
             {
                 var items = File.ReadAllLines(this.completedPath);
@@ -103,7 +99,7 @@ namespace Ntreev.Crema.Services.Domains
 
         public override string ToString()
         {
-            return $"{this.domainInfo.DomainInfo.CategoryPath}{this.domainInfo.DomainInfo.DomainID}";
+            return $"{this.DomainInfo.DomainInfo.CategoryPath}{this.DomainInfo.DomainInfo.DomainID}";
         }
 
         public Task DisposeAsync(bool delete)
@@ -270,8 +266,8 @@ namespace Ntreev.Crema.Services.Domains
 
         public IReadOnlyList<DomainCompleteItemSerializationInfo> CompletedList => this.completedList;
 
-        public DomainSerializationInfo DomainInfo => this.domainInfo;
+        public DomainSerializationInfo DomainInfo { get; }
 
-        public object Source => this.source;
+        public object Source { get; }
     }
 }

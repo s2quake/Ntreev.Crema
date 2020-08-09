@@ -35,12 +35,8 @@ namespace Ntreev.Crema.Repository.Git
     class GitRepositoryProvider : IRepositoryProvider
     {
         public const string KeepExtension = ".keep";
-        private const string commentHeader = "# revision properties";
 
         private static readonly ISerializer propertySerializer = new SerializerBuilder().Build();
-        private static readonly Deserializer propertyDeserializer = new Deserializer();
-
-        private readonly Dictionary<Uri, string> cacheRepositories = new Dictionary<Uri, string>();
 
         public void CopyRepository(string author, string basePath, string repositoryName, string newRepositoryName, string comment, params LogPropertyInfo[] properties)
         {
@@ -84,12 +80,12 @@ namespace Ntreev.Crema.Repository.Git
                 var id = this.GetID(settings.BasePath, repositoryName);
                 this.SetID(settings.WorkingPath, repositoryName, id);
                 var repositoryInfo = this.GetRepositoryInfo(settings.BasePath, repositoryName);
-                return new GitRepository(this, settings.LogService, settings.WorkingPath, settings.TransactionPath, repositoryInfo);
+                return new GitRepository(settings.LogService, settings.WorkingPath, settings.TransactionPath, repositoryInfo);
             }
             else
             {
                 var repositoryInfo = this.GetRepositoryInfo(settings.WorkingPath, repositoryName);
-                return new GitRepository(this, settings.LogService, settings.WorkingPath, settings.TransactionPath, repositoryInfo);
+                return new GitRepository(settings.LogService, settings.WorkingPath, settings.TransactionPath, repositoryInfo);
             }
         }
 
@@ -432,11 +428,6 @@ namespace Ntreev.Crema.Repository.Git
             GitConfig.SetValue(repositoryPath, $"branch.{repositoryName}.createdDateTime", $"{signatureDate.ToString(CultureInfo.GetCultureInfo("en-US"))}");
         }
 
-        private void UnsetCreationInfo(string repositoryPath, string repositoryName)
-        {
-            GitConfig.UnsetValue(repositoryPath, $"branch.{repositoryName}.createdDateTime");
-        }
-
         private bool HasCreationInfo(string repositoryPath, string repositoryName)
         {
             return GitConfig.HasValue(repositoryPath, $"branch.{repositoryName}.createdDateTime");
@@ -450,11 +441,6 @@ namespace Ntreev.Crema.Repository.Git
         private void SetDescription(string repositoryPath, string repositoryName, string description)
         {
             GitConfig.SetValue(repositoryPath, $"branch.{repositoryName}.description", $"{description}");
-        }
-
-        private void UnsetDescription(string repositoryPath, string repositoryName)
-        {
-            GitConfig.UnsetValue(repositoryPath, $"branch.{repositoryName}.description");
         }
 
         private bool HasDescription(string repositoryPath, string repositoryName)

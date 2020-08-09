@@ -54,19 +54,17 @@ namespace Ntreev.Crema.Services.Users
                 var taskID = GuidUtility.FromName(categoryName);
                 var itemPaths = new string[] { categoryName };
                 await this.Repository.LockAsync(authentication, this, nameof(AddNewAsync), itemPaths);
-                using (var userContextSet = await UserContextSet.CreateEmptyAsync(authentication, this.Context, itemPaths))
+                using var userContextSet = await UserContextSet.CreateEmptyAsync(authentication, this.Context, itemPaths);
+                await this.InvokeCategoryCreateAsync(authentication, categoryName);
+                var result = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    await this.InvokeCategoryCreateAsync(authentication, categoryName);
-                    var result = await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        this.CremaHost.Sign(authentication);
-                        var category = this.BaseAddNew(name, parentPath, authentication);
-                        this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
-                        this.Context.InvokeTaskCompletedEvent(authentication, taskID);
-                        return category;
-                    });
-                    return result;
-                }
+                    this.CremaHost.Sign(authentication);
+                    var category = this.BaseAddNew(name, parentPath, authentication);
+                    this.InvokeCategoriesCreatedEvent(authentication, new UserCategory[] { category });
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                    return category;
+                });
+                return result;
             }
             catch (Exception e)
             {

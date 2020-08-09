@@ -51,18 +51,16 @@ namespace Ntreev.Crema.Services.Users
                 });
                 var taskID = Guid.NewGuid();
                 var userSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                using (var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false))
+                using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeCategoryRenameAsync(authentication, tuple.path, name, userContextSet);
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    await this.Container.InvokeCategoryRenameAsync(authentication, tuple.path, name, userContextSet);
-                    await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        base.Name = name;
-                        this.CremaHost.Sign(authentication);
-                        this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths);
-                        this.Context.InvokeTaskCompletedEvent(authentication, taskID);
-                    });
-                    return taskID;
-                }
+                    base.Name = name;
+                    this.CremaHost.Sign(authentication);
+                    this.Container.InvokeCategoriesRenamedEvent(authentication, tuple.items, tuple.oldNames, tuple.oldPaths);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                });
+                return taskID;
             }
             catch (Exception e)
             {
@@ -89,18 +87,16 @@ namespace Ntreev.Crema.Services.Users
                 });
                 var taskID = Guid.NewGuid();
                 var userSet = await this.ReadDataForPathAsync(authentication, tuple.targetName);
-                using (var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false))
+                using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeCategoryMoveAsync(authentication, tuple.path, parentPath, userContextSet);
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    await this.Container.InvokeCategoryMoveAsync(authentication, tuple.path, parentPath, userContextSet);
-                    await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        this.Parent = this.Container[parentPath];
-                        this.CremaHost.Sign(authentication);
-                        this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths);
-                        this.Context.InvokeTaskCompletedEvent(authentication, taskID);
-                    });
-                    return taskID;
-                }
+                    this.Parent = this.Container[parentPath];
+                    this.CremaHost.Sign(authentication);
+                    this.Container.InvokeCategoriesMovedEvent(authentication, tuple.items, tuple.oldPaths, tuple.oldParentPaths);
+                    this.Context.InvokeTaskCompletedEvent(authentication, taskID);
+                });
+                return taskID;
             }
             catch (Exception e)
             {
@@ -129,18 +125,16 @@ namespace Ntreev.Crema.Services.Users
                 });
                 var taskID = Guid.NewGuid();
                 var userSet = await this.ReadDataForPathAsync(authentication, new CategoryName(tuple.path));
-                using (var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false))
+                using var userContextSet = await UserContextSet.CreateAsync(this.Context, userSet, false);
+                await this.Container.InvokeCategoryDeleteAsync(authentication, tuple.path, userContextSet);
+                await this.Dispatcher.InvokeAsync(() =>
                 {
-                    await this.Container.InvokeCategoryDeleteAsync(authentication, tuple.path, userContextSet);
-                    await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        this.Dispose();
-                        cremaHost.Sign(authentication);
-                        container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
-                        context.InvokeTaskCompletedEvent(authentication, taskID);
-                    });
-                    return taskID;
-                }
+                    this.Dispose();
+                    cremaHost.Sign(authentication);
+                    container.InvokeCategoriesDeletedEvent(authentication, tuple.items, tuple.oldPaths);
+                    context.InvokeTaskCompletedEvent(authentication, taskID);
+                });
+                return taskID;
             }
             catch (Exception e)
             {

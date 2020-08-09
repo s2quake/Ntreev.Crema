@@ -39,6 +39,7 @@
     <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library.Random\Ntreev.Library.Random.csproj" />
     <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Repository.Svn\Ntreev.Crema.Repository.Svn.csproj" />
+    <ProjectReference Include="..\Ntreev.Crema.Services.Extensions\Ntreev.Crema.Services.Extensions.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Services.Random\Ntreev.Crema.Services.Random.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj" />
   </ItemGroup>

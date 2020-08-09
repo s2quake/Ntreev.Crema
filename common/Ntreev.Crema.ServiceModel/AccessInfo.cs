@@ -156,7 +156,7 @@ namespace Ntreev.Crema.ServiceModel
             return this.GetAccessType(userID) >= AccessType.Master;
         }
 
-        public static readonly AccessInfo Empty = new AccessInfo()
+        public static AccessInfo Empty { get; } = new AccessInfo()
         {
             Path = string.Empty,
             ParentPath = string.Empty,

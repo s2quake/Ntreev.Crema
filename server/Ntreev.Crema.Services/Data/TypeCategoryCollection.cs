@@ -59,20 +59,18 @@ namespace Ntreev.Crema.Services.Data
                 var taskID = GuidUtility.FromName(categoryName);
                 var fullPaths = new string[] { PathUtility.Separator + CremaSchema.TypeDirectory + categoryName };
                 await this.Repository.LockAsync(authentication, this, nameof(AddNewAsync), fullPaths);
-                using (var dataBaseSet = await DataBaseSet.CreateEmptyAsync(this.DataBase, fullPaths))
+                using var dataBaseSet = await DataBaseSet.CreateEmptyAsync(this.DataBase, fullPaths);
+                await this.InvokeCategoryCreateAsync(authentication, categoryName);
+                var result = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    await this.InvokeCategoryCreateAsync(authentication, categoryName);
-                    var result = await this.Dispatcher.InvokeAsync(() =>
-                    {
-                        this.CremaHost.Sign(authentication);
-                        var category = this.BaseAddNew(name, parentPath, authentication);
-                        var items = EnumerableUtility.One(category).ToArray();
-                        this.InvokeCategoriesCreatedEvent(authentication, items);
-                        return category;
-                    });
-                    await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
-                    return result;
-                }
+                    this.CremaHost.Sign(authentication);
+                    var category = this.BaseAddNew(name, parentPath, authentication);
+                    var items = EnumerableUtility.One(category).ToArray();
+                    this.InvokeCategoriesCreatedEvent(authentication, items);
+                    return category;
+                });
+                await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
+                return result;
             }
             catch (Exception e)
             {

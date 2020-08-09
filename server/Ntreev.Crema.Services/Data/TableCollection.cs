@@ -105,12 +105,10 @@ namespace Ntreev.Crema.Services.Data
                 var dataTables = dataSet.Tables.ToArray();
                 var newDataTable = dataTable.Inherit(targetName, copyContent);
                 newDataTable.CategoryPath = categoryPath;
-                using (var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, DataBaseSetOptions.AllowTableCreation))
-                {
-                    var tables = await this.AddNewAsync(authentication, dataBaseSet);
-                    await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
-                    return tables;
-                }
+                using var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, DataBaseSetOptions.AllowTableCreation);
+                var tables = await this.AddNewAsync(authentication, dataBaseSet);
+                await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
+                return tables;
             }
             catch (Exception e)
             {
@@ -139,12 +137,10 @@ namespace Ntreev.Crema.Services.Data
                 var dataTables = dataSet.Tables.ToArray();
                 var newDataTable = dataTable.Copy(targetName, copyContent);
                 newDataTable.CategoryPath = categoryPath;
-                using (var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, DataBaseSetOptions.AllowTableCreation))
-                {
-                    var tables = await this.AddNewAsync(authentication, dataBaseSet);
-                    await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
-                    return tables;
-                }
+                using var dataBaseSet = await DataBaseSet.CreateAsync(this.DataBase, dataSet, DataBaseSetOptions.AllowTableCreation);
+                var tables = await this.AddNewAsync(authentication, dataBaseSet);
+                await this.Dispatcher.InvokeAsync(() => this.DataBase.InvokeTaskCompletedEvent(authentication, taskID));
+                return tables;
             }
             catch (Exception e)
             {

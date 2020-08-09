@@ -30,7 +30,6 @@ namespace Ntreev.Crema.Bot
 {
     public abstract class AutobotBase : IServiceProvider
     {
-        private readonly static object error = new object();
         private readonly TaskContext taskContext = new TaskContext();
         private readonly CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
         private IEnumerable<ITaskProvider> taskProviders;
@@ -225,7 +224,7 @@ namespace Ntreev.Crema.Bot
                 return true;
             }
 
-            int SelectWeight(ITaskProvider predicate)
+            static int SelectWeight(ITaskProvider predicate)
             {
                 if (!(Attribute.GetCustomAttribute(predicate.GetType(), typeof(TaskClassAttribute)) is TaskClassAttribute attr))
                     return 100;

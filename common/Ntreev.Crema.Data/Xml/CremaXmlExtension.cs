@@ -163,8 +163,7 @@ namespace Ntreev.Crema.Data.Xml
         public static bool TryGetAttributeAsSignatureDate(this XmlReader reader, string user, string dateTime, out SignatureDate value)
         {
             var id = reader.GetAttribute(user);
-            var dateTimeValue = DateTime.MinValue;
-            if (reader.TryGetAttributeAsDateTime(dateTime, XmlDateTimeSerializationMode.Utc, out dateTimeValue) == true || id != null)
+            if (reader.TryGetAttributeAsDateTime(dateTime, XmlDateTimeSerializationMode.Utc, out var dateTimeValue) == true || id != null)
             {
                 value = new SignatureDate()
                 {

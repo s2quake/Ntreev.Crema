@@ -367,10 +367,8 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
         private string GetResourceString(string resourceName)
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            using (var stream = new StreamReader(assembly.GetManifestResourceStream(resourceName)))
-            {
-                return stream.ReadToEnd();
-            }
+            using var stream = new StreamReader(assembly.GetManifestResourceStream(resourceName));
+            return stream.ReadToEnd();
         }
 
         private void PrintResult(string path)

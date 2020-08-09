@@ -53,8 +53,7 @@ namespace Ntreev.Crema.Javascript
 
             foreach (var item in items)
             {
-                var attr = Attribute.GetCustomAttribute(item.GetType(), typeof(PartCreationPolicyAttribute)) as PartCreationPolicyAttribute;
-                if (attr == null)
+                if (!(Attribute.GetCustomAttribute(item.GetType(), typeof(PartCreationPolicyAttribute)) is PartCreationPolicyAttribute attr))
                     throw new NotSupportedException();
                 if (attr.CreationPolicy != CreationPolicy.NonShared)
                     throw new NotSupportedException();

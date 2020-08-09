@@ -30,11 +30,7 @@ namespace Ntreev.Crema.Repository.Svn
 {
     class SvnRepository : IRepository
     {
-        private const string patchExtension = ".patch";
-
-        private readonly string repositoryPath;
         private readonly string transactionPath;
-        private readonly SvnRepositoryProvider repositoryProvider;
         private readonly ILogService logService;
         private readonly SvnCommand revertCommand;
         private readonly SvnCommand cleanupCommand;
@@ -45,29 +41,27 @@ namespace Ntreev.Crema.Repository.Svn
         private List<LogPropertyInfo> transactionPropertyList;
         private string transactionPatchPath;
         private bool needToUpdate;
-        private readonly Uri repositoryRoot;
         private readonly Uri repositoryUri;
         private RepositoryInfo repositoryInfo;
         private SvnInfo info;
 
-        public SvnRepository(SvnRepositoryProvider repositoryProvider, ILogService logService, string repositoryPath, string transactionPath, RepositoryInfo repositoryInfo)
+        public SvnRepository(ILogService logService, string repositoryPath, string transactionPath, RepositoryInfo repositoryInfo)
         {
-            this.repositoryProvider = repositoryProvider;
             this.logService = logService;
-            this.repositoryPath = repositoryPath;
+            this.BasePath = repositoryPath;
             this.transactionPath = transactionPath;
             this.repositoryInfo = repositoryInfo;
             this.revertCommand = new SvnCommand("revert")
             {
-                (SvnPath)this.repositoryPath,
+                (SvnPath)this.BasePath,
                 SvnCommandItem.Recursive,
             };
 
-            this.cleanupCommand = new SvnCommand("cleanup") { (SvnPath)this.repositoryPath };
+            this.cleanupCommand = new SvnCommand("cleanup") { (SvnPath)this.BasePath };
 
             this.statCommand = new SvnCommand("stat")
             {
-                (SvnPath)this.repositoryPath,
+                (SvnPath)this.BasePath,
                 SvnCommandItem.Quiet
             };
             var items = this.statCommand.ReadLines(true);
@@ -80,8 +74,8 @@ namespace Ntreev.Crema.Repository.Svn
                 throw new Exception($"{sb}");
             }
 
-            this.info = SvnInfo.Run(this.repositoryPath);
-            this.repositoryRoot = this.info.RepositoryRoot;
+            this.info = SvnInfo.Run(this.BasePath);
+            this.RepositoryRoot = this.info.RepositoryRoot;
             this.repositoryUri = this.info.Uri;
         }
 
@@ -89,7 +83,9 @@ namespace Ntreev.Crema.Repository.Svn
 
         public RepositoryInfo RepositoryInfo => this.repositoryInfo;
 
-        public string BasePath => this.repositoryPath;
+        public string BasePath { get; }
+
+        public Uri RepositoryRoot { get; }
 
         public void Add(string path)
         {
@@ -120,10 +116,10 @@ namespace Ntreev.Crema.Repository.Svn
                 if (items.Length != 0)
                 {
                     var propText = SvnRepositoryProvider.GeneratePropertiesArgument(this.transactionPropertyList.ToArray());
-                    var updateCommand = new SvnCommand("update") { (SvnPath)this.repositoryPath };
+                    var updateCommand = new SvnCommand("update") { (SvnPath)this.BasePath };
                     var commitCommand = new SvnCommand("commit")
                     {
-                        (SvnPath)this.repositoryPath,
+                        (SvnPath)this.BasePath,
                         SvnCommandItem.FromFile(messagePath),
                         propText,
                         SvnCommandItem.FromEncoding(Encoding.UTF8),
@@ -166,7 +162,7 @@ namespace Ntreev.Crema.Repository.Svn
             {
                 var diffCommand = new SvnCommand("diff")
                 {
-                    (SvnPath)this.repositoryPath,
+                    (SvnPath)this.BasePath,
                     new SvnCommandItem("patch-compatible")
                 };
                 diffCommand.WriteAllText(this.transactionPatchPath);
@@ -175,14 +171,14 @@ namespace Ntreev.Crema.Repository.Svn
                 return;
             }
 
-            this.logService?.Debug($"repository committing {(SvnPath)this.repositoryPath}");
+            this.logService?.Debug($"repository committing {(SvnPath)this.BasePath}");
             var result = string.Empty;
             var commentPath = PathUtility.GetTempFileName();
             var propText = SvnRepositoryProvider.GeneratePropertiesArgument(properties);
-            var updateCommand = new SvnCommand("update") { (SvnPath)this.repositoryPath };
+            var updateCommand = new SvnCommand("update") { (SvnPath)this.BasePath };
             var commitCommand = new SvnCommand("commit")
             {
-                (SvnPath)this.repositoryPath,
+                (SvnPath)this.BasePath,
                 SvnCommandItem.FromMessage(comment),
                 propText,
                 SvnCommandItem.FromEncoding(Encoding.UTF8),
@@ -213,14 +209,14 @@ namespace Ntreev.Crema.Repository.Svn
             if (result.Trim() != string.Empty)
             {
                 this.logService?.Debug(result);
-                this.logService?.Debug($"repository committed {(SvnPath)this.repositoryPath}");
-                this.info = SvnInfo.Run(this.repositoryPath);
+                this.logService?.Debug($"repository committed {(SvnPath)this.BasePath}");
+                this.info = SvnInfo.Run(this.BasePath);
                 this.repositoryInfo.Revision = this.info.LastChangedRevision;
                 this.repositoryInfo.ModificationInfo = new SignatureDate(this.info.LastChangedAuthor, this.info.LastChangedDate);
             }
             else
             {
-                this.logService?.Debug("repository no changes. \"{0}\"", this.repositoryPath);
+                this.logService?.Debug("repository no changes. \"{0}\"", this.BasePath);
             }
         }
 
@@ -325,7 +321,7 @@ namespace Ntreev.Crema.Repository.Svn
                 var patchCommand = new SvnCommand("patch")
                 {
                     (SvnPath)this.transactionPatchPath,
-                    (SvnPath)this.repositoryPath,
+                    (SvnPath)this.BasePath,
                 };
                 patchCommand.Run(this.logService);
             }
@@ -333,31 +329,7 @@ namespace Ntreev.Crema.Repository.Svn
 
         public void Dispose()
         {
-            DirectoryUtility.Delete(this.repositoryPath);
-        }
-
-        private string GetOriginPath(Uri repoUri, SvnLogInfo[] logs, string revision)
-        {
-            var repoPath = PathUtility.SeparatorChar + repoUri.OriginalString;
-
-            foreach (var log in logs)
-            {
-                if (log.Revision == revision)
-                    continue;
-
-                foreach (var changedPath in log.ChangedPaths)
-                {
-                    if (changedPath.CopyFromPath == null)
-                        continue;
-                    if (repoPath.StartsWith(changedPath.Path) == true)
-                    {
-                        repoPath = Regex.Replace(repoPath, "^" + changedPath.Path, changedPath.CopyFromPath);
-                        break;
-                    }
-                }
-            }
-
-            return repoPath;
+            DirectoryUtility.Delete(this.BasePath);
         }
     }
 }

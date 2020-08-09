@@ -84,10 +84,8 @@ namespace Ntreev.Crema.Commands
                 }
             }
 
-            using (var process = Process.Start(startInfo))
-            {
-                process.WaitForExit();
-            }
+            using var process = Process.Start(startInfo);
+            process.WaitForExit();
         }
 
         public static Task ExecuteAsync(string filename)

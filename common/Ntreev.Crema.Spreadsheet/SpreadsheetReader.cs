@@ -209,29 +209,6 @@ namespace Ntreev.Crema.Spreadsheet
             }
         }
 
-        private CremaDataRow NewRow(CremaDataTable dataTable, Dictionary<string, object> fields, IXLRow row)
-        {
-            if (dataTable.Parent == null)
-                return dataTable.NewRow();
-
-            if (fields.ContainsKey(CremaSchema.__ParentID__) == false)
-            {
-                throw new CremaDataException(string.Format("'{0}!{1}'에 부모 행 번호가 존재하지 않습니다.", row.Worksheet.Name, row.RangeAddress));
-            }
-
-            var rowIndex = (int)fields[CremaSchema.RelationID];
-            var index = rowIndex - 2;
-            var parentTable = dataTable.Parent;
-
-            if (index < 0 || index >= parentTable.Rows.Count)
-            {
-                throw new CremaDataException(string.Format("'{0}!{1}'에 부모 행 번호'{2}'은(는) 잘못된 값입니다.", row.Worksheet.Name, row.RangeAddress, rowIndex));
-            }
-            var parentRow = parentTable.Rows[index];
-
-            return dataTable.NewRow(parentRow);
-        }
-
         private Dictionary<string, object> CollectFields(CremaDataTable dataTable, string[] columns, IXLRow row)
         {
             var fields = new Dictionary<string, object>(columns.Length);

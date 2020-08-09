@@ -197,12 +197,6 @@ namespace Ntreev.Crema.Services
 
         public static readonly RepositoryPath Empty = new RepositoryPath() { Path = string.Empty };
 
-        private static string GenerateCategoryPath(string basePath, string parentPath, string name)
-        {
-            var value = new CategoryName(parentPath, name);
-            return GenerateCategoryPath(basePath, value.Path);
-        }
-
         private static string GenerateCategoryPath(string basePath, string categoryPath)
         {
             NameValidator.ValidateCategoryPath(categoryPath);

@@ -134,19 +134,15 @@ namespace Ntreev.Crema.Runtime.Generation
         private static string GetTypesHashValue(GenerationSet dataSet)
         {
             var args = dataSet.Types.Select(item => item.HashValue).ToArray();
-            using (var algorithm = HashAlgorithm.Create("SHA1"))
-            {
-                return HashUtility.GetHashValue(algorithm, args);
-            }
+            using var algorithm = HashAlgorithm.Create("SHA1");
+            return HashUtility.GetHashValue(algorithm, args);
         }
 
         private static string GetTablesHashValue(GenerationSet dataSet)
         {
             var args = dataSet.Tables.Select(item => item.HashValue).ToArray();
-            using (var algorithm = HashAlgorithm.Create("SHA1"))
-            {
-                return HashUtility.GetHashValue(algorithm, args);
-            }
+            using var algorithm = HashAlgorithm.Create("SHA1");
+            return HashUtility.GetHashValue(algorithm, args);
         }
     }
 }

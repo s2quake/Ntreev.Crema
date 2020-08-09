@@ -741,17 +741,13 @@ namespace Ntreev.Crema.Services.Data
         {
             this.ValidateGetDataSet(authentication);
             this.CremaHost.DebugMethod(authentication, this, nameof(GetDataSetAsync), this, dataSetType, filterExpression, revision);
-            switch (dataSetType)
+            return dataSetType switch
             {
-                case DataSetType.All:
-                    return this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.All);
-                case DataSetType.OmitContent:
-                    return this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.OmitContent);
-                case DataSetType.TypeOnly:
-                    return this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.TypeOnly);
-                default:
-                    throw new NotImplementedException();
-            }
+                DataSetType.All => this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.All),
+                DataSetType.OmitContent => this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.OmitContent),
+                DataSetType.TypeOnly => this.GetDataSetAsync(authentication, revision, filterExpression, ReadTypes.TypeOnly),
+                _ => throw new NotImplementedException(),
+            };
         }
 
         public async Task<CremaDataSet> GetDataSetAsync(Authentication authentication, string revision, string filterExpression, ReadTypes readType)
