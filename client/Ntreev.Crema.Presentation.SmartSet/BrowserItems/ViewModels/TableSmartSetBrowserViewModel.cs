@@ -39,20 +39,21 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
     [ParentType(typeof(Tables.IBrowserService))]
     class TableSmartSetBrowserViewModel : SmartSetBrowserViewModel
     {
+        private readonly Authenticator authenticator;
         private readonly TableSmartSetContext smartSetContext;
-        [Import]
-        private readonly Lazy<Ntreev.Crema.Presentation.Tables.IPropertyService> propertyService = null;
-        [Import]
-        private readonly Lazy<ITableBrowser> tableBrowser = null;
-        [Import]
-        private readonly Authenticator authenticator = null;
+        private readonly Lazy<ITableBrowser> tableBrowser;
+        private readonly Lazy<Ntreev.Crema.Presentation.Tables.IPropertyService> propertyService;
 
         [ImportingConstructor]
-        public TableSmartSetBrowserViewModel(ICremaAppHost cremaAppHost, [ImportMany] IEnumerable<IRule> rules, TableSmartSetContext smartSetContext)
+        public TableSmartSetBrowserViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost, [ImportMany] IEnumerable<IRule> rules,
+            TableSmartSetContext smartSetContext, Lazy<ITableBrowser> tableBrowser, Lazy<Tables.IPropertyService> propertyService)
             : base(cremaAppHost, rules.Where(item => item.SupportType == typeof(ITableDescriptor)))
         {
+            this.authenticator = authenticator;
             this.smartSetContext = smartSetContext;
             this.smartSetContext.BookmarkChanged += SmartSetContext_BookmarkChanged;
+            this.tableBrowser = tableBrowser;
+            this.propertyService = propertyService;
             this.DisplayName = Resources.Title_TableSmartCollection;
             this.Dispatcher.InvokeAsync(() => this.AttachPropertyService(this.propertyService.Value));
         }

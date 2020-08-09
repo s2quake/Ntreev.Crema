@@ -32,16 +32,16 @@ namespace Ntreev.Crema.Presentation.Tables.MenuItems.TableMenus
     {
         private readonly IShell shell;
         private readonly ITableDocumentService documentService;
-        [Import]
-        private readonly Lazy<TableServiceViewModel> tableService = null;
+        private readonly Lazy<TableServiceViewModel> tableService;
 
         [ImportingConstructor]
-        public QuickFindTableDataMenuItem(IShell shell, ITableDocumentService documentService)
+        public QuickFindTableDataMenuItem(IShell shell, ITableDocumentService documentService, Lazy<TableServiceViewModel> tableService)
         {
             this.shell = shell;
             this.shell.ServiceChanged += this.InvokeCanExecuteChangedEvent;
             this.documentService = documentService;
             this.documentService.SelectionChanged += this.InvokeCanExecuteChangedEvent;
+            this.tableService = tableService;
             this.InputGesture = new KeyGesture(Key.F, ModifierKeys.Control);
             this.DisplayName = Resources.MenuItem_QuickFind;
         }

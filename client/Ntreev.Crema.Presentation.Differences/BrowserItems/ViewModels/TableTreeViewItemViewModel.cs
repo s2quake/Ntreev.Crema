@@ -28,36 +28,32 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
 {
     class TableTreeViewItemViewModel : DifferenceTreeViewItemViewModel
     {
-        private readonly DiffDataTable diffTable;
+        private readonly DocumentServiceViewModel documentService = null;
         private string header1;
         private string header2;
-        private readonly ICommand viewCommand;
-        private readonly bool isActivated;
 
-        [Import]
-        private readonly DocumentServiceViewModel documentService = null;
-
-        public TableTreeViewItemViewModel(BrowserViewModel browser, DiffDataTable diffTable)
+        public TableTreeViewItemViewModel(BrowserViewModel browser, DocumentServiceViewModel documentService, DiffDataTable diffTable)
             : base(browser)
         {
-            this.diffTable = diffTable;
-            this.diffTable.PropertyChanged += DiffType_PropertyChanged;
-            this.diffTable.SourceItem1.PropertyChanged += SourceItem1_PropertyChanged;
-            this.diffTable.SourceItem2.PropertyChanged += SourceItem2_PropertyChanged;
+            this.documentService = documentService;
+            this.Source = diffTable;
+            this.Source.PropertyChanged += DiffType_PropertyChanged;
+            this.Source.SourceItem1.PropertyChanged += SourceItem1_PropertyChanged;
+            this.Source.SourceItem2.PropertyChanged += SourceItem2_PropertyChanged;
             this.header1 = diffTable.Header1;
             this.header2 = diffTable.Header2;
-            this.viewCommand = new DelegateCommand(this.View);
-            this.isActivated = diffTable.DiffState != DiffState.Unchanged;
+            this.ViewCommand = new DelegateCommand(this.View);
+            this.IsActivated = diffTable.DiffState != DiffState.Unchanged;
             this.Target = diffTable;
 
             foreach (var item in diffTable.Childs)
             {
-                var viewModel = new TableTreeViewItemViewModel(browser, item);
+                var viewModel = new TableTreeViewItemViewModel(browser, documentService, diffTable: item);
                 viewModel.PropertyChanged += ChildViewModel_PropertyChanged;
                 this.Items.Add(viewModel);
-                if (this.isActivated == false && viewModel.DiffState != DiffState.Unchanged)
+                if (this.IsActivated == false && viewModel.DiffState != DiffState.Unchanged)
                 {
-                    this.isActivated = true;
+                    this.IsActivated = true;
                 }
             }
             this.Dispatcher.InvokeAsync(() =>
@@ -83,25 +79,25 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
         {
             get
             {
-                if (this.diffTable.ItemName1 == this.diffTable.ItemName2)
-                    return this.diffTable.ItemName1;
-                return $"{this.diffTable.ItemName1} => {this.diffTable.ItemName2}";
+                if (this.Source.ItemName1 == this.Source.ItemName2)
+                    return this.Source.ItemName1;
+                return $"{this.Source.ItemName1} => {this.Source.ItemName2}";
             }
         }
 
-        public DiffState DiffState => this.diffTable.DiffState;
+        public DiffState DiffState => this.Source.DiffState;
 
-        public bool IsResolved => this.diffTable.IsResolved;
+        public bool IsResolved => this.Source.IsResolved;
 
-        public bool IsActivated => this.isActivated;
+        public bool IsActivated { get; }
 
-        public DiffDataTable Source => this.diffTable;
+        public DiffDataTable Source { get; }
 
-        public CremaDataTable Source1 => this.diffTable.SourceItem1;
+        public CremaDataTable Source1 => this.Source.SourceItem1;
 
-        public CremaDataTable Source2 => this.diffTable.SourceItem2;
+        public CremaDataTable Source2 => this.Source.SourceItem2;
 
-        public IEnumerable<object> UnresolvedItems => this.diffTable.UnresolvedItems;
+        public IEnumerable<object> UnresolvedItems => this.Source.UnresolvedItems;
 
         public string Header1
         {
@@ -123,7 +119,7 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             }
         }
 
-        public ICommand ViewCommand => this.viewCommand;
+        public ICommand ViewCommand { get; }
 
         public bool IsInherited => false;
 
@@ -131,12 +127,12 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
 
         private void DiffType_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(this.diffTable.DiffState) || e.PropertyName == string.Empty)
+            if (e.PropertyName == nameof(this.Source.DiffState) || e.PropertyName == string.Empty)
             {
                 this.NotifyOfPropertyChange(nameof(this.DiffState));
             }
 
-            if (e.PropertyName == nameof(this.diffTable.IsResolved))
+            if (e.PropertyName == nameof(this.Source.IsResolved))
             {
                 this.NotifyOfPropertyChange(nameof(this.IsResolved));
             }
@@ -160,7 +156,7 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
 
         private void ChildViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(this.diffTable.DiffState) || e.PropertyName == string.Empty)
+            if (e.PropertyName == nameof(this.Source.DiffState) || e.PropertyName == string.Empty)
             {
                 this.NotifyOfPropertyChange(nameof(this.DiffState));
             }

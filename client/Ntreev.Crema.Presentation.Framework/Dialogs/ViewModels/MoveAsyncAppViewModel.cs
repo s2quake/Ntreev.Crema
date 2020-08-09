@@ -23,15 +23,19 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 {
-    public abstract class MoveAsyncAppViewModel : MoveAsyncViewModel, IPartImportsSatisfiedNotification
+    public abstract class MoveAsyncAppViewModel : MoveAsyncViewModel
     {
-        [Import]
-        private ICremaAppHost cremaAppHost = null;
+        private ICremaAppHost cremaAppHost;
 
-        protected MoveAsyncAppViewModel(string currentPath, string[] targetPaths)
+        protected MoveAsyncAppViewModel(IServiceProvider serviceProvider, string currentPath, string[] targetPaths)
             : base(currentPath, targetPaths)
         {
-
+            if (serviceProvider.GetService(typeof(ICremaAppHost)) is ICremaAppHost cremaAppHost)
+            {
+                this.cremaAppHost = cremaAppHost;
+                this.cremaAppHost.Closed += CremaAppHost_Closed;
+                this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
+            }
         }
 
         protected async override Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
@@ -48,40 +52,27 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
             }
         }
 
-        protected virtual void OnCancel()
+        protected virtual async Task OnCancelAsync()
         {
-            this.TryCloseAsync();
+            await this.TryCloseAsync();
         }
 
         protected virtual ModalDialogAppScope Scope => ModalDialogAppScope.Loaded;
 
-        private void CremaAppHost_Unloaded(object sender, EventArgs e)
+        private async void CremaAppHost_Unloaded(object sender, EventArgs e)
         {
             if (this.cremaAppHost != null && this.Scope == ModalDialogAppScope.Loaded)
             {
-                this.Dispatcher.InvokeAsync(this.OnCancel);
+                await this.OnCancelAsync();
             }
         }
 
-        private void CremaAppHost_Closed(object sender, EventArgs e)
+        private async void CremaAppHost_Closed(object sender, EventArgs e)
         {
             if (this.cremaAppHost != null)
             {
-                this.Dispatcher.InvokeAsync(this.OnCancel);
+                await this.OnCancelAsync();
             }
         }
-
-        #region IPartImportsSatisfiedNotification
-
-        void IPartImportsSatisfiedNotification.OnImportsSatisfied()
-        {
-            if (this.cremaAppHost != null)
-            {
-                this.cremaAppHost.Closed += CremaAppHost_Closed;
-                this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
-            }
-        }
-
-        #endregion
     }
 }

@@ -28,31 +28,27 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
 {
     class TemplateTreeViewItemViewModel : DifferenceTreeViewItemViewModel
     {
-        private readonly DiffTemplate diffTemplate;
+        private readonly DocumentServiceViewModel documentService = null;
         private string header1;
         private string header2;
-        private readonly ICommand viewCommand;
-        private readonly bool isActivated;
 
-        [Import]
-        private readonly DocumentServiceViewModel documentService = null;
-
-        public TemplateTreeViewItemViewModel(BrowserViewModel browser, DiffTemplate diffTemplate)
+        public TemplateTreeViewItemViewModel(BrowserViewModel browser, DocumentServiceViewModel documentService, DiffTemplate diffTemplate)
             : base(browser)
         {
-            this.diffTemplate = diffTemplate;
-            this.diffTemplate.PropertyChanged += DiffTemplate_PropertyChanged;
-            this.diffTemplate.SourceItem1.PropertyChanged += Template1_PropertyChanged;
-            this.diffTemplate.SourceItem2.PropertyChanged += Template2_PropertyChanged;
+            this.documentService = documentService;
+            this.Source = diffTemplate;
+            this.Source.PropertyChanged += DiffTemplate_PropertyChanged;
+            this.Source.SourceItem1.PropertyChanged += Template1_PropertyChanged;
+            this.Source.SourceItem2.PropertyChanged += Template2_PropertyChanged;
             this.header1 = diffTemplate.Header1;
             this.header2 = diffTemplate.Header2;
-            this.viewCommand = new DelegateCommand(this.View);
-            this.isActivated = diffTemplate.DiffState != DiffState.Unchanged;
+            this.ViewCommand = new DelegateCommand(this.View);
+            this.IsActivated = diffTemplate.DiffState != DiffState.Unchanged;
             this.Target = diffTemplate;
 
-            foreach (var item in this.diffTemplate.DiffTable.Childs)
+            foreach (var item in this.Source.DiffTable.Childs)
             {
-                this.Items.Add(new TemplateTreeViewItemViewModel(browser, item.Template));
+                this.Items.Add(new TemplateTreeViewItemViewModel(browser, documentService, diffTemplate: item.Template));
             }
             this.Dispatcher.InvokeAsync(() =>
             {
@@ -77,25 +73,25 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
         {
             get
             {
-                if (this.diffTemplate.ItemName1 == diffTemplate.ItemName2)
-                    return this.diffTemplate.ItemName1;
-                return $"{this.diffTemplate.ItemName1} => {this.diffTemplate.ItemName2}";
+                if (this.Source.ItemName1 == Source.ItemName2)
+                    return this.Source.ItemName1;
+                return $"{this.Source.ItemName1} => {this.Source.ItemName2}";
             }
         }
 
-        public DiffState DiffState => this.diffTemplate.DiffState;
+        public DiffState DiffState => this.Source.DiffState;
 
-        public bool IsResolved => this.diffTemplate.IsResolved;
+        public bool IsResolved => this.Source.IsResolved;
 
-        public bool IsActivated => this.isActivated;
+        public bool IsActivated { get; }
 
-        public DiffTemplate Source => this.diffTemplate;
+        public DiffTemplate Source { get; }
 
-        public CremaTemplate Source1 => this.diffTemplate.SourceItem1;
+        public CremaTemplate Source1 => this.Source.SourceItem1;
 
-        public CremaTemplate Source2 => this.diffTemplate.SourceItem2;
+        public CremaTemplate Source2 => this.Source.SourceItem2;
 
-        public IEnumerable<object> UnresolvedItems => this.diffTemplate.UnresolvedItems;
+        public IEnumerable<object> UnresolvedItems => this.Source.UnresolvedItems;
 
         public string Header1
         {
@@ -117,16 +113,16 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             }
         }
 
-        public ICommand ViewCommand => this.viewCommand;
+        public ICommand ViewCommand { get; }
 
         private void DiffTemplate_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(this.diffTemplate.DiffState) || e.PropertyName == string.Empty)
+            if (e.PropertyName == nameof(this.Source.DiffState) || e.PropertyName == string.Empty)
             {
                 this.NotifyOfPropertyChange(nameof(this.DiffState));
             }
 
-            if (e.PropertyName == nameof(this.diffTemplate.IsResolved))
+            if (e.PropertyName == nameof(this.Source.IsResolved))
             {
                 this.NotifyOfPropertyChange(nameof(this.IsResolved));
             }

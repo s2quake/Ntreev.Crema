@@ -32,12 +32,12 @@ namespace Ntreev.Crema.Presentation.Types.MenuItems
     [Category("Close")]
     class CancelTemplateEditMenuItem : MenuItemBase
     {
-        [Import]
-        private readonly Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
         [ImportingConstructor]
-        public CancelTemplateEditMenuItem()
+        public CancelTemplateEditMenuItem(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.DisplayName = Resources.MenuItem_CancelTemplateEditing;
             this.HideOnDisabled = true;
         }

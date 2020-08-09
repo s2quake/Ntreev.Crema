@@ -39,14 +39,16 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
         private readonly ICremaAppHost cremaAppHost;
         private readonly Authenticator authenticator;
         private readonly Lazy<BrowserService> browserService;
+        private readonly IStatusBarService statusBarService;
 
         [ImportingConstructor]
-        public AddDifferenceItemViewModel(Authenticator authenticator, ICremaHost cremaHost, ICremaAppHost cremaAppHost, Lazy<BrowserService> browserService)
+        public AddDifferenceItemViewModel(Authenticator authenticator, ICremaHost cremaHost, ICremaAppHost cremaAppHost, Lazy<BrowserService> browserService, IStatusBarService statusBarService)
         {
             this.authenticator = authenticator;
             this.cremaHost = cremaHost;
             this.cremaAppHost = cremaAppHost;
             this.browserService = browserService;
+            this.statusBarService = statusBarService;
         }
 
         public async Task AddAsync()
@@ -57,7 +59,7 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
 
             var task = new BackgroundViewModel(this.authenticator, this.cremaHost, this.cremaAppHost.DataBaseName, destDataBaseName);
             task.ProgressChanged += Task_ProgressChanged;
-            var dialog = new BackgroundTaskViewModel(task) { DisplayName = "데이터 베이스 비교하기", };
+            var dialog = new BackgroundTaskViewModel(this.statusBarService, task: task) { DisplayName = "데이터 베이스 비교하기", };
             await dialog.ShowDialogAsync();
         }
 

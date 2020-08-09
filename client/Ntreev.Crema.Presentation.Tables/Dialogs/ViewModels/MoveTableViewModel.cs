@@ -31,7 +31,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly ITable table;
 
         private MoveTableViewModel(Authentication authentication, ITable table, string[] targetPaths)
-            : base(table.Path, targetPaths)
+            : base(table, currentPath: table.Path, targetPaths: targetPaths)
         {
             this.authentication = authentication;
             this.table = table;

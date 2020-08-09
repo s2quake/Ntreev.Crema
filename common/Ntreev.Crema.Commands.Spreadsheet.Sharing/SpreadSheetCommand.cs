@@ -39,16 +39,15 @@ namespace Ntreev.Crema.Commands.Spreadsheet
     [ResourceDescription("Resources", IsShared = true)]
     class SpreadSheetCommand : ConsoleCommandMethodBase
     {
-        [Import]
-        private readonly Lazy<ICremaHost> cremaHost = null;
+        private readonly ICremaHost cremaHost;
 
         private string dataBaseName;
 
         [ImportingConstructor]
-        public SpreadSheetCommand()
+        public SpreadSheetCommand(ICremaHost cremaHost)
             : base(GetName())
         {
-
+            this.cremaHost = cremaHost;
         }
 
         [CommandMethod]
@@ -198,10 +197,8 @@ namespace Ntreev.Crema.Commands.Spreadsheet
 
         private void ReadDataSet(CremaDataSet dataSet, string filename)
         {
-            using (var reader = new SpreadsheetReader(filename))
-            {
-                reader.Read(dataSet);
-            }
+            using var reader = new SpreadsheetReader(filename);
+            reader.Read(dataSet);
         }
 
         private void WriteDataSet(CremaDataSet dataSet, string filename, SpreadsheetWriterSettings settings)
@@ -284,8 +281,6 @@ namespace Ntreev.Crema.Commands.Spreadsheet
                 throw new InvalidOperationException("해당 폴더가 이미 존재합니다.");
         }
 
-        private ICremaHost CremaHost => this.cremaHost.Value;
-
-        private IDataBaseContext DataBaseContext => this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+        private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }
 }

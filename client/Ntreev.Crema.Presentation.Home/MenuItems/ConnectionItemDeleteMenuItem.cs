@@ -28,6 +28,7 @@ namespace Ntreev.Crema.Presentation.Home.MenuItems
     {
         private readonly CremaAppHostViewModel cremaAppHost;
 
+        [ImportingConstructor]
         public ConnectionItemDeleteMenuItem(CremaAppHostViewModel cremaAppHost)
         {
             this.cremaAppHost = cremaAppHost;

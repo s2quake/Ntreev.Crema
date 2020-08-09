@@ -32,11 +32,12 @@ namespace Ntreev.Crema.Presentation.Types.MenuItems.TreeViewItems
     [Order(-2)]
     class ViewContentMenuItem : MenuItemBase
     {
-        [Import]
-        private readonly Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
-        public ViewContentMenuItem()
+        [ImportingConstructor]
+        public ViewContentMenuItem(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.DisplayName = Resources.MenuItem_View;
             this.HideOnDisabled = true;
         }

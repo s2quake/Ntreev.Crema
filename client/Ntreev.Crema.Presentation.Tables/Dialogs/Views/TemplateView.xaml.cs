@@ -30,13 +30,13 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.Views
 {
     public partial class TemplateView : UserControl
     {
-        [Import]
-        private readonly IAppConfiguration configs = null;
+        private readonly IAppConfiguration configs;
 
         public static DependencyProperty DomainProperty = DependencyProperty.Register(nameof(Domain), typeof(IDomain), typeof(TemplateView));
 
-        public TemplateView()
+        public TemplateView(IAppConfiguration configs)
         {
+            this.configs = configs;
             BindingOperations.SetBinding(this, DomainProperty, new Binding("Domain") { Mode = BindingMode.OneWay, });
         }
 

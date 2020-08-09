@@ -29,18 +29,17 @@ namespace Ntreev.Crema.Presentation.Types.MenuItems.TypeMenus
     [ParentType(typeof(TypeMenuItem))]
     class FindTypeDataMenuItem : MenuItemBase
     {
+        private readonly Authenticator authenticator;
         private readonly IShell shell;
-
-        [Import]
-        private readonly TypeServiceViewModel typeService = null;
-        [Import]
-        private readonly Authenticator authenticator = null;
+        private readonly TypeServiceViewModel typeService;
 
         [ImportingConstructor]
-        public FindTypeDataMenuItem(IShell shell)
+        public FindTypeDataMenuItem(Authenticator authenticator, IShell shell, TypeServiceViewModel typeService)
         {
+            this.authenticator = authenticator;
             this.shell = shell;
             this.shell.ServiceChanged += Shell_ServiceChanged;
+            this.typeService = typeService;
             this.InputGesture = new KeyGesture(Key.F, ModifierKeys.Control | ModifierKeys.Shift);
             this.DisplayName = Resources.MenuItem_FindAll;
             this.HideOnDisabled = true;

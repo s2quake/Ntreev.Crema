@@ -32,17 +32,16 @@ namespace Ntreev.Crema.Presentation.Types.MenuItems.TypeMenus
     {
         private readonly IShell shell;
         private readonly ITypeDocumentService documentService;
-
-        [Import]
-        private readonly Lazy<TypeServiceViewModel> typeService = null;
+        private readonly Lazy<TypeServiceViewModel> typeService;
 
         [ImportingConstructor]
-        public QuickFindTypeDataMenuItem(IShell shell, ITypeDocumentService documentService)
+        public QuickFindTypeDataMenuItem(IShell shell, ITypeDocumentService documentService, Lazy<TypeServiceViewModel> typeService)
         {
             this.shell = shell;
             this.shell.ServiceChanged += this.InvokeCanExecuteChangedEvent;
             this.documentService = documentService;
             this.documentService.SelectionChanged += this.InvokeCanExecuteChangedEvent;
+            this.typeService = typeService;
             this.InputGesture = new KeyGesture(Key.F, ModifierKeys.Control);
             this.DisplayName = Resources.MenuItem_QuickFind;
         }

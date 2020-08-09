@@ -34,6 +34,7 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
         private DomainUserListItemBase selectedUser;
         private IDomainDescriptor descriptor;
 
+        [ImportingConstructor]
         public DomainUsersViewModel(Authenticator authenticator)
         {
             this.authenticator = authenticator;

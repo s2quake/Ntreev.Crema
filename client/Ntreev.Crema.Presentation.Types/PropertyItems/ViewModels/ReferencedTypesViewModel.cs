@@ -37,18 +37,17 @@ namespace Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels
     [ParentType("Ntreev.Crema.Presentation.Tables.IPropertyService, Ntreev.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ReferencedTypesViewModel : PropertyItemBase, ISelector
     {
-        [Import]
-        private readonly Lazy<TypeBrowserViewModel> browser = null;
-        [Import]
-        private readonly Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
+        private readonly Lazy<TypeBrowserViewModel> browser;
         private ITableDescriptor descriptor;
         private TypeListBoxItemViewModel[] types;
         private TypeListBoxItemViewModel selectedType;
-        [Import]
-        private readonly IBuildUp buildUp = null;
 
-        public ReferencedTypesViewModel()
+        [ImportingConstructor]
+        public ReferencedTypesViewModel(Authenticator authenticator, Lazy<TypeBrowserViewModel> browser)
         {
+            this.authenticator = authenticator;
+            this.browser = browser;
             this.DisplayName = Resources.Title_TypesBeingUsed;
         }
 
@@ -81,7 +80,6 @@ namespace Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels
                     else
                     {
                         var viewModel = new TypeListBoxItemViewModel(this.authenticator, item, this);
-                        this.buildUp.BuildUp(viewModel);
                         viewModelList.Add(viewModel);
                     }
                 }

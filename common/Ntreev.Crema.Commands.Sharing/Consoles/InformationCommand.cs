@@ -28,13 +28,10 @@ namespace Ntreev.Crema.Commands.Consoles
     [CommandStaticProperty(typeof(FormatProperties))]
     class InformationCommand : ConsoleCommandBase
     {
-        [Import]
-        private readonly Lazy<ICremaHost> cremaHost = null;
-
+        [ImportingConstructor]
         public InformationCommand()
             : base("info")
         {
-
         }
 
         public override string[] GetCompletions(CommandCompletionContext completionContext)
@@ -60,8 +57,6 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        public ICremaHost CremaHost => this.cremaHost.Value;
-
         public override bool IsEnabled => this.CommandContext.IsOnline;
 
         protected override void OnExecute()
@@ -81,18 +76,6 @@ namespace Ntreev.Crema.Commands.Consoles
                 return provider;
             }
             throw new InvalidOperationException($"'{path}' does not have information.");
-        }
-
-        private void Invoke(IInfoProvider provider, Action action)
-        {
-            if (provider is IDispatcherObject dispatcherObject)
-            {
-                dispatcherObject.Dispatcher.Invoke(action);
-            }
-            else
-            {
-                action();
-            }
         }
 
         private T Invoke<T>(IInfoProvider provider, Func<T> func)

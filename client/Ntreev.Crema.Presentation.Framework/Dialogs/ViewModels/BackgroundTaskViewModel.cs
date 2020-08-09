@@ -26,20 +26,20 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 {
     public class BackgroundTaskViewModel : ModalDialogBase
     {
-        [Import]
-        private readonly IStatusBarService statusBarService = null;
+        private readonly IStatusBarService statusBarService;
         private readonly IBackgroundTask task;
 
-        public BackgroundTaskViewModel(IBackgroundTask task)
+        public BackgroundTaskViewModel(IStatusBarService statusBarService, IBackgroundTask task)
         {
+            this.statusBarService = statusBarService;
             this.task = task ?? throw new ArgumentNullException(nameof(task));
             this.task.ProgressChanged += Task_ProgressChanged;
             this.DisplayName = this.task.DisplayName;
         }
 
-        public void Hide()
+        public async Task HideAsync()
         {
-            this.TryCloseAsync();
+            await this.TryCloseAsync();
         }
 
         public void Cancel()

@@ -36,18 +36,11 @@ namespace Ntreev.Crema.Presentation.Tables
     [Export(typeof(TableServiceViewModel))]
     class TableServiceViewModel : ScreenBase, IContentService, IPartImportsSatisfiedNotification
     {
+        private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
-
-        [Import]
-        private readonly IBrowserService browserService = null;
-        [Import]
-        private readonly TableDocumentServiceViewModel contentsService = null;
-        [Import]
-        private readonly IPropertyService propertyService = null;
-        [Import]
-        private readonly Lazy<IShell> shell = null;
-        [Import]
-        private readonly TableBrowserViewModel browser = null;
+        private readonly IAppConfiguration configs;
+        private readonly Lazy<IShell> shell;
+        private readonly TableBrowserViewModel browser;
 
         private bool isBrowserExpanded = true;
         private bool isPropertyExpanded = true;
@@ -58,22 +51,24 @@ namespace Ntreev.Crema.Presentation.Tables
         private bool isFirst;
         private bool isVisible;
 
-        [Import]
-        private readonly Authenticator authenticator = null;
-
-        [Import]
-        private readonly IAppConfiguration configs = null;
-
         [ImportingConstructor]
-        public TableServiceViewModel(ICremaAppHost cremaAppHost, IBrowserService browserService, TableDocumentServiceViewModel contentsService, IPropertyService propertyService)
+        public TableServiceViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost, IBrowserService browserService,
+            TableDocumentServiceViewModel contentsService, IPropertyService propertyService, IAppConfiguration configs, Lazy<IShell> shell, TableBrowserViewModel browser)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += CremaAppHost_Opened;
             this.cremaAppHost.Closed += CremaAppHost_Closed;
             this.cremaAppHost.Loaded += CremaAppHost_Loaded;
             this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
             this.cremaAppHost.Reset += CremaAppHost_Reset;
+            this.BrowserService = browserService;
+            this.DocumentService = contentsService;
+            this.PropertyService = propertyService;
+            this.configs = configs;
+            this.shell = shell;
             this.DisplayName = Resources.Title_Tables;
+            this.browser = browser;
         }
 
         public override string ToString()
@@ -83,14 +78,14 @@ namespace Ntreev.Crema.Presentation.Tables
 
         public async void Dispose()
         {
-            await this.contentsService.TryCloseAsync();
+            await this.DocumentService.TryCloseAsync();
         }
 
-        public IBrowserService BrowserService => this.browserService;
+        public IBrowserService BrowserService { get; }
 
-        public TableDocumentServiceViewModel DocumentService => this.contentsService;
+        public TableDocumentServiceViewModel DocumentService { get; }
 
-        public IPropertyService PropertyService => this.propertyService;
+        public IPropertyService PropertyService { get; } = null;
 
         [ConfigurationProperty("isBrowserExpanded")]
         public bool IsBrowserExpanded

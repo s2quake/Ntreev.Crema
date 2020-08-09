@@ -21,14 +21,19 @@ using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 {
-    public class MoveAppViewModel : MoveViewModel, IPartImportsSatisfiedNotification
+    public class MoveAppViewModel : MoveViewModel
     {
-        [Import]
-        private readonly ICremaAppHost cremaAppHost = null;
+        private ICremaAppHost cremaAppHost;
 
-        public MoveAppViewModel(string currentPath, string[] targetPaths)
+        public MoveAppViewModel(IServiceProvider serviceProvider, string currentPath, string[] targetPaths)
             : base(currentPath, targetPaths)
         {
+            if (serviceProvider.GetService(typeof(ICremaAppHost)) is ICremaAppHost cremaAppHost)
+            {
+                this.cremaAppHost = cremaAppHost;
+                this.cremaAppHost.Closed += CremaAppHost_Closed;
+                this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
+            }
         }
 
         protected virtual ModalDialogAppScope Scope => ModalDialogAppScope.Loaded;
@@ -37,6 +42,7 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
         {
             if (this.cremaAppHost != null && this.Scope == ModalDialogAppScope.Loaded)
             {
+                this.cremaAppHost = null;
                 await this.TryCloseAsync();
             }
         }
@@ -45,21 +51,9 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
         {
             if (this.cremaAppHost != null)
             {
+                this.cremaAppHost = null;
                 await this.TryCloseAsync();
             }
         }
-
-        #region IPartImportsSatisfiedNotification
-
-        void IPartImportsSatisfiedNotification.OnImportsSatisfied()
-        {
-            if (this.cremaAppHost != null)
-            {
-                this.cremaAppHost.Closed += CremaAppHost_Closed;
-                this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
-            }
-        }
-
-        #endregion
     }
 }

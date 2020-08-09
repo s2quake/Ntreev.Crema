@@ -37,28 +37,25 @@ namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
     [ParentType(typeof(BrowserService))]
     class TypeBrowserViewModel : TreeViewBase, ITypeBrowser, ISelector
     {
+        private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
+        private readonly IPropertyService propertyService;
         private bool isVisible = true;
         private Guid dataBaseID;
 
         private readonly DelegateCommand renameCommand;
         private readonly DelegateCommand deleteCommand;
 
-        [Import]
-        private readonly IPropertyService propertyService = null;
-        [Import]
-        private readonly Authenticator authenticator = null;
-        [Import]
-        private readonly IBuildUp buildUp = null;
-
         [ImportingConstructor]
-        public TypeBrowserViewModel(ICremaAppHost cremaAppHost)
+        public TypeBrowserViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost, IPropertyService propertyService)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Loaded += CremaAppHost_Loaded;
             this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
             this.cremaAppHost.Resetting += CremaAppHost_Resetting;
             this.cremaAppHost.Reset += CremaAppHost_Reset;
+            this.propertyService = propertyService;
             this.renameCommand = new DelegateCommand(this.Rename_Execute, this.Rename_CanExecute);
             this.deleteCommand = new DelegateCommand(this.Delete_Execute, this.Delete_CanExecute);
             this.DisplayName = Resources.Title_TypeBrowser;
@@ -174,7 +171,6 @@ namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
                 {
                     return new TypeRootTreeViewItemViewModel(this.authenticator, dataBase, this);
                 });
-                this.buildUp.BuildUp(viewModel);
                 this.Items.Add(viewModel);
             };
 
@@ -188,6 +184,7 @@ namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
         }
 
         [ConfigurationProperty(ScopeType = typeof(IUserConfiguration))]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:사용되지 않는 private 멤버 제거", Justification = "<보류 중>")]
         private string[] Settings
         {
             get => this.GetSettings();

@@ -29,13 +29,13 @@ namespace Ntreev.Crema.Commands.Consoles
     [ResourceDescription]
     class ShutdownCommand : ConsoleCommandAsyncBase
     {
-        [Import]
-        private readonly Lazy<ICremaHost> cremaHost = null;
+        private readonly ICremaHost cremaHost;
 
-        public ShutdownCommand()
+        [ImportingConstructor]
+        public ShutdownCommand(ICremaHost cremaHost)
             : base("shutdown")
         {
-
+            this.cremaHost = cremaHost;
         }
 
         [CommandPropertyRequired(DefaultValue = "")]
@@ -76,15 +76,13 @@ namespace Ntreev.Crema.Commands.Consoles
             var authentication = this.CommandContext.GetAuthentication(this);
             if (this.IsCancelled == true)
             {
-                await this.CremaHost.CancelShutdownAsync(authentication);
+                await this.cremaHost.CancelShutdownAsync(authentication);
             }
             else
             {
-                await this.CremaHost.ShutdownAsync(authentication, this.Time.Milliseconds, this.ShutdownType, this.Message);
+                await this.cremaHost.ShutdownAsync(authentication, this.Time.Milliseconds, this.ShutdownType, this.Message);
             }
         }
-
-        private ICremaHost CremaHost => this.cremaHost.Value;
 
         private ShutdownType ShutdownType
         {

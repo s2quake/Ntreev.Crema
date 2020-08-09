@@ -35,8 +35,8 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
     class TypeTemplateEditorsViewModel : EditorsViewModel
     {
         [ImportingConstructor]
-        public TypeTemplateEditorsViewModel(ICremaAppHost cremaAppHost)
-            : base(cremaAppHost: cremaAppHost)
+        public TypeTemplateEditorsViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost)
+            : base(authenticator, cremaAppHost: cremaAppHost)
         {
             this.DisplayName = Resources.Title_UsersEditingTemplate;
         }

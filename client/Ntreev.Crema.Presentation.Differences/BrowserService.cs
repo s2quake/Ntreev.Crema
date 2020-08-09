@@ -29,9 +29,6 @@ namespace Ntreev.Crema.Presentation.Differences
     [InheritedExport(typeof(BrowserService))]
     class BrowserService : BrowserServiceBase, IBrowserService
     {
-        [Import]
-        private readonly IBuildUp buildUp = null;
-
         [ImportingConstructor]
         public BrowserService(ICremaAppHost cremaAppHost, [ImportMany] IEnumerable<IBrowserItem> browserItems)
             : base(cremaAppHost, browserItems)
@@ -42,10 +39,8 @@ namespace Ntreev.Crema.Presentation.Differences
         public void Add(DiffDataSet dataSet)
         {
             var browserItem = new BrowserViewModel(dataSet);
-            this.buildUp.BuildUp(browserItem);
             browserItem.UpdateItemsSource();
             this.ItemsSource.Add(browserItem);
-            //this.Browsers.ElementAtOrDefault()
         }
     }
 }

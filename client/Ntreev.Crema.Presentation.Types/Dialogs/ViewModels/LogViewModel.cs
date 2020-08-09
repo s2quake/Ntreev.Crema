@@ -34,17 +34,13 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
         private LogInfoViewModel[] itemsSource;
         private LogInfoViewModel selectedItem;
         private readonly ICommand previewCommand;
-        [Import]
-        private readonly IBuildUp buildUp = null;
 
         public LogViewModel(Authentication authentication, ITypeItem typeItem)
         {
             this.authentication = authentication;
             this.typeItem = typeItem;
             this.DisplayName = Resources.Title_ViewLog;
-#pragma warning disable CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
-            this.previewCommand = new DelegateCommand((p) => this.PreviewAsync(), (p) => this.CanPreview);
-#pragma warning restore CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
+            this.previewCommand = new DelegateCommand(async (p) => await this.PreviewAsync(), (p) => this.CanPreview);
             this.Initialize();
         }
 
@@ -91,10 +87,6 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
                 var query = from item in await this.typeItem.GetLogAsync(this.authentication, null)
                             select new LogInfoViewModel(this.authentication, this.typeItem, item);
                 this.itemsSource = query.ToArray();
-                foreach (var item in this.itemsSource)
-                {
-                    this.buildUp?.BuildUp(item);
-                }
                 this.selectedItem = null;
                 this.EndProgress();
                 this.NotifyOfPropertyChange(nameof(this.SelectedItem));

@@ -32,8 +32,8 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
     class TableContentEditorsViewModel : EditorsViewModel
     {
         [ImportingConstructor]
-        public TableContentEditorsViewModel(ICremaAppHost cremaAppHost)
-            : base(cremaAppHost: cremaAppHost)
+        public TableContentEditorsViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost)
+            : base(authenticator, cremaAppHost: cremaAppHost)
         {
             this.DisplayName = Resources.Title_UsersEditingContent;
         }

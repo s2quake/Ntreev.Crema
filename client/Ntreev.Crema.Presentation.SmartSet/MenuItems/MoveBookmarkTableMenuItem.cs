@@ -19,6 +19,7 @@ using Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels;
 using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.SmartSet.Properties;
 using Ntreev.ModernUI.Framework;
+using System;
 using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Presentation.SmartSet.MenuItems
@@ -27,7 +28,9 @@ namespace Ntreev.Crema.Presentation.SmartSet.MenuItems
     [ParentType(typeof(BookmarkTableTreeViewItemViewModel))]
     class MoveBookmarkTableMenuItem : MenuItemBase
     {
-        public MoveBookmarkTableMenuItem()
+        [ImportingConstructor]
+        public MoveBookmarkTableMenuItem(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
             this.DisplayName = Resources.MenuItem_MoveBookmark;
             this.HideOnDisabled = true;
@@ -44,7 +47,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.MenuItems
             {
                 var browser = viewModel.Browser;
                 var itemPaths = viewModel.Browser.GetBookmarkItemPaths();
-                var dialog = new MoveBookmarkItemViewModel(viewModel.BookmarkPath, itemPaths);
+                var dialog = new MoveBookmarkItemViewModel(this.ServiceProvider, viewModel.BookmarkPath, itemPaths);
                 if (await dialog.ShowDialogAsync() == true)
                 {
                     if (browser.GetBookmarkItem(dialog.TargetPath) is BookmarkCategoryTreeViewItemViewModel categoryViewModel)

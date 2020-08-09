@@ -33,18 +33,15 @@ namespace Ntreev.Crema.ConsoleHost.Commands
     {
         private readonly CremaBootstrapper application;
         private readonly ICremaHost cremaHost;
-
-        [Import]
-        private readonly Lazy<ConsoleTerminal> terminal = null;
-        [Import]
-        private readonly Lazy<ConsoleCommandContext> commandContext = null;
+        private readonly Lazy<ConsoleTerminal> terminal;
 
         [ImportingConstructor]
-        public ConnectCommand(CremaBootstrapper application, ICremaHost cremaHost)
+        public ConnectCommand(CremaBootstrapper application, ICremaHost cremaHost, Lazy<ConsoleTerminal> terminal)
             : base("connect")
         {
             this.application = application;
             this.cremaHost = cremaHost;
+            this.terminal = terminal;
         }
 
         public void Cancel()
@@ -82,6 +79,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             set;
         }
 
+        public new ConsoleCommandContext CommandContext => base.CommandContext as ConsoleCommandContext;
 
         protected override Task OnExecuteAsync()
         {
@@ -114,9 +112,5 @@ namespace Ntreev.Crema.ConsoleHost.Commands
         }
 
         private ConsoleTerminal Terminal => this.terminal.Value;
-
-#pragma warning disable CS0108 // 'ConnectCommand.CommandContext'은(는) 상속된 'CommandAsyncBase.CommandContext' 멤버를 숨깁니다. 숨기려면 new 키워드를 사용하세요.
-        private ConsoleCommandContext CommandContext => this.commandContext.Value;
-#pragma warning restore CS0108 // 'ConnectCommand.CommandContext'은(는) 상속된 'CommandAsyncBase.CommandContext' 멤버를 숨깁니다. 숨기려면 new 키워드를 사용하세요.
     }
 }

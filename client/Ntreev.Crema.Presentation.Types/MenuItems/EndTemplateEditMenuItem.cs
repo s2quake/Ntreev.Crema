@@ -32,12 +32,12 @@ namespace Ntreev.Crema.Presentation.Types.MenuItems
     [Category("Close")]
     class EndTemplateEditMenuItem : MenuItemBase
     {
-        [Import]
-        private readonly Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
         [ImportingConstructor]
-        public EndTemplateEditMenuItem()
+        public EndTemplateEditMenuItem(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.DisplayName = Resources.MenuItem_EndTemplateEditing;
             this.HideOnDisabled = true;
         }

@@ -27,13 +27,12 @@ namespace Ntreev.Crema.Bot.Consoles
     [Export(typeof(IConsoleCommand))]
     class AutobotCommand : ConsoleCommandMethodBase
     {
-        [Import]
-        private readonly Lazy<AutobotService> autobotService = null;
+        private readonly Lazy<AutobotService> autobotService;
 
-        public AutobotCommand()
+        public AutobotCommand(Lazy<AutobotService> autobotService)
             : base("autobot")
         {
-
+            this.autobotService = autobotService;
         }
 
         [CommandMethod]

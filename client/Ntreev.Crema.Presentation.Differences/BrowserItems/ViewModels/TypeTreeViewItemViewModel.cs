@@ -28,26 +28,22 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
 {
     class TypeTreeViewItemViewModel : DifferenceTreeViewItemViewModel
     {
-        private readonly DiffDataType diffType;
+        private readonly DocumentServiceViewModel documentService;
         private string header1;
         private string header2;
-        private readonly ICommand viewCommand;
-        private readonly bool isActivated;
 
-        [Import]
-        private readonly DocumentServiceViewModel documentService = null;
-
-        public TypeTreeViewItemViewModel(BrowserViewModel browser, DiffDataType diffType)
+        public TypeTreeViewItemViewModel(BrowserViewModel browser, DocumentServiceViewModel documentService, DiffDataType diffType)
             : base(browser)
         {
-            this.diffType = diffType;
-            this.diffType.PropertyChanged += DiffType_PropertyChanged;
-            this.diffType.SourceItem1.PropertyChanged += DataType1_PropertyChanged;
-            this.diffType.SourceItem2.PropertyChanged += DataType2_PropertyChanged;
+            this.documentService = documentService;
+            this.Source = diffType;
+            this.Source.PropertyChanged += DiffType_PropertyChanged;
+            this.Source.SourceItem1.PropertyChanged += DataType1_PropertyChanged;
+            this.Source.SourceItem2.PropertyChanged += DataType2_PropertyChanged;
             this.header1 = diffType.Header1;
             this.header2 = diffType.Header2;
-            this.viewCommand = new DelegateCommand(this.View);
-            this.isActivated = diffType.DiffState != DiffState.Unchanged;
+            this.ViewCommand = new DelegateCommand(this.View);
+            this.IsActivated = diffType.DiffState != DiffState.Unchanged;
             this.Target = diffType;
         }
 
@@ -65,23 +61,23 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
         {
             get
             {
-                if (this.diffType.SourceItem1.TypeName == diffType.SourceItem2.TypeName)
-                    return this.diffType.SourceItem1.TypeName;
-                return $"{this.diffType.SourceItem1.TypeName} => {this.diffType.SourceItem2.TypeName}";
+                if (this.Source.SourceItem1.TypeName == Source.SourceItem2.TypeName)
+                    return this.Source.SourceItem1.TypeName;
+                return $"{this.Source.SourceItem1.TypeName} => {this.Source.SourceItem2.TypeName}";
             }
         }
 
-        public DiffState DiffState => this.diffType.DiffState;
+        public DiffState DiffState => this.Source.DiffState;
 
-        public bool IsResolved => this.diffType.IsResolved;
+        public bool IsResolved => this.Source.IsResolved;
 
-        public bool IsActivated => this.isActivated;
+        public bool IsActivated { get; }
 
-        public DiffDataType Source => this.diffType;
+        public DiffDataType Source { get; }
 
-        public CremaDataType Source1 => this.diffType.SourceItem1;
+        public CremaDataType Source1 => this.Source.SourceItem1;
 
-        public CremaDataType Source2 => this.diffType.SourceItem2;
+        public CremaDataType Source2 => this.Source.SourceItem2;
 
         public IEnumerable<object> UnresolvedItems => new object[] { };
 
@@ -105,18 +101,18 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             }
         }
 
-        public ICommand ViewCommand => this.viewCommand;
+        public ICommand ViewCommand { get; }
 
         public bool IsFlag => this.Source2.IsFlag;
 
         private void DiffType_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(this.diffType.DiffState) || e.PropertyName == string.Empty)
+            if (e.PropertyName == nameof(this.Source.DiffState) || e.PropertyName == string.Empty)
             {
                 this.NotifyOfPropertyChange(nameof(this.DiffState));
             }
 
-            if (e.PropertyName == nameof(this.diffType.IsResolved))
+            if (e.PropertyName == nameof(this.Source.IsResolved))
             {
                 this.NotifyOfPropertyChange(nameof(this.IsResolved));
             }

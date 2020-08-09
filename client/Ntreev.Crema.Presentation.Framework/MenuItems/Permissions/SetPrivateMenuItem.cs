@@ -35,6 +35,7 @@ namespace Ntreev.Crema.Presentation.Framework.MenuItems.Permissions
     {
         private readonly Authenticator authenticator;
 
+        [ImportingConstructor]
         public SetPrivateMenuItem(Authenticator authenticator)
         {
             this.authenticator = authenticator;

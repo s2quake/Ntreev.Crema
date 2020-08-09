@@ -28,12 +28,18 @@ namespace Ntreev.Crema.Presentation.Types
     [Export(typeof(TypeServiceView))]
     public partial class TypeServiceView : UserControl
     {
-        [Import]
-        private readonly IAppConfiguration configs = null;
+        private readonly IAppConfiguration configs;
 
         public TypeServiceView()
         {
             InitializeComponent();
+        }
+
+        [ImportingConstructor]
+        public TypeServiceView(IAppConfiguration configs)
+        {
+            InitializeComponent();
+            this.configs = configs;
         }
 
         private void Expander_Loaded(object sender, RoutedEventArgs e)

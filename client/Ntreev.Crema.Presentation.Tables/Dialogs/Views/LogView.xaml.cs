@@ -25,11 +25,11 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.Views
 {
     partial class LogView : UserControl
     {
-        [Import]
-        private readonly IAppConfiguration configs = null;
+        private readonly IAppConfiguration configs;
 
-        public LogView()
+        public LogView(IAppConfiguration configs)
         {
+            this.configs = configs;
             this.InitializeComponent();
         }
 

@@ -27,20 +27,18 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
     [ResourceDescription("Resources", IsShared = true)]
     class LogoutCommand : ConsoleCommandAsyncBase
     {
-        [Import]
-        private readonly Lazy<ConsoleCommandContext> commandContext = null;
-
+        [ImportingConstructor]
         public LogoutCommand()
-            : base("logout")
         {
-
         }
 
-        public override bool IsEnabled => this.commandContext.Value.IsOnline;
+        public new ConsoleCommandContext CommandContext => base.CommandContext as ConsoleCommandContext;
+
+        public override bool IsEnabled => this.CommandContext.IsOnline;
 
         protected override Task OnExecuteAsync()
         {
-            return this.commandContext.Value.LogoutAsync();
+            return this.CommandContext.LogoutAsync();
         }
     }
 }

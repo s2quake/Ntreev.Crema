@@ -36,9 +36,6 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         private LogInfoViewModel selectedItem;
         private readonly ICommand previewCommand;
 
-        [Import]
-        private readonly IBuildUp buildUp = null;
-
         private LogViewModel(Authentication authentication, ITableItem tableItem)
         {
             this.authentication = authentication;
@@ -123,10 +120,6 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
                     }
                     return logList.ToArray();
                 });
-                foreach (var item in this.itemsSource)
-                {
-                    this.buildUp?.BuildUp(item);
-                }
                 this.selectedItem = null;
                 this.EndProgress();
                 this.NotifyOfPropertyChange(nameof(this.SelectedItem));

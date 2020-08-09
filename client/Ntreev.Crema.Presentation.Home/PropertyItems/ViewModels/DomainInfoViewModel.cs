@@ -34,6 +34,7 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
         private DomainInfo domainInfo;
         private string dataBaseName;
 
+        [ImportingConstructor]
         public DomainInfoViewModel(ICremaAppHost cremaAppHost)
         {
             this.cremaAppHost = cremaAppHost;

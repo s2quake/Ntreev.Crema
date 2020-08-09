@@ -37,10 +37,8 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
         private object selectedUser;
         private object descriptor;
 
-        [Import]
-        private readonly IBuildUp buildUp = null;
-
         protected EditorsViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost)
+            : base(cremaAppHost)
         {
             this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
@@ -130,7 +128,6 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 
                 foreach (var item in items)
                 {
-                    this.buildUp?.BuildUp(item);
                     this.domains.Add(item);
                 }
             }
@@ -170,7 +167,6 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
                     var viewModel = domain.Dispatcher.Invoke(() => new DomainTreeItemBase(this.authenticator, domain, true, this));
                     this.Dispatcher.InvokeAsync(() =>
                     {
-                        this.buildUp?.BuildUp(viewModel);
                         this.domains.Add(viewModel);
                         this.SelectObject(this.descriptor);
                     });

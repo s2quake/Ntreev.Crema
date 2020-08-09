@@ -32,15 +32,16 @@ namespace Ntreev.Crema.Presentation.Tables.MenuItems
     [DefaultMenu]
     class SelectInBrowserMenuItem : MenuItemBase
     {
-        [Import]
-        private readonly TableBrowserViewModel browser = null;
-        [Import]
-        private readonly IShell shell = null;
-        [Import]
-        private readonly TableServiceViewModel service = null;
+        private readonly IShell shell;
+        private readonly TableBrowserViewModel browser;
+        private readonly TableServiceViewModel service;
 
-        public SelectInBrowserMenuItem()
+        [ImportingConstructor]
+        public SelectInBrowserMenuItem(IShell shell, TableBrowserViewModel browser, TableServiceViewModel service)
         {
+            this.shell = shell;
+            this.browser = browser;
+            this.service = service;
             this.DisplayName = Resources.MenuItem_SelectInTableBrowser;
         }
 

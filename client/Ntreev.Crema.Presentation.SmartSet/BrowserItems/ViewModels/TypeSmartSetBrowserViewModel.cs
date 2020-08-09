@@ -40,22 +40,23 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
     [ParentType(typeof(Types.IBrowserService))]
     class TypeSmartSetBrowserViewModel : SmartSetBrowserViewModel
     {
+        private readonly Authenticator authenticator;
         private readonly TypeSmartSetContext smartSetContext;
-        [Import]
-        private readonly Lazy<Ntreev.Crema.Presentation.Types.IPropertyService> propertyService = null;
-        [Import]
         private readonly Lazy<ITypeBrowser> typeBrowser = null;
-        [Import]
-        private readonly Authenticator authenticator = null;
+        private readonly Lazy<Ntreev.Crema.Presentation.Types.IPropertyService> propertyService;
 
         [ImportingConstructor]
-        public TypeSmartSetBrowserViewModel(ICremaAppHost cremaAppHost, [ImportMany] IEnumerable<IRule> rules, TypeSmartSetContext smartSetContext)
+        public TypeSmartSetBrowserViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost, [ImportMany] IEnumerable<IRule> rules, 
+            TypeSmartSetContext smartSetContext, Lazy<ITypeBrowser> typeBrowser, Lazy<Types.IPropertyService> propertyService)
             : base(cremaAppHost, rules.Where(item => item.SupportType == typeof(ITypeDescriptor)))
         {
             this.smartSetContext = smartSetContext;
             this.smartSetContext.BookmarkChanged += SmartSetContext_BookmarkChanged;
             this.DisplayName = Resources.Title_TypeSmartCollection;
             this.Dispatcher.InvokeAsync(() => this.AttachPropertyService(this.propertyService.Value));
+            this.authenticator = authenticator;
+            this.typeBrowser = typeBrowser;
+            this.propertyService = propertyService;
         }
 
         public override TreeViewItemViewModel CreateTreeViewItemViewModel(TreeViewItemViewModel parent, object item)

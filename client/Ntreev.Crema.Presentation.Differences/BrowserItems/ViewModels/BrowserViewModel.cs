@@ -132,7 +132,7 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             compositionService.SatisfyImportsOnce(typesCategory);
             foreach (var item in this.dataSet.Types)
             {
-                var viewModel = new TypeTreeViewItemViewModel(this, item);
+                var viewModel = new TypeTreeViewItemViewModel(this, this.documentService, diffType: item);
                 compositionService.SatisfyImportsOnce(viewModel);
                 typesCategory.Items.Add(viewModel);
             }
@@ -144,7 +144,7 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             {
                 if (item.TemplatedParent != null)
                     continue;
-                var viewModel = new TemplateTreeViewItemViewModel(this, item.Template);
+                var viewModel = new TemplateTreeViewItemViewModel(this, this.documentService, diffTemplate: item.Template);
                 compositionService.SatisfyImportsOnce(viewModel);
                 templatesCategory.Items.Add(viewModel);
             }
@@ -154,7 +154,7 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             compositionService.SatisfyImportsOnce(tablesCategory);
             foreach (var item in this.dataSet.Tables)
             {
-                var viewModel = new TableTreeViewItemViewModel(this, item);
+                var viewModel = new TableTreeViewItemViewModel(this, this.documentService, diffTable: item);
                 compositionService.SatisfyImportsOnce(viewModel);
                 tablesCategory.Items.Add(viewModel);
             }

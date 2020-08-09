@@ -31,7 +31,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
         private readonly IType type;
 
         private MoveTypeViewModel(Authentication authentication, IType type, string[] targetPaths)
-            : base(type.Path, targetPaths)
+            : base(type, currentPath: type.Path, targetPaths: targetPaths)
         {
             this.authentication = authentication;
             this.type = type;

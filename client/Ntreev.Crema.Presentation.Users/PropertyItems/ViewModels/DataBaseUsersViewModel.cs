@@ -39,10 +39,9 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
         private IDataBaseDescriptor descriptor;
         private INotifyPropertyChanged notifyObject;
 
-        [Import]
-        private readonly IBuildUp buildUp = null;
-
+        [ImportingConstructor]
         public DataBaseUsersViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost)
+            : base(cremaAppHost)
         {
             this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
@@ -118,8 +117,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
             {
                 if (this.Users.Any(i => i.ID == item.ID) == false)
                 {
-                    var viewModel = new DataBaseUserItemViewModel(item);
-                    this.buildUp?.BuildUp(viewModel);
+                    var viewModel = new DataBaseUserItemViewModel(this.ServiceProvider, item);
                     this.Users.Add(viewModel);
                 }
             }

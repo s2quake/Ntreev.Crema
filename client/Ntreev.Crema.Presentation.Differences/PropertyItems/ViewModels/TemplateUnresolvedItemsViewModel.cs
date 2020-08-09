@@ -38,6 +38,7 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
     {
         private TemplateTreeViewItemViewModel viewModel;
 
+        [ImportingConstructor]
         public TemplateUnresolvedItemsViewModel(IServiceProvider serviceProvider)
             : base(serviceProvider)
         {

@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.ModernUI.Framework.ViewModels;
+using System;
 
 namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
@@ -24,7 +25,8 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
     {
         private AuthenticationInfo authenticationInfo;
 
-        public DataBaseUserItemViewModel(AuthenticationInfo authenticationInfo)
+        public DataBaseUserItemViewModel(IServiceProvider serviceProvier, AuthenticationInfo authenticationInfo)
+            : base(serviceProvier)
         {
             this.authenticationInfo = authenticationInfo;
         }

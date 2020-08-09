@@ -26,7 +26,7 @@ using System.Linq;
 
 namespace Ntreev.Crema.Presentation.Framework
 {
-    public class DomainDescriptor : DescriptorBase, IDomainDescriptor, IPartImportsSatisfiedNotification
+    public class DomainDescriptor : DescriptorBase, IDomainDescriptor
     {
         private IDomain domain;
         private readonly object owner;
@@ -35,9 +35,6 @@ namespace Ntreev.Crema.Presentation.Framework
 
         private DomainInfo domainInfo;
         private DomainState domainState;
-
-        [Import]
-        private readonly IBuildUp buildUp = null;
 
         public DomainDescriptor(Authentication authentication, IDomainDescriptor descriptor, bool isSubscriptable, object owner)
             : base(authentication, descriptor.Target, descriptor, isSubscriptable)
@@ -151,7 +148,6 @@ namespace Ntreev.Crema.Presentation.Framework
             var viewModel = new DomainUserDescriptor(this.authentication, domainUser, this.descriptorTypes, this.owner);
             this.Dispatcher.InvokeAsync(() =>
             {
-                this.buildUp?.BuildUp(viewModel);
                 this.domainUsers.Add(viewModel);
             });
         }
@@ -212,18 +208,6 @@ namespace Ntreev.Crema.Presentation.Framework
             this.domainState = this.domain.DomainState;
             await this.RefreshAsync();
         }
-
-        #region IPartImportsSatisfiedNotification
-
-        void IPartImportsSatisfiedNotification.OnImportsSatisfied()
-        {
-            foreach (var item in this.domainUsers)
-            {
-                this.buildUp.BuildUp(item);
-            }
-        }
-
-        #endregion
 
         #region IDomainDescriptor
 

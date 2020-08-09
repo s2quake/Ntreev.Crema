@@ -27,13 +27,13 @@ namespace Ntreev.Crema.Commands.Consoles
     [Export(typeof(IConsoleDrive))]
     public sealed class DomainsConsoleDrive : ConsoleDriveBase
     {
-        [Import]
-        private readonly Lazy<ICremaHost> cremaHost = null;
+        private readonly ICremaHost cremaHost;
 
-        internal DomainsConsoleDrive()
+        [ImportingConstructor]
+        internal DomainsConsoleDrive(ICremaHost cremaHost)
             : base("domains")
         {
-
+            this.cremaHost = cremaHost;
         }
 
         public override Task<object> GetObjectAsync(Authentication authentication, string path)
@@ -66,24 +66,6 @@ namespace Ntreev.Crema.Commands.Consoles
             return this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.Select(item => item.Path).ToArray());
         }
 
-        private IDomainItem GetObject(string path)
-        {
-            if (NameValidator.VerifyCategoryPath(path) == true)
-            {
-                return this.DomainContext[path];
-            }
-            else
-            {
-                var itemName = new ItemName(path);
-                var category = this.DomainContext.Categories[itemName.CategoryPath];
-                if (category.Categories.ContainsKey(itemName.Name) == true)
-                    return category.Categories[itemName.Name] as IDomainItem;
-                if (category.Domains.ContainsKey(itemName.Name) == true)
-                    return category.Domains[itemName.Name] as IDomainItem;
-                return null;
-            }
-        }
-
-        private IDomainContext DomainContext => this.cremaHost.Value.GetService(typeof(IDomainContext)) as IDomainContext;
+        private IDomainContext DomainContext => this.cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
     }
 }

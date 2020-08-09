@@ -35,15 +35,14 @@ namespace Ntreev.Crema.Commands.Consoles
     class PropertyCommand : ConsoleCommandMethodBase
     {
         private readonly ICremaHost cremaHost;
-
-        [Import]
-        private readonly Lazy<IConfigurationProperties> properties = null;
+        private readonly Lazy<IConfigurationProperties> properties;
 
         [ImportingConstructor]
-        public PropertyCommand(ICremaHost cremaHost)
+        public PropertyCommand(ICremaHost cremaHost, Lazy<IConfigurationProperties> properties)
             : base("prop")
         {
             this.cremaHost = cremaHost;
+            this.properties = properties;
         }
 
         public override string[] GetCompletions(CommandMethodDescriptor methodDescriptor, CommandMemberDescriptor memberDescriptor, string find)

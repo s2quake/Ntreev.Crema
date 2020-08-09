@@ -29,13 +29,12 @@ namespace Ntreev.Crema.Javascript.Consoles
     [ResourceDescription("Resources", IsShared = true)]
     class RunCommand : ConsoleCommandBase
     {
-        [Import]
-        private readonly Lazy<ScriptContext> scriptContext = null;
+        private readonly Lazy<ScriptContext> scriptContext;
 
-        public RunCommand()
-            : base("run")
+        [ImportingConstructor]
+        public RunCommand(Lazy<ScriptContext> scriptContext)
         {
-
+            this.scriptContext = scriptContext;
         }
 
         [CommandPropertyRequired(DefaultValue = "")]

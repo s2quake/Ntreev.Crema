@@ -24,7 +24,7 @@ using System.Linq;
 
 namespace Ntreev.Crema.Presentation.Framework
 {
-    public class DomainUserListBase : PropertyChangedBase, IPartImportsSatisfiedNotification
+    public class DomainUserListBase : PropertyChangedBase
     {
         private readonly ObservableCollection<DomainUserListItemBase> users = new ObservableCollection<DomainUserListItemBase>();
         private readonly ReadOnlyObservableCollection<DomainUserListItemBase> usersReadOnly;
@@ -32,9 +32,6 @@ namespace Ntreev.Crema.Presentation.Framework
         private readonly DomainDescriptor descriptor;
         private readonly bool IsSubscriptable;
         private readonly object owner;
-
-        [Import]
-        private readonly IBuildUp buildUp = null;
 
         public DomainUserListBase(Authentication authentication, IDomain domain, bool IsSubscriptable, object owner)
             : base(domain)
@@ -101,7 +98,6 @@ namespace Ntreev.Crema.Presentation.Framework
         private void AddDescriptor(DomainUserDescriptor descriptor)
         {
             var viewModel = descriptor.Host == null ? this.CreateInstance(this.authentication, descriptor, this.owner) : descriptor.Host as DomainUserListItemBase;
-            this.buildUp?.BuildUp(viewModel);
             this.users.Add(viewModel);
         }
 
@@ -115,17 +111,5 @@ namespace Ntreev.Crema.Presentation.Framework
                 }
             }
         }
-
-        #region IPartImportsSatisfiedNotification
-
-        void IPartImportsSatisfiedNotification.OnImportsSatisfied()
-        {
-            foreach (var item in this.users)
-            {
-                this.buildUp.BuildUp(item);
-            }
-        }
-
-        #endregion
     }
 }

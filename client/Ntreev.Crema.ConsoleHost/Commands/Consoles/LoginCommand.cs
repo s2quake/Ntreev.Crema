@@ -28,13 +28,9 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
     [ResourceDescription("Resources", IsShared = true)]
     class LoginCommand : ConsoleCommandAsyncBase
     {
-        [Import]
-        private readonly Lazy<ConsoleCommandContext> commandContext = null;
-
+        [ImportingConstructor]
         public LoginCommand()
-            : base("login")
         {
-
         }
 
         [CommandProperty]
@@ -44,9 +40,9 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
             get; set;
         }
 
-        public override bool IsEnabled => this.commandContext.Value.IsOnline == false;
+        public override bool IsEnabled => this.CommandContext.IsOnline == false;
 
-        public new ConsoleCommandContext CommandContext => this.commandContext.Value;
+        public new ConsoleCommandContext CommandContext => base.CommandContext as ConsoleCommandContext;
 
         protected override Task OnExecuteAsync()
         {

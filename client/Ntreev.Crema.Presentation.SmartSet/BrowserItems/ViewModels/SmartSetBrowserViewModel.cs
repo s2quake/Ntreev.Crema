@@ -30,47 +30,41 @@ using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
-    abstract class SmartSetBrowserViewModel : TreeViewBase, ISmartSetBrowser, IPartImportsSatisfiedNotification
+    abstract class SmartSetBrowserViewModel : TreeViewBase, ISmartSetBrowser
     {
         private readonly ICremaAppHost cremaAppHost;
-
-        private readonly IRule[] rules;
-        private readonly BookmarkRootTreeViewItemViewModel bookmarkCategory;
-
-        [Import]
-        private readonly IAppConfiguration configs = null;
-        [Import]
-        private readonly IBuildUp buildUp = null;
-
-        private bool isVisible = true;
-
+        private readonly IAppConfiguration configs;
         private readonly DelegateCommand renameCommand;
         private readonly DelegateCommand deleteCommand;
 
+        private bool isVisible = true;
+
         protected SmartSetBrowserViewModel(ICremaAppHost cremaAppHost, IEnumerable<IRule> rules)
+            : base(cremaAppHost)
         {
-            this.rules = rules.OrderBy(item => item.DisplayName).ToArray();
+            this.configs = cremaAppHost.GetService(typeof(IAppConfiguration)) as IAppConfiguration;
+            this.Rules = rules.OrderBy(item => item.DisplayName).ToArray();
             this.isVisible = true;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Loaded += CremaAppHost_Loaded;
             this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
-            this.bookmarkCategory = this.CreateBookmarkRootViewModel();
+            this.BookmarkCategory = this.CreateBookmarkRootViewModel();
             this.renameCommand = new DelegateCommand(this.Rename_Execute, this.Rename_CanExecute);
             this.deleteCommand = new DelegateCommand(this.Delete_Execute, this.Delete_CanExecute);
         }
 
         public string[] GetBookmarkCategoryPaths()
         {
-            var query = from item in TreeViewItemViewModel.FamilyTree(this.bookmarkCategory)
+            var query = from item in TreeViewItemViewModel.FamilyTree(this.BookmarkCategory)
                         where item is BookmarkRootTreeViewItemViewModel || item is BookmarkCategoryTreeViewItemViewModel
-                        select TreeViewItemViewModel.BuildRelativePath(this.bookmarkCategory, item);
+                        select TreeViewItemViewModel.BuildRelativePath(this.BookmarkCategory, item);
             return query.ToArray();
         }
 
         public string[] GetBookmarkItemPaths()
         {
-            var query = from item in TreeViewItemViewModel.FamilyTree(this.bookmarkCategory)
-                        select TreeViewItemViewModel.BuildRelativePath(this.bookmarkCategory, item, this.IsCategory);
+            var query = from item in TreeViewItemViewModel.FamilyTree(this.BookmarkCategory)
+                        select TreeViewItemViewModel.BuildRelativePath(this.BookmarkCategory, item, this.IsCategory);
             return query.ToArray();
         }
 
@@ -94,11 +88,11 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 
         public TreeViewItemViewModel GetBookmarkItem(string path)
         {
-            var items = TreeViewItemViewModel.FamilyTree(this.bookmarkCategory);
+            var items = TreeViewItemViewModel.FamilyTree(this.BookmarkCategory);
 
             foreach (var item in items)
             {
-                var itemmPath = TreeViewItemViewModel.BuildRelativePath(this.bookmarkCategory, item);
+                var itemmPath = TreeViewItemViewModel.BuildRelativePath(this.BookmarkCategory, item);
                 if (path == itemmPath)
                     return item;
             }
@@ -108,8 +102,8 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 
         internal void UpdateBookmarkItems()
         {
-            var query = from item in TreeViewItemViewModel.Descendants(this.bookmarkCategory)
-                        select TreeViewItemViewModel.BuildRelativePath(this.bookmarkCategory, item, IsCategory);
+            var query = from item in TreeViewItemViewModel.Descendants(this.BookmarkCategory)
+                        select TreeViewItemViewModel.BuildRelativePath(this.BookmarkCategory, item, IsCategory);
             this.BookmarkItems = query.ToArray();
 
             static bool IsCategory(TreeViewItemViewModel viewModel)
@@ -144,9 +138,9 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 
         public bool CanNewSmartSet => this.SelectedItem is SmartSetCategoryTreeViewItemViewModel;
 
-        public BookmarkRootTreeViewItemViewModel BookmarkCategory => this.bookmarkCategory;
+        public BookmarkRootTreeViewItemViewModel BookmarkCategory { get; }
 
-        public IRule[] Rules => this.rules;
+        public IRule[] Rules { get; }
 
         public abstract ISmartSetCategory Root
         {
@@ -169,7 +163,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
                 {
                     var categoryName = new CategoryName(item);
                     var parent = this.GetBookmarkItem(categoryName.ParentPath);
-                    var viewModel = this.bookmarkCategory.CreateInstance(categoryName, this);
+                    var viewModel = this.BookmarkCategory.CreateInstance(categoryName, this);
                     viewModel.Parent = parent;
                 }
                 else
@@ -206,24 +200,20 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 
         private void CremaAppHost_Loaded(object sender, EventArgs e)
         {
-            this.Items.Add(this.bookmarkCategory);
+            this.Items.Add(this.BookmarkCategory);
             this.Items.Add(new SmartSetContextTreeViewItemViewModel(this.Root, this));
-            foreach (var item in this.Items)
-            {
-                this.buildUp.BuildUp(item);
-            }
             this.OnLoaded(EventArgs.Empty);
-            this.Dispatcher.InvokeAsync((System.Action)(() =>
+            this.Dispatcher.InvokeAsync(() =>
             {
                 this.InitializeBookmarkItems();
                 this.configs.Update(this);
-            }));
+            });
         }
 
         private void CremaAppHost_Unloaded(object sender, EventArgs e)
         {
             this.configs.Commit(this);
-            this.bookmarkCategory.Items.Clear();
+            this.BookmarkCategory.Items.Clear();
             this.Items.Clear();
             this.OnUnloaded(EventArgs.Empty);
         }
@@ -293,14 +283,5 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             get => this.GetSettings();
             set => this.SetSettings(value);
         }
-
-        #region IPartImportsSatisfiedNotification
-
-        void IPartImportsSatisfiedNotification.OnImportsSatisfied()
-        {
-            this.buildUp.BuildUp(this.bookmarkCategory);
-        }
-
-        #endregion
     }
 }

@@ -30,6 +30,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
         private readonly IType type;
 
         private DeleteTypeViewModel(Authentication authentication, IType type)
+            : base(type)
         {
             this.authentication = authentication;
             this.type = type;

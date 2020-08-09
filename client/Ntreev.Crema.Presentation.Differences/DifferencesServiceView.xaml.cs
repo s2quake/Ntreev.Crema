@@ -26,33 +26,9 @@ namespace Ntreev.Crema.Presentation.Differences
     [Export(typeof(DifferencesServiceView))]
     public partial class DifferencesServiceView : UserControl
     {
-        //[Import]
-        //private IAppConfiguration configs = null;
-
         public DifferencesServiceView()
         {
             InitializeComponent();
         }
-
-        //private void Expander_Loaded(object sender, RoutedEventArgs e)
-        //{
-        //    var expander = sender as Expander;
-        //    if (expander.DataContext == null)
-        //        return;
-
-        //    if (this.configs.TryParse<bool>(expander.DataContext.GetType(), "IsExpanded", out var isExpanded) == true)
-        //    {
-        //        expander.IsExpanded = isExpanded;
-        //    }
-        //}
-
-        //private void Expander_Unloaded(object sender, RoutedEventArgs e)
-        //{
-        //    var expander = sender as Expander;
-        //    if (expander.DataContext == null)
-        //        return;
-
-        //    this.configs[expander.DataContext.GetType(), "IsExpanded"] = expander.IsExpanded;
-        //}
     }
 }

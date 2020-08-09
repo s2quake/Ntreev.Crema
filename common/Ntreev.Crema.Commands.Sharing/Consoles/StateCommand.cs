@@ -29,13 +29,9 @@ namespace Ntreev.Crema.Commands.Consoles
     [CommandStaticProperty(typeof(FormatProperties))]
     class StateCommand : ConsoleCommandAsyncBase
     {
-        [Import]
-        private readonly Lazy<ICremaHost> cremaHost = null;
-
+        [ImportingConstructor]
         public StateCommand()
-            : base("state")
         {
-
         }
 
         public override string[] GetCompletions(CommandCompletionContext completionContext)
@@ -61,8 +57,6 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        public ICremaHost CremaHost => this.cremaHost.Value;
-
         public override bool IsEnabled => this.CommandContext.IsOnline;
 
         protected override async Task OnExecuteAsync()
@@ -82,18 +76,6 @@ namespace Ntreev.Crema.Commands.Consoles
                 return provider;
             }
             throw new InvalidOperationException($"'{path}' does not have information.");
-        }
-
-        private void Invoke(IStateProvider provider, Action action)
-        {
-            if (provider is IDispatcherObject dispatcherObject)
-            {
-                dispatcherObject.Dispatcher.Invoke(action);
-            }
-            else
-            {
-                action();
-            }
         }
 
         private T Invoke<T>(IStateProvider provider, Func<T> func)

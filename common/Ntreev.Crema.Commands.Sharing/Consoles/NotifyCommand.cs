@@ -28,11 +28,12 @@ namespace Ntreev.Crema.Commands.Consoles
     [ResourceDescription("Resources", IsShared = true)]
     class NotifyCommand : ConsoleCommandAsyncBase
     {
-        [Import]
-        private readonly Lazy<ICremaHost> cremaHost = null;
+        private readonly ICremaHost cremaHost;
 
-        public NotifyCommand()
+        [ImportingConstructor]
+        public NotifyCommand(ICremaHost cremaHost)
         {
+            this.cremaHost = cremaHost;
             this.Message = string.Empty;
         }
 
@@ -60,8 +61,6 @@ namespace Ntreev.Crema.Commands.Consoles
             return this.UserContext.NotifyMessageAsync(authentication, this.Message);
         }
 
-        private ICremaHost CremaHost => this.cremaHost.Value;
-
-        private IUserContext UserContext => this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
+        private IUserContext UserContext => this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
     }
 }

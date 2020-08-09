@@ -30,6 +30,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly ITableCategory category;
 
         private DeleteTableCategoryViewModel(Authentication authentication, ITableCategory category)
+            : base(category)
         {
             this.authentication = authentication;
             this.category = category;

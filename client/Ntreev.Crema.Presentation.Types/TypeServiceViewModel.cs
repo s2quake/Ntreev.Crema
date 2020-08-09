@@ -36,15 +36,9 @@ namespace Ntreev.Crema.Presentation.Types
     [InheritedExport(typeof(TypeServiceViewModel))]
     class TypeServiceViewModel : ScreenBase, IContentService
     {
+        private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
-
-        [Import]
-        private readonly IBrowserService browserService = null;
-        [Import]
-        private readonly TypeDocumentServiceViewModel documentService = null;
-        [Import]
-        private readonly IPropertyService propertyService = null;
-        [Import]
+        private readonly IAppConfiguration configs;
         private readonly Lazy<IShell> shell = null;
 
         private bool isBrowserExpanded = true;
@@ -56,20 +50,22 @@ namespace Ntreev.Crema.Presentation.Types
         private bool isFirst;
         private bool isVisible;
 
-        [Import]
-        private readonly Authenticator authenticator = null;
-
-        [Import]
-        private readonly IAppConfiguration configs = null;
 
         [ImportingConstructor]
-        public TypeServiceViewModel(ICremaAppHost cremaAppHost)
+        public TypeServiceViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost, IBrowserService browserService,
+            TypeDocumentServiceViewModel documentService, IPropertyService propertyService, IAppConfiguration configs, Lazy<IShell> shell)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += CremaAppHost_Opened;
             this.cremaAppHost.Closed += CremaAppHost_Closed;
             this.cremaAppHost.Loaded += CremaAppHost_Loaded;
             this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
+            this.BrowserService = browserService;
+            this.DocumentService = documentService;
+            this.PropertyService = propertyService;
+            this.configs = configs;
+            this.shell = shell;
             this.DisplayName = Resources.Title_Type;
         }
 
@@ -80,14 +76,14 @@ namespace Ntreev.Crema.Presentation.Types
 
         public async void Dispose()
         {
-            await this.documentService.TryCloseAsync();
+            await this.DocumentService.TryCloseAsync();
         }
 
-        public IBrowserService BrowserService => this.browserService;
+        public IBrowserService BrowserService { get; } = null;
 
-        public TypeDocumentServiceViewModel DocumentService => this.documentService;
+        public TypeDocumentServiceViewModel DocumentService { get; } = null;
 
-        public IPropertyService PropertyService => this.propertyService;
+        public IPropertyService PropertyService { get; } = null;
 
         [ConfigurationProperty("isBrowserExpanded")]
         [DefaultValue(true)]

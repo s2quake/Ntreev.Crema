@@ -35,7 +35,6 @@ namespace Ntreev.Crema.Presentation.Home.Dialogs.ViewModels
         private DataBaseItemViewModel selectedItem;
         private string selectedValue;
         private readonly Func<Task> actionAsync;
-        private readonly IBuildUp buildUp = null;
 
         public SelectDataBaseViewModel(ICremaAppHost cremaAppHost, string address)
             : this(cremaAppHost, address, (s) => true)
@@ -138,7 +137,6 @@ namespace Ntreev.Crema.Presentation.Home.Dialogs.ViewModels
                     {
                         viewModel.ConnectionItem = query.FirstOrDefault(i => i.DataBaseName == item.Name);
                     }
-                    this.buildUp?.BuildUp(viewModel);
                     this.ItemsSource.Add(viewModel);
                 }
                 this.selectedItem = this.ItemsSource.FirstOrDefault(item => item.Name == this.selectedValue);
@@ -174,7 +172,6 @@ namespace Ntreev.Crema.Presentation.Home.Dialogs.ViewModels
                     {
                         viewModel.ConnectionItem = query.FirstOrDefault(i => i.DataBaseName == item.DataBaseInfo.Name);
                     }
-                    this.buildUp?.BuildUp(viewModel);
                     this.ItemsSource.Add(viewModel);
                 }
                 this.selectedItem = this.ItemsSource.FirstOrDefault(item => item.Name == this.selectedValue);

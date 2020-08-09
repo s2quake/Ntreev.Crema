@@ -29,12 +29,18 @@ namespace Ntreev.Crema.Presentation.Tables
     [Export(typeof(TableServiceView))]
     public partial class TableServiceView : UserControl
     {
-        [Import]
-        private readonly IAppConfiguration configs = null;
+        private readonly IAppConfiguration configs;
 
         public TableServiceView()
         {
             InitializeComponent();
+        }
+
+        [ImportingConstructor]
+        public TableServiceView(IAppConfiguration configs)
+        {
+            InitializeComponent();
+            this.configs = configs;
         }
 
         private void Expander_Loaded(object sender, RoutedEventArgs e)

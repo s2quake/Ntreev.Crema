@@ -31,19 +31,16 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
     class TableDocumentServiceViewModel : DocumentServiceBase<IDocument>, ITableDocumentService
     {
         private readonly ICremaAppHost cremaAppHost;
-
-        [Import]
-        private readonly IBuildUp buildUp = null;
-        [Import]
-        private readonly Lazy<TableBrowserViewModel> browser = null;
+        private readonly Lazy<TableBrowserViewModel> browser;
 
         [ImportingConstructor]
-        public TableDocumentServiceViewModel(ICremaAppHost cremaAppHost)
+        public TableDocumentServiceViewModel(ICremaAppHost cremaAppHost, Lazy<TableBrowserViewModel> browser)
         {
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
             this.cremaAppHost.Resetting += CremaAppHost_Resetting;
             this.cremaAppHost.Reset += CremaAppHost_Reset;
+            this.browser = browser;
             this.DisplayName = Resources.Title_Tables;
         }
 
@@ -86,7 +83,6 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
         public TableDataFinderViewModel AddFinder(Authentication authentication, ITableItemDescriptor descriptor)
         {
             var document = new TableDataFinderViewModel(authentication, this.Browser, descriptor);
-            this.buildUp?.BuildUp(document);
             this.Items.Add(document);
             return document;
         }
@@ -233,7 +229,6 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             this.ValidateOpenTable(authentication, descriptor);
             var document = new TableEditorViewModel(authentication, descriptor);
             document.SelectedTable = document.Tables.FirstOrDefault(item => item.TableName == tableName);
-            this.buildUp?.BuildUp(document);
             this.Items.Add(document);
             return document;
         }
@@ -254,7 +249,6 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             this.ValidateViewTable(authentication, descriptor);
             var document = new TableViewerViewModel(authentication, descriptor);
             document.SelectedTable = document.Tables.FirstOrDefault(item => item.TableName == tableName);
-            this.buildUp?.BuildUp(document);
             this.Items.Add(document);
             return document;
         }

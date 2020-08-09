@@ -39,28 +39,22 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
     [ParentType("Ntreev.Crema.Presentation.Home.IBrowserService, Ntreev.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class UserBrowserViewModel : TreeViewBase, IBrowserItem
     {
+        private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
-
-        [Import]
-        private readonly Authenticator authenticator = null;
-        [ImportMany]
         private readonly IEnumerable<IPropertyService> propertyServices = null;
-        [Import]
         private readonly Lazy<IShell> shell = null;
 
         private readonly DelegateCommand deleteCommand;
 
-        [Import]
-        private readonly IFlashService flashService = null;
-        [Import]
-        private readonly IBuildUp buildUp = null;
-
         [ImportingConstructor]
-        public UserBrowserViewModel(ICremaAppHost cremaAppHost)
+        public UserBrowserViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost, [ImportMany] IEnumerable<IPropertyService> propertyServices, Lazy<IShell> shell)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += CremaAppHost_Opened;
             this.cremaAppHost.Closed += CremaAppHost_Closed;
+            this.propertyServices = propertyServices;
+            this.shell = shell;
             this.deleteCommand = new DelegateCommand(this.Delete_Execute, this.Delete_CanExecute);
             this.DisplayName = Resources.Title_Users;
             this.Dispatcher.InvokeAsync(() =>
@@ -107,8 +101,6 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
                     userContext.Users.MessageReceived += Users_MessageReceived;
                     return new UserCategoryTreeViewItemViewModel(this.authenticator, userContext.Root, this);
                 });
-
-                this.buildUp.BuildUp(viewModel);
                 this.Items.Add(viewModel);
 
                 this.cremaAppHost.UserConfigs.Update(this);
@@ -130,7 +122,8 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
                     {
                     });
                     var title = string.Format(Resources.Title_AdministratorMessage_Format, sendUserID);
-                    this.flashService?.Flash();
+                    if (this.cremaAppHost.GetService(typeof(IFlashService)) is IFlashService flashService)
+                        flashService.Flash();
                     await AppMessageBox.ShowAsync(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }

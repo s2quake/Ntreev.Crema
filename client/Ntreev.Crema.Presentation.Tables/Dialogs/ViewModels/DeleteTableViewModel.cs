@@ -30,6 +30,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly ITable table;
 
         private DeleteTableViewModel(Authentication authentication, ITable table)
+            : base(table)
         {
             this.authentication = authentication;
             this.table = table;

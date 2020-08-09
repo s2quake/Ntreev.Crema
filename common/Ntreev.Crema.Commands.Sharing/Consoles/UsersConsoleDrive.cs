@@ -29,15 +29,13 @@ namespace Ntreev.Crema.Commands.Consoles
     [Export(typeof(IConsoleDrive))]
     public sealed class UsersConsoleDrive : ConsoleDriveBase
     {
-        [Import]
-        private readonly Lazy<ICremaHost> cremaHost = null;
+        private readonly ICremaHost cremaHost;
 
-        private string path;
-
-        internal UsersConsoleDrive()
+        [ImportingConstructor]
+        internal UsersConsoleDrive(ICremaHost cremaHost)
             : base("users")
         {
-
+            this.cremaHost = cremaHost;
         }
 
         public override string[] GetPaths()
@@ -60,10 +58,11 @@ namespace Ntreev.Crema.Commands.Consoles
             return this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.Select(item => item.ID).ToArray());
         }
 
+        public string Path { get; private set; }
+
         protected override async Task OnCreateAsync(Authentication authentication, string path, string name)
         {
-            var category = await this.GetObjectAsync(path) as IUserCategory;
-            if (category == null)
+            if (!(await this.GetObjectAsync(path) is IUserCategory category))
                 throw new CategoryNotFoundException(path);
             await category.AddNewCategoryAsync(authentication, name);
         }
@@ -88,8 +87,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         protected override async Task OnDeleteAsync(Authentication authentication, string path)
         {
-            var userItem = await this.GetObjectAsync(path) as IUserItem;
-            if (userItem == null)
+            if (!(await this.GetObjectAsync(path) is IUserItem userItem))
                 throw new ItemNotFoundException(path);
             await userItem.DeleteAsync(authentication);
         }
@@ -98,7 +96,7 @@ namespace Ntreev.Crema.Commands.Consoles
         {
             return Task.Run(() =>
             {
-                this.path = path;
+                this.Path = path;
             });
         }
 
@@ -185,6 +183,6 @@ namespace Ntreev.Crema.Commands.Consoles
             }
         }
 
-        private IUserContext UserContext => this.cremaHost.Value.GetService(typeof(IUserContext)) as IUserContext;
+        private IUserContext UserContext => this.cremaHost.GetService(typeof(IUserContext)) as IUserContext;
     }
 }

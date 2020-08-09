@@ -31,7 +31,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
         private readonly ITypeCategory category;
 
         private MoveTypeCategoryViewModel(Authentication authentication, ITypeCategory category, string[] targetPaths)
-            : base(category.Path, targetPaths)
+            : base(category, currentPath: category.Path, targetPaths: targetPaths)
         {
             this.authentication = authentication;
             this.category = category;

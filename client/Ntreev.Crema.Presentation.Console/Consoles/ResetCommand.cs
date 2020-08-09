@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.Commands.Consoles;
 using Ntreev.Library.Commands;
+using System;
 using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Presentation.Console.Consoles
@@ -25,18 +26,19 @@ namespace Ntreev.Crema.Presentation.Console.Consoles
     [ResourceDescription("Resources", IsShared = true)]
     class ResetCommand : ConsoleCommandBase
     {
-        private readonly ConsoleView consoleView;
+        private readonly Lazy<ConsoleView> consoleView;
 
         [ImportingConstructor]
-        public ResetCommand(ConsoleView consoleView)
-            : base("reset")
+        public ResetCommand(Lazy<ConsoleView> consoleView)
         {
             this.consoleView = consoleView;
         }
 
         protected override void OnExecute()
         {
-            this.consoleView.Reset();
+            this.ConsoleView.Reset();
         }
+
+        private ConsoleView ConsoleView => this.consoleView.Value;
     }
 }

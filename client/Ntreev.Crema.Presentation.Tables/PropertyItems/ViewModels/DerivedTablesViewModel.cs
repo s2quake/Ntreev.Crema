@@ -36,19 +36,17 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
     [ParentType(typeof(PropertyService))]
     class DerivedTablesViewModel : PropertyItemBase, ISelector
     {
-        [Import]
-        private readonly Lazy<TableBrowserViewModel> browser = null;
-        [Import]
-        private readonly Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
+        private readonly Lazy<TableBrowserViewModel> browser;
         private ITableDescriptor descriptor;
         private TableListBoxItemViewModel[] tables;
         private TableListBoxItemViewModel selectedTable;
-        [Import]
-        private readonly IBuildUp buildUp = null;
 
         [ImportingConstructor]
-        public DerivedTablesViewModel()
+        public DerivedTablesViewModel(Authenticator authenticator, Lazy<TableBrowserViewModel> browser)
         {
+            this.authenticator = authenticator;
+            this.browser = browser;
             this.DisplayName = Resources.Title_DerivedTable;
         }
 
@@ -79,7 +77,6 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
                     else
                     {
                         var viewModel = new TableListBoxItemViewModel(this.authenticator, item, this);
-                        this.buildUp.BuildUp(viewModel);
                         viewModelList.Add(viewModel);
                     }
                 }

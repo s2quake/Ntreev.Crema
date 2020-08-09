@@ -27,13 +27,12 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
     [ResourceDescription("Resources", IsShared = true)]
     class ExitCommand : ConsoleCommandAsyncBase
     {
-        [Import]
-        private readonly Lazy<ConsoleTerminal> terminal = null;
+        private readonly Lazy<ConsoleTerminal> terminal;
 
-        public ExitCommand()
+        public ExitCommand(Lazy<ConsoleTerminal> terminal)
             : base("exit")
         {
-
+            this.terminal = terminal;
         }
 
         protected override async Task OnExecuteAsync()

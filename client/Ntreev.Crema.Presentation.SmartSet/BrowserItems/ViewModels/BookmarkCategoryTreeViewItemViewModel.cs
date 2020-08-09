@@ -100,7 +100,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
         public async Task MoveAsync()
         {
             var itemPaths = this.Browser.GetBookmarkItemPaths();
-            var dialog = new MoveBookmarkItemViewModel(this.Path, itemPaths);
+            var dialog = new MoveBookmarkItemViewModel(this.ServiceProvider, this.Path, itemPaths);
             if (await dialog.ShowDialogAsync() != true)
                 return;
 

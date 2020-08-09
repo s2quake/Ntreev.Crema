@@ -86,6 +86,13 @@ namespace Ntreev.Crema.ApplicationHost.Views
 
                 App.Writer.TextBox = this.logView;
                 this.InitializeFromSettings();
+
+                Application.Current.MainWindow = this;
+                this.configs.Update(this);
+                if (this.IsLogVisible == true)
+                    this.logRow.Height = new GridLength(this.LogViewHeight);
+                this.shell.Closed += Shell_Closed;
+                this.Dispatcher.InvokeAsync(this.ConnectWithSettings);
             }, DispatcherPriority.Render);
         }
 
@@ -255,12 +262,12 @@ namespace Ntreev.Crema.ApplicationHost.Views
 
         private void ModernWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            Application.Current.MainWindow = this;
-            this.configs.Update(this);
-            if (this.IsLogVisible == true)
-                this.logRow.Height = new GridLength(this.LogViewHeight);
-            this.shell.Closed += Shell_Closed;
-            this.Dispatcher.InvokeAsync(this.ConnectWithSettings);
+            //Application.Current.MainWindow = this;
+            //this.configs.Update(this);
+            //if (this.IsLogVisible == true)
+            //    this.logRow.Height = new GridLength(this.LogViewHeight);
+            //this.shell.Closed += Shell_Closed;
+            //this.Dispatcher.InvokeAsync(this.ConnectWithSettings);
         }
 
         private void Shell_Closed(object sender, EventArgs e)

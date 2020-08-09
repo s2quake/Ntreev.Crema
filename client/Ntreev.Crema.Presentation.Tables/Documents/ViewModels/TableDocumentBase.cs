@@ -25,13 +25,10 @@ using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 {
-    abstract class TableDocumentBase : DocumentBase, ITableDocument, IPartImportsSatisfiedNotification
+    abstract class TableDocumentBase : DocumentBase, ITableDocument
     {
         private readonly ObservableCollection<TableItemViewModel> tables = new ObservableCollection<TableItemViewModel>();
         private TableItemViewModel selectedTable;
-
-        [Import]
-        private readonly IBuildUp buildUp = null;
 
         protected TableDocumentBase()
         {
@@ -80,7 +77,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
                     {
                         foreach (var item in e.NewItems)
                         {
-                            this.buildUp?.BuildUp(item);
+
                         }
                     }
                     break;
@@ -108,18 +105,6 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
         }
 
         ITable ITableDocument.Target => this.Target as ITable;
-
-        #endregion
-
-        #region IPartImportsSatisfiedNotification
-
-        void IPartImportsSatisfiedNotification.OnImportsSatisfied()
-        {
-            foreach (var item in this.tables)
-            {
-                this.buildUp.BuildUp(item);
-            }
-        }
 
         #endregion
     }

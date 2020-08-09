@@ -28,8 +28,9 @@ namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
     {
         private readonly string[] itemPaths;
         private readonly string currentName;
-        public MoveBookmarkItemViewModel(string currentPath, string[] itemPaths)
-            : base(currentPath, TreeViewItemViewModelBuilder.MakeItemList(itemPaths, true))
+
+        public MoveBookmarkItemViewModel(IServiceProvider serviceProvider, string currentPath, string[] itemPaths)
+            : base(serviceProvider, currentPath: currentPath, targetPaths: TreeViewItemViewModelBuilder.MakeItemList(itemPaths, true))
         {
             this.itemPaths = itemPaths;
             if (NameValidator.VerifyCategoryPath(currentPath) == true)
