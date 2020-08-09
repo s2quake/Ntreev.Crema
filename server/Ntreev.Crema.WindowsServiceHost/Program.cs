@@ -17,11 +17,6 @@
 
 using Ntreev.Crema.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Resources;
-using System.ServiceProcess;
-using System.Text;
 
 namespace Ntreev.Crema.WindowsServiceHost
 {

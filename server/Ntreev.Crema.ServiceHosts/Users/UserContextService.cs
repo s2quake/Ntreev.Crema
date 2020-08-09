@@ -16,21 +16,14 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library;
 using Ntreev.Crema.Services;
+using Ntreev.Library;
+using Ntreev.Library.ObjectModel;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
-using System.Reflection;
-using System.ServiceModel;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Security;
-using System.Runtime.InteropServices;
-using Ntreev.Crema.ServiceHosts.Properties;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ServiceHosts.Users
 {

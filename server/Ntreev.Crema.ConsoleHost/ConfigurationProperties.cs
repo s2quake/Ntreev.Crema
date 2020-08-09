@@ -16,13 +16,13 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Commands;
-using System;
-using System.Linq;
-using System.ComponentModel.Composition;
-using Ntreev.Library;
-using System.Collections.Generic;
 using Ntreev.Crema.Services;
+using Ntreev.Library;
 using Ntreev.Library.ObjectModel;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Linq;
 
 namespace Ntreev.Crema.ConsoleHost
 {
@@ -33,7 +33,7 @@ namespace Ntreev.Crema.ConsoleHost
         private readonly List<ConfigurationPropertyDescriptor> disabledProperties;
 
         [ImportingConstructor]
-        public ConfigurationProperties(ICremaHost cremaHost, [ImportMany]IEnumerable<IConfigurationPropertyProvider> providers)
+        public ConfigurationProperties(ICremaHost cremaHost, [ImportMany] IEnumerable<IConfigurationPropertyProvider> providers)
         {
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;

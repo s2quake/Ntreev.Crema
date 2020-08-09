@@ -52,12 +52,12 @@ namespace Ntreev.Crema.Services
         private ShutdownTimer shutdownTimer;
 
         [ImportMany]
-        private IEnumerable<IConfigurationPropertyProvider> propertiesProviders = null;
+        private readonly IEnumerable<IConfigurationPropertyProvider> propertiesProviders = null;
 
         [ImportingConstructor]
         public CremaHost(IServiceProvider container, CremaSettings settings,
-            [ImportMany]IEnumerable<IRepositoryProvider> repositoryProviders,
-            [ImportMany]IEnumerable<IObjectSerializer> serializers)
+            [ImportMany] IEnumerable<IRepositoryProvider> repositoryProviders,
+            [ImportMany] IEnumerable<IObjectSerializer> serializers)
         {
             CremaLog.Attach(this);
             CremaLog.Debug("crema instance created.");

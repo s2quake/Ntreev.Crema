@@ -15,17 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Data;
-using System.IO;
-using System.Linq;
-using System.Xml;
-using System.Text;
-using Ntreev.Library.IO;
-using System.Xml.Serialization;
-using System.Data;
 using Ntreev.Crema.Data.Xml.Schema;
+using System;
 
 namespace Ntreev.Crema.Data.Test
 {

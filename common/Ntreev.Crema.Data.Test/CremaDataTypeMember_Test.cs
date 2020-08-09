@@ -16,17 +16,11 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Random;
-using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library;
 using Ntreev.Library.Random;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Data.Test
 {

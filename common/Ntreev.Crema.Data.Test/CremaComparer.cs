@@ -16,14 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Data.Test
 {
@@ -98,7 +92,7 @@ namespace Ntreev.Crema.Data.Test
             if (table1 == null || table2 == null)
                 Assert.Fail("테이블이 같지 않습니다.");
 
-            
+
 
             if (table1.Parent == null)
             {
@@ -246,6 +240,6 @@ namespace Ntreev.Crema.Data.Test
             }
         }
 
-        
+
     }
 }

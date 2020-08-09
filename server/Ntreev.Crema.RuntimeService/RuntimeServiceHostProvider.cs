@@ -15,16 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceHosts;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
 using JSSoft.Communication;
+using Ntreev.Crema.ServiceHosts;
+using Ntreev.Crema.Services;
+using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.RuntimeService
 {
@@ -41,10 +35,7 @@ namespace Ntreev.Crema.RuntimeService
             this.service = service;
         }
 
-        public string Name
-        {
-            get { return nameof(RuntimeService); }
-        }
+        public string Name => nameof(RuntimeService);
 
         public ServiceHostBase CreateInstance()
         {

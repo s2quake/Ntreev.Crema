@@ -16,28 +16,17 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Random;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Ntreev.Library.Random;
-using Ntreev.Library;
-using Ntreev.Library.IO;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Data.Xml;
-using System.Data;
 
 namespace Ntreev.Crema.Data.Test
 {
     [TestClass]
     public class CremaTemplateColumn_InTableTest
     {
-        private CremaTemplate template;
-        private CremaTemplateColumn column;
-        private CremaDataColumn targetColumn;
+        private readonly CremaTemplate template;
+        private readonly CremaTemplateColumn column;
+        private readonly CremaDataColumn targetColumn;
 
         public CremaTemplateColumn_InTableTest()
         {
@@ -51,13 +40,13 @@ namespace Ntreev.Crema.Data.Test
         public void Test()
         {
             Assert.AreEqual(this.targetColumn.Index, this.column.Index);
-            Assert.AreEqual(this.targetColumn.IsKey , this.column.IsKey);
-            Assert.AreEqual(this.targetColumn.Unique , this.column.Unique);
-            Assert.AreEqual(this.targetColumn.ColumnName , this.column.Name);
-            Assert.AreEqual(this.targetColumn.DataTypeName , this.column.DataTypeName);
-            Assert.AreEqual(this.targetColumn.AutoIncrement , this.column.AutoIncrement);
-            Assert.AreEqual(this.targetColumn.Comment , this.column.Comment);
-            Assert.AreEqual(this.targetColumn.Tags , this.column.Tags);
+            Assert.AreEqual(this.targetColumn.IsKey, this.column.IsKey);
+            Assert.AreEqual(this.targetColumn.Unique, this.column.Unique);
+            Assert.AreEqual(this.targetColumn.ColumnName, this.column.Name);
+            Assert.AreEqual(this.targetColumn.DataTypeName, this.column.DataTypeName);
+            Assert.AreEqual(this.targetColumn.AutoIncrement, this.column.AutoIncrement);
+            Assert.AreEqual(this.targetColumn.Comment, this.column.Comment);
+            Assert.AreEqual(this.targetColumn.Tags, this.column.Tags);
             Assert.AreEqual(this.targetColumn.CreationInfo, this.column.CreationInfo);
             Assert.AreEqual(this.targetColumn.ModificationInfo, this.column.ModificationInfo);
         }

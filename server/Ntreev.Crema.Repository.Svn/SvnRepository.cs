@@ -45,8 +45,8 @@ namespace Ntreev.Crema.Repository.Svn
         private List<LogPropertyInfo> transactionPropertyList;
         private string transactionPatchPath;
         private bool needToUpdate;
-        private Uri repositoryRoot;
-        private Uri repositoryUri;
+        private readonly Uri repositoryRoot;
+        private readonly Uri repositoryUri;
         private RepositoryInfo repositoryInfo;
         private SvnInfo info;
 

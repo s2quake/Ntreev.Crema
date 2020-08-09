@@ -19,7 +19,6 @@ using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Crema.Services.Properties;
-using Ntreev.Library.Linq;
 using System;
 using System.ComponentModel;
 using System.Linq;

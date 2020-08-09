@@ -20,10 +20,7 @@ using Ntreev.Crema.Commands.Consoles.Properties;
 using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.RuntimeService.Consoles
@@ -32,9 +29,9 @@ namespace Ntreev.Crema.RuntimeService.Consoles
     class RuntimeCommand : ConsoleCommandMethodBase
     {
         [Import]
-        private Lazy<RuntimeService> runtimeService = null;
+        private readonly Lazy<RuntimeService> runtimeService = null;
         [Import]
-        private Lazy<ICremaHost> cremaHost = null;
+        private readonly Lazy<ICremaHost> cremaHost = null;
 
         public RuntimeCommand()
             : base("rt")

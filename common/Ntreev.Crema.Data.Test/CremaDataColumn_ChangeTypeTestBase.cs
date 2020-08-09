@@ -16,15 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Random;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Library.Random;
-using Ntreev.Library;
 
 namespace Ntreev.Crema.Data.Test
 {
@@ -37,7 +29,7 @@ namespace Ntreev.Crema.Data.Test
         {
             this.column = this.table.Columns.Add("Column1", dataType);
         }
-        
+
         protected void AddRows(params object[] fields)
         {
             foreach (var item in fields)

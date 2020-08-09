@@ -23,8 +23,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ApplicationHost
 {
@@ -35,7 +33,7 @@ namespace Ntreev.Crema.ApplicationHost
         private readonly List<ConfigurationPropertyDescriptor> disabledProperties;
 
         [ImportingConstructor]
-        public ConfigurationProperties(ICremaHost cremaHost, [ImportMany]IEnumerable<IConfigurationPropertyProvider> providers)
+        public ConfigurationProperties(ICremaHost cremaHost, [ImportMany] IEnumerable<IConfigurationPropertyProvider> providers)
         {
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;

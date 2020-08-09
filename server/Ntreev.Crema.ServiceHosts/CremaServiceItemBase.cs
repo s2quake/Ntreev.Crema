@@ -18,10 +18,7 @@
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.Library;
-using Ntreev.Library.IO;
 using System;
-using System.IO;
-using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ServiceHosts

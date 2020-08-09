@@ -204,7 +204,7 @@ namespace Ntreev.Crema.Services.Data
             }
         }
 
-        
+
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void OnValidateBeginEdit(Authentication authentication, object target)

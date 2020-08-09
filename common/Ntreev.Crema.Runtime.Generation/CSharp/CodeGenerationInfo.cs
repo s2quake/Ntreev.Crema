@@ -18,13 +18,8 @@
 using Ntreev.Crema.Data;
 using Ntreev.Library;
 using Ntreev.Library.IO;
-using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Runtime.Generation.CSharp
 {
@@ -101,20 +96,11 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
             }
         }
 
-        public string Revision
-        {
-            get { return this.metaData.Revision; }
-        }
+        public string Revision => this.metaData.Revision;
 
-        public string RequestedRevision
-        {
-            get { return this.settings.Revision; }
-        }
+        public string RequestedRevision => this.settings.Revision;
 
-        public string DataBaseName
-        {
-            get { return this.metaData.Name; }
-        }
+        public string DataBaseName => this.metaData.Name;
 
         public string ClassName
         {
@@ -146,13 +132,7 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
             }
         }
 
-        public string ReaderNamespace
-        {
-            get
-            {
-                return this.BaseNamespace + "." + "Reader";
-            }
-        }
+        public string ReaderNamespace => this.BaseNamespace + "." + "Reader";
 
         public string Prefix
         {
@@ -164,50 +144,23 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
             }
         }
 
-        public string Postfix
-        {
-            get { return this.settings.Postfix; }
-        }
+        public string Postfix => this.settings.Postfix;
 
-        public CodeGenerationOptions Options
-        {
-            get { return this.settings.Options; }
-        }
+        public CodeGenerationOptions Options => this.settings.Options;
 
-        public bool OmitComment
-        {
-            get
-            {
-                return this.settings.Options.HasFlag(CodeGenerationOptions.OmitComments);
-            }
-        }
+        public bool OmitComment => this.settings.Options.HasFlag(CodeGenerationOptions.OmitComments);
 
-        public bool OmitSignatureDate
-        {
-            get
-            {
-                return this.settings.Options.HasFlag(CodeGenerationOptions.OmitSignatureDate);
-            }
-        }
+        public bool OmitSignatureDate => this.settings.Options.HasFlag(CodeGenerationOptions.OmitSignatureDate);
 
         public string RelativePath
         {
             get; private set;
         }
 
-        public string TypesHashValue
-        {
-            get { return this.metaData.TypesHashValue; }
-        }
+        public string TypesHashValue => this.metaData.TypesHashValue;
 
-        public string TablesHashValue
-        {
-            get { return this.metaData.TablesHashValue; }
-        }
+        public string TablesHashValue => this.metaData.TablesHashValue;
 
-        public TagInfo Tags
-        {
-            get { return (TagInfo)this.metaData.Tags; }
-        }
+        public TagInfo Tags => (TagInfo)this.metaData.Tags;
     }
 }

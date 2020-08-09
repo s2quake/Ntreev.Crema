@@ -16,14 +16,12 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Data;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains
 {

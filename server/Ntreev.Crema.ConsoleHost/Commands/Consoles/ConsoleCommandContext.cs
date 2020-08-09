@@ -18,21 +18,10 @@
 using Ntreev.Crema.Commands.Consoles;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
-using Ntreev.Library;
-using Ntreev.Library.Commands;
-using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Security;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
@@ -41,15 +30,15 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
     public class ConsoleCommandContext : ConsoleCommandContextBase
     {
         [Import]
-        private Lazy<ICremaHost> cremaHost = null;
+        private readonly Lazy<ICremaHost> cremaHost = null;
         [Import]
-        private Lazy<CremaApplication> cremaApp = null;
+        private readonly Lazy<CremaApplication> cremaApp = null;
         private Authentication authentication;
 
         [ImportingConstructor]
         public ConsoleCommandContext(ICremaHost cremaHost,
-            [ImportMany]IEnumerable<IConsoleDrive> rootItems,
-            [ImportMany]IEnumerable<IConsoleCommand> commands)
+            [ImportMany] IEnumerable<IConsoleDrive> rootItems,
+            [ImportMany] IEnumerable<IConsoleCommand> commands)
             : base(rootItems, commands)
         {
             this.BaseDirectory = cremaHost.GetPath(CremaPath.Documents);
@@ -88,13 +77,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
 
         public override ICremaHost CremaHost => this.cremaHost.Value;
 
-        public override string Address
-        {
-            get
-            {
-                return AddressUtility.GetDisplayAddress($"localhost:{this.CremaApp.Port}");
-            }
-        }
+        public override string Address => AddressUtility.GetDisplayAddress($"localhost:{this.CremaApp.Port}");
 
         private CremaApplication CremaApp => this.cremaApp.Value;
     }

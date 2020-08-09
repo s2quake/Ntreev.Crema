@@ -75,7 +75,7 @@ namespace Ntreev.Crema.Services.Data
             public DomainAccessType GetAccessType(Authentication authentication)
             {
                 var accessType = DomainAccessType.ReadWrite;
-                foreach(var item in this.Contents)
+                foreach (var item in this.Contents)
                 {
                     var itemAccessType = item.GetAccessType(authentication);
                     if (itemAccessType < accessType)
@@ -243,7 +243,7 @@ namespace Ntreev.Crema.Services.Data
 
             public TableCollection Container { get; }
 
-            public CremaDispatcher Dispatcher => this.Container.Dispatcher;     
+            public CremaDispatcher Dispatcher => this.Container.Dispatcher;
 
             private async void Domain_RowAdded(object sender, DomainRowEventArgs e)
             {
@@ -380,7 +380,7 @@ namespace Ntreev.Crema.Services.Data
                 this.owner = this.domain.Users.OwnerUserID;
             }
 
-            
+
 
             private DomainContext DomainContext => this.Container.GetService(typeof(DomainContext)) as DomainContext;
 

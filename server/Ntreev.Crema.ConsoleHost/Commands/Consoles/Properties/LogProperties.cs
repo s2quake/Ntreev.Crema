@@ -18,12 +18,8 @@
 using Ntreev.Crema.Services;
 using Ntreev.Library;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ConsoleHost.Commands.Consoles.Properties
 {
@@ -31,7 +27,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles.Properties
     class LogProperties : IConfigurationPropertyProvider
     {
         [Import]
-        private Lazy<ConsoleTerminal> terminal = null;
+        private readonly Lazy<ConsoleTerminal> terminal = null;
 
         public string Name => "log";
 

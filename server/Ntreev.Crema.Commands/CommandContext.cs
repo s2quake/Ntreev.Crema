@@ -15,18 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library;
 using Ntreev.Library.Commands;
-using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands
 {
@@ -34,7 +25,7 @@ namespace Ntreev.Crema.Commands
     public class CommandContext : CommandContextBase
     {
         [ImportingConstructor]
-        public CommandContext([ImportMany]IEnumerable<ICommand> commands)
+        public CommandContext([ImportMany] IEnumerable<ICommand> commands)
             : base(commands)
         {
 

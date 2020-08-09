@@ -16,11 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Repository.Git
 {
@@ -46,9 +42,9 @@ namespace Ntreev.Crema.Repository.Git
             }
         }
 
-        public string Name { get => this.name; }
+        public string Name => this.name;
 
-        public string Email { get => this.email ?? string.Empty; }
+        public string Email => this.email ?? string.Empty;
 
         public override string ToString()
         {

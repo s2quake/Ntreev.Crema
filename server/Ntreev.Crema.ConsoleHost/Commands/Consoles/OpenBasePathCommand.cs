@@ -15,20 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Commands;
 using Ntreev.Crema.Commands.Consoles;
 using Ntreev.Crema.Services;
-using Ntreev.Library.Commands;
 using Ntreev.Library;
+using Ntreev.Library.Commands;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
 
 namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
 {
@@ -37,7 +30,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
     class OpenBasePathCommand : ConsoleCommandBase
     {
         [Import]
-        private Lazy<ICremaHost> cremaHost = null;
+        private readonly Lazy<ICremaHost> cremaHost = null;
 
         public OpenBasePathCommand()
             : base("open-base-path")

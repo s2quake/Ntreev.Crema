@@ -16,11 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Library;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Repository.Svn
 {
@@ -29,25 +25,25 @@ namespace Ntreev.Crema.Repository.Svn
         public SvnCommandItem(string name)
             : base(name)
         {
-            
+
         }
 
         public SvnCommandItem(char name)
             : base(name)
         {
-            
+
         }
 
         public SvnCommandItem(string name, object value)
             : base(name, value)
         {
-            
+
         }
 
         public SvnCommandItem(char name, object value)
             : base(name, value)
         {
-            
+
         }
 
         public static SvnCommandItem FromMessage(string message)

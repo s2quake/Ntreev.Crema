@@ -16,31 +16,9 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Commands;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.ServiceHosts;
-using Ntreev.Library;
-using Ntreev.Library.Commands;
-using Ntreev.Library.IO;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition.Hosting;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Mail;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
-using System.Xml.Serialization;
-using Ntreev.Crema.Data;
-using System.Globalization;
-using System.Resources;
 
 namespace Ntreev.Crema.ConsoleHost
 {

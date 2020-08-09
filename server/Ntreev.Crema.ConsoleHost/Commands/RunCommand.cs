@@ -15,23 +15,17 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Commands;
+using Ntreev.Crema.ConsoleHost.Commands.Consoles;
 using Ntreev.Crema.ConsoleHost.Properties;
-using Ntreev.Crema.Services;
+using Ntreev.Crema.Javascript;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.ServiceHosts;
-using Ntreev.Library;
+using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
+using Ntreev.Library.IO;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
-using System.Reflection;
-using Ntreev.Crema.Commands.Consoles;
-using Ntreev.Crema.ConsoleHost.Commands.Consoles;
-using System.Collections.Generic;
-using Ntreev.Crema.Javascript;
-using Ntreev.Library.IO;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ConsoleHost.Commands
@@ -44,7 +38,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
         private readonly CremaApplication application;
         private string repositoryModule;
         [Import]
-        private Lazy<ScriptContext> scriptContext = null;
+        private readonly Lazy<ScriptContext> scriptContext = null;
 
         [ImportingConstructor]
         public RunCommand(CremaApplication application)

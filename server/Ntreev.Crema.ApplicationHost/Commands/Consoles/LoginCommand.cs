@@ -15,20 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library;
-using Ntreev.Crema.Services;
+using Ntreev.Crema.ApplicationHost.Dialogs.ViewModels;
+using Ntreev.Crema.Commands.Consoles;
 using Ntreev.Library.Commands;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Security;
-using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
-using Ntreev.Crema.Commands.Consoles;
-using System.ComponentModel;
-using Ntreev.Crema.ApplicationHost.Dialogs.ViewModels;
 
 namespace Ntreev.Crema.ApplicationHost.Commands.Consoles
 {

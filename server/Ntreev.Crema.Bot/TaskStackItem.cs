@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ntreev.Crema.Bot
+﻿namespace Ntreev.Crema.Bot
 {
     public struct TaskStackItem
     {

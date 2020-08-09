@@ -23,9 +23,7 @@ using Ntreev.Library.Commands;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
 using System.Security;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ApplicationHost.Commands.Consoles
@@ -36,7 +34,7 @@ namespace Ntreev.Crema.ApplicationHost.Commands.Consoles
         private readonly ICremaHost cremaHost;
         private Authentication authentication;
         [Import]
-        private CremaService service = null;
+        private readonly CremaService service = null;
 
         static ConsoleCommandContext()
         {
@@ -45,8 +43,8 @@ namespace Ntreev.Crema.ApplicationHost.Commands.Consoles
 
         [ImportingConstructor]
         public ConsoleCommandContext(ICremaHost cremaHost,
-            [ImportMany]IEnumerable<IConsoleDrive> rootItems,
-            [ImportMany]IEnumerable<IConsoleCommand> commands)
+            [ImportMany] IEnumerable<IConsoleDrive> rootItems,
+            [ImportMany] IEnumerable<IConsoleCommand> commands)
             : base(rootItems, commands)
         {
             this.cremaHost = cremaHost;

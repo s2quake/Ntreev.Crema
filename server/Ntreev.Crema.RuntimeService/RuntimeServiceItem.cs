@@ -15,25 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Runtime.Serialization.Binary;
+using Ntreev.Crema.Data;
+using Ntreev.Crema.Runtime.Generation;
+using Ntreev.Crema.Runtime.Serialization;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Data;
+using Ntreev.Library;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.Data;
-using System.Runtime.Serialization.Formatters.Binary;
-using Ntreev.Library.IO;
-using System.Threading;
-using Ntreev.Library;
-using Ntreev.Crema.Services.Data;
-using Ntreev.Crema.Runtime.Serialization;
-using Ntreev.Crema.Runtime.Generation;
-using Ntreev.Library.Serialization;
 
 namespace Ntreev.Crema.RuntimeService
 {
@@ -43,7 +36,7 @@ namespace Ntreev.Crema.RuntimeService
         private readonly CremaDispatcher dispatcher;
         private readonly Authentication authentication;
         //private readonly BinaryFormatter formatter = new BinaryFormatter();
-        private ILogService logService;
+        private readonly ILogService logService;
 
         private readonly Dictionary<long, CremaDataSet> cachesByRevison = new Dictionary<long, CremaDataSet>();
 
@@ -153,15 +146,9 @@ namespace Ntreev.Crema.RuntimeService
             });
         }
 
-        public override CremaDispatcher Dispatcher
-        {
-            get { return this.dispatcher; }
-        }
+        public override CremaDispatcher Dispatcher => this.dispatcher;
 
-        public override string Name
-        {
-            get { return "serialization"; }
-        }
+        public override string Name => "serialization";
 
         protected override bool CanSerialize(CremaDataTable dataTable)
         {
@@ -208,10 +195,7 @@ namespace Ntreev.Crema.RuntimeService
 
         protected override Type TypeDataType => typeof(SerializationType);
 
-        protected override Authentication Authentication
-        {
-            get { return this.authentication; }
-        }
+        protected override Authentication Authentication => this.authentication;
 
         private object[] ReadTables()
         {

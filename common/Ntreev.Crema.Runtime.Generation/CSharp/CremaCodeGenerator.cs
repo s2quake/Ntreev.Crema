@@ -16,22 +16,17 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.CSharp;
+using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library.IO;
 using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Ntreev.Library;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using Ntreev.Crema.Data.Xml.Schema;
 
 namespace Ntreev.Crema.Runtime.Generation.CSharp
 {
@@ -110,15 +105,9 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
             }
         }
 
-        public string[] SupportedTargets
-        {
-            get { return null; }
-        }
+        public string[] SupportedTargets => null;
 
-        public string Name
-        {
-            get { return "cs"; }
-        }
+        public string Name => "cs";
 
         private IDictionary<string, string> GenerateCodes(CodeGenerationInfo generationInfo)
         {
@@ -140,10 +129,11 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
 
         private IDictionary<string, string> GenerateBaseCodes(CodeGenerationInfo generationInfo)
         {
-            var codes = new Dictionary<string, string>();
-
-            codes.Add($"{generationInfo.RelativePath}CremaBase.cs", this.GenerateBase(generationInfo));
-            codes.Add($"{generationInfo.RelativePath}CremaReader.cs", this.GenerateReader(generationInfo));
+            var codes = new Dictionary<string, string>
+            {
+                { $"{generationInfo.RelativePath}CremaBase.cs", this.GenerateBase(generationInfo) },
+                { $"{generationInfo.RelativePath}CremaReader.cs", this.GenerateReader(generationInfo) }
+            };
 
             //var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             //var ns = string.Join(".", this.GetType().Namespace, "Reader");

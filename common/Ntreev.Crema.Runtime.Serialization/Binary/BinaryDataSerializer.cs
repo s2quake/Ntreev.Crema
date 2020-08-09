@@ -16,22 +16,13 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml;
 using Ntreev.Library.IO;
-using Ntreev.Library;
-using Ntreev.Crema.Data.Xml.Schema;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Xml;
-using System.Data;
-using System.ComponentModel;
-using System.ComponentModel.Composition;
-using Ntreev.Crema.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Runtime.Serialization.Binary
@@ -43,7 +34,7 @@ namespace Ntreev.Crema.Runtime.Serialization.Binary
 
         private BinaryTableHeader tableHeader = new BinaryTableHeader();
         private BinaryTableInfo tableInfo = new BinaryTableInfo();
-        private HashSet<string> strings = new HashSet<string>();
+        private readonly HashSet<string> strings = new HashSet<string>();
         private List<BinaryColumnInfo> columns;
 
         [ImportingConstructor]
@@ -52,10 +43,7 @@ namespace Ntreev.Crema.Runtime.Serialization.Binary
 
         }
 
-        public string Name
-        {
-            get { return "bin"; }
-        }
+        public string Name => "bin";
 
         public void Serialize(Stream stream, SerializationSet dataSet)
         {

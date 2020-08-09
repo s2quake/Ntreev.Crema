@@ -15,23 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceHosts;
-using Ntreev.Library;
+using Ntreev.Crema.Services;
+using Ntreev.Library.Linq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Net;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reflection;
-using Ntreev.Crema.WindowsServiceHost;
-using Ntreev.Library.Linq;
-using Ntreev.Library.Commands;
-using Ntreev.Library.IO;
-using System.Diagnostics;
 
 namespace Ntreev.Crema.WindowsServiceHost
 {

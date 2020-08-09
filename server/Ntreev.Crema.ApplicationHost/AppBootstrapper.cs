@@ -15,20 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Caliburn.Micro;
-using Ntreev.Crema.ServiceHosts;
-using Ntreev.Crema.Services;
-using Ntreev.Library.Linq;
 using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Hosting;
-using System.ComponentModel.Composition.Primitives;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
@@ -48,7 +37,7 @@ namespace Ntreev.Crema.ApplicationHost
         public AppBootstrapper()
             : base(new AppBootstrapperDescriptor())
         {
-           
+
         }
 
         public bool ApplySettings()

@@ -15,18 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using JSSoft.Communication;
 using Ntreev.Crema.Runtime.Generation;
 using Ntreev.Crema.Runtime.Serialization;
-using Ntreev.Crema.ServiceHosts;
 using Ntreev.Crema.ServiceModel;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
-using JSSoft.Communication;
 
 namespace Ntreev.Crema.RuntimeService
 {

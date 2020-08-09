@@ -16,12 +16,12 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Ntreev.Crema.Runtime.Serialization
 {

@@ -16,26 +16,16 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Random;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Ntreev.Library.Random;
-using Ntreev.Library;
-using Ntreev.Library.IO;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Data.Xml;
-using System.Data;
+using System;
 
 namespace Ntreev.Crema.Data.Test
 {
     [TestClass]
     public class CremaTemplateColumn_InTemplate_PropertyTest
     {
-        private CremaTemplate template;
+        private readonly CremaTemplate template;
         private CremaTemplateColumn column;
 
         public CremaTemplateColumn_InTemplate_PropertyTest()

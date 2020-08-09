@@ -22,7 +22,6 @@ using Ntreev.Crema.Services.Data.Serializations;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Crema.Services.Users;
-using Ntreev.Library;
 using Ntreev.Library.IO;
 using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
@@ -30,7 +29,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -51,7 +49,7 @@ namespace Ntreev.Crema.Services.Data
         private EventHandler<AuthenticationEventArgs> authenticationLeft;
         private TaskCompletedEventHandler taskCompleted;
 
-        private HashSet<AuthenticationToken> authentications = new HashSet<AuthenticationToken>();
+        private readonly HashSet<AuthenticationToken> authentications = new HashSet<AuthenticationToken>();
 
         public DataBase(DataBaseContext dataBaseContext, string name)
         {
@@ -328,7 +326,7 @@ namespace Ntreev.Crema.Services.Data
                 this.Dispatcher = new CremaDispatcher(this);
                 this.Repository = new DataBaseRepositoryHost(this, repository);
                 var cache = await this.ReadCacheAsync(repository.RepositoryInfo);
-                
+
                 await this.ResetDataBaseAsync(authentication, cache.Item1, cache.Item2);
                 await this.Dispatcher.InvokeAsync(() =>
                 {

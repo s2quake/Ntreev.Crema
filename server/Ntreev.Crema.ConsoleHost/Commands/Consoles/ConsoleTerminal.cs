@@ -16,19 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Commands.Consoles;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
-using Ntreev.Library.IO;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Text.RegularExpressions;
-using Ntreev.Library.Commands;
 using Ntreev.Library;
+using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
 {
@@ -52,7 +43,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
         public async Task StartAsync(string authentication)
         {
             if (authentication != null)
-            { 
+            {
                 var ss = StringUtility.Split(authentication, ':');
                 await this.commandContext.LoginAsync(ss[0], ss[1]);
             }

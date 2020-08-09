@@ -16,25 +16,21 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Random;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Library.Random;
 using Ntreev.Library;
+using Ntreev.Library.Random;
+using System;
 using System.Data;
+using System.Linq;
 
 namespace Ntreev.Crema.Data.Test
 {
     [TestClass]
     public class CremaDataColumn_Complex_Test
     {
-        private CremaDataSet dataSet = new CremaDataSet();
-        private CremaDataTable table;
-        private CremaDataColumn[] columns;
+        private readonly CremaDataSet dataSet = new CremaDataSet();
+        private readonly CremaDataTable table;
+        private readonly CremaDataColumn[] columns;
 
         public CremaDataColumn_Complex_Test()
         {
@@ -89,8 +85,10 @@ namespace Ntreev.Crema.Data.Test
         {
             var dataSet = CremaDataSetExtensions.CreateRandomSet();
             var table = new CremaDataTable();
-            var column = new CremaDataColumn();
-            column.CremaType = dataSet.Types.Random();
+            var column = new CremaDataColumn
+            {
+                CremaType = dataSet.Types.Random()
+            };
 
             try
             {
@@ -263,8 +261,10 @@ namespace Ntreev.Crema.Data.Test
         public void SetCremaType_Fail()
         {
             var type = new CremaDataType();
-            var column = new CremaDataColumn();
-            column.CremaType = type;
+            var column = new CremaDataColumn
+            {
+                CremaType = type
+            };
         }
 
         [TestMethod]

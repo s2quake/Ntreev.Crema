@@ -16,7 +16,6 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
@@ -441,7 +440,7 @@ namespace Ntreev.Crema.Services.Data
         {
             var fullPaths = await this.Dispatcher.InvokeAsync(() =>
             {
-                var itemPaths = new string[] 
+                var itemPaths = new string[]
                 {
                     DataBase.TypePathPrefix + categoryPath,
                     this.FullPath

@@ -19,13 +19,10 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Domains.Serializations;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
-using Ntreev.Library.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains

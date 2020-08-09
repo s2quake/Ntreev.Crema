@@ -24,7 +24,6 @@ using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Serialization;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace Ntreev.Crema.Services.Data
@@ -96,10 +95,7 @@ namespace Ntreev.Crema.Services.Data
 
         protected override System.Type TypeDataType => typeof(FindTableSerializationInfo);
 
-        protected override Authentication Authentication
-        {
-            get { return this.authentication; }
-        }
+        protected override Authentication Authentication => this.authentication;
 
         private FindTableSerializationInfo BuildCache(CremaDataType dataType)
         {

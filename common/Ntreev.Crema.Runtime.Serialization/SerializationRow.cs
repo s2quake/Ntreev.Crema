@@ -16,13 +16,11 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
+using Ntreev.Library;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Library;
 using System.Xml.Serialization;
 
 namespace Ntreev.Crema.Runtime.Serialization
@@ -124,8 +122,8 @@ namespace Ntreev.Crema.Runtime.Serialization
         [DataMember(Name = nameof(Fields))]
         public SerializationField[] FieldInfos
         {
-            get { return this.Fields != null ? this.Fields.Select(item => new SerializationField(item)).ToArray() : new SerializationField[] { }; }
-            set { this.Fields = value?.Select(item => item.ToValue()).ToArray(); }
+            get => this.Fields != null ? this.Fields.Select(item => new SerializationField(item)).ToArray() : new SerializationField[] { };
+            set => this.Fields = value?.Select(item => item.ToValue()).ToArray();
         }
 
         #endregion

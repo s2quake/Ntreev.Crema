@@ -15,21 +15,6 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.ServiceModel;
-using System.Text;
-using System.Xml;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceHosts;
-using Ntreev.Crema.ServiceHosts.Data;
-using System.ComponentModel.Composition;
-using Ntreev.Crema.ServiceModel;
-using System.Collections.ObjectModel;
 using JSSoft.Communication;
 
 namespace Ntreev.Crema.ServiceHosts.Data
@@ -50,7 +35,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
 
         protected override void DestroyService(IDataBaseService service)
         {
-            
+
         }
     }
 }

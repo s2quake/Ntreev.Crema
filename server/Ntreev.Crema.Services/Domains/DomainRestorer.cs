@@ -18,14 +18,10 @@
 using Ntreev.Crema.Services.Domains.Actions;
 using Ntreev.Crema.Services.Domains.Serializations;
 using Ntreev.Crema.Services.Users;
-using Ntreev.Library.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 

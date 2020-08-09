@@ -31,7 +31,7 @@ namespace Ntreev.Crema.Services.Data
         private readonly IDomainContext domainContext;
         private Authentication authentication;
 
-        private Dictionary<Guid, DataFindServiceItem> items = new Dictionary<Guid, DataFindServiceItem>();
+        private readonly Dictionary<Guid, DataFindServiceItem> items = new Dictionary<Guid, DataFindServiceItem>();
 
         [ImportingConstructor]
         public DataFindService(ICremaHost cremaHost)

@@ -35,11 +35,8 @@ namespace Ntreev.Crema.Services.Data.Serializations
         [DataMember(Name = nameof(AccessType))]
         public string AccessTypeText
         {
-            get { return this.AccessType.ToString(); }
-            set
-            {
-                this.AccessType = (AccessType)Enum.Parse(typeof(AccessType), value);
-            }
+            get => this.AccessType.ToString();
+            set => this.AccessType = (AccessType)Enum.Parse(typeof(AccessType), value);
         }
 
         public static explicit operator AccessMemberInfo(AccessMemberSerializationInfo value)

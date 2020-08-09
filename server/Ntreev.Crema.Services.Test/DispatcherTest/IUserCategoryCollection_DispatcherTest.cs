@@ -15,15 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Library;
-using System.IO;
 using Ntreev.Library.IO;
-using Ntreev.Library.Random;
-using Ntreev.Crema.Services.Random;
-using System.Collections.Generic;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Ntreev.Crema.Services.Test.DispatcherTest
 {
@@ -57,7 +53,7 @@ namespace Ntreev.Crema.Services.Test.DispatcherTest
             });
             app.Dispose();
         }
-      
+
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void Contains()
@@ -106,7 +102,7 @@ namespace Ntreev.Crema.Services.Test.DispatcherTest
         {
             categories.CategoriesDeleted += (s, e) => Assert.Inconclusive();
         }
-        
+
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void Count()

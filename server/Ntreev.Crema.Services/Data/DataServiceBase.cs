@@ -24,7 +24,7 @@ namespace Ntreev.Crema.Services.Data
     public abstract class DataServiceBase<T> : IPlugin where T : DataServiceItemBase
     {
         private readonly string name;
-        private Dictionary<IDataBase, T> items = new Dictionary<IDataBase, T>();
+        private readonly Dictionary<IDataBase, T> items = new Dictionary<IDataBase, T>();
 
         protected DataServiceBase(ICremaHost cremaHost, Guid pluginID, string name)
         {

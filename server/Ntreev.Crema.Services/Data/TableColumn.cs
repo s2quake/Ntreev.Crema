@@ -18,9 +18,7 @@
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
-using System;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;

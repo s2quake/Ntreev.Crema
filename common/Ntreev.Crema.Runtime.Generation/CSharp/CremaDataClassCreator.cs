@@ -17,13 +17,8 @@
 
 using System;
 using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.Specialized;
-using System.Reflection;
 using System.IO;
+using System.Reflection;
 
 namespace Ntreev.Crema.Runtime.Generation.CSharp
 {
@@ -278,61 +273,73 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
 
         private static void CreateNameField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_name";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_name",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateRevisionField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_revision";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_revision",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateTypesHashValueField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_typesHashValue";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_typesHashValue",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateTablesHashValueField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_tablesHashValue";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_tablesHashValue",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateTagsField(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmf = new CodeMemberField();
-            cmf.Attributes = MemberAttributes.Private;
-            cmf.Name = "_tags";
-            cmf.Type = new CodeTypeReference(typeof(string));
+            var cmf = new CodeMemberField
+            {
+                Attributes = MemberAttributes.Private,
+                Name = "_tags",
+                Type = new CodeTypeReference(typeof(string))
+            };
 
             classType.Members.Add(cmf);
         }
 
         private static void CreateNameProperty(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberProperty();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "Name";
-            cmm.HasGet = true;
-            cmm.Type = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberProperty
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "Name",
+                HasGet = true,
+                Type = new CodeTypeReference(typeof(string))
+            };
             cmm.GetStatements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_name"));
 
             classType.Members.Add(cmm);
@@ -340,11 +347,13 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
 
         private static void CreateRevisionProperty(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberProperty();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "Revision";
-            cmm.HasGet = true;
-            cmm.Type = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberProperty
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "Revision",
+                HasGet = true,
+                Type = new CodeTypeReference(typeof(string))
+            };
             cmm.GetStatements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_revision"));
 
             classType.Members.Add(cmm);
@@ -352,11 +361,13 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
 
         private static void CreateTypesHashValueProperty(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberProperty();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "TypesHashValue";
-            cmm.HasGet = true;
-            cmm.Type = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberProperty
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "TypesHashValue",
+                HasGet = true,
+                Type = new CodeTypeReference(typeof(string))
+            };
             cmm.GetStatements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_typesHashValue"));
 
             classType.Members.Add(cmm);
@@ -364,11 +375,13 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
 
         private static void CreateTablesHashValueProperty(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberProperty();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "TablesHashValue";
-            cmm.HasGet = true;
-            cmm.Type = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberProperty
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "TablesHashValue",
+                HasGet = true,
+                Type = new CodeTypeReference(typeof(string))
+            };
             cmm.GetStatements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_tablesHashValue"));
 
             classType.Members.Add(cmm);
@@ -376,11 +389,13 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
 
         private static void CreateTagsProperty(CodeTypeDeclaration classType, CodeGenerationInfo generationInfo)
         {
-            var cmm = new CodeMemberProperty();
-            cmm.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            cmm.Name = "Tags";
-            cmm.HasGet = true;
-            cmm.Type = new CodeTypeReference(typeof(string));
+            var cmm = new CodeMemberProperty
+            {
+                Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                Name = "Tags",
+                HasGet = true,
+                Type = new CodeTypeReference(typeof(string))
+            };
             cmm.GetStatements.AddMethodReturn(new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), "_tags"));
 
             classType.Members.Add(cmm);

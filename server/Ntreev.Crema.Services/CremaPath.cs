@@ -36,7 +36,7 @@ namespace Ntreev.Crema.Services
         Domains,
 
         Documents,
-        
+
         Transactions,
     }
 }

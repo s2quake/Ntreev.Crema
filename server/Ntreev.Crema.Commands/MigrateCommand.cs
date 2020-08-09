@@ -16,17 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
-using Ntreev.Crema.Services.Users.Serializations;
-using Ntreev.Library;
 using Ntreev.Library.Commands;
-using Ntreev.Library.IO;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace Ntreev.Crema.Commands
 {

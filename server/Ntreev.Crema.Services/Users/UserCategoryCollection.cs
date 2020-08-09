@@ -16,18 +16,13 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Users.Serializations;
 using Ntreev.Library;
-using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
-using Ntreev.Library.Serialization;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Users

@@ -15,12 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
 using Ntreev.Crema.Reader;
+using System;
+using System.Collections.Generic;
 
 namespace Ntreev.Crema.Code
 {
@@ -33,10 +30,7 @@ namespace Ntreev.Crema.Code
             this.e = e;
         }
 
-        public Exception Exception
-        {
-            get { return this.e; }
-        }
+        public Exception Exception => this.e;
 
         public bool Handled { get; set; }
     }
@@ -67,8 +61,8 @@ namespace Ntreev.Crema.Code
         private const string __RelationID__ = "__RelationID__";
         private const string __ParentID__ = "__ParentID__";
 
-        private string relationID;
-        private string parentID;
+        private readonly string relationID;
+        private readonly string parentID;
         private int key;
         private CremaRow parentInternal;
 
@@ -132,20 +126,17 @@ namespace Ntreev.Crema.Code
             }
         }
 
-        protected CremaRow ParentInternal
-        {
-            get { return this.parentInternal; }
-        }
+        protected CremaRow ParentInternal => this.parentInternal;
     }
 
     public abstract class CremaTable<T> where T : CremaRow
     {
         private readonly static T[] emptyRows = new T[] { };
 
-        private T[] rows;
-        private Dictionary<int, T> keyToRow;
-        private string name;
-        private string tableName;
+        private readonly T[] rows;
+        private readonly Dictionary<int, T> keyToRow;
+        private readonly string name;
+        private readonly string tableName;
 
         protected CremaTable()
         {
@@ -197,18 +188,12 @@ namespace Ntreev.Crema.Code
         /// <summary>
         /// 테이블의 이름을 나타냅니다. 자식 테이블의 이름이 a.b. 일 경우 a.b를 반환합니다.
         /// </summary>
-        public string Name
-        {
-            get { return this.name; }
-        }
+        public string Name => this.name;
 
         /// <summary>
         /// 부모 이름을 제외한 테이블의 이름을 나타냅니다. 만약 자식 테이블의 이름이 a.b 일 경우 b를 반환합니다.
         /// </summary>
-        public string TableName
-        {
-            get { return this.tableName; }
-        }
+        public string TableName => this.tableName;
 
         protected abstract T CreateRowInstance(IRow row, object table);
 

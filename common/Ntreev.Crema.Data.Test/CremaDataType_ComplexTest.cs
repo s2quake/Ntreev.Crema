@@ -15,24 +15,21 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Data;
+using Ntreev.Crema.Data.Random;
+using Ntreev.Crema.Data.Xml.Schema;
+using Ntreev.Library;
+using Ntreev.Library.IO;
+using Ntreev.Library.ObjectModel;
+using Ntreev.Library.Random;
+using Ntreev.Library.Serialization;
+using System;
+using System.Data;
 using System.IO;
 using System.Linq;
-using System.Xml;
 using System.Text;
-using Ntreev.Library.IO;
-using System.Xml.Serialization;
-using System.Data;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Data.Xml;
-using Ntreev.Library.ObjectModel;
 using System.Threading;
-using Ntreev.Library.Serialization;
-using Ntreev.Library.Random;
-using Ntreev.Library;
-using Ntreev.Crema.Data.Random;
+using System.Xml;
 
 namespace Ntreev.Crema.Data.Test
 {

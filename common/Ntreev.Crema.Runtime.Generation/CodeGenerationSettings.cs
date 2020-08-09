@@ -16,11 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Library;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Runtime.Generation
 {
@@ -38,58 +34,55 @@ namespace Ntreev.Crema.Runtime.Generation
 
         public string ClassName
         {
-            get { return this.className ?? string.Empty; }
-            set { this.className = value; }
+            get => this.className ?? string.Empty;
+            set => this.className = value;
         }
 
         public string Namespace
         {
-            get { return this.classNamespace ?? string.Empty; }
-            set { this.classNamespace = value; }
+            get => this.classNamespace ?? string.Empty;
+            set => this.classNamespace = value;
         }
 
         public string BaseNamespace
         {
-            get { return this.baseNamespace ?? string.Empty; }
-            set { this.baseNamespace = value; }
+            get => this.baseNamespace ?? string.Empty;
+            set => this.baseNamespace = value;
         }
 
         public string Prefix
         {
-            get { return this.prefix ?? string.Empty; }
-            set { this.prefix = value; }
+            get => this.prefix ?? string.Empty;
+            set => this.prefix = value;
         }
 
         public string Postfix
         {
-            get { return this.postfix ?? string.Empty; }
-            set { this.postfix = value; }
+            get => this.postfix ?? string.Empty;
+            set => this.postfix = value;
         }
 
         public string BasePath
         {
-            get { return this.basePath ?? string.Empty; }
-            set { this.basePath = value; }
+            get => this.basePath ?? string.Empty;
+            set => this.basePath = value;
         }
 
         public TagInfo Tags
         {
-            get { return this.tags; }
-            set { this.tags = value; }
+            get => this.tags;
+            set => this.tags = value;
         }
 
         public string Revision
         {
-            get { return this.revision; }
-            set { this.revision = value; }
+            get => this.revision;
+            set => this.revision = value;
         }
 
         public CodeGenerationOptions Options { get; set; }
 
-        public IDictionary<string, object> Arguments
-        {
-            get { return this.arguments; }
-        }
+        public IDictionary<string, object> Arguments => this.arguments;
 
         public readonly static CodeGenerationSettings Default = new CodeGenerationSettings()
         {

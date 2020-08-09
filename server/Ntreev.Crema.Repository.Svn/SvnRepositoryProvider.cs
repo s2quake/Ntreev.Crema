@@ -15,23 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.Services.Users;
 using Ntreev.Library;
 using Ntreev.Library.IO;
-using Ntreev.Library.Serialization;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using YamlDotNet.Serialization;
 
 namespace Ntreev.Crema.Repository.Svn
 {
@@ -43,7 +36,7 @@ namespace Ntreev.Crema.Repository.Svn
         private const string propertyPrefix = "prop:";
 
         [Import]
-        private Lazy<ICremaHost> cremaHost = null;
+        private readonly Lazy<ICremaHost> cremaHost = null;
 
         [ImportingConstructor]
         public SvnRepositoryProvider()

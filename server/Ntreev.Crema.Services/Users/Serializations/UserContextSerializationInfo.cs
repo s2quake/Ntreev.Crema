@@ -40,7 +40,7 @@ namespace Ntreev.Crema.Services.Users.Serializations
         [IgnoreDataMember]
         public string[] Categories
         {
-            get { return this.CategoriesList?.ToArray(); }
+            get => this.CategoriesList?.ToArray();
             set
             {
                 if (value == null)

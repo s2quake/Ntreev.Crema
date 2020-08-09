@@ -24,6 +24,6 @@ namespace Ntreev.Crema.Services.Users.Serializations
     [CollectionDataContract(Name = "Category", Namespace = SchemaUtility.Namespace, ItemName = "Path")]
     public class UserCategorySerializationInfoList : List<string>
     {
-        
+
     }
 }

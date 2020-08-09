@@ -16,16 +16,12 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
-using Ntreev.Library;
 using Ntreev.Library.Commands;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands
 {
@@ -37,7 +33,7 @@ namespace Ntreev.Crema.Commands
         private readonly IRepositoryProvider[] repoProviders;
 
         [ImportingConstructor]
-        public RepositoryModulesCommands([ImportMany]IEnumerable<IRepositoryProvider> repoProviders)
+        public RepositoryModulesCommands([ImportMany] IEnumerable<IRepositoryProvider> repoProviders)
             : base("repo-modules")
         {
             this.repoProviders = repoProviders.ToArray();
@@ -56,7 +52,7 @@ namespace Ntreev.Crema.Commands
                 //if (item.Name == defaultModule)
                 //    Console.WriteLine("* {0}", item.Name);
                 //else
-                    Console.WriteLine("  {0}", item.Name);
+                Console.WriteLine("  {0}", item.Name);
             }
         }
     }

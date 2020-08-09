@@ -16,7 +16,6 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
-using Ntreev.Library.ObjectModel;
 using System;
 using System.ComponentModel.Composition;
 using System.Linq;

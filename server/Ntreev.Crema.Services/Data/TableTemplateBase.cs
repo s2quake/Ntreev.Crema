@@ -710,7 +710,7 @@ namespace Ntreev.Crema.Services.Data
         {
             return (this.items ?? Enumerable.Empty<ITableColumn>()).GetEnumerator();
         }
-        
+
         #endregion
     }
 }

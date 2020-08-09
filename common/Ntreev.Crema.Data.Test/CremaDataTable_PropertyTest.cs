@@ -16,17 +16,9 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Random;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Library.Random;
-using Ntreev.Library;
-using Ntreev.Library.IO;
 using Ntreev.Crema.Data.Xml.Schema;
+using Ntreev.Library.Random;
+using System;
 using System.Threading;
 
 namespace Ntreev.Crema.Data.Test
@@ -34,7 +26,7 @@ namespace Ntreev.Crema.Data.Test
     [TestClass]
     public class CremaDataTable_PropertyTest
     {
-        private CremaDataTable table = new CremaDataTable();
+        private readonly CremaDataTable table = new CremaDataTable();
 
         [TestMethod]
         public void SetName()

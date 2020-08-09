@@ -165,12 +165,13 @@ namespace Ntreev.Crema.Reader
                 throw new ArgumentNullException("tags");
             if (filterExpression == null)
                 throw new ArgumentNullException("filterExpression");
-            var dic = new Dictionary<string, object>();
-
-            dic.Add("type", "bin");
-            dic.Add("tags", tags);
-            dic.Add("database", dataBase);
-            dic.Add("devmode", isDevmode);
+            var dic = new Dictionary<string, object>
+            {
+                { "type", "bin" },
+                { "tags", tags },
+                { "database", dataBase },
+                { "devmode", isDevmode }
+            };
 
             if (filterExpression != string.Empty)
                 dic.Add("filter", filterExpression);
@@ -813,20 +814,11 @@ namespace Ntreev.Crema.Reader
                 this.Position = 0;
             }
 
-            public override bool CanRead
-            {
-                get { return true; }
-            }
+            public override bool CanRead => true;
 
-            public override bool CanSeek
-            {
-                get { return true; }
-            }
+            public override bool CanSeek => true;
 
-            public override bool CanWrite
-            {
-                get { return true; }
-            }
+            public override bool CanWrite => true;
 
             public override void Flush()
             {
@@ -963,13 +955,13 @@ namespace Ntreev.Crema.Reader
             private const int bufferLength = 1024 * 5000;
             private readonly TcpClient client;
             private long position;
-            private long length;
+            private readonly long length;
             private byte[] buffer;
             private long bufferpos;
 
             private NetworkStream stream;
-            private BinaryWriter bw;
-            private BinaryReader br;
+            private readonly BinaryWriter bw;
+            private readonly BinaryReader br;
 
             public SocketStream(string ipAddress, int port, string name)
             {
@@ -986,41 +978,23 @@ namespace Ntreev.Crema.Reader
                 this.length = br.ReadInt64();
             }
 
-            public override bool CanRead
-            {
-                get { return true; }
-            }
+            public override bool CanRead => true;
 
-            public override bool CanSeek
-            {
-                get { return true; }
-            }
+            public override bool CanSeek => true;
 
-            public override bool CanWrite
-            {
-                get { return false; }
-            }
+            public override bool CanWrite => false;
 
             public override void Flush()
             {
                 throw new NotImplementedException();
             }
 
-            public override long Length
-            {
-                get { return this.length; }
-            }
+            public override long Length => this.length;
 
             public override long Position
             {
-                get
-                {
-                    return this.position;
-                }
-                set
-                {
-                    this.position = value;
-                }
+                get => this.position;
+                set => this.position = value;
             }
 
             public override int Read(byte[] buffer, int offset, int count)
@@ -1134,7 +1108,7 @@ namespace Ntreev.Crema.Reader
         static class StringResource
         {
             private static int refCount = 0;
-            private static Dictionary<int, string> strings = new Dictionary<int, string>();
+            private static readonly Dictionary<int, string> strings = new Dictionary<int, string>();
 
             public static void Read(BinaryReader reader)
             {
@@ -1189,7 +1163,7 @@ namespace Ntreev.Crema.Reader
 
             public static int Ref
             {
-                get { return StringResource.refCount; }
+                get => StringResource.refCount;
                 set
                 {
                     StringResource.refCount = value;
@@ -1243,9 +1217,9 @@ namespace Ntreev.Crema.Reader
     {
         class CremaBinaryColumn : IColumn
         {
-            private string columnName;
-            private Type type;
-            private bool isKey;
+            private readonly string columnName;
+            private readonly Type type;
+            private readonly bool isKey;
             private int index;
 
             public CremaBinaryColumn(string columnName, Type type, bool isKey)
@@ -1255,25 +1229,16 @@ namespace Ntreev.Crema.Reader
                 this.isKey = isKey;
             }
 
-            public string Name
-            {
-                get { return this.columnName; }
-            }
+            public string Name => this.columnName;
 
-            public Type DataType
-            {
-                get { return this.type; }
-            }
+            public Type DataType => this.type;
 
-            public bool IsKey
-            {
-                get { return this.isKey; }
-            }
+            public bool IsKey => this.isKey;
 
             public int Index
             {
-                get { return this.index; }
-                internal set { this.index = value; }
+                get => this.index;
+                internal set => this.index = value;
             }
 
             public CremaBinaryTable Table
@@ -1284,10 +1249,7 @@ namespace Ntreev.Crema.Reader
 
             #region IColumn
 
-            ITable IColumn.Table
-            {
-                get { return this.Table; }
-            }
+            ITable IColumn.Table => this.Table;
 
             #endregion
         }
@@ -1295,7 +1257,7 @@ namespace Ntreev.Crema.Reader
         class CremaBinaryColumnCollection : IColumnCollection
         {
             private readonly CremaBinaryTable table;
-            private OrderedDictionary columns;
+            private readonly OrderedDictionary columns;
 
             public CremaBinaryColumnCollection(CremaBinaryTable table, int capacity, bool caseSensitive)
             {
@@ -1309,37 +1271,19 @@ namespace Ntreev.Crema.Reader
                 this.columns.Add(item.Name, item);
             }
 
-            public CremaBinaryColumn this[int index]
-            {
-                get { return this.columns[index] as CremaBinaryColumn; }
-            }
+            public CremaBinaryColumn this[int index] => this.columns[index] as CremaBinaryColumn;
 
-            public CremaBinaryColumn this[string columnName]
-            {
-                get { return this.columns[columnName] as CremaBinaryColumn; }
-            }
+            public CremaBinaryColumn this[string columnName] => this.columns[columnName] as CremaBinaryColumn;
 
-            private ICollection Collection
-            {
-                get { return this.columns.Values as ICollection; }
-            }
+            private ICollection Collection => this.columns.Values as ICollection;
 
             #region IColumnCollection
 
-            IColumn IColumnCollection.this[int index]
-            {
-                get { return this[index]; }
-            }
+            IColumn IColumnCollection.this[int index] => this[index];
 
-            IColumn IColumnCollection.this[string columnName]
-            {
-                get { return this[columnName]; }
-            }
+            IColumn IColumnCollection.this[string columnName] => this[columnName];
 
-            ITable IColumnCollection.Table
-            {
-                get { return this.table; }
-            }
+            ITable IColumnCollection.Table => this.table;
 
             #endregion
 
@@ -1350,20 +1294,11 @@ namespace Ntreev.Crema.Reader
                 this.Collection.CopyTo(array, index);
             }
 
-            int ICollection.Count
-            {
-                get { return this.Collection.Count; }
-            }
+            int ICollection.Count => this.Collection.Count;
 
-            bool ICollection.IsSynchronized
-            {
-                get { return this.Collection.IsSynchronized; }
-            }
+            bool ICollection.IsSynchronized => this.Collection.IsSynchronized;
 
-            object ICollection.SyncRoot
-            {
-                get { return this.Collection.SyncRoot; }
-            }
+            object ICollection.SyncRoot => this.Collection.SyncRoot;
 
             IEnumerator IEnumerable.GetEnumerator()
             {
@@ -1396,50 +1331,23 @@ namespace Ntreev.Crema.Reader
 
             }
 
-            public ITableCollection Tables
-            {
-                get { return this.tables; }
-            }
+            public ITableCollection Tables => this.tables;
 
-            public ReadOptions Options
-            {
-                get { return this.options; }
-            }
+            public ReadOptions Options => this.options;
 
-            public bool CaseSensitive
-            {
-                get { return (this.options & ReadOptions.CaseSensitive) == ReadOptions.CaseSensitive; }
-            }
+            public bool CaseSensitive => (this.options & ReadOptions.CaseSensitive) == ReadOptions.CaseSensitive;
 
-            public string Revision
-            {
-                get { return this.revision; }
-            }
+            public string Revision => this.revision;
 
-            public int Version
-            {
-                get { return this.version; }
-            }
+            public int Version => this.version;
 
-            public string TypesHashValue
-            {
-                get { return this.typesHashValue; }
-            }
+            public string TypesHashValue => this.typesHashValue;
 
-            public string TablesHashValue
-            {
-                get { return this.tablesHashValue; }
-            }
+            public string TablesHashValue => this.tablesHashValue;
 
-            public string Tags
-            {
-                get { return this.tags; }
-            }
+            public string Tags => this.tags;
 
-            public string Name
-            {
-                get { return this.name; }
-            }
+            public string Name => this.name;
 
             public CremaBinaryTable ReadTable(string tableName)
             {
@@ -1631,10 +1539,7 @@ namespace Ntreev.Crema.Reader
                     }
                     throw new Exception();
                 }
-                set
-                {
-                    throw new NotImplementedException();
-                }
+                set => throw new NotImplementedException();
             }
 
             public bool HasValue(IColumn column)
@@ -1645,26 +1550,11 @@ namespace Ntreev.Crema.Reader
 
             #region IRow
 
-            ITable IRow.Table
-            {
-                get { return this.Table; }
-            }
+            ITable IRow.Table => this.Table;
 
-            object IRow.this[string columnName]
-            {
-                get
-                {
-                    return this[this.Table.Columns[columnName]];
-                }
-            }
+            object IRow.this[string columnName] => this[this.Table.Columns[columnName]];
 
-            object IRow.this[int columnIndex]
-            {
-                get
-                {
-                    return this[this.Table.Columns[columnIndex]];
-                }
-            }
+            object IRow.this[int columnIndex] => this[this.Table.Columns[columnIndex]];
 
             bool IRow.HasValue(string columnName)
             {
@@ -1700,22 +1590,13 @@ namespace Ntreev.Crema.Reader
                 }
             }
 
-            public CremaBinaryRow this[int index]
-            {
-                get { return this.rows[index]; }
-            }
+            public CremaBinaryRow this[int index] => this.rows[index];
 
             #region IRowCollection
 
-            IRow IRowCollection.this[int index]
-            {
-                get { return this.rows[index]; }
-            }
+            IRow IRowCollection.this[int index] => this.rows[index];
 
-            ITable IRowCollection.Table
-            {
-                get { return this.table; }
-            }
+            ITable IRowCollection.Table => this.table;
 
             #endregion
 
@@ -1726,20 +1607,11 @@ namespace Ntreev.Crema.Reader
                 throw new NotImplementedException();
             }
 
-            int ICollection.Count
-            {
-                get { return this.rows.Count; }
-            }
+            int ICollection.Count => this.rows.Count;
 
-            bool ICollection.IsSynchronized
-            {
-                get { return (this.rows as ICollection).IsSynchronized; }
-            }
+            bool ICollection.IsSynchronized => (this.rows as ICollection).IsSynchronized;
 
-            object ICollection.SyncRoot
-            {
-                get { return (this.rows as ICollection).SyncRoot; }
-            }
+            object ICollection.SyncRoot => (this.rows as ICollection).SyncRoot;
 
             IEnumerator IEnumerable.GetEnumerator()
             {
@@ -1779,79 +1651,61 @@ namespace Ntreev.Crema.Reader
 
             public string Category
             {
-                get { return this.categoryName; }
-                set { this.categoryName = value; }
+                get => this.categoryName;
+                set => this.categoryName = value;
             }
 
             public string Name
             {
-                get { return this.tableName; }
-                set { this.tableName = value; }
+                get => this.tableName;
+                set => this.tableName = value;
             }
 
             public int Index
             {
-                get { return this.index; }
-                internal set { this.index = value; }
+                get => this.index;
+                internal set => this.index = value;
             }
 
             public string HashValue
             {
-                get { return this.hashValue; }
-                set { this.hashValue = value; }
+                get => this.hashValue;
+                set => this.hashValue = value;
             }
 
             public CremaBinaryColumnCollection Columns
             {
-                get { return this.columns; }
-                set { this.columns = value; }
+                get => this.columns;
+                set => this.columns = value;
             }
 
-            public CremaBinaryRowCollection Rows
-            {
-                get { return this.rows; }
-            }
+            public CremaBinaryRowCollection Rows => this.rows;
 
-            public CremaBinaryReader Reader
-            {
-                get { return this.reader; }
-            }
+            public CremaBinaryReader Reader => this.reader;
 
             public IColumn[] Keys
             {
-                get { return this.keys; }
-                set { this.keys = value; }
+                get => this.keys;
+                set => this.keys = value;
             }
 
             #region ITable
 
-            IColumn[] ITable.Keys
-            {
-                get { return this.keys; }
-            }
+            IColumn[] ITable.Keys => this.keys;
 
-            IRowCollection ITable.Rows
-            {
-                get { return this.rows; }
-            }
+            IRowCollection ITable.Rows => this.rows;
 
-            IColumnCollection ITable.Columns
-            {
-                get { return this.columns; }
-            }
+            IColumnCollection ITable.Columns => this.columns;
 
-            IDataSet ITable.DataSet
-            {
-                get { return this.reader; }
-            }
+            IDataSet ITable.DataSet => this.reader;
 
             #endregion
         }
 
         class CremaBinaryTableCollection : ITableCollection
         {
-            private OrderedDictionary tables;
-            private string[] tableNames;
+            private readonly OrderedDictionary tables;
+            private readonly string[] tableNames;
 
             private readonly CremaBinaryReader reader;
 
@@ -1906,10 +1760,7 @@ namespace Ntreev.Crema.Reader
                 }
             }
 
-            private ICollection Collection
-            {
-                get { return this.tables.Values as ICollection; }
-            }
+            private ICollection Collection => this.tables.Values as ICollection;
 
             #region ITableCollection
 
@@ -1923,20 +1774,11 @@ namespace Ntreev.Crema.Reader
                 return true;
             }
 
-            ITable ITableCollection.this[int index]
-            {
-                get { return this[index] as ITable; }
-            }
+            ITable ITableCollection.this[int index] => this[index] as ITable;
 
-            ITable ITableCollection.this[string tableName]
-            {
-                get { return this[tableName] as ITable; }
-            }
+            ITable ITableCollection.this[string tableName] => this[tableName] as ITable;
 
-            string[] ITableCollection.TableNames
-            {
-                get { return this.tableNames; }
-            }
+            string[] ITableCollection.TableNames => this.tableNames;
 
             #endregion
 
@@ -1947,20 +1789,11 @@ namespace Ntreev.Crema.Reader
                 this.Collection.CopyTo(array, index);
             }
 
-            int ICollection.Count
-            {
-                get { return this.tables.Count; }
-            }
+            int ICollection.Count => this.tables.Count;
 
-            bool ICollection.IsSynchronized
-            {
-                get { return this.Collection.IsSynchronized; }
-            }
+            bool ICollection.IsSynchronized => this.Collection.IsSynchronized;
 
-            object ICollection.SyncRoot
-            {
-                get { return this.Collection.SyncRoot; }
-            }
+            object ICollection.SyncRoot => this.Collection.SyncRoot;
 
             IEnumerator IEnumerable.GetEnumerator()
             {

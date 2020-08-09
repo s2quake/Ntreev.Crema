@@ -17,18 +17,7 @@
 
 using Ntreev.Crema.Runtime.Generation;
 using Ntreev.Crema.Runtime.Serialization;
-using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.ServiceHosts;
-using Ntreev.Library;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel.Composition;
-using System.IO;
-using System.Linq;
-using System.ServiceModel;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.RuntimeService

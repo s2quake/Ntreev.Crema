@@ -31,7 +31,7 @@ namespace Ntreev.Crema.Services
         internal static string AdminID = "admin";
         internal static string AdminName = "Administrator";
 
-        private IAuthenticationProvider provider;
+        private readonly IAuthenticationProvider provider;
         private EventHandler expired;
         private bool isExpired;
         private Authentication child;
@@ -173,20 +173,11 @@ namespace Ntreev.Crema.Services
 
         #region IAuthentication
 
-        AuthenticationType IAuthentication.Types
-        {
-            get { return this.Types; }
-        }
+        AuthenticationType IAuthentication.Types => this.Types;
 
-        bool IAuthentication.IsAdmin
-        {
-            get { return this.Types.HasFlag(AuthenticationType.Administrator); }
-        }
+        bool IAuthentication.IsAdmin => this.Types.HasFlag(AuthenticationType.Administrator);
 
-        bool IAuthentication.IsSystem
-        {
-            get { return this.Types.HasFlag(AuthenticationType.System); }
-        }
+        bool IAuthentication.IsSystem => this.Types.HasFlag(AuthenticationType.System);
 
         #endregion
 
@@ -194,25 +185,13 @@ namespace Ntreev.Crema.Services
 
         class SystemAuthenticationProvider : IAuthenticationProvider
         {
-            public AuthenticationType AuthenticationTypes
-            {
-                get { return AuthenticationType.System; }
-            }
+            public AuthenticationType AuthenticationTypes => AuthenticationType.System;
 
-            public string ID
-            {
-                get { return Authentication.SystemID; }
-            }
+            public string ID => Authentication.SystemID;
 
-            public string Name
-            {
-                get { return Authentication.SystemName; }
-            }
+            public string Name => Authentication.SystemName;
 
-            public Authority Authority
-            {
-                get { return Authority.None; }
-            }
+            public Authority Authority => Authority.None;
         }
 
         #endregion

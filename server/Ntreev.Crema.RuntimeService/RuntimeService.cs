@@ -17,18 +17,13 @@
 
 using Ntreev.Crema.Runtime.Generation;
 using Ntreev.Crema.Runtime.Serialization;
-using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.ServiceHosts;
+using Ntreev.Crema.Services;
 using Ntreev.Library;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel.Composition;
-using System.IO;
 using System.Linq;
-using System.ServiceModel;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.RuntimeService
@@ -43,11 +38,11 @@ namespace Ntreev.Crema.RuntimeService
         private readonly ICremaHost cremaHost;
         private readonly IEnumerable<Runtime.Serialization.IDataSerializer> serializers;
         private readonly Dictionary<Guid, RuntimeServiceItem> items = new Dictionary<Guid, RuntimeServiceItem>();
-        private CremaDispatcher dispatcher;
+        private readonly CremaDispatcher dispatcher;
         private Authentication authentication;
 
         [ImportingConstructor]
-        public RuntimeService(ICremaHost cremaHost, [ImportMany]IEnumerable<Runtime.Serialization.IDataSerializer> serializers)
+        public RuntimeService(ICremaHost cremaHost, [ImportMany] IEnumerable<Runtime.Serialization.IDataSerializer> serializers)
         {
             this.cremaHost = cremaHost;
             this.serializers = serializers;
@@ -57,15 +52,9 @@ namespace Ntreev.Crema.RuntimeService
             this.cremaHost.Disposed += (s, e) => this.dispatcher.Dispose();
         }
 
-        public string Name
-        {
-            get { return nameof(RuntimeService); }
-        }
+        public string Name => nameof(RuntimeService);
 
-        public Guid ID
-        {
-            get { return Guid.Parse(ServiceID); }
-        }
+        public Guid ID => Guid.Parse(ServiceID);
 
         public async void Initialize(Authentication authentication)
         {
@@ -206,10 +195,7 @@ namespace Ntreev.Crema.RuntimeService
             return result;
         }
 
-        public CremaDispatcher Dispatcher
-        {
-            get { return this.dispatcher; }
-        }
+        public CremaDispatcher Dispatcher => this.dispatcher;
 
         private void DataBaseContext_ItemCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
         {

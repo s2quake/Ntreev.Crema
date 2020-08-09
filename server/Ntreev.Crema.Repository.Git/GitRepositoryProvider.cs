@@ -25,9 +25,7 @@ using System.ComponentModel.Composition;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 
 namespace Ntreev.Crema.Repository.Git
@@ -378,7 +376,7 @@ namespace Ntreev.Crema.Repository.Git
                 "ignore"
             };
             configCommand.Run();
-            
+
             DirectoryUtility.Copy(repositoryPath, basePath);
             foreach (var item in GetEmptyDirectories(basePath))
             {

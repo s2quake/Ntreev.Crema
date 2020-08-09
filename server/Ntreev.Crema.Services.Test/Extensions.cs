@@ -16,28 +16,20 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Services.Random;
-using Ntreev.Library;
-using Ntreev.Library.IO;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Test
 {
     static class Extensions
     {
-        private static object lockobj = new object();
+        private static readonly object lockobj = new object();
 #if CLIENT
         private static int port = 4006;
 #endif
 
-        private static Dictionary<ICremaHost, int> cremaHostToPort = new Dictionary<ICremaHost, int>();
-        private static Dictionary<Authentication, Guid> authenticationToToken = new Dictionary<Authentication, Guid>();
+        private static readonly Dictionary<ICremaHost, int> cremaHostToPort = new Dictionary<ICremaHost, int>();
+        private static readonly Dictionary<Authentication, Guid> authenticationToToken = new Dictionary<Authentication, Guid>();
 
         public static void Initialize(this CremaBootstrapper boot, TestContext context, string name)
         {

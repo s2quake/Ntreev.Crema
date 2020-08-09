@@ -19,7 +19,6 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Domains.Actions;
 using Ntreev.Crema.Services.Domains.Serializations;
 using Ntreev.Library.IO;
-using Ntreev.Library.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -227,7 +226,7 @@ namespace Ntreev.Crema.Services.Domains
             {
                 UserID = authentication.ID,
                 AcceptTime = authentication.SignatureDate.DateTime
-            }); 
+            });
         }
 
         public long Post(DomainActionBase action)

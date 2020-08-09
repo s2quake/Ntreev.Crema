@@ -21,7 +21,6 @@ using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Runtime.Serialization;
-using System.Xml.Serialization;
 
 namespace Ntreev.Crema.Services.Users.Serializations
 {

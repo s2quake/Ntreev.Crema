@@ -16,26 +16,17 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Random;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Library.Random;
 using Ntreev.Library;
-using Ntreev.Library.IO;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Data.Xml;
+using Ntreev.Library.Random;
+using System;
 
 namespace Ntreev.Crema.Data.Test
 {
     [TestClass]
     public class CremaTemplateColumn_PropertyTest
     {
-        private CremaTemplate template = new CremaTemplate(new CremaDataTable());
-        private CremaTemplateColumn column;
+        private readonly CremaTemplate template = new CremaTemplate(new CremaDataTable());
+        private readonly CremaTemplateColumn column;
 
         public CremaTemplateColumn_PropertyTest()
         {
@@ -155,7 +146,7 @@ namespace Ntreev.Crema.Data.Test
             if (defaultValue == string.Empty)
                 Assert.AreEqual(DBNull.Value, this.column.DefaultValue);
             else
-                Assert.AreEqual(defaultValue, this.column.DefaultValue); 
+                Assert.AreEqual(defaultValue, this.column.DefaultValue);
         }
 
         [TestMethod]

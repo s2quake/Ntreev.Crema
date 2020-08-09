@@ -15,22 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.ModernUI.Framework.Controls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Ntreev.Crema.ApplicationHost.Dialogs.Views
 {
@@ -39,9 +27,9 @@ namespace Ntreev.Crema.ApplicationHost.Dialogs.Views
     /// </summary>
     public partial class LoginView : UserControl
     {
-        private static DependencyProperty PasswordProperty = DependencyProperty.Register(nameof(Password), typeof(SecureString), typeof(LoginView));
+        private static readonly DependencyProperty PasswordProperty = DependencyProperty.Register(nameof(Password), typeof(SecureString), typeof(LoginView));
 
-        private BindingExpressionBase passwordBinding;
+        private readonly BindingExpressionBase passwordBinding;
 
         public LoginView()
         {
@@ -54,10 +42,7 @@ namespace Ntreev.Crema.ApplicationHost.Dialogs.Views
             });
         }
 
-        private SecureString Password
-        {
-            get { return (SecureString)this.GetValue(PasswordProperty); }
-        }
+        private SecureString Password => (SecureString)this.GetValue(PasswordProperty);
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
