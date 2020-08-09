@@ -19,11 +19,8 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.Services.Extensions;
 using Ntreev.Library.ObjectModel;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableTemplate

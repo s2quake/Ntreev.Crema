@@ -17,16 +17,8 @@
 
 using Ntreev.Crema.Services;
 using Ntreev.Crema.Services.Extensions;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Text;
 using System.ComponentModel;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Data;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library;
+using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase

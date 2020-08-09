@@ -17,13 +17,8 @@
 
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using Xceed.Wpf.DataGrid;
 
 namespace Ntreev.Crema.Presentation.Assets
 {
@@ -32,37 +27,29 @@ namespace Ntreev.Crema.Presentation.Assets
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             var checkBox = sender as CheckBox;
-            var cell = checkBox.Tag as ModernDataCell;
-            if (cell != null && cell.IsBeingEdited == true)
+            if (checkBox.Tag is ModernDataCell cell && cell.IsBeingEdited == true)
                 cell.EndEdit();
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             var checkBox = sender as CheckBox;
-            var cell = checkBox.Tag as ModernDataCell;
-            if (cell != null && cell.IsBeingEdited == true)
+            if (checkBox.Tag is ModernDataCell cell && cell.IsBeingEdited == true)
                 cell.EndEdit();
         }
 
         private void CheckBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-
         }
 
         private void TagSelector_ValueChanged(object sender, RoutedEventArgs e)
         {
-            var tagSelector = sender as Controls.TagSelector;
-            var cell = tagSelector.Tag as Cell;
-            //if (cell != null)
-            //    cell.EndEdit();
         }
 
         private void TagSelector_PopupClosed(object sender, EventArgs e)
         {
             var tagSelector = sender as Controls.TagSelector;
-            var cell = tagSelector.Tag as ModernDataCell;
-            if (cell != null && cell.IsBeingEdited == true)
+            if (tagSelector.Tag is ModernDataCell cell && cell.IsBeingEdited == true)
                 cell.EndEdit();
         }
     }

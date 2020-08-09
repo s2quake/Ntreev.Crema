@@ -28,8 +28,6 @@ namespace Ntreev.Crema.Data
             NameValidator.ValidateCategoryPath(categoryPath);
 
             var tableName = NameUtility.GetName(name);
-            var parentName = NameUtility.GetParentName(name);
-
             this.Name = name;
             this.TableName = tableName;
             this.TableNamespace = baseNamespace + categoryPath + name;

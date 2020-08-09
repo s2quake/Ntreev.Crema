@@ -17,34 +17,26 @@
 
 using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
+using Ntreev.Crema.Presentation.Users.Properties;
+using Ntreev.Crema.Presentation.Users.PropertyItems.Views;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using Ntreev.Crema.Presentation.Users.PropertyItems.Views;
-using Ntreev.Crema.Presentation.Users.Properties;
 
 namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     [View(typeof(EditorsView))]
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [Dependency("Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels.TypeInfoViewModel, Ntreev.Crema.Presentation.Types, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Presentation.Types.IPropertyService, Ntreev.Crema.Presentation.Types, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [Dependency("Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels.TypeInfoViewModel, Ntreev.Crema.Presentation.Types, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Types.IPropertyService, Ntreev.Crema.Presentation.Types, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class TypeTemplateEditorsViewModel : EditorsViewModel
     {
         [ImportingConstructor]
         public TypeTemplateEditorsViewModel(ICremaAppHost cremaAppHost)
-            : base(cremaAppHost)
+            : base(cremaAppHost: cremaAppHost)
         {
             this.DisplayName = Resources.Title_UsersEditingTemplate;
         }

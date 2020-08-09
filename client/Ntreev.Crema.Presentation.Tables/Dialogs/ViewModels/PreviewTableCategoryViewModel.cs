@@ -15,20 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Tables.Properties;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
 using Ntreev.Crema.Data;
-using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.ModernUI.Framework.ViewModels;
-using System.Collections.ObjectModel;
+using Ntreev.Crema.Presentation.Tables.Properties;
+using Ntreev.Crema.Services;
 using Ntreev.Library.IO;
+using Ntreev.ModernUI.Framework;
+using Ntreev.ModernUI.Framework.ViewModels;
+using System;
 using System.Collections;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 {
@@ -39,8 +35,8 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly string revision;
 
         private CremaDataSet source;
-        private ObservableCollection<TreeViewItemViewModel> itemsSource = new ObservableCollection<TreeViewItemViewModel>();
-        private PreviewDocumentViewModel documents = new PreviewDocumentViewModel();
+        private readonly ObservableCollection<TreeViewItemViewModel> itemsSource = new ObservableCollection<TreeViewItemViewModel>();
+        private readonly PreviewDocumentViewModel documents = new PreviewDocumentViewModel();
         private object selectedItem;
 
         public PreviewTableCategoryViewModel(Authentication authentication, ITableCategory category, string revision)

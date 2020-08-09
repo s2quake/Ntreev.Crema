@@ -19,15 +19,9 @@ using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Types.Properties;
 using Ntreev.Library.IO;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Windows.Threading;
 
 namespace Ntreev.Crema.Presentation.Types.MenuItems.TypeMenus
 {
@@ -38,9 +32,9 @@ namespace Ntreev.Crema.Presentation.Types.MenuItems.TypeMenus
         private readonly IShell shell;
 
         [Import]
-        private TypeServiceViewModel typeService = null;
+        private readonly TypeServiceViewModel typeService = null;
         [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator = null;
 
         [ImportingConstructor]
         public FindTypeDataMenuItem(IShell shell)

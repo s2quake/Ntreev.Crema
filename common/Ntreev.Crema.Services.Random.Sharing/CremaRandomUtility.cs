@@ -15,25 +15,20 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.Library;
-using Ntreev.Library.Linq;
-using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Random;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Services.Random
 {
     public static class CremaRandomUtility
     {
-        private static TagInfo[] tags = new TagInfo[] { TagInfo.All, TagInfoUtility.Server, TagInfoUtility.Client, TagInfo.Unused };
+        private static readonly TagInfo[] tags = new TagInfo[] { TagInfo.All, TagInfoUtility.Server, TagInfoUtility.Client, TagInfo.Unused };
 
         public static async Task GenerateAsync(this IDataBase dataBase, Authentication authentication, int tryCount)
         {

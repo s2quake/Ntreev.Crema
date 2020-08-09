@@ -19,26 +19,21 @@ using Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Converters.Properties;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Converters.ToolBarItems.TableBrowser
 {
     [Export(typeof(IToolBarItem))]
-    [ParentType("Ntreev.Crema.Presentation.Tables.ITableBrowser, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Tables.ITableBrowser, Ntreev.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ExportRevisionDataBaseToolBarItem : ToolBarItemBase
     {
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
         [ImportingConstructor]
-        public ExportRevisionDataBaseToolBarItem()
+        public ExportRevisionDataBaseToolBarItem(Authenticator authenticator)
         {
-            this.Icon = "/Ntreev.Crema.Presentation.Converters;component/Images/spreadsheet.png";
+            this.authenticator = authenticator;
+            this.Icon = "Images/spreadsheet.png";
             this.DisplayName = Resources.MenuItem_Export;
         }
 

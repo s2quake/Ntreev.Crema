@@ -21,16 +21,13 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Crema.Services.Users;
-using Ntreev.Library;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.ServiceModel;
 using System.Threading.Tasks;
-using System.Timers;
 
 namespace Ntreev.Crema.Services.Data
 {
@@ -537,7 +534,7 @@ namespace Ntreev.Crema.Services.Data
                 this.ValidateExpired();
                 var transaction = await this.Dispatcher.InvokeAsync(() =>
                 {
-                    return new DataBaseTransaction(authentication, this, this.DataBaseContext.Service);
+                    return new DataBaseTransaction(this, this.DataBaseContext.Service);
                 });
                 await transaction.BeginAsync(authentication);
                 return transaction;
@@ -605,7 +602,9 @@ namespace Ntreev.Crema.Services.Data
             this.authentications.Clear();
             base.DataBaseState = DataBaseState.None;
             base.Unload(authentication);
+#pragma warning disable CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
             this.clientContext.CloseAsync(this.serviceToken);
+#pragma warning restore CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
         }
 
         public void SetResetting(Authentication authentication)

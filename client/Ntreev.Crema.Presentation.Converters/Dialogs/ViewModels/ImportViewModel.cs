@@ -15,31 +15,21 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Threading;
-using Caliburn.Micro;
+using Ntreev.Crema.Data;
+using Ntreev.Crema.Presentation.Converters.Properties;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
-using Ntreev.Library.IO;
-using Ntreev.Crema.Data;
-using Ntreev.ModernUI.Framework;
 using Ntreev.Library;
-using System.ComponentModel;
 using Ntreev.Library.Linq;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
-using Ntreev.Crema.Presentation.Converters.Properties;
+using Ntreev.ModernUI.Framework;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
 {
@@ -256,9 +246,10 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
         }
 
         [ConfigurationProperty("SelectedImporter")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:사용되지 않는 private 멤버 제거", Justification = "<보류 중>")]
         private string SelectedImporterName
         {
-            get { return this.selectedImporter?.Name; }
+            get => this.selectedImporter?.Name;
             set
             {
                 if (value != null)

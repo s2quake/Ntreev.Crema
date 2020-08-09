@@ -17,11 +17,8 @@
 
 using Ntreev.Crema.Services;
 using Ntreev.Crema.Services.Extensions;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.TableContent

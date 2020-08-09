@@ -18,12 +18,7 @@
 using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.Presentation.Home.Services.ViewModels;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Home.MenuItems
 {
@@ -31,11 +26,11 @@ namespace Ntreev.Crema.Presentation.Home.MenuItems
     [ParentType(typeof(ConnectionItemViewModel))]
     class ConnectionItemEditMenuItem : MenuItemBase
     {
-        [Import]
-        private Lazy<CremaAppHostViewModel> cremaAppHost = null;
+        private readonly CremaAppHostViewModel cremaAppHost;
 
-        public ConnectionItemEditMenuItem()
+        public ConnectionItemEditMenuItem(CremaAppHostViewModel cremaAppHost)
         {
+            this.cremaAppHost = cremaAppHost;
             this.DisplayName = Resources.MenuItem_Edit;
         }
 
@@ -50,10 +45,8 @@ namespace Ntreev.Crema.Presentation.Home.MenuItems
         {
             if (parameter is ConnectionItemViewModel connectionItem)
             {
-                this.CremaAppHost.EditConnectionItem(connectionItem);
+                this.cremaAppHost.EditConnectionItem(connectionItem);
             }
         }
-
-        private CremaAppHostViewModel CremaAppHost => this.cremaAppHost.Value;
     }
 }

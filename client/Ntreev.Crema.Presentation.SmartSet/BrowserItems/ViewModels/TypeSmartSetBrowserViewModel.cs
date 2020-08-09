@@ -15,35 +15,21 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.SmartSet.Properties;
+using Ntreev.Crema.Presentation.Types;
+using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
+using Ntreev.Library.Linq;
+using Ntreev.Library.ObjectModel;
+using Ntreev.ModernUI.Framework;
+using Ntreev.ModernUI.Framework.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Ntreev.Crema.Presentation.Framework;
 using System.ComponentModel.Composition;
-using Caliburn.Micro;
-using System.Collections.ObjectModel;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using System.Collections.Specialized;
-using System.Windows;
+using System.Linq;
 using System.Windows.Threading;
-using System.Windows.Input;
-using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
-using System.Xml.Serialization;
-using System.Xml.Schema;
-using System.Xml;
-using Ntreev.Crema.Presentation.Types;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Library;
-using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.SmartSet.BrowserItems.Views;
-using System.IO;
-using Ntreev.Library.Serialization;
-using Ntreev.ModernUI.Framework.ViewModels;
-using Ntreev.Library.Linq;
-using Ntreev.Crema.Presentation.SmartSet.Properties;
-using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
@@ -56,14 +42,14 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
     {
         private readonly TypeSmartSetContext smartSetContext;
         [Import]
-        private Lazy<Ntreev.Crema.Presentation.Types.IPropertyService> propertyService = null;
+        private readonly Lazy<Ntreev.Crema.Presentation.Types.IPropertyService> propertyService = null;
         [Import]
-        private Lazy<ITypeBrowser> typeBrowser = null;
+        private readonly Lazy<ITypeBrowser> typeBrowser = null;
         [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator = null;
 
         [ImportingConstructor]
-        public TypeSmartSetBrowserViewModel(ICremaAppHost cremaAppHost, [ImportMany]IEnumerable<IRule> rules, TypeSmartSetContext smartSetContext)
+        public TypeSmartSetBrowserViewModel(ICremaAppHost cremaAppHost, [ImportMany] IEnumerable<IRule> rules, TypeSmartSetContext smartSetContext)
             : base(cremaAppHost, rules.Where(item => item.SupportType == typeof(ITypeDescriptor)))
         {
             this.smartSetContext = smartSetContext;

@@ -15,19 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Data;
 using Ntreev.ModernUI.Framework;
+using System;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 {

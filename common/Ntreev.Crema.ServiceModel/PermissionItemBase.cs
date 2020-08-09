@@ -15,20 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Xml.Schema;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.ServiceModel.Properties;
-using System.Xml;
-using System.IO;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Data.Xml;
-using Ntreev.Crema.Data.Xml.Schema;
-using System.ComponentModel;
 using Ntreev.Library;
+using Ntreev.Library.ObjectModel;
+using System;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 
 namespace Ntreev.Crema.ServiceModel
@@ -115,7 +106,7 @@ namespace Ntreev.Crema.ServiceModel
         //    this.OnAccessChanged(EventArgs.Empty);
         //}
 
-        protected void Lock(IAuthentication authentication,  string comment)
+        protected void Lock(IAuthentication authentication, string comment)
         {
             this.lockInfo = new LockInfo()
             {

@@ -18,16 +18,10 @@
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Types.Properties;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Data;
-using Ntreev.Library.ObjectModel;
-using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.ComponentModel;
 using Ntreev.Crema.Services.Extensions;
+using Ntreev.Library.ObjectModel;
+using System;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 {

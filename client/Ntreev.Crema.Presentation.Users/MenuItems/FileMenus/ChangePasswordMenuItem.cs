@@ -15,20 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.MenuItems;
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Home.MenuItems;
 using Ntreev.Crema.Presentation.Users.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Users.Properties;
-using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace Ntreev.Crema.Presentation.Users.MenuItems.FileMenus
 {
@@ -36,13 +28,13 @@ namespace Ntreev.Crema.Presentation.Users.MenuItems.FileMenus
     [ParentType(typeof(FileMenuItem))]
     class ChangePasswordMenuItem : MenuItemBase
     {
+        private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
-        [Import]
-        private Authenticator authenticator = null;
 
         [ImportingConstructor]
-        public ChangePasswordMenuItem(ICremaAppHost cremaAppHost)
+        public ChangePasswordMenuItem(Authenticator authenticator, ICremaAppHost cremaAppHost)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += this.InvokeCanExecuteChangedEvent;
             this.cremaAppHost.Closed += this.InvokeCanExecuteChangedEvent;

@@ -18,10 +18,6 @@
 using Ntreev.Crema.Presentation.Controls;
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -32,24 +28,21 @@ namespace Ntreev.Crema.Presentation.Assets
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             var checkBox = sender as CheckBox;
-            var cell = checkBox.Tag as ModernDataCell;
-            if (cell != null && cell.IsBeingEdited == true)
+            if (checkBox.Tag is ModernDataCell cell && cell.IsBeingEdited == true)
                 cell.EndEdit();
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             var checkBox = sender as CheckBox;
-            var cell = checkBox.Tag as ModernDataCell;
-            if (cell != null && cell.IsBeingEdited == true)
+            if (checkBox.Tag is ModernDataCell cell && cell.IsBeingEdited == true)
                 cell.EndEdit();
         }
 
         private void TagSelector_PopupClosed(object sender, EventArgs e)
         {
             var tagSelector = sender as TagSelector;
-            var cell = tagSelector.Tag as ModernDataCell;
-            if (cell != null && cell.IsBeingEdited == true)
+            if (tagSelector.Tag is ModernDataCell cell && cell.IsBeingEdited == true)
                 cell.EndEdit();
         }
     }

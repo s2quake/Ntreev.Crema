@@ -31,7 +31,7 @@ namespace Ntreev.Crema.Services
         internal static string AdminID = "admin";
         internal static string AdminName = "Administrator";
 
-        private IAuthenticationProvider provider;
+        private readonly IAuthenticationProvider provider;
         private readonly Guid token;
         private SignatureDate signatureDate;
         private EventHandler expired;
@@ -145,7 +145,7 @@ namespace Ntreev.Crema.Services
             this.InvokeExpiredEvent(userID, string.Empty);
         }
 
-        internal void InvokeExpiredEvent(string userID, string message)
+        internal void InvokeExpiredEvent(string _1, string _2)
         {
             lock (lockobj)
             {
@@ -159,7 +159,7 @@ namespace Ntreev.Crema.Services
             return this.Sign(DateTime.UtcNow);
         }
 
-        internal SignatureDate Sign(DateTime dateTime)
+        internal SignatureDate Sign(DateTime _)
         {
             this.signatureDate = new SignatureDate(this.ID, DateTime.UtcNow);
             return this.signatureDate;

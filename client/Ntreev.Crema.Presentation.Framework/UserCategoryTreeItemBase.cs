@@ -15,24 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Library.Linq;
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel.Composition.Hosting;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
-using Ntreev.ModernUI.Framework.ViewModels;
-using System.Windows.Input;
 using System.ComponentModel;
-using System.ComponentModel.Composition;
+using System.Linq;
 
 namespace Ntreev.Crema.Presentation.Framework
 {
@@ -75,7 +61,7 @@ namespace Ntreev.Crema.Presentation.Framework
         public override string DisplayName => this.descriptor.DisplayName;
 
         public override int Order => 1;
-        
+
         protected virtual UserCategoryTreeItemBase CreateInstance(Authentication authentication, UserCategoryDescriptor descriptor, object owner)
         {
             return new UserCategoryTreeItemBase(authentication, descriptor, owner);

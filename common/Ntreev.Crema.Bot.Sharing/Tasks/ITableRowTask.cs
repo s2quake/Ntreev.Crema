@@ -16,16 +16,13 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.Services.Extensions;
 using Ntreev.Library;
 using Ntreev.Library.Random;
 using System;
-using System.Linq;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Bot.Tasks

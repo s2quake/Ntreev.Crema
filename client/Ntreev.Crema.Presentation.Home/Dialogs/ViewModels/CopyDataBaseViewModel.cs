@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.Services;
 using Ntreev.Library.ObjectModel;
 using Ntreev.ModernUI.Framework;
@@ -67,7 +67,7 @@ namespace Ntreev.Crema.Presentation.Home.Dialogs.ViewModels
             await new ProgressAction(this)
             {
                 BeginMessage = Resources.Message_CopingDataBase,
-                Try = async()=>
+                Try = async () =>
                 {
                     await this.dataBase.CopyAsync(this.authentication, this.DataBaseName, this.Comment, false);
                     await this.TryCloseAsync(true);

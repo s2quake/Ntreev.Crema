@@ -17,15 +17,10 @@
 
 using Ntreev.Crema.Services;
 using Ntreev.Crema.Services.Extensions;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Text;
-using System.ComponentModel;
-using Ntreev.Crema.ServiceModel;
-using System.Threading.Tasks;
 using Ntreev.Library.IO;
+using System.ComponentModel;
+using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {

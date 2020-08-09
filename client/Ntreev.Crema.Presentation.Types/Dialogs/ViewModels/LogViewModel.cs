@@ -15,26 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Presentation.Types.Properties;
+using Ntreev.Crema.Services;
+using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Caliburn.Micro;
-using Ntreev.Crema.Services;
-using System.Collections.ObjectModel;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Data;
-using System.ComponentModel;
-using System.Threading;
-using System.IO;
-using System.Threading.Tasks;
-using System.Windows;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Types.Properties;
-using Ntreev.ModernUI.Framework;
-using System.Collections;
-using System.Windows.Input;
 using System.ComponentModel.Composition;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 {
@@ -46,14 +35,16 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
         private LogInfoViewModel selectedItem;
         private readonly ICommand previewCommand;
         [Import]
-        private IBuildUp buildUp = null;
+        private readonly IBuildUp buildUp = null;
 
         public LogViewModel(Authentication authentication, ITypeItem typeItem)
         {
             this.authentication = authentication;
             this.typeItem = typeItem;
             this.DisplayName = Resources.Title_ViewLog;
+#pragma warning disable CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
             this.previewCommand = new DelegateCommand((p) => this.PreviewAsync(), (p) => this.CanPreview);
+#pragma warning restore CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
             this.Initialize();
         }
 

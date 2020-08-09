@@ -15,30 +15,19 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Windows;
-using System.Windows.Threading;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Presentation.Framework;
-using Caliburn.Micro;
+using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Presentation.Types.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
-using System.Windows.Input;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Ntreev.ModernUI.Framework.ViewModels;
-using Ntreev.Crema.Presentation.Types.Properties;
+using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
 {
     public class TypeCategoryTreeViewItemViewModel : TypeCategoryTreeItemBase
     {
-        private ICommand renameCommand;
-        private ICommand deleteCommand;
+        private readonly ICommand renameCommand;
+        private readonly ICommand deleteCommand;
 
         public TypeCategoryTreeViewItemViewModel(Authentication authentication, ITypeCategory category)
             : this(authentication, category, null)

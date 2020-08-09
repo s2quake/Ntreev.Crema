@@ -15,20 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data;
 using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
 using Ntreev.Crema.Presentation.Differences.Properties;
-using Ntreev.Crema.Presentation.Differences.PropertyItems.Views;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Data;
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
 {

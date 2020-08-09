@@ -15,13 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Newtonsoft.Json.Schema.Generation;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Schema.Generation;
+using System.Linq;
 
 namespace Ntreev.Crema.Commands.Consoles.Serializations
 {
@@ -31,7 +28,7 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
 
         public EnumStringGenerationProvider(params object[] args)
         {
-                this.propertyName = (string)args.FirstOrDefault();
+            this.propertyName = (string)args.FirstOrDefault();
             //this.propertyName = propertyName;
         }
 

@@ -15,19 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Runtime.Serialization;
-using System.Collections;
-using System.Text.RegularExpressions;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.ServiceModel.Properties;
-using System.ComponentModel;
 using Ntreev.Library;
+using Ntreev.Library.ObjectModel;
+using System;
+using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace Ntreev.Crema.ServiceModel
 {
@@ -71,7 +64,7 @@ namespace Ntreev.Crema.ServiceModel
             return this.GetAccessType(authentication).HasFlag(accessType);
         }
 
-        protected void SetPublic(IAuthentication authentication)
+        protected void SetPublic(IAuthentication _)
         {
             this.accessInfo.SetPublic();
             this.UpdateAccessParent(this.accessParent);
@@ -119,32 +112,29 @@ namespace Ntreev.Crema.ServiceModel
             this.OnLockChanged(EventArgs.Empty);
         }
 
-        protected void Unlock(IAuthentication authentication)
+        protected void Unlock(IAuthentication _)
         {
             this.lockInfo = LockInfo.Empty;
             this.UpdateLockParent(this.lockParent);
             this.OnLockChanged(EventArgs.Empty);
         }
 
-        protected void Rename(IAuthentication authentication, string name)
+        protected void Rename(IAuthentication _, string name)
         {
             this.Name = name;
         }
 
-        protected void Move(IAuthentication authentication, string parentPath)
+        protected void Move(IAuthentication _, string parentPath)
         {
             this.Parent = this.Container[parentPath];
         }
 
-        protected void Delete(IAuthentication authentication)
+        protected void Delete(IAuthentication _)
         {
             base.Dispose();
         }
 
-        public bool IsPublic
-        {
-            get { return this.IsPrivate == false; }
-        }
+        public bool IsPublic => this.IsPrivate == false;
 
         public bool IsPrivate
         {
@@ -232,7 +222,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public ILockParent LockParent
         {
-            get { return this.lockParent; }
+            get => this.lockParent;
             set
             {
                 this.lockParent = value;
@@ -242,7 +232,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public IAccessParent AccessParent
         {
-            get { return this.accessParent; }
+            get => this.accessParent;
             set
             {
                 this.accessParent = value;
@@ -277,12 +267,6 @@ namespace Ntreev.Crema.ServiceModel
         {
             this.AccessChanged?.Invoke(this, e);
         }
-
-        //public void ValidateAccessType(IAuthentication authentication, AccessType accessType)
-        //{
-        //    if (this.VerifyAccessType(authentication, accessType) == false)
-        //        throw new PermissionDeniedException();
-        //}
 
         protected void ValidateSetPublic(IAuthentication authentication)
         {
@@ -374,7 +358,7 @@ namespace Ntreev.Crema.ServiceModel
         {
             if (this.LockInfo.IsLocked == true && this.LockInfo.IsInherited == false)
                 throw new PermissionException(Resources.Exception_AlreadyLocked);
-            
+
             this.OnValidateLock(authentication, this);
         }
 

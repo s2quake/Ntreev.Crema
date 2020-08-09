@@ -16,12 +16,6 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel.Properties;
-using Ntreev.Crema.ServiceModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ServiceModel
 {
@@ -30,7 +24,7 @@ namespace Ntreev.Crema.ServiceModel
         public UserNotFoundException(string userID)
             : base(string.Format(Resources.Exception_UserNotFound_Format, userID))
         {
-            
+
         }
     }
 }

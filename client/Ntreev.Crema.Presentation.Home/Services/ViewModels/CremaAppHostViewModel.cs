@@ -15,36 +15,23 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using Ntreev.Library;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.ServiceModel;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Threading;
-using System.Xml.Serialization;
-using Caliburn.Micro;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Presentation.Home.Properties;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
-using System.ComponentModel.Composition.Hosting;
-using System.Collections.ObjectModel;
-using System.Collections;
-using System.Security;
-using System.Runtime.InteropServices;
-using System.Windows.Input;
+using Ntreev.Crema.Presentation.Home.Properties;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services;
+using Ntreev.Library;
+using Ntreev.ModernUI.Framework;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
+using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.Linq;
+using System.Security;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 {
@@ -53,6 +40,13 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
     [Export(typeof(IContentService))]
     class CremaAppHostViewModel : ViewModelBase, ICremaAppHost, IPartImportsSatisfiedNotification, IContentService
     {
+        private readonly ICremaHost cremaHost;
+        private readonly IAppConfiguration configs;
+        private readonly IBuildUp buildUp;
+        private readonly Lazy<DataBaseServiceViewModel> dataBaseService;
+        private readonly Lazy<DataBaseListViewModel> dataBaseSelections;
+        private readonly Lazy<IShell> shell;
+
         private ConnectionItemViewModel connectionItem;
         private readonly ICommand loginCommand;
         private SecureString securePassword;
@@ -62,10 +56,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
         private bool isLoaded;
         private bool isEncrypted;
 
-        private readonly ICremaHost cremaHost;
-        private readonly IAppConfiguration configs;
-
-        private Authenticator authenticator;
+        private readonly Authenticator authenticator;
         private string dataBaseName;
         private Guid token;
         private Color themeColor;
@@ -73,15 +64,8 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
         private string address;
         private IConfigurationCommitter userConfigCommitter;
 
-        [Import]
-        private Lazy<DataBaseServiceViewModel> dataBaseService = null;
-        [Import]
-        private Lazy<DataBaseListViewModel> dataBaseSelections = null;
-        private IBuildUp buildUp;
         private IDataBase dataBase;
 
-        [Import]
-        private Lazy<IShell> shell = null;
 
         private string filterExpression;
         private bool caseSensitive;
@@ -96,16 +80,20 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
         public static Dictionary<string, Uri> Themes { get; } = new Dictionary<string, Uri>(StringComparer.CurrentCultureIgnoreCase);
 
         [ImportingConstructor]
-        public CremaAppHostViewModel(ICremaHost cremaHost, IAppConfiguration configs, IBuildUp buildUp)
+        public CremaAppHostViewModel(ICremaHost cremaHost, IAppConfiguration configs, IBuildUp buildUp, 
+            Lazy<DataBaseServiceViewModel> dataBaseService, Lazy<DataBaseListViewModel> dataBaseSelections, Lazy<IShell> shell)
         {
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;
             this.configs = configs;
             this.buildUp = buildUp;
+            this.dataBaseService = dataBaseService;
+            this.dataBaseSelections = dataBaseSelections;
+            this.shell = shell;
             this.theme = Themes.Keys.FirstOrDefault();
             this.themeColor = FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor;
             this.loginCommand = new DelegateCommand((p) => this.LoginAsync(), (p) => this.CanLogin);
-            this.ConnectionItems = ConnectionItemCollection.Read(AppUtility.GetDocumentFilename("ConnectionList.xml"));
+            this.ConnectionItems = ConnectionItemCollection.Read(this, AppUtility.GetDocumentFilename("ConnectionList.xml"));
             this.buildUp.BuildUp(this.ConnectionItems);
             this.ConnectionItem = this.ConnectionItems.FirstOrDefault(item => item.IsDefault);
             this.authenticator = this.cremaHost.GetService(typeof(Authenticator)) as Authenticator;
@@ -884,7 +872,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 
         async Task ICremaAppHost.LoginAsync(string address, string userID, string password, string dataBaseName)
         {
-            var connectionItem = new ConnectionItemViewModel()
+            var connectionItem = new ConnectionItemViewModel(this)
             {
                 Name = "Temporary",
                 Address = address,

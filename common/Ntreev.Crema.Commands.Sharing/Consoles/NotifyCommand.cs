@@ -18,10 +18,8 @@
 using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles
@@ -31,7 +29,7 @@ namespace Ntreev.Crema.Commands.Consoles
     class NotifyCommand : ConsoleCommandAsyncBase
     {
         [Import]
-        private Lazy<ICremaHost> cremaHost = null;
+        private readonly Lazy<ICremaHost> cremaHost = null;
 
         public NotifyCommand()
         {

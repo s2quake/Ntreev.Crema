@@ -16,12 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Library;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ConsoleHost
 {
@@ -30,7 +26,7 @@ namespace Ntreev.Crema.ConsoleHost
     class ConsoleConfiguration : ConfigurationBase, IConsoleConfiguration
     {
         [ImportingConstructor]
-        public ConsoleConfiguration([ImportMany]IEnumerable<IConfigurationPropertyProvider> propertiesProviders)
+        public ConsoleConfiguration([ImportMany] IEnumerable<IConfigurationPropertyProvider> propertiesProviders)
             : base(propertiesProviders)
         {
 

@@ -19,14 +19,8 @@ using Ntreev.Crema.ApplicationHost.Properties;
 using Ntreev.Crema.ApplicationHost.Views;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 

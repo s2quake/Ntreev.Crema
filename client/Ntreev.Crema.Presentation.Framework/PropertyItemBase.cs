@@ -17,15 +17,20 @@
 
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Framework
 {
     public abstract class PropertyItemBase : ViewModelBase, IPropertyItem
     {
+        protected PropertyItemBase()
+        {
+        }
+
+        protected PropertyItemBase(IServiceProvider serviceProvider)
+            : base(serviceProvider)
+        {
+        }
+
         private string displayName;
 
         public abstract bool CanSupport(object obj);
@@ -34,7 +39,7 @@ namespace Ntreev.Crema.Presentation.Framework
 
         public string DisplayName
         {
-            get { return this.displayName; }
+            get => this.displayName;
             set
             {
                 this.displayName = value;

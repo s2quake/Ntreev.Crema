@@ -16,16 +16,12 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ConsoleHost.Commands.Consoles;
-using Ntreev.Crema.Javascript;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ConsoleHost.Commands
@@ -39,9 +35,9 @@ namespace Ntreev.Crema.ConsoleHost.Commands
         private readonly ICremaHost cremaHost;
 
         [Import]
-        private Lazy<ConsoleTerminal> terminal = null;
+        private readonly Lazy<ConsoleTerminal> terminal = null;
         [Import]
-        private Lazy<ConsoleCommandContext> commandContext = null;
+        private readonly Lazy<ConsoleCommandContext> commandContext = null;
 
         [ImportingConstructor]
         public ConnectCommand(CremaBootstrapper application, ICremaHost cremaHost)
@@ -119,6 +115,8 @@ namespace Ntreev.Crema.ConsoleHost.Commands
 
         private ConsoleTerminal Terminal => this.terminal.Value;
 
+#pragma warning disable CS0108 // 'ConnectCommand.CommandContext'은(는) 상속된 'CommandAsyncBase.CommandContext' 멤버를 숨깁니다. 숨기려면 new 키워드를 사용하세요.
         private ConsoleCommandContext CommandContext => this.commandContext.Value;
+#pragma warning restore CS0108 // 'ConnectCommand.CommandContext'은(는) 상속된 'CommandAsyncBase.CommandContext' 멤버를 숨깁니다. 숨기려면 new 키워드를 사용하세요.
     }
 }

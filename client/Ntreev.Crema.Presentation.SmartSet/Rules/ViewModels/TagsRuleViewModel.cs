@@ -16,16 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Xml.Serialization;
 using Ntreev.Library;
+using System;
 
 namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
 {

@@ -17,19 +17,13 @@
 
 using Ntreev.Crema.ServiceHosts.Domains;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Data;
 using Ntreev.Crema.Services.Users;
-using Ntreev.Library;
-using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.ServiceModel;
 using System.Threading.Tasks;
-using System.Timers;
 
 namespace Ntreev.Crema.Services.Domains
 {

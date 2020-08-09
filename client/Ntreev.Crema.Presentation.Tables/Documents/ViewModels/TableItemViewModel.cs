@@ -15,25 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Caliburn.Micro;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.Services.Extensions;
 using Ntreev.Crema.Data;
-using Ntreev.Crema.ServiceModel;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels;
-using System.Windows.Input;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Presentation.Framework.Controls;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using Xceed.Wpf.DataGrid;
 
 namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
@@ -47,7 +40,9 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
         private object selectedItem;
         private int selectedIndex;
         private string selectedColumn;
-        private DataGridContext currentContext;
+#pragma warning disable CS0169 // TableItemViewModel.currentContext' 필드가 사용되지 않았습니다.
+        private readonly DataGridContext currentContext;
+#pragma warning restore CS0169 // TableItemViewModel.currentContext' 필드가 사용되지 않았습니다.
 
 #pragma warning disable IDE0044 // 읽기 전용 한정자 추가
         [Import]
@@ -85,51 +80,53 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
             await dialog.ShowDialogAsync();
         }
 
+#pragma warning disable CS1998 // 이 비동기 메서드에는 'await' 연산자가 없으며 메서드가 동시에 실행됩니다. 'await' 연산자를 사용하여 비블로킹 API 호출을 대기하거나, 'await Task.Run(...)'을 사용하여 백그라운드 스레드에서 CPU 바인딩된 작업을 수행하세요.
         public async Task InsertManyAsync()
+#pragma warning restore CS1998 // 이 비동기 메서드에는 'await' 연산자가 없으며 메서드가 동시에 실행됩니다. 'await' 연산자를 사용하여 비블로킹 API 호출을 대기하거나, 'await Task.Run(...)'을 사용하여 백그라운드 스레드에서 CPU 바인딩된 작업을 수행하세요.
         {
-                //var gridContext = DataGridControl.GetDataGridContext(this);
-                //var gridControl = gridContext.DataGridControl as TableSourceDataGridControl;
-                //var inserter = new DomainTextClipboardInserter(gridContext);
+            //var gridContext = DataGridControl.GetDataGridContext(this);
+            //var gridControl = gridContext.DataGridControl as TableSourceDataGridControl;
+            //var inserter = new DomainTextClipboardInserter(gridContext);
 
-                //var textData = ClipboardUtility.GetData(true);
+            //var textData = ClipboardUtility.GetData(true);
 
-                //if (textData.Length == 1)
-                //{
-                //    //var textLine = textData.First();
-                //    //var index = gridContext.CurrentColumn == null ? -1 : gridContext.VisibleColumns.IndexOf(gridContext.CurrentColumn);
+            //if (textData.Length == 1)
+            //{
+            //    //var textLine = textData.First();
+            //    //var index = gridContext.CurrentColumn == null ? -1 : gridContext.VisibleColumns.IndexOf(gridContext.CurrentColumn);
 
-                //    //for (var i = 0; i < textLine.Length; i++)
-                //    //{
-                //    //    var text = textLine[i];
-                //    //    var column = gridContext.VisibleColumns[index + i];
-                //    //    if (this.Cells[column] is TableSourceDataCell cell)
-                //    //    {
-                //    //        cell.BeginEdit();
-                //    //        cell.EditingContent = text;
-                //    //        cell.EndEdit();
-                //    //    }
-                //    //}
-                //}
-                //else
-                //{
-                //    inserter.Parse(textData);
+            //    //for (var i = 0; i < textLine.Length; i++)
+            //    //{
+            //    //    var text = textLine[i];
+            //    //    var column = gridContext.VisibleColumns[index + i];
+            //    //    if (this.Cells[column] is TableSourceDataCell cell)
+            //    //    {
+            //    //        cell.BeginEdit();
+            //    //        cell.EditingContent = text;
+            //    //        cell.EndEdit();
+            //    //    }
+            //    //}
+            //}
+            //else
+            //{
+            //    inserter.Parse(textData);
 
-                //    var domainRows = inserter.DomainRows;
-                //    var domain = gridControl.Domain;
-                //    var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
+            //    var domainRows = inserter.DomainRows;
+            //    var domain = gridControl.Domain;
+            //    var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
 
-                //    (gridContext.Items as INotifyCollectionChanged).CollectionChanged += Items_CollectionChanged;
-                //    try
-                //    {
-                //        this.results = domain.Dispatcher.Invoke(() => domain.NewRow(authenticator, domainRows));
-                //    }
-                //    catch (Exception e)
-                //    {
-                //        this.results = null;
-                //        (gridContext.Items as INotifyCollectionChanged).CollectionChanged -= Items_CollectionChanged;
-                //        throw e;
-                //    }
-                //}
+            //    (gridContext.Items as INotifyCollectionChanged).CollectionChanged += Items_CollectionChanged;
+            //    try
+            //    {
+            //        this.results = domain.Dispatcher.Invoke(() => domain.NewRow(authenticator, domainRows));
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        this.results = null;
+            //        (gridContext.Items as INotifyCollectionChanged).CollectionChanged -= Items_CollectionChanged;
+            //        throw e;
+            //    }
+            //}
         }
 
         public override string DisplayName => this.descriptor.TableName;

@@ -16,20 +16,14 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Controls.Actions
 {
     class SetIndexAction : ActionBase
     {
         private readonly object dataContext;
-        private int oldIndex;
+        private readonly int oldIndex;
         private int newIndex;
 
         public SetIndexAction(object dataContext)

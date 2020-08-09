@@ -18,7 +18,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
-using Ntreev.Crema.Commands.Consoles.Properties;
 using Ntreev.Library;
 using Ntreev.Library.IO;
 using System;
@@ -39,7 +38,7 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
         private readonly string jsonPath;
         private readonly Type type;
         private readonly JSchema schema;
-        private string hash;
+        private readonly string hash;
 
         public JsonEditorHost(object obj)
             : this(obj, null)
@@ -70,14 +69,12 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
 
         public static bool TryEdit<T>(ref T obj, JSchema schema)
         {
-            using (var editor = new JsonEditorHost(obj, schema))
-            {
-                if (editor.Execute() == false)
-                    return false;
+            using var editor = new JsonEditorHost(obj, schema);
+            if (editor.Execute() == false)
+                return false;
 
-                obj = editor.Read<T>();
-                return true;
-            }
+            obj = editor.Read<T>();
+            return true;
         }
 
         public bool Execute()
@@ -105,22 +102,20 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
                 Formatting = Formatting.Indented,
             };
 
-            using (var stream = File.OpenText(this.jsonPath))
-            using (var reader = new JsonTextReader(stream))
-            using (var validatingReader = new JSchemaValidatingReader(reader))
+            using var stream = File.OpenText(this.jsonPath);
+            using var reader = new JsonTextReader(stream);
+            using var validatingReader = new JSchemaValidatingReader(reader);
+            var messages = new List<string>();
+            validatingReader.Schema = this.schema;
+            validatingReader.ValidationEventHandler += (o, a) => messages.Add(a.Message);
+            var obj = serializer.Deserialize<T>(validatingReader);
+
+            if (messages.Any() == true)
             {
-                var messages = new List<string>();
-                validatingReader.Schema = this.schema;
-                validatingReader.ValidationEventHandler += (o, a) => messages.Add(a.Message);
-                var obj = serializer.Deserialize<T>(validatingReader);
-
-                if (messages.Any() == true)
-                {
-                    throw new JsonSerializationException(string.Join(Environment.NewLine, messages));
-                }
-
-                return obj;
+                throw new JsonSerializationException(string.Join(Environment.NewLine, messages));
             }
+
+            return obj;
         }
 
         public string Filename

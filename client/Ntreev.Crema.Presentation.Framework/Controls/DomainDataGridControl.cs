@@ -15,11 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml;
-using Ntreev.Library;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System;
@@ -28,16 +26,12 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Threading;
 using Xceed.Wpf.DataGrid;
-using Xceed.Wpf.DataGrid.Export;
 
 namespace Ntreev.Crema.Presentation.Framework.Controls
 {
@@ -265,16 +259,13 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
         private async static void DomainPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var self = d as DomainDataGridControl;
-            var oldDomain = e.OldValue as IDomain;
-            var newDomain = e.NewValue as IDomain;
-            if (oldDomain != null)
+            if (e.OldValue is IDomain oldDomain)
             {
                 self.PropertyChanged -= self.DomainDataGridControl_PropertyChanged;
                 self.ValueChanging -= self.DomainDataGridControl_ValueChanging;
                 oldDomain.Deleted -= self.Domain_Deleted;
             }
-
-            if (newDomain != null)
+            if (e.NewValue is IDomain newDomain)
             {
                 self.PropertyChanged += self.DomainDataGridControl_PropertyChanged;
                 self.ValueChanging += self.DomainDataGridControl_ValueChanging;
@@ -331,7 +322,9 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             {
                 var domain = this.Domain;
                 var authenticator = domain.GetService(typeof(Authenticator)) as Authenticator;
+#pragma warning disable CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
                 domain.Dispatcher.Invoke(() => domain.SetRowAsync(authenticator, rows));
+#pragma warning restore CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
             }
             catch (Exception e)
             {
@@ -400,7 +393,9 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
 
         private void PasteFromClipboard_Execute(object sender, ExecutedRoutedEventArgs e)
         {
+#pragma warning disable CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
             this.RequestPasteFromClipboard();
+#pragma warning restore CS4014 // 이 호출이 대기되지 않으므로 호출이 완료되기 전에 현재 메서드가 계속 실행됩니다. 호출 결과에 'await' 연산자를 적용해 보세요.
         }
 
         private async Task RequestPasteFromClipboard()

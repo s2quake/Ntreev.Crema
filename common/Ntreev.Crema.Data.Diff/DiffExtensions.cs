@@ -17,11 +17,8 @@
 
 using Ntreev.Crema.Data.Xml.Schema;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Data.Diff
 {

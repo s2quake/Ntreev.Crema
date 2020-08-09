@@ -15,11 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Caliburn.Micro;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Data;
+using Ntreev.Crema.Presentation.Converters.Properties;
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services;
 using Ntreev.Library;
 using Ntreev.Library.Linq;
 using Ntreev.ModernUI.Framework;
@@ -30,10 +30,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Ntreev.Crema.Presentation.Converters.Properties;
 
 namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
 {
@@ -50,7 +48,7 @@ namespace Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels
         private bool isExporting;
         private CancellationTokenSource cancelToken;
 
-        private TableRootTreeViewItemViewModel root;
+        private readonly TableRootTreeViewItemViewModel root;
 
         private ExportViewModel(Authentication authentication, IDataBase dataBase, string[] selectedPaths)
             : base(dataBase)

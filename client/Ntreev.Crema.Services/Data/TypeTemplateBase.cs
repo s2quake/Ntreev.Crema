@@ -19,7 +19,6 @@ using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Domains;
-using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
 using System;
 using System.Collections.Generic;
@@ -134,7 +133,7 @@ namespace Ntreev.Crema.Services.Data
                 this.ValidateExpired();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync)); 
+                    this.CremaHost.DebugMethod(authentication, this, nameof(CancelEditAsync));
                 });
                 await this.OnCancelEditAsync(authentication);
                 await this.Dispatcher.InvokeAsync(() =>

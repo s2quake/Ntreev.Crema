@@ -15,26 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Caliburn.Micro;
-using Ntreev.Crema.Services;
-using System.Collections.ObjectModel;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Data;
-using System.ComponentModel;
-using System.Threading;
-using System.IO;
-using System.Threading.Tasks;
-using System.Windows;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Tables.Properties;
+using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
-using System.Collections;
-using System.Windows.Input;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 {
@@ -47,7 +37,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
         private readonly ICommand previewCommand;
 
         [Import]
-        private IBuildUp buildUp = null;
+        private readonly IBuildUp buildUp = null;
 
         private LogViewModel(Authentication authentication, ITableItem tableItem)
         {

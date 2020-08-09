@@ -15,21 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Ntreev.Crema.Data;
-using Ntreev.Crema.Spreadsheet.Properties;
-using Ntreev.Library;
+using Ntreev.Crema.Data.Xml.Schema;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using Ntreev.Crema.Data.Xml.Schema;
-using ClosedXML.Excel;
 
 namespace Ntreev.Crema.Spreadsheet
 {
@@ -69,10 +63,8 @@ namespace Ntreev.Crema.Spreadsheet
 
         public static string[] ReadSheetNames(string filename)
         {
-            using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read))
-            {
-                return SpreadsheetReader.ReadSheetNames(fs);
-            }
+            using var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+            return SpreadsheetReader.ReadSheetNames(fs);
         }
 
         public static string[] ReadTypeNames(string filename)
@@ -93,15 +85,13 @@ namespace Ntreev.Crema.Spreadsheet
 
         public static string[] ReadSheetNames(Stream stream)
         {
-            using (var doc = SpreadsheetDocument.Open(stream, false))
-            {
-                var sheets = doc.WorkbookPart.Workbook.GetFirstChild<Sheets>();
+            using var doc = SpreadsheetDocument.Open(stream, false);
+            var sheets = doc.WorkbookPart.Workbook.GetFirstChild<Sheets>();
 
-                var query = from item in sheets.Elements<Sheet>()
-                            orderby item.Name.Value
-                            select item.Name.Value;
-                return query.ToArray();
-            }
+            var query = from item in sheets.Elements<Sheet>()
+                        orderby item.Name.Value
+                        select item.Name.Value;
+            return query.ToArray();
         }
 
         public void Read(CremaDataSet dataSet)

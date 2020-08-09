@@ -17,21 +17,8 @@
 
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Crema.ServiceModel;
-using System.Windows;
-using Ntreev.ModernUI.Framework;
 using System.Windows.Media;
-using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.Home.Properties;
-using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
-using System.ComponentModel.Composition;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
-using Ntreev.ModernUI.Framework.ViewModels;
 
 namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 {
@@ -147,7 +134,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 
         public bool IsCurrent
         {
-            get { return this.isCurrent; }
+            get => this.isCurrent;
             set
             {
                 this.isCurrent = value;

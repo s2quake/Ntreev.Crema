@@ -15,26 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Windows;
-using Ntreev.Crema.Services;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Types.Properties;
-using System.Threading.Tasks;
-using Caliburn.Micro;
-using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
-using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
-using Ntreev.Crema.Presentation.Types.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
-using Ntreev.Library.Linq;
-using System.Collections.Generic;
-using System.ComponentModel.Composition.Hosting;
-using Ntreev.ModernUI.Framework.ViewModels;
-using Ntreev.Crema.Data;
-using Ntreev.Library;
-using System.Windows.Threading;
 
 namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
 {

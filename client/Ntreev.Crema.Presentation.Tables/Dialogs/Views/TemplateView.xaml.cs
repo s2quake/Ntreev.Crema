@@ -15,25 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework.Controls;
-using Ntreev.Crema.Presentation.Tables.Properties;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Services;
-using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
-using System.Windows.Media;
 using Xceed.Wpf.DataGrid;
 
 namespace Ntreev.Crema.Presentation.Tables.Dialogs.Views
@@ -41,7 +31,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.Views
     public partial class TemplateView : UserControl
     {
         [Import]
-        private IAppConfiguration configs = null;
+        private readonly IAppConfiguration configs = null;
 
         public static DependencyProperty DomainProperty = DependencyProperty.Register(nameof(Domain), typeof(IDomain), typeof(TemplateView));
 

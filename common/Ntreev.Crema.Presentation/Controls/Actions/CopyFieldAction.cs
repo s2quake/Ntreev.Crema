@@ -15,22 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Diff;
-using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Controls.Actions
 {
     class CopyFieldAction : ActionBase
     {
-        private object dataItem;
-        private object destItem;
-        private string fieldName;
+        private readonly object dataItem;
+        private readonly object destItem;
+        private readonly string fieldName;
         private readonly object oldField;
 
         public CopyFieldAction(object dataItem, object destItem, string fieldName)
@@ -38,7 +31,7 @@ namespace Ntreev.Crema.Presentation.Controls.Actions
             this.dataItem = dataItem;
             this.destItem = destItem;
             this.fieldName = fieldName;
-            this.oldField = DiffUtility.GetField(destItem, fieldName);    
+            this.oldField = DiffUtility.GetField(destItem, fieldName);
         }
 
         protected override void OnRedo()

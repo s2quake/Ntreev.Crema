@@ -99,10 +99,8 @@ namespace Ntreev.Crema.Spreadsheet
 
         public void Write(string filename)
         {
-            using (var stream = new FileStream(filename, FileMode.Create))
-            {
-                this.Write(stream);
-            }
+            using var stream = new FileStream(filename, FileMode.Create);
+            this.Write(stream);
         }
 
         public void Write(Stream stream)
@@ -370,61 +368,61 @@ namespace Ntreev.Crema.Spreadsheet
             {
                 var cell = worksheet.Cell(r, c);
 
-                if (field is byte)
+                if (field is byte @byte)
                 {
-                    cell.SetValue((byte)field);
+                    cell.SetValue(@byte);
                 }
-                else if (field is sbyte)
+                else if (field is sbyte byte1)
                 {
-                    cell.SetValue((sbyte)field);
+                    cell.SetValue(byte1);
                 }
-                else if (field is short)
+                else if (field is short @int)
                 {
-                    cell.SetValue((short)field);
+                    cell.SetValue(@int);
                 }
-                else if (field is ushort)
+                else if (field is ushort int1)
                 {
-                    cell.SetValue((ushort)field);
+                    cell.SetValue(int1);
                 }
-                else if (field is int)
+                else if (field is int int2)
                 {
-                    cell.SetValue((int)field);
+                    cell.SetValue(int2);
                 }
-                else if (field is uint)
+                else if (field is uint int3)
                 {
-                    cell.SetValue((uint)field);
+                    cell.SetValue(int3);
                 }
-                else if (field is float)
+                else if (field is float single)
                 {
-                    cell.SetValue((float)field);
+                    cell.SetValue(single);
                 }
-                else if (field is double)
+                else if (field is double @double)
                 {
-                    cell.SetValue((double)field);
+                    cell.SetValue(@double);
                 }
-                else if (field is long)
+                else if (field is long int4)
                 {
-                    cell.SetValue((long)field);
+                    cell.SetValue(int4);
                 }
-                else if (field is ulong)
+                else if (field is ulong int5)
                 {
-                    cell.SetValue((ulong)field);
+                    cell.SetValue(int5);
                 }
                 else if (field is char)
                 {
                     cell.SetValue((int)field);
                 }
-                else if (field is bool)
+                else if (field is bool boolean)
                 {
-                    cell.SetValue((bool)field);
+                    cell.SetValue(boolean);
                 }
-                else if (field is TimeSpan)
+                else if (field is TimeSpan span)
                 {
-                    cell.SetValue((TimeSpan)field);
+                    cell.SetValue(span);
                 }
-                else if (field is DateTime)
+                else if (field is DateTime time)
                 {
-                    cell.SetValue((DateTime)field);
+                    cell.SetValue(time);
                 }
                 else
                 {

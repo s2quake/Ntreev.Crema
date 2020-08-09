@@ -16,11 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.ApplicationHost.ViewModels;
-using Ntreev.Crema.ApplicationHost.Views;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.ServiceHosts;
-using Ntreev.Crema.Services;
 using Ntreev.Library;
 using Ntreev.Library.Linq;
 using Ntreev.ModernUI.Framework;
@@ -32,10 +28,6 @@ using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
 
 namespace Ntreev.Crema.ApplicationHost
 {

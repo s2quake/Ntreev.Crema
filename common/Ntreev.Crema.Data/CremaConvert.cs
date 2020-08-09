@@ -29,26 +29,26 @@ namespace Ntreev.Crema.Data
             if (value.GetType() == dataType)
                 return value;
 
-            var textValue = string.Empty;
-            if (value is DateTime)
+            string textValue;
+            if (value is DateTime time)
             {
                 if (dataType == typeof(string))
-                    return ((DateTime)value).ToString();
-                textValue = ((DateTime)value).ToOADate().ToString();
+                    return time.ToString();
+                textValue = time.ToOADate().ToString();
             }
-            else if (value is TimeSpan)
+            else if (value is TimeSpan span)
             {
                 if (dataType == typeof(string))
-                    return ((TimeSpan)value).ToString();
-                textValue = ((TimeSpan)value).TotalSeconds.ToString();
+                    return span.ToString();
+                textValue = span.TotalSeconds.ToString();
             }
-            else if (value is float)
+            else if (value is float single)
             {
-                textValue = ((float)value).ToString("R");
+                textValue = single.ToString("R");
             }
-            else if (value is double)
+            else if (value is double @double)
             {
-                textValue = ((double)value).ToString("R");
+                textValue = @double.ToString("R");
             }
             else
             {
@@ -166,61 +166,61 @@ namespace Ntreev.Crema.Data
             if (value.GetType() == dataType)
                 return true;
 
-            var textValue = string.Empty;
-            if (value is DateTime)
-                textValue = ((DateTime)value).ToOADate().ToString();
-            else if (value is TimeSpan)
-                textValue = ((TimeSpan)value).Ticks.ToString();
-            else if (value is float)
-                textValue = ((float)value).ToString("R");
-            else if (value is double)
-                textValue = ((double)value).ToString("R");
+            string textValue;
+            if (value is DateTime time)
+                textValue = time.ToOADate().ToString();
+            else if (value is TimeSpan span)
+                textValue = span.Ticks.ToString();
+            else if (value is float single)
+                textValue = single.ToString("R");
+            else if (value is double @double)
+                textValue = @double.ToString("R");
             else
                 textValue = value.ToString();
 
             if (dataType == typeof(bool))
             {
-                return bool.TryParse(textValue, out bool v);
+                return bool.TryParse(textValue, out _);
             }
             else if (dataType == typeof(float))
             {
-                return float.TryParse(textValue, out float v);
+                return float.TryParse(textValue, out _);
             }
             else if (dataType == typeof(double))
             {
-                return double.TryParse(textValue, out double v);
+                return double.TryParse(textValue, out _);
             }
             else if (dataType == typeof(sbyte))
             {
-                return sbyte.TryParse(textValue, out sbyte v);
+                return sbyte.TryParse(textValue, out _);
             }
             else if (dataType == typeof(byte))
             {
-                return byte.TryParse(textValue, out byte v);
+                return byte.TryParse(textValue, out _);
             }
             else if (dataType == typeof(short))
             {
-                return short.TryParse(textValue, out short v);
+                return short.TryParse(textValue, out _);
             }
             else if (dataType == typeof(ushort))
             {
-                return ushort.TryParse(textValue, out ushort v);
+                return ushort.TryParse(textValue, out _);
             }
             else if (dataType == typeof(int))
             {
-                return int.TryParse(textValue, out int v);
+                return int.TryParse(textValue, out _);
             }
             else if (dataType == typeof(uint))
             {
-                return uint.TryParse(textValue, out uint v);
+                return uint.TryParse(textValue, out _);
             }
             else if (dataType == typeof(long))
             {
-                return long.TryParse(textValue, out long v);
+                return long.TryParse(textValue, out _);
             }
             else if (dataType == typeof(ulong))
             {
-                return ulong.TryParse(textValue, out ulong v);
+                return ulong.TryParse(textValue, out _);
             }
             else if (dataType == typeof(DateTime))
             {
@@ -258,7 +258,7 @@ namespace Ntreev.Crema.Data
             }
             else if (dataType == typeof(Guid))
             {
-                return Guid.TryParse(textValue, out Guid v);
+                return Guid.TryParse(textValue, out _);
             }
 
             return true;

@@ -15,16 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Linq;
-using Ntreev.Crema.Presentation.Types.Properties;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
 using Ntreev.Crema.Presentation.Framework;
-using System.Threading.Tasks;
-using System;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Library.ObjectModel;
+using Ntreev.Crema.Presentation.Types.Properties;
+using Ntreev.Crema.Services;
 using Ntreev.Crema.Services.Extensions;
+using Ntreev.Library.ObjectModel;
+using Ntreev.ModernUI.Framework;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 {
@@ -36,9 +35,9 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
         private readonly ITypeCategoryCollection categories;
         private bool isValid;
 
-        private string[] categoryPaths;
+        private readonly string[] categoryPaths;
         private string categoryPath;
-        private string typeName;
+        private readonly string typeName;
         private string newName;
 
         private CopyTypeViewModel(Authentication authentication, IType type)

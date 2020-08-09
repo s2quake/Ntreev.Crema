@@ -15,14 +15,6 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library.ObjectModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Ntreev.Crema.Services
 {
     public class ItemsDeletedEventArgs<T> : ItemsEventArgs<T>
@@ -30,7 +22,7 @@ namespace Ntreev.Crema.Services
         public ItemsDeletedEventArgs(Authentication authentication, T[] items, string[] itemPaths)
             : this(authentication, items, itemPaths, null)
         {
-            
+
         }
 
         public ItemsDeletedEventArgs(Authentication authentication, T[] items, string[] itemPaths, object metaData)

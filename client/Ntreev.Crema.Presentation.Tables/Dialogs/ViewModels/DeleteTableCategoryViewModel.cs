@@ -19,13 +19,8 @@ using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Tables.Properties;
 using Ntreev.Crema.Services;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 
 namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 {

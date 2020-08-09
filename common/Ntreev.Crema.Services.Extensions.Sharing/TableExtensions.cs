@@ -15,12 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Library.Linq;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
-using Ntreev.Library.Linq;
 
 namespace Ntreev.Crema.Services.Extensions
 {
@@ -36,7 +35,7 @@ namespace Ntreev.Crema.Services.Extensions
             return GetTypes(table, item => true);
         }
 
-            internal static IType[] GetTypes(ITable table, Func<IType, bool> predicate)
+        internal static IType[] GetTypes(ITable table, Func<IType, bool> predicate)
         {
             table.Dispatcher.VerifyAccess();
             var typeContext = table.GetService(typeof(ITypeContext)) as ITypeContext;
@@ -55,7 +54,7 @@ namespace Ntreev.Crema.Services.Extensions
             return query.ToArray();
         }
 
-        internal static ITable[] GetRelationTables(ITable table, Func<ITable, bool> predicate)
+        internal static ITable[] GetRelationTables(ITable table, Func<ITable, bool> _)
         {
             table.Dispatcher.VerifyAccess();
             while (table.Parent != null)
@@ -76,7 +75,7 @@ namespace Ntreev.Crema.Services.Extensions
             return GetAllRelationTables(table, item => true);
         }
 
-            internal static ITable[] GetAllRelationTables(ITable table, Func<ITable, bool> predicate)
+        internal static ITable[] GetAllRelationTables(ITable table, Func<ITable, bool> _)
         {
             while (table.Parent != null)
             {

@@ -188,34 +188,34 @@ namespace Ntreev.Crema.Data.Xml
 
             if (value.GetType().IsEnum == true)
                 return ToString((Enum)value);
-            else if (value is bool)
-                return ToString((bool)value);
-            else if (value is float)
-                return ToString((float)value);
-            else if (value is double)
-                return ToString((double)value);
-            else if (value is byte)
-                return ToString((byte)value);
-            else if (value is sbyte)
-                return ToString((sbyte)value);
-            else if (value is short)
-                return ToString((short)value);
-            else if (value is ushort)
-                return ToString((ushort)value);
-            else if (value is int)
-                return ToString((int)value);
-            else if (value is uint)
-                return ToString((uint)value);
-            else if (value is long)
-                return ToString((long)value);
-            else if (value is ulong)
-                return ToString((ulong)value);
-            else if (value is DateTime)
-                return ToString((DateTime)value);
-            else if (value is TimeSpan)
-                return ToString((TimeSpan)value);
-            else if (value is Guid)
-                return ToString((Guid)value);
+            else if (value is bool boolean)
+                return ToString(boolean);
+            else if (value is float single)
+                return ToString(single);
+            else if (value is double @double)
+                return ToString(@double);
+            else if (value is byte @byte)
+                return ToString(@byte);
+            else if (value is sbyte @sbyte)
+                return ToString(@sbyte);
+            else if (value is short @short)
+                return ToString(@short);
+            else if (value is ushort @ushort)
+                return ToString(@ushort);
+            else if (value is int @int)
+                return ToString(@int);
+            else if (value is uint @uint)
+                return ToString(@uint);
+            else if (value is long @long)
+                return ToString(@long);
+            else if (value is ulong @ulong)
+                return ToString(@ulong);
+            else if (value is DateTime dateTime)
+                return ToString(dateTime);
+            else if (value is TimeSpan timeSpan)
+                return ToString(timeSpan);
+            else if (value is Guid guid)
+                return ToString(guid);
             else if (value is string)
                 return value as string;
 

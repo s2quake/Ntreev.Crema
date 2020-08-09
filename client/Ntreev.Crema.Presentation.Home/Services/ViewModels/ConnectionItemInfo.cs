@@ -16,15 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.ObjectModel;
-using System.Xml.Serialization;
 using System.Windows.Media;
-using Ntreev.Crema.Services;
-using Caliburn.Micro;
-using Ntreev.Crema.Presentation.Framework;
+using System.Xml.Serialization;
 
 namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 {

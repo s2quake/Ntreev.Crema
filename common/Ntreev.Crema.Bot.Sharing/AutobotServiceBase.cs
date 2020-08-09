@@ -22,11 +22,8 @@ using Ntreev.Library;
 using Ntreev.Library.Random;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Linq;
 using System.Security;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Bot

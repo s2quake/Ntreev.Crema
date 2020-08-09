@@ -15,16 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Collections;
-using System.Collections.Generic;
-using System;
-using System.Linq;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.ServiceModel.Properties;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library.IO;
+using Ntreev.Library.ObjectModel;
+using System;
 
 namespace Ntreev.Crema.ServiceModel
 {
@@ -39,7 +33,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public TypeCategoryBase()
         {
-            
+
         }
 
         public IContainer<_I> Types => this.Items;
@@ -64,7 +58,7 @@ namespace Ntreev.Crema.ServiceModel
         {
             this.metaData.LockInfo = this.LockInfo;
             base.OnLockChanged(e);
-            
+
         }
 
         protected override void OnAccessChanged(EventArgs e)

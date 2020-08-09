@@ -15,12 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceModel;
 using Ntreev.Library.Commands;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
-using Ntreev.Crema.ServiceModel;
 using System.IO;
 
 namespace Ntreev.Crema.Commands.Consoles.Properties
@@ -48,7 +46,7 @@ namespace Ntreev.Crema.Commands.Consoles.Properties
 
             writer.WriteLine();
             writer.WriteLine(string.Empty.PadRight(Console.BufferWidth - 1, '='));
-            
+
             foreach (var item in logs)
             {
                 if (LogProperties.Limit >= 0 && LogProperties.Limit <= count)

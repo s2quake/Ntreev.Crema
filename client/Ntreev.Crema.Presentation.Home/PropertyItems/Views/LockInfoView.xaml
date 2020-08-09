@@ -28,12 +28,14 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              mc:Ignorable="d" d:DesignWidth="300">
 
     <UserControl.Resources>
-        <nmfv:ContentToStringConverter x:Key="contentToStringConverter" />
+        
+        <nmfv:ContentToStringConverter x:Key="ContentToStringConverter" />
+        
     </UserControl.Resources>
 
     <ncpc:HeaderedContentList>
         <HeaderedContentControl Header="{x:Static p:Resources.Label_User}" Content="{Binding LockInfo.UserID}" />
-        <HeaderedContentControl Header="{x:Static p:Resources.Label_SettingDateTime}" Content="{Binding LockInfo.DateTime, Converter={StaticResource contentToStringConverter}}" />
+        <HeaderedContentControl Header="{x:Static p:Resources.Label_SettingDateTime}" Content="{Binding LockInfo.DateTime, Converter={StaticResource ContentToStringConverter}}" />
         <HeaderedContentControl Header="{x:Static p:Resources.Label_Comment}" Content="{Binding LockInfo.Comment}" />
         <HeaderedContentControl Header="{x:Static p:Resources.Label_Path}" Content="{Binding LockInfo.Path}" />
         <HeaderedContentControl Header="ParentPath" Content="{Binding LockInfo.ParentPath}" />

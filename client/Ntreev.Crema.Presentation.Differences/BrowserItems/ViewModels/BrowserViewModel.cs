@@ -15,19 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data.Diff;
 using Ntreev.Crema.Presentation.Differences.Documents.ViewModels;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Data.Diff;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
-using Ntreev.ModernUI.Framework.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -36,28 +33,31 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
     class BrowserViewModel : TreeViewBase, IBrowserItem
     {
         private readonly DiffDataSet dataSet;
-        private ICommand closeCommand;
+        private readonly Authenticator authenticator;
+        private readonly ICremaHost cremaHost;
+        private readonly ICremaAppHost cremaAppHost;
+        private readonly PropertyService propertyService;
+        private readonly BrowserService browserService;
+        private readonly DocumentServiceViewModel documentService;
+        private readonly Lazy<IServiceProvider> serviceProvider;
 
-        [Import]
-        private Lazy<IServiceProvider> serviceProvider = null;
-        [Import]
-        private DocumentServiceViewModel documentService = null;
-        [Import]
-        private BrowserService browserService = null;
-        [Import]
-        private PropertyService propertyService = null;
-        [Import]
-        private ICremaAppHost cremaAppHost = null;
-        [Import]
-        private ICremaHost cremaHost = null;
-        [Import]
-        private Authenticator authenticator = null;
+        public BrowserViewModel(Authenticator authenticator, ICremaHost cremaHost, ICremaAppHost cremaAppHost, PropertyService propertyService, BrowserService browserService, DocumentServiceViewModel documentService, Lazy<IServiceProvider> serviceProvider)
+        {
+            this.authenticator = authenticator;
+            this.cremaHost = cremaHost;
+            this.cremaAppHost = cremaAppHost;
+            this.propertyService = propertyService;
+            this.browserService = browserService;
+            this.documentService = documentService;
+            this.serviceProvider = serviceProvider;
+        }
+
         private TableTreeViewItemViewModel selectedTable;
 
         public BrowserViewModel(DiffDataSet dataSet)
         {
             this.dataSet = dataSet;
-            this.closeCommand = new DelegateCommand((p) => this.CloseAsync(), (p) => this.CanClose);
+            this.CloseCommand = new DelegateCommand(async (p) => await this.CloseAsync(), (p) => this.CanClose);
             this.DisplayName = dataSet.Header1;
             this.Dispatcher.InvokeAsync(() => this.AttachPropertyService(this.propertyService));
         }
@@ -99,10 +99,7 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             }
         }
 
-        public ICommand CloseCommand
-        {
-            get { return this.closeCommand; }
-        }
+        public ICommand CloseCommand { get; }
 
         private async Task CloseDocumentsAsync(bool save)
         {
@@ -216,8 +213,10 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
                 if (comment == null)
                     return;
 
-                var dialog = new ProgressViewModel();
-                dialog.DisplayName = viewModel.DisplayName;
+                var dialog = new ProgressViewModel
+                {
+                    DisplayName = viewModel.DisplayName
+                };
                 await dialog.ShowDialogAsync(() => dataBase.ImportAsync(this.authenticator, dataTable.DataSet, comment));
             }
             catch (Exception e)
@@ -237,7 +236,9 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
             return null;
         }
 
+#pragma warning disable CS0108 // 'BrowserViewModel.ServiceProvider'은(는) 상속된 'ViewModelBase.ServiceProvider' 멤버를 숨깁니다. 숨기려면 new 키워드를 사용하세요.
         private IServiceProvider ServiceProvider => this.serviceProvider.Value;
+#pragma warning restore CS0108 // 'BrowserViewModel.ServiceProvider'은(는) 상속된 'ViewModelBase.ServiceProvider' 멤버를 숨깁니다. 숨기려면 new 키워드를 사용하세요.
 
         private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }

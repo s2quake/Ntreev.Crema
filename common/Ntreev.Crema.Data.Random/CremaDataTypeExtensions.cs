@@ -17,10 +17,7 @@
 
 using Ntreev.Library.Random;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Data.Random
 {
@@ -39,18 +36,22 @@ namespace Ntreev.Crema.Data.Random
 
         public static CremaDataType CreateRandomType(string prefix, string postfix)
         {
-            var dataType = new CremaDataType(IdentifierUtility.Next(prefix, postfix));
-            dataType.IsFlag = RandomUtility.Within(25);
-            dataType.Comment = RandomUtility.Within(25) ? string.Empty : RandomUtility.NextString();
+            var dataType = new CremaDataType(IdentifierUtility.Next(prefix, postfix))
+            {
+                IsFlag = RandomUtility.Within(25),
+                Comment = RandomUtility.Within(25) ? string.Empty : RandomUtility.NextString()
+            };
             dataType.AddRandomMembers(RandomUtility.Next(CremaDataTypeExtensions.MinMemberCount, CremaDataTypeExtensions.MaxMemberCount));
             return dataType;
         }
 
         public static CremaDataType CreateRandomEmptyType(string prefix, string postfix)
         {
-            var dataType = new CremaDataType(IdentifierUtility.Next(prefix, postfix));
-            dataType.IsFlag = RandomUtility.Within(25);
-            dataType.Comment = RandomUtility.Within(25) ? string.Empty : RandomUtility.NextString();
+            var dataType = new CremaDataType(IdentifierUtility.Next(prefix, postfix))
+            {
+                IsFlag = RandomUtility.Within(25),
+                Comment = RandomUtility.Within(25) ? string.Empty : RandomUtility.NextString()
+            };
             return dataType;
         }
 

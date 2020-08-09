@@ -43,19 +43,15 @@ namespace Ntreev.Crema.Data
         public static string GenerateHashValue(params TypeInfo[] types)
         {
             var args = types.Select(item => item.HashValue).ToArray();
-            using (var algorithm = HashAlgorithm.Create("SHA1"))
-            {
-                return HashUtility.GetHashValue(algorithm, args);
-            }
+            using var algorithm = HashAlgorithm.Create("SHA1");
+            return HashUtility.GetHashValue(algorithm, args);
         }
 
         public static string GenerateHashValue(params TableInfo[] tables)
         {
             var args = tables.Select(item => item.HashValue).ToArray();
-            using (var algorithm = HashAlgorithm.Create("SHA1"))
-            {
-                return HashUtility.GetHashValue(algorithm, args);
-            }
+            using var algorithm = HashAlgorithm.Create("SHA1");
+            return HashUtility.GetHashValue(algorithm, args);
         }
 
         public InternalDataTable AddTable()

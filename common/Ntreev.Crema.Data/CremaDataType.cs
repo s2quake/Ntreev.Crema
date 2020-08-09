@@ -37,8 +37,6 @@ namespace Ntreev.Crema.Data
     [Serializable]
     public class CremaDataType : IListSource, IXmlSerializable, ISerializable, INotifyPropertyChanged
     {
-        private static readonly CremaDataTypeMember[] emptyMembers = new CremaDataTypeMember[] { };
-
         private bool isEventsAttached;
         internal readonly CremaDataTypeMemberBuilder builder;
 
@@ -225,7 +223,7 @@ namespace Ntreev.Crema.Data
 
             return false;
 
-            bool CompareDataRow(DataRow dataRow)
+            static bool CompareDataRow(DataRow dataRow)
             {
                 if (dataRow.HasVersion(DataRowVersion.Original) == false)
                     return false;
@@ -371,12 +369,10 @@ namespace Ntreev.Crema.Data
                 var schema = this.GetXmlSchema();
                 var dataType = new CremaDataType();
                 var schemaReader = new CremaSchemaReader(dataType, itemName);
-                using (var sr = new StringReader(schema))
-                using (var reader = XmlReader.Create(sr))
-                {
-                    schemaReader.Read(reader);
-                    return dataType;
-                }
+                using var sr = new StringReader(schema);
+                using var reader = XmlReader.Create(sr);
+                schemaReader.Read(reader);
+                return dataType;
             }
         }
 
@@ -414,11 +410,9 @@ namespace Ntreev.Crema.Data
 
         public string GetXmlSchema()
         {
-            using (var sw = new Utf8StringWriter())
-            {
-                this.Write(sw);
-                return sw.ToString();
-            }
+            using var sw = new Utf8StringWriter();
+            this.Write(sw);
+            return sw.ToString();
         }
 
         public void BeginLoadData()
@@ -706,16 +700,6 @@ namespace Ntreev.Crema.Data
 
             if (this.DataSet != null && this.DataSet.Types.Contains(itemName.Name, itemName.CategoryPath) == true)
                 throw new ArgumentException(string.Format(Resources.Exception_AlreadyExistedItem_Format, itemName));
-        }
-
-        private void ValidateSetTypeName(string value)
-        {
-            if (this.DataSet != null && CremaDataSet.VerifyName(value) == false)
-                throw new CremaDataException(Resources.Exception_InvalidName);
-            if (this.DataSet == null && string.IsNullOrEmpty(value) == false && CremaDataSet.VerifyName(value) == false)
-                throw new CremaDataException(Resources.Exception_InvalidName);
-            if (this.DataSet != null && this.DataSet.Types.Contains(value) == true)
-                throw new CremaDataException(Resources.Exception_AreadyExistedDataType_Format, value);
         }
 
         internal void AttachEventHandlers()

@@ -15,18 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.ServiceModel.Properties;
 using Ntreev.Library;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Data;
+using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
 using System;
-using System.Linq;
-using System.Collections.Generic;
-using Ntreev.Crema.ServiceModel.Properties;
-using System.Collections.Specialized;
-using Ntreev.Crema.Data.Xml.Schema;
-using System.Text.RegularExpressions;
-using Ntreev.Library.IO;
 
 namespace Ntreev.Crema.ServiceModel
 {
@@ -61,14 +54,11 @@ namespace Ntreev.Crema.ServiceModel
             this.OnDomainInfoChanged(EventArgs.Empty);
         }
 
-        public DomainInfo DomainInfo
-        {
-            get { return this.domainInfo; }
-        }
+        public DomainInfo DomainInfo => this.domainInfo;
 
         public DomainState DomainState
         {
-            get { return this.domainState; }
+            get => this.domainState;
             set
             {
                 if (this.domainState == value)
@@ -80,7 +70,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public bool IsModified
         {
-            get { return this.DomainState.HasFlag(DomainState.IsModified); }
+            get => this.DomainState.HasFlag(DomainState.IsModified);
             set
             {
                 if (value == true)
@@ -92,7 +82,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public bool IsActivated
         {
-            get { return this.DomainState.HasFlag(DomainState.IsActivated); }
+            get => this.DomainState.HasFlag(DomainState.IsActivated);
             set
             {
                 if (value == true)
@@ -112,12 +102,12 @@ namespace Ntreev.Crema.ServiceModel
             this.OnDomainInfoChanged(EventArgs.Empty);
         }
 
-        protected void Move(IAuthentication authentication, string categoryPath)
+        protected void Move(IAuthentication _, string categoryPath)
         {
             this.Category = this.Context.Categories[categoryPath];
         }
 
-        protected void Delete(IAuthentication authentication)
+        protected void Delete(IAuthentication _)
         {
             base.Dispose();
         }
@@ -143,7 +133,7 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
-        protected void ValidateMove(IAuthentication authentication, string categoryPath)
+        protected void ValidateMove(IAuthentication _, string categoryPath)
         {
             if (this.Category.Path == categoryPath)
                 throw new ArgumentException(Resources.Exception_CannotMoveToSameFolder, nameof(categoryPath));

@@ -15,22 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ConsoleHost.Commands.Consoles;
 using Ntreev.Crema.Javascript;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
-using Ntreev.Library.IO;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ConsoleHost.Commands
 {
@@ -41,16 +33,15 @@ namespace Ntreev.Crema.ConsoleHost.Commands
     {
         private readonly CremaBootstrapper application;
         private readonly ICremaHost cremaHost;
-        [Import]
-        private Lazy<ScriptContext> scriptContext = null;
+        private readonly ScriptContext scriptContext;
 
         [ImportingConstructor]
-        public RunCommand(CremaBootstrapper application, ICremaHost cremaHost)
+        public RunCommand(CremaBootstrapper application, ICremaHost cremaHost, ScriptContext scriptContext)
             : base("run")
         {
             this.application = application;
             this.cremaHost = cremaHost;
-
+            this.scriptContext = scriptContext;
         }
 
         [CommandPropertyRequired]
@@ -104,76 +95,13 @@ namespace Ntreev.Crema.ConsoleHost.Commands
 
             if (this.List == true)
             {
-                Console.Write(this.ScriptContext.GenerateDeclaration(this.GetArgumentTypes()));
+                this.Out.Write(this.scriptContext.GenerateDeclaration(this.GetArgumentTypes()));
             }
             else
             {
                 if (File.Exists(this.ScriptPath) == false)
                     throw new FileNotFoundException(this.ScriptPath);
-                this.ScriptContext.RunFromFile(this.ScriptPath, this.ScriptEntry, this.GetProperties(), null);
-            }
-        }
-
-        private static string ExecuteCmd(string cmd, string arguments)
-        {
-            var cmdPath = GetCmdPath(cmd);
-
-            var startInfo = new ProcessStartInfo(cmdPath, arguments)
-            {
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-            };
-            var process = Process.Start(startInfo);
-            var text = process.StandardOutput.ReadLine();
-            process.WaitForExit();
-            if (process.ExitCode == 2)
-            {
-                throw new Exception(text);
-            }
-            else if (process.ExitCode != 0)
-            {
-                throw new Exception(process.StandardError.ReadLine());
-            }
-            return text;
-        }
-
-        private static string GetCmdPath(string cmd)
-        {
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                var startInfo = new ProcessStartInfo("where", cmd + ".cmd")
-                {
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                };
-
-                var process = Process.Start(startInfo);
-                var text = process.StandardOutput.ReadLine();
-                process.WaitForExit();
-                if (process.ExitCode != 0)
-                    throw new Exception(process.StandardError.ReadLine());
-                return text;
-            }
-            else
-            {
-                var startInfo = new ProcessStartInfo("which", cmd)
-                {
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                };
-
-                var process = Process.Start(startInfo);
-                var text = process.StandardOutput.ReadLine();
-                process.WaitForExit();
-                if (process.ExitCode != 0)
-                    throw new Exception(process.StandardError.ReadLine());
-                return text;
+                this.scriptContext.RunFromFile(this.ScriptPath, this.ScriptEntry, this.GetProperties(), null);
             }
         }
 
@@ -219,13 +147,5 @@ namespace Ntreev.Crema.ConsoleHost.Commands
             }
             return properties;
         }
-
-        public bool Parse(string key, string value)
-        {
-            //Regex.Match("--[a-zA-Z_$][a-zA-Z0-9_$]*[=])
-            return false;
-        }
-
-        private ScriptContextBase ScriptContext => this.scriptContext.Value;
     }
 }

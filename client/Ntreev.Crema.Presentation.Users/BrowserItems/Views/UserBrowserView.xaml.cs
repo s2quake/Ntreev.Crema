@@ -16,12 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Presentation.Framework;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -30,9 +26,9 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.Views
     partial class UserBrowserView : UserControl
     {
         [ImportMany]
-        private IEnumerable<IPropertyService> propertyServices = null;
+        private readonly IEnumerable<IPropertyService> propertyServices = null;
         [Import]
-        private IShell shell = null;
+        private readonly IShell shell = null;
 
         public UserBrowserView()
         {

@@ -564,7 +564,7 @@ namespace Ntreev.Crema.Services.Data
         }
 
         #endregion
-        
+
         #region IAccessible
 
         Task IAccessible.SetPublicAsync(Authentication authentication)

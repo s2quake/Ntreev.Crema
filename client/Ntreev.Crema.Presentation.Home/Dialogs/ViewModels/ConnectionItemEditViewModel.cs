@@ -17,35 +17,33 @@
 
 using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.Presentation.Home.Services.ViewModels;
-using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Home.Dialogs.ViewModels
 {
     class ConnectionItemEditViewModel : ModalDialogBase
     {
-        private readonly ICremaAppHost cremaAppHost;
+        private readonly CremaAppHostViewModel cremaAppHost;
         private ConnectionItemViewModel connectionItemInfo;
         private bool isModified;
         private bool isPasswordChanged;
 
-        public ConnectionItemEditViewModel(ICremaAppHost cremaAppHost)
+        public ConnectionItemEditViewModel(CremaAppHostViewModel cremaAppHost)
         {
             this.cremaAppHost = cremaAppHost;
-            this.connectionItemInfo = new ConnectionItemViewModel();
+            this.connectionItemInfo = new ConnectionItemViewModel(cremaAppHost);
             this.connectionItemInfo.PropertyChanged += ConnectionItemInfo_PropertyChanged;
             this.IsNew = true;
             this.DisplayName = Resources.Title_AddConnectionItem;
         }
 
-        public ConnectionItemEditViewModel(ICremaAppHost cremaAppHost, ConnectionItemViewModel connectionItemInfo)
+        public ConnectionItemEditViewModel(CremaAppHostViewModel cremaAppHost, ConnectionItemViewModel connectionItemInfo)
         {
             this.cremaAppHost = cremaAppHost;
             this.connectionItemInfo = connectionItemInfo ?? throw new ArgumentNullException(nameof(connectionItemInfo));

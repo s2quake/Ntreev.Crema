@@ -15,41 +15,36 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Linq;
-using System.ComponentModel.Composition;
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using System.Threading.Tasks;
-using Ntreev.Library;
-using System.Collections.Generic;
-using System.Collections;
-using Ntreev.ModernUI.Framework;
-using System.ComponentModel;
-using Ntreev.Library.Linq;
-using Ntreev.Crema.Presentation.Tables.Properties;
-using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Tables.Properties;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
+using Ntreev.Library.Linq;
+using Ntreev.ModernUI.Framework;
+using Ntreev.ModernUI.Framework.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Linq;
 
 namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [Dependency("Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels.TypeInfoViewModel, Ntreev.Crema.Presentation.Types, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Presentation.Types.IPropertyService, Ntreev.Crema.Presentation.Types, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [Dependency("Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels.TypeInfoViewModel, Ntreev.Crema.Presentation.Types, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Types.IPropertyService, Ntreev.Crema.Presentation.Types, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ReferencedTablesViewModel : PropertyItemBase, ISelector
     {
         [Import]
-        private Lazy<TableBrowserViewModel> browser = null;
+        private readonly Lazy<TableBrowserViewModel> browser = null;
         [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator = null;
         private ITypeDescriptor descriptor;
         private TableListBoxItemViewModel[] tables;
         private TableListBoxItemViewModel selectedTable;
         [Import]
-        private IBuildUp buildUp = null;
+        private readonly IBuildUp buildUp = null;
 
         [ImportingConstructor]
         public ReferencedTablesViewModel()

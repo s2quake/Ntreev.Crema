@@ -26,7 +26,7 @@ namespace Ntreev.Crema.Data
         {
 
         }
-        
+
         public InternalDataRowChangeEventArgs(DataRow row, DataRowAction action)
             : base(row, action)
         {

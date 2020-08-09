@@ -15,17 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Text;
-using Ntreev.Library.IO;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Library.ObjectModel;
-using System.Threading.Tasks;
+using Ntreev.Crema.Services;
 using Ntreev.Crema.Services.Extensions;
+using Ntreev.Library.ObjectModel;
+using System;
+using System.ComponentModel.Composition;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
@@ -33,7 +30,7 @@ namespace Ntreev.Crema.Commands.Consoles
     public sealed class UsersConsoleDrive : ConsoleDriveBase
     {
         [Import]
-        private Lazy<ICremaHost> cremaHost = null;
+        private readonly Lazy<ICremaHost> cremaHost = null;
 
         private string path;
 
@@ -104,7 +101,7 @@ namespace Ntreev.Crema.Commands.Consoles
                 this.path = path;
             });
         }
-        
+
         private async Task MoveUserCategoryAsync(Authentication authentication, IUserCategory sourceCategory, string destPath)
         {
             var destObject = await this.GetObjectAsync(destPath);

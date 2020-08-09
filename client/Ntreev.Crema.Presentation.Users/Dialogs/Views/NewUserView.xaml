@@ -30,7 +30,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     <StackPanel>
         <nmfc:PropertyItemsControl>
             <Grid nmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_ID}">
-                <TextBox x:Name="ID" TextChanged="ID_TextChanged">
+                <TextBox x:Name="ID">
                     <TextBox.Text>
                         <Binding Path="ID" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
                             <Binding.ValidationRules>

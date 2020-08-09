@@ -15,18 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Users.Properties;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Users.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Users.Properties;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
@@ -36,21 +33,19 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
     [ParentType("Ntreev.Crema.Presentation.Home.IPropertyService, Ntreev.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class DataBaseUsersViewModel : PropertyItemBase
     {
-        private readonly ObservableCollection<DataBaseUserItemViewModel> users = new ObservableCollection<DataBaseUserItemViewModel>();
+        private readonly Authenticator authenticator;
+        private readonly ICremaAppHost cremaAppHost;
         private DataBaseUserItemViewModel selectedUser;
         private IDataBaseDescriptor descriptor;
         private INotifyPropertyChanged notifyObject;
 
         [Import]
-        private IBuildUp buildUp = null;
+        private readonly IBuildUp buildUp = null;
 
-        [Import]
-        private Authenticator authenticator = null;
-        [Import]
-        private ICremaAppHost cremaAppHost = null;
-
-        public DataBaseUsersViewModel()
+        public DataBaseUsersViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost)
         {
+            this.authenticator = authenticator;
+            this.cremaAppHost = cremaAppHost;
             this.DisplayName = Resources.Title_DataBaseUsers;
         }
 
@@ -78,7 +73,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 
         public async Task NotifyMessageAsync()
         {
-            var userIDs = this.users.Select(item => item.ID).ToArray();
+            var userIDs = this.Users.Select(item => item.ID).ToArray();
             var dialog = await NotifyMessageViewModel.CreateInstanceAsync(this.authenticator, this.cremaAppHost, userIDs);
             await dialog.ShowDialogAsync();
         }
@@ -91,20 +86,17 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
             }
         }
 
-        public override bool IsVisible => this.descriptor != null && this.users.Any();
+        public override bool IsVisible => this.descriptor != null && this.Users.Any();
 
         public override object SelectedObject => this.descriptor;
 
-        public bool CanNotifyMessage
-        {
-            get { return this.authenticator.Authority == Authority.Admin; }
-        }
+        public bool CanNotifyMessage => this.authenticator.Authority == Authority.Admin;
 
-        public ObservableCollection<DataBaseUserItemViewModel> Users => this.users;
+        public ObservableCollection<DataBaseUserItemViewModel> Users { get; } = new ObservableCollection<DataBaseUserItemViewModel>();
 
         public DataBaseUserItemViewModel SelectedUser
         {
-            get { return this.selectedUser; }
+            get => this.selectedUser;
             set
             {
                 this.selectedUser = value;
@@ -114,21 +106,21 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 
         private void SyncUsers(AuthenticationInfo[] authenticationInfos)
         {
-            foreach (var item in this.users.ToArray())
+            foreach (var item in this.Users.ToArray())
             {
                 if (authenticationInfos.Any(i => i.ID == item.ID) == false)
                 {
-                    this.users.Remove(item);
+                    this.Users.Remove(item);
                 }
             }
 
             foreach (var item in authenticationInfos)
             {
-                if (this.users.Any(i => i.ID == item.ID) == false)
+                if (this.Users.Any(i => i.ID == item.ID) == false)
                 {
                     var viewModel = new DataBaseUserItemViewModel(item);
                     this.buildUp?.BuildUp(viewModel);
-                    this.users.Add(viewModel);
+                    this.Users.Add(viewModel);
                 }
             }
 

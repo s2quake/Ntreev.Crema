@@ -24,7 +24,6 @@ using Ntreev.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Domains
@@ -345,7 +344,7 @@ namespace Ntreev.Crema.Services.Domains
                 this.OnInitialize(metaData.Data);
                 this.Logger = new DomainLogger(this)
                 {
-                    
+
                 };
             }
         }

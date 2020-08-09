@@ -17,9 +17,6 @@
 
 using Ntreev.Crema.ServiceModel;
 using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Reflection;
 using System.Security;
 using System.Threading.Tasks;
 

@@ -17,10 +17,7 @@
 
 using Ntreev.Library.Random;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Data.Random
 {
@@ -81,11 +78,6 @@ namespace Ntreev.Crema.Data.Random
                 dataColumn.CremaType = dataTable.DataSet.Types.Random();
             }
 
-            if (RandomUtility.Within(25) == true)
-            {
-                SetHopeType(dataColumn);
-            }
-
             if (dataTable != null && dataTable.PrimaryKey.Any() == false)
             {
                 dataColumn.IsKey = true;
@@ -124,28 +116,6 @@ namespace Ntreev.Crema.Data.Random
             {
                 dataColumn.ReadOnly = true;
             }
-        }
-
-        //[Obsolete]
-        private static void SetHopeType(CremaDataColumn dataColumn)
-        {
-            //var dataTable = dataColumn.Table;
-
-            //if (dataColumn.DataType == typeof(string))
-            //{
-            //    if (dataColumn.CremaType == null && dataTable.DataSet != null)
-            //    {
-            //        SetHopeType(dataColumn, dataTable.DataSet.Types.Random());
-            //    }
-            //    else
-            //    {
-            //        SetHopeType(dataColumn, CremaDataTypeUtility.GetBaseTypes().Random(item => item != typeof(string)));
-            //    }
-            //}
-            //else
-            //{
-            //    //SetHopeType(dataColumn, CremaDataTypeUtility.GetBaseTypes().Random(item => item != dataColumn.DataType));
-            //}
         }
     }
 }

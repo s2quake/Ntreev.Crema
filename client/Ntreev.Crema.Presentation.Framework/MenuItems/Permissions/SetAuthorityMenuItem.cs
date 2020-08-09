@@ -17,15 +17,8 @@
 
 using Ntreev.Crema.Presentation.Framework.Properties;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.Controls;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 
 namespace Ntreev.Crema.Presentation.Framework.MenuItems.Permissions
 {
@@ -40,11 +33,12 @@ namespace Ntreev.Crema.Presentation.Framework.MenuItems.Permissions
     [Category("Permissions")]
     class SetAuthorityMenuItem : MenuItemBase
     {
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
-        public SetAuthorityMenuItem()
+        [ImportingConstructor]
+        public SetAuthorityMenuItem(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.DisplayName = Resources.MenuItem_SetAuthority;
         }
 

@@ -17,18 +17,11 @@
 
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Tables.Properties;
-using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
-using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Crema.Services;
 
 namespace Ntreev.Crema.Presentation.Tables.MenuItems.TreeViewItems.TagMenus
 {
@@ -36,11 +29,12 @@ namespace Ntreev.Crema.Presentation.Tables.MenuItems.TreeViewItems.TagMenus
     [ParentType(typeof(TagsMenuItem))]
     class UnusedTagsMenuItem : MenuItemBase
     {
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
-        public UnusedTagsMenuItem()
+        [ImportingConstructor]
+        public UnusedTagsMenuItem(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.DisplayName = Resources.MenuItem_TagsUnused;
         }
 

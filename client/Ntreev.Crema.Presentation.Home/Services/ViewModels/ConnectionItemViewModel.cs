@@ -16,48 +16,37 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.ViewModels;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using System.Windows.Media;
 
 namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 {
     class ConnectionItemViewModel : ListBoxItemViewModel, IConnectionItem
     {
+        private readonly CremaAppHostViewModel cremaAppHost;
         private string name;
         private string address;
         private string dataBaseName;
         private string userID;
         private string password;
-        private Color themeColor = FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor;
         private string theme;
-        private bool isDefault;
+        private Color themeColor = FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor;
         private bool isCurrentTheme;
         private bool isTemporary;
-        private DateTime lastConnectedDateTime;
 
-        [Import]
-        private Lazy<CremaAppHostViewModel> cremaAppHost = null;
-
-        public ConnectionItemViewModel()
+        public ConnectionItemViewModel(CremaAppHostViewModel cremaAppHost)
+            : base(cremaAppHost)
         {
-
+            this.cremaAppHost = cremaAppHost ?? throw new ArgumentNullException(nameof(cremaAppHost));
         }
 
         public ConnectionItemViewModel Clone()
         {
-            return new ConnectionItemViewModel()
+            return new ConnectionItemViewModel(this.cremaAppHost)
             {
                 name = this.name,
                 address = this.address,
@@ -66,8 +55,8 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
                 password = this.password,
                 themeColor = this.themeColor,
                 theme = this.theme,
-                isDefault = this.isDefault,
-                lastConnectedDateTime = this.lastConnectedDateTime,
+                IsDefault = this.IsDefault,
+                LastConnectedDateTime = this.LastConnectedDateTime,
             };
         }
 
@@ -80,15 +69,15 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
             this.password = connectionInfo.password;
             this.themeColor = connectionInfo.themeColor;
             this.theme = connectionInfo.theme;
-            this.isDefault = connectionInfo.isDefault;
-            this.lastConnectedDateTime = connectionInfo.lastConnectedDateTime;
+            this.IsDefault = connectionInfo.IsDefault;
+            this.LastConnectedDateTime = connectionInfo.LastConnectedDateTime;
             this.Refresh();
             this.RefreshIsCurrentThemeProperty();
         }
 
         public string Name
         {
-            get { return this.name ?? string.Empty; }
+            get => this.name ?? string.Empty;
             set
             {
                 this.name = value;
@@ -98,7 +87,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 
         public string Address
         {
-            get { return this.address ?? string.Empty; }
+            get => this.address ?? string.Empty;
             set
             {
                 this.address = value;
@@ -108,7 +97,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 
         public string DataBaseName
         {
-            get { return this.dataBaseName ?? string.Empty; }
+            get => this.dataBaseName ?? string.Empty;
             set
             {
                 this.dataBaseName = value;
@@ -118,7 +107,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 
         public string ID
         {
-            get { return this.userID ?? string.Empty; }
+            get => this.userID ?? string.Empty;
             set
             {
                 this.userID = value;
@@ -128,10 +117,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 
         public string Password
         {
-            get
-            {
-                return this.password ?? string.Empty;
-            }
+            get => this.password ?? string.Empty;
             set
             {
                 this.password = value;
@@ -141,7 +127,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 
         public Color ThemeColor
         {
-            get { return this.themeColor; }
+            get => this.themeColor;
             set
             {
                 this.themeColor = value;
@@ -151,7 +137,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 
         public string Theme
         {
-            get { return this.theme ?? "Dark"; }
+            get => this.theme ?? "Dark";
             set
             {
                 this.theme = value;
@@ -180,41 +166,29 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
         {
             get
             {
-                using (var stream = new MemoryStream())
-                using (var writer = new StreamWriter(stream))
-                using (var md5 = MD5.Create())
+                using var stream = new MemoryStream();
+                using var writer = new StreamWriter(stream);
+                using var md5 = MD5.Create();
+                writer.Write(this.Password);
+                writer.Close();
+
+                var bytes = md5.ComputeHash(stream.GetBuffer());
+                var sBuilder = new StringBuilder();
+                for (var i = 0; i < bytes.Length; i++)
                 {
-                    writer.Write(this.Password);
-                    writer.Close();
-
-                    var bytes = md5.ComputeHash(stream.GetBuffer());
-                    var sBuilder = new StringBuilder();
-
-                    for (var i = 0; i < bytes.Length; i++)
-                    {
-                        sBuilder.Append(bytes[i].ToString("x2"));
-                    }
-
-                    return Guid.Parse(sBuilder.ToString());
+                    sBuilder.Append(bytes[i].ToString("x2"));
                 }
+                return Guid.Parse(sBuilder.ToString());
             }
         }
 
-        public bool IsDefault
-        {
-            get { return this.isDefault; }
-            set { this.isDefault = value; }
-        }
+        public bool IsDefault { get; set; }
 
-        public DateTime LastConnectedDateTime
-        {
-            get { return this.lastConnectedDateTime; }
-            set { this.lastConnectedDateTime = value; }
-        }
+        public DateTime LastConnectedDateTime { get; set; }
 
         public bool IsCurrentTheme
         {
-            get { return this.isCurrentTheme; }
+            get => this.isCurrentTheme;
             private set
             {
                 this.isCurrentTheme = value;
@@ -224,18 +198,13 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 
         public bool IsTemporary
         {
-            get { return this.isTemporary; }
+            get => this.isTemporary;
             set
             {
                 this.isTemporary = value;
                 this.NotifyOfPropertyChange(nameof(this.IsTemporary));
             }
         }
-
-        public static readonly ConnectionItemViewModel Empty = new ConnectionItemViewModel()
-        {
-            themeColor = FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor,
-        };
 
         private void Current_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -249,7 +218,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
         {
             foreach (var item in CremaAppHostViewModel.Themes)
             {
-                if (item.Key == this.Theme && item.Key == this.CremaAppHost.Theme)
+                if (item.Key == this.Theme && item.Key == this.cremaAppHost.Theme)
                 {
                     this.IsCurrentTheme = true;
                     return;
@@ -257,7 +226,5 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
             }
             this.IsCurrentTheme = false;
         }
-
-        private CremaAppHostViewModel CremaAppHost => this.cremaAppHost.Value;
     }
 }

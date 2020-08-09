@@ -18,12 +18,7 @@
 using Ntreev.Library.Commands;
 using Ntreev.ModernUI.Framework.Controls;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace Ntreev.Crema.Presentation.Console

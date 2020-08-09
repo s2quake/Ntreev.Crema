@@ -15,16 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.Presentation.Home.Services.ViewModels;
-using Ntreev.Crema.Presentation.Framework;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Home.ToolBarItems
 {
@@ -32,14 +27,14 @@ namespace Ntreev.Crema.Presentation.Home.ToolBarItems
     [ParentType(typeof(DataBaseListViewModel))]
     class LoadDataBaseToolBarItem : ToolBarItemBase
     {
+        private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
-        [Import]
-        private Authenticator authenticator = null;
         private bool isLoaded;
 
         [ImportingConstructor]
-        public LoadDataBaseToolBarItem(ICremaAppHost cremaAppHost)
+        public LoadDataBaseToolBarItem(Authenticator authenticator, ICremaAppHost cremaAppHost)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += this.InvokeCanExecuteChangedEvent;
             this.cremaAppHost.Loaded += this.InvokeCanExecuteChangedEvent;

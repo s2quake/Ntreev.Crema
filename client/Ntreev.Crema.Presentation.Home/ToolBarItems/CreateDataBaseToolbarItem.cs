@@ -17,14 +17,9 @@
 
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Home.Properties;
-using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Ntreev.Crema.Presentation.Home.Services.ViewModels;
+using Ntreev.ModernUI.Framework;
+using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Presentation.Home.ToolBarItems
 {
@@ -32,19 +27,17 @@ namespace Ntreev.Crema.Presentation.Home.ToolBarItems
     [ParentType(typeof(DataBaseListViewModel))]
     class CreateDataBaseToolBarItem : ToolBarItemBase
     {
+        private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
-        [Import]
-        private Authenticator authenticator = null;
-        [Import]
-        private IServiceProvider serviceProvider = null;
 
         [ImportingConstructor]
-        public CreateDataBaseToolBarItem(ICremaAppHost cremaAppHost)
+        public CreateDataBaseToolBarItem(Authenticator authenticator, ICremaAppHost cremaAppHost)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += this.InvokeCanExecuteChangedEvent;
             this.cremaAppHost.Closed += this.InvokeCanExecuteChangedEvent;
-            this.Icon = "/Ntreev.Crema.Presentation.Home;component/Images/add.png";
+            this.Icon = "Images/add.png";
             this.DisplayName = Resources.MenuItem_CreateDataBase;
             this.HideOnDisabled = true;
         }
@@ -62,7 +55,7 @@ namespace Ntreev.Crema.Presentation.Home.ToolBarItems
         {
             if (this.cremaAppHost.IsOpened == true && parameter is DataBaseListViewModel listViewModel)
             {
-                await DataBaseUtility.CreateAsync(this.authenticator, this.serviceProvider);
+                await DataBaseUtility.CreateAsync(this.authenticator, this.cremaAppHost);
             }
         }
     }

@@ -15,20 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
 using Ntreev.Crema.Presentation.Types.Properties;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
 {
@@ -39,7 +33,7 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
         private readonly ICremaAppHost cremaAppHost;
 
         [Import]
-        private IBuildUp buildUp = null;
+        private readonly IBuildUp buildUp = null;
 
         [ImportingConstructor]
         public TypeDocumentServiceViewModel(ICremaAppHost cremaAppHost)

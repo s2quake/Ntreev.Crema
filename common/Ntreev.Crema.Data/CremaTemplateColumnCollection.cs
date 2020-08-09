@@ -27,13 +27,11 @@ namespace Ntreev.Crema.Data
     public sealed class CremaTemplateColumnCollection : IEnumerable<CremaTemplateColumn>, ICollection
     {
         private readonly InternalTemplate template;
-        private readonly DataRowCollection rows;
         private readonly IList<InternalTemplateColumn> itemList;
 
         internal CremaTemplateColumnCollection(InternalTemplate template)
         {
             this.template = template;
-            this.rows = template.Rows;
             this.itemList = template.RowList;
         }
 

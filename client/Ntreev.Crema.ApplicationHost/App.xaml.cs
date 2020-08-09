@@ -15,20 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Library;
 using Ntreev.Library.Commands;
+using System;
+using System.Diagnostics;
+using System.IO;
 using System.Text;
-using System.Resources;
+using System.Windows;
 
 namespace Ntreev.Crema.ApplicationHost
 {
@@ -37,11 +31,9 @@ namespace Ntreev.Crema.ApplicationHost
     /// </summary>
     public partial class App : Application
     {
-        private static LogWriter writer = new LogWriter();
-
         static App()
         {
-            CremaLog.AddRedirection(writer, LogVerbose.Debug);
+            CremaLog.AddRedirection(Writer, LogVerbose.Debug);
         }
 
         public App()
@@ -76,7 +68,7 @@ namespace Ntreev.Crema.ApplicationHost
 
         protected override void OnExit(ExitEventArgs e)
         {
-            CremaLog.RemoveRedirection(writer);
+            CremaLog.RemoveRedirection(Writer);
             base.OnExit(e);
         }
 
@@ -107,10 +99,7 @@ namespace Ntreev.Crema.ApplicationHost
             return true;
         }
 
-        internal static LogWriter Writer
-        {
-            get { return writer; }
-        }
+        internal static LogWriter Writer { get; } = new LogWriter();
 
         #region classes
 

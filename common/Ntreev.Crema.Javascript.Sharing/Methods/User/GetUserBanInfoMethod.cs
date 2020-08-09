@@ -16,15 +16,12 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Text;
-using Ntreev.Crema.Data.Xml.Schema;
-using System.ComponentModel;
-using System.Threading.Tasks;
 using Ntreev.Crema.Services.Extensions;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.User
 {

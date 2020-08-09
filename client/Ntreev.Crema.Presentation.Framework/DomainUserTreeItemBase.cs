@@ -17,11 +17,6 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace Ntreev.Crema.Presentation.Framework
@@ -71,7 +66,7 @@ namespace Ntreev.Crema.Presentation.Framework
                 return this.foreground;
             }
         }
-                
+
         #region IDomainUserDescriptor
 
         IDomainUser IDomainUserDescriptor.Target => this.descriptor.Target as IDomainUser;

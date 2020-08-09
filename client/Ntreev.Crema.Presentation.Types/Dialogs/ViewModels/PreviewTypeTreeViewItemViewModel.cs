@@ -19,18 +19,14 @@ using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 {
     class PreviewTypeTreeViewItemViewModel : ItemTreeViewItemViewModel
     {
-        private Action<PreviewTypeTreeViewItemViewModel> viewAction;
-        private ICommand viewCommand;
+        private readonly Action<PreviewTypeTreeViewItemViewModel> viewAction;
+        private readonly ICommand viewCommand;
 
         public PreviewTypeTreeViewItemViewModel(string path, Action<PreviewTypeTreeViewItemViewModel> viewAction)
             : base(path)

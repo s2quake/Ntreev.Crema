@@ -17,12 +17,6 @@
 
 using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
 {

@@ -120,7 +120,7 @@ namespace Ntreev.Crema.Data
                 switch (i % 4)
                 {
                     case 0:
-                        if (args[i] is string dataType)
+                        if (args[i] is string)
                         {
 
                         }
@@ -130,7 +130,7 @@ namespace Ntreev.Crema.Data
                         }
                         break;
                     case 1:
-                        if (args[i] is string name)
+                        if (args[i] is string)
                         {
 
                         }
@@ -140,7 +140,7 @@ namespace Ntreev.Crema.Data
                         }
                         break;
                     case 2:
-                        if (args[i] is bool isKey)
+                        if (args[i] is bool)
                         {
 
                         }
@@ -150,7 +150,7 @@ namespace Ntreev.Crema.Data
                         }
                         break;
                     case 3:
-                        if (args[i] is bool isUnique)
+                        if (args[i] is bool)
                         {
 
                         }
@@ -162,10 +162,8 @@ namespace Ntreev.Crema.Data
                 }
 
             }
-            using (var algorithm = HashAlgorithm.Create("SHA1"))
-            {
-                return HashUtility.GetHashValue(algorithm, args);
-            }
+            using var algorithm = HashAlgorithm.Create("SHA1");
+            return HashUtility.GetHashValue(algorithm, args);
         }
 
         public void AddRow(InternalDataRow row)
@@ -792,7 +790,7 @@ namespace Ntreev.Crema.Data
                     }
                     else
                     {
-                        TypeConverter cc = TypeDescriptor.GetConverter(item.DataType);
+                        var cc = TypeDescriptor.GetConverter(item.DataType);
 
                         long maxValue = query.Max(i => (long)cc.ConvertTo(i[item], typeof(long)));
                         e.Row[item] = longConverter.ConvertTo(maxValue + item.AutoIncrementStep, item.DataType);
@@ -803,12 +801,8 @@ namespace Ntreev.Crema.Data
 
         protected override void OnColumnChanging(DataColumnChangeEventArgs e)
         {
-            var column = e.Column as InternalDataColumn;
-            var row = e.Row as InternalDataRow;
-
             if (this.IsDiffMode == false)
                 this.ValidateCremaType(e);
-
             base.OnColumnChanging(e);
         }
 

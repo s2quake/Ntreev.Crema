@@ -19,56 +19,43 @@
 
 using Ntreev.Library;
 using Ntreev.Library.IO;
-using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
 using System.Xml.Serialization;
 
 namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 {
-    class ConnectionItemCollection : ObservableCollection<ConnectionItemViewModel>, IPartImportsSatisfiedNotification
+    class ConnectionItemCollection : ObservableCollection<ConnectionItemViewModel>
     {
-        private const string versionString = "3.5";
+        private const string versionString = "5.0";
         private static readonly XmlSerializer serializer;
-
-        private string filename;
-        [Import]
-        private IBuildUp buildUp = null;
+        private readonly CremaAppHostViewModel cremaAppHost;
+        private readonly string filename;
 
         static ConnectionItemCollection()
         {
             serializer = XmlSerializer.FromTypes(new Type[] { typeof(ConnectionItemInfo[]), }).First();
         }
 
-        private ConnectionItemCollection(string filename)
-            : this(filename, Enumerable.Empty<ConnectionItemInfo>())
+        private ConnectionItemCollection(CremaAppHostViewModel cremaAppHost, string filename)
+            : this(cremaAppHost, filename, Enumerable.Empty<ConnectionItemInfo>())
         {
 
         }
 
-        private ConnectionItemCollection(string filename, IEnumerable<ConnectionItemInfo> items)
+        private ConnectionItemCollection(CremaAppHostViewModel cremaAppHost, string filename, IEnumerable<ConnectionItemInfo> items)
         {
+            this.cremaAppHost = cremaAppHost;
             this.filename = filename;
-
-            if (File.Exists(filename) == false)
-            {
-                this.AddFromOldList(Path.Combine(Path.GetDirectoryName(filename), "FavoriteServers.xml"));
-                this.AddFromOldList(Path.Combine(Path.GetDirectoryName(filename), "RecentServers.xml"));
-            }
 
             foreach (var item in items)
             {
                 var version = item.Version;
-                var itemViewModel = new ConnectionItemViewModel()
+                var itemViewModel = new ConnectionItemViewModel(this.cremaAppHost)
                 {
                     Name = item.Name,
                     Address = item.Address,
@@ -81,7 +68,6 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 
                 if (item.Password != null)
                     itemViewModel.Password = version == null ? StringUtility.Encrypt(item.Password, item.ID) : item.Password;
-
                 base.Add(itemViewModel);
             }
             this.CollectionChanged += ConnectionItemInfoCollection_CollectionChanged;
@@ -95,20 +81,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
                     return;
             }
             base.Add(viewModel);
-            this.buildUp.BuildUp(viewModel);
         }
-
-        //public void RemoveEquale(ConnectionItemViewModel viewModel)
-        //{
-        //    for (var i = this.Count - 1; i >= 0; i--)
-        //    {
-        //        var recentItem = this[i];
-        //        if (recentItem.Equals(viewModel) == true)
-        //        {
-        //            this.RemoveAt(i);
-        //        }
-        //    }
-        //}
 
         public void Write()
         {
@@ -136,26 +109,22 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
             }
 
             FileUtility.Backup(this.filename);
-            using (var stream = new FileStream(this.filename, FileMode.Create))
-            {
-                serializer.Serialize(stream, connectionItemInfoList.ToArray());
-            }
+            using var stream = new FileStream(this.filename, FileMode.Create);
+            serializer.Serialize(stream, connectionItemInfoList.ToArray());
         }
 
-        public static ConnectionItemCollection Read(string filename)
+        public static ConnectionItemCollection Read(CremaAppHostViewModel cremaAppHost, string filename)
         {
             try
             {
-                using (var stream = new FileStream(filename, FileMode.Open))
-                {
-                    var items = serializer.Deserialize(stream) as ConnectionItemInfo[];
-                    var collection = new ConnectionItemCollection(filename, items);
-                    return collection;
-                }
+                using var stream = new FileStream(filename, FileMode.Open);
+                var items = serializer.Deserialize(stream) as ConnectionItemInfo[];
+                var collection = new ConnectionItemCollection(cremaAppHost, filename, items);
+                return collection;
             }
             catch
             {
-                return new ConnectionItemCollection(filename);
+                return new ConnectionItemCollection(cremaAppHost, filename);
             }
         }
 
@@ -163,37 +132,5 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
         {
             this.Write();
         }
-
-        private void AddFromOldList(string filename)
-        {
-            var dirPath = Path.GetDirectoryName(filename);
-            var oldFileName = Path.Combine(dirPath, filename);
-            if (File.Exists(oldFileName) == true)
-            {
-                var oldItems = ServerItemCollection.Read(oldFileName);
-
-                foreach (var item in oldItems)
-                {
-                    base.Add(item);
-                }
-
-                return;
-            }
-        }
-
-        #region IPartImportsSatisfiedNotification
-
-        void IPartImportsSatisfiedNotification.OnImportsSatisfied()
-        {
-            Application.Current.Dispatcher.InvokeAsync(() =>
-            {
-                foreach (var item in this)
-                {
-                    this.buildUp.BuildUp(item);
-                }
-            });
-        }
-
-        #endregion
     }
 }

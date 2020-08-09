@@ -16,18 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Text;
-using System.ComponentModel;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Data;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library;
-using System.Threading.Tasks;
 using Ntreev.Crema.Services.Extensions;
+using System.ComponentModel;
+using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Methods.DataBase
 {

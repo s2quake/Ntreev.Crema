@@ -16,23 +16,14 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #pragma warning disable 0618
-using Ntreev.Crema.Commands;
-using Ntreev.Crema.Commands.Consoles;
+using Newtonsoft.Json.Schema;
+using Ntreev.Crema.Commands.Consoles.Serializations;
+using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
-using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.Commands.Consoles.Serializations;
-using Ntreev.Crema.Commands.Consoles.Properties;
-using Newtonsoft.Json.Linq;
-using System.ComponentModel;
-using Newtonsoft.Json.Schema;
-using Ntreev.Crema.Data;
-using Newtonsoft.Json.Schema.Generation;
 
 namespace Ntreev.Crema.Commands.Consoles.TableContent
 {
@@ -97,13 +88,11 @@ namespace Ntreev.Crema.Commands.Consoles.TableContent
 
             JsonPropertiesInfo GetResult()
             {
-                using (var editor = new JsonEditorHost(fields, schema))
-                {
-                    if (editor.Execute() == false)
-                        return null;
+                using var editor = new JsonEditorHost(fields, schema);
+                if (editor.Execute() == false)
+                    return null;
 
-                    return editor.Read<JsonPropertiesInfo>();
-                }
+                return editor.Read<JsonPropertiesInfo>();
             }
         }
     }

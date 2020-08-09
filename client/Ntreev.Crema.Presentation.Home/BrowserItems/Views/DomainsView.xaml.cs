@@ -15,21 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Ntreev.Crema.Presentation.Home.BrowserItems.Views
 {
@@ -38,12 +25,12 @@ namespace Ntreev.Crema.Presentation.Home.BrowserItems.Views
     /// </summary>
     public partial class DomainsView : UserControl
     {
-        [Import]
-        private IPropertyService propertyService = null;
+        private readonly IPropertyService propertyService;
 
-        public DomainsView()
+        public DomainsView(IPropertyService propertyService)
         {
             InitializeComponent();
+            this.propertyService = propertyService;
         }
 
         protected override void OnIsKeyboardFocusWithinChanged(DependencyPropertyChangedEventArgs e)

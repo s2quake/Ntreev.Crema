@@ -17,9 +17,9 @@
 
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Home.Properties;
+using Ntreev.Crema.Presentation.Home.Services.ViewModels;
 using Ntreev.ModernUI.Framework;
 using System.ComponentModel.Composition;
-using Ntreev.Crema.Presentation.Home.Services.ViewModels;
 
 namespace Ntreev.Crema.Presentation.Home.ToolBarItems
 {

@@ -17,7 +17,6 @@
 
 using Ntreev.Crema.ServiceHosts.Users;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections;
@@ -40,7 +39,7 @@ namespace Ntreev.Crema.Services.Users
         {
 
         }
-                
+
         public async Task<UserCategory> AddNewAsync(Authentication authentication, string name, string parentPath)
         {
             try

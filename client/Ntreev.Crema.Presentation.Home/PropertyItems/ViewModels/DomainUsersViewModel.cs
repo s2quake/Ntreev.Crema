@@ -15,18 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
 {
@@ -35,17 +29,14 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
     [ParentType(typeof(PropertyService))]
     class DomainUsersViewModel : PropertyItemBase
     {
+        private readonly Authenticator authenticator;
         private ReadOnlyObservableCollection<DomainUserListItemBase> users;
         private DomainUserListItemBase selectedUser;
         private IDomainDescriptor descriptor;
 
-        [Import]
-        private Authenticator authenticator = null;
-        [Import]
-        private IBuildUp buildUp = null;
-
-        public DomainUsersViewModel()
+        public DomainUsersViewModel(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.DisplayName = Resources.Title_DomainUserList;
         }
 
@@ -70,7 +61,6 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
                 else
                 {
                     var listBase = await domain.Dispatcher.InvokeAsync(() => new DomainUserListBase(this.authenticator, domain, true, this));
-                    this.buildUp?.BuildUp(listBase);
                     this.Users = listBase.Users;
                 }
 

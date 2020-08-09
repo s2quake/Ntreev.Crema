@@ -17,13 +17,9 @@
 
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.SmartSet.Properties;
-using Ntreev.Crema.ServiceModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels.Tables
 {

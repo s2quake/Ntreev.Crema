@@ -15,36 +15,25 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
+using Ntreev.Crema.Presentation.Users.Properties;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using Ntreev.Crema.Presentation.Users.PropertyItems.Views;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Presentation.Users.Properties;
 
 namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [Dependency("Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels.TableInfoViewModel, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Presentation.Tables.IPropertyService, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [Dependency("Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels.TableInfoViewModel, Ntreev.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Tables.IPropertyService, Ntreev.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class TableContentEditorsViewModel : EditorsViewModel
     {
         [ImportingConstructor]
         public TableContentEditorsViewModel(ICremaAppHost cremaAppHost)
-            : base(cremaAppHost)
+            : base(cremaAppHost: cremaAppHost)
         {
             this.DisplayName = Resources.Title_UsersEditingContent;
         }

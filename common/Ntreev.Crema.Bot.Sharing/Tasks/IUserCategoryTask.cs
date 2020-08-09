@@ -15,19 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
-using Ntreev.Library;
+using Ntreev.Library.Linq;
 using Ntreev.Library.Random;
 using System;
-using System.Linq;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Text;
+using System.Linq;
 using System.Security;
 using System.Threading.Tasks;
-using Ntreev.Library.Linq;
 
 namespace Ntreev.Crema.Bot.Tasks
 {

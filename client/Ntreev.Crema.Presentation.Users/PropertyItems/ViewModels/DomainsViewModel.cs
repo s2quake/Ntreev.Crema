@@ -15,20 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.Services.ViewModels;
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Users.Properties;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Crema.Presentation.Users.Properties;
 
 namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
@@ -37,24 +33,23 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
     [ParentType("Ntreev.Crema.Presentation.Home.IPropertyService, Ntreev.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class DomainsViewModel : PropertyItemBase
     {
-        private readonly ICremaAppHost cremaAppHost;
         private readonly ObservableCollection<DomainTreeItemBase> domains = new ObservableCollection<DomainTreeItemBase>();
-        private readonly ReadOnlyObservableCollection<DomainTreeItemBase> domainsReadOnly;
+        private readonly ICremaAppHost cremaAppHost;
+        private readonly Authenticator authenticator;
         private DomainTreeItemBase selectedDomain;
         private IUserDescriptor descriptor;
 
         [Import]
-        private IBuildUp buildUp = null;
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly IBuildUp buildUp = null;
 
         [ImportingConstructor]
-        public DomainsViewModel(ICremaAppHost cremaAppHost)
+        public DomainsViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += CremaAppHost_Opened;
             this.cremaAppHost.Closed += CremaAppHost_Closed;
-            this.domainsReadOnly = new ReadOnlyObservableCollection<DomainTreeItemBase>(this.domains);
+            this.Domains = new ReadOnlyObservableCollection<DomainTreeItemBase>(this.domains);
             this.DisplayName = Resources.Title_UserDomainList;
         }
 
@@ -104,7 +99,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 
         public override object SelectedObject => this.descriptor;
 
-        public ReadOnlyObservableCollection<DomainTreeItemBase> Domains => this.domainsReadOnly;
+        public ReadOnlyObservableCollection<DomainTreeItemBase> Domains { get; }
 
         public DomainTreeItemBase SelectedDomain
         {

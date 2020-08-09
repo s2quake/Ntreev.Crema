@@ -17,16 +17,10 @@
 
 using Ntreev.Crema.Commands.Consoles.Properties;
 using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Services;
-using Ntreev.Library;
 using Ntreev.Library.Commands;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles.TableContent

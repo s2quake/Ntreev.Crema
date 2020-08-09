@@ -22,9 +22,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Consoles
 {
@@ -33,7 +30,7 @@ namespace Ntreev.Crema.Javascript.Consoles
     class RunCommand : ConsoleCommandBase
     {
         [Import]
-        private Lazy<ScriptContext> scriptContext = null;
+        private readonly Lazy<ScriptContext> scriptContext = null;
 
         public RunCommand()
             : base("run")

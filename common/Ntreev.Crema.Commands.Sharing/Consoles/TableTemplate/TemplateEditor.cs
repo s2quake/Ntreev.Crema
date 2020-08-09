@@ -16,14 +16,12 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Commands.Consoles.Serializations;
-using Ntreev.Crema.Services;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Text;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library;
 using Ntreev.Crema.Data;
+using Ntreev.Crema.Services;
+using Ntreev.Library;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles.TableTemplate
@@ -80,45 +78,45 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
 
             //template.Dispatcher.Invoke(() =>
             //{
-                foreach (var item in idToColumn.Keys.ToArray())
+            foreach (var item in idToColumn.Keys.ToArray())
+            {
+                if (columns.Items.Any(i => i.ID == item) == false)
                 {
-                    if (columns.Items.Any(i => i.ID == item) == false)
-                    {
-                        var column = idToColumn[item];
-                        await column.DeleteAsync(authentication);
-                        idToColumn.Remove(item);
-                    }
+                    var column = idToColumn[item];
+                    await column.DeleteAsync(authentication);
+                    idToColumn.Remove(item);
                 }
+            }
 
-                for (var i = 0; i < columns.Items.Length; i++)
+            for (var i = 0; i < columns.Items.Length; i++)
+            {
+                var item = columns.Items[i];
+                if (item.ID == Guid.Empty)
                 {
-                    var item = columns.Items[i];
-                    if (item.ID == Guid.Empty)
-                    {
-                        var column = await template.AddNewAsync(authentication);
-                        item = await InitializeFieldsAsync(authentication, item, column);
-                        await template.EndNewAsync(authentication, column);
-                        item.ID = Guid.NewGuid();
-                        idToColumn.Add(item.ID, column);
-                        columns.Items[i] = item;
-                    }
-                    else if (idToColumn.ContainsKey(item.ID) == true)
-                    {
-                        var column = idToColumn[item.ID];
-                    await SetFieldsAsync(authentication, item, column);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"{item.ID} is not existed column.");
-                    }
+                    var column = await template.AddNewAsync(authentication);
+                    item = await InitializeFieldsAsync(authentication, item, column);
+                    await template.EndNewAsync(authentication, column);
+                    item.ID = Guid.NewGuid();
+                    idToColumn.Add(item.ID, column);
+                    columns.Items[i] = item;
                 }
-
-                for (var i = 0; i < columns.Items.Length; i++)
+                else if (idToColumn.ContainsKey(item.ID) == true)
                 {
-                    var item = columns.Items[i];
                     var column = idToColumn[item.ID];
-                    await column.SetIndexAsync(authentication, i);
+                    await SetFieldsAsync(authentication, item, column);
                 }
+                else
+                {
+                    throw new InvalidOperationException($"{item.ID} is not existed column.");
+                }
+            }
+
+            for (var i = 0; i < columns.Items.Length; i++)
+            {
+                var item = columns.Items[i];
+                var column = idToColumn[item.ID];
+                await column.SetIndexAsync(authentication, i);
+            }
             //});
 
             return true;

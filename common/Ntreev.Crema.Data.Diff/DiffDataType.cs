@@ -15,17 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Properties;
-using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Data.Diff
 {
@@ -35,9 +31,9 @@ namespace Ntreev.Crema.Data.Diff
         private readonly CremaDataType diffSource2;
         private readonly CremaDataType dataType1;
         private readonly CremaDataType dataType2;
-        private DiffMergeTypes mergeType;
-        private bool dummy1;
-        private bool dummy2;
+        private readonly DiffMergeTypes mergeType;
+        private readonly bool dummy1;
+        private readonly bool dummy2;
         private readonly List<DiffDataTypeMember> itemList = new List<DiffDataTypeMember>();
         private DiffState diffState;
         private bool isResolved;

@@ -15,27 +15,17 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework.Controls;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Threading;
 using Xceed.Wpf.DataGrid;
 
 namespace Ntreev.Crema.Presentation.Framework.Controls
@@ -216,7 +206,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
                 this.ParentRow.CancelEdit();
             this.Focus();
             await this.RequestEditEndAsync();
-            
+
         }
 
         protected override void OnContentChanged(object oldContent, object newContent)

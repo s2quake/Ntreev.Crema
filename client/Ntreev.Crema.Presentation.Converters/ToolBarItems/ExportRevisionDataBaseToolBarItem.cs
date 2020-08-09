@@ -23,11 +23,7 @@ using Ntreev.Crema.Spreadsheet;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Converters.ToolBarItems
 {
@@ -35,12 +31,12 @@ namespace Ntreev.Crema.Presentation.Converters.ToolBarItems
     [ParentType("Ntreev.Crema.Presentation.Home.Dialogs.ViewModels.LogViewModel, Ntreev.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ExportRevisionDataBaseToolBarItem : ToolBarItemBase
     {
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
         [ImportingConstructor]
-        public ExportRevisionDataBaseToolBarItem()
+        public ExportRevisionDataBaseToolBarItem(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.Icon = "/Ntreev.Crema.Presentation.Converters;component/Images/spreadsheet.png";
             this.DisplayName = Resources.MenuItem_Export;
         }

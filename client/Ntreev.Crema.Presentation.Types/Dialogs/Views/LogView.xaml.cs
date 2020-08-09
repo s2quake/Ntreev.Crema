@@ -16,23 +16,17 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using Ntreev.Library;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows;
 
 namespace Ntreev.Crema.Presentation.Types.Dialogs.Views
 {
     public partial class LogView : UserControl
     {
         [Import]
-        private IAppConfiguration configs = null;
+        private readonly IAppConfiguration configs = null;
 
         public LogView()
         {

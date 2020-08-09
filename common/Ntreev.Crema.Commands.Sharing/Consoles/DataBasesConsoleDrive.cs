@@ -15,20 +15,17 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data.Xml.Schema;
+using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
+using Ntreev.Library.IO;
+using Ntreev.Library.ObjectModel;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Text;
-using Ntreev.Library.IO;
-using Ntreev.Library;
-using System.Text.RegularExpressions;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.ServiceModel;
+using System.Linq;
 using System.Threading.Tasks;
-using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
@@ -173,7 +170,7 @@ namespace Ntreev.Crema.Commands.Consoles
             if (target is IDataBase)
             {
                 var dataBase = target as IDataBase;
-             await    dataBase.DeleteAsync(authentication);
+                await dataBase.DeleteAsync(authentication);
             }
             else if (target is ITableItem tableItem)
             {
@@ -423,7 +420,7 @@ namespace Ntreev.Crema.Commands.Consoles
         void IPartImportsSatisfiedNotification.OnImportsSatisfied()
         {
             this.CremaHost.Closed += (s, e) => this.dataBasePath = null;
-        } 
+        }
 
         #endregion
     }

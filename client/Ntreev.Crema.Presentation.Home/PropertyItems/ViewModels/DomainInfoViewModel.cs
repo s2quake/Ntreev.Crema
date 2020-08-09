@@ -15,18 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
 {
@@ -35,15 +29,14 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
     [ParentType(typeof(PropertyService))]
     class DomainInfoViewModel : PropertyItemBase
     {
+        private readonly ICremaAppHost cremaAppHost;
         private IDomainDescriptor descriptor;
         private DomainInfo domainInfo;
         private string dataBaseName;
 
-        [Import]
-        private ICremaAppHost cremaAppHost = null;
-
-        public DomainInfoViewModel()
+        public DomainInfoViewModel(ICremaAppHost cremaAppHost)
         {
+            this.cremaAppHost = cremaAppHost;
             this.DisplayName = Resources.Title_DomainInfo;
         }
 
@@ -55,12 +48,10 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
         public override void SelectObject(object obj)
         {
             this.descriptor = obj as IDomainDescriptor;
-
             if (this.descriptor != null)
             {
                 this.DomainInfo = this.descriptor.DomainInfo;
             }
-
             this.NotifyOfPropertyChange(nameof(this.IsVisible));
             this.NotifyOfPropertyChange(nameof(this.SelectedObject));
         }

@@ -22,14 +22,11 @@ using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Threading;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
-using System.Timers;
 
 namespace Ntreev.Crema.Services.Users
 {

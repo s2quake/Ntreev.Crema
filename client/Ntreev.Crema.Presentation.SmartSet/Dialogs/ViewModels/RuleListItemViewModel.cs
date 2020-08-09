@@ -15,19 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.Specialized;
-using System.Collections.ObjectModel;
-using Ntreev.Crema.Services;
-using System.Windows;
-using System.Windows.Threading;
-using System.Reflection;
-using System.ComponentModel;
-using Ntreev.Crema.Presentation.Framework;
 using Ntreev.ModernUI.Framework;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 
 namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
 {
@@ -35,31 +27,26 @@ namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
     {
         private readonly ObservableCollection<RuleListItemViewModel> itemsSource;
         private readonly Dictionary<IRule, IRuleItem> ruleToItem = new Dictionary<IRule, IRuleItem>();
-        private readonly IEnumerable<IRule> rules;
         private IRule rule;
-        private IRuleItem ruleItem;
 
         public RuleListItemViewModel(ObservableCollection<RuleListItemViewModel> ruleItems, IEnumerable<IRule> rules, IRuleItem ruleItem)
         {
             this.itemsSource = ruleItems;
-            this.itemsSource.CollectionChanged += itemsSource_CollectionChanged;
-            this.rules = rules;
+            this.itemsSource.CollectionChanged += ItemsSource_CollectionChanged;
+            this.Rules = rules;
             if (ruleItem != null)
             {
                 this.rule = rules.First(item => item.Name == ruleItem.RuleName);
-                this.ruleItem = ruleItem;
+                this.RuleItem = ruleItem;
             }
         }
 
-        private void itemsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void ItemsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             this.NotifyOfPropertyChange(nameof(this.CanDelete));
         }
 
-        public string Name
-        {
-            get { return this.ruleItem.GetType().Name; }
-        }
+        public string Name => this.RuleItem.GetType().Name;
 
         public string Text
         {
@@ -69,12 +56,11 @@ namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
                     return "unknown";
                 return this.rule.DisplayName;
             }
-
         }
 
         public IRule Rule
         {
-            get { return this.rule; }
+            get => this.rule;
             set
             {
                 this.rule = value;
@@ -83,21 +69,15 @@ namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
                 {
                     this.ruleToItem.Add(this.rule, this.rule.CreateItem());
                 }
-                this.ruleItem = this.ruleToItem[this.rule];
+                this.RuleItem = this.ruleToItem[this.rule];
                 this.NotifyOfPropertyChange(nameof(this.Rule));
                 this.NotifyOfPropertyChange(nameof(this.RuleItem));
             }
         }
 
-        public IRuleItem RuleItem
-        {
-            get { return this.ruleItem; }
-        }
+        public IRuleItem RuleItem { get; private set; }
 
-        public bool CanDelete
-        {
-            get { return this.itemsSource.Count != 1; }
-        }
+        public bool CanDelete => this.itemsSource.Count != 1;
 
         public void Delete()
         {
@@ -107,12 +87,9 @@ namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
         public void Insert()
         {
             var index = this.itemsSource.IndexOf(this) + 1;
-            this.itemsSource.Insert(index, new RuleListItemViewModel(this.itemsSource, this.rules, null));
+            this.itemsSource.Insert(index, new RuleListItemViewModel(this.itemsSource, this.Rules, null));
         }
 
-        public IEnumerable<IRule> Rules
-        {
-            get { return this.rules; }
-        }
+        public IEnumerable<IRule> Rules { get; }
     }
 }

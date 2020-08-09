@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Ntreev.Crema.Services.Data
+﻿namespace Ntreev.Crema.Services.Data
 {
     class DataBaseClientContext : ClientContext
     {

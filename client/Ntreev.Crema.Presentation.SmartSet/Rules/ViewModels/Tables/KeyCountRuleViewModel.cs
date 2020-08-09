@@ -15,17 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Xml.Serialization;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
-using System.ComponentModel.Composition;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.SmartSet.Properties;
+using System;
+using System.ComponentModel.Composition;
+using System.Linq;
 
 namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels.Tables
 {

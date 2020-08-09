@@ -15,31 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Ntreev.Crema.Presentation.Framework;
-using System.ComponentModel.Composition;
-using Caliburn.Micro;
-using System.Collections.ObjectModel;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using System.Windows.Input;
-using System.Threading.Tasks;
-using System.Threading;
 using Ntreev.Crema.Presentation.Tables.Properties;
-using Ntreev.ModernUI.Framework;
-using System.Xml.Serialization;
-using System.Xml.Schema;
-using System.Xml;
-using Ntreev.Library.ObjectModel;
-using System.Windows;
-using Ntreev.Library.Linq;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services;
 using Ntreev.Library;
+using Ntreev.Library.Linq;
+using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.ViewModels;
+using System;
 using System.Collections;
-using System.Windows.Threading;
+using System.ComponentModel.Composition;
+using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
 {
@@ -50,28 +37,24 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
     [ParentType(typeof(BrowserService))]
     class TableBrowserViewModel : TreeViewBase, ITableBrowser, ISelector
     {
+        private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
+        private readonly IPropertyService propertyService;
         private bool isVisible = true;
-        private Guid dataBaseID;
 
-        private DelegateCommand renameCommand;
-        private DelegateCommand deleteCommand;
-
-        [Import]
-        private IPropertyService propertyService = null;
-        [Import]
-        private Authenticator authenticator = null;
-        [Import]
-        private IBuildUp buildUp = null;
+        private readonly DelegateCommand renameCommand;
+        private readonly DelegateCommand deleteCommand;
 
         [ImportingConstructor]
-        public TableBrowserViewModel(ICremaAppHost cremaAppHost)
+        public TableBrowserViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost, IPropertyService propertyService)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Loaded += CremaAppHost_Loaded;
             this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
             this.cremaAppHost.Resetting += CremaAppHost_Resetting;
             this.cremaAppHost.Reset += CremaAppHost_Reset;
+            this.propertyService = propertyService;
             this.renameCommand = new DelegateCommand(this.Rename_Execute, this.Rename_CanExecute);
             this.deleteCommand = new DelegateCommand(this.Delete_Execute, this.Delete_CanExecute);
             this.DisplayName = Resources.Title_TableBrowser;
@@ -239,12 +222,10 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
         {
             if (this.cremaAppHost.GetService(typeof(IDataBase)) is IDataBase dataBase)
             {
-                this.dataBaseID = dataBase.ID;
                 var viewModel = await dataBase.Dispatcher.InvokeAsync(() =>
                 {
                     return new TableRootTreeViewItemViewModel(this.authenticator, dataBase, this);
                 });
-                this.buildUp.BuildUp(viewModel);
                 this.Items.Add(viewModel);
             };
 
@@ -258,13 +239,11 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
         }
 
         [ConfigurationProperty(ScopeType = typeof(IUserConfiguration))]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:사용되지 않는 private 멤버 제거", Justification = "<보류 중>")]
         private string[] Settings
         {
-            get { return this.GetSettings(); }
-            set
-            {
-                this.SetSettings(value);
-            }
+            get => this.GetSettings();
+            set => this.SetSettings(value);
         }
 
         #region ITableBrowser

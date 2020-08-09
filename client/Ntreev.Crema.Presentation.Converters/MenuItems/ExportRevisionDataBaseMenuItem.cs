@@ -23,11 +23,7 @@ using Ntreev.Crema.Spreadsheet;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Converters.MenuItems
 {
@@ -35,11 +31,12 @@ namespace Ntreev.Crema.Presentation.Converters.MenuItems
     [ParentType("Ntreev.Crema.Presentation.Home.Dialogs.ViewModels.LogInfoViewModel, Ntreev.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ExportRevisionDataBaseMenuItem : MenuItemBase
     {
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
-        public ExportRevisionDataBaseMenuItem()
+        [ImportingConstructor]
+        public ExportRevisionDataBaseMenuItem(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.Icon = "Images/spreadsheet.png";
             this.DisplayName = Resources.MenuItem_Export;
         }

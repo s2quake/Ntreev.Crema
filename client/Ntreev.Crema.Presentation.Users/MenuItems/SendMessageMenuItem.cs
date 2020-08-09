@@ -16,19 +16,11 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.ModernUI.Framework;
 using Ntreev.Crema.Presentation.Users.Properties;
-using System;
-using System.Collections.Generic;
+using Ntreev.Library;
+using Ntreev.ModernUI.Framework;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.ModernUI.Framework.Controls;
-using System.Windows.Media.Imaging;
-using Ntreev.Library;
-using System.Windows.Controls;
 
 namespace Ntreev.Crema.Presentation.Users.MenuItems
 {
@@ -41,11 +33,12 @@ namespace Ntreev.Crema.Presentation.Users.MenuItems
     [DefaultMenu]
     class SendMessageMenuItem : MenuItemBase
     {
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
-        public SendMessageMenuItem()
+        [ImportingConstructor]
+        public SendMessageMenuItem(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.Icon = "Images/message.png";
             this.DisplayName = Resources.MenuItem_SendMessage;
         }

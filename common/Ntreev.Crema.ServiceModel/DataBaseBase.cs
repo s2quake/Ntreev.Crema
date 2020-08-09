@@ -15,21 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Xml.Schema;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.ServiceModel.Properties;
-using System.Xml;
-using System.IO;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Data.Xml;
-using Ntreev.Crema.Data.Xml.Schema;
-using System.ComponentModel;
 using Ntreev.Library;
-using System.Text.RegularExpressions;
+using Ntreev.Library.ObjectModel;
+using System;
+using System.ComponentModel;
 using System.Data;
 
 namespace Ntreev.Crema.ServiceModel
@@ -66,24 +56,15 @@ namespace Ntreev.Crema.ServiceModel
                 throw new PermissionDeniedException();
         }
 
-        public bool IsPublic
-        {
-            get { return this.IsPrivate == false; }
-        }
+        public bool IsPublic => this.IsPrivate == false;
 
-        public bool IsPrivate
-        {
-            get { return this.accessInfo.UserID != string.Empty; }
-        }
+        public bool IsPrivate => this.accessInfo.UserID != string.Empty;
 
-        public bool IsLocked
-        {
-            get { return this.lockInfo.UserID != string.Empty; }
-        }
+        public bool IsLocked => this.lockInfo.UserID != string.Empty;
 
         public LockInfo LockInfo
         {
-            get { return this.lockInfo; }
+            get => this.lockInfo;
             protected set
             {
                 if (this.lockInfo == value)
@@ -99,7 +80,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public AccessInfo AccessInfo
         {
-            get { return this.accessInfo; }
+            get => this.accessInfo;
             protected set
             {
                 if (this.accessInfo == value)
@@ -115,7 +96,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public string Name
         {
-            get { return this.name ?? string.Empty; }
+            get => this.name ?? string.Empty;
             set
             {
                 this.name = value;
@@ -150,7 +131,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public DataBaseInfo DataBaseInfo
         {
-            get { return this.dataBaseInfo; }
+            get => this.dataBaseInfo;
             set
             {
                 this.dataBaseInfo = value;
@@ -160,7 +141,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public DataBaseState DataBaseState
         {
-            get { return this.dataBaseState; }
+            get => this.dataBaseState;
             set
             {
                 this.dataBaseState = value;
@@ -223,7 +204,7 @@ namespace Ntreev.Crema.ServiceModel
             return this.GetAccessType(authentication).HasFlag(accessType);
         }
 
-        protected void SetPublic(IAuthentication authentication)
+        protected void SetPublic(IAuthentication _)
         {
             this.accessInfo.SetPublic();
             this.UpdateAccessParent(null);
@@ -258,7 +239,7 @@ namespace Ntreev.Crema.ServiceModel
             this.OnAccessChanged(EventArgs.Empty);
         }
 
-        protected void Delete(IAuthentication authentication)
+        protected void Delete(IAuthentication _)
         {
             this.OnDeleted(EventArgs.Empty);
         }
@@ -276,29 +257,29 @@ namespace Ntreev.Crema.ServiceModel
             this.OnLockChanged(EventArgs.Empty);
         }
 
-        protected void Unlock(IAuthentication authentication)
+        protected void Unlock(IAuthentication _)
         {
             this.lockInfo = LockInfo.Empty;
             this.UpdateLockParent(null);
             this.OnLockChanged(EventArgs.Empty);
         }
 
-        protected void Load(IAuthentication authentication)
+        protected void Load(IAuthentication _)
         {
             this.OnLoaded(EventArgs.Empty);
         }
 
-        protected void Unload(IAuthentication authentication)
+        protected void Unload(IAuthentication _)
         {
             this.OnUnloaded(EventArgs.Empty);
         }
 
-        protected void ResettingDataBase(IAuthentication authentication)
+        protected void ResettingDataBase(IAuthentication _)
         {
             this.OnResetting(EventArgs.Empty);
         }
 
-        protected void ResetDataBase(IAuthentication authentication)
+        protected void ResetDataBase(IAuthentication _)
         {
             this.OnReset(EventArgs.Empty);
         }

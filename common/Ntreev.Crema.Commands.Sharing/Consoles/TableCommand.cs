@@ -19,7 +19,6 @@ using Ntreev.Crema.Commands.Consoles.Properties;
 using Ntreev.Crema.Commands.Consoles.Serializations;
 using Ntreev.Crema.Commands.Consoles.TableTemplate;
 using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.Services.Extensions;
@@ -31,7 +30,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -294,7 +292,7 @@ namespace Ntreev.Crema.Commands.Consoles
             var table = await this.GetTableAsync(tableName);
             var template = table.Dispatcher.Invoke(() => table.Template);
             var domain = template.Dispatcher.Invoke(() => template.Domain);
-            var contains = domain == null ? false : await domain.Users.ContainsAsync(authentication.ID);
+            var contains = domain != null && await domain.Users.ContainsAsync(authentication.ID);
 
             if (contains == false)
                 await template.BeginEditAsync(authentication);
@@ -334,7 +332,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
             throw new NotImplementedException("dotnet");
             // this.CommandContext.Category = nameof(ITableContent);
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
             this.CommandContext.Target = content;
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
         }
 
         [CommandProperty("force")]
@@ -384,7 +384,9 @@ namespace Ntreev.Crema.Commands.Consoles
                 domain.UserRemoved -= Domain_UserRemoved;
                 throw new NotImplementedException("dotnet");
                 // this.CommandContext.Category = null;
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                 this.CommandContext.Target = null;
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
         }
 
@@ -478,7 +480,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private string GetCurrentDirectory()
         {
-            if (this.CommandContext.Drive is DataBasesConsoleDrive root)
+            if (this.CommandContext.Drive is DataBasesConsoleDrive)
             {
                 var dataBasePath = new DataBasePath(this.CommandContext.Path);
                 if (dataBasePath.ItemPath != string.Empty)

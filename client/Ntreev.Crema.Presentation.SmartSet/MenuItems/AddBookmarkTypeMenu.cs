@@ -21,14 +21,7 @@ using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.SmartSet.Properties;
 using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.Controls;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 
 namespace Ntreev.Crema.Presentation.SmartSet.MenuItems
 {
@@ -36,14 +29,15 @@ namespace Ntreev.Crema.Presentation.SmartSet.MenuItems
     [ParentType(typeof(TypeTreeViewItemViewModel))]
     class AddBookmarkTypeMenu : MenuItemBase
     {
-        [Import]
-        private TypeSmartSetBrowserViewModel browser = null;
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly TypeSmartSetBrowserViewModel browser;
+        private readonly Authenticator authenticator;
 
-        public AddBookmarkTypeMenu()
+        [ImportingConstructor]
+        public AddBookmarkTypeMenu(Authenticator authenticator, TypeSmartSetBrowserViewModel browser)
         {
-            this.Icon = "/Ntreev.Crema.Presentation.SmartSet;component/Images/star.png";
+            this.authenticator = authenticator;
+            this.browser = browser;
+            this.Icon = "Images/star.png";
             this.DisplayName = Resources.MenuItem_AddToBookmark;
             this.HideOnDisabled = true;
         }

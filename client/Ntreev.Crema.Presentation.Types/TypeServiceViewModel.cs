@@ -15,27 +15,20 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Types.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Types.Documents.ViewModels;
 using Ntreev.Crema.Presentation.Types.Properties;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
+using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using Ntreev.Library;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Threading;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
-using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Presentation.Types
 {
@@ -46,13 +39,13 @@ namespace Ntreev.Crema.Presentation.Types
         private readonly ICremaAppHost cremaAppHost;
 
         [Import]
-        private IBrowserService browserService = null;
+        private readonly IBrowserService browserService = null;
         [Import]
-        private TypeDocumentServiceViewModel documentService = null;
+        private readonly TypeDocumentServiceViewModel documentService = null;
         [Import]
-        private IPropertyService propertyService = null;
+        private readonly IPropertyService propertyService = null;
         [Import]
-        private Lazy<IShell> shell = null;
+        private readonly Lazy<IShell> shell = null;
 
         private bool isBrowserExpanded = true;
         private bool isPropertyExpanded = true;
@@ -64,10 +57,10 @@ namespace Ntreev.Crema.Presentation.Types
         private bool isVisible;
 
         [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator = null;
 
         [Import]
-        private IAppConfiguration configs = null;
+        private readonly IAppConfiguration configs = null;
 
         [ImportingConstructor]
         public TypeServiceViewModel(ICremaAppHost cremaAppHost)

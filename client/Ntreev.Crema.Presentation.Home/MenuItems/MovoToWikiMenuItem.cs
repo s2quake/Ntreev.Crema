@@ -17,17 +17,8 @@
 
 using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.Presentation.Home.Services.ViewModels;
-using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.Framework.Dialogs.Views;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace Ntreev.Crema.Presentation.Home.MenuItems
 {

@@ -1,13 +1,4 @@
-﻿using Ntreev.Crema.Presentation.Tables.Documents.ViewModels;
-using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Ntreev.Crema.Presentation.Tables.Documents.ToolBarItems
+﻿namespace Ntreev.Crema.Presentation.Tables.Documents.ToolBarItems
 {
     //[Export]
     //[Export(typeof(IToolBarItem))]

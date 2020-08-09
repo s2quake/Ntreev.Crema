@@ -16,19 +16,11 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Types.Documents.Views;
 using Ntreev.Crema.Presentation.Types.Properties;
-using Ntreev.Library.IO;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.Controls;
-using Ntreev.ModernUI.Framework.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Types.MenuItems.TypeMenus
@@ -42,7 +34,7 @@ namespace Ntreev.Crema.Presentation.Types.MenuItems.TypeMenus
         private readonly ITypeDocumentService documentService;
 
         [Import]
-        private Lazy<TypeServiceViewModel> typeService = null;
+        private readonly Lazy<TypeServiceViewModel> typeService = null;
 
         [ImportingConstructor]
         public QuickFindTypeDataMenuItem(IShell shell, ITypeDocumentService documentService)

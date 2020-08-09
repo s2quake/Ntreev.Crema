@@ -16,10 +16,6 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Data.Xml.Schema
 {
@@ -27,80 +23,48 @@ namespace Ntreev.Crema.Data.Xml.Schema
     {
         public static string GetSchemaTypeName(this Type type)
         {
-            switch (type.GetTypeName())
+            return (type.GetTypeName()) switch
             {
-                case CremaDataTypeUtility.booleanType:
-                    return "boolean";
-                case CremaDataTypeUtility.stringType:
-                    return "string";
-                case CremaDataTypeUtility.floatType:
-                    return "float";
-                case CremaDataTypeUtility.doubleType:
-                    return "double";
-                case CremaDataTypeUtility.int8Type:
-                    return "byte";
-                case CremaDataTypeUtility.uint8Type:
-                    return "unsignedByte";
-                case CremaDataTypeUtility.int16Type:
-                    return "short";
-                case CremaDataTypeUtility.uint16Type:
-                    return "unsignedShort";
-                case CremaDataTypeUtility.int32Type:
-                    return "int";
-                case CremaDataTypeUtility.uint32Type:
-                    return "unsignedInt";
-                case CremaDataTypeUtility.int64Type:
-                    return "long";
-                case CremaDataTypeUtility.uint64Type:
-                    return "unsignedLong";
-                case CremaDataTypeUtility.datetimeType:
-                    return "dateTime";
-                case CremaDataTypeUtility.durationType:
-                    return "duration";
-                case CremaDataTypeUtility.guidType:
-                    return "guid";
-                default:
-                    throw new NotImplementedException();
-            }
+                CremaDataTypeUtility.booleanType => "boolean",
+                CremaDataTypeUtility.stringType => "string",
+                CremaDataTypeUtility.floatType => "float",
+                CremaDataTypeUtility.doubleType => "double",
+                CremaDataTypeUtility.int8Type => "byte",
+                CremaDataTypeUtility.uint8Type => "unsignedByte",
+                CremaDataTypeUtility.int16Type => "short",
+                CremaDataTypeUtility.uint16Type => "unsignedShort",
+                CremaDataTypeUtility.int32Type => "int",
+                CremaDataTypeUtility.uint32Type => "unsignedInt",
+                CremaDataTypeUtility.int64Type => "long",
+                CremaDataTypeUtility.uint64Type => "unsignedLong",
+                CremaDataTypeUtility.datetimeType => "dateTime",
+                CremaDataTypeUtility.durationType => "duration",
+                CremaDataTypeUtility.guidType => "guid",
+                _ => throw new NotImplementedException(),
+            };
         }
 
         public static Type GetType(string typeName)
         {
-            switch (typeName)
+            return typeName switch
             {
-                case "boolean":
-                    return typeof(bool);
-                case "string":
-                    return typeof(string);
-                case "float":
-                    return typeof(float);
-                case "double":
-                    return typeof(double);
-                case "byte":
-                    return typeof(sbyte);
-                case "unsignedByte":
-                    return typeof(byte);
-                case "short":
-                    return typeof(short);
-                case "unsignedShort":
-                    return typeof(ushort);
-                case "int":
-                    return typeof(int);
-                case "unsignedInt":
-                    return typeof(uint);
-                case "long":
-                    return typeof(long);
-                case "unsignedLong":
-                    return typeof(ulong);
-                case "dateTime":
-                    return typeof(DateTime);
-                case "duration":
-                    return typeof(TimeSpan);
-                case "guid":
-                    return typeof(Guid);
-                default:
-                    throw new NotImplementedException();
-            }
+                "boolean" => typeof(bool),
+                "string" => typeof(string),
+                "float" => typeof(float),
+                "double" => typeof(double),
+                "byte" => typeof(sbyte),
+                "unsignedByte" => typeof(byte),
+                "short" => typeof(short),
+                "unsignedShort" => typeof(ushort),
+                "int" => typeof(int),
+                "unsignedInt" => typeof(uint),
+                "long" => typeof(long),
+                "unsignedLong" => typeof(ulong),
+                "dateTime" => typeof(DateTime),
+                "duration" => typeof(TimeSpan),
+                "guid" => typeof(Guid),
+                _ => throw new NotImplementedException(),
+            };
         }
     }
 }

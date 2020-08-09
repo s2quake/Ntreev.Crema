@@ -15,18 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
 using Ntreev.Library;
 using Ntreev.Library.Random;
 using System;
-using System.Linq;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Bot.Tasks
 {
@@ -44,7 +40,7 @@ namespace Ntreev.Crema.Bot.Tasks
             {
                 context.Pop(dataBase);
             }
-            else 
+            else
             {
                 if (await dataBase.ContainsAsync(authentication) == false)
                     return;
@@ -99,7 +95,7 @@ namespace Ntreev.Crema.Bot.Tasks
             await dataBase.LeaveAsync(authentication);
             //if (context.IsCompleted(dataBase) == true)
             //{
-                
+
             //    context.Pop(dataBase);
             //}
         }

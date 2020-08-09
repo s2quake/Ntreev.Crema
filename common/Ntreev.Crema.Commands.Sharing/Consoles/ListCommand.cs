@@ -15,21 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Services;
 using Ntreev.Library;
 using Ntreev.Library.Commands;
 using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
@@ -69,62 +60,64 @@ namespace Ntreev.Crema.Commands.Consoles
             if (allPath.Contains(path) == false)
                 throw new ArgumentException($"No such directory : {path}");
 
-            throw new NotImplementedException("dotnet");
-            // var query = from item in allPath
-            //             where item.StartsWith(path)
-            //             let text = item.Substring(path.Length)
-            //             where StringUtility.Split(text, PathUtility.SeparatorChar).Length == 1
-            //             let name = text.Trim(PathUtility.SeparatorChar)
-            //             orderby name
-            //             select new ItemObject(text);
+            var query = from item in allPath
+                        where item.StartsWith(path)
+                        let text = item.Substring(path.Length)
+                        where StringUtility.Split(text, PathUtility.SeparatorChar).Length == 1
+                        let name = text.Trim(PathUtility.SeparatorChar)
+                        orderby name
+                        select text;
 
-            // this.CommandContext.WriteList(query.ToArray());
+            foreach (var item in query)
+            {
+                this.Out.WriteLine(item);
+            }
         }
 
-        // #region classes
+        //#region classes
 
-        // class ItemObject : TerminalTextItem
-        // {
-        //     private bool isCategory;
-        //     private string name;
-        //     public ItemObject(string path)
-        //         : base(path)
-        //     {
-        //         if (path.EndsWith(PathUtility.Separator) == true)
-        //         {
-        //             this.name = path.Remove(path.Length - 1);
-        //             this.isCategory = true;
-        //         }
-        //         else
-        //         {
-        //             this.name = path;
-        //             this.isCategory = false;
-        //         }
-        //     }
+        //class ItemObject : TerminalTextItem
+        //{
+        //    private bool isCategory;
+        //    private string name;
+        //    public ItemObject(string path)
+        //        : base(path)
+        //    {
+        //        if (path.EndsWith(PathUtility.Separator) == true)
+        //        {
+        //            this.name = path.Remove(path.Length - 1);
+        //            this.isCategory = true;
+        //        }
+        //        else
+        //        {
+        //            this.name = path;
+        //            this.isCategory = false;
+        //        }
+        //    }
 
-        //     public bool IsCategory { get { return this.isCategory; } }
+        //    public bool IsCategory { get { return this.isCategory; } }
 
-        //     protected override void OnDraw(TextWriter writer, string text)
-        //     {
-        //         if (this.isCategory == true)
-        //         {
-        //             using (TerminalColor.SetForeground(ConsoleColor.Cyan))
-        //             {
-        //                 base.OnDraw(writer, text);
-        //             }
-        //         }
-        //         else
-        //         {
-        //             base.OnDraw(writer, text);
-        //         }
-        //     }
+        //    protected override void OnDraw(TextWriter writer, string text)
+        //    {
+        //        if (this.isCategory == true)
+        //        {
+        //            using (TerminalColor.SetForeground(ConsoleColor.Cyan))
+        //            {
+        //                base.OnDraw(writer, text);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            base.OnDraw(writer, text);
+        //        }
+        //    }
 
-        //     public override string ToString()
-        //     {
-        //         return this.name;
-        //     }
-        // }
+        //    public override string ToString()
+        //    {
+        //        return this.name;
+        //    }
+        //}
 
-        // #endregion
+        //#endregion
     }
 }

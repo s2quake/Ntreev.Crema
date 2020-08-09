@@ -16,13 +16,9 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Commands.Consoles;
-using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
@@ -32,7 +28,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
     class ExitCommand : ConsoleCommandAsyncBase
     {
         [Import]
-        private Lazy<ConsoleTerminal> terminal = null;
+        private readonly Lazy<ConsoleTerminal> terminal = null;
 
         public ExitCommand()
             : base("exit")

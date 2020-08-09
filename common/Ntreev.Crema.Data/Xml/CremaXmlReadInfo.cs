@@ -20,21 +20,18 @@ using Ntreev.Library;
 using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using System.Xml.XPath;
 using System.Xml.Schema;
+using System.Xml.XPath;
 
 namespace Ntreev.Crema.Data.Xml
 {
     public class CremaXmlReadInfo
     {
-        private Version version = new Version(2, 0);
+        private readonly Version version = new Version(2, 0);
 
         public CremaXmlReadInfo(string xmlPath)
         {

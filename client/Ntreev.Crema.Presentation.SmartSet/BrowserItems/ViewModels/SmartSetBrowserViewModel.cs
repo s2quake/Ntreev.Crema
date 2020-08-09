@@ -15,33 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Services;
+using Ntreev.Library;
+using Ntreev.Library.ObjectModel;
+using Ntreev.ModernUI.Framework;
+using Ntreev.ModernUI.Framework.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Ntreev.Crema.Presentation.Framework;
 using System.ComponentModel.Composition;
-using Caliburn.Micro;
-using System.Collections.ObjectModel;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using System.Collections.Specialized;
-using System.Windows;
-using System.Windows.Threading;
-using System.Windows.Input;
-using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
-using System.Xml.Serialization;
-using System.Xml.Schema;
-using System.Xml;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Library;
-using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.SmartSet.BrowserItems.Views;
-using System.IO;
-using Ntreev.Library.Serialization;
-using Ntreev.ModernUI.Framework.ViewModels;
-using Ntreev.Library.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
@@ -53,14 +38,14 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
         private readonly BookmarkRootTreeViewItemViewModel bookmarkCategory;
 
         [Import]
-        private IAppConfiguration configs = null;
+        private readonly IAppConfiguration configs = null;
         [Import]
-        private IBuildUp buildUp = null;
+        private readonly IBuildUp buildUp = null;
 
         private bool isVisible = true;
 
-        private DelegateCommand renameCommand;
-        private DelegateCommand deleteCommand;
+        private readonly DelegateCommand renameCommand;
+        private readonly DelegateCommand deleteCommand;
 
         protected SmartSetBrowserViewModel(ICremaAppHost cremaAppHost, IEnumerable<IRule> rules)
         {
@@ -127,7 +112,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
                         select TreeViewItemViewModel.BuildRelativePath(this.bookmarkCategory, item, IsCategory);
             this.BookmarkItems = query.ToArray();
 
-            bool IsCategory(TreeViewItemViewModel viewModel)
+            static bool IsCategory(TreeViewItemViewModel viewModel)
             {
                 return viewModel is BookmarkRootTreeViewItemViewModel || viewModel is BookmarkCategoryTreeViewItemViewModel;
             }
@@ -138,7 +123,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             var viewModel = this.SelectedItem as SmartSetCategoryTreeViewItemViewModel;
             await viewModel.NewSmartSetAsync();
         }
-    
+
         public void SelectItem(TreeViewItemViewModel item)
         {
             this.SelectedItem = item;
@@ -221,19 +206,19 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 
         protected virtual void OnLoaded(EventArgs e)
         {
-            
+
         }
 
         protected virtual void OnUnloaded(EventArgs e)
         {
-            
+
         }
 
         protected abstract string[] BookmarkItems
         {
             get; set;
         }
-        
+
         private void CremaAppHost_Loaded(object sender, EventArgs e)
         {
             this.Items.Add(this.bookmarkCategory);
@@ -317,13 +302,11 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
         }
 
         [ConfigurationProperty(ScopeType = typeof(IUserConfiguration))]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:사용되지 않는 private 멤버 제거", Justification = "<보류 중>")]
         private string[] Settings
         {
-            get { return this.GetSettings(); }
-            set
-            {
-                this.SetSettings(value);
-            }
+            get => this.GetSettings();
+            set => this.SetSettings(value);
         }
 
         #region IPartImportsSatisfiedNotification

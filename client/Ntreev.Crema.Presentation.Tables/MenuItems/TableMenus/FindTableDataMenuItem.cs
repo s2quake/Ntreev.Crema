@@ -15,19 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Tables.Properties;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Library.IO;
+using Ntreev.Crema.Presentation.Tables.Properties;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using System.Windows.Threading;
 
 namespace Ntreev.Crema.Presentation.Tables.MenuItems.TableMenus
 {
@@ -35,17 +27,17 @@ namespace Ntreev.Crema.Presentation.Tables.MenuItems.TableMenus
     [ParentType(typeof(TableMenuItem))]
     class FindTableDataMenuItem : MenuItemBase
     {
+        private readonly Authenticator authenticator;
         private readonly IShell shell;
-        [Import]
-        private TableServiceViewModel tableService = null;
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly TableServiceViewModel tableService;
 
         [ImportingConstructor]
-        public FindTableDataMenuItem(IShell shell)
+        public FindTableDataMenuItem(Authenticator authenticator, IShell shell, TableServiceViewModel tableService)
         {
+            this.authenticator = authenticator;
             this.shell = shell;
             this.shell.ServiceChanged += this.InvokeCanExecuteChangedEvent;
+            this.tableService = tableService;
             this.InputGesture = new KeyGesture(Key.F, ModifierKeys.Control | ModifierKeys.Shift);
             this.DisplayName = Resources.MenuItem_FindAll;
         }

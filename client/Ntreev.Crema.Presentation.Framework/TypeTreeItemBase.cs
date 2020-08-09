@@ -15,24 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Windows;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.Presentation.Framework;
-using System.Threading.Tasks;
-using Caliburn.Micro;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.ModernUI.Framework;
-using System.Linq;
-using System.Windows.Input;
-using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
-using Ntreev.Library.Linq;
-using System.Collections.Generic;
-using System.ComponentModel.Composition.Hosting;
-using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.Crema.Data;
-using Ntreev.Library;
-using System.Windows.Threading;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Framework
 {
@@ -59,7 +45,7 @@ namespace Ntreev.Crema.Presentation.Framework
         public TypeTreeItemBase(Authentication authentication, TypeDescriptor descriptor, object owner)
             : base(authentication, descriptor, owner)
         {
-            
+
         }
 
         public async Task LockAsync()

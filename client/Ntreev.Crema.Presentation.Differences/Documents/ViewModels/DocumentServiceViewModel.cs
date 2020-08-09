@@ -18,15 +18,11 @@
 using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
 using Ntreev.Crema.Presentation.Differences.Properties;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
 {

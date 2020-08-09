@@ -15,16 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
-using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Diff;
+using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -34,9 +31,8 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
     {
         private readonly TemplateTreeViewItemViewModel viewModel;
         private readonly List<TemplateDocumentItemViewModel> itemList = new List<TemplateDocumentItemViewModel>();
+        private readonly UndoService undoService = new UndoService();
         private TemplateDocumentItemViewModel selectedItem;
-        private UndoService undoService = new UndoService();
-        private ICommand resolveCommand;
 
         public TemplateDocumentViewModel(TemplateTreeViewItemViewModel viewModel)
             : base(viewModel)
@@ -53,7 +49,7 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
                 item.PropertyChanged += DocumentItem_PropertyChanged;
             }
             this.undoService.Changed += UndoService_Changed;
-            this.resolveCommand = new DelegateCommand((p) => this.ResolveAsync(), (p) => this.CanResolve);
+            this.ResolveCommand = new DelegateCommand(async (p) => await this.ResolveAsync(), (p) => this.CanResolve);
             this.SelectedItem = this.itemList.First();
             this.DisplayName = viewModel.DisplayName;
         }
@@ -76,19 +72,13 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
             return this.viewModel.ToString();
         }
 
-        public DiffTemplate Source
-        {
-            get { return this.viewModel.Source; }
-        }
+        public DiffTemplate Source => this.viewModel.Source;
 
-        public IEnumerable<TemplateDocumentItemViewModel> ItemsSource
-        {
-            get { return this.itemList; }
-        }
+        public IEnumerable<TemplateDocumentItemViewModel> ItemsSource => this.itemList;
 
         public TemplateDocumentItemViewModel SelectedItem
         {
-            get { return this.selectedItem; }
+            get => this.selectedItem;
             set
             {
                 this.selectedItem = value;
@@ -98,7 +88,7 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
 
         public string SelectedName
         {
-            get { return $"{this.selectedItem}"; }
+            get => $"{this.selectedItem}";
             set
             {
                 var query = from item in this.itemList
@@ -112,20 +102,12 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
             }
         }
 
-        public ICommand ResolveCommand => this.resolveCommand;
+        public ICommand ResolveCommand { get; }
 
-        public IUndoService UndoService
-        {
-            get { return this.undoService; }
-        }
+        public IUndoService UndoService => this.undoService;
 
-        public bool CanResolve
-        {
-            get
-            {
-                return this.Source.IsResolved == false && this.Source.UnresolvedItems.Any() == false;
-            }
-        }
+        public bool CanResolve => this.Source.IsResolved == false && this.Source.UnresolvedItems.Any() == false;
+
         protected override async Task<bool> CloseAsync()
         {
             return await this.Dispatcher.InvokeAsync(() =>

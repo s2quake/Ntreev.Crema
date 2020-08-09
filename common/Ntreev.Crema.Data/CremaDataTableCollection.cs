@@ -116,14 +116,14 @@ namespace Ntreev.Crema.Data
         public bool Contains(string name)
         {
             return this.itemsByName.ContainsKey(name);
-            //return this.IndexOf(name) >= 0;
         }
 
         public bool Contains(string name, string categoryPath)
         {
-            var itemNamespace = UriUtility.Combine(this.dataSet.TableNamespace + categoryPath, name);
+            throw new NotImplementedException("categoryPath 사용이 안됨.");
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
             return this.itemsByNamespace.ContainsKey(name);
-            //return this.IndexOf(name, categoryPath) >= 0;
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
         }
 
         public void CopyTo(CremaDataTable[] array, int index)

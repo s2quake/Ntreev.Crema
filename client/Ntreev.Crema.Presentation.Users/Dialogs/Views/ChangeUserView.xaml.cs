@@ -16,12 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.ModernUI.Framework.Controls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -30,15 +25,13 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.Views
 {
     partial class ChangeUserView : UserControl
     {
-        private static DependencyProperty PasswordProperty = DependencyProperty.Register("Password", typeof(SecureString), typeof(ChangeUserView));
-
-        private BindingExpressionBase passwordBinding;
+        private static readonly DependencyProperty PasswordProperty = DependencyProperty.Register(nameof(Password), typeof(SecureString), typeof(ChangeUserView));
+        private readonly BindingExpressionBase passwordBinding;
 
         public ChangeUserView()
         {
             this.InitializeComponent();
-
-            this.passwordBinding = BindingOperations.SetBinding(this, PasswordProperty, new Binding("Password")
+            this.passwordBinding = BindingOperations.SetBinding(this, PasswordProperty, new Binding(nameof(Password))
             {
                 Mode = BindingMode.OneWayToSource,
                 UpdateSourceTrigger = UpdateSourceTrigger.Explicit,
@@ -50,10 +43,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.Views
             this.passwordBox1.Focus();
         }
 
-        private SecureString Password
-        {
-            get { return (SecureString)this.GetValue(PasswordProperty); }
-        }
+        private SecureString Password => (SecureString)this.GetValue(PasswordProperty);
 
         private void PasswordBox1_PasswordChanged(object sender, RoutedEventArgs e)
         {

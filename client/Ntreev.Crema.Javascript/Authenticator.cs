@@ -16,13 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
-using Ntreev.Library;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript
 {
@@ -30,6 +24,6 @@ namespace Ntreev.Crema.Javascript
     [Export(typeof(Authenticator))]
     class Authenticator : AuthenticatorBase
     {
-        
+
     }
 }

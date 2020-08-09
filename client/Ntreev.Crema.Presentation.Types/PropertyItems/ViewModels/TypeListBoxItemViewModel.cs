@@ -18,21 +18,9 @@
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using Ntreev.ModernUI.Framework.ViewModels;
-using System.ComponentModel;
-using Ntreev.Crema.Data;
-using System.Windows.Input;
-using System.Windows.Threading;
 using System.ComponentModel.Composition;
+using System.Windows.Input;
 using TypeDescriptor = Ntreev.Crema.Presentation.Framework.TypeDescriptor;
 
 namespace Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels
@@ -41,11 +29,11 @@ namespace Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels
     {
         private readonly ICommand selectInBrowserCommand;
         [Import]
-        private TypeBrowserViewModel browser = null;
+        private readonly TypeBrowserViewModel browser = null;
         [Import]
-        private IShell shell = null;
+        private readonly IShell shell = null;
         [Import]
-        private TypeServiceViewModel service = null;
+        private readonly TypeServiceViewModel service = null;
 
         public TypeListBoxItemViewModel(Authentication authentication, IType type, object owner)
             : base(authentication, new TypeDescriptor(authentication, type, DescriptorTypes.IsSubscriptable, owner), owner)

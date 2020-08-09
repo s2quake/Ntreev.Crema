@@ -18,13 +18,8 @@
 using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Home.MenuItems
 {
@@ -32,11 +27,12 @@ namespace Ntreev.Crema.Presentation.Home.MenuItems
     [ParentType(typeof(LogInfoViewModel))]
     class RevertDataBaseMenuItem : MenuItemBase
     {
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
-        public RevertDataBaseMenuItem()
+        [ImportingConstructor]
+        public RevertDataBaseMenuItem(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.DisplayName = "Revert";
         }
 

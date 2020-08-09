@@ -15,23 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Linq;
-using System.ComponentModel.Composition;
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using System.Threading.Tasks;
-using Ntreev.Library;
-using System.Collections.Generic;
-using System.Collections;
-using Ntreev.ModernUI.Framework;
-using System.ComponentModel;
-using Ntreev.Library.Linq;
-using Ntreev.Crema.Presentation.Tables.Properties;
-using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Tables.Properties;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
+using Ntreev.Library.Linq;
+using Ntreev.ModernUI.Framework;
+using Ntreev.ModernUI.Framework.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Linq;
 
 namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 {
@@ -42,14 +37,14 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
     class DerivedTablesViewModel : PropertyItemBase, ISelector
     {
         [Import]
-        private Lazy<TableBrowserViewModel> browser = null;
+        private readonly Lazy<TableBrowserViewModel> browser = null;
         [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator = null;
         private ITableDescriptor descriptor;
         private TableListBoxItemViewModel[] tables;
         private TableListBoxItemViewModel selectedTable;
         [Import]
-        private IBuildUp buildUp = null;
+        private readonly IBuildUp buildUp = null;
 
         [ImportingConstructor]
         public DerivedTablesViewModel()
@@ -120,7 +115,7 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
             set
             {
                 this.tables = value;
-                 this.NotifyOfPropertyChange(nameof(this.Tables));
+                this.NotifyOfPropertyChange(nameof(this.Tables));
             }
         }
 

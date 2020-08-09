@@ -15,12 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
-using Ntreev.Crema.Data;
 
 namespace Ntreev.Crema.Services.Extensions
 {
@@ -36,23 +35,23 @@ namespace Ntreev.Crema.Services.Extensions
             return GetTables(type, item => true);
         }
 
-            internal static ITable[] GetTables(IType type, Func<ITable, bool> predicate)
+        internal static ITable[] GetTables(IType type, Func<ITable, bool> predicate)
         {
-                var tables = type.GetService(typeof(ITableCollection)) as ITableCollection;
-                var tableList = new List<ITable>(tables.Count);
-                var path = type.Path;
-                foreach (var item in tables)
+            var tables = type.GetService(typeof(ITableCollection)) as ITableCollection;
+            var tableList = new List<ITable>(tables.Count);
+            var path = type.Path;
+            foreach (var item in tables)
+            {
+                var tableInfo = item.TableInfo;
+                if (IsUsingType(tableInfo, path) == true)
                 {
-                    var tableInfo = item.TableInfo;
-                    if (IsUsingType(tableInfo, path) == true)
-                    {
-                        tableList.Add(item);
-                    }
+                    tableList.Add(item);
                 }
-                var query = from item in tableList
-                            where predicate(item)
-                            select item;
-                return query.ToArray();
+            }
+            var query = from item in tableList
+                        where predicate(item)
+                        select item;
+            return query.ToArray();
         }
 
         private static bool IsUsingType(TableInfo tableInfo, string typePath)

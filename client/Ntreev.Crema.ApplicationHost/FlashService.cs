@@ -17,12 +17,7 @@
 
 using Ntreev.Crema.ApplicationHost.Views;
 using Ntreev.Crema.Presentation.Framework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ApplicationHost
 {

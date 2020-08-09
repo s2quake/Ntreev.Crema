@@ -15,30 +15,24 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Properties;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Data.Diff
 {
     public class DiffDataTable : INotifyPropertyChanged
     {
-        private CremaDataTable diffSource1;
-        private CremaDataTable diffSource2;
+        private readonly CremaDataTable diffSource1;
+        private readonly CremaDataTable diffSource2;
         private readonly CremaDataTable dataTable1;
         private readonly CremaDataTable dataTable2;
-        private DiffMergeTypes mergeType;
+        private readonly DiffMergeTypes mergeType;
         private DiffState diffState;
         private DiffTemplate template;
         private readonly ObservableCollection<object> unresolvedItemList = new ObservableCollection<object>();

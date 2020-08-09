@@ -15,14 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
-using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Diff;
+using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -31,15 +27,14 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
     class TypeDocumentViewModel : DifferenceDocumentBase
     {
         private readonly TypeTreeViewItemViewModel viewModel;
-        private UndoService undoService = new UndoService();
-        private ICommand resolveCommand;
+        private readonly UndoService undoService = new UndoService();
 
         public TypeDocumentViewModel(TypeTreeViewItemViewModel viewModel)
             : base(viewModel)
         {
             this.viewModel = viewModel;
             this.undoService.Changed += UndoService_Changed;
-            this.resolveCommand = new DelegateCommand((p) => this.ResolveAsync(), (p) => this.CanResolve);
+            this.ResolveCommand = new DelegateCommand(async (p) => await this.ResolveAsync(), (p) => this.CanResolve);
             this.DisplayName = viewModel.DisplayName;
         }
 
@@ -61,37 +56,19 @@ namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
             }
         }
 
-        public bool IsResolved
-        {
-            get { return this.viewModel.IsResolved; }
-        }
+        public bool IsResolved => this.viewModel.IsResolved;
 
-        public DiffDataType Source
-        {
-            get { return this.viewModel.Source; }
-        }
+        public DiffDataType Source => this.viewModel.Source;
 
-        public string Header1
-        {
-            get { return this.viewModel.Header1; }
-        }
+        public string Header1 => this.viewModel.Header1;
 
-        public string Header2
-        {
-            get { return this.viewModel.Header2; }
-        }
+        public string Header2 => this.viewModel.Header2;
 
-        public ICommand ResolveCommand => this.resolveCommand;
+        public ICommand ResolveCommand { get; }
 
-        public IUndoService UndoService
-        {
-            get { return this.undoService; }
-        }
+        public IUndoService UndoService => this.undoService;
 
-        public bool CanResolve
-        {
-            get { return this.Source.IsResolved == false; }
-        }
+        public bool CanResolve => this.Source.IsResolved == false;
 
         protected override async Task<bool> CloseAsync()
         {

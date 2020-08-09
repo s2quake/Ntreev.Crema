@@ -27,15 +27,25 @@ namespace Ntreev.Crema.Services
     {
         private readonly string schemaPath;
         private readonly string xmlPath;
+        private readonly IConfigurationSerializer serializer = new ConfigurationSerializer();
 
         public UserConfiguration(string path, IEnumerable<IConfigurationPropertyProvider> propertiesProviders)
             : base(typeof(IUserConfiguration), propertiesProviders)
         {
             this.xmlPath = path;
             this.schemaPath = Path.ChangeExtension(path, ".xsd");
-            throw new NotImplementedException();
-            //if (File.Exists(this.xmlPath) == true)
-            //    this.Read(this.xmlPath);
+            try
+            {
+                if (File.Exists(this.xmlPath) == true)
+                {
+                    using var stream = File.OpenRead(this.xmlPath);
+                    this.Read(stream, this.serializer);
+                }
+            }
+            catch
+            {
+
+            }
         }
 
         public override string Name => "UserConfigs";

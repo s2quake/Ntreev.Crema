@@ -19,38 +19,33 @@ using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Users.Dialogs.ViewModels;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
-using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Users
 {
     public static class UserCategoryUtility
     {
-        public static bool CanRename(Authentication authentication, IUserCategoryDescriptor descriptor)
+        public static bool CanRename(Authentication authentication, IUserCategoryDescriptor _)
         {
             return authentication.Authority == Authority.Admin;
         }
 
-        public static bool CanMove(Authentication authentication, IUserCategoryDescriptor descriptor)
+        public static bool CanMove(Authentication authentication, IUserCategoryDescriptor _)
         {
             return authentication.Authority == Authority.Admin;
         }
 
-        public static bool CanDelete(Authentication authentication, IUserCategoryDescriptor descriptor)
+        public static bool CanDelete(Authentication authentication, IUserCategoryDescriptor _)
         {
             return authentication.Authority == Authority.Admin;
         }
 
-        public static bool CanNewUser(Authentication authentication, IUserCategoryDescriptor descriptor)
+        public static bool CanNewUser(Authentication authentication, IUserCategoryDescriptor _)
         {
             return authentication.Authority == Authority.Admin;
         }
 
-        public static bool CanNewFolder(Authentication authentication, IUserCategoryDescriptor descriptor)
+        public static bool CanNewFolder(Authentication authentication, IUserCategoryDescriptor _)
         {
             return authentication.Authority == Authority.Admin;
         }

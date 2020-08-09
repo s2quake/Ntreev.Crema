@@ -19,30 +19,22 @@ using Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Converters.Properties;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Converters.MenuItems.Tables
 {
     [Export(typeof(IMenuItem))]
-    [ParentType("Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels.TableCategoryTreeViewItemViewModel, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels.TableCategoryTreeViewItemViewModel, Ntreev.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class TableCategoryExportMenuItem : MenuItemBase
     {
+        private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
-        [Import]
-        private Authenticator authenticator = null;
 
         [ImportingConstructor]
-        public TableCategoryExportMenuItem(ICremaAppHost cremaAppHost)
+        public TableCategoryExportMenuItem(Authenticator authenticator, ICremaAppHost cremaAppHost)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Loaded += this.InvokeCanExecuteChangedEvent;
             this.cremaAppHost.Unloaded += this.InvokeCanExecuteChangedEvent;

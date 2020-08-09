@@ -15,18 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.ComponentModel.Composition;
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
+using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.ServiceModel;
-using System.Threading.Tasks;
-using Ntreev.Library;
-using System.Windows;
 using Ntreev.ModernUI.Framework;
 using System.ComponentModel;
-using Ntreev.Crema.Presentation.Home.Properties;
+using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
 {
@@ -55,10 +49,7 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
             this.Attach();
         }
 
-        public override object SelectedObject
-        {
-            get { return this.descriptor; }
-        }
+        public override object SelectedObject => this.descriptor;
 
         public override bool IsVisible
         {
@@ -72,7 +63,7 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
 
         public AccessInfo AccessInfo
         {
-            get { return this.accessInfo; }
+            get => this.accessInfo;
             private set
             {
                 this.accessInfo = value;
@@ -93,10 +84,7 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
         {
             if (this.descriptor != null)
             {
-                if (this.descriptor is INotifyPropertyChanged)
-                {
-                    (this.descriptor as INotifyPropertyChanged).PropertyChanged += Descriptor_PropertyChanged;
-                }
+                this.PropertyChanged += Descriptor_PropertyChanged;
                 this.AccessInfo = this.descriptor.AccessInfo;
             }
             this.NotifyOfPropertyChange(nameof(this.IsVisible));
@@ -107,10 +95,7 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
         {
             if (this.descriptor != null)
             {
-                if (this.descriptor is INotifyPropertyChanged)
-                {
-                    (this.descriptor as INotifyPropertyChanged).PropertyChanged -= Descriptor_PropertyChanged;
-                }
+                this.descriptor.PropertyChanged -= Descriptor_PropertyChanged;
             }
         }
     }

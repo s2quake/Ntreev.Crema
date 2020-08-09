@@ -15,30 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Commands;
+using Ntreev.Crema.Javascript;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Commands.Consoles;
-using Ntreev.Crema.Services;
-using Ntreev.Library.Commands;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel.Composition;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Ntreev.Crema.Javascript;
 
 namespace Ntreev.Crema.Presentation.Console
 {
@@ -76,8 +59,6 @@ namespace Ntreev.Crema.Presentation.Console
             this.terminal.CommandContext = this.commandContext;
             this.SetPrompt();
         }
-
-        private readonly static string[] emptyStrings = new string[] { };
 
         public async void Run(string commandLine)
         {
@@ -127,7 +108,7 @@ namespace Ntreev.Crema.Presentation.Console
         private void CremaAppHost_Opened(object sender, EventArgs e)
         {
             this.SetPrompt();
-            
+
             this.terminal.AppendLine(Properties.Resources.Comment_Hello);
             this.terminal.AppendLine(Properties.Resources.Comment_AvaliableCommands);
             foreach (var item in this.commandContext.Node.Commands)
@@ -167,7 +148,7 @@ namespace Ntreev.Crema.Presentation.Console
 
         private void Term_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            
+
         }
 
         private void TerminalControl_Executed(object sender, RoutedEventArgs e)

@@ -15,10 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -35,8 +32,8 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
             DependencyProperty.Register(nameof(Box2), typeof(PasswordBox), typeof(PasswordValidator),
                 new PropertyMetadata(Box2PropertyChangedCallback));
 
-        private static Dictionary<PasswordBox, Brush> passwordBoxToBackground = new Dictionary<PasswordBox, Brush>();
-        private static Dictionary<PasswordBox, Brush> passwordBoxToForeground = new Dictionary<PasswordBox, Brush>();
+        private static readonly Dictionary<PasswordBox, Brush> passwordBoxToBackground = new Dictionary<PasswordBox, Brush>();
+        private static readonly Dictionary<PasswordBox, Brush> passwordBoxToForeground = new Dictionary<PasswordBox, Brush>();
 
         public PasswordBox Box1
         {

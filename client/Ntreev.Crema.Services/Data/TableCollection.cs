@@ -20,7 +20,6 @@ using Ntreev.Crema.ServiceHosts.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Properties;
 using Ntreev.Library;
-using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections;
@@ -85,7 +84,7 @@ namespace Ntreev.Crema.Services.Data
                 var tableInfos = result.Value;
                 await this.DataBase.WaitAsync(taskID);
                 return await this.Dispatcher.InvokeAsync(() => tableInfos.Select(item => this[item.Name]).ToArray());
-                
+
             }
             catch (Exception e)
             {

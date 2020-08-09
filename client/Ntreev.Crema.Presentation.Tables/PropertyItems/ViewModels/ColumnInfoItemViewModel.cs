@@ -16,22 +16,16 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Library;
 using Ntreev.Library.ObjectModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 {
     class ColumnInfoItemViewModel
     {
         private ColumnInfo columnInfo;
-        private string dataType;
-        private string categoryName;
+        private readonly string dataType;
+        private readonly string categoryName;
 
         public ColumnInfoItemViewModel(ColumnInfo columnInfo)
         {

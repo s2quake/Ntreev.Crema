@@ -17,12 +17,6 @@
 
 using Ntreev.Crema.Data;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 {

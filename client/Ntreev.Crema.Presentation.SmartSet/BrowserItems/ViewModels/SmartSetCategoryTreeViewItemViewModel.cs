@@ -15,22 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections.Specialized;
-using System.Collections.ObjectModel;
-using Ntreev.Crema.Services;
-using System.Windows;
-using System.Windows.Threading;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.SmartSet.Properties;
-using Ntreev.ModernUI.Framework;
 using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
-using Ntreev.ModernUI.Framework.ViewModels;
-using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
+using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
+using Ntreev.ModernUI.Framework.ViewModels;
+using System;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
@@ -110,7 +101,9 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
             }
         }
 
+#pragma warning disable CS1998 // 이 비동기 메서드에는 'await' 연산자가 없으며 메서드가 동시에 실행됩니다. 'await' 연산자를 사용하여 비블로킹 API 호출을 대기하거나, 'await Task.Run(...)'을 사용하여 백그라운드 스레드에서 CPU 바인딩된 작업을 수행하세요.
         public async Task MoveAsync()
+#pragma warning restore CS1998 // 이 비동기 메서드에는 'await' 연산자가 없으며 메서드가 동시에 실행됩니다. 'await' 연산자를 사용하여 비블로킹 API 호출을 대기하거나, 'await Task.Run(...)'을 사용하여 백그라운드 스레드에서 CPU 바인딩된 작업을 수행하세요.
         {
 
         }

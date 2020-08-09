@@ -15,26 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.ComponentModel;
-using Ntreev.ModernUI.Framework.ViewModels;
-using Ntreev.Crema.Data;
-using Ntreev.Library;
-using System.Windows.Input;
-using System.Windows.Threading;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 {
@@ -43,11 +30,11 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
         private readonly ICommand selectInBrowserCommand;
 
         [Import]
-        private TableBrowserViewModel browser = null;
+        private readonly TableBrowserViewModel browser = null;
         [Import]
-        private IShell shell = null;
+        private readonly IShell shell = null;
         [Import]
-        private TableServiceViewModel service = null;
+        private readonly TableServiceViewModel service = null;
 
         public TableListBoxItemViewModel(Authentication authentication, ITable table, object owner)
             : base(authentication, table, owner)

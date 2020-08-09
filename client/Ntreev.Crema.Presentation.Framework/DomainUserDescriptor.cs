@@ -15,21 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Crema.ServiceModel;
-using System.Windows;
-using Ntreev.ModernUI.Framework;
-using System.Windows.Media;
-using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
-using System.ComponentModel.Composition;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
-using Ntreev.ModernUI.Framework.ViewModels;
 using System.ComponentModel;
 
 namespace Ntreev.Crema.Presentation.Framework
@@ -42,7 +30,7 @@ namespace Ntreev.Crema.Presentation.Framework
         private DomainUserInfo domainUserInfo;
         private DomainUserState domainUserState;
 
-        private Action disposeAction;
+        private readonly Action disposeAction;
 
         public DomainUserDescriptor(Authentication authentication, IDomainUserDescriptor descriptor, DescriptorTypes descriptorTypes, object owner)
             : base(authentication, descriptor.Target, descriptorTypes)

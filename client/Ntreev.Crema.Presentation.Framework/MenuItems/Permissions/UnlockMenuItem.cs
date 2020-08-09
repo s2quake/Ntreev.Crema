@@ -17,13 +17,8 @@
 
 using Ntreev.Crema.Presentation.Framework.Properties;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Framework.MenuItems.Permissions
 {
@@ -38,11 +33,12 @@ namespace Ntreev.Crema.Presentation.Framework.MenuItems.Permissions
     [Category("Permissions")]
     class UnlockMenuItem : MenuItemBase
     {
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
-        public UnlockMenuItem()
+        [ImportingConstructor]
+        public UnlockMenuItem(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.DisplayName = Resources.MenuItem_Unlock;
             this.HideOnDisabled = true;
         }

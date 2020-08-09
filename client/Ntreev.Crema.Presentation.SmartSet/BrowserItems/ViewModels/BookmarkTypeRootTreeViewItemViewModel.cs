@@ -15,22 +15,6 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.SmartSet.Properties;
-using Ntreev.Crema.Services;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
-using System.ComponentModel.Composition;
-using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.Framework;
-
 namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
     // ☆Bookmark

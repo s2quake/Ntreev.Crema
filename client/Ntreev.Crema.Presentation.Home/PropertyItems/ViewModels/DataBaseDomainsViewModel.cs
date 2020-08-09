@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
@@ -25,8 +25,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
 {
@@ -35,24 +33,20 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
     [ParentType(typeof(PropertyService))]
     class DataBaseDomainsViewModel : PropertyItemBase
     {
+        private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
         private readonly ObservableCollection<DomainListItemBase> domains = new ObservableCollection<DomainListItemBase>();
-        private readonly ReadOnlyObservableCollection<DomainListItemBase> domainsReadOnly;
         private DomainListItemBase selectedDomain;
         private IDataBaseDescriptor descriptor;
 
-        [Import]
-        private IBuildUp buildUp = null;
-        [Import]
-        private Authenticator authenticator = null;
-
         [ImportingConstructor]
-        public DataBaseDomainsViewModel(ICremaAppHost cremaAppHost)
+        public DataBaseDomainsViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += CremaAppHost_Opened;
             this.cremaAppHost.Closed += CremaAppHost_Closed;
-            this.domainsReadOnly = new ReadOnlyObservableCollection<DomainListItemBase>(this.domains);
+            this.Domains = new ReadOnlyObservableCollection<DomainListItemBase>(this.domains);
             this.DisplayName = Resources.Title_DataBaseDomainList;
         }
 
@@ -100,7 +94,7 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
 
         public override object SelectedObject => this.descriptor;
 
-        public ReadOnlyObservableCollection<DomainListItemBase> Domains => this.domainsReadOnly;
+        public ReadOnlyObservableCollection<DomainListItemBase> Domains { get; }
 
         public DomainListItemBase SelectedDomain
         {
@@ -135,7 +129,6 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
 
                 foreach (var item in items)
                 {
-                    this.buildUp?.BuildUp(item);
                     this.domains.Add(item);
                 }
             }
@@ -177,7 +170,6 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
                     var viewModel = domain.Dispatcher.Invoke(() => new DomainListItemBase(this.authenticator, domain, true, this));
                     this.Dispatcher.InvokeAsync(() =>
                     {
-                        this.buildUp?.BuildUp(viewModel);
                         this.domains.Add(viewModel);
                     });
                 }

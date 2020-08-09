@@ -15,21 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using Ntreev.Crema.Presentation.Converters;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Data;
 //using Ntreev.Crema.Data.Automation;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.Spreadsheet;
-using Ntreev.Crema.ServiceModel;
 
 namespace Ntreev.Crema.Presentation.Converters.Excel
 {

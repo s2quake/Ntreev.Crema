@@ -15,28 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Types.MenuItems.TypeMenus;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework.Controls;
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
-using Ntreev.Library;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Ntreev.Crema.Presentation.Types.MenuItems.TypeMenus;
 
 namespace Ntreev.Crema.Presentation.Types.Documents.Views
 {
@@ -50,9 +38,9 @@ namespace Ntreev.Crema.Presentation.Types.Documents.Views
                 new UIPropertyMetadata(string.Empty, SearchTextPropertyChangedCallback, SearchTextCoerceValueCallback));
 
         [Import]
-        private ICremaHost cremaHost = null;
+        private readonly ICremaHost cremaHost = null;
         [Import]
-        private QuickFindTypeDataMenuItem menuItem = null;
+        private readonly QuickFindTypeDataMenuItem menuItem = null;
 
         private ModernDataGridControl gridControl;
 
@@ -156,7 +144,7 @@ namespace Ntreev.Crema.Presentation.Types.Documents.Views
 
         private void GridControl_ItemsSourceChangeCompleted(object sender, EventArgs e)
         {
-            
+
         }
 
         private IUserConfiguration Configs => this.cremaHost.GetService(typeof(IUserConfiguration)) as IUserConfiguration;

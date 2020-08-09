@@ -15,28 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library.Linq;
-using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Diff;
-using Ntreev.Crema.Presentation.Media;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+using Ntreev.Library.Linq;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Input;
-using System.Windows.Media;
-using Xceed.Wpf.DataGrid;
-using System.Windows.Data;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.Controls;
-using System.Windows.Threading;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library.IO;
 
 namespace Ntreev.Crema.Presentation.Controls
 {

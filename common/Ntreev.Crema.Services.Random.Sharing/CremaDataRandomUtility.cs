@@ -19,8 +19,6 @@ using Ntreev.Crema.Data;
 using Ntreev.Library.Random;
 using System;
 using System.Linq;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Ntreev.Crema.Services.Random
 {

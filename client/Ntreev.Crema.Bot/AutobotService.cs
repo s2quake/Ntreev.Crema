@@ -16,14 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Library;
 using System.Security;
 
 namespace Ntreev.Crema.Bot
@@ -36,7 +32,7 @@ namespace Ntreev.Crema.Bot
         private Authentication authentication;
 
         [ImportingConstructor]
-        public AutobotService(ICremaHost cremaHost, [ImportMany]IEnumerable<ITaskProvider> taskProviders)
+        public AutobotService(ICremaHost cremaHost, [ImportMany] IEnumerable<ITaskProvider> taskProviders)
             : base(cremaHost, taskProviders)
         {
             this.cremaHost = cremaHost;

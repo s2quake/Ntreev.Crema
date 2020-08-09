@@ -16,13 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Data.Diff
 {
@@ -155,10 +152,6 @@ namespace Ntreev.Crema.Data.Diff
                 {
                     if (item is InternalDataColumn dataColumn)
                     {
-                        var field1 = dataRow1[dataColumn.ColumnName];
-                        var dataColumn2 = GetColumn(dataRow2, dataColumn.Index);
-                        var field2 = dataRow2[dataColumn2];
-
                         DiffDataTable.Validate((CremaDataRow)dataRow1, (CremaDataColumn)dataColumn);
                     }
                 }

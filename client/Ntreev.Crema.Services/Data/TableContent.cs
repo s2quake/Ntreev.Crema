@@ -20,10 +20,8 @@ using Ntreev.Crema.ServiceHosts.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Crema.Services.Properties;
-using Ntreev.Library.Linq;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -124,7 +122,7 @@ namespace Ntreev.Crema.Services.Data
             return this.domainHost.LeaveEditAsync(authentication);
         }
 
-        
+
 
         public async Task ClearAsync(Authentication authentication)
         {

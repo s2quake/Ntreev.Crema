@@ -15,30 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Framework.Controls;
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
-using Ntreev.Library;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Xceed.Wpf.DataGrid;
 
 namespace Ntreev.Crema.Presentation.Types.Dialogs.Views
@@ -49,7 +35,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.Views
     public partial class TemplateView : UserControl
     {
         [Import]
-        private IAppConfiguration configs = null;
+        private readonly IAppConfiguration configs = null;
 
         public static DependencyProperty DomainProperty =
             DependencyProperty.Register(nameof(Domain), typeof(IDomain), typeof(TemplateView));
@@ -127,7 +113,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.Views
 
         private void PART_DataGridControl_ItemsSourceChangeCompleted(object sender, EventArgs e)
         {
-            
+
         }
     }
 }

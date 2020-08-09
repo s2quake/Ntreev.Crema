@@ -17,22 +17,16 @@
 
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Xml.Schema;
+using Ntreev.Library;
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
-using Xceed.Wpf.DataGrid;
-using Ntreev.Library;
 using System.Windows.Threading;
+using Xceed.Wpf.DataGrid;
 
 namespace Ntreev.Crema.Presentation.Controls
 {
@@ -40,7 +34,7 @@ namespace Ntreev.Crema.Presentation.Controls
     public class CremaTemplateControl : UserControl
     {
         public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.Register(nameof(Source), typeof(CremaTemplate), typeof(CremaTemplateControl), 
+            DependencyProperty.Register(nameof(Source), typeof(CremaTemplate), typeof(CremaTemplateControl),
                 new PropertyMetadata(null, SourcePropertyChangedCallback));
 
         public static readonly DependencyProperty ReadOnlyProperty =
@@ -50,7 +44,7 @@ namespace Ntreev.Crema.Presentation.Controls
             DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(CremaTemplateControl));
 
         public static readonly DependencyProperty SelectableTypesProperty =
-            DependencyProperty.Register(nameof(SelectableTypes), typeof(IEnumerable), typeof(CremaTemplateControl), 
+            DependencyProperty.Register(nameof(SelectableTypes), typeof(IEnumerable), typeof(CremaTemplateControl),
                 new PropertyMetadata(CremaDataTypeUtility.GetBaseTypes()));
 
         public static readonly DependencyProperty IsVerticalScrollBarOnLeftSideProperty =
@@ -102,8 +96,8 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public IEnumerable SelectableTypes
         {
-            get { return (IEnumerable)this.GetValue(SelectableTypesProperty);}
-            set {this.SetValue(SelectableTypesProperty, value);}
+            get { return (IEnumerable)this.GetValue(SelectableTypesProperty); }
+            set { this.SetValue(SelectableTypesProperty, value); }
         }
 
         public bool IsVerticalScrollBarOnLeftSide

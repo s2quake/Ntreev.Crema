@@ -15,18 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
-using Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels;
 using Ntreev.Crema.Data.Diff;
+using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
 using Ntreev.ModernUI.Framework.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
 {
@@ -34,7 +27,8 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
     {
         private readonly object item;
 
-        public TableUnresolvedItemListBoxItemViewModel(object item)
+        public TableUnresolvedItemListBoxItemViewModel(IServiceProvider serviceProvider, object item)
+            : base(serviceProvider)
         {
             this.item = item;
             this.Target = item;
@@ -80,7 +74,7 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
 
         private void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is TemplateTreeViewItemViewModel viewModel && e.PropertyName == nameof(TemplateTreeViewItemViewModel.IsResolved))
+            if (sender is TemplateTreeViewItemViewModel && e.PropertyName == nameof(TemplateTreeViewItemViewModel.IsResolved))
             {
                 this.NotifyOfPropertyChange(nameof(this.IsResolved));
             }

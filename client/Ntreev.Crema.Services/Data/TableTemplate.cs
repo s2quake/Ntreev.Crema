@@ -19,9 +19,6 @@ using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceHosts.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Domains;
-using Ntreev.Library.Linq;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Data
@@ -63,8 +60,6 @@ namespace Ntreev.Crema.Services.Data
 
         protected override async Task OnEndEditAsync(Authentication authentication)
         {
-            var domain = this.Domain;
-            var taskID = domain.ID;
             await base.OnEndEditAsync(authentication);
         }
 

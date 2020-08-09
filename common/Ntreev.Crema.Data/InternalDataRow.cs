@@ -23,7 +23,7 @@ namespace Ntreev.Crema.Data
 {
     class InternalDataRow : InternalRowBase<InternalDataTable, InternalDataRow>
     {
-        private InternalDataTable table;
+        private readonly InternalDataTable table;
 
         public InternalDataRow(CremaDataRowBuilder builder, InternalDataTable table)
             : base(table, builder.InternalBuilder)

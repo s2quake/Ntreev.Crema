@@ -17,28 +17,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Xml.Schema;
-using System.IO;
-using Ntreev.Crema.Data;
-using System.Xml;
-using Ntreev.Crema.Data.Xml.Schema;
-using Caliburn.Micro;
-using Ntreev.Crema.Presentation.Tables.Documents.ViewModels;
-using Ntreev.ModernUI.Framework.Controls;
-using Xceed.Wpf.DataGrid;
-using Ntreev.Crema.Services;
-using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Presentation.Tables.Documents.Views
 {

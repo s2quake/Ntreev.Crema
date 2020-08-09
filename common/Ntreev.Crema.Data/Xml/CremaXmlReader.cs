@@ -58,26 +58,20 @@ namespace Ntreev.Crema.Data.Xml
 
         public void Read(string filename)
         {
-            using (var reader = XmlReader.Create(filename))
-            {
-                this.Read(reader);
-            }
+            using var reader = XmlReader.Create(filename);
+            this.Read(reader);
         }
 
         public void Read(Stream stream)
         {
-            using (var xmlReader = XmlReader.Create(stream))
-            {
-                this.Read(xmlReader);
-            }
+            using var xmlReader = XmlReader.Create(stream);
+            this.Read(xmlReader);
         }
 
         public void Read(TextReader reader)
         {
-            using (var xmlReader = XmlReader.Create(reader))
-            {
-                this.Read(xmlReader);
-            }
+            using var xmlReader = XmlReader.Create(reader);
+            this.Read(xmlReader);
         }
 
         public void Read(XmlReader reader)
@@ -114,10 +108,8 @@ namespace Ntreev.Crema.Data.Xml
 
         public void ReadModifyInfo(TextReader textReader)
         {
-            using (var reader = new XmlTextReader(textReader))
-            {
-                this.ReadModifyInfo(reader);
-            }
+            using var reader = new XmlTextReader(textReader);
+            this.ReadModifyInfo(reader);
         }
 
         public void ReadModifyInfo(XmlReader xmlReader)

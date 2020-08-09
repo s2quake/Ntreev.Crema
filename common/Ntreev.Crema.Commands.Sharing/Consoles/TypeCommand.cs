@@ -18,8 +18,6 @@
 using Ntreev.Crema.Commands.Consoles.Properties;
 using Ntreev.Crema.Commands.Consoles.Serializations;
 using Ntreev.Crema.Commands.Consoles.TypeTemplate;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.Services.Extensions;
@@ -27,13 +25,9 @@ using Ntreev.Library;
 using Ntreev.Library.Commands;
 using Ntreev.Library.IO;
 using Ntreev.Library.ObjectModel;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles

@@ -19,13 +19,7 @@ using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.Presentation.Home.Services.ViewModels;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Home.MenuItems
 {

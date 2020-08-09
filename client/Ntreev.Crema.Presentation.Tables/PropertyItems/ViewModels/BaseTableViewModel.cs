@@ -15,23 +15,17 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Linq;
-using System.ComponentModel.Composition;
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using System.Threading.Tasks;
-using Ntreev.Library;
-using System.Collections.Generic;
-using System.Collections;
-using Ntreev.ModernUI.Framework;
-using System.ComponentModel;
-using Ntreev.Library.Linq;
-using Ntreev.Crema.Presentation.Tables.Properties;
-using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
+using Ntreev.Library.Linq;
+using Ntreev.ModernUI.Framework;
+using Ntreev.ModernUI.Framework.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Linq;
 
 namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 {
@@ -41,15 +35,18 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
     [ParentType(typeof(PropertyService))]
     class BaseTableViewModel : PropertyItemBase, ISelector
     {
-        [Import]
-        private Lazy<TableBrowserViewModel> browser = null;
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
+        private readonly Lazy<TableBrowserViewModel> browser;
         private ITableDescriptor descriptor;
         private TableListBoxItemViewModel[] tables;
         private TableListBoxItemViewModel selectedTable;
-        [Import]
-        private IBuildUp buildUp = null;
+
+        [ImportingConstructor]
+        public BaseTableViewModel(Authenticator authenticator, Lazy<TableBrowserViewModel> browser)
+        {
+            this.authenticator = authenticator;
+            this.browser = browser;
+        }
 
         public override bool CanSupport(object obj)
         {
@@ -78,7 +75,6 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
                     else
                     {
                         var viewModel = new TableListBoxItemViewModel(this.authenticator, item, this);
-                        this.buildUp.BuildUp(viewModel);
                         viewModelList.Add(viewModel);
                     }
                 }
@@ -103,14 +99,11 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
             }
         }
 
-        public override object SelectedObject
-        {
-            get { return this.descriptor; }
-        }
+        public override object SelectedObject => this.descriptor;
 
         public TableListBoxItemViewModel[] Tables
         {
-            get { return this.tables; }
+            get => this.tables;
             set
             {
                 this.tables = value;
@@ -120,7 +113,7 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 
         public TableListBoxItemViewModel SelectedTable
         {
-            get { return this.selectedTable; }
+            get => this.selectedTable;
             set
             {
                 if (this.selectedTable != null)
@@ -138,8 +131,8 @@ namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
 
         object ISelector.SelectedItem
         {
-            get { return this.SelectedTable; }
-            set { this.SelectedTable = value as TableListBoxItemViewModel; }
+            get => this.SelectedTable;
+            set => this.SelectedTable = value as TableListBoxItemViewModel;
         }
 
         #endregion

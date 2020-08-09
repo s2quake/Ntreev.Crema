@@ -22,27 +22,22 @@ using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Converters.MenuItems.SmartSet
 {
     [Export(typeof(IMenuItem))]
-    [ParentType("Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels.SmartSetTreeViewItemViewModel, Ntreev.Crema.Presentation.SmartSet, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels.SmartSetTreeViewItemViewModel, Ntreev.Crema.Presentation.SmartSet, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class SmartSetTableExportMenuItem : MenuItemBase
     {
+        private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
-        [Import]
-        private Authenticator authenticator = null;
 
         [ImportingConstructor]
-        public SmartSetTableExportMenuItem(ICremaAppHost cremaAppHost)
+        public SmartSetTableExportMenuItem(Authenticator authenticator, ICremaAppHost cremaAppHost)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Loaded += this.InvokeCanExecuteChangedEvent;
             this.cremaAppHost.Unloaded += this.InvokeCanExecuteChangedEvent;

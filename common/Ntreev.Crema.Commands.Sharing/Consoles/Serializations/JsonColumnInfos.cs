@@ -18,10 +18,8 @@
 using Newtonsoft.Json;
 using Ntreev.Library;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Ntreev.Crema.Commands.Consoles.Serializations
 {

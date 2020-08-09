@@ -20,19 +20,13 @@ using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
 using System.Windows.Threading;
 using Xceed.Wpf.DataGrid;
-using Xceed.Wpf.DataGrid.Views;
 
 namespace Ntreev.Crema.Presentation.Controls
 {

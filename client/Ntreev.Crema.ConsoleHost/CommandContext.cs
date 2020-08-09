@@ -16,12 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Library.Commands;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ConsoleHost
 {
@@ -29,7 +25,7 @@ namespace Ntreev.Crema.ConsoleHost
     class CommandContext : CommandContextBase
     {
         [ImportingConstructor]
-        public CommandContext([ImportMany]IEnumerable<ICommand> commands)
+        public CommandContext([ImportMany] IEnumerable<ICommand> commands)
             : base(commands)
         {
 

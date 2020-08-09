@@ -18,10 +18,6 @@
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Home.BrowserItems.ViewModels
 {
@@ -36,12 +32,12 @@ namespace Ntreev.Crema.Presentation.Home.BrowserItems.ViewModels
         internal DomainTreeViewItemViewModel(Authentication authentication, DomainDescriptor descriptor, object selector)
             : base(authentication, descriptor, selector)
         {
-            
+
         }
 
         protected override void OnDisposed(EventArgs e)
         {
-            
+
             base.OnDisposed(e);
 
         }

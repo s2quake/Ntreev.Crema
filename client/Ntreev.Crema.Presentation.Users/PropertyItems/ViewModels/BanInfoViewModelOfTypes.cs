@@ -15,24 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.ComponentModel.Composition;
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
-using System.Threading.Tasks;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
-using System.Windows;
-using System.ComponentModel;
+using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [Dependency("Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels.TypeInfoViewModel, Ntreev.Crema.Presentation.Types, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Presentation.Types.IPropertyService, Ntreev.Crema.Presentation.Types, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [Dependency("Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels.TypeInfoViewModel, Ntreev.Crema.Presentation.Types, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Types.IPropertyService, Ntreev.Crema.Presentation.Types, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     public class BanInfoViewModelOfTypes : BanInfoViewModel
     {
 

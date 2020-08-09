@@ -15,26 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Commands;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library;
-using Ntreev.Library.Commands;
-using Ntreev.Library.Linq;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Security;
-using Ntreev.Crema.Commands.Consoles;
-using Ntreev.Crema.ConsoleHost.Commands;
-using Ntreev.Crema.ConsoleHost.Properties;
-using System.Resources;
 using System.Reflection;
-using System.IO;
 
 namespace Ntreev.Crema.ConsoleHost
 {
@@ -42,20 +25,18 @@ namespace Ntreev.Crema.ConsoleHost
     {
         static Program()
         {
-           
+
         }
 
         static void Main(string[] args)
         {
             try
             {
-                using (var application = new CremaBootstrapper())
-                {
-                    var configs = application.GetService(typeof(ConsoleConfiguration)) as ConsoleConfiguration;
-                    var commandContext = application.GetService(typeof(CommandContext)) as CommandContext;
-                    commandContext.Execute(Environment.CommandLine);
-                    configs.Commit();
-                }
+                using var application = new CremaBootstrapper();
+                var configs = application.GetService(typeof(ConsoleConfiguration)) as ConsoleConfiguration;
+                var commandContext = application.GetService(typeof(CommandContext)) as CommandContext;
+                commandContext.Execute(Environment.CommandLine);
+                configs.Commit();
             }
             catch (TargetInvocationException e)
             {

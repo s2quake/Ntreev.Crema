@@ -180,10 +180,8 @@ namespace Ntreev.Crema.Data
                 argList.Add(item.Value);
             }
 
-            using (var algorithm = HashAlgorithm.Create("SHA1"))
-            {
-                return HashUtility.GetHashValue(algorithm, argList.ToArray());
-            }
+            using var algorithm = HashAlgorithm.Create("SHA1");
+            return HashUtility.GetHashValue(algorithm, argList.ToArray());
         }
 
         public new void AcceptChanges()
@@ -1203,7 +1201,7 @@ namespace Ntreev.Crema.Data
                     ValidateRows(column);
                 }
 
-                void ValidateRows(DataColumn dataColumn)
+                static void ValidateRows(DataColumn dataColumn)
                 {
                     var table = dataColumn.Table;
                     foreach (var item in dataColumn.Table.Rows)

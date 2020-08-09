@@ -18,34 +18,20 @@
 using Ntreev.Crema.Presentation.Differences.Documents.ViewModels;
 using Ntreev.Crema.Presentation.Differences.Properties;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Threading;
 
 namespace Ntreev.Crema.Presentation.Differences
 {
     [Export(typeof(IContentService))]
     [InheritedExport(typeof(DifferencesServiceViewModel))]
     [Order(50)]
-    class DifferencesServiceViewModel : ScreenBase, IContentService, IPartImportsSatisfiedNotification
+    class DifferencesServiceViewModel : ScreenBase, IContentService
     {
         private readonly ICremaAppHost cremaAppHost;
-
-        [Import]
-        private IBrowserService browserService = null;
-        [Import]
-        private DocumentServiceViewModel documentService = null;
-        [Import]
-        private IPropertyService propertyService = null;
-        [Import]
-        private Lazy<IShell> shell = null;
+        private readonly IAppConfiguration configs;
 
         private bool isBrowserExpanded = true;
         private bool isPropertyExpanded = true;
@@ -55,17 +41,18 @@ namespace Ntreev.Crema.Presentation.Differences
 
         private bool isVisible;
 
-        [Import]
-        private IAppConfiguration configs = null;
-
         [ImportingConstructor]
-        public DifferencesServiceViewModel(ICremaAppHost cremaAppHost, IBrowserService browserService, DocumentServiceViewModel contentsService, IPropertyService propertyService)
+        public DifferencesServiceViewModel(ICremaAppHost cremaAppHost, IBrowserService browserService, DocumentServiceViewModel documentService, IPropertyService propertyService, IAppConfiguration configs)
         {
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += CremaAppHost_Opened;
             this.cremaAppHost.Closed += CremaAppHost_Closed;
             this.cremaAppHost.Loaded += CremaAppHost_Loaded;
             this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
+            this.BrowserService = browserService;
+            this.DocumentService = documentService;
+            this.PropertyService = propertyService;
+            this.configs = configs;
             this.DisplayName = Resources.Title_Differences;
         }
 
@@ -76,28 +63,19 @@ namespace Ntreev.Crema.Presentation.Differences
 
         public async void Dispose()
         {
-            await this.documentService.TryCloseAsync();
+            await this.DocumentService.TryCloseAsync();
         }
 
-        public IBrowserService BrowserService
-        {
-            get { return this.browserService; }
-        }
+        public IBrowserService BrowserService { get; }
 
-        public DocumentServiceViewModel DocumentService
-        {
-            get { return this.documentService; }
-        }
+        public DocumentServiceViewModel DocumentService { get; }
 
-        public IPropertyService PropertyService
-        {
-            get { return this.propertyService; }
-        }
+        public IPropertyService PropertyService { get; }
 
         [ConfigurationProperty("isBrowserExpanded")]
         public bool IsBrowserExpanded
         {
-            get { return this.isBrowserExpanded; }
+            get => this.isBrowserExpanded;
             set
             {
                 this.isBrowserExpanded = value;
@@ -108,7 +86,7 @@ namespace Ntreev.Crema.Presentation.Differences
         [ConfigurationProperty("isPropertyExpanded")]
         public bool IsPropertyExpanded
         {
-            get { return this.isPropertyExpanded; }
+            get => this.isPropertyExpanded;
             set
             {
                 this.isPropertyExpanded = value;
@@ -119,7 +97,7 @@ namespace Ntreev.Crema.Presentation.Differences
         [ConfigurationProperty("browserDistance")]
         public double BrowserDistance
         {
-            get { return this.browserDistance; }
+            get => this.browserDistance;
             set
             {
                 this.browserDistance = value;
@@ -130,7 +108,7 @@ namespace Ntreev.Crema.Presentation.Differences
         [ConfigurationProperty("propertyDistance")]
         public double PropertyDistance
         {
-            get { return this.propertyDistance; }
+            get => this.propertyDistance;
             set
             {
                 this.propertyDistance = value;
@@ -140,7 +118,7 @@ namespace Ntreev.Crema.Presentation.Differences
 
         public bool IsVisible
         {
-            get { return this.isVisible; }
+            get => this.isVisible;
             set
             {
                 this.isVisible = value;
@@ -168,27 +146,5 @@ namespace Ntreev.Crema.Presentation.Differences
         {
             this.IsVisible = false;
         }
-
-        private void Shell_ServiceChanged(object sender, EventArgs e)
-        {
-            if (this.Shell.SelectedService == this)
-            {
-                //await this.Dispatcher.InvokeAsync(() => this.Restore(), DispatcherPriority.Background);
-            }
-        }
-
-        private IShell Shell => this.shell.Value;
-
-        #region IPartImportsSatisfiedNotification
-
-        async void IPartImportsSatisfiedNotification.OnImportsSatisfied()
-        {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.Shell.ServiceChanged += Shell_ServiceChanged;
-            });
-        }
-
-        #endregion
     }
 }

@@ -381,51 +381,39 @@ namespace Ntreev.Crema.Data
         public void ReadXmlString(string xml)
         {
             this.ValidateReadXml(null);
-            using (var reader = new StringReader(xml))
-            {
-                this.ReadXml(reader);
-            }
+            using var reader = new StringReader(xml);
+            this.ReadXml(reader);
         }
 
         public void ReadXmlString(string xml, ItemName itemName)
         {
             this.ValidateReadXml(itemName);
-            using (var reader = new StringReader(xml))
-            {
-                this.ReadXml(reader, itemName);
-            }
+            using var reader = new StringReader(xml);
+            this.ReadXml(reader, itemName);
         }
 
         public void ReadXmlSchemaString(string xmlSchema)
         {
-            using (var sr = new StringReader(xmlSchema))
-            {
-                this.ReadXmlSchema(sr, new CremaTypeXmlResolver(this, this.TableNamespace));
-            }
+            using var sr = new StringReader(xmlSchema);
+            this.ReadXmlSchema(sr, new CremaTypeXmlResolver(this, this.TableNamespace));
         }
 
         public void ReadXmlSchemaString(string xmlSchema, ItemName itemName)
         {
-            using (var reader = new StringReader(xmlSchema))
-            {
-                this.ReadXmlSchema(reader, itemName, new CremaTypeXmlResolver(this, this.TableNamespace));
-            }
+            using var reader = new StringReader(xmlSchema);
+            this.ReadXmlSchema(reader, itemName, new CremaTypeXmlResolver(this, this.TableNamespace));
         }
 
         public void ReadXmlSchemaString(string xmlSchema, XmlResolver resolver)
         {
-            using (var sr = new StringReader(xmlSchema))
-            {
-                this.ReadXmlSchema(sr, resolver);
-            }
+            using var sr = new StringReader(xmlSchema);
+            this.ReadXmlSchema(sr, resolver);
         }
 
         public void ReadXmlSchemaString(string xmlSchema, ItemName itemName, XmlResolver resolver)
         {
-            using (var sr = new StringReader(xmlSchema))
-            {
-                this.ReadXmlSchema(sr, itemName, resolver);
-            }
+            using var sr = new StringReader(xmlSchema);
+            this.ReadXmlSchema(sr, itemName, resolver);
         }
 
         public void ReadTypeString(string schema)
@@ -435,10 +423,8 @@ namespace Ntreev.Crema.Data
 
         public void ReadTypeString(string schema, ItemName itemName)
         {
-            using (var sr = new StringReader(schema))
-            {
-                this.ReadType(sr, itemName);
-            }
+            using var sr = new StringReader(schema);
+            this.ReadType(sr, itemName);
         }
 
         public void ReadXml(string filename)
@@ -574,39 +560,39 @@ namespace Ntreev.Crema.Data
 
             //if (schemaOnly == false)
             //{
-                this.BeginLoad();
+            this.BeginLoad();
 
 #if USE_PARALLEL
-                readInfos.Sort((x, y) => y.XmlSize.CompareTo(x.XmlSize));
+            readInfos.Sort((x, y) => y.XmlSize.CompareTo(x.XmlSize));
 
-                var threadcount = 8;
-                var query = from item in readInfos
-                            let key = readInfos.IndexOf(item) % threadcount
-                            group item by key into g
-                            select g;
+            var threadcount = 8;
+            var query = from item in readInfos
+                        let key = readInfos.IndexOf(item) % threadcount
+                        group item by key into g
+                        select g;
 
-                var parallellist = new List<CremaXmlReadInfo>(readInfos.Count);
+            var parallellist = new List<CremaXmlReadInfo>(readInfos.Count);
 
-                foreach (var item in query)
+            foreach (var item in query)
+            {
+                parallellist.AddRange(item);
+            }
+
+            try
+            {
+                Parallel.ForEach(parallellist, new ParallelOptions { MaxDegreeOfParallelism = threadcount }, item =>
                 {
-                    parallellist.AddRange(item);
-                }
-
-                try
-                {
-                    Parallel.ForEach(parallellist, new ParallelOptions { MaxDegreeOfParallelism = threadcount }, item =>
+                    var xmlReader = new CremaXmlReader(this, item.ItemName)
                     {
-                        var xmlReader = new CremaXmlReader(this, item.ItemName)
-                        {
-                            OmitContent = schemaOnly == true
-                        };
-                        xmlReader.Read(item.XmlPath);
-                    });
-                }
-                catch (AggregateException e)
-                {
-                    throw e.InnerException;
-                }
+                        OmitContent = schemaOnly == true
+                    };
+                    xmlReader.Read(item.XmlPath);
+                });
+            }
+            catch (AggregateException e)
+            {
+                throw e.InnerException;
+            }
 #else
             foreach (var item in readInfos)
             {
@@ -617,7 +603,7 @@ namespace Ntreev.Crema.Data
                 xmlReader.Read(item.XmlPath);
             }
 #endif
-                this.EndLoad();
+            this.EndLoad();
             //}
             this.Tables.Sort();
         }
@@ -853,20 +839,16 @@ namespace Ntreev.Crema.Data
 
         public string GetXmlSchema()
         {
-            using (var sw = new Utf8StringWriter())
-            {
-                this.WriteXmlSchema(sw);
-                return sw.ToString();
-            }
+            using var sw = new Utf8StringWriter();
+            this.WriteXmlSchema(sw);
+            return sw.ToString();
         }
 
         public string GetXml()
         {
-            using (var sw = new Utf8StringWriter())
-            {
-                this.WriteXml(sw);
-                return sw.ToString();
-            }
+            using var sw = new Utf8StringWriter();
+            this.WriteXml(sw);
+            return sw.ToString();
         }
 
         public IDictionary<string, object> ToDictionary()
@@ -1007,10 +989,8 @@ namespace Ntreev.Crema.Data
             XmlSchema ReaderSchema()
             {
                 var readInfo = new CremaXmlReadInfo(filename);
-                using (var reader = XmlReader.Create(readInfo.SchemaPath))
-                {
-                    return XmlSchema.Read(reader, (s, e) => { });
-                }
+                using var reader = XmlReader.Create(readInfo.SchemaPath);
+                return XmlSchema.Read(reader, (s, e) => { });
             }
         }
 
@@ -1151,14 +1131,6 @@ namespace Ntreev.Crema.Data
                     items.Add(item.Namespace + CremaSchema.XmlExtension, xml);
                 }
             });
-        }
-
-        private void CopyTo(CremaDataSet dest)
-        {
-            foreach (CremaDataTable item in this.Tables)
-            {
-                item.CopyTo(dest.Tables[item.TableName]);
-            }
         }
 
         private static void ValidateReadFromDirectory(string path)

@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using System;
@@ -92,15 +92,7 @@ namespace Ntreev.Crema.Presentation.Home.Dialogs.ViewModels
             }
         }
 
-        public IEnumerable<LogInfoViewModel> ItemsSource
-        {
-            get { return this.itemsSource; }
-        }
-
-        //public ICommand PreviewCommand
-        //{
-        //    get { return this.previewCommand; }
-        //}
+        public IEnumerable<LogInfoViewModel> ItemsSource => this.itemsSource;
 
         protected override async Task OnInitializeAsync(CancellationToken cancellationToken)
         {

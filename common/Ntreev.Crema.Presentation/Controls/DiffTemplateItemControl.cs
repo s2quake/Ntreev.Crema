@@ -18,17 +18,12 @@
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Diff;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.Controls;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Threading;
 using Xceed.Wpf.DataGrid;
 using Xceed.Wpf.DataGrid.Views;
 

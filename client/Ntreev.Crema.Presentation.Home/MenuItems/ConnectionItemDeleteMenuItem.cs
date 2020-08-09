@@ -18,12 +18,7 @@
 using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.Presentation.Home.Services.ViewModels;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Home.MenuItems
 {
@@ -31,11 +26,11 @@ namespace Ntreev.Crema.Presentation.Home.MenuItems
     [ParentType(typeof(ConnectionItemViewModel))]
     class ConnectionItemDeleteMenuItem : MenuItemBase
     {
-        [Import]
-        private Lazy<CremaAppHostViewModel> cremaAppHost = null;
+        private readonly CremaAppHostViewModel cremaAppHost;
 
-        public ConnectionItemDeleteMenuItem()
+        public ConnectionItemDeleteMenuItem(CremaAppHostViewModel cremaAppHost)
         {
+            this.cremaAppHost = cremaAppHost;
             this.DisplayName = Resources.MenuItem_Delete;
         }
 
@@ -52,10 +47,8 @@ namespace Ntreev.Crema.Presentation.Home.MenuItems
             {
                 if (await AppMessageBox.ConfirmDeleteAsync() == false)
                     return;
-                this.CremaAppHost.RemoveConnectionItem(connectionItem);
+                this.cremaAppHost.RemoveConnectionItem(connectionItem);
             }
         }
-
-        private CremaAppHostViewModel CremaAppHost => this.cremaAppHost.Value;
     }
 }

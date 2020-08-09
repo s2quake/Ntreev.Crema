@@ -15,12 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using DiffPlex;
-using DiffPlex.DiffBuilder;
-using DiffPlex.DiffBuilder.Model;
-using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Properties;
-using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library;
 using System;
 using System.Collections.Generic;
@@ -28,8 +23,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Data.Diff
 {
@@ -40,17 +33,17 @@ namespace Ntreev.Crema.Data.Diff
         private readonly CremaDataTable diffTable2;
         private readonly CremaDataTable dataTable1;
         private readonly CremaDataTable dataTable2;
-        private CremaTemplate diffSource1;
-        private CremaTemplate diffSource2;
-        private DiffMergeTypes mergeType;
-        private bool dummy1;
-        private bool dummy2;
+        private readonly CremaTemplate diffSource1;
+        private readonly CremaTemplate diffSource2;
+        private readonly DiffMergeTypes mergeType;
+        private readonly bool dummy1;
+        private readonly bool dummy2;
         private readonly List<DiffTemplateColumn> itemList = new List<DiffTemplateColumn>();
         private DiffState diffState;
         private bool isResolved;
         private string header1;
         private string header2;
-        private ObservableCollection<object> unresolvedItemList = new ObservableCollection<object>();
+        private readonly ObservableCollection<object> unresolvedItemList = new ObservableCollection<object>();
         private readonly HashSet<object> itemSet = new HashSet<object>();
 
         [Obsolete]
@@ -849,7 +842,7 @@ namespace Ntreev.Crema.Data.Diff
             }
         }
 
-        private void AttachEventHandler(CremaTemplate template, CremaDataTable diffTable)
+        private void AttachEventHandler(CremaTemplate _, CremaDataTable diffTable)
         {
             var query = from item in diffTable.Columns
                         where item.CremaType != null

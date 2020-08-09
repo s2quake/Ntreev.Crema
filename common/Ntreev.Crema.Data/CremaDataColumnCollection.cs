@@ -70,7 +70,7 @@ namespace Ntreev.Crema.Data
             dataColumn.IsKey = true;
             return dataColumn;
         }
-        
+
         public CremaDataColumn Add(string columnName)
         {
             var dataColumn = this.table.AddColumn(columnName);

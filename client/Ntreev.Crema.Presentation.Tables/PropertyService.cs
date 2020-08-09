@@ -15,21 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Ntreev.Crema.Presentation.Framework;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using Caliburn.Micro;
-using System.Reflection;
-using Ntreev.Crema.Services;
-using System.Threading.Tasks;
-using System.Threading;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library.Linq;
-using Ntreev.ModernUI.Framework;
-using System.Windows;
 
 namespace Ntreev.Crema.Presentation.Tables
 {
@@ -39,7 +27,7 @@ namespace Ntreev.Crema.Presentation.Tables
     class PropertyService : PropertyServiceBase, IPropertyService
     {
         [ImportingConstructor]
-        public PropertyService(ICremaAppHost cremaAppHost, [ImportMany]IEnumerable<IPropertyItem> propertyItems)
+        public PropertyService(ICremaAppHost cremaAppHost, [ImportMany] IEnumerable<IPropertyItem> propertyItems)
             : base(cremaAppHost, propertyItems)
         {
 

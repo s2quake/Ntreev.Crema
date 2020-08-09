@@ -15,11 +15,6 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -30,7 +25,7 @@ namespace Ntreev.Crema.Presentation.Framework.Controls
     {
         private static Color DefaultColor = Color.FromArgb(0xff, 0x1b, 0xa1, 0xe2);
 
-        private static DependencyPropertyKey ThemePropertyKey =
+        private static readonly DependencyPropertyKey ThemePropertyKey =
             DependencyProperty.RegisterReadOnly(nameof(Theme), typeof(Brush), typeof(CremaSplashControl),
                 new PropertyMetadata(new SolidColorBrush(DefaultColor)));
         public static DependencyProperty ThemeProperty = ThemePropertyKey.DependencyProperty;

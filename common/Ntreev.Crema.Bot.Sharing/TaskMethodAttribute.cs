@@ -17,8 +17,6 @@
 
 using Ntreev.Crema.ServiceModel;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Ntreev.Crema.Bot
 {

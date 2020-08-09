@@ -15,24 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Tables.Documents.Views;
+using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
 using Ntreev.Crema.Presentation.Tables.Properties;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Collections;
-using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
-using Ntreev.Library.Linq;
 
 namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 {
@@ -43,9 +33,9 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
         private readonly ICremaAppHost cremaAppHost;
 
         [Import]
-        private IBuildUp buildUp = null;
+        private readonly IBuildUp buildUp = null;
         [Import]
-        private Lazy<TableBrowserViewModel> browser = null;
+        private readonly Lazy<TableBrowserViewModel> browser = null;
 
         [ImportingConstructor]
         public TableDocumentServiceViewModel(ICremaAppHost cremaAppHost)
@@ -235,7 +225,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 
         private void CremaAppHost_Reset(object sender, EventArgs e)
         {
-            
+
         }
 
         private TableEditorViewModel OpenTable(Authentication authentication, TableDescriptor descriptor, string tableName)

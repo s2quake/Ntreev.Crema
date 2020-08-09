@@ -17,13 +17,9 @@
 
 using Ntreev.Crema.Services;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Jint.Native;
+using System.Linq;
 
 namespace Ntreev.Crema.Javascript.Methods
 {
@@ -36,7 +32,7 @@ namespace Ntreev.Crema.Javascript.Methods
         private CremaEventListenerContext eventListenerContext;
 
         [ImportingConstructor]
-        public AddEventListenerMethod(ICremaHost cremaHost, [ImportMany]IEnumerable<CremaEventListenerHost> eventListeners)
+        public AddEventListenerMethod(ICremaHost cremaHost, [ImportMany] IEnumerable<CremaEventListenerHost> eventListeners)
         {
             this.cremaHost = cremaHost;
             this.eventListeners = eventListeners.ToArray();

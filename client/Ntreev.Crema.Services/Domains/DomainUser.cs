@@ -25,7 +25,7 @@ namespace Ntreev.Crema.Services.Domains
     class DomainUser : DomainUserBase, IDomainUser
     {
         private readonly Domain domain;
-        bool metadata;
+        readonly bool metadata;
 
         public DomainUser(Domain domain, DomainUserInfo domainUserInfo, DomainUserState domainUserState, bool metadata)
         {
@@ -72,7 +72,7 @@ namespace Ntreev.Crema.Services.Domains
 
             return metaData;
         }
-        
+
         public string ID => base.DomainUserInfo.UserID;
 
         public CremaDispatcher Dispatcher => this.domain.Dispatcher;

@@ -16,13 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
-using Ntreev.Crema.Services;
 using Ntreev.Library.Random;
-using System;
 using System.Linq;
-using System.Collections.Generic;
-using System.Text;
-using Ntreev.Library.ObjectModel;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Random
@@ -38,7 +33,7 @@ namespace Ntreev.Crema.Services.Random
             {
                 await tableColumn.SetDataTypeAsync(authentication, CremaDataTypeUtility.GetBaseTypeNames().Random(item => item != typeof(bool).GetTypeName()));
             }
-            else 
+            else
             {
                 await tableColumn.SetDataTypeAsync(authentication, template.SelectableTypes.Random());
             }

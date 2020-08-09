@@ -18,10 +18,6 @@
 using Ntreev.Library;
 using Ntreev.Library.Serialization;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services
 {
@@ -40,7 +36,9 @@ namespace Ntreev.Crema.Services
     {
         public static bool TryGetValue<T>(this IUserConfiguration config, Type section, string key, out T value)
         {
+#pragma warning disable CS0612 // 'ConfigurationItem'은(는) 사용되지 않습니다.
             var configItem = new ConfigurationItem(section.Name, key);
+#pragma warning restore CS0612 // 'ConfigurationItem'은(는) 사용되지 않습니다.
             if (config.Contains(configItem) == true)
             {
                 try
@@ -69,7 +67,9 @@ namespace Ntreev.Crema.Services
 
         public static void SetValue<T>(this IUserConfiguration config, Type section, string key, T value)
         {
+#pragma warning disable CS0612 // 'ConfigurationItem'은(는) 사용되지 않습니다.
             var configItem = new ConfigurationItem(section.Name, key);
+#pragma warning restore CS0612 // 'ConfigurationItem'은(는) 사용되지 않습니다.
             if (ConfigurationBase.CanSupportType(typeof(T)) == true)
             {
                 config[configItem] = value;

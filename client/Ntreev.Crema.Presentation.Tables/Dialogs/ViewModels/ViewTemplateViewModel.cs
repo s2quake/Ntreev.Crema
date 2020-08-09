@@ -15,32 +15,22 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Tables.Properties;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Data;
-using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
 using Ntreev.Library;
+using System;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 {
     public class ViewTemplateViewModel : ModalDialogAppBase
     {
         private readonly Authentication authentication;
-        private CremaTemplate template;
-        private string tableName;
-        private string comment;
+        private readonly CremaTemplate template;
+        private readonly string tableName;
+        private readonly string comment;
         private TagInfo tags;
 
         public ViewTemplateViewModel(Authentication authentication, CremaTemplate template)

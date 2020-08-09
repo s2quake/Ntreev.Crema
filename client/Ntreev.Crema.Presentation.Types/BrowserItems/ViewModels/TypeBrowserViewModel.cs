@@ -15,26 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Collections.ObjectModel;
-using System.ComponentModel.Composition;
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using System.Windows;
-using System.Windows.Input;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Library.ObjectModel;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using Ntreev.ModernUI.Framework.ViewModels;
-using Ntreev.Library.Linq;
-using System.Collections;
-using System.Windows.Threading;
 using Ntreev.Crema.Presentation.Types.Properties;
-using System.Threading.Tasks;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services;
 using Ntreev.Library;
+using Ntreev.Library.Linq;
+using Ntreev.ModernUI.Framework;
+using Ntreev.ModernUI.Framework.ViewModels;
+using System;
+using System.Collections;
+using System.ComponentModel.Composition;
+using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
 {
@@ -49,15 +41,15 @@ namespace Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels
         private bool isVisible = true;
         private Guid dataBaseID;
 
-        private DelegateCommand renameCommand;
-        private DelegateCommand deleteCommand;
+        private readonly DelegateCommand renameCommand;
+        private readonly DelegateCommand deleteCommand;
 
         [Import]
-        private IPropertyService propertyService = null;
+        private readonly IPropertyService propertyService = null;
         [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator = null;
         [Import]
-        private IBuildUp buildUp = null;
+        private readonly IBuildUp buildUp = null;
 
         [ImportingConstructor]
         public TypeBrowserViewModel(ICremaAppHost cremaAppHost)

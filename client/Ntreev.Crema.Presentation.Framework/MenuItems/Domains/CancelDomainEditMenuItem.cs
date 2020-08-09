@@ -15,16 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.ModernUI.Framework;
 using Ntreev.Crema.Presentation.Framework.Properties;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.ModernUI.Framework;
+using System;
+using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Presentation.Framework.MenuItems.Domains
 {
@@ -33,11 +29,12 @@ namespace Ntreev.Crema.Presentation.Framework.MenuItems.Domains
     [ParentType(typeof(DomainListItemBase))]
     class CancelDomainEditMenuItem : MenuItemBase
     {
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
-        public CancelDomainEditMenuItem()
+        [ImportingConstructor]
+        public CancelDomainEditMenuItem(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.DisplayName = Resources.MenuItem_CancelEdit;
         }
 

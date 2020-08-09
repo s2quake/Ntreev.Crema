@@ -17,28 +17,21 @@
 
 using Ntreev.Crema.Commands.Consoles;
 using Ntreev.Crema.Commands.Consoles.Properties;
-using Ntreev.Crema.Commands.Consoles.Serializations;
-using Ntreev.Crema.Commands.Consoles.TableContent;
-using Ntreev.Crema.Commands.Consoles.TableTemplate;
 using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Spreadsheet;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Spreadsheet;
 using Ntreev.Library;
 using Ntreev.Library.Commands;
 using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Diagnostics;
-using System.Collections;
 
 namespace Ntreev.Crema.Commands.Spreadsheet
 {
@@ -47,7 +40,7 @@ namespace Ntreev.Crema.Commands.Spreadsheet
     class SpreadSheetCommand : ConsoleCommandMethodBase
     {
         [Import]
-        private Lazy<ICremaHost> cremaHost = null;
+        private readonly Lazy<ICremaHost> cremaHost = null;
 
         private string dataBaseName;
 

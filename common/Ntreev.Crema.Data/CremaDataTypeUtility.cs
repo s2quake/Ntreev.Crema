@@ -23,8 +23,8 @@ namespace Ntreev.Crema.Data
 {
     public static class CremaDataTypeUtility
     {
-        private static Dictionary<string, Type> baseTypes = new Dictionary<string, Type>();
-        private static Dictionary<Type, string> typeToName = new Dictionary<Type, string>();
+        private static readonly Dictionary<string, Type> baseTypes = new Dictionary<string, Type>();
+        private static readonly Dictionary<Type, string> typeToName = new Dictionary<Type, string>();
 
         public const string booleanType = "boolean";
         public const string stringType = "string";

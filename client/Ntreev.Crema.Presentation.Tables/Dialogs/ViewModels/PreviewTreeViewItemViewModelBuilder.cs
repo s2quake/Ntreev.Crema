@@ -15,16 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
 using Ntreev.Library;
 using Ntreev.Library.ObjectModel;
 using Ntreev.ModernUI.Framework.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 {
@@ -44,7 +38,7 @@ namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
 
         protected override TreeViewItemViewModel CreateItem(string path)
         {
-            return new PreviewTableTreeViewItemViewModel(path,this.viewAction);
+            return new PreviewTableTreeViewItemViewModel(path, this.viewAction);
         }
 
         protected override string GetParentPath(string path)

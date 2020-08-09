@@ -17,26 +17,22 @@
 
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Users.Dialogs.ViewModels;
-using Ntreev.Crema.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Users
 {
     public static class UserUtility
     {
-        public static bool CanRename(Authentication authentication, IUserDescriptor descriptor)
+        public static bool CanRename(Authentication _1, IUserDescriptor _2)
         {
             return false;
         }
 
-        public static bool CanMove(Authentication authentication, IUserDescriptor descriptor)
+        public static bool CanMove(Authentication authentication, IUserDescriptor _)
         {
             return authentication.Authority == Authority.Admin;
         }
@@ -55,7 +51,7 @@ namespace Ntreev.Crema.Presentation.Users
             return UserDescriptorUtility.IsOnline(authentication, descriptor);
         }
 
-        public static bool CanChange(Authentication authentication, IUserDescriptor descriptor)
+        public static bool CanChange(Authentication authentication, IUserDescriptor _)
         {
             return authentication.Authority == Authority.Admin;
         }
@@ -93,7 +89,7 @@ namespace Ntreev.Crema.Presentation.Users
             return UserDescriptorUtility.IsBanned(authentication, descriptor) == true;
         }
 
-        public static async Task<bool> RenameAsync(Authentication authentication, IUserDescriptor descriptor)
+        public static async Task<bool> RenameAsync(Authentication _1, IUserDescriptor _2)
         {
             return await Task.Run(() => false);
         }
@@ -116,7 +112,7 @@ namespace Ntreev.Crema.Presentation.Users
 
         public static async Task<bool> SendMessageAsync(Authentication authentication, IUserDescriptor descriptor)
         {
-            if (descriptor.Target is IUser user)
+            if (descriptor.Target is IUser)
             {
                 var dialog = await SendMessageViewModel.CreateInstanceAsync(authentication, descriptor);
                 if (dialog != null && await dialog.ShowDialogAsync() == true)

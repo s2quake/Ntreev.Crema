@@ -17,12 +17,7 @@
 
 using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 using Xceed.Wpf.DataGrid;
 
@@ -32,7 +27,7 @@ namespace Ntreev.Crema.Presentation.Controls
     {
         public DiffColumnManagerRow()
         {
-            
+
         }
 
         protected override Cell CreateCell(ColumnBase column)

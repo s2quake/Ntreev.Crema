@@ -16,18 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
+using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using Ntreev.Crema.Presentation.Home.Properties;
 
 namespace Ntreev.Crema.Presentation.Home.MenuItems
 {
@@ -35,13 +27,13 @@ namespace Ntreev.Crema.Presentation.Home.MenuItems
     [ParentType(typeof(ToolsMenuItem))]
     class DataBaseMenuItem : MenuItemBase
     {
+        private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
-        [Import]
-        private Authenticator authenticator = null;
 
         [ImportingConstructor]
-        public DataBaseMenuItem(ICremaAppHost cremaAppHost)
+        public DataBaseMenuItem(Authenticator authenticator, ICremaAppHost cremaAppHost)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += this.InvokeCanExecuteChangedEvent;
             this.cremaAppHost.Closed += this.InvokeCanExecuteChangedEvent;

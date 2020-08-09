@@ -15,32 +15,23 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Diff;
+using Ntreev.Crema.Presentation.Controls.Actions;
+using Ntreev.Library;
+using Ntreev.Library.Linq;
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using Xceed.Wpf.DataGrid;
-using System.Collections;
 using Xceed.Wpf.DataGrid.Views;
-using System.Collections.Specialized;
-using Ntreev.Crema.Presentation.Controls;
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Presentation.Controls.Actions;
-using Ntreev.Library.Linq;
-using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace Ntreev.Crema.Presentation.Controls
 {
@@ -60,8 +51,8 @@ namespace Ntreev.Crema.Presentation.Controls
 
         private ScrollViewer scrollViewer;
         private ScrollViewer destScrollViewer;
-        private FieldStack<bool> preventEvent = new FieldStack<bool>();
-        private FieldStack<bool> preventSelection = new FieldStack<bool>();
+        private readonly FieldStack<bool> preventEvent = new FieldStack<bool>();
+        private readonly FieldStack<bool> preventSelection = new FieldStack<bool>();
 
         static DiffDataGridControl()
         {

@@ -16,13 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
-using Ntreev.Crema.Services;
 using Ntreev.Library.Random;
-using System;
 using System.Linq;
-using System.Collections.Generic;
-using System.Text;
-using Ntreev.Library.ObjectModel;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Services.Random
@@ -111,7 +106,7 @@ namespace Ntreev.Crema.Services.Random
             else
             {
                 var typeContext = table.GetService(typeof(ITypeContext)) as ITypeContext;
-                var type = await typeContext.Dispatcher.InvokeAsync(()=> typeContext[columnInfo.DataType] as IType);
+                var type = await typeContext.Dispatcher.InvokeAsync(() => typeContext[columnInfo.DataType] as IType);
                 return await type.GetRandomValueAsync();
             }
         }

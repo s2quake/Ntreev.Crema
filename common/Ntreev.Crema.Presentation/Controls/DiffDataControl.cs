@@ -15,27 +15,20 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library.Linq;
-using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Diff;
-using Ntreev.Crema.Presentation.Media;
+using Ntreev.Crema.Presentation.Controls.Actions;
+using Ntreev.ModernUI.Framework;
+using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Windows.Media;
-using Xceed.Wpf.DataGrid;
-using Xceed.Wpf.DataGrid.Views;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Presentation.Controls.Actions;
-using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System.Windows.Threading;
+using Xceed.Wpf.DataGrid;
 
 namespace Ntreev.Crema.Presentation.Controls
 {
@@ -102,8 +95,8 @@ namespace Ntreev.Crema.Presentation.Controls
 
         private DiffDataGridControl gridControl1;
         private DiffDataGridControl gridControl2;
-        private List<DiffItemInfo> diffItems = new List<DiffItemInfo>();
-        private List<object> visibleItems = new List<object>();
+        private readonly List<DiffItemInfo> diffItems = new List<DiffItemInfo>();
+        private readonly List<object> visibleItems = new List<object>();
 
         public DiffDataControl()
         {

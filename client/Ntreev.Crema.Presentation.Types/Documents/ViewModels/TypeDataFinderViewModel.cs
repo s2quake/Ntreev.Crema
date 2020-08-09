@@ -15,31 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Caliburn.Micro;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.ComponentModel.Composition;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using System.Xml.XPath;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library.IO;
-using System.Windows;
 using Ntreev.Crema.Presentation.Types.Properties;
-using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
-using Ntreev.Library.Linq;
-using Ntreev.ModernUI.Framework.ViewModels;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services;
+using Ntreev.ModernUI.Framework;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel.Composition;
+using System.Linq;
 
 namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
 {
@@ -54,7 +37,7 @@ namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
         private FindResultItemViewModel selectedItem;
 
         [Import]
-        private TypeDocumentServiceViewModel documentService = null;
+        private readonly TypeDocumentServiceViewModel documentService = null;
 
         public TypeDataFinderViewModel(Authentication authentication, IDataBase dataBase, string findingTarget)
         {

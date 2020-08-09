@@ -16,14 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Domains.Actions;
 using Ntreev.Crema.Services.Domains.Serializations;
-using Ntreev.Library;
-using Ntreev.Library.IO;
-using Ntreev.Library.Serialization;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 

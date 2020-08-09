@@ -17,11 +17,6 @@
 
 using Caliburn.Micro;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -55,6 +50,6 @@ namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
 
         protected abstract void OnWriteXml(XmlWriter writer);
 
-        
+
     }
 }

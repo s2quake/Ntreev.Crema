@@ -50,12 +50,6 @@ namespace Ntreev.Crema.ApplicationHost.Controls
             this.control.Dispatcher.Invoke(() => this.control.AppendLine(string.Empty));
         }
 
-        public override void WriteLine(string value)
-        {
-            base.WriteLine(value);
-            this.control.Dispatcher.Invoke(() => this.control.AppendLine(value));
-        }
-
         public override void Write(string value)
         {
             base.Write(value);

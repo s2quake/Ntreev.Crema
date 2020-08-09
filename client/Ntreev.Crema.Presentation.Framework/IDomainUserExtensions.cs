@@ -16,20 +16,17 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using FirstFloor.ModernUI.Presentation;
-using Ntreev.Crema.Services;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace Ntreev.Crema.Presentation.Framework
 {
     public static class IDomainUserExtensions
     {
-        private static List<Color> colors = new List<Color>() {
+        private static readonly List<Color> colors = new List<Color>() {
             Color.FromRgb(0xa4, 0xc4, 0x00),   // lime
             Color.FromRgb(0x60, 0xa9, 0x17),   // green
             Color.FromRgb(0x00, 0x8a, 0x00),   // emerald
@@ -52,10 +49,10 @@ namespace Ntreev.Crema.Presentation.Framework
             Color.FromRgb(0x87, 0x79, 0x4e),   // taupe
         };
 
-        private static List<Color> emptyColors = new List<Color>();
-        private static Random random = new Random(DateTime.Now.Millisecond);
+        private static readonly List<Color> emptyColors = new List<Color>();
+        private static readonly Random random = new Random(DateTime.Now.Millisecond);
 
-        private static Dictionary<string, Color> idToColor = new Dictionary<string, Color>();
+        private static readonly Dictionary<string, Color> idToColor = new Dictionary<string, Color>();
 
         public static Color GetColor(this IDomainUser domainUser)
         {
@@ -70,7 +67,7 @@ namespace Ntreev.Crema.Presentation.Framework
                 int index = random.Next() % emptyColors.Count;
                 idToColor.Add(domainUser.ID, emptyColors[index]);
                 emptyColors.RemoveAt(index);
-                
+
             }
             return idToColor[domainUser.ID];
         }

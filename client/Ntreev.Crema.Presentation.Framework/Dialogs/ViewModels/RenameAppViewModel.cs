@@ -17,18 +17,14 @@
 
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 {
     public class RenameAppViewModel : RenameViewModel, IPartImportsSatisfiedNotification
     {
         [Import]
-        private ICremaAppHost cremaAppHost = null;
+        private readonly ICremaAppHost cremaAppHost = null;
 
         public RenameAppViewModel(string currentName)
             : base(currentName)

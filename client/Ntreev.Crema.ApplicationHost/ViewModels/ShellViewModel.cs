@@ -15,28 +15,20 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Linq;
-using System.Collections.Generic;
-using System.Reflection;
-using System.ComponentModel.Composition;
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
-using System.Windows;
-using Ntreev.Crema.ServiceModel;
-using System.ComponentModel;
-using System.Xml.Serialization;
-using System;
-using System.Threading.Tasks;
-using System.Collections;
 using Ntreev.Library;
-using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
-using System.Collections.ObjectModel;
 using Ntreev.Library.Linq;
 using Ntreev.ModernUI.Framework;
-using System.Diagnostics;
-using System.Windows.Input;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
 
 namespace Ntreev.Crema.ApplicationHost.ViewModels
 {
@@ -57,8 +49,8 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
             Lazy<ICremaAppHost> cremaAppHost,
             Lazy<IStatusBarService> statusBarService,
             Lazy<IMenuService> menuService,
-            [ImportMany]IEnumerable<Lazy<IContentService>> contentServices,
-            [ImportMany]IEnumerable<Lazy<IBrowserItem>> browsers)
+            [ImportMany] IEnumerable<Lazy<IContentService>> contentServices,
+            [ImportMany] IEnumerable<Lazy<IBrowserItem>> browsers)
             : base(serviceProvider)
         {
             this.cremaHost = cremaHost;

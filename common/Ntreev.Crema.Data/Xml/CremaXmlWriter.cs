@@ -32,11 +32,11 @@ namespace Ntreev.Crema.Data.Xml
 {
     public class CremaXmlWriter
     {
-        private CremaDataSet dataSet;
-        private CremaDataTable dataTable;
-        private string targetNamespace;
+        private readonly CremaDataSet dataSet;
+        private readonly CremaDataTable dataTable;
+        private readonly string targetNamespace;
 
-        private static XmlWriterSettings settings = new XmlWriterSettings()
+        private static readonly XmlWriterSettings settings = new XmlWriterSettings()
         {
             Encoding = Encoding.UTF8,
             Indent = true,
@@ -60,26 +60,20 @@ namespace Ntreev.Crema.Data.Xml
 
         public void Write(string filename)
         {
-            using (XmlWriter writer = XmlWriter.Create(filename, CremaXmlWriter.settings))
-            {
-                this.Write(writer);
-            }
+            using XmlWriter writer = XmlWriter.Create(filename, CremaXmlWriter.settings);
+            this.Write(writer);
         }
 
         public void Write(Stream stream)
         {
-            using (XmlWriter writer = XmlWriter.Create(stream, CremaXmlWriter.settings))
-            {
-                this.Write(writer);
-            }
+            using XmlWriter writer = XmlWriter.Create(stream, CremaXmlWriter.settings);
+            this.Write(writer);
         }
 
         public void Write(TextWriter writer)
         {
-            using (XmlWriter xmlWriter = XmlWriter.Create(writer, CremaXmlWriter.settings))
-            {
-                this.Write(xmlWriter);
-            }
+            using XmlWriter xmlWriter = XmlWriter.Create(writer, CremaXmlWriter.settings);
+            this.Write(xmlWriter);
         }
 
         public void Write(XmlWriter writer)

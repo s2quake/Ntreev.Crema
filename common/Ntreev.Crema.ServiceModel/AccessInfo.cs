@@ -15,19 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel.Properties;
 using Ntreev.Library;
 using Ntreev.Library.ObjectModel;
-using Ntreev.Library.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace Ntreev.Crema.ServiceModel
 {
@@ -47,10 +40,10 @@ namespace Ntreev.Crema.ServiceModel
         public AccessMemberInfo[] Members { get; set; }
 
         [IgnoreDataMember]
-        public string UserID { get { return this.SignatureDate.ID; } }
+        public string UserID => this.SignatureDate.ID;
 
         [IgnoreDataMember]
-        public DateTime DateTime { get { return this.SignatureDate.DateTime; } }
+        public DateTime DateTime => this.SignatureDate.DateTime;
 
         public static bool operator ==(AccessInfo x, AccessInfo y)
         {
@@ -172,16 +165,10 @@ namespace Ntreev.Crema.ServiceModel
         };
 
         [IgnoreDataMember]
-        public bool IsInherited
-        {
-            get { return this.ParentPath != string.Empty; }
-        }
+        public bool IsInherited => this.ParentPath != string.Empty;
 
         [IgnoreDataMember]
-        public bool IsPrivate
-        {
-            get { return this.UserID != string.Empty; }
-        }
+        public bool IsPrivate => this.UserID != string.Empty;
 
         private object[] GetMembersInfo()
         {
@@ -247,7 +234,7 @@ namespace Ntreev.Crema.ServiceModel
             }
         }
 
-        internal void Remove(SignatureDate signatureDate, string memberID)
+        internal void Remove(SignatureDate _, string memberID)
         {
             if (this.Contains(memberID) == false)
                 throw new ArgumentException();

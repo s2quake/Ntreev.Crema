@@ -16,12 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.ModernUI.Framework.Controls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -30,12 +25,12 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.Views
 {
     partial class ChangePasswordView : UserControl
     {
-        private static DependencyProperty PasswordProperty = DependencyProperty.Register("Password", typeof(SecureString), typeof(ChangePasswordView));
+        private static readonly DependencyProperty PasswordProperty = DependencyProperty.Register("Password", typeof(SecureString), typeof(ChangePasswordView));
 
-        private static DependencyProperty NewPasswordProperty = DependencyProperty.Register("NewPassword", typeof(SecureString), typeof(ChangePasswordView));
+        private static readonly DependencyProperty NewPasswordProperty = DependencyProperty.Register("NewPassword", typeof(SecureString), typeof(ChangePasswordView));
 
-        private BindingExpressionBase passwordBinding;
-        private BindingExpressionBase newPasswordBinding;
+        private readonly BindingExpressionBase passwordBinding;
+        private readonly BindingExpressionBase newPasswordBinding;
 
         public ChangePasswordView()
         {

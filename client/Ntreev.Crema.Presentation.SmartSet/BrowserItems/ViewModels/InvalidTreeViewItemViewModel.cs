@@ -15,14 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Library.IO;
 using Ntreev.ModernUI.Framework.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library.IO;
 
 namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
@@ -40,7 +35,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 
             var index = path.LastIndexOf(PathUtility.SeparatorChar);
             this.displayName = path.Substring(index + 1);
-            
+
             this.deleteAction = deleteAction;
         }
 

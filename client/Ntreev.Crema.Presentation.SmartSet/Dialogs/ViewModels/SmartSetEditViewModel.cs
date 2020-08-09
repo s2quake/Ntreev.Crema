@@ -15,19 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Collections.ObjectModel;
-using System.Linq;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using System;
-using Ntreev.Crema.Data;
-using System.Threading.Tasks;
-using System.Collections;
-using System.Collections.Generic;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.ModernUI.Framework;
 using Ntreev.Crema.Presentation.SmartSet.Dialogs.Views;
 using Ntreev.Crema.Presentation.SmartSet.Properties;
+using Ntreev.ModernUI.Framework;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
 {
@@ -39,7 +34,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels
 
         private string smartSetName;
         private IRuleItem[] ruleItems;
-        private bool canRename;
+        private readonly bool canRename;
 
         public SmartSetEditViewModel(IEnumerable<IRule> rules)
         {

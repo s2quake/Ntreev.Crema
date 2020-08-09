@@ -16,18 +16,13 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Presentation.Framework.Controls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Ntreev.Crema.Presentation.Tables.Documents.Views
 {
     class TableSourceDataGridControl : DomainDataGridControl
     {
-        public static DependencyProperty CanInsertProperty = 
+        public static DependencyProperty CanInsertProperty =
             DependencyProperty.Register(nameof(CanInsert), typeof(bool), typeof(TableSourceDataGridControl),
                 new PropertyMetadata(true));
 

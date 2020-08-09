@@ -15,22 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
-using Ntreev.Crema.Services;
+using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.Home.Properties;
+using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Presentation.Home.MenuItems
 {
@@ -38,13 +29,13 @@ namespace Ntreev.Crema.Presentation.Home.MenuItems
     [ParentType(typeof(DataBaseMenuItem))]
     class DeleteDataBaseMenuItem : MenuItemBase
     {
+        private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
-        [Import]
-        private Authenticator authenticator = null;
 
         [ImportingConstructor]
-        public DeleteDataBaseMenuItem(ICremaAppHost cremaAppHost)
+        public DeleteDataBaseMenuItem(Authenticator authenticator, ICremaAppHost cremaAppHost)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += this.InvokeCanExecuteChangedEvent;
             this.cremaAppHost.Closed += this.InvokeCanExecuteChangedEvent;
@@ -61,16 +52,13 @@ namespace Ntreev.Crema.Presentation.Home.MenuItems
             var dialog = new SelectDataBaseViewModel(this.authenticator, this.cremaAppHost, (s) => DataBaseDescriptorUtility.IsLoaded(this.authenticator, s) == false);
             if (await dialog.ShowDialogAsync() != true)
                 return;
-
             if (DataBaseDescriptorUtility.IsLoaded(this.authenticator, dialog.SelectedItem) == true)
             {
                 await AppMessageBox.ShowAsync("현재 사용중인 데이터베이스는 삭제할 수 없습니다.");
                 return;
             }
-
             if (await new DeleteViewModel().ShowDialogAsync() != true)
                 return;
-
             await DataBaseUtility.DeleteAsync(this.authenticator, dialog.SelectedItem);
         }
     }

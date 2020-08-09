@@ -64,4 +64,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <None Update="C:\Users\s2quake\source\repos\Ntreev.Crema\.editorconfig" Link="Controls\External\.editorconfig" />
+  </ItemGroup>
 </Project>

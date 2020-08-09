@@ -15,11 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Users.Properties;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections;
@@ -27,29 +25,24 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using Ntreev.Crema.Presentation.Users.PropertyItems.Views;
-using Ntreev.Crema.Presentation.Users.Properties;
 
 namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     abstract class EditorsViewModel : PropertyItemBase
     {
-        private readonly ICremaAppHost cremaAppHost;
         private readonly ObservableCollection<DomainTreeItemBase> domains = new ObservableCollection<DomainTreeItemBase>();
+        private readonly ICremaAppHost cremaAppHost;
+        private readonly Authenticator authenticator;
         private IEnumerable users;
         private object selectedUser;
         private object descriptor;
 
         [Import]
-        private Authenticator authenticator = null;
-        [Import]
-        private IBuildUp buildUp = null;
+        private readonly IBuildUp buildUp = null;
 
-        protected EditorsViewModel(ICremaAppHost cremaAppHost)
+        protected EditorsViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += CremaAppHost_Opened;
             this.cremaAppHost.Closed += CremaAppHost_Closed;

@@ -15,31 +15,22 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using System.Windows.Media.Animation;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.Windows.Input;
-using Ntreev.Crema.Presentation.Framework;
-using System.Reflection;
 using FirstFloor.ModernUI.Windows.Controls;
-using System.Windows.Controls.Primitives;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
-using System.ComponentModel.Composition;
-using System.Windows.Media;
-using System.ComponentModel;
-using Ntreev.ModernUI.Framework;
-using System.Windows.Controls;
-using System.Windows.Data;
 using Ntreev.Library;
-using System.Windows.Threading;
 using Ntreev.Library.IO;
-using Ntreev.Crema.ServiceModel;
+using Ntreev.ModernUI.Framework;
+using System;
+using System.ComponentModel;
+using System.ComponentModel.Composition;
 using System.IO;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Ntreev.Crema.ApplicationHost.Views
 {
@@ -61,11 +52,8 @@ namespace Ntreev.Crema.ApplicationHost.Views
         private IMenuService menuService;
         private ICremaHost cremaHost;
         private ICremaAppHost cremaAppHost;
-
-        [Import]
-        private IAppConfiguration configs = null;
-        [Import]
-        private Lazy<IShell> shell = null;
+        private IAppConfiguration configs;
+        private IShell shell;
         private TextWriter redirectionWriter;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -76,7 +64,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
         }
 
         [ImportingConstructor]
-        public ShellView(Lazy<IMenuService> menuService, Lazy<ICremaHost> cremaHost, Lazy<ICremaAppHost> cremaAppHost)
+        public ShellView(Lazy<IMenuService> menuService, Lazy<ICremaHost> cremaHost, Lazy<ICremaAppHost> cremaAppHost, Lazy<IAppConfiguration> configs, Lazy<IShell> shell)
         {
             InitializeComponent();
 
@@ -93,6 +81,8 @@ namespace Ntreev.Crema.ApplicationHost.Views
                 this.cremaHost.Closing += CremaHost_Closing;
                 this.cremaAppHost.Loaded += CremaAppHost_Loaded;
                 this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
+                this.configs = configs.Value;
+                this.shell = shell.Value;
 
                 App.Writer.TextBox = this.logView;
                 this.InitializeFromSettings();
@@ -269,7 +259,7 @@ namespace Ntreev.Crema.ApplicationHost.Views
             this.configs.Update(this);
             if (this.IsLogVisible == true)
                 this.logRow.Height = new GridLength(this.LogViewHeight);
-            this.shell.Value.Closed += Shell_Closed;
+            this.shell.Closed += Shell_Closed;
             this.Dispatcher.InvokeAsync(this.ConnectWithSettings);
         }
 

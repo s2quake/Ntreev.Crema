@@ -16,12 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data.Diff;
-using Ntreev.ModernUI.Framework;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Controls.Actions
 {
@@ -51,7 +46,7 @@ namespace Ntreev.Crema.Presentation.Controls.Actions
         class ItemInfo
         {
             private readonly object dataItem;
-            private object[] fields;
+            private readonly object[] fields;
 
             private readonly List<ItemInfo> childList = new List<ItemInfo>();
 

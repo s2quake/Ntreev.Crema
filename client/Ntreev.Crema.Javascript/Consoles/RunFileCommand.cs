@@ -19,12 +19,8 @@ using Ntreev.Crema.Commands.Consoles;
 using Ntreev.Library.Commands;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Javascript.Consoles
 {
@@ -33,7 +29,7 @@ namespace Ntreev.Crema.Javascript.Consoles
     class RunFileCommand : ConsoleCommandBase
     {
         [Import]
-        private Lazy<ScriptContext> scriptContext = null;
+        private readonly Lazy<ScriptContext> scriptContext = null;
 
         public RunFileCommand()
             : base("run-file")

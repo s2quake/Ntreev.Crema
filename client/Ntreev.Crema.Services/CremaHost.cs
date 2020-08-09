@@ -15,10 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using JSSoft.Communication;
 using Microsoft.Win32;
 using Ntreev.Crema.Data;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.ServiceHosts;
+using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services.Data;
 using Ntreev.Crema.Services.Domains;
 using Ntreev.Crema.Services.Properties;
@@ -32,9 +33,6 @@ using System.IO;
 using System.Linq;
 using System.Security;
 using System.Threading.Tasks;
-using System.Timers;
-using System.Xml;
-using JSSoft.Communication;
 
 namespace Ntreev.Crema.Services
 {
@@ -53,9 +51,11 @@ namespace Ntreev.Crema.Services
 
         private LogService log;
         private Guid token;
-        private CremaHostServiceHost host;
+#pragma warning disable CS0169 // CremaHost.host' 필드가 사용되지 않았습니다.
+        private readonly CremaHostServiceHost host;
+#pragma warning restore CS0169 // CremaHost.host' 필드가 사용되지 않았습니다.
         //private PingTimer pingTimer;
-        private ClientContext clientContext;
+        private readonly ClientContext clientContext;
         private Guid serviceToken;
 
         [ImportingConstructor]
@@ -141,8 +141,8 @@ namespace Ntreev.Crema.Services
                 });
                 this.serviceToken = await this.clientContext.OpenAsync();
                 this.ServiceInfo = (await this.Service.GetServiceInfoAsync()).Value;
-                    var version = typeof(CremaHost).Assembly.GetName().Version;
-                    var result = await this.Service.SubscribeAsync(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}");
+                var version = typeof(CremaHost).Assembly.GetName().Version;
+                var result = await this.Service.SubscribeAsync(userID, UserContext.Encrypt(userID, password), $"{version}", $"{Environment.OSVersion.Platform}", $"{CultureInfo.CurrentCulture}");
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.AuthenticationToken = result.Value;
@@ -153,9 +153,9 @@ namespace Ntreev.Crema.Services
                     {
                         Verbose = this.settings.Verbose
                     };
-                    this.UserContext = new UserContext(this);
-                    this.DataBaseContext = new DataBaseContext(this);
-                    this.DomainContext = new DomainContext(this);
+                    //this.UserContext = new UserContext(this);
+                    //this.DataBaseContext = new DataBaseContext(this);
+                    //this.DomainContext = new DomainContext(this);
                 });
                 await this.UserContext.InitializeAsync(userID, this.AuthenticationToken);
                 await this.DataBaseContext.InitializeAsync(this.AuthenticationToken);

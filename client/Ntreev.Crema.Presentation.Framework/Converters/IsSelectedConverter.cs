@@ -17,13 +17,7 @@
 
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Data;
 
 namespace Ntreev.Crema.Presentation.Framework.Converters

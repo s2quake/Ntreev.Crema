@@ -17,8 +17,6 @@
 
 using Ntreev.Library.Linq;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -34,8 +32,8 @@ namespace Ntreev.Crema.Services.Extensions
             return category.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in EnumerableUtility.FamilyTree<ITableItem, ITable>(category as ITableItem, item => item.Childs)
-                             where predicate(item)
-                             select item;
+                            where predicate(item)
+                            select item;
                 return query.ToArray();
             });
         }

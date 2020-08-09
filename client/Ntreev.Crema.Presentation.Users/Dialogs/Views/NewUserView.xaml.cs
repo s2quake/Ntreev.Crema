@@ -17,12 +17,7 @@
 
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework.Controls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -31,15 +26,13 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.Views
 {
     partial class NewUserView : UserControl
     {
-        private static DependencyProperty PasswordProperty = DependencyProperty.Register("Password", typeof(SecureString), typeof(NewUserView));
-
-        private BindingExpressionBase passwordBinding;
+        private static readonly DependencyProperty PasswordProperty = DependencyProperty.Register(nameof(Password), typeof(SecureString), typeof(NewUserView));
+        private readonly BindingExpressionBase passwordBinding;
 
         public NewUserView()
         {
             this.InitializeComponent();
-
-            this.passwordBinding = BindingOperations.SetBinding(this, PasswordProperty, new Binding("Password")
+            this.passwordBinding = BindingOperations.SetBinding(this, PasswordProperty, new Binding(nameof(Password))
             {
                 Mode = BindingMode.OneWayToSource,
                 UpdateSourceTrigger = UpdateSourceTrigger.Explicit,
@@ -51,18 +44,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.Views
             this.ID.Focus();
         }
 
-        private void ID_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (this.ID.Text != string.Empty && IdentifierValidator.Verify(this.ID.Text) == false)
-            {
-                //this.blinker.HasError = true;
-            }
-        }
-
-        private SecureString Password
-        {
-            get { return (SecureString)this.GetValue(PasswordProperty); }
-        }
+        private SecureString Password => (SecureString)this.GetValue(PasswordProperty);
 
         private void PasswordBox1_PasswordChanged(object sender, RoutedEventArgs e)
         {

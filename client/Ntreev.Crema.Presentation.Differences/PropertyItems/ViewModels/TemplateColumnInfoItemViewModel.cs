@@ -19,19 +19,12 @@ using Ntreev.Crema.Data;
 using Ntreev.Crema.Data.Diff;
 using Ntreev.Library;
 using Ntreev.Library.ObjectModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
 {
     class TemplateColumnInfoItemViewModel
     {
         private ColumnInfo columnInfo;
-        private string dataType;
-        private string categoryName;
 
         public TemplateColumnInfoItemViewModel(ColumnInfo columnInfo)
         {
@@ -39,14 +32,14 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
 
             if (NameValidator.VerifyItemPath(this.columnInfo.DataType) == false)
             {
-                this.dataType = this.columnInfo.DataType;
-                this.categoryName = string.Empty;
+                this.DataType = this.columnInfo.DataType;
+                this.CategoryName = string.Empty;
             }
             else
             {
                 var itemName = new ItemName(this.columnInfo.DataType);
-                this.dataType = itemName.Name;
-                this.categoryName = itemName.CategoryPath;
+                this.DataType = itemName.Name;
+                this.CategoryName = itemName.CategoryPath;
             }
         }
 
@@ -70,39 +63,18 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
             }
         }
 
-        public string Name
-        {
-            get { return this.columnInfo.Name; }
-        }
+        public string Name => this.columnInfo.Name;
 
-        public string DataType
-        {
-            get { return this.dataType; }
-        }
+        public string DataType { get; }
 
-        public string CategoryName
-        {
-            get { return this.categoryName; }
-        }
+        public string CategoryName { get; }
 
-        public string Comment
-        {
-            get { return this.columnInfo.Comment; }
-        }
+        public string Comment => this.columnInfo.Comment;
 
-        public TagInfo Tags
-        {
-            get { return this.columnInfo.DerivedTags; }
-        }
+        public TagInfo Tags => this.columnInfo.DerivedTags;
 
-        public bool IsKey
-        {
-            get { return this.columnInfo.IsKey; }
-        }
+        public bool IsKey => this.columnInfo.IsKey;
 
-        public bool IsUnique
-        {
-            get { return this.columnInfo.IsUnique; }
-        }
+        public bool IsUnique => this.columnInfo.IsUnique;
     }
 }

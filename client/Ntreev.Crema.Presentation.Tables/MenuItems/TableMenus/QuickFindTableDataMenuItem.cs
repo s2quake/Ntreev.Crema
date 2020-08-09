@@ -17,19 +17,11 @@
 
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Tables.Properties;
-using Ntreev.Crema.Presentation.Tables.Documents.Views;
-using Ntreev.Library.IO;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using Ntreev.ModernUI.Framework.Controls;
+using System;
+using System.ComponentModel.Composition;
+using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Tables.MenuItems.TableMenus
 {
@@ -41,7 +33,7 @@ namespace Ntreev.Crema.Presentation.Tables.MenuItems.TableMenus
         private readonly IShell shell;
         private readonly ITableDocumentService documentService;
         [Import]
-        private Lazy<TableServiceViewModel> tableService = null;
+        private readonly Lazy<TableServiceViewModel> tableService = null;
 
         [ImportingConstructor]
         public QuickFindTableDataMenuItem(IShell shell, ITableDocumentService documentService)

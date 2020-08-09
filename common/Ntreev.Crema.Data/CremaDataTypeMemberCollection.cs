@@ -27,13 +27,11 @@ namespace Ntreev.Crema.Data
     public sealed class CremaDataTypeMemberCollection : IEnumerable<CremaDataTypeMember>, ICollection
     {
         private readonly InternalDataType type;
-        private readonly DataRowCollection rows;
         private readonly IList<InternalDataTypeMember> itemList;
 
         internal CremaDataTypeMemberCollection(InternalDataType type)
         {
             this.type = type;
-            this.rows = type.Rows;
             this.itemList = type.RowList;
         }
 

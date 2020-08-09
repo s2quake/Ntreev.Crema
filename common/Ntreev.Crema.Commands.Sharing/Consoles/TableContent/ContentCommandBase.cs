@@ -19,13 +19,7 @@ using Newtonsoft.Json.Schema;
 using Ntreev.Crema.Commands.Consoles.Serializations;
 using Ntreev.Crema.Data;
 using Ntreev.Crema.Services;
-using Ntreev.Library.Commands;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles.TableContent
 {

@@ -30,7 +30,6 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace Ntreev.Crema.Data
@@ -281,32 +280,26 @@ namespace Ntreev.Crema.Data
             {
                 var schema = this.GetXmlSchema();
                 var xml = copyData == true ? this.GetXml() : null;
-                using (var sr = new StringReader(schema))
-                using (var reader = XmlReader.Create(sr))
-                {
-                    var dataTable = CremaDataTable.ReadSchema(reader, itemName);
-                    if (xml != null)
-                        dataTable.ReadXmlString(xml);
-                    return dataTable;
-                }
+                using var sr = new StringReader(schema);
+                using var reader = XmlReader.Create(sr);
+                var dataTable = CremaDataTable.ReadSchema(reader, itemName);
+                if (xml != null)
+                    dataTable.ReadXmlString(xml);
+                return dataTable;
             }
         }
 
         public void ReadXmlString(string xml)
         {
             this.ValidateReadXml();
-            using (var reader = new StringReader(xml))
-            {
-                this.ReadXml(reader);
-            }
+            using var reader = new StringReader(xml);
+            this.ReadXml(reader);
         }
 
         public void ReadXmlSchemaString(string xmlSchema)
         {
-            using (var sr = new StringReader(xmlSchema))
-            {
-                this.ReadXmlSchema(sr);
-            }
+            using var sr = new StringReader(xmlSchema);
+            this.ReadXmlSchema(sr);
         }
 
         public void ImportRow(CremaDataRow row)
@@ -347,7 +340,7 @@ namespace Ntreev.Crema.Data
 
             return false;
 
-            bool CompareDataRow(DataRow dataRow)
+            static bool CompareDataRow(DataRow dataRow)
             {
                 if (dataRow.HasVersion(DataRowVersion.Original) == false)
                     return false;
@@ -615,11 +608,9 @@ namespace Ntreev.Crema.Data
 
         public string GetXml(bool isRecursive)
         {
-            using (var sw = new Utf8StringWriter())
-            {
-                this.WriteXml(sw, isRecursive);
-                return sw.ToString();
-            }
+            using var sw = new Utf8StringWriter();
+            this.WriteXml(sw, isRecursive);
+            return sw.ToString();
         }
 
         public string GetXmlSchema()
@@ -629,11 +620,9 @@ namespace Ntreev.Crema.Data
 
         public string GetXmlSchema(bool isRecursive)
         {
-            using (var sw = new Utf8StringWriter())
-            {
-                this.WriteXmlSchema(sw, isRecursive);
-                return sw.ToString();
-            }
+            using var sw = new Utf8StringWriter();
+            this.WriteXmlSchema(sw, isRecursive);
+            return sw.ToString();
         }
 
         public override string ToString()
@@ -944,11 +933,6 @@ namespace Ntreev.Crema.Data
             this.PropertyChanged?.Invoke(this, e);
         }
 
-        private void ValidateReadXmlSchema()
-        {
-
-        }
-
         private void ValidateReadXml()
         {
             if (this.Rows.Count > 0)
@@ -999,11 +983,9 @@ namespace Ntreev.Crema.Data
                 var schemaWriter = GetSchemaWriter(item);
                 var action = new Func<string>(() =>
                 {
-                    using (var sw = new Utf8StringWriter())
-                    {
-                        schemaWriter.Write(sw);
-                        return sw.ToString();
-                    }
+                    using var sw = new Utf8StringWriter();
+                    schemaWriter.Write(sw);
+                    return sw.ToString();
                 });
 
                 var schema = action();

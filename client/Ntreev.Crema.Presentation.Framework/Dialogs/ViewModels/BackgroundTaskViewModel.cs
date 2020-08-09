@@ -18,10 +18,7 @@
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,8 +27,8 @@ namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
     public class BackgroundTaskViewModel : ModalDialogBase
     {
         [Import]
-        private IStatusBarService statusBarService = null;
-        private IBackgroundTask task;
+        private readonly IStatusBarService statusBarService = null;
+        private readonly IBackgroundTask task;
 
         public BackgroundTaskViewModel(IBackgroundTask task)
         {

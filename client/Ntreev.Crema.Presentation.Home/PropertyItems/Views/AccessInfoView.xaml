@@ -22,14 +22,13 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:nmfv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework"
-             xmlns:nmgv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework.DataGrid"
              xmlns:ncpc="clr-namespace:Ntreev.Crema.Presentation.Controls;assembly=Ntreev.Crema.Presentation"
              xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Home.Properties"
              mc:Ignorable="d" d:DesignWidth="300">
 
     <UserControl.Resources>
 
-        <nmfv:ContentToStringConverter x:Key="contentToStringConverter" />
+        <nmfv:ContentToStringConverter x:Key="ContentToStringConverter" />
 
         <DataTemplate x:Key="HeaderTemplate">
             <TextBlock Text="{Binding}" TextAlignment="Right" />
@@ -51,7 +50,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     <StackPanel>
         <ncpc:HeaderedContentList>
             <HeaderedContentControl Header="{x:Static p:Resources.Label_Owner}" Content="{Binding AccessInfo.UserID}" />
-            <HeaderedContentControl Header="{x:Static p:Resources.Label_SettingDateTime}" Content="{Binding AccessInfo.DateTime, Converter={StaticResource contentToStringConverter}}" />
+            <HeaderedContentControl Header="{x:Static p:Resources.Label_SettingDateTime}" Content="{Binding AccessInfo.DateTime, Converter={StaticResource ContentToStringConverter}}" />
             <HeaderedContentControl Header="{x:Static p:Resources.Label_Path}" Content="{Binding AccessInfo.Path}" />
             <HeaderedContentControl Header="ParentPath" Content="{Binding AccessInfo.ParentPath}" />
         </ncpc:HeaderedContentList>

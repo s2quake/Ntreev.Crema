@@ -277,7 +277,7 @@ namespace Ntreev.Crema.Data
                     if (this.IsKey == true)
                         tags = table.DerivedTags;
                     else
-                        tags = tags & table.DerivedTags;
+                        tags &= table.DerivedTags;
                 }
                 return tags;
             }

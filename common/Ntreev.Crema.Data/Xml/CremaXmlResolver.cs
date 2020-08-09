@@ -28,7 +28,7 @@ namespace Ntreev.Crema.Data.Xml
     {
         private readonly string filename;
         private readonly CremaDataSet dataSet;
-        private Dictionary<string, SchemaBuilder> nameToBuilder = new Dictionary<string, SchemaBuilder>();
+        private readonly Dictionary<string, SchemaBuilder> nameToBuilder = new Dictionary<string, SchemaBuilder>();
 
         public static CremaXmlResolver Default = new CremaXmlResolver();
 

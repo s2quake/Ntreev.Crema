@@ -15,17 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data.Diff;
 using Ntreev.Crema.Presentation.Differences.Properties;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Diff;
 using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
@@ -40,11 +38,11 @@ namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
         private string header2;
 
         [Import]
-        private BrowserService browserService = null;
+        private readonly BrowserService browserService = null;
         [Import]
-        private DifferencesServiceViewModel service = null;
+        private readonly DifferencesServiceViewModel service = null;
         [Import]
-        private IShell shell = null;
+        private readonly IShell shell = null;
 
         internal DiffDataTableViewModel(Task<DiffDataTable> action)
         {

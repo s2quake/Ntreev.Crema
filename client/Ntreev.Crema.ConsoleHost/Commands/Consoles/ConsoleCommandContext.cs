@@ -15,25 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Commands;
 using Ntreev.Crema.Commands.Consoles;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
-using Ntreev.Library;
-using Ntreev.Library.Commands;
-using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
@@ -48,8 +36,8 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles
 
         [ImportingConstructor]
         public ConsoleCommandContext(ICremaHost cremaHost,
-            [ImportMany]IEnumerable<IConsoleDrive> driveItems,
-            [ImportMany]IEnumerable<IConsoleCommand> commands)
+            [ImportMany] IEnumerable<IConsoleDrive> driveItems,
+            [ImportMany] IEnumerable<IConsoleCommand> commands)
             : base(driveItems, commands)
         {
             this.cremaHost = cremaHost;

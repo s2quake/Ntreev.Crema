@@ -21,27 +21,16 @@ using Ntreev.Library;
 using Ntreev.ModernUI.Framework.DataGrid.Controls;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
-using System.Xml.Linq;
 using Xceed.Wpf.DataGrid;
-using Xceed.Wpf.DataGrid.Views;
 
 namespace Ntreev.Crema.Presentation.Controls
 {
@@ -84,9 +73,8 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public static readonly RoutedEvent SourceChangedEvent = EventManager.RegisterRoutedEvent(nameof(SourceChanged), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(CremaDataTableItemControl));
 
+        private readonly DataGridCollectionViewSource viewSource = new DataGridCollectionViewSource();
         private ModernDataGridControl dataGridControl;
-        private TableView view;
-        private DataGridCollectionViewSource viewSource = new DataGridCollectionViewSource();
 
         public CremaDataTableItemControl()
         {
@@ -181,35 +169,18 @@ namespace Ntreev.Crema.Presentation.Controls
             if (this.dataGridControl == null)
                 return;
 
-            this.view = this.dataGridControl.View as TableView;
-
+            try
             {
-                try
+                var columnNames = new string[] { "tagColumn", "enableColumn", "modifierColumn", "modifiedDateTimeColumn", "creatorColumn", "createdDateTimeColumn" };
+                foreach (var item in columnNames)
                 {
-#if DEBUG
-                    //this.dataGridControl.Columns.Add(new Column() { FieldName = CremaSchema.Index, ReadOnly = true, Width = 30, });
-#endif
-                }
-                catch
-                {
-
+                    if (this.TryFindResource(item) is ColumnBase column)
+                        this.dataGridControl.Columns.Add(column);
                 }
             }
-            //if (this.dataGridControl.Columns.Count == 0)
+            catch
             {
-                try
-                {
-                    var columnNames = new string[] { "tagColumn", "enableColumn", "modifierColumn", "modifiedDateTimeColumn", "creatorColumn", "createdDateTimeColumn" };
-                    foreach (var item in columnNames)
-                    {
-                        if (this.TryFindResource(item) is ColumnBase column)
-                            this.dataGridControl.Columns.Add(column);
-                    }
-                }
-                catch
-                {
 
-                }
             }
 
             this.dataGridControl.RowDrag += DataGridControl_RowDrag;
@@ -229,46 +200,45 @@ namespace Ntreev.Crema.Presentation.Controls
 
         public new bool Focus()
         {
-            var viewer = this.dataGridControl.Template.FindName("PART_ScrollViewer", this.dataGridControl) as ScrollViewer;
-            if (viewer == null)
+            if (!(this.dataGridControl.Template.FindName("PART_ScrollViewer", this.dataGridControl) is ScrollViewer viewer))
                 return false;
             return viewer.Focus();
         }
 
         public CremaDataTable Source
         {
-            get { return (CremaDataTable)this.GetValue(SourceProperty); }
-            set { this.SetValue(SourceProperty, value); }
+            get => (CremaDataTable)this.GetValue(SourceProperty);
+            set => this.SetValue(SourceProperty, value);
         }
 
         public object SelectedItem
         {
-            get { return (object)this.GetValue(SelectedItemProperty); }
-            set { this.SetValue(SelectedItemProperty, value); }
+            get => (object)this.GetValue(SelectedItemProperty);
+            set => this.SetValue(SelectedItemProperty, value);
         }
 
         public int SelectedItemIndex
         {
-            get { return (int)this.GetValue(SelectedItemIndexProperty); }
-            set { this.SetValue(SelectedItemIndexProperty, value); }
+            get => (int)this.GetValue(SelectedItemIndexProperty);
+            set => this.SetValue(SelectedItemIndexProperty, value);
         }
 
         public string SelectedColumn
         {
-            get { return (string)this.GetValue(SelectedColumnProperty); }
-            set { this.SetValue(SelectedColumnProperty, value); }
+            get => (string)this.GetValue(SelectedColumnProperty);
+            set => this.SetValue(SelectedColumnProperty, value);
         }
 
         public bool ReadOnly
         {
-            get { return (bool)this.GetValue(ReadOnlyProperty); }
-            set { this.SetValue(ReadOnlyProperty, value); }
+            get => (bool)this.GetValue(ReadOnlyProperty);
+            set => this.SetValue(ReadOnlyProperty, value);
         }
 
         public bool IsVerticalScrollBarOnLeftSide
         {
-            get { return (bool)this.GetValue(IsVerticalScrollBarOnLeftSideProperty); }
-            set { this.SetValue(IsVerticalScrollBarOnLeftSideProperty, value); }
+            get => (bool)this.GetValue(IsVerticalScrollBarOnLeftSideProperty);
+            set => this.SetValue(IsVerticalScrollBarOnLeftSideProperty, value);
         }
 
         public event RoutedEventHandler SourceChanged

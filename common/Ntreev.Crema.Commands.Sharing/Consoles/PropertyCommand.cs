@@ -15,30 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library;
+using Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Schema.Generation;
+using Ntreev.Crema.Commands.Consoles.Properties;
+using Ntreev.Crema.Commands.Consoles.Serializations;
 using Ntreev.Crema.Services;
+using Ntreev.Library;
 using Ntreev.Library.Commands;
+using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using Ntreev.Crema.ServiceModel;
-using System.ComponentModel;
-using Ntreev.Library.IO;
-using System.Diagnostics;
-using Ntreev.Crema.Commands.Consoles.Properties;
-using Ntreev.Crema.Commands.Consoles.Serializations;
-using Ntreev.Crema.Data.Xml;
-using Ntreev.Library.Serialization;
-using Ntreev.Crema.Commands.Consoles;
-using Ntreev.Crema.Commands;
-using Newtonsoft.Json.Schema.Generation;
-using Newtonsoft.Json.Schema;
-using Ntreev.Library.ObjectModel;
 
 namespace Ntreev.Crema.Commands.Consoles
 {
@@ -49,7 +37,7 @@ namespace Ntreev.Crema.Commands.Consoles
         private readonly ICremaHost cremaHost;
 
         [Import]
-        private Lazy<IConfigurationProperties> properties = null;
+        private readonly Lazy<IConfigurationProperties> properties = null;
 
         [ImportingConstructor]
         public PropertyCommand(ICremaHost cremaHost)
@@ -136,13 +124,11 @@ namespace Ntreev.Crema.Commands.Consoles
 
             JsonPropertiesInfo GetResult()
             {
-                using (var editor = new JsonEditorHost(propertiesInfo, schema))
-                {
-                    if (editor.Execute() == false)
-                        return null;
+                using var editor = new JsonEditorHost(propertiesInfo, schema);
+                if (editor.Execute() == false)
+                    return null;
 
-                    return editor.Read<JsonPropertiesInfo>();
-                }
+                return editor.Read<JsonPropertiesInfo>();
             }
         }
 

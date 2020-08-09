@@ -66,7 +66,7 @@ namespace Ntreev.Crema.Data
         public void ValidateSetColumnName(string value)
         {
             this.ValidateSetProperty(nameof(this.ColumnName));
-            foreach (var item in this.SiblingColumns.ToArray())
+            foreach (var _ in this.SiblingColumns.ToArray())
             {
                 this.OnValidateSetColumnName(value);
             }
@@ -75,7 +75,7 @@ namespace Ntreev.Crema.Data
         public void ValidateSetDataType(Type value)
         {
             this.ValidateSetProperty(nameof(this.DataType));
-            foreach (var item in this.SiblingColumns.ToArray())
+            foreach (var _ in this.SiblingColumns.ToArray())
             {
                 this.OnValidateSetDataType(value);
             }
@@ -84,7 +84,7 @@ namespace Ntreev.Crema.Data
         public void ValidateSetReadOnly(bool value)
         {
             this.ValidateSetProperty(nameof(this.ReadOnly));
-            foreach (var item in this.SiblingColumns.ToArray())
+            foreach (var _ in this.SiblingColumns.ToArray())
             {
                 this.OnValidateSetReadOnly(value);
             }
@@ -93,7 +93,7 @@ namespace Ntreev.Crema.Data
         public void ValidateSetExpression(string value)
         {
             this.ValidateSetProperty(nameof(this.Expression));
-            foreach (var item in this.SiblingColumns.ToArray())
+            foreach (var _ in this.SiblingColumns.ToArray())
             {
                 this.OnValidateSetExpression(value);
             }
@@ -102,7 +102,7 @@ namespace Ntreev.Crema.Data
         public void ValidateSetDefaultValue(object value)
         {
             this.ValidateSetProperty(nameof(this.DefaultValue));
-            foreach (var item in this.SiblingColumns.ToArray())
+            foreach (var _ in this.SiblingColumns.ToArray())
             {
                 this.OnValidateSetDefaultValue(value);
             }
@@ -111,7 +111,7 @@ namespace Ntreev.Crema.Data
         public void ValidateSetAutoIncrement(bool value)
         {
             this.ValidateSetProperty(nameof(this.AutoIncrement));
-            foreach (var item in this.SiblingColumns.ToArray())
+            foreach (var _ in this.SiblingColumns.ToArray())
             {
                 this.OnValidateSetAutoIncrement(value);
             }
@@ -120,7 +120,7 @@ namespace Ntreev.Crema.Data
         public void ValidateSetAllowDBNull(bool value)
         {
             this.ValidateSetProperty(nameof(this.AllowDBNull));
-            foreach (var item in this.SiblingColumns.ToArray())
+            foreach (var _ in this.SiblingColumns.ToArray())
             {
                 this.OnValidateSetAllowDBNull(value);
             }
@@ -373,20 +373,20 @@ namespace Ntreev.Crema.Data
                 }
                 else if (this.Table is InternalTableBase table)
                 {
-                    var oldType = base.DataType;
+                    _ = base.DataType;
                     var fieldList = new List<object>(table.Rows.Count);
                     foreach (DataRow item in table.Rows)
                     {
                         fieldList.Add(item[this.ColumnName]);
                     }
 
-                    var oldName = this.ColumnName;
+                    _ = this.ColumnName;
                     var defaultValue = this.DefaultValue;
                     var ordinal = this.Ordinal;
                     var keys = table.PrimaryKey;
                     var unique = this.Unique;
                     var isReadonly = this.ReadOnly;
-                    var isKey = this.isKey;
+                    _ = this.isKey;
 
                     this.IsInternalAction = true;
                     table.PrimaryKey = null;

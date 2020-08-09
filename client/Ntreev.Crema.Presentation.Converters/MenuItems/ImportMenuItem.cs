@@ -15,34 +15,27 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels;
+using Ntreev.Crema.Presentation.Converters.Properties;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Services;
-using System.ComponentModel.Composition;
-using System.Windows;
-using Caliburn.Micro;
-using System.Windows.Input;
-using Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels;
-using Ntreev.ModernUI.Framework.ViewModels;
 using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Presentation.Converters.Properties;
+using System.ComponentModel.Composition;
+using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Converters.MenuItems
 {
     [Export(typeof(IMenuItem))]
     [ParentType(typeof(IToolMenuItem))]
-    public class ImportMenuItem : MenuItemBase
+    class ImportMenuItem : MenuItemBase
     {
+        private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
-        [Import]
-        private Authenticator authenticator = null;
 
         [ImportingConstructor]
-        public ImportMenuItem(ICremaAppHost cremaAppHost)
+        public ImportMenuItem(Authenticator authenticator, ICremaAppHost cremaAppHost)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Loaded += this.InvokeCanExecuteChangedEvent;
             this.cremaAppHost.Unloaded += this.InvokeCanExecuteChangedEvent;

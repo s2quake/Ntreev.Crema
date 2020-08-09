@@ -328,7 +328,7 @@ namespace Ntreev.Crema.Services.Domains
             var domains = domainList.ToArray();
             this.InvokeDomainCreatedEvent(authentication, domains);
 
-            foreach(var item in domains)
+            foreach (var item in domains)
             {
                 this.Context.creationEvent.Set(item.ID);
             }

@@ -19,12 +19,7 @@ using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels;
 using Ntreev.Crema.Presentation.Users.Properties;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Users.ToolBarItems
 {
@@ -32,13 +27,13 @@ namespace Ntreev.Crema.Presentation.Users.ToolBarItems
     [ParentType(typeof(UserBrowserViewModel))]
     class KickUserToolbarItem : ToolBarItemBase
     {
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
         [ImportingConstructor]
-        public KickUserToolbarItem()
+        public KickUserToolbarItem(Authenticator authenticator)
         {
-            this.Icon = "/Ntreev.Crema.Presentation.Users;component/Images/kick.png";
+            this.authenticator = authenticator;
+            this.Icon = "Images/kick.png";
             this.DisplayName = Resources.MenuItem_Kick;
         }
 

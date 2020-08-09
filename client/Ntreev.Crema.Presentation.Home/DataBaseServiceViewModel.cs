@@ -15,16 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.Services.ViewModels;
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Home.Services.ViewModels;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Home
 {
@@ -33,6 +29,7 @@ namespace Ntreev.Crema.Presentation.Home
     class DataBaseServiceViewModel : ScreenBase
     {
         private readonly ICremaAppHost cremaAppHost;
+        private readonly IAppConfiguration configs;
 
         private bool isBrowserExpanded = true;
         private bool isPropertyExpanded = true;
@@ -40,18 +37,8 @@ namespace Ntreev.Crema.Presentation.Home
         private double browserDistance = 250.0;
         private double propertyDistance = 250.0;
 
-        [Import]
-        private IAppConfiguration configs = null;
-
-        [Import]
-        private BrowserService browserService = null;
-        [Import]
-        private DataBaseListViewModel contentService = null;
-        [Import]
-        private PropertyService propertyService = null;
-
         [ImportingConstructor]
-        public DataBaseServiceViewModel(ICremaAppHost cremaAppHost)
+        public DataBaseServiceViewModel(ICremaAppHost cremaAppHost, BrowserService browserService, DataBaseListViewModel contentService, PropertyService propertyService, IAppConfiguration configs)
             : base(cremaAppHost)
         {
             this.cremaAppHost = cremaAppHost;
@@ -59,6 +46,10 @@ namespace Ntreev.Crema.Presentation.Home
             this.cremaAppHost.Closed += CremaAppHost_Closed;
             this.cremaAppHost.Loaded += CremaAppHost_Loaded;
             this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
+            this.BrowserService = browserService;
+            this.ContentService = contentService;
+            this.PropertyService = propertyService;
+            this.configs = configs;
         }
 
         public override string ToString()
@@ -66,25 +57,16 @@ namespace Ntreev.Crema.Presentation.Home
             return "데이터 베이스";
         }
 
-        public IBrowserService BrowserService
-        {
-            get { return this.browserService; }
-        }
+        public BrowserService BrowserService { get; }
 
-        public DataBaseListViewModel ContentService
-        {
-            get { return this.contentService; }
-        }
+        public DataBaseListViewModel ContentService { get; }
 
-        public IPropertyService PropertyService
-        {
-            get { return this.propertyService; }
-        }
+        public PropertyService PropertyService { get; }
 
         [ConfigurationProperty("isBrowserExpanded")]
         public bool IsBrowserExpanded
         {
-            get { return this.isBrowserExpanded; }
+            get => this.isBrowserExpanded;
             set
             {
                 this.isBrowserExpanded = value;
@@ -95,7 +77,7 @@ namespace Ntreev.Crema.Presentation.Home
         [ConfigurationProperty("isPropertyExpanded")]
         public bool IsPropertyExpanded
         {
-            get { return this.isPropertyExpanded; }
+            get => this.isPropertyExpanded;
             set
             {
                 this.isPropertyExpanded = value;
@@ -106,7 +88,7 @@ namespace Ntreev.Crema.Presentation.Home
         [ConfigurationProperty("browserDistance")]
         public double BrowserDistance
         {
-            get { return this.browserDistance; }
+            get => this.browserDistance;
             set
             {
                 this.browserDistance = value;
@@ -117,7 +99,7 @@ namespace Ntreev.Crema.Presentation.Home
         [ConfigurationProperty("propertyDistance")]
         public double PropertyDistance
         {
-            get { return this.propertyDistance; }
+            get => this.propertyDistance;
             set
             {
                 this.propertyDistance = value;

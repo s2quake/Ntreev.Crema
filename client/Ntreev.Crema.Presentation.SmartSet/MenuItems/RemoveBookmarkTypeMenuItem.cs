@@ -17,16 +17,8 @@
 
 using Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels;
 using Ntreev.Crema.Presentation.SmartSet.Properties;
-using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.Controls;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 
 namespace Ntreev.Crema.Presentation.SmartSet.MenuItems
 {

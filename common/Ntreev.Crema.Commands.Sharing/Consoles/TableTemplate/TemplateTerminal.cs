@@ -18,9 +18,7 @@
 using Ntreev.Crema.Services;
 using Ntreev.Library.Commands;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Ntreev.Crema.Commands.Consoles.TableTemplate
 {

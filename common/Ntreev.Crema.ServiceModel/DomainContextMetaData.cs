@@ -15,20 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Serialization;
-using Ntreev.Crema.Data.Xml;
-using System.Runtime.Serialization;
-using System.IO;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library.IO;
 using Ntreev.Library;
-using System.Xml.Schema;
-using Ntreev.Library.Serialization;
-using System.Xml;
+using System.Runtime.Serialization;
 
 namespace Ntreev.Crema.ServiceModel
 {

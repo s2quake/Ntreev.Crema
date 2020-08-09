@@ -15,20 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Commands;
-using Ntreev.Crema.Commands.Consoles;
-using Ntreev.Library.Commands;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Crema.Services;
 using Ntreev.Crema.Commands.Consoles.Serializations;
-using Ntreev.Crema.Commands.Consoles.Properties;
-using Newtonsoft.Json.Linq;
+using Ntreev.Crema.Services;
+using Ntreev.Library.Commands;
 using System.ComponentModel;
+using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles.TableTemplate
 {
@@ -87,14 +79,12 @@ namespace Ntreev.Crema.Commands.Consoles.TableTemplate
             indexSchema.Minimum = 0;
             indexSchema.Maximum = columnCount - 1;
 
-            using (var editor = new JsonEditorHost(value, schema))
+            using var editor = new JsonEditorHost(value, schema);
+            if (editor.Execute() == true)
             {
-                if (editor.Execute() == true)
-                {
-                    value = editor.Read<JsonColumnInfo>();
-                    if (column.Name != value.Name)
-                        await column.SetNameAsync(this.Authentication, value.Name);
-                }
+                value = editor.Read<JsonColumnInfo>();
+                if (column.Name != value.Name)
+                    await column.SetNameAsync(this.Authentication, value.Name);
             }
         }
     }

@@ -15,14 +15,6 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library.ObjectModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Ntreev.Crema.Services
 {
     public class ItemsMovedEventArgs<T> : ItemsEventArgs<T>
@@ -30,14 +22,14 @@ namespace Ntreev.Crema.Services
         public ItemsMovedEventArgs(Authentication authentication, T[] items, string[] oldPaths, string[] oldCategoryPaths)
             : this(authentication, items, oldPaths, oldCategoryPaths, null)
         {
-            
+
         }
 
         public ItemsMovedEventArgs(Authentication authentication, T[] items, string[] oldPaths, string[] oldCategoryPaths, object metaData)
             : base(authentication, items, metaData)
         {
             this.OldPaths = oldPaths;
-            this.OldCategoryPaths = oldCategoryPaths;   
+            this.OldCategoryPaths = oldCategoryPaths;
         }
 
         public string[] OldPaths { get; }

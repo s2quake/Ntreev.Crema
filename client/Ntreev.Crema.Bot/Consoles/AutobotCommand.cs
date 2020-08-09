@@ -18,11 +18,8 @@
 using Ntreev.Crema.Commands.Consoles;
 using Ntreev.Library.Commands;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Bot.Consoles
@@ -31,7 +28,7 @@ namespace Ntreev.Crema.Bot.Consoles
     class AutobotCommand : ConsoleCommandMethodBase
     {
         [Import]
-        private Lazy<AutobotService> autobotService = null;
+        private readonly Lazy<AutobotService> autobotService = null;
 
         public AutobotCommand()
             : base("autobot")

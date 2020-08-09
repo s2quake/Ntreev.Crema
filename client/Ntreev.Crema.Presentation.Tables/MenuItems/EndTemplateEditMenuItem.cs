@@ -15,20 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Tables.Properties;
-using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using Ntreev.Crema.Presentation.Framework;
 
 namespace Ntreev.Crema.Presentation.Tables.MenuItems
 {
@@ -38,11 +32,12 @@ namespace Ntreev.Crema.Presentation.Tables.MenuItems
     [Category("Close")]
     class EndTemplateEditMenuItem : MenuItemBase
     {
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
-        public EndTemplateEditMenuItem()
+        [ImportingConstructor]
+        public EndTemplateEditMenuItem(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.DisplayName = Resources.MenuItem_EndTemplateEditing;
             this.HideOnDisabled = true;
         }
@@ -55,7 +50,6 @@ namespace Ntreev.Crema.Presentation.Tables.MenuItems
                     return false;
                 return descriptor.IsTemplateEditor == true || this.authenticator.Authority == Authority.Admin;
             }
-
             return false;
         }
 

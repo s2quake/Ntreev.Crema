@@ -17,15 +17,9 @@
 
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
-using Ntreev.ModernUI.Framework;
 using Ntreev.Crema.Presentation.Types.Properties;
-using System;
-using System.Collections.Generic;
+using Ntreev.ModernUI.Framework;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 
 namespace Ntreev.Crema.Presentation.Types.MenuItems
 {
@@ -35,11 +29,11 @@ namespace Ntreev.Crema.Presentation.Types.MenuItems
     class SelectInBrowserMenuItem : MenuItemBase
     {
         [Import]
-        private TypeBrowserViewModel browser = null;
+        private readonly TypeBrowserViewModel browser = null;
         [Import]
-        private IShell shell = null;
+        private readonly IShell shell = null;
         [Import]
-        private TypeServiceViewModel service = null;
+        private readonly TypeServiceViewModel service = null;
 
         public SelectInBrowserMenuItem()
         {

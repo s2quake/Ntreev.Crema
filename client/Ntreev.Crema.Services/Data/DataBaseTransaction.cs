@@ -25,19 +25,20 @@ namespace Ntreev.Crema.Services.Data
 {
     class DataBaseTransaction : ITransaction
     {
-        private Authentication authentication;
         private readonly DataBase dataBase;
         private readonly IDataBaseContextService service;
 
-        public DataBaseTransaction(Authentication authentication, DataBase dataBase, IDataBaseContextService service)
+        public DataBaseTransaction(DataBase dataBase, IDataBaseContextService service)
         {
-            this.authentication = authentication;
             this.dataBase = dataBase;
             this.service = service;
         }
 
         public async Task BeginAsync(Authentication authentication)
         {
+            if (authentication is null)
+                throw new ArgumentNullException(nameof(authentication));
+
             var result = await this.service.BeginTransactionAsync(this.dataBase.Name);
             await this.Dispatcher.InvokeAsync(() =>
             {
@@ -49,6 +50,9 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task CommitAsync(Authentication authentication)
         {
+            if (authentication is null)
+                throw new ArgumentNullException(nameof(authentication));
+
             try
             {
                 this.ValidateExpired();
@@ -69,6 +73,9 @@ namespace Ntreev.Crema.Services.Data
 
         public async Task<DataBaseMetaData> RollbackAsync(Authentication authentication)
         {
+            if (authentication is null)
+                throw new ArgumentNullException(nameof(authentication));
+
             try
             {
                 this.ValidateExpired();
@@ -82,7 +89,7 @@ namespace Ntreev.Crema.Services.Data
 
                 //await this.DomainContext.DeleteDomainsAsync(authentication, this.dataBase.ID);
                 //await this.DomainContext.RestoreAsync(authentication, this.dataBase.ID);
-                
+
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                     this.CremaHost.Sign(authentication, result);
@@ -97,10 +104,9 @@ namespace Ntreev.Crema.Services.Data
                 throw;
             }
         }
-         
+
         public void Dispose()
         {
-            this.authentication = null;
         }
 
         public CremaDispatcher Dispatcher => this.dataBase.Dispatcher;
@@ -115,7 +121,5 @@ namespace Ntreev.Crema.Services.Data
         {
             this.Disposed?.Invoke(this, e);
         }
-
-        private DomainContext DomainContext => this.CremaHost.DomainContext;
     }
 }

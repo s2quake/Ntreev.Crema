@@ -15,21 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Tables.Properties;
-using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
 using Ntreev.Crema.Data;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Tables.Properties;
 using Ntreev.Crema.Services;
+using Ntreev.ModernUI.Framework;
+using System;
+using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Presentation.Tables.MenuItems.TreeViewItems.TagMenus
 {
@@ -37,11 +29,12 @@ namespace Ntreev.Crema.Presentation.Tables.MenuItems.TreeViewItems.TagMenus
     [ParentType(typeof(TagsMenuItem))]
     class ClientTagsMenuItem : MenuItemBase
     {
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
-        public ClientTagsMenuItem()
+        [ImportingConstructor]
+        public ClientTagsMenuItem(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.DisplayName = Resources.MenuItem_TagsClient;
         }
 

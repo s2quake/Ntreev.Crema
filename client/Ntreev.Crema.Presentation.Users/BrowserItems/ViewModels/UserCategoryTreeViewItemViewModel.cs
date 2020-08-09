@@ -16,31 +16,18 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Users.Dialogs.ViewModels;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Library.Linq;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel.Composition.Hosting;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
-using Ntreev.ModernUI.Framework.ViewModels;
-using System.Windows.Input;
 using Ntreev.Crema.Presentation.Users.Properties;
-using System.ComponentModel;
-using System.ComponentModel.Composition;
+using Ntreev.Crema.Services;
+using Ntreev.ModernUI.Framework;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
 {
     public class UserCategoryTreeViewItemViewModel : UserCategoryTreeItemBase
     {
-        private ICommand deleteCommand;
+        private readonly ICommand deleteCommand;
 
         public UserCategoryTreeViewItemViewModel(Authentication authentication, IUserCategory category, object owner)
             : this(authentication, new UserCategoryDescriptor(authentication, category, DescriptorTypes.All, owner), owner)

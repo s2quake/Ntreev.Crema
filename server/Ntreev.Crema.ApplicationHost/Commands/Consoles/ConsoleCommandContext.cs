@@ -33,7 +33,7 @@ namespace Ntreev.Crema.ApplicationHost.Commands.Consoles
     [Export(typeof(ConsoleCommandContext))]
     public class ConsoleCommandContext : ConsoleCommandContextBase
     {
-        private ICremaHost cremaHost;
+        private readonly ICremaHost cremaHost;
         private Authentication authentication;
         [Import]
         private CremaService service = null;

@@ -15,30 +15,21 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Tables;
+using Ntreev.Crema.Services;
+using Ntreev.Library;
+using Ntreev.Library.Linq;
+using Ntreev.Library.ObjectModel;
+using Ntreev.ModernUI.Framework.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Services;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Windows;
-using System.Xml.Serialization;
-using System.Xml;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Library;
-using System.Collections.ObjectModel;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Presentation.Tables;
-using Ntreev.Library.Linq;
 using System.Windows.Threading;
-using Ntreev.ModernUI.Framework.ViewModels;
-using Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels;
-using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
-using Ntreev.Library.IO;
+using System.Xml;
+using System.Xml.Serialization;
 using Dispatcher = System.Windows.Threading.Dispatcher;
 
 namespace Ntreev.Crema.Presentation.SmartSet
@@ -54,7 +45,7 @@ namespace Ntreev.Crema.Presentation.SmartSet
         private bool isModified;
 
         [ImportingConstructor]
-        public TableSmartSetContext(ICremaAppHost cremaAppHost, ITableBrowser tableBrowser, [ImportMany]IEnumerable<IRule> rules)
+        public TableSmartSetContext(ICremaAppHost cremaAppHost, ITableBrowser tableBrowser, [ImportMany] IEnumerable<IRule> rules)
         {
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Loaded += CremaAppHost_Loaded;

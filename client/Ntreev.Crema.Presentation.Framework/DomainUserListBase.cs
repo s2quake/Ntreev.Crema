@@ -15,17 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Framework
 {
@@ -39,9 +34,10 @@ namespace Ntreev.Crema.Presentation.Framework
         private readonly object owner;
 
         [Import]
-        private IBuildUp buildUp = null;
+        private readonly IBuildUp buildUp = null;
 
         public DomainUserListBase(Authentication authentication, IDomain domain, bool IsSubscriptable, object owner)
+            : base(domain)
         {
             this.authentication = authentication;
             this.descriptor = new DomainDescriptor(authentication, domain, IsSubscriptable == true ? DescriptorTypes.All : DescriptorTypes.IsRecursive, owner);

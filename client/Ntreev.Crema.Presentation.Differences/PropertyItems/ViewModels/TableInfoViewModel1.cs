@@ -16,18 +16,12 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Data;
+using Ntreev.Crema.Data.Diff;
+using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Crema.Data.Diff;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
 
 namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
 {

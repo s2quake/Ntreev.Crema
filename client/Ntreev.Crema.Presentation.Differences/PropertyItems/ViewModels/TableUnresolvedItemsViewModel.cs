@@ -17,7 +17,6 @@
 
 using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
 using Ntreev.Crema.Presentation.Differences.Properties;
-using Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Library;
 using Ntreev.Library.Linq;
@@ -29,8 +28,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
 {
@@ -39,19 +36,16 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
     [Order(-1)]
     class TableUnresolvedItemsViewModel : PropertyItemBase
     {
-        [Import]
-        private IBuildUp buildUp = null;
-
         private TableTreeViewItemViewModel viewModel;
-        private ObservableCollection<TableUnresolvedItemListBoxItemViewModel> itemList = new ObservableCollection<TableUnresolvedItemListBoxItemViewModel>();
-        private TableUnresolvedItemListBoxItemViewModel selectedItem;
 
-        public TableUnresolvedItemsViewModel()
+        [ImportingConstructor]
+        public TableUnresolvedItemsViewModel(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
             this.DisplayName = Resources.Title_UnresolvedItems;
         }
 
-        public override bool IsVisible => this.itemList.Any();
+        public override bool IsVisible => this.Items.Any();
 
         public override object SelectedObject => this.viewModel;
 
@@ -60,10 +54,7 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
             return obj is TableTreeViewItemViewModel;
         }
 
-        public ObservableCollection<TableUnresolvedItemListBoxItemViewModel> Items
-        {
-            get { return this.itemList; }
-        }
+        public ObservableCollection<TableUnresolvedItemListBoxItemViewModel> Items { get; } = new ObservableCollection<TableUnresolvedItemListBoxItemViewModel>();
 
         public override void SelectObject(object obj)
         {
@@ -73,25 +64,19 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
                             join unresolvedItem in viewModel.Source.UnresolvedItems on viewModelItem.Target equals unresolvedItem
                             select viewModelItem;
 
-                this.itemList.Clear();
+                this.Items.Clear();
                 foreach (var item in query)
                 {
-                    var itemViewModel = new TableUnresolvedItemListBoxItemViewModel(item);
-                    itemList.Add(itemViewModel);
+                    var itemViewModel = new TableUnresolvedItemListBoxItemViewModel(this.ServiceProvider, item);
+                    Items.Add(itemViewModel);
                     itemViewModel.PropertyChanged += ItemViewModel_PropertyChanged;
                 }
 
-                foreach (var item in itemList)
-                {
-                    this.buildUp.BuildUp(item);
-                }
-
                 this.viewModel = viewModel;
-                this.selectedItem = itemList.FirstOrDefault();
             }
             else
             {
-                this.itemList.Clear();
+                this.Items.Clear();
                 this.viewModel = null;
             }
             this.NotifyOfPropertyChange(nameof(this.DisplayName));
@@ -105,7 +90,7 @@ namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
             {
                 if (viewModel.IsResolved == true)
                 {
-                    this.itemList.Remove(viewModel);
+                    this.Items.Remove(viewModel);
                     this.NotifyOfPropertyChange(nameof(this.IsVisible));
                 }
             }

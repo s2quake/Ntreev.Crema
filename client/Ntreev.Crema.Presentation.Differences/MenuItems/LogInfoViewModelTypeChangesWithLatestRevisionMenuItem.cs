@@ -15,20 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data.Diff;
 using Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Differences.Properties;
-using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Types.Dialogs.ViewModels;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Diff;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Differences.MenuItems
@@ -37,11 +31,12 @@ namespace Ntreev.Crema.Presentation.Differences.MenuItems
     [ParentType(typeof(LogInfoViewModel))]
     class LogInfoViewModelTypeChangesWithLatestRevisionMenuItem : MenuItemBase
     {
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
 
-        public LogInfoViewModelTypeChangesWithLatestRevisionMenuItem()
+        [ImportingConstructor]
+        public LogInfoViewModelTypeChangesWithLatestRevisionMenuItem(Authenticator authenticator)
         {
+            this.authenticator = authenticator;
             this.DisplayName = Resources.MenuItem_CompareWithLatestRevision;
         }
 

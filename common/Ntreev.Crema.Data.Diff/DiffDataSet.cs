@@ -18,14 +18,10 @@
 //#if !DEBUG
 //#define USE_PARALLEL
 //#endif
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml.Schema;
 using Ntreev.Library;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Data.Diff
@@ -36,10 +32,10 @@ namespace Ntreev.Crema.Data.Diff
         private readonly CremaDataSet diffSet2;
         private readonly CremaDataSet dataSet1;
         private readonly CremaDataSet dataSet2;
-        private DiffMergeTypes mergeType;
+        private readonly DiffMergeTypes mergeType;
         private DiffDataType[] types;
         private DiffDataTable[] tables;
-        private DiffDataResolver resolver = new DiffDataResolver();
+        private readonly DiffDataResolver resolver = new DiffDataResolver();
         private string header1;
         private string header2;
 

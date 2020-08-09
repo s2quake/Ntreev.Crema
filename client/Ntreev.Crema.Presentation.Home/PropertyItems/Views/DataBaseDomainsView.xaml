@@ -27,7 +27,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              d:DesignHeight="300" d:DesignWidth="300">
     
     <UserControl.Resources>
+        
         <Style TargetType="{x:Type nmfc:IconButton}" BasedOn="{StaticResource ToolBar_IconButton_Style}" />
+        
     </UserControl.Resources>
 
     <Grid>

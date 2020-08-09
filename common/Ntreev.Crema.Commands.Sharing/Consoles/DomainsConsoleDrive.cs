@@ -16,14 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Services;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Text;
-using Ntreev.Library.IO;
-using Ntreev.Crema.ServiceModel;
 using Ntreev.Library.ObjectModel;
+using System;
+using System.ComponentModel.Composition;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Commands.Consoles
@@ -32,7 +28,7 @@ namespace Ntreev.Crema.Commands.Consoles
     public sealed class DomainsConsoleDrive : ConsoleDriveBase
     {
         [Import]
-        private Lazy<ICremaHost> cremaHost = null;
+        private readonly Lazy<ICremaHost> cremaHost = null;
 
         internal DomainsConsoleDrive()
             : base("domains")

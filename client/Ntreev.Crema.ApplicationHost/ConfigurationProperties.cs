@@ -19,13 +19,9 @@ using Ntreev.Crema.Commands;
 using Ntreev.Crema.Services;
 using Ntreev.Library;
 using Ntreev.Library.ObjectModel;
-using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ConsoleHost
 {
@@ -35,7 +31,7 @@ namespace Ntreev.Crema.ConsoleHost
         private readonly ICremaHost cremaHost;
 
         [ImportingConstructor]
-        public ConfigurationProperties(ICremaHost cremaHost, [ImportMany]IEnumerable<IConfigurationPropertyProvider> providers)
+        public ConfigurationProperties(ICremaHost cremaHost, [ImportMany] IEnumerable<IConfigurationPropertyProvider> providers)
         {
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;

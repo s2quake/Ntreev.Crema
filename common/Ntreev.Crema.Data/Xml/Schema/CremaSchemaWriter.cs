@@ -33,7 +33,7 @@ namespace Ntreev.Crema.Data.Xml.Schema
 {
     public sealed class CremaSchemaWriter
     {
-        private CremaDataSet dataSet;
+        private readonly CremaDataSet dataSet;
         private readonly CremaDataTable dataTable;
         private readonly CremaDataType dataType;
         private readonly ItemName itemName;
@@ -79,26 +79,20 @@ namespace Ntreev.Crema.Data.Xml.Schema
 
         public void Write(string filename)
         {
-            using (var writer = XmlWriter.Create(filename, settings))
-            {
-                this.Write(writer);
-            }
+            using var writer = XmlWriter.Create(filename, settings);
+            this.Write(writer);
         }
 
         public void Write(Stream stream)
         {
-            using (var writer = XmlWriter.Create(stream, settings))
-            {
-                this.Write(writer);
-            }
+            using var writer = XmlWriter.Create(stream, settings);
+            this.Write(writer);
         }
 
         public void Write(TextWriter writer)
         {
-            using (var xmlWriter = XmlWriter.Create(writer, settings))
-            {
-                this.Write(xmlWriter);
-            }
+            using var xmlWriter = XmlWriter.Create(writer, settings);
+            this.Write(xmlWriter);
         }
 
         public void Write(XmlWriter writer)

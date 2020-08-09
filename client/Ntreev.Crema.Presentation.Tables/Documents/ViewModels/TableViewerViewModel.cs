@@ -15,25 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Tables.Properties;
+using Ntreev.Crema.Services;
+using Ntreev.Library.Linq;
+using Ntreev.ModernUI.Framework;
 using System;
 using System.Linq;
-using System.ComponentModel.Composition;
-using Caliburn.Micro;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.Data;
-using System.ComponentModel;
-using System.Collections.ObjectModel;
-using System.Windows.Threading;
 using System.Threading.Tasks;
-using Ntreev.Crema.Presentation.Tables.Properties;
-using System.Windows;
-using System.Collections;
-using System.Threading;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Library.Linq;
-using Ntreev.Crema.ServiceModel;
-using System.Collections.Generic;
 
 namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 {

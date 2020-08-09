@@ -16,26 +16,19 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
 using Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Tables.Documents.ViewModels;
 using Ntreev.Crema.Presentation.Tables.Properties;
 using Ntreev.Crema.Services;
+using Ntreev.Crema.Services.Extensions;
+using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
-using Ntreev.Library;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Threading;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
-using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
-using Ntreev.Crema.Services.Extensions;
 
 namespace Ntreev.Crema.Presentation.Tables
 {
@@ -46,15 +39,15 @@ namespace Ntreev.Crema.Presentation.Tables
         private readonly ICremaAppHost cremaAppHost;
 
         [Import]
-        private IBrowserService browserService = null;
+        private readonly IBrowserService browserService = null;
         [Import]
-        private TableDocumentServiceViewModel contentsService = null;
+        private readonly TableDocumentServiceViewModel contentsService = null;
         [Import]
-        private IPropertyService propertyService = null;
+        private readonly IPropertyService propertyService = null;
         [Import]
-        private Lazy<IShell> shell = null;
+        private readonly Lazy<IShell> shell = null;
         [Import]
-        private TableBrowserViewModel browser = null;
+        private readonly TableBrowserViewModel browser = null;
 
         private bool isBrowserExpanded = true;
         private bool isPropertyExpanded = true;
@@ -66,10 +59,10 @@ namespace Ntreev.Crema.Presentation.Tables
         private bool isVisible;
 
         [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator = null;
 
         [Import]
-        private IAppConfiguration configs = null;
+        private readonly IAppConfiguration configs = null;
 
         [ImportingConstructor]
         public TableServiceViewModel(ICremaAppHost cremaAppHost, IBrowserService browserService, TableDocumentServiceViewModel contentsService, IPropertyService propertyService)

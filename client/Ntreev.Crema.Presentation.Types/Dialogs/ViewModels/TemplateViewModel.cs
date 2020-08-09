@@ -18,19 +18,15 @@
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Types.Properties;
 using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Data;
+using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
 using System;
+using System.Collections;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Text;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using Ntreev.Library;
-using System.Collections;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
 {
@@ -39,7 +35,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
         private readonly Authentication authentication;
         private ITypeTemplate template;
         private IDomain domain;
-        private bool isNew;
+        private readonly bool isNew;
         private bool isReadOnly;
         private bool isModified;
         private bool isValid;
@@ -50,7 +46,7 @@ namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
         private object source;
 
         [Import]
-        private IFlashService flashService = null;
+        private readonly IFlashService flashService = null;
 
         private EventHandler<DataErrorsChangedEventArgs> errorsChanged;
         private string typeNameError;

@@ -16,9 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Newtonsoft.Json.Schema;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Ntreev.Crema.Commands.Consoles.Serializations
 {
@@ -26,13 +24,11 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
     {
         public JsonPropertiesInfo Execute(JSchema schema)
         {
-            using (var editor = new JsonEditorHost(this, schema))
-            {
-                if (editor.Execute() == false)
-                    return null;
+            using var editor = new JsonEditorHost(this, schema);
+            if (editor.Execute() == false)
+                return null;
 
-                return editor.Read<JsonPropertiesInfo>();
-            }
+            return editor.Read<JsonPropertiesInfo>();
         }
     }
 }

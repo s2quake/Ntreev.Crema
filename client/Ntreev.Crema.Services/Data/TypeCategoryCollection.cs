@@ -18,7 +18,6 @@
 using Ntreev.Crema.ServiceHosts.Data;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Library;
-using Ntreev.Library.Linq;
 using Ntreev.Library.ObjectModel;
 using System;
 using System.Collections;

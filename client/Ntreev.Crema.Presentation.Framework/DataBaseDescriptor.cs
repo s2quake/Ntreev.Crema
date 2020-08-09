@@ -15,21 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ntreev.Crema.ServiceModel;
-using System.Windows;
-using Ntreev.ModernUI.Framework;
-using System.Windows.Media;
-using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
-using System.ComponentModel.Composition;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
-using Ntreev.ModernUI.Framework.ViewModels;
 
 namespace Ntreev.Crema.Presentation.Framework
 {
@@ -118,25 +106,25 @@ namespace Ntreev.Crema.Presentation.Framework
         public bool IsLoaded => DataBaseDescriptorUtility.IsLoaded(Authenticator.Current, this);
 
         [DescriptorProperty]
-        public bool IsLocked => this.authentication != null ? LockableDescriptorUtility.IsLocked(this.authentication, this) : false;
+        public bool IsLocked => this.authentication != null && LockableDescriptorUtility.IsLocked(this.authentication, this);
 
         [DescriptorProperty]
-        public bool IsLockInherited => this.authentication != null ? LockableDescriptorUtility.IsLockInherited(this.authentication, this) : false;
+        public bool IsLockInherited => this.authentication != null && LockableDescriptorUtility.IsLockInherited(this.authentication, this);
 
         [DescriptorProperty]
-        public bool IsLockOwner => this.authentication != null ? LockableDescriptorUtility.IsLockOwner(this.authentication, this) : false;
+        public bool IsLockOwner => this.authentication != null && LockableDescriptorUtility.IsLockOwner(this.authentication, this);
 
         [DescriptorProperty]
-        public bool IsPrivate => this.authentication != null ? AccessibleDescriptorUtility.IsPrivate(this.authentication, this) : false;
+        public bool IsPrivate => this.authentication != null && AccessibleDescriptorUtility.IsPrivate(this.authentication, this);
 
         [DescriptorProperty]
-        public bool IsAccessInherited => this.authentication != null ? AccessibleDescriptorUtility.IsAccessInherited(this.authentication, this) : false;
+        public bool IsAccessInherited => this.authentication != null && AccessibleDescriptorUtility.IsAccessInherited(this.authentication, this);
 
         [DescriptorProperty]
-        public bool IsAccessOwner => this.authentication != null ? AccessibleDescriptorUtility.IsAccessOwner(this.authentication, this) : false;
+        public bool IsAccessOwner => this.authentication != null && AccessibleDescriptorUtility.IsAccessOwner(this.authentication, this);
 
         [DescriptorProperty]
-        public bool IsAccessMember => this.authentication != null ? AccessibleDescriptorUtility.IsAccessMember(this.authentication, this) : false;
+        public bool IsAccessMember => this.authentication != null && AccessibleDescriptorUtility.IsAccessMember(this.authentication, this);
 
         protected async override void OnDisposed(EventArgs e)
         {

@@ -17,13 +17,7 @@
 
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
-using Ntreev.Library.ObjectModel;
 using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Framework
 {
@@ -32,7 +26,7 @@ namespace Ntreev.Crema.Presentation.Framework
         public DomainListItemBase(Authentication authentication, IDomain domain, bool IsSubscriptable, object owner)
             : base(authentication, new DomainDescriptor(authentication, domain, IsSubscriptable == true ? DescriptorTypes.IsSubscriptable : DescriptorTypes.None, owner), owner)
         {
-            
+
         }
 
         public Guid DomainID => this.descriptor.DomainID;

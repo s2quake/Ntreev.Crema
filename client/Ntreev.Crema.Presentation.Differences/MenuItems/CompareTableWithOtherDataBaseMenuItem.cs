@@ -15,38 +15,35 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
+using Ntreev.Crema.Data;
+using Ntreev.Crema.Data.Diff;
 using Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Differences.Properties;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Diff;
+using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Differences.MenuItems
 {
     [Export(typeof(IMenuItem))]
-    [ParentType("Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels.TableTreeViewItemViewModel, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels.TableTreeViewItemViewModel, Ntreev.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class CompareTableWithOtherDataBaseMenuItem : MenuItemBase
     {
-        [Import]
-        private ICremaHost cremaHost = null;
-        [Import]
-        private ICremaAppHost cremaAppHost = null;
-        [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator;
+        private readonly ICremaHost cremaHost;
+        private readonly ICremaAppHost cremaAppHost;
 
-        public CompareTableWithOtherDataBaseMenuItem()
+        [ImportingConstructor]
+        public CompareTableWithOtherDataBaseMenuItem(Authenticator authenticator, ICremaHost cremaHost, ICremaAppHost cremaAppHost)
         {
+            this.authenticator = authenticator;
+            this.cremaHost = cremaHost;
+            this.cremaAppHost = cremaAppHost;
             this.DisplayName = Resources.MenuItem_CompareWithOtherDataBase;
         }
 
@@ -92,39 +89,38 @@ namespace Ntreev.Crema.Presentation.Differences.MenuItems
             return null;
         }
 
-        private async Task<CremaDataSet> PreviewOtherTableAsync(string dataBaseName, string tableName)
+        private async Task<CremaDataSet> PreviewOtherTableAsync(string _1, string _2)
         {
-            throw new NotImplementedException();
-            //try
-            //{
-                
-            //    //var dataBase = this.cremaHost item.DataBase;
-            //    //if (dataBase.TableContext.Tables.Contains(tableName) == true)
-            //    //{
-            //    //    var table2 = dataBase.TableContext.Tables[tableName];
-            //    //    return table2.GetDataSet(this.authenticator, null);
-            //    //}
-            //    //return null;
+            try
+            {
+                throw new NotImplementedException();
+                //var dataBase = this.cremaHost item.DataBase;
+                //if (dataBase.TableContext.Tables.Contains(tableName) == true)
+                //{
+                //    var table2 = dataBase.TableContext.Tables[tableName];
+                //    return table2.GetDataSet(this.authenticator, null);
+                //}
+                //return null;
 
-            //    //return this.cremaHost.Dispatcher.Invoke(() =>
-            //    //{
-            //    //    using (var item = UsingDataBase.Set(this.cremaHost, dataBaseName, this.authenticator))
-            //    //    {
-            //    //        var dataBase = item.DataBase;
-            //    //        if (dataBase.TableContext.Tables.Contains(tableName) == true)
-            //    //        {
-            //    //            var table2 = dataBase.TableContext.Tables[tableName];
-            //    //            return table2.GetDataSet(this.authenticator, null);
-            //    //        }
-            //    //        return null;
-            //    //    }
-            //    //});
-            //}
-            //catch (Exception e)
-            //{
-            //    AppMessageBox.ShowError(e);
-            //    return null;
-            //}
+                //return this.cremaHost.Dispatcher.Invoke(() =>
+                //{
+                //    using (var item = UsingDataBase.Set(this.cremaHost, dataBaseName, this.authenticator))
+                //    {
+                //        var dataBase = item.DataBase;
+                //        if (dataBase.TableContext.Tables.Contains(tableName) == true)
+                //        {
+                //            var table2 = dataBase.TableContext.Tables[tableName];
+                //            return table2.GetDataSet(this.authenticator, null);
+                //        }
+                //        return null;
+                //    }
+                //});
+            }
+            catch (Exception e)
+            {
+                await AppMessageBox.ShowErrorAsync(e);
+                return null;
+            }
         }
     }
 }

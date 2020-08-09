@@ -16,18 +16,16 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using log4net;
-using Ntreev.Crema.Services;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Text;
-using Ntreev.Library;
-using log4net.Repository.Hierarchy;
-using log4net.Layout;
 using log4net.Appender;
-using System.IO;
 using log4net.Core;
-using Ntreev.Crema.ServiceModel;
+using log4net.Layout;
+using log4net.Repository.Hierarchy;
+using Ntreev.Library;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace Ntreev.Crema.Services
 {
@@ -37,7 +35,7 @@ namespace Ntreev.Crema.Services
         private readonly ILog log;
         private LogVerbose verbose = LogVerbose.Info | LogVerbose.Error | LogVerbose.Warn | LogVerbose.Fatal;
         private ConsoleAppender consoleAppender;
-        private RollingFileAppender rollingAppender;
+        private readonly RollingFileAppender rollingAppender;
         private Hierarchy hierarchy;
         //private TextWriter redirectionWriter;
         //private TextWriterAppender textAppender;

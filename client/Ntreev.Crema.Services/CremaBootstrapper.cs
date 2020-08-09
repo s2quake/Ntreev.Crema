@@ -59,23 +59,27 @@ namespace Ntreev.Crema.Services
 
         public static async Task<bool> IsOnlineAsync(string address, string userID, SecureString password)
         {
-            throw new NotImplementedException();
-            //var serviceClient = CremaHostServiceFactory.CreateServiceClient(address);
-            //serviceClient.Open();
-            //try
-            //{
-            //    var result = await InvokeServiceAsync(() => serviceClient.IsOnline(userID, UserContext.Encrypt(userID, password)));
-            //    return result.Value;
-            //}
-            //finally
-            //{
-            //    serviceClient.CloseService(CloseReason.None);
-            //}
+            var serviceHost = new CremaHostServiceHost();
+            var clientContext = new ClientContext(serviceHost)
+            {
+                Host = AddressUtility.GetIPAddress(address),
+                Port = AddressUtility.GetPort(address)
+            };
+            var token = Guid.Empty;
+            try
+            {
+                token = await clientContext.OpenAsync();
+                return await serviceHost.IsOnlineAsync(userID, UserContext.Encrypt(userID, password));
+            }
+            finally
+            {
+                await clientContext.CloseAsync(token);
+            }
         }
 
         public static async Task<DataBaseInfo[]> GetDataBasesAsync(string address)
         {
-            var serviceHost = new CremaHostServiceHost(null);
+            var serviceHost = new CremaHostServiceHost();
             var clientContext = new ClientContext(serviceHost)
             {
                 Host = AddressUtility.GetIPAddress(address),
@@ -246,28 +250,26 @@ namespace Ntreev.Crema.Services
             this.settings = this.container.GetExportedValue<CremaSettings>();
         }
 
-        private static async Task<ResultBase<TResult>> InvokeServiceAsync<TResult>(Func<ResultBase<TResult>> func)
-        {
-            var result = await Task.Run(func);
-            result.Validate();
-            return result;
-        }
-
         internal static TimeSpan DefaultInactivityTimeout { get; set; }
+
+        #region CremaHostServiceHost
 
         class CremaHostServiceHost : ClientServiceHostBase<ICremaHostService>
         {
-            private readonly CremaHost cremaHost;
             private ICremaHostService service;
 
-            public CremaHostServiceHost(CremaHost cremaHost)
+            public CremaHostServiceHost()
             {
-                this.cremaHost = cremaHost;
             }
 
             public async Task<DataBaseInfo[]> GetDataBaseInfosAsync()
             {
                 return (await this.service.GetDataBaseInfosAsync()).Value;
+            }
+
+            public async Task<bool> IsOnlineAsync(string userID, byte[] password)
+            {
+                return (await this.service.IsOnlineAsync(userID, password)).Value;
             }
 
             protected override void OnServiceCreated(ICremaHostService service)
@@ -276,5 +278,7 @@ namespace Ntreev.Crema.Services
                 this.service = service;
             }
         }
+
+        #endregion
     }
 }

@@ -15,23 +15,19 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
+using Ntreev.Crema.Data;
+using Ntreev.Crema.Data.Diff;
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
-using Ntreev.Crema.Data.Diff;
+using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
-using Ntreev.Crema.Data;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
 {
@@ -39,15 +35,19 @@ namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
     [ParentType(typeof(BrowserService))]
     class AddDifferenceItemViewModel : ViewModelBase, IBrowserItem
     {
-        [Import]
-        private ICremaHost cremaHost = null;
-        [Import]
-        private ICremaAppHost cremaAppHost = null;
+        private readonly ICremaHost cremaHost;
+        private readonly ICremaAppHost cremaAppHost;
+        private readonly Authenticator authenticator;
+        private readonly Lazy<BrowserService> browserService;
 
-        [Import]
-        private Authenticator authenticator = null;
-        [Import]
-        private Lazy<BrowserService> browserService = null;
+        [ImportingConstructor]
+        public AddDifferenceItemViewModel(Authenticator authenticator, ICremaHost cremaHost, ICremaAppHost cremaAppHost, Lazy<BrowserService> browserService)
+        {
+            this.authenticator = authenticator;
+            this.cremaHost = cremaHost;
+            this.cremaAppHost = cremaAppHost;
+            this.browserService = browserService;
+        }
 
         public async Task AddAsync()
         {

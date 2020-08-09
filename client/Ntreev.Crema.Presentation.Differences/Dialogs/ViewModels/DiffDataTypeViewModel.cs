@@ -15,43 +15,33 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using Ntreev.Crema.Data.Diff;
 using Ntreev.Crema.Presentation.Differences.Properties;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Diff;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
 namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
 {
-    public class DiffDataTypeViewModel : ModalDialogBase
+    class DiffDataTypeViewModel : ModalDialogBase
     {
         private DiffDataType diffType;
         private string header1;
         private string header2;
 
         [Import]
-        private BrowserService browserService = null;
+        private readonly BrowserService browserService = null;
         [Import]
-        private DifferencesServiceViewModel service = null;
+        private readonly DifferencesServiceViewModel service = null;
         [Import]
-        private IShell shell = null;
+        private readonly IShell shell = null;
 
         internal DiffDataTypeViewModel(Task<DiffDataType> action)
         {
             this.Initialize(action);
-        }
-
-        public DiffDataTypeViewModel(DiffDataType diffType)
-        {
-            this.Source = diffType;
         }
 
         public async Task MergeAsync()
@@ -66,7 +56,7 @@ namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
 
         public DiffDataType Source
         {
-            get { return this.diffType; }
+            get => this.diffType;
             private set
             {
                 this.diffType = value;
@@ -78,7 +68,7 @@ namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
 
         public string Header1
         {
-            get { return this.header1 ?? string.Empty; }
+            get => this.header1 ?? string.Empty;
             set
             {
                 this.header1 = value;
@@ -88,7 +78,7 @@ namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
 
         public string Header2
         {
-            get { return this.header2 ?? string.Empty; }
+            get => this.header2 ?? string.Empty;
             set
             {
                 this.header2 = value;
@@ -108,8 +98,8 @@ namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
                 await this.Dispatcher.InvokeAsync(() =>
                 {
                 }, DispatcherPriority.ApplicationIdle);
-                    await AppMessageBox.ShowErrorAsync(e);
-                    await this.TryCloseAsync();
+                await AppMessageBox.ShowErrorAsync(e);
+                await this.TryCloseAsync();
             }
             finally
             {

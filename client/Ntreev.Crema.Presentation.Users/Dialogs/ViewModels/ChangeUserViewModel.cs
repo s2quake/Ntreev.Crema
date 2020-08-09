@@ -15,19 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Caliburn.Micro;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
+using Ntreev.Crema.Presentation.Users.Properties;
 using Ntreev.Crema.ServiceModel;
+using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Security;
-using Ntreev.Crema.Presentation.Users.Properties;
+using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
 {
@@ -40,8 +37,8 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
         private string userName;
         private Authority authority;
 
-        private string oldUserName;
-        private Authority oldAuthority;
+        private readonly string oldUserName;
+        private readonly Authority oldAuthority;
 
         private ChangeUserViewModel(Authentication authentication, IUser user)
         {
@@ -85,7 +82,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
                 this.NotifyOfPropertyChange(nameof(this.CanChange));
             }
         }
-         
+
         public SecureString Password
         {
             get { return this.password; }
@@ -97,7 +94,7 @@ namespace Ntreev.Crema.Presentation.Users.Dialogs.ViewModels
                 this.NotifyOfPropertyChange(nameof(this.CanChange));
             }
         }
-             
+
         public string UserName
         {
             get { return this.userName ?? string.Empty; }

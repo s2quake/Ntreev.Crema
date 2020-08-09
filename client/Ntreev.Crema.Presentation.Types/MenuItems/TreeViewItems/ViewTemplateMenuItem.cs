@@ -17,17 +17,11 @@
 
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
-using Ntreev.Crema.Presentation.Types.Documents.ViewModels;
 using Ntreev.Crema.Presentation.Types.Properties;
 using Ntreev.Library;
 using Ntreev.ModernUI.Framework;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Types.MenuItems.TreeViewItems
 {
@@ -39,7 +33,7 @@ namespace Ntreev.Crema.Presentation.Types.MenuItems.TreeViewItems
     class ViewContentMenuItem : MenuItemBase
     {
         [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator = null;
 
         public ViewContentMenuItem()
         {

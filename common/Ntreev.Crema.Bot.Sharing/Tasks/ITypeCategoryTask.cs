@@ -18,7 +18,6 @@
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.Crema.Services.Extensions;
-using Ntreev.Library;
 using Ntreev.Library.ObjectModel;
 using Ntreev.Library.Random;
 using System;
@@ -131,7 +130,7 @@ namespace Ntreev.Crema.Bot.Tasks
                 if (lockInfo.IsLocked == true || lockInfo.IsInherited == true)
                     return;
             }
-            
+
             await category.LockAsync(authentication, comment);
         }
 
@@ -146,7 +145,7 @@ namespace Ntreev.Crema.Bot.Tasks
                 var lockInfo = await category.Dispatcher.InvokeAsync(() => category.LockInfo);
                 if (lockInfo.IsLocked == false || lockInfo.IsInherited == true)
                     return;
-                
+
             }
             await category.UnlockAsync(authentication);
         }

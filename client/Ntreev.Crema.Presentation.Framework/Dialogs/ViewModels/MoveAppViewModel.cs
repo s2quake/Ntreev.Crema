@@ -17,18 +17,14 @@
 
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
 {
     public class MoveAppViewModel : MoveViewModel, IPartImportsSatisfiedNotification
     {
         [Import]
-        private ICremaAppHost cremaAppHost = null;
+        private readonly ICremaAppHost cremaAppHost = null;
 
         public MoveAppViewModel(string currentPath, string[] targetPaths)
             : base(currentPath, targetPaths)

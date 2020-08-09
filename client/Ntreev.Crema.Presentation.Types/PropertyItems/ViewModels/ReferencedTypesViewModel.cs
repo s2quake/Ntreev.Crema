@@ -15,41 +15,37 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Linq;
-using System.ComponentModel.Composition;
 using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.ServiceModel;
-using System.Threading.Tasks;
-using Ntreev.Library;
-using System.Collections.Generic;
-using System.Collections;
-using Ntreev.ModernUI.Framework;
-using System.ComponentModel;
-using Ntreev.Library.Linq;
-using Ntreev.Crema.Presentation.Types.Properties;
-using Ntreev.ModernUI.Framework.ViewModels;
-using TypeDescriptor = Ntreev.Crema.Presentation.Framework.TypeDescriptor;
 using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
+using Ntreev.Crema.Presentation.Types.Properties;
+using Ntreev.Crema.ServiceModel;
+using Ntreev.Library;
+using Ntreev.Library.Linq;
+using Ntreev.ModernUI.Framework;
+using Ntreev.ModernUI.Framework.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Linq;
+using TypeDescriptor = Ntreev.Crema.Presentation.Framework.TypeDescriptor;
 
 namespace Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [Dependency("Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels.TableInfoViewModel, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Presentation.Tables.IPropertyService, Ntreev.Crema.Presentation.Tables, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [Dependency("Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels.TableInfoViewModel, Ntreev.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("Ntreev.Crema.Presentation.Tables.IPropertyService, Ntreev.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ReferencedTypesViewModel : PropertyItemBase, ISelector
     {
         [Import]
-        private Lazy<TypeBrowserViewModel> browser = null;
+        private readonly Lazy<TypeBrowserViewModel> browser = null;
         [Import]
-        private Authenticator authenticator = null;
+        private readonly Authenticator authenticator = null;
         private ITableDescriptor descriptor;
         private TypeListBoxItemViewModel[] types;
         private TypeListBoxItemViewModel selectedType;
         [Import]
-        private IBuildUp buildUp = null;
+        private readonly IBuildUp buildUp = null;
 
         public ReferencedTypesViewModel()
         {

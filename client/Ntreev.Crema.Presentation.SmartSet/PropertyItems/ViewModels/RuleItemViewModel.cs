@@ -16,11 +16,6 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.SmartSet.PropertyItems.ViewModels
 {
@@ -34,7 +29,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.PropertyItems.ViewModels
             this.name = name;
             this.expression = expression;
         }
-        
+
         public string Name
         {
             get { return this.name; }
@@ -47,7 +42,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.PropertyItems.ViewModels
                 this.NotifyOfPropertyChange(nameof(this.Name));
             }
         }
-        
+
         public string Expression
         {
             get { return this.expression; }

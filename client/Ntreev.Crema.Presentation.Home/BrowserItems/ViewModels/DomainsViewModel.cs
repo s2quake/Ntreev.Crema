@@ -15,22 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.Properties;
-using Ntreev.Crema.Presentation.Home.Services.ViewModels;
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Home.Properties;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Home.BrowserItems.ViewModels
 {
@@ -40,21 +33,19 @@ namespace Ntreev.Crema.Presentation.Home.BrowserItems.ViewModels
     class DomainsViewModel : TreeViewBase, IBrowserItem
     {
         private readonly ICremaAppHost cremaAppHost;
+        private readonly Authenticator authenticator;
+        private readonly IPropertyService propertyService;
         private DomainCategoryTreeViewItemViewModel root;
 
-        [Import]
-        private IBuildUp buildUp = null;
-        [Import]
-        private Authenticator authenticator = null;
-        [Import]
-        private IPropertyService propertyService = null;
-
         [ImportingConstructor]
-        public DomainsViewModel(ICremaAppHost cremaAppHost)
+        public DomainsViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost, IPropertyService propertyService)
+            : base(cremaAppHost)
         {
+            this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += CremaAppHost_Opened;
             this.cremaAppHost.Closed += CremaAppHost_Closed;
+            this.propertyService = propertyService;
             this.DisplayName = Resources.Title_DomainList;
             this.Dispatcher.InvokeAsync(() => this.AttachPropertyService(this.propertyService));
         }
@@ -75,10 +66,8 @@ namespace Ntreev.Crema.Presentation.Home.BrowserItems.ViewModels
                 {
                     return new DomainCategoryTreeViewItemViewModel(this.authenticator, domainContext.Root, this);
                 });
-
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.buildUp.BuildUp(this.root);
                     foreach (var item in this.root.Items)
                     {
                         this.Items.Add(item);

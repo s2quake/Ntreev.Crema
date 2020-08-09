@@ -22,9 +22,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
 {
@@ -34,7 +31,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.ViewModels
         private TableItemViewModel selectedTable;
 
         [Import]
-        private IBuildUp buildUp = null;
+        private readonly IBuildUp buildUp = null;
 
         protected TableDocumentBase()
         {

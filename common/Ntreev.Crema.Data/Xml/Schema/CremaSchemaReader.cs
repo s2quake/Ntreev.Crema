@@ -77,12 +77,10 @@ namespace Ntreev.Crema.Data.Xml.Schema
             {
                 this.hashValue = HashUtility.GetHashValueFromFile(filename);
             }
-            using (var stream = File.OpenRead(filename))
-            {
-                var schema = XmlSchema.Read(stream, CremaSchema.SchemaValidationEventHandler);
-                schema.SourceUri = $"{new Uri(filename)}";
-                this.Read(schema, new CremaXmlResolver(filename));
-            }
+            using var stream = File.OpenRead(filename);
+            var schema = XmlSchema.Read(stream, CremaSchema.SchemaValidationEventHandler);
+            schema.SourceUri = $"{new Uri(filename)}";
+            this.Read(schema, new CremaXmlResolver(filename));
         }
 
         public void Read(string filename, XmlResolver resolver)
@@ -91,12 +89,10 @@ namespace Ntreev.Crema.Data.Xml.Schema
             {
                 this.hashValue = HashUtility.GetHashValueFromFile(filename);
             }
-            using (var stream = File.OpenRead(filename))
-            {
-                var schema = XmlSchema.Read(stream, CremaSchema.SchemaValidationEventHandler);
-                schema.SourceUri = $"{new Uri(filename)}";
-                this.Read(schema, resolver);
-            }
+            using var stream = File.OpenRead(filename);
+            var schema = XmlSchema.Read(stream, CremaSchema.SchemaValidationEventHandler);
+            schema.SourceUri = $"{new Uri(filename)}";
+            this.Read(schema, resolver);
         }
 
         public void Read(TextReader reader)
@@ -132,10 +128,8 @@ namespace Ntreev.Crema.Data.Xml.Schema
 
         public void Read(TextReader reader, XmlResolver resolver)
         {
-            using (var xmlReader = XmlReader.Create(reader))
-            {
-                this.Read(xmlReader, resolver);
-            }
+            using var xmlReader = XmlReader.Create(reader);
+            this.Read(xmlReader, resolver);
         }
 
         public void Read(XmlReader reader, XmlResolver resolver)
@@ -952,7 +946,7 @@ namespace Ntreev.Crema.Data.Xml.Schema
         {
             var xPath = key.Selector.XPath;
             var strArray = xPath.Split(new char[] { '/', ':' });
-            var name = strArray[strArray.Length - 1];
+            var name = strArray[^1];
             if ((name == null) || (name.Length == 0))
             {
                 throw new CremaDataException();

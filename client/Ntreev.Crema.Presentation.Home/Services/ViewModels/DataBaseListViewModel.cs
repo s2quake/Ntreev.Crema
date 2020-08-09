@@ -15,21 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
 using Ntreev.Crema.Presentation.Framework;
+using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.ModernUI.Framework;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
 
 namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 {
@@ -37,19 +32,17 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
     class DataBaseListViewModel : ListBoxBase<DataBaseItemViewModel>
     {
         private readonly ICremaHost cremaHost;
-        [Import]
-        private Lazy<CremaAppHostViewModel> cremaAppHost = null;
-        [Import]
-        private Authenticator authenticator = null;
-        [Import]
-        private IPropertyService propertyService = null;
+        private readonly Lazy<CremaAppHostViewModel> cremaAppHost;
+        private readonly Authenticator authenticator;
 
         [ImportingConstructor]
-        public DataBaseListViewModel(ICremaHost cremaHost)
+        public DataBaseListViewModel(Authenticator authenticator, ICremaHost cremaHost, Lazy<CremaAppHostViewModel> cremaAppHost, IPropertyService propertyService)
         {
+            this.authenticator = authenticator;
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += CremaHost_Opened;
-            this.AttachPropertyService(this.propertyService);
+            this.cremaAppHost = cremaAppHost;
+            this.AttachPropertyService(propertyService);
             this.Dispatcher.InvokeAsync(() =>
             {
                 this.CremaAppHost.Loaded += CremaAppHost_Loaded;
@@ -119,18 +112,6 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
             }
         }
 
-        //TODO:
-        //protected override void OnPartImportsSatisfied()
-        //{
-        //    base.OnPartImportsSatisfied();
-        //    this.AttachPropertyService(this.propertyService);
-        //    this.Dispatcher.InvokeAsync(() =>
-        //    {
-        //        this.CremaAppHost.Loaded += CremaAppHost_Loaded;
-        //        this.CremaAppHost.Unloaded += CremaAppHost_Unloaded;
-        //    });
-        //}
-
         protected override void OnSelectionChanged(EventArgs e)
         {
             base.OnSelectionChanged(e);
@@ -145,7 +126,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
                 this.DataBaseContext.ItemsDeleted += DataBaseContext_ItemsDeleted;
                 return this.DataBaseContext.Select(item => new DataBaseItemViewModel(this.authenticator, item, this)).ToArray();
             });
-            
+
             await this.Dispatcher.InvokeAsync(() =>
             {
                 var query = from connectionItem in this.CremaAppHost.ConnectionItems

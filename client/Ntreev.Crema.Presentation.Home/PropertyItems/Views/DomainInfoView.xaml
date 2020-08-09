@@ -22,14 +22,15 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:nmfv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework"
-             xmlns:nmgv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework.DataGrid"
              xmlns:ncpc="clr-namespace:Ntreev.Crema.Presentation.Controls;assembly=Ntreev.Crema.Presentation"
              xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Home.Properties"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     
     <UserControl.Resources>
-        <nmfv:ContentToStringConverter x:Key="contentToStringConverter" />
+        
+        <nmfv:ContentToStringConverter x:Key="ContentToStringConverter" />
+        
     </UserControl.Resources>
 
     <ncpc:HeaderedContentList x:Name="content" HeaderWidth="0.33*">
@@ -48,11 +49,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         <HeaderedContentControl Header="{x:Static p:Resources.Label_Creator}" 
                                 Content="{Binding DomainInfo.CreationInfo.ID}" />
         <HeaderedContentControl Header="{x:Static p:Resources.Label_CreatedDateTime}" 
-                                Content="{Binding DomainInfo.CreationInfo.DateTime, Converter={StaticResource contentToStringConverter}}" />
+                                Content="{Binding DomainInfo.CreationInfo.DateTime, Converter={StaticResource ContentToStringConverter}}" />
         <HeaderedContentControl Header="{x:Static p:Resources.Label_Modifier}" 
                                 Content="{Binding DomainInfo.ModificationInfo.ID}" />
         <HeaderedContentControl Header="{x:Static p:Resources.Label_ModifiedDateTime}" 
-                                Content="{Binding DomainInfo.ModificationInfo.DateTime, Converter={StaticResource contentToStringConverter}}" />
+                                Content="{Binding DomainInfo.ModificationInfo.DateTime, Converter={StaticResource ContentToStringConverter}}" />
     </ncpc:HeaderedContentList>
     
 </UserControl>
