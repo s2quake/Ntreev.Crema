@@ -1,14 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\base.props" />
-  <Import Project="..\..\common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.projitems" Label="Shared" />
-  <Import Project="..\..\common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.projitems" Label="Shared" />
+  <Import Project="..\..\share\Ntreev.Crema.Services\Ntreev.Crema.Services.projitems" Label="Shared" />
+  <Import Project="..\..\share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.projitems" Label="Shared" />
+  <Import Project="..\..\share\Ntreev.Crema.ServiceHosts.Users\Ntreev.Crema.ServiceHosts.Users.projitems" Label="Shared" />
+  <Import Project="..\..\share\Ntreev.Crema.ServiceHosts.Domains\Ntreev.Crema.ServiceHosts.Domains.projitems" Label="Shared" />
+  <Import Project="..\..\share\Ntreev.Crema.ServiceHosts.Data\Ntreev.Crema.ServiceHosts.Data.projitems" Label="Shared" />
   <PropertyGroup>
     <DefineConstants>CLIENT</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="System.ComponentModel.Composition" Version="4.5.0" />
+    <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('netcoreapp3.'))">
     <PackageReference Include="Microsoft.Win32.SystemEvents" Version="4.7.0" />

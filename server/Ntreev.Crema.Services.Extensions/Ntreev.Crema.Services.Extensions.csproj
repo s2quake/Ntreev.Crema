@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\base.props" />
-  <Import Project="..\..\common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems" Label="Shared" />
+  <Import Project="..\..\share\Ntreev.Crema.Services.Extensions\Ntreev.Crema.Services.Extensions.projitems" Label="Shared" />
   <ItemGroup>
     <ProjectReference Include="..\..\common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
     <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj" />

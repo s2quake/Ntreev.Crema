@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\common\Ntreev.Crema.RuntimeService.Sharing\Ntreev.Crema.RuntimeService.Sharing.projitems" Label="Shared" />
-  <Import Project="..\..\common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.projitems" Label="Shared" />
+  <Import Project="..\..\share\Ntreev.Crema.ServiceHosts.RuntimeService\Ntreev.Crema.ServiceHosts.RuntimeService.projitems" Label="Shared" />
+  <Import Project="..\..\share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.projitems" Label="Shared" />
   <Import Project="..\..\base.props" />
   <ItemGroup>
     <ProjectReference Include="..\..\..\JSSoft.Communication\JSSoft.Communication\JSSoft.Communication.csproj" />

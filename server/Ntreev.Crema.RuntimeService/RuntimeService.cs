@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.Runtime.Generation;
 using Ntreev.Crema.Runtime.Serialization;
+using Ntreev.Crema.ServiceHosts.RuntimeService;
 using Ntreev.Crema.ServiceModel;
 using Ntreev.Crema.Services;
 using Ntreev.Library;

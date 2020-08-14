@@ -11,6 +11,5 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.csproj" />
   </ItemGroup>
 </Project>

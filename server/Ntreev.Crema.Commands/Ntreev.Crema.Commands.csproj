@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\base.props" />
-  <Import Project="..\..\common\Ntreev.Crema.Commands.Sharing\Ntreev.Crema.Commands.Sharing.projitems" Label="Shared" />
+  <Import Project="..\..\share\Ntreev.Crema.Commands\Ntreev.Crema.Commands.projitems" Label="Shared" />
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.1" />

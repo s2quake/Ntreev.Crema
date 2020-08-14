@@ -63,18 +63,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Data.Diff", "c
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{B33C0519-121E-4BBA-AE76-CEEEC5A40BA6}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts.Sharing", "common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.shproj", "{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts", "share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.shproj", "{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.RuntimeService.Sharing", "common\Ntreev.Crema.RuntimeService.Sharing\Ntreev.Crema.RuntimeService.Sharing.shproj", "{7E5C7310-0DA2-4F46-896B-C8E871C22E37}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.RuntimeService", "share\Ntreev.Crema.RuntimeService\Ntreev.Crema.RuntimeService.shproj", "{7E5C7310-0DA2-4F46-896B-C8E871C22E37}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Communication", "..\JSSoft.Communication\JSSoft.Communication\JSSoft.Communication.csproj", "{49672040-1A49-44DC-BABD-045AAF03ACF0}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.projitems*{6baf8a0b-5b3e-40ea-8e96-c667df63516c}*SharedItemsImports = 13
-		common\Ntreev.Crema.RuntimeService.Sharing\Ntreev.Crema.RuntimeService.Sharing.projitems*{7e5c7310-0da2-4f46-896b-c8e871c22e37}*SharedItemsImports = 13
-		common\Ntreev.Crema.RuntimeService.Sharing\Ntreev.Crema.RuntimeService.Sharing.projitems*{bdb528b8-1482-4fcb-8caa-dadc8fad5243}*SharedItemsImports = 5
-		common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.projitems*{bdb528b8-1482-4fcb-8caa-dadc8fad5243}*SharedItemsImports = 5
+		share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.projitems*{6baf8a0b-5b3e-40ea-8e96-c667df63516c}*SharedItemsImports = 13
+		share\Ntreev.Crema.RuntimeService\Ntreev.Crema.RuntimeService.projitems*{7e5c7310-0da2-4f46-896b-c8e871c22e37}*SharedItemsImports = 13
+		share\Ntreev.Crema.RuntimeService\Ntreev.Crema.RuntimeService.projitems*{bdb528b8-1482-4fcb-8caa-dadc8fad5243}*SharedItemsImports = 5
+		share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.projitems*{bdb528b8-1482-4fcb-8caa-dadc8fad5243}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

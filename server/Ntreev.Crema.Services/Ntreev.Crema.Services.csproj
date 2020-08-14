@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\base.props" />
-  <Import Project="..\..\common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.projitems" Label="Shared" />
+  <Import Project="..\..\share\Ntreev.Crema.Services\Ntreev.Crema.Services.projitems" Label="Shared" />
   <PropertyGroup>
     <DefineConstants>SERVER</DefineConstants>
   </PropertyGroup>

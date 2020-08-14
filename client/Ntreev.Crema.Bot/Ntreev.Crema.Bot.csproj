@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\base.props" />
-  <Import Project="..\..\common\Ntreev.Crema.Bot.Sharing\Ntreev.Crema.Bot.Sharing.projitems" Label="Shared" />
+  <Import Project="..\..\share\Ntreev.Crema.Bot\Ntreev.Crema.Bot.projitems" Label="Shared" />
   <ItemGroup>
     <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library.Random\Ntreev.Library.Random.csproj" />
     <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />

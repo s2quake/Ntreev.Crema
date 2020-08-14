@@ -15,24 +15,23 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using JSSoft.Communication;
-using Ntreev.Crema.ServiceHosts.RuntimeService;
-using Ntreev.Crema.Services;
+using Ntreev.Crema.Runtime.Generation;
+using Ntreev.Crema.Runtime.Serialization;
+using Ntreev.Crema.ServiceModel;
+using System.Threading.Tasks;
 
-namespace Ntreev.Crema.RuntimeService
+namespace Ntreev.Crema.ServiceHosts.RuntimeService
 {
-    class RuntimeServiceHost : ServerServiceHostBase<IRuntimeService>
+    public interface IRuntimeService
     {
-        private readonly RuntimeService service;
+        Task<ResultBase<GenerationSet>> GetCodeGenerationDataAsync(string dataBaseName, string tags, string filterExpression, string revision);
 
-        public RuntimeServiceHost(ICremaHost cremaHost, RuntimeService service)
-        {
-            this.service = service;
-        }
+        Task<ResultBase<SerializationSet>> GetDataGenerationDataAsync(string dataBaseName, string tags, string filterExpression, string revision);
 
-        protected override IRuntimeService CreateService()
-        {
-            return this.service;
-        }
+        Task<ResultBase<GenerationSet, SerializationSet>> GetMetaDataAsync(string dataBaseName, string tags, string filterExpression, string revision);
+
+        Task<ResultBase> ResetDataAsync(string dataBaseName);
+
+        Task<ResultBase<string>> GetRevisionAsync(string dataBaseName);
     }
 }

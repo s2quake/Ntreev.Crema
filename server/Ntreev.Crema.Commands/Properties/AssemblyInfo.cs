@@ -15,24 +15,6 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using JSSoft.Communication;
-using Ntreev.Crema.ServiceHosts.RuntimeService;
-using Ntreev.Crema.Services;
+using System.Runtime.CompilerServices;
 
-namespace Ntreev.Crema.RuntimeService
-{
-    class RuntimeServiceHost : ServerServiceHostBase<IRuntimeService>
-    {
-        private readonly RuntimeService service;
-
-        public RuntimeServiceHost(ICremaHost cremaHost, RuntimeService service)
-        {
-            this.service = service;
-        }
-
-        protected override IRuntimeService CreateService()
-        {
-            return this.service;
-        }
-    }
-}
+[assembly: InternalsVisibleTo("Ntreev.Crema.Javascript")]

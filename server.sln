@@ -37,7 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{4162
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Runtime.Generation", "common\Ntreev.Crema.Runtime.Generation\Ntreev.Crema.Runtime.Generation.csproj", "{79AEF7D1-93D1-4EEB-B09C-1595C82E7492}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Services.Random.Sharing", "common\Ntreev.Crema.Services.Random.Sharing\Ntreev.Crema.Services.Random.Sharing.shproj", "{1F4A20AE-F955-4231-8636-27B7A38EB4B3}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Services.Random", "share\Ntreev.Crema.Services.Random\Ntreev.Crema.Services.Random.shproj", "{1F4A20AE-F955-4231-8636-27B7A38EB4B3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Library.Random", "..\Ntreev.Library\Ntreev.Library.Random\Ntreev.Library.Random.csproj", "{83F1180F-F170-48CF-BE1E-CA60D6851800}"
 EndProject
@@ -48,7 +48,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Data", "common
 		{1918437F-4FBF-4731-AC5B-981A4A4CB1F1} = {1918437F-4FBF-4731-AC5B-981A4A4CB1F1}
 	EndProjectSection
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Services.Sharing", "common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.shproj", "{24ECBEE1-2859-4F09-969B-F382E6341814}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Services", "share\Ntreev.Crema.Services\Ntreev.Crema.Services.shproj", "{24ECBEE1-2859-4F09-969B-F382E6341814}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Services.Test", "server\Ntreev.Crema.Services.Test\Ntreev.Crema.Services.Test.csproj", "{578B0AEF-9F2B-42AD-AD29-B97F267B0D2A}"
 EndProject
@@ -58,19 +58,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Services.Rando
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Bot", "server\Ntreev.Crema.Bot\Ntreev.Crema.Bot.csproj", "{14BA15B4-4B3D-453F-938D-4A23758D35DF}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Commands.Sharing", "common\Ntreev.Crema.Commands.Sharing\Ntreev.Crema.Commands.Sharing.shproj", "{3D3128AA-908D-44C4-9EFD-0E1A903F5287}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Commands", "share\Ntreev.Crema.Commands\Ntreev.Crema.Commands.shproj", "{3D3128AA-908D-44C4-9EFD-0E1A903F5287}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Bot.Sharing", "common\Ntreev.Crema.Bot.Sharing\Ntreev.Crema.Bot.Sharing.shproj", "{35AD4803-BEC1-4F3E-98AB-5C7961F2C261}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Bot", "share\Ntreev.Crema.Bot\Ntreev.Crema.Bot.shproj", "{35AD4803-BEC1-4F3E-98AB-5C7961F2C261}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Data.Test", "common\Ntreev.Crema.Data.Test\Ntreev.Crema.Data.Test.csproj", "{DEBB7753-6410-47C4-ACEA-6771DD271940}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Spreadsheet", "common\Ntreev.Crema.Spreadsheet\Ntreev.Crema.Spreadsheet.csproj", "{A41E71C2-33F2-4EBF-B8E9-4050BB6C282D}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Commands.Spreadsheet.Sharing", "common\Ntreev.Crema.Commands.Spreadsheet.Sharing\Ntreev.Crema.Commands.Spreadsheet.Sharing.shproj", "{05971A74-2D68-4781-9CEB-DF2B48F8BA75}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Commands.Spreadsheet", "share\Ntreev.Crema.Commands.Spreadsheet\Ntreev.Crema.Commands.Spreadsheet.shproj", "{05971A74-2D68-4781-9CEB-DF2B48F8BA75}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Commands.Spreadsheet", "server\Ntreev.Crema.Commands.Spreadsheet\Ntreev.Crema.Commands.Spreadsheet.csproj", "{490F7E03-79F6-461C-9D90-80F24ACE659A}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Javascript.Sharing", "common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.shproj", "{A4955825-195F-4677-9695-5FC67362A449}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Javascript", "share\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.shproj", "{A4955825-195F-4677-9695-5FC67362A449}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Javascript", "server\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.csproj", "{9ED00A26-BF13-4B1F-AF6E-3009C666AE15}"
 EndProject
@@ -90,7 +90,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Library", "..\Ntreev
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Library.Commands", "..\Ntreev.Library.Commands\Ntreev.Library.Commands\Ntreev.Library.Commands.csproj", "{0D96CC61-6D74-49B4-A558-33AC0DCF8529}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Services.Extensions.Sharing", "common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.shproj", "{97AD6C00-3B71-4E83-97C3-0201BC035471}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Services.Extensions", "share\Ntreev.Crema.Services.Extensions\Ntreev.Crema.Services.Extensions.shproj", "{97AD6C00-3B71-4E83-97C3-0201BC035471}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Services.Extensions", "server\Ntreev.Crema.Services.Extensions\Ntreev.Crema.Services.Extensions.csproj", "{0261747B-0A44-4FB0-8E27-2CE4BAF2153B}"
 EndProject
@@ -110,29 +110,42 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.RuntimeService.Sharing", "common\Ntreev.Crema.RuntimeService.Sharing\Ntreev.Crema.RuntimeService.Sharing.shproj", "{7E5C7310-0DA2-4F46-896B-C8E871C22E37}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts.RuntimeService", "share\Ntreev.Crema.ServiceHosts.RuntimeService\Ntreev.Crema.ServiceHosts.RuntimeService.shproj", "{7E5C7310-0DA2-4F46-896B-C8E871C22E37}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts.Sharing", "common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.shproj", "{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts", "share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.shproj", "{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts.Data", "share\Ntreev.Crema.ServiceHosts.Data\Ntreev.Crema.ServiceHosts.Data.shproj", "{BABAB208-95FB-4D06-B801-3FEE20F980EB}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts.Domains", "share\Ntreev.Crema.ServiceHosts.Domains\Ntreev.Crema.ServiceHosts.Domains.shproj", "{F2688CF8-CC3E-48C9-A718-738F57388165}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts.Users", "share\Ntreev.Crema.ServiceHosts.Users\Ntreev.Crema.ServiceHosts.Users.shproj", "{4E857C1F-3CA7-45B7-9B3F-2AF6D49071B2}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems*{0261747b-0a44-4fb0-8e27-2ce4baf2153b}*SharedItemsImports = 5
-		common\Ntreev.Crema.Commands.Spreadsheet.Sharing\Ntreev.Crema.Commands.Spreadsheet.Sharing.projitems*{05971a74-2d68-4781-9ceb-df2b48f8ba75}*SharedItemsImports = 13
-		common\Ntreev.Crema.Services.Random.Sharing\Ntreev.Crema.Services.Random.Sharing.projitems*{138c9b99-d30b-4e3b-89f0-381a03515431}*SharedItemsImports = 5
-		common\Ntreev.Crema.Bot.Sharing\Ntreev.Crema.Bot.Sharing.projitems*{14ba15b4-4b3d-453f-938d-4a23758d35df}*SharedItemsImports = 5
-		common\Ntreev.Crema.Services.Random.Sharing\Ntreev.Crema.Services.Random.Sharing.projitems*{1f4a20ae-f955-4231-8636-27b7a38eb4b3}*SharedItemsImports = 13
-		common\Ntreev.Crema.Commands.Sharing\Ntreev.Crema.Commands.Sharing.projitems*{20dab068-f188-4ec5-96fa-227c11bba46d}*SharedItemsImports = 5
-		common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.projitems*{24ecbee1-2859-4f09-969b-f382e6341814}*SharedItemsImports = 13
-		common\Ntreev.Crema.Bot.Sharing\Ntreev.Crema.Bot.Sharing.projitems*{35ad4803-bec1-4f3e-98ab-5c7961f2c261}*SharedItemsImports = 13
-		common\Ntreev.Crema.Commands.Sharing\Ntreev.Crema.Commands.Sharing.projitems*{3d3128aa-908d-44c4-9efd-0e1a903f5287}*SharedItemsImports = 13
-		common\Ntreev.Crema.RuntimeService.Sharing\Ntreev.Crema.RuntimeService.Sharing.projitems*{3d7847d1-7706-4a64-8846-d8aa3639471c}*SharedItemsImports = 5
-		common\Ntreev.Crema.Commands.Spreadsheet.Sharing\Ntreev.Crema.Commands.Spreadsheet.Sharing.projitems*{490f7e03-79f6-461c-9d90-80f24ace659a}*SharedItemsImports = 5
-		common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.projitems*{6baf8a0b-5b3e-40ea-8e96-c667df63516c}*SharedItemsImports = 13
-		common\Ntreev.Crema.RuntimeService.Sharing\Ntreev.Crema.RuntimeService.Sharing.projitems*{7e5c7310-0da2-4f46-896b-c8e871c22e37}*SharedItemsImports = 13
-		common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems*{97ad6c00-3b71-4e83-97c3-0201bc035471}*SharedItemsImports = 13
-		common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.projitems*{9ed00a26-bf13-4b1f-af6e-3009c666ae15}*SharedItemsImports = 5
-		common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.projitems*{a4955825-195f-4677-9695-5fc67362a449}*SharedItemsImports = 13
-		common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.projitems*{b7b4c207-7729-4147-96c4-b55e85647a66}*SharedItemsImports = 5
+		share\Ntreev.Crema.Services.Extensions\Ntreev.Crema.Services.Extensions.projitems*{0261747b-0a44-4fb0-8e27-2ce4baf2153b}*SharedItemsImports = 5
+		share\Ntreev.Crema.Commands.Spreadsheet\Ntreev.Crema.Commands.Spreadsheet.projitems*{05971a74-2d68-4781-9ceb-df2b48f8ba75}*SharedItemsImports = 13
+		share\Ntreev.Crema.Services.Random\Ntreev.Crema.Services.Random.projitems*{138c9b99-d30b-4e3b-89f0-381a03515431}*SharedItemsImports = 5
+		share\Ntreev.Crema.Bot\Ntreev.Crema.Bot.projitems*{14ba15b4-4b3d-453f-938d-4a23758d35df}*SharedItemsImports = 5
+		share\Ntreev.Crema.Services.Random\Ntreev.Crema.Services.Random.projitems*{1f4a20ae-f955-4231-8636-27b7a38eb4b3}*SharedItemsImports = 13
+		share\Ntreev.Crema.Commands\Ntreev.Crema.Commands.projitems*{20dab068-f188-4ec5-96fa-227c11bba46d}*SharedItemsImports = 5
+		share\Ntreev.Crema.Services\Ntreev.Crema.Services.projitems*{24ecbee1-2859-4f09-969b-f382e6341814}*SharedItemsImports = 13
+		share\Ntreev.Crema.Bot\Ntreev.Crema.Bot.projitems*{35ad4803-bec1-4f3e-98ab-5c7961f2c261}*SharedItemsImports = 13
+		share\Ntreev.Crema.Commands\Ntreev.Crema.Commands.projitems*{3d3128aa-908d-44c4-9efd-0e1a903f5287}*SharedItemsImports = 13
+		share\Ntreev.Crema.ServiceHosts.RuntimeService\Ntreev.Crema.ServiceHosts.RuntimeService.projitems*{3d7847d1-7706-4a64-8846-d8aa3639471c}*SharedItemsImports = 5
+		share\Ntreev.Crema.Commands.Spreadsheet\Ntreev.Crema.Commands.Spreadsheet.projitems*{490f7e03-79f6-461c-9d90-80f24ace659a}*SharedItemsImports = 5
+		share\Ntreev.Crema.ServiceHosts.Users\Ntreev.Crema.ServiceHosts.Users.projitems*{4e857c1f-3ca7-45b7-9b3f-2af6d49071b2}*SharedItemsImports = 13
+		share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.projitems*{6baf8a0b-5b3e-40ea-8e96-c667df63516c}*SharedItemsImports = 13
+		share\Ntreev.Crema.ServiceHosts.RuntimeService\Ntreev.Crema.ServiceHosts.RuntimeService.projitems*{7e5c7310-0da2-4f46-896b-c8e871c22e37}*SharedItemsImports = 13
+		share\Ntreev.Crema.Services.Extensions\Ntreev.Crema.Services.Extensions.projitems*{97ad6c00-3b71-4e83-97c3-0201bc035471}*SharedItemsImports = 13
+		share\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.projitems*{9ed00a26-bf13-4b1f-af6e-3009c666ae15}*SharedItemsImports = 5
+		share\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.projitems*{a4955825-195f-4677-9695-5fc67362a449}*SharedItemsImports = 13
+		share\Ntreev.Crema.ServiceHosts.Data\Ntreev.Crema.ServiceHosts.Data.projitems*{a7bf94f7-94a5-46ba-a756-c04bde65f47b}*SharedItemsImports = 5
+		share\Ntreev.Crema.ServiceHosts.Domains\Ntreev.Crema.ServiceHosts.Domains.projitems*{a7bf94f7-94a5-46ba-a756-c04bde65f47b}*SharedItemsImports = 5
+		share\Ntreev.Crema.ServiceHosts.Users\Ntreev.Crema.ServiceHosts.Users.projitems*{a7bf94f7-94a5-46ba-a756-c04bde65f47b}*SharedItemsImports = 5
+		share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.projitems*{a7bf94f7-94a5-46ba-a756-c04bde65f47b}*SharedItemsImports = 5
+		share\Ntreev.Crema.Services\Ntreev.Crema.Services.projitems*{b7b4c207-7729-4147-96c4-b55e85647a66}*SharedItemsImports = 5
+		share\Ntreev.Crema.ServiceHosts.Data\Ntreev.Crema.ServiceHosts.Data.projitems*{babab208-95fb-4d06-b801-3fee20f980eb}*SharedItemsImports = 13
+		share\Ntreev.Crema.ServiceHosts.Domains\Ntreev.Crema.ServiceHosts.Domains.projitems*{f2688cf8-cc3e-48c9-a718-738f57388165}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -294,6 +307,9 @@ Global
 		{4A8417DD-9882-4FC1-B471-06905354545D} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
 		{7E5C7310-0DA2-4F46-896B-C8E871C22E37} = {F24B626E-02A8-431A-9319-C71D978C7328}
 		{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C} = {F24B626E-02A8-431A-9319-C71D978C7328}
+		{BABAB208-95FB-4D06-B801-3FEE20F980EB} = {F24B626E-02A8-431A-9319-C71D978C7328}
+		{F2688CF8-CC3E-48C9-A718-738F57388165} = {F24B626E-02A8-431A-9319-C71D978C7328}
+		{4E857C1F-3CA7-45B7-9B3F-2AF6D49071B2} = {F24B626E-02A8-431A-9319-C71D978C7328}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {081892D7-815F-41E8-91E5-C26BA161204B}

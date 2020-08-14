@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\common\Ntreev.Crema.RuntimeService.Sharing\Ntreev.Crema.RuntimeService.Sharing.projitems" Label="Shared" />
+  <Import Project="..\..\share\Ntreev.Crema.ServiceHosts.RuntimeService\Ntreev.Crema.ServiceHosts.RuntimeService.projitems" Label="Shared" />
   <Import Project="..\..\base.props" />
   <ItemGroup>
     <ProjectReference Include="..\..\common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
