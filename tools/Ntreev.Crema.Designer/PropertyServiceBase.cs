@@ -31,7 +31,8 @@ namespace Ntreev.Crema.Designer
         private IPropertyItem[] itemsSource;
         private object selectedObject;
 
-        protected PropertyServiceBase(IEnumerable<IPropertyItem> propertyItems)
+        protected PropertyServiceBase(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
             //this.cremaHost = cremaHost;
             //this.cremaHost.Opened += CremaHost_Opened;
@@ -39,7 +40,6 @@ namespace Ntreev.Crema.Designer
             //this.cremaAppHost.Loaded += CremaAppHost_Loaded;
             //this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
 
-            this.propertyItems = MenuItemUtility.GetMenuItems(this, propertyItems).ToArray();
             this.itemsSource = this.propertyItems;
         }
 

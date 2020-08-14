@@ -1,4 +1,4 @@
-//Released under the MIT License.
+﻿//Released under the MIT License.
 //
 //Copyright (c) 2018 Ntreev Soft co., Ltd.
 //
@@ -15,22 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-using Caliburn.Micro;
-using Ntreev.Crema.Presentation;
-using Ntreev.Crema.Designer.ViewModels;
 using Ntreev.ModernUI.Framework;
 
 namespace Ntreev.Crema.Designer
 {
-    public class AppBootstrapper : AppBootstrapper<IShell>
+    public class AppBootstrapper : AppBootstrapperBase
     {
         public AppBootstrapper()
+            : base(new AppBootstrapperDescriptor())
         {
-            FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor = System.Windows.Media.Color.FromRgb(0xd8, 0x00, 0x73);
-            FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor = System.Windows.Media.Color.FromRgb(0xa2, 0x00, 0x25);
-            Initialize();
+            
         }
     }
 }

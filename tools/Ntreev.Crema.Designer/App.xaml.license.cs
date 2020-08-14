@@ -15,8 +15,6 @@ namespace Ntreev.Crema.Designer
     {
         static void RegisterLicense()
         {
-            Xceed.Wpf.DataGrid.Licenser.LicenseKey = "DGP579UKDUB7A1J3B5A";
-            Xceed.Wpf.Toolkit.Licenser.LicenseKey = "WTK34-D145B-UKKTY-0UUA";
         }
     }
 }

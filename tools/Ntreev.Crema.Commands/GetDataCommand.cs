@@ -49,19 +49,19 @@ namespace Ntreev.Crema.Commands
 
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string Address
         {
             get; set;
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string Filename
         {
             get; set;
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         [DefaultValue("bin")]
         public string OutputType
         {
@@ -108,11 +108,6 @@ namespace Ntreev.Crema.Commands
             var serializer = this.serializers.FirstOrDefault(item => item.Name == this.OutputType);
             serializer.Serialize(this.Filename, metaData);
             this.Out.WriteLine("data serialized.");
-        }
-
-        private TextWriter Out
-        {
-            get { return this.commandContext.Value.Out; }
         }
     }
 }

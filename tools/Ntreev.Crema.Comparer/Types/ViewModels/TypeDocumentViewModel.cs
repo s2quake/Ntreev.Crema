@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Comparer.Types.ViewModels
         {
             this.viewModel = viewModel;
             this.undoService.Changed += UndoService_Changed;
-            this.resolveCommand = new DelegateCommand((p) => this.Resolve(), (p) => this.CanResolve);
+            this.resolveCommand = new DelegateCommand(async (p) => await this.ResolveAsync(), (p) => this.CanResolve);
             this.DisplayName = viewModel.DisplayName;
         }
 
@@ -47,7 +47,7 @@ namespace Ntreev.Crema.Comparer.Types.ViewModels
             return this.viewModel.ToString();
         }
 
-        public void Resolve()
+        public async Task ResolveAsync()
         {
             try
             {
@@ -56,7 +56,7 @@ namespace Ntreev.Crema.Comparer.Types.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 

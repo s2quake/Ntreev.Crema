@@ -84,9 +84,9 @@ namespace Ntreev.Crema.Designer
             base.OnPreviewKeyDown(e);
         }
 
-        private void Open_Execute(object sender, ExecutedRoutedEventArgs e)
+        private async void Open_Execute(object sender, ExecutedRoutedEventArgs e)
         {
-            this.shell.Open();
+            await this.shell.OpenAsync();
         }
 
         private void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -94,9 +94,9 @@ namespace Ntreev.Crema.Designer
             e.CanExecute = this.shell.CanOpen;
         }
 
-        private void Save_Execute(object sender, ExecutedRoutedEventArgs e)
+        private async void Save_Execute(object sender, ExecutedRoutedEventArgs e)
         {
-            this.shell.Save();
+            await this.shell.SaveAsync();
         }
 
         private void Save_CanExecute(object sender, CanExecuteRoutedEventArgs e)

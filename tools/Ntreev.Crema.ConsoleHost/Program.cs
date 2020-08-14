@@ -32,7 +32,6 @@ namespace Ntreev.Crema.ConsoleHost
             var commandContext = Container.Get<CommandContext>();
             try
             {
-                commandContext.VerifyName = false;
                 commandContext.Execute(Environment.CommandLine);
             }
             catch (AggregateException e)

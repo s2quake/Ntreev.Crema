@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Designer.Tables.ViewModels
@@ -55,7 +56,7 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
             this.Initialize();
         }
 
-        public void Change()
+        public async Task ChangeAsync()
         {
             try
             {
@@ -63,12 +64,12 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
                 this.template = null;
                 this.isModified = false;
                 this.EndProgress();
-                this.TryClose(true);
+                await this.TryCloseAsync(true);
             }
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e.Message);
+                await AppMessageBox.ShowErrorAsync(e.Message);
             }
         }
 
@@ -172,18 +173,17 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
             }
         }
 
-        public override void CanClose(Action<bool> callback)
+        public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken)
         {
             if (this.template == null || this.IsModified == false)
             {
-                callback(true);
-                return;
+                return true;
             }
 
-            var result = AppMessageBox.ConfirmSaveOnClosing();
+            var result = await AppMessageBox.ConfirmSaveOnClosingAsync();
 
             if (result == null)
-                return;
+                return false;
 
             if (this.template != null && result == true)
             {
@@ -201,28 +201,20 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
                 }
                 catch (Exception e)
                 {
-                    AppMessageBox.ShowError(e);
+                    await AppMessageBox.ShowErrorAsync(e);
                     this.EndProgress();
-                    return;
+                    return false;
                 }
             }
 
-            this.DialogResult = result.Value;
-            callback(true);
-        }
-
-        protected override void OnProgress()
-        {
-            base.OnProgress();
-            this.NotifyOfPropertyChange(nameof(this.CanChange));
+            return true;
         }
 
         protected abstract void Verify(Action<bool> isValid);
 
-        protected override void OnDeactivate(bool close)
+        protected override async Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
-            base.OnDeactivate(close);
-
+            await base.OnDeactivateAsync(close, cancellationToken);
             //await this.dataBase.Dispatcher.InvokeAsync(() =>
             //{
             //    this.dataBase.Unloaded -= DataBase_Unloaded;

@@ -28,8 +28,8 @@ namespace Ntreev.Crema.Comparer.Types.ViewModels
     class TypePropertyViewModel : PropertyServiceBase 
     {
         [ImportingConstructor]
-        public TypePropertyViewModel([ImportMany]IEnumerable<IPropertyItem> propertyItems)
-            : base(propertyItems)
+        public TypePropertyViewModel(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
 
         }

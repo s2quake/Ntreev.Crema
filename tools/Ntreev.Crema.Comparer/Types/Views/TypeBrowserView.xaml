@@ -39,10 +39,10 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <nmfc:ExpandableToolBar>
+        <nmfc:ModernToolBar>
             <nmfc:IconToggleButton Source="/Images/state.png" />
             <nmfc:IconToggleButton Source="/Images/state.png" />
-        </nmfc:ExpandableToolBar>
+        </nmfc:ModernToolBar>
         <nmfc:FilterBox Grid.Row="1" Text="{Binding FilterExpression, Delay=300, Mode=TwoWay}" 
                         CaseSensitive="{Binding CaseSensitive, Delay=300, Mode=TwoWay}" 
                         GlobPattern="{Binding GlobPattern, Delay=300, Mode=TwoWay}" />

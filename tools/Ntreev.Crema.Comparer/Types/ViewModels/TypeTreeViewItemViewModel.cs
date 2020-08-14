@@ -46,7 +46,7 @@ namespace Ntreev.Crema.Comparer.Types.ViewModels
             this.diffType.PropertyChanged += DiffType_PropertyChanged;
             this.diffType.SourceItem1.PropertyChanged += DataType1_PropertyChanged;
             this.diffType.SourceItem2.PropertyChanged += DataType2_PropertyChanged;
-            this.viewCommand = new DelegateCommand(this.View);
+            this.viewCommand = new DelegateCommand(async () => await this.ViewAsync());
             this.Target = diffType;
         }
 
@@ -55,9 +55,9 @@ namespace Ntreev.Crema.Comparer.Types.ViewModels
             return this.DisplayName;
         }
 
-        public void View()
+        public async Task ViewAsync()
         {
-            this.documentService.View(this);
+            await this.documentService.ViewAsync(this);
         }
 
         public override string DisplayName

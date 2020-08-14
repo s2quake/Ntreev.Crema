@@ -31,30 +31,79 @@ namespace Ntreev.Crema.RuntimeService
     [Export(typeof(IRuntimeService))]
     class RuntimeService : IRuntimeService
     {
-        public async Task<ResultBase<GenerationSet>> GetCodeGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
+        public async Task<GenerationSet> GetCodeGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
         {
-
-            throw new NotImplementedException();
+            var serviceContext = RuntimeServiceContext.Create(address);
+            var token = Guid.Empty;
+            try
+            {
+                token = await serviceContext.OpenAsync();
+                return await serviceContext.GetCodeGenerationDataAsync(dataBaseName, tags, filterExpression, revision);
+            }
+            finally
+            {
+                await serviceContext.CloseAsync(token);
+            }
         }
 
-        public async Task<ResultBase<SerializationSet>> GetDataGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
+        public async Task<SerializationSet> GetDataGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
         {
-            throw new NotImplementedException();
+            var serviceContext = RuntimeServiceContext.Create(address);
+            var token = Guid.Empty;
+            try
+            {
+                token = await serviceContext.OpenAsync();
+                return await serviceContext.GetDataGenerationDataAsync(dataBaseName, tags, filterExpression, revision);
+            }
+            finally
+            {
+                await serviceContext.CloseAsync(token);
+            }
         }
 
-        public async Task<ResultBase<GenerationSet, SerializationSet>> GetMetaDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
+        public async Task<(GenerationSet, SerializationSet)> GetMetaDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
         {
-            throw new NotImplementedException();
+            var serviceContext = RuntimeServiceContext.Create(address);
+            var token = Guid.Empty;
+            try
+            {
+                token = await serviceContext.OpenAsync();
+                return await serviceContext.GetMetaDataAsync(dataBaseName, tags, filterExpression, revision);
+            }
+            finally
+            {
+                await serviceContext.CloseAsync(token);
+            }
         }
 
-        public async Task<ResultBase> ResetDataAsync(string dataBaseName)
+        public async Task ResetDataAsync(string address, string dataBaseName)
         {
-            throw new NotImplementedException();
+            var serviceContext = RuntimeServiceContext.Create(address);
+            var token = Guid.Empty;
+            try
+            {
+                token = await serviceContext.OpenAsync();
+                await serviceContext.ResetDataAsync(dataBaseName);
+            }
+            finally
+            {
+                await serviceContext.CloseAsync(token);
+            }
         }
 
-        public async Task<ResultBase<string>> GetRevisionAsync(string dataBaseName)
+        public async Task<string> GetRevisionAsync(string address, string dataBaseName)
         {
-            throw new NotImplementedException();
+            var serviceContext = RuntimeServiceContext.Create(address);
+            var token = Guid.Empty;
+            try
+            {
+                token = await serviceContext.OpenAsync();
+                return await serviceContext.GetRevisionAsync(dataBaseName);
+            }
+            finally
+            {
+                await serviceContext.CloseAsync(token);
+            }
         }
     }
 }

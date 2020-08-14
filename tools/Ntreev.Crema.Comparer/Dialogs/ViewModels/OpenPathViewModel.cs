@@ -67,21 +67,21 @@ namespace Ntreev.Crema.Comparer.Dialogs.ViewModels
             }
         }
 
-        public void EditFilterExpression()
+        public async Task EditFilterExpressionAsync()
         {
             var dialog = new EditFilterExpressionViewModel()
             {
                 FilterExpression = this.FilterExpression,
             };
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 this.FilterExpression = dialog.FilterExpression;
             }
         }
 
-        public void Open()
+        public async Task OpenAsync()
         {
-            this.TryClose(true);
+            await this.TryCloseAsync(true);
         }
 
         [ConfigurationProperty]

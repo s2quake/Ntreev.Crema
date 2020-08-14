@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Designer.Types.ViewModels
@@ -56,7 +57,7 @@ namespace Ntreev.Crema.Designer.Types.ViewModels
             this.DisplayName = Resources.Title_EditTypeTemplate;
         }
 
-        public void Change()
+        public async Task ChangeAsync()
         {
             try
             {
@@ -71,12 +72,12 @@ namespace Ntreev.Crema.Designer.Types.ViewModels
                 //this.template = null;
                 this.isModified = false;
                 this.EndProgress();
-                this.TryClose(true);
+                await this.TryCloseAsync(true);
             }
             catch (Exception e)
             {
                 this.EndProgress();
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
@@ -158,18 +159,17 @@ namespace Ntreev.Crema.Designer.Types.ViewModels
             }
         }
 
-        public override void CanClose(Action<bool> callback)
+        public override async Task<bool> CanCloseAsync(CancellationToken cancellationToken)
         {
             if (this.IsModified == false)
             {
-                callback(true);
-                return;
+                return true;
             }
 
-            var result = AppMessageBox.ConfirmSaveOnClosing();
+            var result = await AppMessageBox.ConfirmSaveOnClosingAsync();
 
             if (result == null)
-                return;
+                return false;
 
             //if (this.template != null && result == true)
             //{
@@ -192,14 +192,7 @@ namespace Ntreev.Crema.Designer.Types.ViewModels
             //    }
             //}
 
-            this.DialogResult = result.Value;
-            callback(true);
-        }
-
-        protected override void OnProgress()
-        {
-            base.OnProgress();
-            this.NotifyOfPropertyChange(nameof(this.CanSave));
+            return true;
         }
 
         protected abstract void Verify(Action<bool> isValid);

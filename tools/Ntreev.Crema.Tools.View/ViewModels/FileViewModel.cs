@@ -47,7 +47,7 @@ namespace Ntreev.Crema.Tools.View.ViewModels
             this.dataViewModel = dataViewModel;
         }
 
-        public async void Open(string filename)
+        public async Task OpenAsync(string filename)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace Ntreev.Crema.Tools.View.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e.Message);
+                await AppMessageBox.ShowErrorAsync(e.Message);
                 this.EndProgress();
                 this.Dispose();
                 return;

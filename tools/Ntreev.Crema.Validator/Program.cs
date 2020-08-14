@@ -35,7 +35,7 @@ namespace Ntreev.Crema.Validator
 
             try
             {
-                if (parser.Parse(Environment.CommandLine) == true)
+                if (parser.TryParse(Environment.CommandLine) == true)
                 {
                     var directoryInfo = new DirectoryInfo(settings.Path);
                     while (true)

@@ -21,9 +21,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:cal="http://www.caliburnproject.org"
              xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
@@ -48,9 +46,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
             <DataTemplate x:Key="ListBox_ItemTemplate">
                 <DataTemplate.Resources>
-                    <nmfc:ExpandableContextMenu x:Key="ListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}">
+                    <nmfc:ModernContextMenu x:Key="ListBoxItem_ContextMenu" ItemsSource="{Binding ContextMenus}">
                         <MenuItem x:Name="SelectInBrowser" Header="선택" TextElement.FontWeight="Bold" />
-                    </nmfc:ExpandableContextMenu>
+                    </nmfc:ModernContextMenu>
                 </DataTemplate.Resources>
                 <ContentControl Focusable="False" Margin="2" ContextMenu="{StaticResource ListBoxItem_ContextMenu}" ContextMenuOpening="ContentControl_ContextMenuOpening">
                     <DockPanel Background="Transparent">
@@ -59,11 +57,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                             <TextBlock x:Name="textBox" Text="{Binding DisplayName}" />
                         </StackPanel>
                     </DockPanel>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="PreviewMouseDoubleClick">
-                            <cal:ActionMessage MethodName="SelectInBrowserCommand" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
                 </ContentControl>
                 <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding DiffState}" Value="Modified">

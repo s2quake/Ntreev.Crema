@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Designer.Types.ViewModels
@@ -37,14 +38,15 @@ namespace Ntreev.Crema.Designer.Types.ViewModels
 
         }
 
-        public void OpenType(CremaDataType dataType)
+        public async Task OpenTypeAsync(CremaDataType dataType)
         {
             var targetType = dataType;
-            this.OpenType(targetType, targetType.Name, dataType.Name);
+            await this.OpenTypeAsync(targetType, targetType.Name, dataType.Name);
         }
 
-        private void OpenType(CremaDataType targetType, string targetName, string typeName)
+        private async Task OpenTypeAsync(CremaDataType targetType, string targetName, string typeName)
         {
+            var cancellation = new CancellationTokenSource();
             var document = this.Items.OfType<TypeViewerViewModel>().FirstOrDefault(item => item.Type == targetType);
             if (document == null)
             {
@@ -54,7 +56,7 @@ namespace Ntreev.Crema.Designer.Types.ViewModels
                 this.Items.Add(document);
             }
             //document.SelectedTypeName = typeName;
-            this.ActivateItem(document);
+            await this.ActivateItemAsync(document, cancellation.Token);
         }
 
         private IServiceProvider ServiceProvider => this.serviceProvider.Value;

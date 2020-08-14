@@ -67,7 +67,7 @@ namespace Ntreev.Crema.Comparer
             this.DisplayName = "Crema Compare";
         }
 
-        public async void Open(string path1, string path2, string filterExpression)
+        public async Task OpenAsync(string path1, string path2, string filterExpression)
         {
             try
             {
@@ -95,13 +95,13 @@ namespace Ntreev.Crema.Comparer
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e.Message);
+                await  AppMessageBox.ShowErrorAsync(e.Message);
                 this.EndProgress();
                 return;
             }
         }
 
-        public async void Open(CremaDataSet dataSet1, CremaDataSet dataSet2)
+        public async Task OpenAsync(CremaDataSet dataSet1, CremaDataSet dataSet2)
         {
             try
             {
@@ -114,17 +114,17 @@ namespace Ntreev.Crema.Comparer
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e.Message);
+                await AppMessageBox.ShowErrorAsync(e.Message);
                 this.EndProgress();
                 return;
             }
         }
 
-        public async void Open()
+        public async Task OpenAsync()
         {
             var dialog = new OpenPathViewModel();
             this.configs.Update(dialog);
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 if (this.dataSet != null)
                 {
@@ -135,7 +135,7 @@ namespace Ntreev.Crema.Comparer
                     this.OnUnloaded(EventArgs.Empty);
                 }
 
-                this.Open(dialog.Path1, dialog.Path2, dialog.FilterExpression);
+                await this.OpenAsync(dialog.Path1, dialog.Path2, dialog.FilterExpression);
                 this.configs.Commit(dialog);
             }
         }
@@ -299,10 +299,9 @@ namespace Ntreev.Crema.Comparer
             this.configs.Update(this);
         }
 
-        protected override void OnDeactivate(bool close)
+        protected override async Task OnDeactivateAsync(bool close, CancellationToken cancellationToken)
         {
-            base.OnDeactivate(close);
-
+            await base.OnDeactivateAsync(close, cancellationToken);
             if (close == true)
             {
                 this.configs.Commit(this);
@@ -328,13 +327,6 @@ namespace Ntreev.Crema.Comparer
         protected virtual void OnClosed(EventArgs e)
         {
             this.Closed?.Invoke(this, e);
-        }
-
-        protected override void OnProgress()
-        {
-            base.OnProgress();
-            this.NotifyOfPropertyChange(nameof(this.CanOpen));
-            this.NotifyOfPropertyChange(nameof(this.CanClose));
         }
 
         protected override void OnClose()

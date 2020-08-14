@@ -78,9 +78,9 @@ namespace Ntreev.Crema.ApplicationHost.Views
                 this.terminal.AppendLine("안녕하세요!");
                 this.terminal.AppendLine("사용 가능한 명령들:");
 
-                foreach (var item in this.commandContext.Commands)
+                foreach (var item in this.commandContext.Node.Commands)
                 {
-                    if (this.commandContext.IsCommandEnabled(item) == false)
+                    if (item.IsEnabled == false)
                         continue;
                     this.terminal.AppendLine(" - " + item.Name);
                 }

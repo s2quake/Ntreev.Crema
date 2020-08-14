@@ -27,19 +27,19 @@ namespace Ntreev.Crema.ResxGenerator
 {
     class Settings
     {
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string Address
         {
             get; set;
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string ExportName
         {
             get; set;
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string OutputPath
         {
             get; set;

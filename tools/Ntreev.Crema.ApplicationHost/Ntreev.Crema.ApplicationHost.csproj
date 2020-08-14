@@ -1,15 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <Import Project="..\..\wpf.props" />
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <AssemblyName>cremadevapp</AssemblyName>
+    <AssemblyName>cremadevApp</AssemblyName>
     <Product>Crema Dev App</Product>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <OutputPath>..\..\bin\$(Configuration)\$(TargetFramework)\cremadevApp</OutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\..\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework.csproj" />
+    <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj" />
+    <ProjectReference Include="..\Ntreev.Crema.Tools.Framework\Ntreev.Crema.Tools.Framework.csproj" />
   </ItemGroup>
 </Project>

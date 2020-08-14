@@ -1,46 +1,22 @@
-$majorVersion=4
-$minorVersion=0
-$assemblyFilePath = ".\common\Ntreev.Crema.AssemblyInfo\AssemblyInfo.cs"
-
-$assemblyPath = Join-Path (Split-Path $myInvocation.MyCommand.Definition) $assemblyFilePath -Resolve
+$majorVersion = 5
+$minorVersion = 0
 $version = "$majorVersion.$minorVersion"
 $fileVersion = "$majorVersion.$minorVersion" + "." + (Get-Date -Format yy) + (Get-Date).DayOfYear + "." + (Get-Date -Format HHmm)
+$fileName = "$PSScriptRoot\base.props"
 
-if (Test-Path $assemblyPath) {
-    $content = Get-Content $assemblyPath -Encoding UTF8
-
-    $pattern1 = "(AssemblyVersion[(]`").+(`"[)]])"
-    if ($content -match $pattern1) {
-        $content = $content -replace $pattern1, "`${1}$version`$2"
+[xml]$doc = Get-Content $fileName -Encoding UTF8
+foreach ($obj in $doc.Project.PropertyGroup) {        
+    if ($obj.Version) {
+        $obj.Version = $fileVersion
     }
-
-    $pattern2 = "(AssemblyFileVersion[(]`").+(`"[)]])"
-    if ($content -match $pattern2) {
-        $content = $content -replace $pattern2, "`${1}$fileVersion`$2"
+    if ($obj.FileVersion) {
+        $obj.FileVersion = $fileVersion
     }
-
-    $pattern3 = "(AssemblyInformationalVersion[(]`").+(`"[)]])"
-    if ($content -match $pattern3) {
-        $content = $content -replace $pattern3, "`${1}$fileVersion`$2"
-    }
-
-    $backupPath = $assemblyPath + ".bak"
-    Copy-Item $assemblyPath $backupPath
-    Set-Content $assemblyPath $content -Encoding UTF8
-
-    if ($null -eq (Get-Content $assemblyPath)) {
-        Remove-Item $assemblyPath
-        Copy-Item $backupPath $assemblyPath
-        Remove-Item $backupPath
-        throw "replace version failed: $assemblyPath"
-    }
-    else {
-        Remove-Item $backupPath
+    if ($obj.AssemblyVersion) {
+        $obj.AssemblyVersion = $version
     }
 }
-else {
-    throw "assembly path not found: $assemblyPath"
-}
+$doc.Save($fileName)
 
-Set-Content version.txt $fileVersion -NoNewline
-Write-Host $fileVersion -NoNewline
+Set-Content (Join-Path $PSScriptRoot version.txt) $fileVersion -NoNewline -Encoding UTF8
+Write-Host $fileVersion

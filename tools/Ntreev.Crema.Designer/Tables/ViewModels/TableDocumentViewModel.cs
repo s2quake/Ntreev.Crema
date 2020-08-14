@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Designer.Tables.ViewModels
@@ -37,14 +38,15 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
 
         }
 
-        public void OpenTable(CremaDataTable dataTable)
+        public async Task OpenTableAsync(CremaDataTable dataTable)
         {
             var targetTable = dataTable.Parent ?? dataTable;
-            this.OpenTable(targetTable, targetTable.Name, dataTable.Name);
+            await this.OpenTableAsync(targetTable, targetTable.Name, dataTable.Name);
         }
 
-        private void OpenTable(CremaDataTable targetTable, string targetName, string tableName)
+        private async Task OpenTableAsync(CremaDataTable targetTable, string targetName, string tableName)
         {
+            var cancellation = new CancellationTokenSource();
             var document = this.Items.OfType<TableEditorViewModel>().FirstOrDefault(item => item.Table == targetTable);
             if (document == null)
             {
@@ -54,7 +56,7 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
                 this.Items.Add(document);
             }
             document.SelectedTableName = tableName;
-            this.ActivateItem(document);
+            await this.ActivateItemAsync(document, cancellation.Token);
         }
 
         private IServiceProvider ServiceProvider => this.serviceProvider.Value;

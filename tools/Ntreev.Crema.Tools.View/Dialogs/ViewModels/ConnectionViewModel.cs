@@ -21,7 +21,6 @@ using Ntreev.ModernUI.Framework;
 using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,31 +40,30 @@ namespace Ntreev.Crema.Tools.View.Dialogs.ViewModels
             this.DisplayName = "연결 설정";
         }
 
-        public void SelectDataBase()
+        public async Task SelectDataBaseAsync()
         {
             var dialog = new DataBaseListViewModel(this.Address);
-
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 this.DataBase = dialog.SelectedItem.Value.Name;
             }
         }
 
-        public void EditFilterExpression()
+        public async Task EditFilterExpressionAsync()
         {
             var dialog = new EditFilterExpressionViewModel()
             {
                 FilterExpression = this.FilterExpression,
             };
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 this.FilterExpression = dialog.FilterExpression;
             }
         }
 
-        public void Connect()
+        public async Task ConnectAsync()
         {
-            this.TryClose(true);
+            await this.TryCloseAsync(true);
         }
 
         [ConfigurationProperty("address")]

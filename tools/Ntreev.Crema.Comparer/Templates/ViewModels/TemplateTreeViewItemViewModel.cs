@@ -48,7 +48,7 @@ namespace Ntreev.Crema.Comparer.Templates.ViewModels
             this.diffTemplate.PropertyChanged += DiffTemplate_PropertyChanged;
             this.diffTemplate.SourceItem1.PropertyChanged += Template1_PropertyChanged;
             this.diffTemplate.SourceItem2.PropertyChanged += Template2_PropertyChanged;
-            this.viewCommand = new DelegateCommand(this.View);
+            this.viewCommand = new DelegateCommand(async () => await this.ViewAsync());
             this.Target = diffTemplate;
 
             foreach (var item in this.diffTemplate.DiffTable.Childs)
@@ -62,9 +62,9 @@ namespace Ntreev.Crema.Comparer.Templates.ViewModels
             return this.DisplayName;
         }
 
-        public void View()
+        public async Task ViewAsync()
         {
-            this.documentService.View(this);
+            await this.documentService.ViewAsync(this);
         }
 
         public override string DisplayName

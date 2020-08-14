@@ -64,33 +64,33 @@ namespace Ntreev.Crema.Designer.Types.ViewModels
             this.typeInfo = dataType.TypeInfo;
             this.typeAttribute = TypeAttribute.None;
             this.typeState = TypeState.None;
-            this.renameCommand = new DelegateCommand(item => this.Rename());
-            this.deleteCommand = new DelegateCommand(item => this.Delete());
-            this.viewCommand = new DelegateCommand(item => this.ViewContent());
+            this.renameCommand = new DelegateCommand(async () => await this.RenameAsync());
+            this.deleteCommand = new DelegateCommand(async () => await this.DeleteAsync());
+            this.viewCommand = new DelegateCommand(async () => await this.ViewContentAsync());
             this.dataType.PropertyChanged += DataType_PropertyChanged;
             this.Items.CollectionChanged += Items_CollectionChanged;
         }
 
-        public void ViewContent()
+        public async Task ViewContentAsync()
         {
             var service = this.serviceProvider.GetService(typeof(TypeDocumentViewModel)) as TypeDocumentViewModel;
-            service.OpenType(this.dataType);
+            await service.OpenTypeAsync(this.dataType);
         }
 
-        public void EditTemplate()
+        public async Task EditTemplateAsync()
         {
             var dataSet = new CremaDataSet();
             var dataType = this.dataType.CopyTo(dataSet);
 
             var dialog = new EditTemplateViewModel(dataType);
             if (dialog != null)
-                dialog.ShowDialog();
+                await dialog.ShowDialogAsync();
         }
 
-        public void Delete()
+        public async Task DeleteAsync()
         {
             var dialog = new DeleteViewModel();
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             var dataSet = this.dataType.DataSet;
@@ -114,21 +114,21 @@ namespace Ntreev.Crema.Designer.Types.ViewModels
             //dialog.ShowDialog();
         }
 
-        public void Rename()
+        public async Task RenameAsync()
         {
             var dialog = new RenameTypeViewModel(this.dataType);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             this.dataType.TypeName = dialog.NewName;
         }
 
-        public void Move()
+        public async Task MoveAsync()
         {
             var dataSet = this.dataType.DataSet;
             var categoryPaths = dataSet.ExtendedProperties[CremaSchema.TypeDirectory] as string[];
             var dialog = new MoveViewModel(this.dataType.CategoryPath + this.dataType.Name, categoryPaths);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             var targetViewModel = FindCategory(dialog.TargetPath);

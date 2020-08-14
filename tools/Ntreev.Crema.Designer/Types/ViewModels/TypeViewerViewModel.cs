@@ -186,7 +186,7 @@ namespace Ntreev.Crema.Designer.Types.ViewModels
             });
         }
 
-        private void Initialize()
+        private async void Initialize()
         {
             try
             {
@@ -212,9 +212,9 @@ namespace Ntreev.Crema.Designer.Types.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e.Message);
+                await AppMessageBox.ShowErrorAsync(e.Message);
                 this.EndProgress();
-                this.TryClose();
+                await this.TryCloseAsync();
                 return;
             }
 

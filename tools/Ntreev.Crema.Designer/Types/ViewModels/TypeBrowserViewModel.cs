@@ -140,7 +140,5 @@ namespace Ntreev.Crema.Designer.Types.ViewModels
             //    this.SetSettings(savedItems);
             //}
         }
-
-        private IServiceProvider ServiceProvider => this.serviceProvider.Value;
     }
 }

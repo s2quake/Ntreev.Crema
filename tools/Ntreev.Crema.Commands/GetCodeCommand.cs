@@ -50,13 +50,13 @@ namespace Ntreev.Crema.Commands
         {
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string Address
         {
             get; set;
         }
 
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string OutputPath
         {
             get; set;
@@ -149,11 +149,6 @@ namespace Ntreev.Crema.Commands
             this.Out.WriteLine("code compiling.");
             compiler.Compile(this.OutputPath, metaData.Item1, generationSettings, CodeSettings.BuildTarget);
             this.Out.WriteLine("code compiled.");
-        }
-
-        private TextWriter Out
-        {
-            get { return this.commandContext.Value.Out; }
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Ntreev.Crema.Tools.View.ViewModels
             this.serializer = serializer;
         }
 
-        public async void Connect(string address, string dataBaseName, string tags, string filterExpression)
+        public async Task ConnectAsync(string address, string dataBaseName, string tags, string filterExpression)
         {
             this.DisplayName = "connecting...";
 
@@ -78,7 +78,7 @@ namespace Ntreev.Crema.Tools.View.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
                 this.EndProgress();
                 this.Dispose();
                 return;

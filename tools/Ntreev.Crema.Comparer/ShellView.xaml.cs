@@ -119,7 +119,7 @@ namespace Ntreev.Crema.Comparer
             base.OnDragLeave(e);
         }
 
-        protected override void OnDrop(DragEventArgs e)
+        protected override async void OnDrop(DragEventArgs e)
         {
             base.OnDrop(e);
 
@@ -128,18 +128,15 @@ namespace Ntreev.Crema.Comparer
                 var items = e.Data.GetData(DataFormats.FileDrop) as string[];
                 if (items.Length == 2)
                 {
-                    this.Dispatcher.InvokeAsync(() =>
+                    var dialog = new OpenPathViewModel()
                     {
-                        var dialog = new OpenPathViewModel()
-                        {
-                            Path1 = items[0],
-                            Path2 = items[1],
-                        };
-                        if (dialog.ShowDialog() == true)
-                        {
-                            this.shell.Open(dialog.Path1, dialog.Path2, dialog.FilterExpression);
-                        }
-                    });
+                        Path1 = items[0],
+                        Path2 = items[1],
+                    };
+                    if (await dialog.ShowDialogAsync() == true)
+                    {
+                        await this.shell.OpenAsync(dialog.Path1, dialog.Path2, dialog.FilterExpression);
+                    }
                 }
             }
         }
@@ -148,10 +145,10 @@ namespace Ntreev.Crema.Comparer
         {
             base.OnPreviewKeyDown(e);
         }
-        
-        private void Open_Execute(object sender, ExecutedRoutedEventArgs e)
+
+        private async void Open_Execute(object sender, ExecutedRoutedEventArgs e)
         {
-            this.shell.Open();
+            await this.shell.OpenAsync();
         }
 
         private void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e)

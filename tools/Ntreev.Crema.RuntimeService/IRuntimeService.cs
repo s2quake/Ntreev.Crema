@@ -32,7 +32,7 @@ namespace Ntreev.Crema.RuntimeService
 
         Task<SerializationSet> GetDataGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision);
 
-        Task<Tuple<GenerationSet, SerializationSet>> GetMetaDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision);
+        Task<(GenerationSet, SerializationSet)> GetMetaDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision);
 
         Task ResetDataAsync(string address, string dataBaseName);
 

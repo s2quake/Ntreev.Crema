@@ -40,9 +40,9 @@ namespace Ntreev.Crema.Tools.Framework.Dialogs.ViewModels
             this.address = address;
         }
 
-        public void OK()
+        public async Task OKAsync()
         {
-            this.TryClose(true);
+            await this.TryCloseAsync(true);
         }
 
         public ObservableCollection<DataBaseInfo> ItemsSource
@@ -95,12 +95,12 @@ namespace Ntreev.Crema.Tools.Framework.Dialogs.ViewModels
 
         private async void RefreshLabelList()
         {
+            var service = CremaServiceContext.Create(this.address);
+            var token = await service.OpenAsync();
             try
             {
-                var service = CremaHostServiceFactory.CreateServiceClient(this.address);
-                var result = await InvokeServiceAsync(() => service.GetDataBaseInfos());
-                var labels = result.Value;
-                service.CloseService();
+                
+                var labels = await service.GetDataBaseInfosAsync();
                 var selectedValue = this.selectedValue;
                 this.ItemsSource = new ObservableCollection<DataBaseInfo>(labels);
                 foreach (var item in labels)
@@ -113,12 +113,12 @@ namespace Ntreev.Crema.Tools.Framework.Dialogs.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e.Message);
-                this.TryClose();
+                await AppMessageBox.ShowErrorAsync(e.Message);
+                await this.TryCloseAsync();
             }
             finally
             {
-                //this.EndProgress();
+                await service.CloseAsync(token);
             }
         }
 

@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Comparer.Types.ViewModels
@@ -33,15 +34,16 @@ namespace Ntreev.Crema.Comparer.Types.ViewModels
 
         }
 
-        public void View(TypeTreeViewItemViewModel viewModel)
+        public async Task ViewAsync(TypeTreeViewItemViewModel viewModel)
         {
+            var cancellation = new CancellationTokenSource();
             var document = this.Items.OfType<TypeDocumentViewModel>().FirstOrDefault(item => item.Source == viewModel.Source);
             if (document == null)
             {
                 document = new TypeDocumentViewModel(viewModel);
                 this.Items.Add(document);
             }
-            this.ActivateItem(document);
+            await this.ActivateItemAsync(document, cancellation.Token);
         }
     }
 }

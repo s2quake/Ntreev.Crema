@@ -73,7 +73,7 @@ namespace Ntreev.Crema.Designer
             this.OnUnloaded(EventArgs.Empty);
         }
 
-        public void Open()
+        public async Task OpenAsync()
         {
             this.CanOpen = false;
             this.IsLoaded = false;
@@ -85,14 +85,14 @@ namespace Ntreev.Crema.Designer
 
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                this.Open(dialog.FileName);
+                await this.OpenAsync(dialog.FileName);
             }
 
             this.IsLoaded = true;
             this.CanOpen = true;
         }
 
-        public void Save()
+        public async Task SaveAsync()
         {
             var dialog = new CommonOpenFileDialog()
             {
@@ -101,11 +101,11 @@ namespace Ntreev.Crema.Designer
 
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                this.Save(dialog.FileName);
+                await this.SaveAsync(dialog.FileName);
             }
         }
 
-        public async void Open(string path)
+        public async Task OpenAsync(string path)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace Ntreev.Crema.Designer
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e.Message);
+                await AppMessageBox.ShowErrorAsync(e.Message);
                 this.EndProgress();
                 return;
             }
@@ -127,7 +127,7 @@ namespace Ntreev.Crema.Designer
             this.NotifyOfPropertyChange(() => this.Filename);
         }
 
-        public void Save(string path)
+        public async Task SaveAsync(string path)
         {
             DirectoryUtility.Backup(path);
             try
@@ -138,7 +138,7 @@ namespace Ntreev.Crema.Designer
             catch (Exception e)
             {
                 DirectoryUtility.Restore(path);
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
@@ -190,12 +190,12 @@ namespace Ntreev.Crema.Designer
         public string Filename
         {
             get { return this.filename; }
-            set
+            set 
             {
                 if (this.filename == value)
                     return;
 
-                this.Open(value);
+                this.OpenAsync(value);
             }
         }
 

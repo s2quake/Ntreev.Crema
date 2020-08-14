@@ -33,7 +33,6 @@ namespace Ntreev.Crema.Commands
         public CommandContext([ImportMany]IEnumerable<ICommand> commands)
             : base(commands)
         {
-            this.Name = string.Empty;
         }
     }
 }

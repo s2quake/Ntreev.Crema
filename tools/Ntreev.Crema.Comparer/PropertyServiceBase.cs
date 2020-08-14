@@ -31,7 +31,8 @@ namespace Ntreev.Crema.Comparer
         private IPropertyItem[] itemsSource;
         private object selectedObject;
 
-        protected PropertyServiceBase(IEnumerable<IPropertyItem> propertyItems)
+        protected PropertyServiceBase(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
             //this.cremaHost = cremaHost;
             //this.cremaHost.Opened += CremaHost_Opened;
@@ -39,7 +40,7 @@ namespace Ntreev.Crema.Comparer
             //this.cremaAppHost.Loaded += CremaAppHost_Loaded;
             //this.cremaAppHost.Unloaded += CremaAppHost_Unloaded;
 
-            this.propertyItems = MenuItemUtility.GetMenuItems(this, propertyItems).ToArray();
+            //this.propertyItems = ParentItemUtility.GetItems(this, serviceProvider).ToArray();
             this.itemsSource = this.propertyItems;
         }
 

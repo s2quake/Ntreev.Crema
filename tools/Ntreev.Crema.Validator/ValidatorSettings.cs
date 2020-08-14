@@ -26,7 +26,7 @@ namespace Ntreev.Crema.Validator
 {
     class ValidatorSettings
     {
-        [CommandProperty(IsRequired = true)]
+        [CommandPropertyRequired]
         public string Path
         {
             get; set;

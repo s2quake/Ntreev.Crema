@@ -65,15 +65,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{B33C05
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts", "share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.shproj", "{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.RuntimeService", "share\Ntreev.Crema.RuntimeService\Ntreev.Crema.RuntimeService.shproj", "{7E5C7310-0DA2-4F46-896B-C8E871C22E37}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Communication", "..\JSSoft.Communication\JSSoft.Communication\JSSoft.Communication.csproj", "{49672040-1A49-44DC-BABD-045AAF03ACF0}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts.RuntimeService", "share\Ntreev.Crema.ServiceHosts.RuntimeService\Ntreev.Crema.ServiceHosts.RuntimeService.shproj", "{7E5C7310-0DA2-4F46-896B-C8E871C22E37}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.projitems*{6baf8a0b-5b3e-40ea-8e96-c667df63516c}*SharedItemsImports = 13
-		share\Ntreev.Crema.RuntimeService\Ntreev.Crema.RuntimeService.projitems*{7e5c7310-0da2-4f46-896b-c8e871c22e37}*SharedItemsImports = 13
-		share\Ntreev.Crema.RuntimeService\Ntreev.Crema.RuntimeService.projitems*{bdb528b8-1482-4fcb-8caa-dadc8fad5243}*SharedItemsImports = 5
+		share\Ntreev.Crema.ServiceHosts.RuntimeService\Ntreev.Crema.ServiceHosts.RuntimeService.projitems*{7e5c7310-0da2-4f46-896b-c8e871c22e37}*SharedItemsImports = 13
+		share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.projitems*{af7fe3f1-e2cc-45cb-a848-198ddf4aec18}*SharedItemsImports = 5
+		share\Ntreev.Crema.ServiceHosts.RuntimeService\Ntreev.Crema.ServiceHosts.RuntimeService.projitems*{bdb528b8-1482-4fcb-8caa-dadc8fad5243}*SharedItemsImports = 5
 		share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.projitems*{bdb528b8-1482-4fcb-8caa-dadc8fad5243}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -210,8 +211,8 @@ Global
 		{1C55FED2-99EB-469D-9DAC-A1F7B9E7C790} = {3EE26F25-842C-4633-AF9F-34847F643EDF}
 		{99DAB5B1-1EB8-462C-8BA0-837F2A45CC52} = {3EE26F25-842C-4633-AF9F-34847F643EDF}
 		{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C} = {B33C0519-121E-4BBA-AE76-CEEEC5A40BA6}
-		{7E5C7310-0DA2-4F46-896B-C8E871C22E37} = {B33C0519-121E-4BBA-AE76-CEEEC5A40BA6}
 		{49672040-1A49-44DC-BABD-045AAF03ACF0} = {3EE26F25-842C-4633-AF9F-34847F643EDF}
+		{7E5C7310-0DA2-4F46-896B-C8E871C22E37} = {B33C0519-121E-4BBA-AE76-CEEEC5A40BA6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3D00CE57-F648-41E3-B2E2-8C9CEA453C0F}

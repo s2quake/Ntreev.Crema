@@ -101,7 +101,5 @@ namespace Ntreev.Crema.Comparer.Templates.ViewModels
         {
             this.Items.Clear();
         }
-
-        private IServiceProvider ServiceProvider => this.serviceProvider.Value;
     }
 }

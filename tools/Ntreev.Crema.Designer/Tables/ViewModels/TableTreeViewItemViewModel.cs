@@ -64,9 +64,9 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
             this.tableInfo = dataTable.TableInfo;
             this.tableAttribute = TableAttribute.None;
             this.tableState = TableState.None;
-            this.renameCommand = new DelegateCommand(item => this.Rename());
-            this.deleteCommand = new DelegateCommand(item => this.Delete());
-            this.editCommand = new DelegateCommand(item => this.EditContent());
+            this.renameCommand = new DelegateCommand(async () => await this.RenameAsync());
+            this.deleteCommand = new DelegateCommand(async () => await this.DeleteAsync());
+            this.editCommand = new DelegateCommand(async () => await this.EditContentAsync());
             this.dataTable.PropertyChanged += DataTable_PropertyChanged;
         }
 
@@ -75,13 +75,13 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
 
         }
 
-        public void EditContent()
+        public async Task EditContentAsync()
         {
             var service = this.serviceProvider.GetService(typeof(TableDocumentViewModel)) as TableDocumentViewModel;
-            service.OpenTable(this.dataTable);
+            await service.OpenTableAsync(this.dataTable);
         }
 
-        public void EditTemplate()
+        public async Task EditTemplateAsync()
         {
             //var comment = await this.LockAsync("EditTemplate");
             //if (comment == null)
@@ -92,15 +92,15 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
 
             var dialog = new EditTemplateViewModel(new CremaTemplate(dataTable));
             if (dialog != null)
-                dialog.ShowDialog();
+                await dialog.ShowDialogAsync();
 
             //await this.UnlockAsync(comment);
         }
 
-        public void Delete()
+        public async Task DeleteAsync()
         {
             var dialog = new DeleteViewModel();
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             var dataSet = this.dataTable.DataSet;
@@ -124,21 +124,21 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
             //dialog.ShowDialog();
         }
 
-        public void Rename()
+        public async Task RenameAsync()
         {
             var dialog = new RenameTableViewModel(this.dataTable);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             this.dataTable.TableName = dialog.NewName;
         }
 
-        public void Move()
+        public async Task MoveAsync()
         {
             var dataSet = this.dataTable.DataSet;
             var categoryPaths = CategoryTreeViewItemViewModel.GetAllCategoryPaths(this);
             var dialog = new MoveViewModel(this.dataTable.CategoryPath + this.dataTable.Name, categoryPaths);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             var targetViewModel = FindCategory(dialog.TargetPath);
@@ -156,7 +156,7 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
             //dialog.ShowDialog();
         }
 
-        public void AddChildTable()
+        public async Task AddChildTableAsync()
         {
             //var comment = await this.LockAsync("AddChildTable");
             //if (comment == null)
@@ -167,7 +167,7 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
             var tempalte = CremaTemplate.Create(dataTable);
             var dialog = new NewChildTableViewModel(dataTable, tempalte);
             if (dialog != null)
-                dialog.ShowDialog();
+                await dialog.ShowDialogAsync();
 
             //await this.UnlockAsync(comment);
         }

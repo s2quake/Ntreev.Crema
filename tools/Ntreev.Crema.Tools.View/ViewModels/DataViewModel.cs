@@ -50,36 +50,36 @@ namespace Ntreev.Crema.Tools.View.ViewModels
         {
             this.DisplayName = "New View...";
             this.GroupName = "View";
-            this.loadCommand = new DelegateCommand((p) => this.Load(p as string));
+            this.loadCommand = new DelegateCommand(async (p) => await this.LoadAsync(p as string));
         }
 
-        public void Load()
+        public async Task LoadAsync()
         {
             var dialog = new CommonOpenFileDialog();
             dialog.Filters.Add(new CommonFileDialogFilter("crema data", "*.dat"));
 
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                this.Load(dialog.FileName);
+                await this.LoadAsync(dialog.FileName);
             }
         }
 
-        public void Load(string filename)
+        public async Task LoadAsync(string filename)
         {
             var contentService = this.contentService.Value;
             var viewModel = new FileViewModel(this);
             contentService.Contents.Add(viewModel);
             contentService.SelectedContent = viewModel;
             viewModel.Disposed += ViewModel_Disposed;
-            viewModel.Open(filename);
+            await viewModel.OpenAsync(filename);
         }
 
-        public void Connect()
+        public async Task ConnectAsync()
         {
             var dialog = new ConnectionViewModel();
             this.configs.Update(dialog);
 
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 var contentService = this.contentService.Value;
                 var viewModel = new RemoteViewModel(this, this.service, this.serializers.First(item => item.Name == "bin"));
@@ -87,7 +87,7 @@ namespace Ntreev.Crema.Tools.View.ViewModels
                 contentService.Contents.Add(viewModel);
                 contentService.SelectedContent = viewModel;
                 viewModel.Disposed += ViewModel_Disposed;
-                viewModel.Connect(dialog.Address, dialog.DataBase, dialog.Tags, dialog.FilterExpression);
+                await viewModel.ConnectAsync(dialog.Address, dialog.DataBase, dialog.Tags, dialog.FilterExpression);
                 this.configs.Commit(dialog);
             }
         }

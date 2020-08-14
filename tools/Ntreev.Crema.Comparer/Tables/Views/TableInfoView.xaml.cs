@@ -36,7 +36,7 @@ namespace Ntreev.Crema.Comparer.Tables.Views
     /// <summary>
     /// TableInfoView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class TableInfoView : BrowserExpander
+    public partial class TableInfoView : ModernExpander
     {
         public TableInfoView()
         {

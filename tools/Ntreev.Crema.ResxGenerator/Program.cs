@@ -30,7 +30,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Resources;
-using System.Resources.Tools;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,7 +44,7 @@ namespace Ntreev.Crema.ResxGenerator
 
             try
             {
-                if (parser.Parse(Environment.CommandLine) == true)
+                if (parser.TryParse(Environment.CommandLine) == true)
                 {
                     await WriteAsync(settings);
                 }
@@ -86,10 +85,10 @@ namespace Ntreev.Crema.ResxGenerator
 
                 Write(Path.GetDirectoryName(projectPath), item, dataTable);
 
-                if (item.ResgenFileName != string.Empty)
-                {
-                    WriteDesigner(Path.GetDirectoryName(projectPath), projectInfo, item);
-                }
+                //if (item.ResgenFileName != string.Empty)
+                //{
+                //    WriteDesigner(Path.GetDirectoryName(projectPath), projectInfo, item);
+                //}
             }
 
             CremaDataTable FindDataTable(ResxInfo resxInfo)
@@ -126,32 +125,32 @@ namespace Ntreev.Crema.ResxGenerator
             Console.WriteLine(Path.Combine(outputPath, resxInfo.FileName));
         }
 
-        static void WriteDesigner(string outputPath, ProjectInfo projectInfo, ResxInfo resxInfo)
-        {
-            var resxFileName = Path.Combine(outputPath, resxInfo.FileName);
-            var designerFileName = Path.Combine(outputPath, resxInfo.ResgenFileName);
-            var ss = Ntreev.Library.StringUtility.SplitPath(Path.GetDirectoryName(resxInfo.FileName));
-            var codeNamespace = $"{projectInfo.RootNamespace}.{string.Join(".", ss)}";
-            var baseName = Path.GetFileNameWithoutExtension(resxInfo.FileName);
+        //static void WriteDesigner(string outputPath, ProjectInfo projectInfo, ResxInfo resxInfo)
+        //{
+        //    var resxFileName = Path.Combine(outputPath, resxInfo.FileName);
+        //    var designerFileName = Path.Combine(outputPath, resxInfo.ResgenFileName);
+        //    var ss = Ntreev.Library.StringUtility.SplitPath(Path.GetDirectoryName(resxInfo.FileName));
+        //    var codeNamespace = $"{projectInfo.RootNamespace}.{string.Join(".", ss)}";
+        //    var baseName = Path.GetFileNameWithoutExtension(resxInfo.FileName);
 
-            using (var sw = new StreamWriter(designerFileName))
-            {
-                var errors = null as string[];
-                var provider = new CSharpCodeProvider();
-                var code = StronglyTypedResourceBuilder.Create(resxFileName, baseName, codeNamespace, provider, resxInfo.IsPublic == false, out errors);
-                if (errors.Length > 0)
-                {
-                    foreach (var error in errors)
-                    {
-                        Console.WriteLine(error);
-                    }
-                    return;
-                }
+        //    using (var sw = new StreamWriter(designerFileName))
+        //    {
+        //        var errors = null as string[];
+        //        var provider = new CSharpCodeProvider();
+        //        var code = StronglyTypedResourceBuilder.Create(resxFileName, baseName, codeNamespace, provider, resxInfo.IsPublic == false, out errors);
+        //        if (errors.Length > 0)
+        //        {
+        //            foreach (var error in errors)
+        //            {
+        //                Console.WriteLine(error);
+        //            }
+        //            return;
+        //        }
 
-                provider.GenerateCodeFromCompileUnit(code, sw, new CodeGeneratorOptions());
-                Console.WriteLine(designerFileName);
-            }
-        }
+        //        provider.GenerateCodeFromCompileUnit(code, sw, new CodeGeneratorOptions());
+        //        Console.WriteLine(designerFileName);
+        //    }
+        //}
     }
 }
 

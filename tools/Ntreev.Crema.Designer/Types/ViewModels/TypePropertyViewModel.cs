@@ -29,8 +29,8 @@ namespace Ntreev.Crema.Designer.Types.ViewModels
     class TypePropertyViewModel : PropertyServiceBase, ITypePropertyService
     {
         [ImportingConstructor]
-        public TypePropertyViewModel([ImportMany]IEnumerable<IPropertyItem> propertyItems)
-            : base(propertyItems)
+        public TypePropertyViewModel(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
 
         }

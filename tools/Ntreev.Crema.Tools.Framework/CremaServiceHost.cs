@@ -15,37 +15,27 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.ModernUI.Framework.Controls;
+using JSSoft.Communication;
+using Ntreev.Crema.ServiceHosts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Xml;
 
-namespace Ntreev.Crema.Comparer.Templates.Views
+namespace Ntreev.Crema.Tools.Framework
 {
-    /// <summary>
-    /// TemplateColumnInfoView.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class TemplateColumnInfoView : ModernExpander
+    class CremaServiceHost : ClientServiceHostBase<ICremaHostService>
     {
-        public TemplateColumnInfoView()
-        {
-            InitializeComponent();
-        }
+        public ICremaHostService Service { get; private set; }
 
-        protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
+        protected override void OnServiceCreated(ICremaHostService service)
         {
-            base.OnPreviewMouseDown(e);
+            base.OnServiceCreated(service);
+            this.Service = service;
         }
     }
 }

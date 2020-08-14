@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ntreev.Crema.Comparer.Templates.ViewModels
@@ -33,8 +34,9 @@ namespace Ntreev.Crema.Comparer.Templates.ViewModels
 
         }
 
-        public void View(TemplateTreeViewItemViewModel viewModel)
+        public async Task ViewAsync(TemplateTreeViewItemViewModel viewModel)
         {
+            var cancellation = new CancellationTokenSource();
             var targetModel = (TemplateTreeViewItemViewModel)viewModel.Parent ?? viewModel;
             var document = this.Items.OfType<TemplateDocumentViewModel>().FirstOrDefault(item => item.Source == targetModel.Source);
             if (document == null)
@@ -43,7 +45,7 @@ namespace Ntreev.Crema.Comparer.Templates.ViewModels
                 this.Items.Add(document);
             }
             document.SelectedName = $"{viewModel}";
-            this.ActivateItem(document);
+            await this.ActivateItemAsync(document, cancellation.Token);
         }
     }
 }

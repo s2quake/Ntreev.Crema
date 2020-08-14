@@ -29,8 +29,8 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
     class TablePropertyViewModel : PropertyServiceBase, ITablePropertyService
     {
         [ImportingConstructor]
-        public TablePropertyViewModel([ImportMany]IEnumerable<IPropertyItem> propertyItems)
-            : base(propertyItems)
+        public TablePropertyViewModel(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
 
         }

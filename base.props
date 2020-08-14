@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net45</TargetFrameworks>
-    <Version>5.0.20179.0842</Version>
+    <Version>5.0.20227.2025</Version>
     <AssemblyVersion>5.0</AssemblyVersion>
-    <FileVersion>5.0.20179.0842</FileVersion>
+    <FileVersion>5.0.20227.2025</FileVersion>
     <RepositoryType>git</RepositoryType>
     <PackageLicense>https://github.com/s2quake/Crema/blob/master/LICENSE.md</PackageLicense>
     <Copyright>Copyright © JSSoft 2020</Copyright>

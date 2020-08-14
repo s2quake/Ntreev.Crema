@@ -30,7 +30,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
-using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -83,17 +82,16 @@ namespace Ntreev.Crema.Tools.Runtime.ViewModels
             }
         }
 
-        public void SelectDataBase()
+        public async Task SelectDataBaseAsync()
         {
             var dialog = new DataBaseListViewModel(this.Address);
-
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 this.DataBase = dialog.SelectedItem.Value.Name;
             }
         }
 
-        public async void Generate()
+        public async Task GenerateAsync()
         {
             try
             {
@@ -114,18 +112,18 @@ namespace Ntreev.Crema.Tools.Runtime.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
                 this.EndProgress();
             }
         }
 
-        public void EditFilterExpression()
+        public async Task EditFilterExpressionAsync()
         {
             var dialog = new EditFilterExpressionViewModel()
             {
                 FilterExpression = this.FilterExpression,
             };
-            if (dialog.ShowDialog() == true)
+            if (await dialog.ShowDialogAsync() == true)
             {
                 this.FilterExpression = dialog.FilterExpression;
             }

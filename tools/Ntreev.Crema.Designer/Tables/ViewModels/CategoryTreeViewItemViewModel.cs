@@ -58,8 +58,8 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
             this.Target = categoryPath;
             this.selector = selector;
 
-            this.renameCommand = new DelegateCommand(item => this.Rename());
-            this.deleteCommand = new DelegateCommand(item => this.Delete());
+            this.renameCommand = new DelegateCommand(async () => await this.RenameAsync());
+            this.deleteCommand = new DelegateCommand(async () => await this.DeleteAsync());
         }
 
         public static string[] GetAllCategoryPaths(TreeViewItemViewModel viewModel)
@@ -91,7 +91,7 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
             get { return 1; }
         }
 
-        public void NewTable()
+        public async Task NewTableAsync()
         {
             var dataSet = new CremaDataSet();
             foreach (var item in this.dataSet.Types)
@@ -102,7 +102,7 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
             var template = CremaTemplate.Create(dataSet, tableName, this.categoryPath);
             var dialog = new NewTableViewModel(this.dataSet, template);
 
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             var dataTable = template.DataTable.CopyTo(this.dataSet);
@@ -112,11 +112,11 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
             };
         }
 
-        public void NewFolder()
+        public async Task NewFolderAsync()
         {
             var categoryPaths = GetAllCategoryPaths(this);
             var dialog = new NewCategoryViewModel(this.categoryPath, categoryPaths);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             var categoryName = new CategoryName(this.categoryPath, dialog.CategoryName);
@@ -135,11 +135,11 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
             //service?.AddFinder(this.categoryPath);
         }
 
-        public void Rename()
+        public async Task RenameAsync()
         {
             var categoryPaths = CategoryTreeViewItemViewModel.GetAllCategoryPaths(this);
             var dialog = new RenameCategoryViewModel(this.categoryPath, categoryPaths);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             var categoryName = new CategoryName(this.categoryPath)
@@ -172,11 +172,11 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
                 this.selector.SelectedItem = this;
         }
 
-        public void Move()
+        public async Task MoveAsync()
         {
             var categoryPaths = GetAllCategoryPaths(this);
             var dialog = new MoveViewModel(this.categoryPath, categoryPaths);
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
 
             //await this.UnlockAsync(comment);
@@ -185,13 +185,13 @@ namespace Ntreev.Crema.Designer.Tables.ViewModels
             //    this.ExpandAncestors();
         }
 
-        public void Delete()
+        public async Task DeleteAsync()
         {
             var dialog = new DeleteViewModel()
             {
                 DisplayName = Resources.Title_DeleteCategory
             };
-            if (dialog.ShowDialog() != true)
+            if (await dialog.ShowDialogAsync() != true)
                 return;
         }
 

@@ -56,7 +56,7 @@ namespace Ntreev.Crema.Comparer.Tables.ViewModels
             }
         }
 
-        public void ExportToExcel()
+        public async Task ExportToExcelAsync()
         {
             var dialog = new CommonSaveFileDialog();
             dialog.Filters.Add(new CommonFileDialogFilter("excel file", "*.xlsx"));
@@ -73,7 +73,7 @@ namespace Ntreev.Crema.Comparer.Tables.ViewModels
             }
             catch (Exception e)
             {
-                AppMessageBox.ShowError(e);
+                await AppMessageBox.ShowErrorAsync(e);
             }
         }
 
@@ -153,7 +153,5 @@ namespace Ntreev.Crema.Comparer.Tables.ViewModels
             //    this.cremaHost.Dispatcher.Invoke(() => dataBase.TableContext.Import(this.authenticator, dataTable.DataSet, comment));
             //});
         }
-
-        private IServiceProvider ServiceProvider => this.serviceProvider.Value;
     }
 }
