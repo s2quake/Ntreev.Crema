@@ -108,6 +108,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F1D6B445-06B9-4981-8DBC-F72CFC35FCE3}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		base.props = base.props
+		wpf.props = wpf.props
 	EndProjectSection
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts.RuntimeService", "share\Ntreev.Crema.ServiceHosts.RuntimeService\Ntreev.Crema.ServiceHosts.RuntimeService.shproj", "{7E5C7310-0DA2-4F46-896B-C8E871C22E37}"

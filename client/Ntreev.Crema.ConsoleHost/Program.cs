@@ -23,11 +23,6 @@ namespace Ntreev.Crema.ConsoleHost
 {
     partial class Program
     {
-        static Program()
-        {
-
-        }
-
         static void Main(string[] args)
         {
             try

@@ -61,7 +61,6 @@ namespace Ntreev.Crema.Services
         [ImportingConstructor]
         public CremaHost(IServiceProvider container, [ImportMany] IEnumerable<IConfigurationPropertyProvider> propertiesProviders, CremaSettings settings)
         {
-            SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
             CremaLog.Attach(this);
             this.container = container;
             this.propertiesProviders = propertiesProviders.ToArray();
@@ -428,11 +427,6 @@ namespace Ntreev.Crema.Services
                 throw new InvalidOperationException(Resources.Exception_NotClosed);
             if (this.Dispatcher == null)
                 throw new InvalidOperationException(Resources.Exception_AlreadyDisposed);
-        }
-
-        private void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
-        {
-
         }
 
         private async void PingTimer_Faulted(object sender, EventArgs e)
