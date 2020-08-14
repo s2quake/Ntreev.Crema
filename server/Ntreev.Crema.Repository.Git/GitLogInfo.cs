@@ -177,7 +177,7 @@ namespace Ntreev.Crema.Repository.Git
             {
                 if (item.Index != index)
                 {
-                    var logItem = text[index..item.Index];
+                    var logItem = text.Substring(index, item.Index - index);
                     var logInfo = GitLogInfo.Parse(logItem);
                     itemList.Add(logInfo);
                     currentText = currentText.Substring(logItem.Length);

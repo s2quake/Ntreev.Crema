@@ -32,9 +32,8 @@ namespace Ntreev.Crema.ApplicationHost.Commands.Consoles
     public class ConsoleCommandContext : ConsoleCommandContextBase
     {
         private readonly ICremaHost cremaHost;
+        private readonly CremaService service;
         private Authentication authentication;
-        [Import]
-        private readonly CremaService service = null;
 
         static ConsoleCommandContext()
         {
@@ -42,13 +41,14 @@ namespace Ntreev.Crema.ApplicationHost.Commands.Consoles
         }
 
         [ImportingConstructor]
-        public ConsoleCommandContext(ICremaHost cremaHost,
+        public ConsoleCommandContext(ICremaHost cremaHost, CremaService service,
             [ImportMany] IEnumerable<IConsoleDrive> rootItems,
             [ImportMany] IEnumerable<IConsoleCommand> commands)
             : base(rootItems, commands)
         {
             this.cremaHost = cremaHost;
             this.cremaHost.Opened += (s, e) => this.BaseDirectory = this.cremaHost.GetPath(CremaPath.Documents);
+            this.service = service;
         }
 
         public async Task LoginAsync(string userID, SecureString password)

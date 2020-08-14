@@ -20,3 +20,6 @@ dotnet_style_qualification_for_property = false:none
 
 # IDE0059: 불필요한 값 할당
 csharp_style_unused_value_assignment_preference = unused_local_variable:suggestion
+
+# IDE0056: 인덱스 연산자 사용
+csharp_style_prefer_index_operator = true:silent

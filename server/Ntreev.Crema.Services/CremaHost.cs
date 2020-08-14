@@ -45,19 +45,17 @@ namespace Ntreev.Crema.Services
         private readonly CremaSettings settings;
         private readonly IRepositoryProvider[] repositoryProviders;
         private readonly IObjectSerializer[] serializers;
-        //private string databasesPath;
-        //private string usersPath;
+        private readonly IEnumerable<Lazy<IConfigurationPropertyProvider>> propertiesProviders;
         private LogService log;
         private Guid token;
         private ShutdownTimer shutdownTimer;
 
-        [ImportMany]
-        private readonly IEnumerable<IConfigurationPropertyProvider> propertiesProviders = null;
 
         [ImportingConstructor]
         public CremaHost(IServiceProvider container, CremaSettings settings,
             [ImportMany] IEnumerable<IRepositoryProvider> repositoryProviders,
-            [ImportMany] IEnumerable<IObjectSerializer> serializers)
+            [ImportMany] IEnumerable<IObjectSerializer> serializers,
+            [ImportMany] IEnumerable<Lazy<IConfigurationPropertyProvider>> propertiesProviders)
         {
             CremaLog.Attach(this);
             CremaLog.Debug("crema instance created.");
@@ -65,6 +63,7 @@ namespace Ntreev.Crema.Services
             this.settings = settings;
             this.repositoryProviders = repositoryProviders.ToArray();
             this.serializers = serializers.ToArray();
+            this.propertiesProviders = propertiesProviders;
             CremaLog.Debug("crema log service initialized.");
             CremaLog.Debug($"available tags : {string.Join(", ", TagInfoUtility.Names)}");
             this.Dispatcher = new CremaDispatcher(this);
@@ -138,7 +137,7 @@ namespace Ntreev.Crema.Services
                     this.Info(Resources.Message_ProgramInfo, AppUtility.ProductName, AppUtility.ProductVersion);
                     this.Info("Repository module : {0}", this.settings.RepositoryModule);
                     this.Info(Resources.Message_ServiceStart);
-                    this.configs = new RepositoryConfiguration(Path.Combine(this.BasePath, "configs"), this.propertiesProviders);
+                    this.configs = new RepositoryConfiguration(Path.Combine(this.BasePath, "configs"), this.propertiesProviders.Select(item => item.Value));
                     this.UserContext = new UserContext(this);
                     this.DataBaseContext = new DataBaseContext(this);
                     this.DomainContext = new DomainContext(this);

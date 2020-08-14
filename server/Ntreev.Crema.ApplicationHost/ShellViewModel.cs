@@ -67,7 +67,7 @@ namespace Ntreev.Crema.ApplicationHost
                 Catch = async (e) =>
                 {
                     this.ServiceState = ServiceState.None;
-                    await Task.FromException(e);
+                    await Task.FromResult(e);
                 }
             }.RunAsync();
         }
@@ -85,7 +85,7 @@ namespace Ntreev.Crema.ApplicationHost
                 Catch = async (e) =>
                 {
                     this.ServiceState = ServiceState.Open;
-                    await Task.FromException(e);
+                    await Task.FromResult(e);
                 }
             }.RunAsync();
         }

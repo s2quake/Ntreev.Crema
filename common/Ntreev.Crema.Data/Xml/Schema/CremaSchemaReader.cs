@@ -942,7 +942,7 @@ namespace Ntreev.Crema.Data.Xml.Schema
         {
             var xPath = key.Selector.XPath;
             var strArray = xPath.Split(new char[] { '/', ':' });
-            var name = strArray[^1];
+            var name = strArray[strArray.Length - 1];
             if ((name == null) || (name.Length == 0))
             {
                 throw new CremaDataException();

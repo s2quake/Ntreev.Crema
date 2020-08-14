@@ -28,15 +28,15 @@ namespace Ntreev.Crema.RuntimeService.Consoles
     [Export(typeof(IConsoleCommand))]
     class RuntimeCommand : ConsoleCommandMethodBase
     {
-        [Import]
-        private readonly Lazy<RuntimeService> runtimeService = null;
-        [Import]
-        private readonly Lazy<ICremaHost> cremaHost = null;
+        private readonly ICremaHost cremaHost;
+        private readonly RuntimeService runtimeService;
 
-        public RuntimeCommand()
+        [ImportingConstructor]
+        public RuntimeCommand(ICremaHost cremaHost, RuntimeService runtimeService)
             : base("rt")
         {
-
+            this.cremaHost = cremaHost;
+            this.runtimeService = runtimeService;
         }
 
         [CommandMethod]
@@ -50,7 +50,7 @@ namespace Ntreev.Crema.RuntimeService.Consoles
                 return dataBase.ID;
             });
 
-            var serviceItem = this.RuntimeService.GetServiceItem(dataBaseID);
+            var serviceItem = this.runtimeService.GetServiceItem(dataBaseID);
             await serviceItem.ResetAsync();
         }
 
@@ -66,17 +66,13 @@ namespace Ntreev.Crema.RuntimeService.Consoles
                 return dataBase.ID;
             });
 
-            var serviceItem = this.RuntimeService.GetServiceItem(dataBaseID);
+            var serviceItem = this.runtimeService.GetServiceItem(dataBaseID);
             var info = serviceItem.Dispatcher.Invoke(() => serviceItem.DataServiceItemInfo);
             this.CommandContext.WriteObject(info.ToDictionary(), FormatProperties.Format);
         }
 
-        public override bool IsEnabled => this.CremaHost.ServiceState == ServiceState.Open;
+        public override bool IsEnabled => this.cremaHost.ServiceState == ServiceState.Open;
 
-        private RuntimeService RuntimeService => this.runtimeService.Value;
-
-        private ICremaHost CremaHost => this.cremaHost.Value;
-
-        private IDataBaseContext DataBases => this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+        private IDataBaseContext DataBases => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }
 }
