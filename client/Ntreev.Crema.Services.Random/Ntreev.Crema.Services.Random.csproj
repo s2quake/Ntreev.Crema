@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\base.props" />
+  <Import Project="..\..\common\Ntreev.Crema.Services.Random.Sharing\Ntreev.Crema.Services.Random.Sharing.projitems" Label="Shared" />
   <ItemGroup>
     <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library.Random\Ntreev.Library.Random.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Services.Extentions\Ntreev.Crema.Services.Extentions.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj" />
   </ItemGroup>
-  <Import Project="..\..\common\Ntreev.Crema.Services.Random.Sharing\Ntreev.Crema.Services.Random.Sharing.projitems" Label="Shared" />
 </Project>

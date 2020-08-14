@@ -33,8 +33,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Repository.Svn
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Runtime.Serialization", "common\Ntreev.Crema.Runtime.Serialization\Ntreev.Crema.Runtime.Serialization.csproj", "{279D3BBF-10A3-449F-AA73-545BC0B7BAAF}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.AssemblyInfo", "common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.shproj", "{AD0EBA0C-D167-4722-A2A7-82B17E1FC9AA}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{416293F6-EC8E-479F-9E38-55A1E79EE7E3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Runtime.Generation", "common\Ntreev.Crema.Runtime.Generation\Ntreev.Crema.Runtime.Generation.csproj", "{79AEF7D1-93D1-4EEB-B09C-1595C82E7492}"
@@ -112,6 +110,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.RuntimeService.Sharing", "common\Ntreev.Crema.RuntimeService.Sharing\Ntreev.Crema.RuntimeService.Sharing.shproj", "{7E5C7310-0DA2-4F46-896B-C8E871C22E37}"
+EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts.Sharing", "common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.shproj", "{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C}"
 EndProject
 Global
@@ -125,12 +125,13 @@ Global
 		common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.projitems*{24ecbee1-2859-4f09-969b-f382e6341814}*SharedItemsImports = 13
 		common\Ntreev.Crema.Bot.Sharing\Ntreev.Crema.Bot.Sharing.projitems*{35ad4803-bec1-4f3e-98ab-5c7961f2c261}*SharedItemsImports = 13
 		common\Ntreev.Crema.Commands.Sharing\Ntreev.Crema.Commands.Sharing.projitems*{3d3128aa-908d-44c4-9efd-0e1a903f5287}*SharedItemsImports = 13
+		common\Ntreev.Crema.RuntimeService.Sharing\Ntreev.Crema.RuntimeService.Sharing.projitems*{3d7847d1-7706-4a64-8846-d8aa3639471c}*SharedItemsImports = 5
+		common\Ntreev.Crema.Commands.Spreadsheet.Sharing\Ntreev.Crema.Commands.Spreadsheet.Sharing.projitems*{490f7e03-79f6-461c-9d90-80f24ace659a}*SharedItemsImports = 5
 		common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.projitems*{6baf8a0b-5b3e-40ea-8e96-c667df63516c}*SharedItemsImports = 13
+		common\Ntreev.Crema.RuntimeService.Sharing\Ntreev.Crema.RuntimeService.Sharing.projitems*{7e5c7310-0da2-4f46-896b-c8e871c22e37}*SharedItemsImports = 13
 		common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems*{97ad6c00-3b71-4e83-97c3-0201bc035471}*SharedItemsImports = 13
 		common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.projitems*{9ed00a26-bf13-4b1f-af6e-3009c666ae15}*SharedItemsImports = 5
 		common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.projitems*{a4955825-195f-4677-9695-5fc67362a449}*SharedItemsImports = 13
-		common\Ntreev.Crema.ServiceHosts.Sharing\Ntreev.Crema.ServiceHosts.Sharing.projitems*{a7bf94f7-94a5-46ba-a756-c04bde65f47b}*SharedItemsImports = 5
-		common\Ntreev.Crema.AssemblyInfo\Ntreev.Crema.AssemblyInfo.projitems*{ad0eba0c-d167-4722-a2a7-82b17e1fc9aa}*SharedItemsImports = 13
 		common\Ntreev.Crema.Services.Sharing\Ntreev.Crema.Services.Sharing.projitems*{b7b4c207-7729-4147-96c4-b55e85647a66}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -263,7 +264,6 @@ Global
 		{6478450A-DFA5-445D-890F-BC5F57C9A148} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
 		{E0F76B09-4FE3-4A58-B16D-D136441DC1AE} = {C23811F0-895C-4355-ACAE-A36FD3F9E974}
 		{279D3BBF-10A3-449F-AA73-545BC0B7BAAF} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
-		{AD0EBA0C-D167-4722-A2A7-82B17E1FC9AA} = {F24B626E-02A8-431A-9319-C71D978C7328}
 		{79AEF7D1-93D1-4EEB-B09C-1595C82E7492} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
 		{1F4A20AE-F955-4231-8636-27B7A38EB4B3} = {F24B626E-02A8-431A-9319-C71D978C7328}
 		{83F1180F-F170-48CF-BE1E-CA60D6851800} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
@@ -292,6 +292,7 @@ Global
 		{0261747B-0A44-4FB0-8E27-2CE4BAF2153B} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
 		{20C3D3DD-DE99-4126-9449-BCA12E4D255D} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
 		{4A8417DD-9882-4FC1-B471-06905354545D} = {48F9CF3D-2F99-48CF-BB02-CD91C21EF237}
+		{7E5C7310-0DA2-4F46-896B-C8E871C22E37} = {F24B626E-02A8-431A-9319-C71D978C7328}
 		{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C} = {F24B626E-02A8-431A-9319-C71D978C7328}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

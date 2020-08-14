@@ -20,7 +20,7 @@ using Ntreev.Crema.Services;
 
 namespace Ntreev.Crema.RuntimeService
 {
-    class RuntimeServiceHost : ServerServiceHostBase<IRuntimeServiceInternal>
+    class RuntimeServiceHost : ServerServiceHostBase<IRuntimeService>
     {
         private readonly RuntimeService service;
 
@@ -29,7 +29,7 @@ namespace Ntreev.Crema.RuntimeService
             this.service = service;
         }
 
-        protected override IRuntimeServiceInternal CreateService()
+        protected override IRuntimeService CreateService()
         {
             return this.service;
         }

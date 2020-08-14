@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\base.props" />
+  <Import Project="..\..\common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.projitems" Label="Shared" />
   <ItemGroup>
     <PackageReference Include="Jint" Version="2.11.58" />
   </ItemGroup>
@@ -8,5 +9,4 @@
     <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj" />
   </ItemGroup>
-  <Import Project="..\..\common\Ntreev.Crema.Javascript.Sharing\Ntreev.Crema.Javascript.Sharing.projitems" Label="Shared" />
 </Project>

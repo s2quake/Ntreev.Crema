@@ -2,7 +2,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\base.props" />
   <PropertyGroup>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>cremaconsole</AssemblyName>
+    <Product>Crema Console</Product>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <OutputPath>..\..\bin\$(Configuration)\$(TargetFramework)\cremaconsole</OutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
   </PropertyGroup>

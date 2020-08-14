@@ -1,8 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\base.props" />
+  <Import Project="..\..\common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems" Label="Shared" />
   <ItemGroup>
     <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj" />
   </ItemGroup>
-  <Import Project="..\..\common\Ntreev.Crema.Services.Extensions.Sharing\Ntreev.Crema.Services.Extensions.Sharing.projitems" Label="Shared" />
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
 </Project>

@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\base.props" />
+  <Import Project="..\..\common\Ntreev.Crema.Commands.Spreadsheet.Sharing\Ntreev.Crema.Commands.Spreadsheet.Sharing.projitems" Label="Shared" />
   <ItemGroup>
     <ProjectReference Include="..\..\common\Ntreev.Crema.Spreadsheet\Ntreev.Crema.Spreadsheet.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj" />
   </ItemGroup>
-  <Import Project="..\..\common\Ntreev.Crema.Commands.Spreadsheet.Sharing\Ntreev.Crema.Commands.Spreadsheet.Sharing.projitems" Label="Shared" />
 </Project>

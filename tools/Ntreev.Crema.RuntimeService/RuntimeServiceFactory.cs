@@ -15,15 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.RuntimeService.CremaHostService;
-using Ntreev.Crema.RuntimeService.ServiceClient;
 using Ntreev.Crema.ServiceModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
-using System.ServiceModel.Channels;
-using System.ServiceModel.Description;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -31,7 +27,7 @@ using System.Xml;
 
 namespace Ntreev.Crema.RuntimeService
 {
-    class RuntimeServiceFactory : ICremaHostServiceCallback
+    class RuntimeServiceFactory : ICremaHostEventCallback
     {
         private static readonly RuntimeServiceFactory empty = new RuntimeServiceFactory();
 
@@ -77,19 +73,6 @@ namespace Ntreev.Crema.RuntimeService
             var result = await Task.Run(func);
             result.Validate();
             return result;
-        }
-
-        private static Binding CreateBinding(TimeSpan timeSpan)
-        {
-            var binding = new NetTcpBinding();
-            binding.Security.Mode = SecurityMode.None;
-            binding.ReceiveTimeout = TimeSpan.MaxValue;
-            binding.MaxBufferPoolSize = long.MaxValue;
-            binding.MaxBufferSize = int.MaxValue;
-            binding.MaxReceivedMessageSize = int.MaxValue;
-            binding.ReaderQuotas = XmlDictionaryReaderQuotas.Max;
-
-            return binding;
         }
 
         #region ICremaHostServiceCallback

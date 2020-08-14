@@ -31,99 +31,30 @@ namespace Ntreev.Crema.RuntimeService
     [Export(typeof(IRuntimeService))]
     class RuntimeService : IRuntimeService
     {
-        public async Task<GenerationSet> GetCodeGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
+        public async Task<ResultBase<GenerationSet>> GetCodeGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
         {
-            var service = await RuntimeServiceFactory.CreateServiceClientAsync(address);
-            service.Open();
-            try
-            {
-                var result = await this.InvokeServiceAsync(() => service.GetCodeGenerationData(dataBaseName, tags, filterExpression, revision));
-                return result.Value;
-            }
-            finally
-            {
-                service.CloseService();
-            }
+
+            throw new NotImplementedException();
         }
 
-        public async Task<SerializationSet> GetDataGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
+        public async Task<ResultBase<SerializationSet>> GetDataGenerationDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
         {
-            var service = await RuntimeServiceFactory.CreateServiceClientAsync(address);
-            service.Open();
-            try
-            {
-                var result = await this.InvokeServiceAsync(() => service.GetDataGenerationData(dataBaseName, tags, filterExpression, revision));
-                return result.Value;
-            }
-            finally
-            {
-                service.CloseService();
-            }
+            throw new NotImplementedException();
         }
 
-        public async Task<Tuple<GenerationSet, SerializationSet>> GetMetaDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
+        public async Task<ResultBase<GenerationSet, SerializationSet>> GetMetaDataAsync(string address, string dataBaseName, string tags, string filterExpression, string revision)
         {
-            var service = await RuntimeServiceFactory.CreateServiceClientAsync(address);
-            service.Open();
-            try
-            {
-                var result = await this.InvokeServiceAsync(() => service.GetMetaData(dataBaseName, tags, filterExpression, revision));
-                return new Tuple<GenerationSet, SerializationSet>(result.Value1, result.Value2);
-            }
-            finally
-            {
-                service.CloseService();
-            }
+            throw new NotImplementedException();
         }
 
-        public async Task ResetDataAsync(string address, string dataBaseName)
+        public async Task<ResultBase> ResetDataAsync(string dataBaseName)
         {
-            var service = await RuntimeServiceFactory.CreateServiceClientAsync(address);
-            service.Open();
-            try
-            {
-                await this.InvokeServiceAsync(() => service.ResetData(dataBaseName));
-            }
-            finally
-            {
-                service.CloseService();
-            }
+            throw new NotImplementedException();
         }
 
-        public async Task<string> GetRevisionAsync(string address, string dataBaseName)
+        public async Task<ResultBase<string>> GetRevisionAsync(string dataBaseName)
         {
-            var service = await RuntimeServiceFactory.CreateServiceClientAsync(address);
-            service.Open();
-            try
-            {
-                var result = await this.InvokeServiceAsync(() => service.GetRevision(dataBaseName));
-                return result.Value;
-            }
-            finally
-            {
-                service.CloseService();
-            }
-        }
-
-        public async Task<ResultBase<TResult>> InvokeServiceAsync<TResult>(Func<ResultBase<TResult>> func)
-        {
-            var result = await Task.Run(func);
-            result.Validate();
-            return result;
-        }
-
-        public async Task<ResultBase<T1, T2>> InvokeServiceAsync<T1, T2>(Func<ResultBase<T1, T2>> func)
-        {
-            var result = await Task.Run(func);
-            result.Validate();
-            return result;
-        }
-
-        public async Task<ResultBase> InvokeServiceAsync(Func<ResultBase> func)
-        {
-            var result = await Task.Run(func);
-            result.Validate();
-            return result;
+            throw new NotImplementedException();
         }
     }
 }

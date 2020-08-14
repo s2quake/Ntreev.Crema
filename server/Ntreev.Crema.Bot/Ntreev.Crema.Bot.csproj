@@ -1,34 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net45</TargetFrameworks>
-    <Version>5.0.20179.0842</Version>
-    <AssemblyVersion>5.0</AssemblyVersion>
-    <FileVersion>5.0.20179.0842</FileVersion>
-    <RepositoryType>git</RepositoryType>
-    <PackageLicense>https://github.com/s2quake/Crema/blob/master/LICENSE.md</PackageLicense>
-    <Copyright>Copyright © JSSoft 2020</Copyright>
-    <Authors>s2quake</Authors>
-    <RepositoryUrl>https://github.com/s2quake/Crema</RepositoryUrl>
-    <PackageTags>Crema</PackageTags>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
+  <Import Project="..\..\base.props" />
+  <Import Project="..\..\common\Ntreev.Crema.Bot.Sharing\Ntreev.Crema.Bot.Sharing.projitems" Label="Shared" />
   <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
@@ -41,5 +16,4 @@
     <ProjectReference Include="..\Ntreev.Crema.Services.Random\Ntreev.Crema.Services.Random.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj" />
   </ItemGroup>
-  <Import Project="..\..\common\Ntreev.Crema.Bot.Sharing\Ntreev.Crema.Bot.Sharing.projitems" Label="Shared" />
 </Project>
