@@ -2,9 +2,9 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net45</TargetFrameworks>
-    <Version>5.0.20227.2025</Version>
+    <Version>5.0.0-$(TargetFramework)-unversioned</Version>
     <AssemblyVersion>5.0</AssemblyVersion>
-    <FileVersion>5.0.20227.2025</FileVersion>
+    <FileVersion>5.0.0</FileVersion>
     <RepositoryType>git</RepositoryType>
     <PackageLicense>https://github.com/s2quake/Crema/blob/master/LICENSE.md</PackageLicense>
     <Copyright>Copyright © JSSoft 2020</Copyright>
@@ -13,30 +13,4 @@
     <PackageTags>Crema</PackageTags>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Properties\Settings.Designer.cs">
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
 </Project>

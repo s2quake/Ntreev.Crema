@@ -31,3 +31,5 @@ TestResults/
 /*.htm
 /build
 .DS_Store
+.vs/
+.vscode/
