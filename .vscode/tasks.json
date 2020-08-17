@@ -4,12 +4,42 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
-            "command": "dotnet build server.sln",
+            "label": "build client",
+            "command": "dotnet build client.sln --framework netcoreapp3.1",
             "type": "shell",
             "group": "build",
             "presentation": {
-                "reveal": "silent"
+                "reveal": "always"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build server",
+            "command": "dotnet build server.sln --framework netcoreapp3.1",
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build all",
+            "command": "dotnet build crema.sln --framework netcoreapp3.1",
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "clean",
+            "command": "dotnet clean",
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "reveal": "always"
             },
             "problemMatcher": "$msCompile"
         }
