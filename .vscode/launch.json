@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (client)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build client",
+            "program": "${workspaceFolder}/bin/Debug/netcoreapp3.1/crema/crema.dll",
+            "cwd": "${workspaceFolder}/bin/Debug/netcoreapp3.1/crema",
+            "stopAtEntry": false,
+            "console": "externalTerminal"
+        },
+        {
+            "name": ".NET Core Launch (server)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build server",
+            "program": "${workspaceFolder}/bin/Debug/netcoreapp3.1/cremaserverApp/cremaserverApp.dll",
+            "cwd": "${workspaceFolder}/bin/Debug/netcoreapp3.1/cremaserverApp",
+            "console": "externalTerminal",
+            "stopAtEntry": false
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        }
+    ]
+}
