@@ -51,10 +51,7 @@ namespace Ntreev.Crema.Services
 
         private LogService log;
         private Guid token;
-#pragma warning disable CS0169 // CremaHost.host' 필드가 사용되지 않았습니다.
         private readonly CremaHostServiceHost host;
-#pragma warning restore CS0169 // CremaHost.host' 필드가 사용되지 않았습니다.
-        //private PingTimer pingTimer;
         private readonly ClientContext clientContext;
         private Guid serviceToken;
 
@@ -70,8 +67,8 @@ namespace Ntreev.Crema.Services
             CremaLog.Debug("Crema created.");
 
             this.DataBaseContext = new DataBaseContext(this);
-            this.DomainContext = new DomainContext(this);
             this.UserContext = new UserContext(this);
+            this.DomainContext = new DomainContext(this);
 
             this.hosts = new List<ServiceHostBase>()
             {
@@ -152,9 +149,6 @@ namespace Ntreev.Crema.Services
                     {
                         Verbose = this.settings.Verbose
                     };
-                    //this.UserContext = new UserContext(this);
-                    //this.DataBaseContext = new DataBaseContext(this);
-                    //this.DomainContext = new DomainContext(this);
                 });
                 await this.UserContext.InitializeAsync(userID, this.AuthenticationToken);
                 await this.DataBaseContext.InitializeAsync(this.AuthenticationToken);

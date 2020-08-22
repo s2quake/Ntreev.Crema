@@ -55,7 +55,6 @@ namespace Ntreev.Crema.Services.Data
         public DataBaseContext(CremaHost cremaHost)
         {
             this.CremaHost = cremaHost;
-            this.UserContext = cremaHost.UserContext;
             this.Dispatcher = new CremaDispatcher(this);
             this.taskEvent = new TaskResetEvent<Guid>(this.Dispatcher);
             this.callbackEvent = new IndexedDispatcher(this);
@@ -444,9 +443,9 @@ namespace Ntreev.Crema.Services.Data
 
         public CremaHost CremaHost { get; }
 
-        public UserContext UserContext { get; }
-
         public IDataBaseContextService Service { get; set; }
+
+        public UserContext UserContext => this.CremaHost.UserContext;
 
         public new int Count => base.Count;
 

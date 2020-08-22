@@ -32,5 +32,10 @@ namespace Ntreev.Crema.ServiceHosts
         {
             return new CremaHostService(this.service, callback);
         }
+
+        protected override void DestroyService(ICremaHostService service)
+        {
+            base.DestroyService(service);
+        }
     }
 }

@@ -38,7 +38,7 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
     [Export(typeof(ICremaAppHost)), PartCreationPolicy(CreationPolicy.Shared)]
     [Export]
     [Export(typeof(IContentService))]
-    class CremaAppHostViewModel : ViewModelBase, ICremaAppHost, IPartImportsSatisfiedNotification, IContentService
+    class CremaAppHostViewModel : ViewModelBase, ICremaAppHost, IContentService
     {
         private readonly ICremaHost cremaHost;
         private readonly IAppConfiguration configs;
@@ -678,11 +678,11 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
             this.isOpened = true;
             this.Authority = this.cremaHost.Authority;
             this.cremaHost.Closed += CremaHost_Closed;
-            await this.Dispatcher.InvokeAsync((System.Action)(() =>
+            await this.Dispatcher.InvokeAsync(() =>
             {
                 this.configs.Commit(this);
                 this.Refresh();
-            }));
+            });
         }
 
         private async void DataBase_Unloaded(object sender, EventArgs e)
@@ -844,18 +844,6 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
         }
 
         private IShell Shell => this.shell.Value;
-
-        #region IPartImportsSatisfiedNotification
-
-        async void IPartImportsSatisfiedNotification.OnImportsSatisfied()
-        {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-
-            });
-        }
-
-        #endregion
 
         #region IServiceProvider
 

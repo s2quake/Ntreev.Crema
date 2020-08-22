@@ -23,10 +23,21 @@ using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Tables.BrowserItems.Views
 {
-    public partial class TableBrowserView : System.Windows.Controls.UserControl, IDisposable
+    public partial class TableBrowserView : UserControl, IDisposable
     {
-        [Import]
-        private readonly IPropertyService propertyService = null;
+        private readonly IPropertyService propertyService;
+
+        public TableBrowserView()
+        {
+            this.InitializeComponent();
+        }
+
+        [ImportingConstructor]
+        public TableBrowserView(IPropertyService propertyService)
+        {
+            this.propertyService = propertyService;
+            this.InitializeComponent();
+        }
 
         public void Dispose()
         {
@@ -83,11 +94,6 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.Views
                     }
                     break;
             }
-        }
-
-        private void UserControl_Initialized(object sender, EventArgs e)
-        {
-
         }
     }
 }

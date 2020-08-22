@@ -8,14 +8,12 @@
   </ItemGroup>
   <ItemGroup>
     <Page Remove="Controls\ColorPicker.xaml" />
-    <Page Remove="Controls\DataLocationPicker.xaml" />
     <Page Remove="Controls\DataTableControl.xaml" />
     <Page Remove="Controls\TagSelector.xaml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Controls\ColorPicker.xaml" />
     <None Include="Controls\ColorPicker.xaml.cs" />
-    <None Include="Controls\DataLocationPicker.xaml" />
     <None Include="Controls\DataTableControl.xaml" />
     <None Include="Controls\DataTableControl.xaml.cs" />
     <None Include="Controls\TagSelector.xaml" />

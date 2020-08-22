@@ -30,7 +30,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              d:DesignHeight="694" d:DesignWidth="1022">
 
     <UserControl.Resources>
-      
 
         <Style x:Key="ErrorMessage_ErrorBlinker_Style" TargetType="{x:Type nmfc:ErrorBlinker}"  BasedOn="{StaticResource {x:Type nmfc:ErrorBlinker}}">
             <Setter Property="ErrorContent" Value="{Binding ErrorMessage}" />

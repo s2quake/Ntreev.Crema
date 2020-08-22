@@ -313,7 +313,6 @@ namespace Ntreev.Crema.Services.Data
                     var taskID = await this.Dispatcher.InvokeAsync(() =>
                     {
                         var metaData = result.Value;
-                        //this.pingTimer = new PingTimer(this.service.IsAlive, this.CremaHost.ServiceInfo.Timeout);
                         this.CremaHost.Sign(authentication, result);
                         this.TypeContext = new TypeContext(this, metaData);
                         this.TableContext = new TableContext(this, metaData);

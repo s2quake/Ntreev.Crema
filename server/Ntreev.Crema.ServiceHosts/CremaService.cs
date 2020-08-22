@@ -74,7 +74,7 @@ namespace Ntreev.Crema.ServiceHosts
                 this.hostProviders = (this.GetService(typeof(IEnumerable<IServiceHostProvider>)) as IEnumerable<IServiceHostProvider>).TopologicalSort().ToArray();
                 this.serviceInfo.Port = this.Port;
                 this.serviceInfo.Timeout = this.Timeout;
-                this.serviceInfo.Version = $"{new Version(FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).ProductVersion)}";
+                this.serviceInfo.Version = FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).ProductVersion;
                 this.serviceInfo.PlatformID = $"{Environment.OSVersion.Platform}";
                 this.serviceInfo.Culture = $"{CultureInfo.CurrentCulture}";
                 this.serviceInfo.ServiceItems = this.hostProviders.Select(item => new ServiceItemInfo() { Name = item.Name }).ToArray();
