@@ -25,7 +25,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                   xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
                   xmlns:ctrl="clr-namespace:Ntreev.Crema.ApplicationHost.Controls"
                   mc:Ignorable="d" Style="{StaticResource ModernWindow_Style}"
-                  ResizeMode="CanMinimize" Height="500" Width="500" Loaded="ModernWindow_Loaded"
+                  ResizeMode="CanMinimize" Height="500" Width="500" Activated="ModernWindow_Activated"
                   LogoData="F1M12.267,9.942C12.793,9.908,13.324,9.93,13.864,10.037L15.516,10.641 15.337,11.892C14.941,14.66 14.625,16.875 14.625,16.875 14.625,16.875 3.375,16.875 3.375,16.875 3.375,16.875 3.059,14.66 2.663,11.892L2.484,10.641 4.259,11.214C7.136,11.705,9.637,10.114,12.267,9.942z M1.125,1.125C1.125,1.125 16.875,1.125 16.875,1.125 16.875,1.125 16.312,5.062 15.75,9 15.867,8.18 15.984,7.359 15.984,7.359 11.484,4.922 6.891,9.891 2.016,7.359 2.016,7.359 2.133,8.18 2.25,9 1.688,5.062 1.125,1.125 1.125,1.125z">
 
     <mui:ModernWindow.Resources>
@@ -51,9 +51,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <RowDefinition Height="10"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TabControl Style="{StaticResource TabControl_Style}">
+        <TabControl x:Name="TabControl" Style="{StaticResource TabControl_Style}" BorderThickness="0 1 0 1">
             <TabItem Header="Log">
-                <TextBox x:Name="LogBox" ScrollViewer.VerticalScrollBarVisibility="Visible" 
+                <TextBox x:Name="LogBox" ScrollViewer.VerticalScrollBarVisibility="Visible" BorderThickness="0"
                          PreviewTextInput="LogBox_PreviewTextInput" PreviewKeyDown="LogBox_PreviewKeyDown" />
             </TabItem>
             <TabItem Header="Console">

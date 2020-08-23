@@ -31,7 +31,6 @@ namespace Ntreev.Crema.ApplicationHost
         {
             themes.Add("dark", new Uri("/Ntreev.ModernUI.Framework;component/Assets/ModernUI.Dark.xaml", UriKind.Relative));
             themes.Add("light", new Uri("/Ntreev.ModernUI.Framework;component/Assets/ModernUI.Light.xaml", UriKind.Relative));
-            //FirstFloor.ModernUI.Presentation.AppearanceManager.Current.AccentColor = value;
         }
 
         public AppBootstrapper()
@@ -72,7 +71,5 @@ namespace Ntreev.Crema.ApplicationHost
         public AppSettings Settings => this.Descriptor.Settings;
 
         protected new AppBootstrapperDescriptor Descriptor => base.Descriptor as AppBootstrapperDescriptor;
-
-        //protected override bool AutoInitialize => false;
     }
 }

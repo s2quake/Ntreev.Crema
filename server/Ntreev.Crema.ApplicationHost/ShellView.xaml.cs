@@ -151,19 +151,30 @@ namespace Ntreev.Crema.ApplicationHost
             });
         }
 
-        private void OpenService_Click(object sender, RoutedEventArgs e)
+        private async void OpenService_Click(object sender, RoutedEventArgs e)
         {
-            this.LogBox.Focus();
+            await this.SetFocusAsync();
         }
 
-        private void CloseService_Click(object sender, RoutedEventArgs e)
+        private async void CloseService_Click(object sender, RoutedEventArgs e)
         {
-            this.LogBox.Focus();
+            await this.SetFocusAsync();
         }
 
-        private void ModernWindow_Loaded(object sender, RoutedEventArgs e)
+        private async void ModernWindow_Activated(object sender, EventArgs e)
         {
-            this.LogBox.Focus();
+            await this.SetFocusAsync();
+        }
+
+        private async Task SetFocusAsync()
+        {
+            await this.Dispatcher.InvokeAsync(() =>
+            {
+                if (this.TabControl.SelectedContent is UIElement element && element.Focusable == true)
+                {
+                    element.Focus();
+                }
+            });
         }
     }
 }
