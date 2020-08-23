@@ -29,18 +29,27 @@ namespace Ntreev.Crema.Presentation.Home.Services.Views
     /// <summary>
     /// DataBaseSelectionView.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class DataBaseListView : UserControl, IPartImportsSatisfiedNotification
+    [Export]
+    public partial class DataBaseListView : UserControl
     {
-        [Import]
-        private readonly ICremaAppHost cremaAppHost = null;
-        [Import]
-        private readonly IAppConfiguration configs = null;
-        [Import]
-        private readonly IPropertyService propertyService = null;
+        private readonly ICremaAppHost cremaAppHost;
+        private readonly IAppConfiguration configs;
+        private readonly IPropertyService propertyService;
 
         public DataBaseListView()
         {
             InitializeComponent();
+        }
+
+        [ImportingConstructor]
+        public DataBaseListView(ICremaAppHost cremaAppHost, IAppConfiguration configs, IPropertyService propertyService)
+        {
+            this.cremaAppHost = cremaAppHost;
+            this.cremaAppHost.Opened += CremaAppHost_Opened;
+            this.cremaAppHost.Closed += CremaAppHost_Closed;
+            this.configs = configs;
+            this.propertyService = propertyService;
+            this.InitializeComponent();
         }
 
         protected override void OnIsKeyboardFocusWithinChanged(DependencyPropertyChangedEventArgs e)
@@ -73,18 +82,5 @@ namespace Ntreev.Crema.Presentation.Home.Services.Views
         {
             this.configs.Commit(this);
         }
-
-        #region IPartImportsSatisfiedNotification
-
-        async void IPartImportsSatisfiedNotification.OnImportsSatisfied()
-        {
-            await this.Dispatcher.InvokeAsync(() =>
-            {
-                this.cremaAppHost.Opened += CremaAppHost_Opened;
-                this.cremaAppHost.Closed += CremaAppHost_Closed;
-            });
-        }
-
-        #endregion
     }
 }

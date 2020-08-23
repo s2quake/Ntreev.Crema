@@ -30,10 +30,16 @@ namespace Ntreev.Crema.Presentation.Home
     {
         private readonly IAppConfiguration configs;
 
+        public DataBaseServiceView()
+        {
+            this.InitializeComponent();
+        }
+
+        [ImportingConstructor]
         public DataBaseServiceView(IAppConfiguration configs)
         {
-            InitializeComponent();
             this.configs = configs;
+            this.InitializeComponent();
         }
 
         private void Expander_Loaded(object sender, RoutedEventArgs e)

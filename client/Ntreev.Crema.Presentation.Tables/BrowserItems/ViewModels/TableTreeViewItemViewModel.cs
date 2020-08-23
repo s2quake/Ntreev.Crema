@@ -25,10 +25,6 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
 {
     public class TableTreeViewItemViewModel : TableTreeItemBase
     {
-        private readonly ICommand renameCommand;
-        private readonly ICommand deleteCommand;
-        private readonly ICommand editCommand;
-
         public TableTreeViewItemViewModel(Authentication authentication, ITable table)
             : this(authentication, table, null)
         {
@@ -50,9 +46,9 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
         public TableTreeViewItemViewModel(Authentication authentication, TableDescriptor descriptor, object owner)
             : base(authentication, descriptor, owner)
         {
-            this.renameCommand = new DelegateCommand(async item => await this.RenameAsync(), item => this.CanRename);
-            this.deleteCommand = new DelegateCommand(async item => await this.DeleteAsync(), item => this.CanDelete);
-            this.editCommand = new DelegateCommand(async item =>
+            this.RenameCommand = new DelegateCommand(async item => await this.RenameAsync(), item => this.CanRename);
+            this.DeleteCommand = new DelegateCommand(async item => await this.DeleteAsync(), item => this.CanDelete);
+            this.EditCommand = new DelegateCommand(async item =>
             {
                 if (this.CanEditContent == true)
                     await this.EditContentAsync();
@@ -173,11 +169,11 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
         [DescriptorProperty]
         public bool CanDelete => TableUtility.CanDelete(this.authentication, this.descriptor);
 
-        public ICommand RenameCommand => this.renameCommand;
+        public ICommand RenameCommand { get; }
 
-        public ICommand DeleteCommand => this.deleteCommand;
+        public ICommand DeleteCommand { get; }
 
-        public ICommand EditCommand => this.editCommand;
+        public ICommand EditCommand { get; }
 
         public override string DisplayName
         {

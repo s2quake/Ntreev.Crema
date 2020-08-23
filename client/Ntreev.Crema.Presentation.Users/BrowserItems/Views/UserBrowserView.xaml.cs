@@ -23,15 +23,22 @@ using System.Windows.Controls;
 
 namespace Ntreev.Crema.Presentation.Users.BrowserItems.Views
 {
+    [Export]
     partial class UserBrowserView : UserControl
     {
-        [ImportMany]
-        private readonly IEnumerable<IPropertyService> propertyServices = null;
-        [Import]
-        private readonly IShell shell = null;
+        private readonly IEnumerable<IPropertyService> propertyServices;
+        private readonly IShell shell;
 
         public UserBrowserView()
         {
+            InitializeComponent();
+        }
+
+        [ImportingConstructor]
+        public UserBrowserView(IShell shell, [ImportMany] IEnumerable<IPropertyService> propertyServices)
+        {
+            this.shell = shell;
+            this.propertyServices = propertyServices;
             InitializeComponent();
         }
 

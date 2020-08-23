@@ -46,7 +46,7 @@ namespace Ntreev.Crema.ApplicationHost
         public ShellView(ICremaHost cremaHost, ConsoleCommandContext commandContext)
         {
             InitializeComponent();
-            this.writer = new LogTextWriter() { TextBox = this.logBox };
+            this.writer = new LogTextWriter() { TextBox = this.LogBox };
             this.cremaHost = cremaHost;
             this.cremaHost.Opening += CremaHost_Opening;
             this.cremaHost.Opened += CremaHost_Opened;
@@ -55,7 +55,6 @@ namespace Ntreev.Crema.ApplicationHost
             this.commandContext.Out = new ConsoleWriter(this.terminal);
             this.terminal.CommandContext = this.commandContext;
             this.SetPrompt();
-            this.Dispatcher.InvokeAsync(() => this.logBox.Focus());
             CremaLog.AddRedirection(this.writer, LogVerbose.Info);
         }
 
@@ -131,15 +130,14 @@ namespace Ntreev.Crema.ApplicationHost
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.SetPrompt();
-
                 this.terminal.AppendLine(Properties.Resources.Comment_Hello);
                 this.terminal.AppendLine(Properties.Resources.Comment_AvaliableCommands);
-                //foreach (var item in this.commandContext.Commands)
-                //{
-                //    if (this.commandContext.IsCommandEnabled(item) == false)
-                //        continue;
-                //    this.terminal.AppendLine(" - " + item.Name);
-                //}
+                foreach (var item in this.commandContext.Node.Commands)
+                {
+                    if (item.IsEnabled == false)
+                        continue;
+                    this.terminal.AppendLine(" - " + item.Name);
+                }
                 this.terminal.AppendLine(Properties.Resources.Comment_TypeHelp + Environment.NewLine);
                 this.terminal.AppendLine(Properties.Resources.Comment_TypeVersion);
             });
@@ -155,12 +153,17 @@ namespace Ntreev.Crema.ApplicationHost
 
         private void OpenService_Click(object sender, RoutedEventArgs e)
         {
-            this.logBox.Focus();
+            this.LogBox.Focus();
         }
 
         private void CloseService_Click(object sender, RoutedEventArgs e)
         {
-            this.logBox.Focus();
+            this.LogBox.Focus();
+        }
+
+        private void ModernWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.LogBox.Focus();
         }
     }
 }

@@ -23,6 +23,7 @@ using System.Windows.Input;
 
 namespace Ntreev.Crema.Presentation.Tables.BrowserItems.Views
 {
+    [Export]
     public partial class TableBrowserView : UserControl, IDisposable
     {
         private readonly IPropertyService propertyService;

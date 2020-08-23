@@ -30,23 +30,23 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Ntreev.Crema.Presentation.Types;component/Assets/TreeView.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Style TargetType="{x:Type nmfc:IconButton}" BasedOn="{StaticResource ToolBar_IconButton_Style}" />
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <nmfc:ModernToolBar ItemsSource="{Binding ToolBarItems}">
+        <nmfc:ModernToolBar ItemsSource="{Binding ToolBarMenus}">
             <nmfc:IconButton x:Name="CollapseAll" Source="/Ntreev.Crema.Presentation.Framework;component/Images/collapse_all.png" />
         </nmfc:ModernToolBar>
         <nmfc:FilterBox x:Name="FilterBox" Grid.Row="1" Text="{Binding FilterExpression, Delay=300, Mode=TwoWay}" 
-                        CaseSensitive="{Binding CaseSensitive, Mode=TwoWay}" GlobPattern="{Binding GlobPattern, Mode=TwoWay}" />
-        <ncfc:BrowserTreeView x:Name="treeView" Grid.Row="2" ItemsSource="{Binding Items}" VerticalAlignment="Stretch"
-                              nmfc:TreeViewUtility.SelectedItemBindingPath="SelectedItem" >
+                        CaseSensitive="{Binding CaseSensitive, Mode=TwoWay}" 
+                        GlobPattern="{Binding GlobPattern, Mode=TwoWay}" />
+        <ncfc:BrowserTreeView x:Name="treeView" Grid.Row="2" nmfc:TreeViewUtility.SelectedItemBindingPath="SelectedItem"
+                              ItemsSource="{Binding Items}">
             <ncfc:BrowserTreeView.InputBindings>
                 <KeyBinding Key="Delete" Command="{Binding DeleteCommand}" CommandParameter="{Binding SelectedItem, ElementName=treeView}" />
                 <KeyBinding Key="F2" Command="{Binding RenameCommand}" CommandParameter="{Binding SelectedItem, ElementName=treeView}" />

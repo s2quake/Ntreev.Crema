@@ -25,7 +25,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                   xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
                   xmlns:ctrl="clr-namespace:Ntreev.Crema.ApplicationHost.Controls"
                   mc:Ignorable="d" Style="{StaticResource ModernWindow_Style}"
-                  ResizeMode="CanMinimize" Height="500" Width="500"
+                  ResizeMode="CanMinimize" Height="500" Width="500" Loaded="ModernWindow_Loaded"
                   LogoData="F1M12.267,9.942C12.793,9.908,13.324,9.93,13.864,10.037L15.516,10.641 15.337,11.892C14.941,14.66 14.625,16.875 14.625,16.875 14.625,16.875 3.375,16.875 3.375,16.875 3.375,16.875 3.059,14.66 2.663,11.892L2.484,10.641 4.259,11.214C7.136,11.705,9.637,10.114,12.267,9.942z M1.125,1.125C1.125,1.125 16.875,1.125 16.875,1.125 16.875,1.125 16.312,5.062 15.75,9 15.867,8.18 15.984,7.359 15.984,7.359 11.484,4.922 6.891,9.891 2.016,7.359 2.016,7.359 2.133,8.18 2.25,9 1.688,5.062 1.125,1.125 1.125,1.125z">
 
     <mui:ModernWindow.Resources>
@@ -39,10 +39,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="TabControl_Style" TargetType="{x:Type TabControl}" BasedOn="{StaticResource TabControl_Page_Style}">
+        <Style x:Key="TabControl_Style" TargetType="{x:Type TabControl}" BasedOn="{StaticResource TabControl_Page_Style}" />
 
-        </Style>
-        
     </mui:ModernWindow.Resources>
     
     <Grid Margin="0 10">
@@ -55,7 +53,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         </Grid.RowDefinitions>
         <TabControl Style="{StaticResource TabControl_Style}">
             <TabItem Header="Log">
-                <TextBox x:Name="logBox" ScrollViewer.VerticalScrollBarVisibility="Visible" 
+                <TextBox x:Name="LogBox" ScrollViewer.VerticalScrollBarVisibility="Visible" 
                          PreviewTextInput="LogBox_PreviewTextInput" PreviewKeyDown="LogBox_PreviewKeyDown" />
             </TabItem>
             <TabItem Header="Console">
@@ -77,13 +75,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <Button Grid.Column="4" x:Name="SelectBasePath" Content="..." ToolTip="저장소 경로를 선택합니다." Width="50" />
             <nmfc:IconButton Grid.Column="6" x:Name="CreateRepository" Source="/cremaserverApp;component/Images/add.png" ToolTip="새로운 저장소를 생성합니다." Width="50" />
         </Grid>
-
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="5">
             <Button x:Name="OpenService" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Start" Click="OpenService_Click" />
             <Border Width="20" />
             <Button x:Name="CloseService" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Stop" Click="CloseService_Click" />
         </StackPanel>
-
     </Grid>
 
 </mui:ModernWindow>

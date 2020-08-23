@@ -40,10 +40,9 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
         private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
         private readonly IPropertyService propertyService;
-        private bool isVisible = true;
-
         private readonly DelegateCommand renameCommand;
         private readonly DelegateCommand deleteCommand;
+        private bool isVisible = true;
 
         [ImportingConstructor]
         public TableBrowserViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost, IPropertyService propertyService)
@@ -176,13 +175,10 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
         {
             if (parameter is TableRootTreeViewItemViewModel)
                 return false;
-
             if (parameter is TableTreeViewItemViewModel tableViewModel)
                 return tableViewModel.DeleteCommand.CanExecute(parameter);
-
             if (parameter is TableCategoryTreeViewItemViewModel categoryViewModel)
                 return categoryViewModel.DeleteCommand.CanExecute(parameter);
-
             return false;
         }
 
@@ -202,10 +198,8 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
         {
             if (parameter is TableRootTreeViewItemViewModel)
                 return false;
-
             if (parameter is TableTreeViewItemViewModel tableViewModel)
                 return tableViewModel.RenameCommand.CanExecute(parameter);
-
             if (parameter is TableCategoryTreeViewItemViewModel categoryViewModel)
                 return categoryViewModel.RenameCommand.CanExecute(parameter);
 
@@ -222,7 +216,6 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
                 });
                 this.Items.Add(viewModel);
             };
-
             this.cremaAppHost.UserConfigs.Update(this);
         }
 

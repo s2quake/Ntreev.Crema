@@ -26,18 +26,14 @@ namespace Ntreev.Crema.Presentation.Framework
 {
     public class TableCategoryDescriptor : DescriptorBase, ITableCategoryDescriptor, ITableItemDescriptor, ILockableDescriptor, IPermissionDescriptor, IAccessibleDescriptor
     {
-        private ITableCategory category;
         private readonly object owner;
         private readonly ObservableCollection<TableCategoryDescriptor> categories = new ObservableCollection<TableCategoryDescriptor>();
-        private readonly ReadOnlyObservableCollection<TableCategoryDescriptor> categoriesReadonly;
         private readonly ObservableCollection<TableDescriptor> tables = new ObservableCollection<TableDescriptor>();
-        private readonly ReadOnlyObservableCollection<TableDescriptor> tablesReadonly;
-
+        private ITableCategory category;
         private string categoryName;
         private string categoryPath;
         private AccessInfo accessInfo = AccessInfo.Empty;
         private LockInfo lockInfo = LockInfo.Empty;
-        private AccessType accessType;
 
         public TableCategoryDescriptor(Authentication authentication, ITableCategory category, DescriptorTypes descriptorTypes, object owner)
            : base(authentication, category, descriptorTypes)
@@ -49,10 +45,10 @@ namespace Ntreev.Crema.Presentation.Framework
             this.categoryPath = category.Path;
             this.accessInfo = category.AccessInfo;
             this.lockInfo = category.LockInfo;
-            this.accessType = category.GetAccessType(authentication);
+            this.AccessType = category.GetAccessType(authentication);
 
-            this.tablesReadonly = new ReadOnlyObservableCollection<TableDescriptor>(this.tables);
-            this.categoriesReadonly = new ReadOnlyObservableCollection<TableCategoryDescriptor>(this.categories);
+            this.Tables = new ReadOnlyObservableCollection<TableDescriptor>(this.tables);
+            this.Categories = new ReadOnlyObservableCollection<TableCategoryDescriptor>(this.categories);
 
             if (this.descriptorTypes.HasFlag(DescriptorTypes.IsSubscriptable) == true)
             {
@@ -89,9 +85,9 @@ namespace Ntreev.Crema.Presentation.Framework
             }
         }
 
-        public ReadOnlyObservableCollection<TableCategoryDescriptor> Categories => this.categoriesReadonly;
+        public ReadOnlyObservableCollection<TableCategoryDescriptor> Categories { get; private set; }
 
-        public ReadOnlyObservableCollection<TableDescriptor> Tables => this.tablesReadonly;
+        public ReadOnlyObservableCollection<TableDescriptor> Tables { get; private set; }
 
         [DescriptorProperty(nameof(categoryName))]
         public string Name => this.categoryName ?? string.Empty;
@@ -108,8 +104,8 @@ namespace Ntreev.Crema.Presentation.Framework
         [DescriptorProperty(nameof(accessInfo))]
         public AccessInfo AccessInfo => this.accessInfo;
 
-        [DescriptorProperty(nameof(accessType))]
-        public AccessType AccessType => this.accessType;
+        [DescriptorProperty]
+        public AccessType AccessType { get; private set; }
 
         [DescriptorProperty]
         public bool IsLocked => LockableDescriptorUtility.IsLocked(this.authentication, this);
@@ -186,14 +182,14 @@ namespace Ntreev.Crema.Presentation.Framework
         private async void Category_AccessChanged(object sender, EventArgs e)
         {
             this.accessInfo = this.category.AccessInfo;
-            this.accessType = this.category.GetAccessType(this.authentication);
+            this.AccessType = this.category.GetAccessType(this.authentication);
             await this.RefreshAsync();
         }
 
         private async void Category_LockChanged(object sender, EventArgs e)
         {
             this.lockInfo = this.category.LockInfo;
-            this.accessType = this.category.GetAccessType(this.authentication);
+            this.AccessType = this.category.GetAccessType(this.authentication);
             await this.RefreshAsync();
         }
 

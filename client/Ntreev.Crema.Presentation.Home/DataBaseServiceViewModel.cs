@@ -24,7 +24,6 @@ using System.ComponentModel.Composition;
 
 namespace Ntreev.Crema.Presentation.Home
 {
-    //[Export(typeof(IContentService))]
     [Export(typeof(DataBaseServiceViewModel))]
     class DataBaseServiceViewModel : ScreenBase
     {

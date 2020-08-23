@@ -26,8 +26,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:nmfm="clr-namespace:Ntreev.ModernUI.Framework.Markup;assembly=Ntreev.ModernUI.Framework"
              xmlns:view="clr-namespace:Ntreev.Crema.Presentation.Home.Services.Views"
              xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Home.Properties"
-             mc:Ignorable="d"  Loaded="UserControl_Loaded"
-             d:DesignHeight="694" d:DesignWidth="1022">
+             mc:Ignorable="d" d:DesignHeight="694" d:DesignWidth="1022">
 
     <UserControl.Resources>
 
@@ -57,7 +56,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <view:LeftPaneView Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" />
+            <view:LeftPaneView Grid.Column="0" DataContext="{Binding}" />
 
             <Grid Grid.Column="1" x:Name="content" Style="{StaticResource ContentGrid_Style}">
                 <Grid.RowDefinitions>
@@ -92,8 +91,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <Button Content="{x:Static p:Resources.Label_AddConnectionItem}" cal:Message.Attach="AddConnectionItem" />
             </Grid>
         </Grid>
-        <view:DataBaseListView Visibility="{nmfm:VisibilityBinding IsOpened}" d:IsHidden="True" />
-        <!--<nmfc:ProgressContent Visibility="{nmfm:VisibilityBinding IsProgressing}" Message="{Binding ProgressMessage}" d:IsHidden="True" />-->
+        <ContentControl x:Name="DataBaseService" Visibility="{nmfm:VisibilityBinding IsOpened}" />
     </Grid>
     
 </UserControl>

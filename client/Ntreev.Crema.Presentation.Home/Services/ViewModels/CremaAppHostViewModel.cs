@@ -487,8 +487,6 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
             }
         }
 
-        public IEnumerable<IDataBaseDescriptor> DataBases => this.dataBaseSelections.Value.Items;
-
         public bool CanLogin
         {
             get
@@ -890,6 +888,8 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
                 }
             }
         }
+
+        IEnumerable<IDataBaseDescriptor> ICremaAppHost.DataBases => this.dataBaseSelections.Value.Items;
 
         #endregion
     }

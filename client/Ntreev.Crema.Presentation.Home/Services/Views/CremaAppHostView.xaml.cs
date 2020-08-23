@@ -18,7 +18,6 @@
 using Ntreev.Crema.Presentation.Framework;
 using Ntreev.Crema.Presentation.Home.Services.ViewModels;
 using Ntreev.ModernUI.Framework.Controls;
-using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -39,8 +38,8 @@ namespace Ntreev.Crema.Presentation.Home.Services.Views
         [ImportingConstructor]
         public CremaAppHostView(ICremaAppHost cremaAppHost)
         {
-            this.InitializeComponent();
             this.cremaAppHost = cremaAppHost;
+            this.InitializeComponent();
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -69,29 +68,6 @@ namespace Ntreev.Crema.Presentation.Home.Services.Views
             }
         }
 
-        private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
-        {
-            //this.Dispatcher.InvokeAsync(() =>
-            //{
-            //    if (this.serverList.SelectedItem != null)
-            //    {
-            //        if (this.serverList.ItemContainerGenerator.ContainerFromItem(this.serverList.SelectedItem) is ListBoxItem container)
-            //        {
-            //            container.BringIntoView();
-            //        }
-            //    }
-            //}, DispatcherPriority.Background);
-        }
-
-        private void CremaAppHost_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            //var cremaAppHost = this.cremaAppHost.Value;
-            //if (e.PropertyName == nameof(cremaAppHost.Password) == true)
-            //{
-            //    this.SetPassword(cremaAppHost.Password);
-            //}
-        }
-
         private void PasswordBox_PasswordChanged(object sender, System.Windows.RoutedEventArgs e)
         {
             var passwordBox = sender as PasswordBox;
@@ -99,13 +75,6 @@ namespace Ntreev.Crema.Presentation.Home.Services.Views
             {
                 viewModel.SetPassword(passwordBox.Password, false);
             }
-        }
-
-        private void SetPassword(string password)
-        {
-            //this.passwordBox.PasswordChanged -= PasswordBox_PasswordChanged;
-            //this.passwordBox.Password = password;
-            //this.passwordBox.PasswordChanged += PasswordBox_PasswordChanged;
         }
     }
 }

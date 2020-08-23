@@ -26,9 +26,6 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
 {
     public class TableCategoryTreeViewItemViewModel : TableCategoryTreeItemBase
     {
-        private readonly ICommand renameCommand;
-        private readonly ICommand deleteCommand;
-
         public TableCategoryTreeViewItemViewModel(Authentication authentication, ITableCategory category)
             : this(authentication, category, null)
         {
@@ -50,8 +47,8 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
         public TableCategoryTreeViewItemViewModel(Authentication authentication, TableCategoryDescriptor descriptor, object owner)
             : base(authentication, descriptor, owner)
         {
-            this.renameCommand = new DelegateCommand(async item => await this.RenameAsync(), item => this.CanRename);
-            this.deleteCommand = new DelegateCommand(async item => await this.DeleteAsync(), item => this.CanDelete);
+            this.RenameCommand = new DelegateCommand(async item => await this.RenameAsync(), item => this.CanRename);
+            this.DeleteCommand = new DelegateCommand(async item => await this.DeleteAsync(), item => this.CanDelete);
             this.Owner = owner;
         }
 
@@ -67,7 +64,12 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
             }
         }
 
-        public async Task NewFolderAsync()
+        public void NewFolder()
+        {
+            int qwer = 0;
+        }
+
+            public async Task NewFolderAsync()
         {
             if (await TableCategoryUtility.NewFolderAsync(this.authentication, this.descriptor) is string categoryName)
             {
@@ -131,9 +133,9 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
         [DescriptorProperty]
         public bool CanViewLog => TableItemUtility.CanViewLog(this.authentication, this.descriptor);
 
-        public ICommand RenameCommand => this.renameCommand;
+        public ICommand RenameCommand { get; }
 
-        public ICommand DeleteCommand => this.deleteCommand;
+        public ICommand DeleteCommand { get; }
 
         public override int Order => 1;
 

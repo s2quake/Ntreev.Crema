@@ -27,18 +27,16 @@ namespace Ntreev.Crema.Presentation.Framework
     {
         private const int defaultDelay = 100;
         private readonly List<IPropertyService> propertyServiceList = new List<IPropertyService>();
-        private Task selectPropertyTask;
         private readonly int delay = defaultDelay;
+        private Task selectPropertyTask;
 
         public TreeViewBase()
         {
-
         }
 
         public TreeViewBase(IServiceProvider serviceProvider)
             : base(serviceProvider)
         {
-
         }
 
         public void AttachPropertyService(IPropertyService propertyService)

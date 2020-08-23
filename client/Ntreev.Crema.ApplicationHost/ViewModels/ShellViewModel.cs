@@ -240,10 +240,10 @@ namespace Ntreev.Crema.ApplicationHost.ViewModels
         private void CremaAppHost_Loaded(object sender, EventArgs e)
         {
             this.NotifyOfPropertyChange(nameof(this.Title));
-            var selectedService = this.contentServices.FirstOrDefault(item => item.GetType().FullName == this.SelectedServiceType);
+            var selectedService = this.contentServices.Select(item => item.Value).FirstOrDefault(item => item.GetType().FullName == this.SelectedServiceType);
             if (selectedService == null)
             {
-                selectedService = EnumerableUtility.OrderByAttribute(this.contentServices).First();
+                selectedService = EnumerableUtility.OrderByAttribute(this.contentServices.Select(item => item.Value)).First();
             }
             this.SelectedService = selectedService;
         }

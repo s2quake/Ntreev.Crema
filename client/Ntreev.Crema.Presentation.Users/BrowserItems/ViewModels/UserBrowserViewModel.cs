@@ -41,20 +41,19 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
     {
         private readonly Authenticator authenticator;
         private readonly ICremaAppHost cremaAppHost;
-        private readonly IEnumerable<IPropertyService> propertyServices = null;
-        private readonly Lazy<IShell> shell = null;
-
+        private readonly IShell shell;
+        private readonly IEnumerable<IPropertyService> propertyServices;
         private readonly DelegateCommand deleteCommand;
 
         [ImportingConstructor]
-        public UserBrowserViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost, [ImportMany] IEnumerable<IPropertyService> propertyServices, Lazy<IShell> shell)
+        public UserBrowserViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost, IShell shell, [ImportMany] IEnumerable<IPropertyService> propertyServices)
         {
             this.authenticator = authenticator;
             this.cremaAppHost = cremaAppHost;
             this.cremaAppHost.Opened += CremaAppHost_Opened;
             this.cremaAppHost.Closed += CremaAppHost_Closed;
-            this.propertyServices = propertyServices;
             this.shell = shell;
+            this.propertyServices = propertyServices;
             this.deleteCommand = new DelegateCommand(this.Delete_Execute, this.Delete_CanExecute);
             this.DisplayName = Resources.Title_Users;
             this.Dispatcher.InvokeAsync(() =>
@@ -82,7 +81,7 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
 
         protected override bool Predicate(IPropertyService propertyService)
         {
-            return this.Shell.SelectedService.GetType().Assembly == propertyService.GetType().Assembly;
+            return this.shell.SelectedService.GetType().Assembly == propertyService.GetType().Assembly;
         }
 
         private void CremaAppHost_Closed(object sender, EventArgs e)
@@ -131,11 +130,6 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
             {
                 if (e.UserID != this.authenticator.ID)
                 {
-#pragma warning disable CS1998 // 이 비동기 메서드에는 'await' 연산자가 없으며 메서드가 동시에 실행됩니다. 'await' 연산자를 사용하여 비블로킹 API 호출을 대기하거나, 'await Task.Run(...)'을 사용하여 백그라운드 스레드에서 CPU 바인딩된 작업을 수행하세요.
-                    await this.Dispatcher.InvokeAsync(async () =>
-#pragma warning restore CS1998 // 이 비동기 메서드에는 'await' 연산자가 없으며 메서드가 동시에 실행됩니다. 'await' 연산자를 사용하여 비블로킹 API 호출을 대기하거나, 'await Task.Run(...)'을 사용하여 백그라운드 스레드에서 CPU 바인딩된 작업을 수행하세요.
-                    {
-                    });
                     var userContext = this.cremaAppHost.GetService(typeof(IUserContext)) as IUserContext;
                     var dialog = await ViewMessageViewModel.CreateInstanceAsync(this.authenticator, userContext, message, sendUserID);
                     if (dialog != null)
@@ -176,7 +170,5 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
             get => this.GetSettings();
             set => this.SetSettings(value);
         }
-
-        private IShell Shell => this.shell.Value;
     }
 }

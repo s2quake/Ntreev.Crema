@@ -52,10 +52,9 @@ namespace Ntreev.Crema.Services
 
         public void Commit()
         {
-            FileUtility.Prepare(this.schemaPath);
-            throw new NotImplementedException();
-            //this.WriteSchema(this.schemaPath);
-            //this.Write(this.xmlPath);
+            FileUtility.Prepare(this.xmlPath);
+            using var stream = File.OpenWrite(this.xmlPath);
+            this.Write(stream, this.serializer);
         }
     }
 }

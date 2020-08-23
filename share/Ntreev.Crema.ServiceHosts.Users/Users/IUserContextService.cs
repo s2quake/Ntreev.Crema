@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ServiceHosts.Users
 {
-    [ServiceContract]
+    [ServiceContract(PerPeer = true)]
     public partial interface IUserContextService
     {
         [OperationContract]

@@ -25,14 +25,21 @@ namespace Ntreev.Crema.Presentation.Types.BrowserItems.Views
     /// <summary>
     /// Interaction logic for TypeBrowserView.xaml
     /// </summary>
+    [Export]
     public partial class TypeBrowserView : UserControl
     {
-        [Import]
-        private readonly IPropertyService propertyService = null;
+        private readonly IPropertyService propertyService;
 
         public TypeBrowserView()
         {
             InitializeComponent();
+        }
+
+        [ImportingConstructor]
+        public TypeBrowserView(IPropertyService propertyService)
+        {
+            this.propertyService = propertyService;
+            this.InitializeComponent();
         }
 
         protected override void OnIsKeyboardFocusWithinChanged(DependencyPropertyChangedEventArgs e)
@@ -58,8 +65,7 @@ namespace Ntreev.Crema.Presentation.Types.BrowserItems.Views
 
                         if (this.treeView.SelectedItem == null)
                         {
-                            var item = this.treeView.ItemContainerGenerator.ContainerFromIndex(0) as TreeViewItem;
-                            if (item != null)
+                            if (this.treeView.ItemContainerGenerator.ContainerFromIndex(0) is TreeViewItem item)
                             {
                                 item.IsSelected = true;
                             }
@@ -71,8 +77,8 @@ namespace Ntreev.Crema.Presentation.Types.BrowserItems.Views
                     break;
                 case Key.Up:
                     {
-                        var item = this.treeView.ItemContainerGenerator.ContainerFromIndex(0) as TreeViewItem;
-                        if (item != null && item.IsSelected == true && item.IsFocused == true)
+                        if (this.treeView.ItemContainerGenerator.ContainerFromIndex(0) is TreeViewItem item && 
+                            item.IsSelected == true && item.IsFocused == true)
                         {
                             this.FilterBox.Focus();
                         }

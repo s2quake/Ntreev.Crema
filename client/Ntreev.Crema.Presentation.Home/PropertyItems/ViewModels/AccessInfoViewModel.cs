@@ -75,7 +75,7 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
         {
             if (e.PropertyName == nameof(IAccessibleDescriptor.AccessInfo) || e.PropertyName == string.Empty)
             {
-                this.AccessInfo = this.descriptor.AccessInfo;
+                this.accessInfo = this.descriptor.AccessInfo;
                 this.NotifyOfPropertyChange(nameof(this.IsVisible));
             }
         }

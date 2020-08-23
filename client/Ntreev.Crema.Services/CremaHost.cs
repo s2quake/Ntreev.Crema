@@ -268,13 +268,13 @@ namespace Ntreev.Crema.Services
                 throw new InvalidOperationException("server is not closed.");
             }
             this.log?.Dispose();
-            this.DataBaseContext.Dispose();
+            this.DataBaseContext?.Dispose();
             this.DataBaseContext = null;
-            this.DomainContext.Dispose();
+            this.DomainContext?.Dispose();
             this.DomainContext = null;
-            this.UserContext.Dispose();
+            this.UserContext?.Dispose();
             this.UserContext = null;
-            this.Dispatcher.Dispose();
+            this.Dispatcher?.Dispose();
             this.Dispatcher = null;
             this.OnDisposed(EventArgs.Empty);
             CremaLog.Debug("Crema disposed.");

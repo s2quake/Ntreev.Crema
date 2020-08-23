@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ServiceHosts.Data
 {
-    [ServiceContract]
+    [ServiceContract(PerPeer = true)]
     public interface IDataBaseContextService
     {
         [OperationContract]

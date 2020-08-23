@@ -75,7 +75,7 @@ namespace Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels
         {
             if (e.PropertyName == nameof(ILockableDescriptor.LockInfo) || e.PropertyName == string.Empty)
             {
-                this.LockInfo = this.descriptor.LockInfo;
+                this.lockInfo = this.descriptor.LockInfo;
                 this.NotifyOfPropertyChange(nameof(this.IsVisible));
             }
         }

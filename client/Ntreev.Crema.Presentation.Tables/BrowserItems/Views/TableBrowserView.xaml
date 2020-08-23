@@ -23,8 +23,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
              xmlns:ncfc="clr-namespace:Ntreev.Crema.Presentation.Framework.Controls;assembly=Ntreev.Crema.Presentation.Framework"
-             mc:Ignorable="d" 
-             d:DesignWidth="300" d:DesignHeight="300" Initialized="UserControl_Initialized">
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="300">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -36,11 +35,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <nmfc:ModernToolBar ItemsSource="{Binding ToolBarItems}">
+        <nmfc:ModernToolBar ItemsSource="{Binding ToolBarMenus}">
             <nmfc:IconButton x:Name="CollapseAll" Source="/Ntreev.Crema.Presentation.Framework;component/Images/collapse_all.png" />
         </nmfc:ModernToolBar>
         <nmfc:FilterBox x:Name="FilterBox" Grid.Row="1" Text="{Binding FilterExpression, Delay=300, Mode=TwoWay}" 

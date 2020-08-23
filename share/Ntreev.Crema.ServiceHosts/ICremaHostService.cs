@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 
 namespace Ntreev.Crema.ServiceHosts
 {
-    [ServiceContract]
+    [ServiceContract(PerPeer = true)]
     public interface ICremaHostService
     {
         [OperationContract]
