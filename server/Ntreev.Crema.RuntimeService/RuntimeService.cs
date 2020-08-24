@@ -38,7 +38,6 @@ namespace Ntreev.Crema.RuntimeService
         private readonly ICremaHost cremaHost;
         private readonly IEnumerable<Runtime.Serialization.IDataSerializer> serializers;
         private readonly Dictionary<Guid, RuntimeServiceItem> items = new Dictionary<Guid, RuntimeServiceItem>();
-        private readonly CremaDispatcher dispatcher;
         private Authentication authentication;
 
         [ImportingConstructor]
@@ -46,10 +45,10 @@ namespace Ntreev.Crema.RuntimeService
         {
             this.cremaHost = cremaHost;
             this.serializers = serializers;
-            this.dispatcher = new CremaDispatcher(this);
+            this.Dispatcher = new CremaDispatcher(this);
             this.cremaHost.Opened += CremaHost_Opened;
             this.cremaHost.Closed += CremaHost_Closed;
-            this.cremaHost.Disposed += (s, e) => this.dispatcher.Dispose();
+            this.cremaHost.Disposed += (s, e) => this.Dispatcher.Dispose();
         }
 
         public string Name => nameof(RuntimeService);
@@ -66,7 +65,7 @@ namespace Ntreev.Crema.RuntimeService
                 {
                     foreach (var item in dataBaseContext)
                     {
-                        var obj = new RuntimeServiceItem(item, this.dispatcher, authentication);
+                        var obj = new RuntimeServiceItem(item, this.Dispatcher, authentication);
                         this.items.Add(item.ID, obj);
                     }
                 });
@@ -185,13 +184,13 @@ namespace Ntreev.Crema.RuntimeService
             return result;
         }
 
-        public CremaDispatcher Dispatcher => this.dispatcher;
+        public CremaDispatcher Dispatcher { get; }
 
         private void DataBaseContext_ItemCreated(object sender, ItemsCreatedEventArgs<IDataBase> e)
         {
             foreach (var item in e.Items)
             {
-                var obj = new RuntimeServiceItem(item, this.dispatcher, authentication);
+                var obj = new RuntimeServiceItem(item, this.Dispatcher, authentication);
                 this.items.Add(item.ID, obj);
             }
         }

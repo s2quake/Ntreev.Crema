@@ -22,19 +22,16 @@ namespace Ntreev.Crema.Services.Random
     [AttributeUsage(AttributeTargets.Method)]
     public class ActionTypeAttribute : Attribute
     {
-        private readonly ActionTypes types;
-
         public ActionTypeAttribute()
             : this(ActionTypes.None)
         {
-
         }
 
         public ActionTypeAttribute(ActionTypes types)
         {
-            this.types = types;
+            this.Types = types;
         }
 
-        public ActionTypes Types => this.types;
+        public ActionTypes Types { get; }
     }
 }

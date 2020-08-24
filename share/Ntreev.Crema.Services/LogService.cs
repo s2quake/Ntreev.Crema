@@ -40,7 +40,6 @@ namespace Ntreev.Crema.Services
         //private TextWriter redirectionWriter;
         //private TextWriterAppender textAppender;
         private readonly Dictionary<TextWriter, TextWriterAppender> appendersByWriter = new Dictionary<TextWriter, TextWriterAppender>();
-        private string name;
 
         public LogService()
         {
@@ -95,7 +94,7 @@ namespace Ntreev.Crema.Services
             this.hierarchy.Configured = true;
 
             this.log = log4net.LogManager.GetLogger(repositoryName, name);
-            this.name = name;
+            this.Name = name;
         }
 
         public LogService(string name, string path, bool isSingle)
@@ -152,7 +151,7 @@ namespace Ntreev.Crema.Services
             this.hierarchy.Configured = true;
 
             this.log = log4net.LogManager.GetLogger(name, typeof(LogService));
-            this.name = name;
+            this.Name = name;
         }
 
         public LogService(string address, string userID, string path)
@@ -209,12 +208,12 @@ namespace Ntreev.Crema.Services
             this.hierarchy.Configured = true;
 
             this.log = log4net.LogManager.GetLogger(repositoryName, userID);
-            this.name = userID;
+            this.Name = userID;
         }
 
         public override string ToString()
         {
-            return $"{nameof(LogService)}: {this.name}";
+            return $"{nameof(LogService)}: {this.Name}";
         }
 
         public void Debug(object message)
@@ -381,11 +380,7 @@ namespace Ntreev.Crema.Services
         //    }
         //}
 
-        public string Name
-        {
-            get => this.name;
-            set => this.name = value;
-        }
+        public string Name { get; set; }
 
         public string FileName
         {

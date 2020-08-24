@@ -88,13 +88,6 @@ namespace Ntreev.Crema.Data.Xml.Schema
 
         public const string ContentsModifiedDateTime = "ContentsModifiedDateTime";
         public const string ContentsModifier = "ContentsModifier";
-
-        private readonly static string[] reservedNames = new string[]
-        {
-            CremaSchemaObsolete.DataLocation ,
-            CremaSchema.RelationID,
-        };
-
         internal readonly static object lockobj = new object();
 
         internal const string DataTypePrefix = "dt";
@@ -203,7 +196,11 @@ namespace Ntreev.Crema.Data.Xml.Schema
             Trace.WriteLine(e.Message);
         }
 
-        public static string[] ReservedNames => reservedNames;
+        public static string[] ReservedNames { get; } = new string[]
+        {
+            CremaSchemaObsolete.DataLocation ,
+            CremaSchema.RelationID,
+        };
 
         internal static void WriteAppInfo(this XmlSchemaAnnotated annotated, string nodeName, string attributeName, bool value, string ns)
         {

@@ -22,21 +22,20 @@ namespace Ntreev.Crema.ServiceModel
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Event)]
     public class DispatcherScopeAttribute : Attribute
     {
-        private readonly string scopeTypeName;
         private Type scopeType;
 
         public DispatcherScopeAttribute(Type scopeType)
         {
             this.scopeType = scopeType;
-            this.scopeTypeName = scopeType.AssemblyQualifiedName;
+            this.ScopeTypeName = scopeType.AssemblyQualifiedName;
         }
 
         public DispatcherScopeAttribute(string scopeTypeName)
         {
-            this.scopeTypeName = scopeTypeName;
+            this.ScopeTypeName = scopeTypeName;
         }
 
-        public string ScopeTypeName => this.scopeTypeName;
+        public string ScopeTypeName { get; }
 
         internal Type ScopeType
         {
@@ -44,7 +43,7 @@ namespace Ntreev.Crema.ServiceModel
             {
                 if (this.scopeType == null)
                 {
-                    this.scopeType = Type.GetType(this.scopeTypeName);
+                    this.scopeType = Type.GetType(this.ScopeTypeName);
                 }
                 return this.scopeType;
             }

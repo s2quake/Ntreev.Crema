@@ -36,7 +36,6 @@ namespace Ntreev.Crema.Javascript
         private readonly string name;
         private readonly ICremaHost cremaHost;
         private readonly List<Engine> engineList = new List<Engine>();
-        private Authentication authentication;
         private TextWriter writer;
 
         public ScriptContextBase(string name, ICremaHost cremaHost)
@@ -260,7 +259,7 @@ namespace Ntreev.Crema.Javascript
 
         protected void Initialize(Authentication authentication)
         {
-            this.authentication = authentication;
+            this.Authentication = authentication;
         }
 
         protected void Release()
@@ -271,10 +270,10 @@ namespace Ntreev.Crema.Javascript
                 this.authentication.Expired -= Authentication_Expired;
             }
 #endif
-            this.authentication = null;
+            this.Authentication = null;
         }
 
-        protected Authentication Authentication => this.authentication;
+        protected Authentication Authentication { get; private set; }
 
 #if SERVER
         private void Authentication_Expired(object sender, EventArgs e)

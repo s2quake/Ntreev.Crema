@@ -22,11 +22,9 @@ namespace Ntreev.Crema.Commands.Consoles
 {
     public abstract class ConsoleDriveBase : IConsoleDrive
     {
-        private readonly string name;
-
         protected ConsoleDriveBase(string name)
         {
-            this.name = name;
+            this.Name = name;
         }
 
         public abstract string[] GetPaths();
@@ -53,7 +51,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         public abstract Task<object> GetObjectAsync(Authentication authentication, string path);
 
-        public string Name => this.name;
+        public string Name { get; }
 
         public ConsoleCommandContextBase CommandContext
         {

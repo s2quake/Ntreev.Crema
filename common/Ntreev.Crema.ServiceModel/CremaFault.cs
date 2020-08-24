@@ -24,38 +24,25 @@ namespace Ntreev.Crema.ServiceModel
     [DataContract(Namespace = SchemaUtility.Namespace)]
     public class CremaFault
     {
-        private string exceptionType;
-        private string message;
-
         public CremaFault()
         {
-
         }
 
         public CremaFault(Exception exception, string message)
         {
-            this.exceptionType = exception.GetType().AssemblyQualifiedName;
-            this.message = message;
+            this.ExceptionType = exception.GetType().AssemblyQualifiedName;
+            this.Message = message;
         }
 
         public CremaFault(Exception exception)
             : this(exception, exception.Message)
         {
-
         }
 
         [DataMember]
-        public string ExceptionType
-        {
-            get => this.exceptionType;
-            set => this.exceptionType = value;
-        }
+        public string ExceptionType { get; set; }
 
         [DataMember]
-        public string Message
-        {
-            get => this.message;
-            set => this.message = value;
-        }
+        public string Message { get; set; }
     }
 }

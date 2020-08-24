@@ -64,12 +64,7 @@ namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
             }
         }
 
-        public void NewFolder()
-        {
-            int qwer = 0;
-        }
-
-            public async Task NewFolderAsync()
+        public async Task NewFolderAsync()
         {
             if (await TableCategoryUtility.NewFolderAsync(this.authentication, this.descriptor) is string categoryName)
             {

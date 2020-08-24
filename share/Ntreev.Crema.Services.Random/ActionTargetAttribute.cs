@@ -22,19 +22,16 @@ namespace Ntreev.Crema.Services.Random
     [AttributeUsage(AttributeTargets.Method)]
     public class ActionTargetAttribute : Attribute
     {
-        private readonly ActionTargets targets;
-
         public ActionTargetAttribute()
             : this(ActionTargets.None)
         {
-
         }
 
         public ActionTargetAttribute(ActionTargets targets)
         {
-            this.targets = targets;
+            this.Targets = targets;
         }
 
-        public ActionTargets Targets => this.targets;
+        public ActionTargets Targets { get; }
     }
 }

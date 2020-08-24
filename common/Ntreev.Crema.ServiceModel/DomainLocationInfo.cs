@@ -28,8 +28,6 @@ namespace Ntreev.Crema.ServiceModel
     [XmlInclude(typeof(TimeSpan))]
     public struct DomainLocationInfo
     {
-        private object[] keys;
-
         [DataMember]
         public string TableName { get; set; }
 
@@ -37,17 +35,13 @@ namespace Ntreev.Crema.ServiceModel
         public string ColumnName { get; set; }
 
         [IgnoreDataMember]
-        public object[] Keys
-        {
-            get => this.keys;
-            set => this.keys = value;
-        }
+        public object[] Keys { get; set; }
 
         [DataMember]
         public DomainFieldInfo[] KeyInfos
         {
-            get => this.keys != null ? this.keys.Select(item => new DomainFieldInfo(item)).ToArray() : new DomainFieldInfo[] { };
-            set => this.keys = value?.Select(item => item.ToValue()).ToArray();
+            get => this.Keys != null ? this.Keys.Select(item => new DomainFieldInfo(item)).ToArray() : new DomainFieldInfo[] { };
+            set => this.Keys = value?.Select(item => item.ToValue()).ToArray();
         }
 
         public static readonly DomainLocationInfo Empty = new DomainLocationInfo() { Keys = new object[] { } };

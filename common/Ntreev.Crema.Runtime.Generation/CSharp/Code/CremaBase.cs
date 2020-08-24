@@ -23,14 +23,12 @@ namespace Ntreev.Crema.Code
 {
     public class CremaErrorEventArgs : EventArgs
     {
-        private readonly Exception e;
-
         public CremaErrorEventArgs(Exception e)
         {
-            this.e = e;
+            this.Exception = e;
         }
 
-        public Exception Exception => this.e;
+        public Exception Exception { get; }
 
         public bool Handled { get; set; }
     }
@@ -39,7 +37,6 @@ namespace Ntreev.Crema.Code
     {
         protected CremaData()
         {
-
         }
 
         public static event EventHandler<CremaErrorEventArgs> ErrorOccured;
@@ -64,7 +61,6 @@ namespace Ntreev.Crema.Code
         private readonly string relationID;
         private readonly string parentID;
         private int key;
-        private CremaRow parentInternal;
 
         protected CremaRow(IRow row)
         {
@@ -122,11 +118,11 @@ namespace Ntreev.Crema.Code
         {
             foreach (var item in childs)
             {
-                item.parentInternal = parent;
+                item.ParentInternal = parent;
             }
         }
 
-        protected CremaRow ParentInternal => this.parentInternal;
+        protected CremaRow ParentInternal { get; private set; }
     }
 
     public abstract class CremaTable<T> where T : CremaRow
@@ -135,18 +131,15 @@ namespace Ntreev.Crema.Code
 
         private readonly T[] rows;
         private readonly Dictionary<int, T> keyToRow;
-        private readonly string name;
-        private readonly string tableName;
 
         protected CremaTable()
         {
-
         }
 
         protected CremaTable(ITable table)
         {
-            this.name = table.Name;
-            this.tableName = this.GetTableName(table.Name);
+            this.Name = table.Name;
+            this.TableName = this.GetTableName(table.Name);
             this.keyToRow = new Dictionary<int, T>(table.Rows.Count);
             List<T> rows = new List<T>(table.Rows.Count);
             foreach (var item in table.Rows)
@@ -160,8 +153,8 @@ namespace Ntreev.Crema.Code
 
         protected CremaTable(string name, T[] rows)
         {
-            this.name = name;
-            this.tableName = this.GetTableName(name);
+            this.Name = name;
+            this.TableName = this.GetTableName(name);
 
             if (rows.Length == 0)
                 return;
@@ -188,12 +181,12 @@ namespace Ntreev.Crema.Code
         /// <summary>
         /// 테이블의 이름을 나타냅니다. 자식 테이블의 이름이 a.b. 일 경우 a.b를 반환합니다.
         /// </summary>
-        public string Name => this.name;
+        public string Name { get; }
 
         /// <summary>
         /// 부모 이름을 제외한 테이블의 이름을 나타냅니다. 만약 자식 테이블의 이름이 a.b 일 경우 b를 반환합니다.
         /// </summary>
-        public string TableName => this.tableName;
+        public string TableName { get; }
 
         protected abstract T CreateRowInstance(IRow row, object table);
 

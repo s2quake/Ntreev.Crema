@@ -27,8 +27,6 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
 {
     public class UserCategoryTreeViewItemViewModel : UserCategoryTreeItemBase
     {
-        private readonly ICommand deleteCommand;
-
         public UserCategoryTreeViewItemViewModel(Authentication authentication, IUserCategory category, object owner)
             : this(authentication, new UserCategoryDescriptor(authentication, category, DescriptorTypes.All, owner), owner)
         {
@@ -38,7 +36,7 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
         private UserCategoryTreeViewItemViewModel(Authentication authentication, UserCategoryDescriptor descriptor, object owner)
             : base(authentication, descriptor, owner)
         {
-            this.deleteCommand = new DelegateCommand(async item => await this.DeleteAsync(), item => this.CanDelete);
+            this.DeleteCommand = new DelegateCommand(async item => await this.DeleteAsync(), item => this.CanDelete);
         }
 
         public async Task NewUserAsync()
@@ -87,7 +85,7 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
 
         public bool CanDelete => UserCategoryUtility.CanDelete(this.authentication, this.descriptor);
 
-        public ICommand DeleteCommand => this.deleteCommand;
+        public ICommand DeleteCommand { get; }
 
         public override string DisplayName => this.descriptor.Name == string.Empty ? Resources.Title_Users : this.descriptor.Name;
 

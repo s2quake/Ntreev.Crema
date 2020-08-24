@@ -140,8 +140,6 @@ namespace Ntreev.Crema.Commands.Consoles
             return domain;
         }
 
-        private ICremaHost CremaHost => this.cremaHost;
-
         private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }
 }

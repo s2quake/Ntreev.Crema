@@ -329,8 +329,6 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private DataBasesConsoleDrive Drive => this.CommandContext.Drive as DataBasesConsoleDrive;
 
-        private ICremaHost CremaHost => this.cremaHost;
-
         private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }
 }

@@ -26,9 +26,6 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
 {
     public class UserTreeViewItemViewModel : UserTreeItemBase
     {
-        private readonly ICommand modifyCommand;
-        private readonly ICommand deleteCommand;
-
         public UserTreeViewItemViewModel(Authentication authentication, IUser user, object owner)
             : this(authentication, new UserDescriptor(authentication, user, DescriptorTypes.All, owner), owner)
         {
@@ -39,8 +36,8 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
         internal protected UserTreeViewItemViewModel(Authentication authentication, UserDescriptor descriptor, object owner)
             : base(authentication, descriptor, owner)
         {
-            this.modifyCommand = new DelegateCommand(async item => await this.ChangeAsync(), item => this.CanChange);
-            this.deleteCommand = new DelegateCommand(async item => await this.DeleteAsync(), item => this.CanDelete);
+            this.ModifyCommand = new DelegateCommand(async item => await this.ChangeAsync(), item => this.CanChange);
+            this.DeleteCommand = new DelegateCommand(async item => await this.DeleteAsync(), item => this.CanDelete);
         }
 
         public async Task ChangeAsync()
@@ -92,9 +89,9 @@ namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
 
         public override string DisplayName => this.descriptor.UserInfo.ID + " [" + this.descriptor.UserInfo.Name + "]";
 
-        public ICommand ModifyCommand => this.modifyCommand;
+        public ICommand ModifyCommand { get; }
 
-        public ICommand DeleteCommand => this.deleteCommand;
+        public ICommand DeleteCommand { get; }
 
         public IUserDescriptor UserDescriptor => this.descriptor;
 

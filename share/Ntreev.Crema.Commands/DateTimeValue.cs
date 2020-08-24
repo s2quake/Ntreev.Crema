@@ -28,7 +28,6 @@ namespace Ntreev.Crema.Commands
         private const string formatString = "HH:mm";
 
         private readonly string text;
-        private readonly int milliseconds;
 
         public DateTimeValue(string text)
         {
@@ -37,13 +36,13 @@ namespace Ntreev.Crema.Commands
             if (text == DateTimeValue.nowString)
             {
                 this.text = text;
-                this.milliseconds = 0;
+                this.Milliseconds = 0;
             }
             else if (text == string.Empty)
             {
                 this.text = text;
-                this.milliseconds = 60000;
-                this.text = DateTime.Now.AddMilliseconds(this.milliseconds).ToString(formatString);
+                this.Milliseconds = 60000;
+                this.text = DateTime.Now.AddMilliseconds(this.Milliseconds).ToString(formatString);
                 //this.value = DateTime.Now + new TimeSpan(0, 0, 5);
             }
             else
@@ -52,7 +51,7 @@ namespace Ntreev.Crema.Commands
                 if (dateTime < DateTime.Now)
                     dateTime += new TimeSpan(TimeSpan.TicksPerDay);
                 var timeSpan = (dateTime - DateTime.Now);
-                this.milliseconds = (int)timeSpan.TotalMilliseconds;
+                this.Milliseconds = (int)timeSpan.TotalMilliseconds;
                 this.text = dateTime.ToString(formatString);
             }
         }
@@ -62,6 +61,6 @@ namespace Ntreev.Crema.Commands
             return this.text;
         }
 
-        public int Milliseconds => this.milliseconds;
+        public int Milliseconds { get; }
     }
 }

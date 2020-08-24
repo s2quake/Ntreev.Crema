@@ -21,18 +21,15 @@ namespace Ntreev.Crema.Services
 {
     public class MessageEventArgs : ItemsEventArgs<IUser>
     {
-        private readonly string message;
-        private readonly MessageType messageType;
-
         public MessageEventArgs(Authentication authentication, IUser[] users, string message, MessageType messageType)
             : base(authentication, users)
         {
-            this.message = message;
-            this.messageType = messageType;
+            this.Message = message;
+            this.MessageType = messageType;
         }
 
-        public string Message => this.message;
+        public string Message { get; }
 
-        public MessageType MessageType => this.messageType;
+        public MessageType MessageType { get; }
     }
 }

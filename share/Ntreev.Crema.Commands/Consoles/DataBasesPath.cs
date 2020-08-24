@@ -26,7 +26,6 @@ namespace Ntreev.Crema.Commands.Consoles
         private readonly string dataBaseName;
         private readonly string context;
         private readonly string itemPath;
-        private readonly string path;
 
         public DataBasePath(string path)
         {
@@ -53,15 +52,15 @@ namespace Ntreev.Crema.Commands.Consoles
                 this.context = null;
                 this.itemPath = null;
             }
-            this.path = path;
+            this.Path = path;
         }
 
         public override string ToString()
         {
-            return this.path;
+            return this.Path;
         }
 
-        public string Path => this.path;
+        public string Path { get; }
 
         public string DataBaseName => this.dataBaseName ?? string.Empty;
 

@@ -31,12 +31,10 @@ namespace Ntreev.Crema.Commands.Consoles
     [ResourceDescription("Resources", IsShared = true)]
     class DomainCommand : ConsoleCommandMethodBase, IConsoleCommand
     {
-        private readonly ICremaHost cremaHost;
-
         [ImportingConstructor]
         public DomainCommand(ICremaHost cremaHost)
         {
-            this.cremaHost = cremaHost;
+            this.CremaHost = cremaHost;
         }
 
         //[CommandMethod]
@@ -90,7 +88,7 @@ namespace Ntreev.Crema.Commands.Consoles
                 return domainInfoList.ToArray();
             });
 
-            var dataBaseInfos = this.cremaHost.Dispatcher.Invoke(() =>
+            var dataBaseInfos = this.CremaHost.Dispatcher.Invoke(() =>
             {
                 return this.DataBaseContext.Select(item => item.DataBaseInfo).ToArray();
             });
@@ -151,7 +149,7 @@ namespace Ntreev.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.Drive is DomainsConsoleDrive;
 
-        public IDomainContext DomainContext => this.cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
+        public IDomainContext DomainContext => this.CremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
 
         private string[] GetDataBaseNames()
         {
@@ -182,8 +180,8 @@ namespace Ntreev.Crema.Commands.Consoles
             return domain;
         }
 
-        private ICremaHost CremaHost => this.cremaHost;
+        private ICremaHost CremaHost { get; }
 
-        private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+        private IDataBaseContext DataBaseContext => this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
     }
 }

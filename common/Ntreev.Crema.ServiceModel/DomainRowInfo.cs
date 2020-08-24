@@ -24,38 +24,27 @@ namespace Ntreev.Crema.ServiceModel
     [DataContract(Namespace = SchemaUtility.Namespace)]
     public struct DomainRowInfo
     {
-        private object[] fields;
-        private object[] keys;
-
         [DataMember]
         public string TableName { get; set; }
 
         [IgnoreDataMember]
-        public object[] Fields
-        {
-            get => this.fields;
-            set => this.fields = value;
-        }
+        public object[] Fields { get; set; }
 
         [IgnoreDataMember]
-        public object[] Keys
-        {
-            get => this.keys;
-            set => this.keys = value;
-        }
+        public object[] Keys { get; set; }
 
         [DataMember]
         public DomainFieldInfo[] FieldInfos
         {
-            get => this.fields != null ? this.fields.Select(item => new DomainFieldInfo(item)).ToArray() : new DomainFieldInfo[] { };
-            set => this.fields = value?.Select(item => item.ToValue()).ToArray();
+            get => this.Fields != null ? this.Fields.Select(item => new DomainFieldInfo(item)).ToArray() : new DomainFieldInfo[] { };
+            set => this.Fields = value?.Select(item => item.ToValue()).ToArray();
         }
 
         [DataMember]
         public DomainFieldInfo[] KeyInfos
         {
-            get => this.keys != null ? this.keys.Select(item => new DomainFieldInfo(item)).ToArray() : new DomainFieldInfo[] { };
-            set => this.keys = value?.Select(item => item.ToValue()).ToArray();
+            get => this.Keys != null ? this.Keys.Select(item => new DomainFieldInfo(item)).ToArray() : new DomainFieldInfo[] { };
+            set => this.Keys = value?.Select(item => item.ToValue()).ToArray();
         }
 
         [IgnoreDataMember]

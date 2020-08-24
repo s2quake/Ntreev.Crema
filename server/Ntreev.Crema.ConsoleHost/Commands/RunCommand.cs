@@ -36,7 +36,6 @@ namespace Ntreev.Crema.ConsoleHost.Commands
     class RunCommand : CommandAsyncBase
     {
         private readonly CremaApplication application;
-        private string repositoryModule;
         [Import]
         private readonly Lazy<ScriptContext> scriptContext = null;
 
@@ -81,11 +80,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands
         }
 
         [CommandProperty("repo-module")]
-        public string RepositoryModule
-        {
-            get => this.repositoryModule;
-            set => this.repositoryModule = value;
-        }
+        public string RepositoryModule { get; set; }
 
         [CommandProperty("file-type")]
         public string FileType

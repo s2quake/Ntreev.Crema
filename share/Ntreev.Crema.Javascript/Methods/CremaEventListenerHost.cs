@@ -23,12 +23,11 @@ namespace Ntreev.Crema.Javascript.Methods
 {
     abstract class CremaEventListenerHost
     {
-        private readonly CremaEvents eventName;
         private readonly CremaEventListenerCollection listeners = new CremaEventListenerCollection();
 
         protected CremaEventListenerHost(CremaEvents eventName)
         {
-            this.eventName = eventName;
+            this.EventName = eventName;
         }
 
         public void Dispose()
@@ -65,7 +64,7 @@ namespace Ntreev.Crema.Javascript.Methods
             get; set;
         }
 
-        public CremaEvents EventName => this.eventName;
+        public CremaEvents EventName { get; }
 
         protected void Invoke(IDictionary<string, object> properties)
         {

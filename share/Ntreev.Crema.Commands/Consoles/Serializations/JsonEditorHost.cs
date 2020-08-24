@@ -35,7 +35,6 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
         private const string jsonExtension = ".json";
         private const string schemaExtension = ".schema.json";
         private readonly string schemaPath;
-        private readonly string jsonPath;
         private readonly Type type;
         private readonly JSchema schema;
         private readonly string hash;
@@ -50,7 +49,7 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
         {
             var path = PathUtility.GetTempPath(false);
             this.schemaPath = path + schemaExtension;
-            this.jsonPath = path + jsonExtension;
+            this.Filename = path + jsonExtension;
             this.type = obj.GetType();
             this.schema = schema ?? JsonSchemaUtility.GetSchema(this.type);
             this.schema = JSchema.Parse(this.schema.ToString());
@@ -59,7 +58,7 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
             this.WriteSchemaText();
             this.WriteText(obj);
 
-            this.hash = HashUtility.GetHashValueFromFile(jsonPath);
+            this.hash = HashUtility.GetHashValueFromFile(Filename);
         }
 
         public static bool TryEdit<T>(ref T obj)
@@ -81,7 +80,7 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
         {
             try
             {
-                TextEditorHost.Execute(this.jsonPath);
+                TextEditorHost.Execute(this.Filename);
             }
             catch (Exception e)
             {
@@ -102,7 +101,7 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
                 Formatting = Formatting.Indented,
             };
 
-            using var stream = File.OpenText(this.jsonPath);
+            using var stream = File.OpenText(this.Filename);
             using var reader = new JsonTextReader(stream);
             using var validatingReader = new JSchemaValidatingReader(reader);
             var messages = new List<string>();
@@ -118,13 +117,13 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
             return obj;
         }
 
-        public string Filename => this.jsonPath;
+        public string Filename { get; }
 
-        public bool IsModified => this.hash != HashUtility.GetHashValueFromFile(jsonPath);
+        public bool IsModified => this.hash != HashUtility.GetHashValueFromFile(Filename);
 
         public string ReadText()
         {
-            return File.ReadAllText(this.jsonPath);
+            return File.ReadAllText(this.Filename);
         }
 
         private void WriteSchemaText()
@@ -142,7 +141,7 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
             {
                 jobj2.Add(item);
             }
-            File.WriteAllText(this.jsonPath, jobj2.ToString(Formatting.Indented) + Environment.NewLine, Encoding.UTF8);
+            File.WriteAllText(this.Filename, jobj2.ToString(Formatting.Indented) + Environment.NewLine, Encoding.UTF8);
         }
 
         #region IDisposable
@@ -150,7 +149,7 @@ namespace Ntreev.Crema.Commands.Consoles.Serializations
         void IDisposable.Dispose()
         {
             FileUtility.Delete(this.schemaPath);
-            FileUtility.Delete(this.jsonPath);
+            FileUtility.Delete(this.Filename);
         }
 
         #endregion

@@ -23,3 +23,9 @@ csharp_style_unused_value_assignment_preference = unused_local_variable:suggesti
 
 # IDE0056: 인덱스 연산자 사용
 csharp_style_prefer_index_operator = true:silent
+
+# IDE0032: auto 속성 사용
+dotnet_style_prefer_auto_properties = true:suggestion
+
+# IDE0057: 범위 연산자 사용
+csharp_style_prefer_range_operator = true:silent

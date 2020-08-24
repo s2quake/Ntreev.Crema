@@ -79,10 +79,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
         {
             if (this.descriptor != null)
             {
-                if (this.descriptor is INotifyPropertyChanged)
-                {
-                    (this.descriptor as INotifyPropertyChanged).PropertyChanged += Descriptor_PropertyChanged;
-                }
+                this.descriptor.PropertyChanged += Descriptor_PropertyChanged;
                 this.BanInfo = this.descriptor.BanInfo;
             }
             this.NotifyOfPropertyChange(nameof(this.IsVisible));
@@ -93,10 +90,7 @@ namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
         {
             if (this.descriptor != null)
             {
-                if (this.descriptor is INotifyPropertyChanged)
-                {
-                    (this.descriptor as INotifyPropertyChanged).PropertyChanged -= Descriptor_PropertyChanged;
-                }
+                this.descriptor.PropertyChanged -= Descriptor_PropertyChanged;
             }
         }
     }

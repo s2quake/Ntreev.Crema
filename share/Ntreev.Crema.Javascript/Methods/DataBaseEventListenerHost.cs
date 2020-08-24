@@ -24,12 +24,11 @@ namespace Ntreev.Crema.Javascript.Methods
 {
     abstract class DataBaseEventListenerHost
     {
-        private readonly DataBaseEvents eventName;
         private readonly Dictionary<IDataBase, DataBaseEventListenerCollection> dataBaseToListeners = new Dictionary<IDataBase, DataBaseEventListenerCollection>();
 
         protected DataBaseEventListenerHost(DataBaseEvents eventName)
         {
-            this.eventName = eventName;
+            this.EventName = eventName;
         }
 
         public void Dispose()
@@ -83,7 +82,7 @@ namespace Ntreev.Crema.Javascript.Methods
             get; set;
         }
 
-        public DataBaseEvents EventName => this.eventName;
+        public DataBaseEvents EventName { get; }
 
         protected void InvokeAsync(IDataBase dataBase, IDictionary<string, object> properties)
         {

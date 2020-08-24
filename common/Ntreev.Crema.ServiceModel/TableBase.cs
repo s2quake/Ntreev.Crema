@@ -35,7 +35,6 @@ namespace Ntreev.Crema.ServiceModel
         where _CC : CategoryContainer<_I, _C, _IC, _CC, _CT>, new()
         where _CT : ItemContext<_I, _C, _IC, _CC, _CT>
     {
-        private readonly InternalTableCollection<_I, _C, _IC, _CC, _CT> childs = new InternalTableCollection<_I, _C, _IC, _CC, _CT>(true);
         private readonly InternalTableCollection<_I, _C, _IC, _CC, _CT> derivedTables = new InternalTableCollection<_I, _C, _IC, _CC, _CT>();
         private _I parent;
         private _I templatedParent;
@@ -244,7 +243,7 @@ namespace Ntreev.Crema.ServiceModel
             this.tableInfo.CategoryPath = this.Category.Path;
             this.tableInfo.TemplatedParent = this.templatedParent == null ? string.Empty : this.templatedParent.Name;
 
-            foreach (var item in this.childs)
+            foreach (var item in this.Childs)
             {
                 item.UpdateTableInfo();
             }
@@ -306,7 +305,7 @@ namespace Ntreev.Crema.ServiceModel
 
             this.OnTableInfoChanged(EventArgs.Empty);
 
-            foreach (var item in this.childs)
+            foreach (var item in this.Childs)
             {
                 item.UpdateDerivedTags(tags);
             }
@@ -415,7 +414,7 @@ namespace Ntreev.Crema.ServiceModel
             {
                 if (this.parent != null)
                 {
-                    this.parent.childs.Remove(this as _I);
+                    this.parent.Childs.Remove(this as _I);
                     this.parent.Renamed -= Parent_Renamed;
                     this.parent.Moved -= Parent_Moved;
                     this.parent.Deleted -= Parent_Deleted;
@@ -423,7 +422,7 @@ namespace Ntreev.Crema.ServiceModel
                 this.parent = value;
                 if (this.parent != null)
                 {
-                    this.parent.childs.Add(this as _I);
+                    this.parent.Childs.Add(this as _I);
                     this.parent.Renamed += Parent_Renamed;
                     this.parent.Moved += Parent_Moved;
                     this.parent.Deleted += Parent_Deleted;
@@ -470,7 +469,7 @@ namespace Ntreev.Crema.ServiceModel
 
         public IContainer<_I> DerivedTables => this.derivedTables;
 
-        public InternalTableCollection<_I, _C, _IC, _CC, _CT> Childs => this.childs;
+        public InternalTableCollection<_I, _C, _IC, _CC, _CT> Childs { get; } = new InternalTableCollection<_I, _C, _IC, _CC, _CT>(true);
 
         public TableMetaData MetaData => this.metaData;
 

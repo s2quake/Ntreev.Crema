@@ -87,6 +87,13 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Services", "sh
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Services.Random", "share\Ntreev.Crema.Services.Random\Ntreev.Crema.Services.Random.shproj", "{1F4A20AE-F955-4231-8636-27B7A38EB4B3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "etc", "etc", "{922B62F6-AB65-4A1A-80D6-79F3E839AD43}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		base.props = base.props
+		wpf.props = wpf.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		share\Ntreev.Crema.Commands.Spreadsheet\Ntreev.Crema.Commands.Spreadsheet.projitems*{05971a74-2d68-4781-9ceb-df2b48f8ba75}*SharedItemsImports = 13

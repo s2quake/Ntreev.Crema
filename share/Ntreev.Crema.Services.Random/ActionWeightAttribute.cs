@@ -22,13 +22,11 @@ namespace Ntreev.Crema.Services.Random
     [AttributeUsage(AttributeTargets.Method)]
     public class ActionWeightAttribute : Attribute
     {
-        private readonly int weight;
-
         public ActionWeightAttribute(int weight)
         {
-            this.weight = weight;
+            this.Weight = weight;
         }
 
-        public int Weight => this.weight;
+        public int Weight { get; }
     }
 }

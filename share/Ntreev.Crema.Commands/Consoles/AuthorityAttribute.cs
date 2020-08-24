@@ -23,13 +23,11 @@ namespace Ntreev.Crema.Commands
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
     public class AuthorityAttribute : Attribute
     {
-        private readonly Authority authority;
-
         public AuthorityAttribute(Authority authority)
         {
-            this.authority = authority;
+            this.Authority = authority;
         }
 
-        public Authority Authority => this.authority;
+        public Authority Authority { get; }
     }
 }

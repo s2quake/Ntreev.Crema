@@ -26,18 +26,13 @@ namespace Ntreev.Crema.Bot
     public sealed class TaskContext
     {
         private readonly Stack<TaskItem> stacks = new Stack<TaskItem>();
-        private Authentication authentication;
 
         internal TaskContext()
         {
 
         }
 
-        public Authentication Authentication
-        {
-            get => this.authentication;
-            internal set => this.authentication = value;
-        }
+        public Authentication Authentication { get; internal set; }
 
         public void Push(object target)
         {

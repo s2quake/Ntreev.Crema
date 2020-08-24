@@ -23,7 +23,6 @@ namespace Ntreev.Crema.Repository.Git
     class GitAuthor
     {
         private const string authorPattern = "(?<name>.+)\\s<(?<email>.*)>";
-        private readonly string name;
         private readonly string email;
 
         public GitAuthor(string author)
@@ -33,16 +32,16 @@ namespace Ntreev.Crema.Repository.Git
             var match = Regex.Match(author, authorPattern, RegexOptions.ExplicitCapture);
             if (match.Success == true)
             {
-                this.name = match.Groups["name"].Value;
+                this.Name = match.Groups["name"].Value;
                 this.email = match.Groups["email"].Value;
             }
             else
             {
-                this.name = author;
+                this.Name = author;
             }
         }
 
-        public string Name => this.name;
+        public string Name { get; }
 
         public string Email => this.email ?? string.Empty;
 

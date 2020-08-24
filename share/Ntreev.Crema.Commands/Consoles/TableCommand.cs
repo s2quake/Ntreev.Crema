@@ -39,12 +39,10 @@ namespace Ntreev.Crema.Commands.Consoles
     [ResourceDescription("Resources", IsShared = true)]
     class TableCommand : ConsoleCommandMethodBase
     {
-        private readonly ICremaHost cremaHost;
-
         [ImportingConstructor]
         public TableCommand(ICremaHost cremaHost)
         {
-            this.cremaHost = cremaHost;
+            this.CremaHost = cremaHost;
         }
 
         public override string[] GetCompletions(CommandMethodDescriptor methodDescriptor, CommandMemberDescriptor memberDescriptor, string find)
@@ -491,9 +489,9 @@ namespace Ntreev.Crema.Commands.Consoles
 
         private DataBasesConsoleDrive Drive => this.CommandContext.Drive as DataBasesConsoleDrive;
 
-        private ICremaHost CremaHost => this.cremaHost;
+        private ICremaHost CremaHost { get; }
 
-        private IDataBaseContext DataBaseContext => this.cremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
+        private IDataBaseContext DataBaseContext => this.CremaHost.GetService(typeof(IDataBaseContext)) as IDataBaseContext;
 
         // #region classes
 

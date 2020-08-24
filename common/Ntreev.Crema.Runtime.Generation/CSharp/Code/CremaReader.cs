@@ -1214,29 +1214,20 @@ namespace Ntreev.Crema.Reader
     {
         class CremaBinaryColumn : IColumn
         {
-            private readonly string columnName;
-            private readonly Type type;
-            private readonly bool isKey;
-            private int index;
-
             public CremaBinaryColumn(string columnName, Type type, bool isKey)
             {
-                this.columnName = columnName;
-                this.type = type;
-                this.isKey = isKey;
+                this.Name = columnName;
+                this.DataType = type;
+                this.IsKey = isKey;
             }
 
-            public string Name => this.columnName;
+            public string Name { get; }
 
-            public Type DataType => this.type;
+            public Type DataType { get; }
 
-            public bool IsKey => this.isKey;
+            public bool IsKey { get; }
 
-            public int Index
-            {
-                get => this.index;
-                internal set => this.index = value;
-            }
+            public int Index { get; internal set; }
 
             public CremaBinaryTable Table
             {
@@ -1314,14 +1305,7 @@ namespace Ntreev.Crema.Reader
         {
             private Stream stream;
             private TableIndex[] tableIndexes;
-            private ReadOptions options;
             private CremaBinaryTableCollection tables;
-            private int version;
-            private string revision;
-            private string name;
-            private string typesHashValue;
-            private string tablesHashValue;
-            private string tags;
 
             public CremaBinaryReader()
             {
@@ -1330,21 +1314,21 @@ namespace Ntreev.Crema.Reader
 
             public ITableCollection Tables => this.tables;
 
-            public ReadOptions Options => this.options;
+            public ReadOptions Options { get; private set; }
 
-            public bool CaseSensitive => (this.options & ReadOptions.CaseSensitive) == ReadOptions.CaseSensitive;
+            public bool CaseSensitive => (this.Options & ReadOptions.CaseSensitive) == ReadOptions.CaseSensitive;
 
-            public string Revision => this.revision;
+            public string Revision { get; private set; }
 
-            public int Version => this.version;
+            public int Version { get; private set; }
 
-            public string TypesHashValue => this.typesHashValue;
+            public string TypesHashValue { get; private set; }
 
-            public string TablesHashValue => this.tablesHashValue;
+            public string TablesHashValue { get; private set; }
 
-            public string Tags => this.tags;
+            public string Tags { get; private set; }
 
-            public string Name => this.name;
+            public string Name { get; private set; }
 
             public CremaBinaryTable ReadTable(string tableName)
             {
@@ -1385,23 +1369,23 @@ namespace Ntreev.Crema.Reader
             protected void ReadCore(Stream stream, ReadOptions options)
             {
                 this.stream = stream;
-                this.options = options;
+                this.Options = options;
 
                 var reader = new BinaryReader(stream);
 
                 stream.Seek(0, SeekOrigin.Begin);
                 var fileHeader = reader.ReadValue<FileHeader>();
                 this.tableIndexes = reader.ReadValues<TableIndex>(fileHeader.TableCount);
-                this.version = fileHeader.MagicValue;
+                this.Version = fileHeader.MagicValue;
 
                 stream.Seek(fileHeader.StringResourcesOffset, SeekOrigin.Begin);
                 StringResource.Read(reader);
-                this.revision = StringResource.GetString(fileHeader.Revision);
-                this.name = StringResource.GetString(fileHeader.Name);
+                this.Revision = StringResource.GetString(fileHeader.Revision);
+                this.Name = StringResource.GetString(fileHeader.Name);
                 this.tables = new CremaBinaryTableCollection(this, this.tableIndexes);
-                this.typesHashValue = StringResource.GetString(fileHeader.TypesHashValue);
-                this.tablesHashValue = StringResource.GetString(fileHeader.TablesHashValue);
-                this.tags = StringResource.GetString(fileHeader.Tags);
+                this.TypesHashValue = StringResource.GetString(fileHeader.TypesHashValue);
+                this.TablesHashValue = StringResource.GetString(fileHeader.TablesHashValue);
+                this.Tags = StringResource.GetString(fileHeader.Tags);
 
                 for (var i = 0; i < this.tableIndexes.Length; i++)
                 {
@@ -1419,7 +1403,7 @@ namespace Ntreev.Crema.Reader
                 reader.Seek(tableHeader.TableInfoOffset + offset, SeekOrigin.Begin);
                 reader.ReadValue(out TableInfo tableInfo);
 
-                var table = new CremaBinaryTable(this, tableInfo.RowCount, this.options);
+                var table = new CremaBinaryTable(this, tableInfo.RowCount, this.Options);
 
                 reader.Seek(tableHeader.StringResourcesOffset + offset, SeekOrigin.Begin);
                 StringResource.Read(reader);
@@ -1622,76 +1606,42 @@ namespace Ntreev.Crema.Reader
 
         class CremaBinaryTable : ITable
         {
-            private string tableName;
-            private string categoryName;
-            private int index;
-            private string hashValue;
-
-            private CremaBinaryColumnCollection columns;
-            private readonly CremaBinaryRowCollection rows;
-            private IColumn[] keys;
-            private readonly CremaBinaryReader reader;
-
             public CremaBinaryTable(CremaBinaryReader reader, int rowCount, ReadOptions options)
             {
-                this.reader = reader;
-                this.rows = new CremaBinaryRowCollection(this, rowCount);
+                this.Reader = reader;
+                this.Rows = new CremaBinaryRowCollection(this, rowCount);
             }
 
             public override string ToString()
             {
-                return this.tableName ?? base.ToString();
+                return this.Name ?? base.ToString();
             }
 
-            public string Category
-            {
-                get => this.categoryName;
-                set => this.categoryName = value;
-            }
+            public string Category { get; set; }
 
-            public string Name
-            {
-                get => this.tableName;
-                set => this.tableName = value;
-            }
+            public string Name { get; set; }
 
-            public int Index
-            {
-                get => this.index;
-                internal set => this.index = value;
-            }
+            public int Index { get; internal set; }
 
-            public string HashValue
-            {
-                get => this.hashValue;
-                set => this.hashValue = value;
-            }
+            public string HashValue { get; set; }
 
-            public CremaBinaryColumnCollection Columns
-            {
-                get => this.columns;
-                set => this.columns = value;
-            }
+            public CremaBinaryColumnCollection Columns { get; set; }
 
-            public CremaBinaryRowCollection Rows => this.rows;
+            public CremaBinaryRowCollection Rows { get; }
 
-            public CremaBinaryReader Reader => this.reader;
+            public CremaBinaryReader Reader { get; }
 
-            public IColumn[] Keys
-            {
-                get => this.keys;
-                set => this.keys = value;
-            }
+            public IColumn[] Keys { get; set; }
 
             #region ITable
 
-            IColumn[] ITable.Keys => this.keys;
+            IColumn[] ITable.Keys => this.Keys;
 
-            IRowCollection ITable.Rows => this.rows;
+            IRowCollection ITable.Rows => this.Rows;
 
-            IColumnCollection ITable.Columns => this.columns;
+            IColumnCollection ITable.Columns => this.Columns;
 
-            IDataSet ITable.DataSet => this.reader;
+            IDataSet ITable.DataSet => this.Reader;
 
             #endregion
         }
