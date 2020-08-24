@@ -21,21 +21,16 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:nmfv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework"
-             xmlns:nmgv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework.DataGrid"
+             xmlns:nmfm="clr-namespace:Ntreev.ModernUI.Framework.Markup;assembly=Ntreev.ModernUI.Framework"
              xmlns:ncpc="clr-namespace:Ntreev.Crema.Presentation.Controls;assembly=Ntreev.Crema.Presentation"
              xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Users.Properties"
              mc:Ignorable="d" d:DesignWidth="300">
-
-    <UserControl.Resources>
-        <nmfv:ContentToStringConverter x:Key="contentToStringConverter" />
-    </UserControl.Resources>
 
     <ncpc:HeaderedContentList>
         <HeaderedContentControl Header="{x:Static p:Resources.Label_Blocker}" 
                                 Content="{Binding BanInfo.UserID}" />
         <HeaderedContentControl Header="{x:Static p:Resources.Label_BanDateTime}" 
-                                Content="{Binding BanInfo.DateTime, Converter={StaticResource contentToStringConverter}}" />
+                                Content="{nmfm:DateTimeBinding BanInfo.DateTime}" />
         <HeaderedContentControl Header="{x:Static p:Resources.Label_BanReason}" 
                                 Content="{Binding BanInfo.Comment}" />
     </ncpc:HeaderedContentList>

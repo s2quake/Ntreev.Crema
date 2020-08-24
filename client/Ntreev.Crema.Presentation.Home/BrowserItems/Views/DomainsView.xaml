@@ -24,7 +24,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
              xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
              xmlns:ncfc="clr-namespace:Ntreev.Crema.Presentation.Framework.Controls;assembly=Ntreev.Crema.Presentation.Framework"
              xmlns:vm="clr-namespace:Ntreev.Crema.Presentation.Home.BrowserItems.ViewModels"
-             xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Home.Properties"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 

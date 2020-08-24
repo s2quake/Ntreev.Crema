@@ -15,19 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System.Threading.Tasks;
+using System.Windows.Controls;
 
-namespace Ntreev.Crema.Services.Random
+namespace Ntreev.Crema.Presentation.Users.PropertyItems.Views
 {
-    public static class CremaDataCreator
+    /// <summary>
+    /// BanInfoView.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class BanInfoView : UserControl
     {
-        public static async Task CreateStandardAsync(this IDataBase dataBase, Authentication authentication)
+        public BanInfoView()
         {
-            var tableContext = dataBase.TableContext;
-            await tableContext.Root.AddNewCategoryAsync(authentication, "All");
-            await tableContext.Root.AddNewCategoryAsync(authentication, "Client");
-            await tableContext.Root.AddNewCategoryAsync(authentication, "Server");
-            await tableContext.Root.AddNewCategoryAsync(authentication, "None");
+            InitializeComponent();
         }
     }
 }

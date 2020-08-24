@@ -7,20 +7,10 @@
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Presentation\Ntreev.Crema.Presentation.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Presentation.Framework\Ntreev.Crema.Presentation.Framework.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Presentation.Tables\Ntreev.Crema.Presentation.Tables.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Presentation.Types\Ntreev.Crema.Presentation.Types.csproj">
-      <Private>false</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\..\..\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework.csproj" />
+    <ProjectReference Include="..\..\common\Ntreev.Crema.Presentation\Ntreev.Crema.Presentation.csproj" />
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Framework\Ntreev.Crema.Presentation.Framework.csproj" />
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Tables\Ntreev.Crema.Presentation.Tables.csproj" />
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Types\Ntreev.Crema.Presentation.Types.csproj" />
   </ItemGroup>
 </Project>

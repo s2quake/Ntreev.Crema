@@ -6,6 +6,17 @@ MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client", "client", "{290BFCAE-735F-4FDB-8CBE-A2F3541DA58C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.ApplicationHost", "client\Ntreev.Crema.ApplicationHost\Ntreev.Crema.ApplicationHost.csproj", "{EDDF6676-53ED-4244-927A-B9719809A4EC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0BEFE601-F1EE-4FA8-9E5C-C972E7D9B182} = {0BEFE601-F1EE-4FA8-9E5C-C972E7D9B182}
+		{D0AD2312-AB7C-4707-BF12-39829FB76202} = {D0AD2312-AB7C-4707-BF12-39829FB76202}
+		{42003936-846E-4710-A4BD-F75DC778C9D5} = {42003936-846E-4710-A4BD-F75DC778C9D5}
+		{D3C7D537-66D9-40C9-A70B-CC5B9419B7B8} = {D3C7D537-66D9-40C9-A70B-CC5B9419B7B8}
+		{9B1C4468-7CDD-4DAB-80CE-75365A4E6031} = {9B1C4468-7CDD-4DAB-80CE-75365A4E6031}
+		{B8B76C9F-8EE5-45B2-B358-DB5FA4698EAB} = {B8B76C9F-8EE5-45B2-B358-DB5FA4698EAB}
+		{C66D34D2-0BA9-4E68-B08A-B48337FC1CDA} = {C66D34D2-0BA9-4E68-B08A-B48337FC1CDA}
+		{009450EB-EF51-4AD6-802C-61A56E4CA4FE} = {009450EB-EF51-4AD6-802C-61A56E4CA4FE}
+		{240587FE-F7B5-453F-A49B-92AAC3943DC8} = {240587FE-F7B5-453F-A49B-92AAC3943DC8}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Presentation.Framework", "client\Ntreev.Crema.Presentation.Framework\Ntreev.Crema.Presentation.Framework.csproj", "{0BEFE601-F1EE-4FA8-9E5C-C972E7D9B182}"
 EndProject
@@ -92,6 +103,13 @@ EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Services.Extensions", "share\Ntreev.Crema.Services.Extensions\Ntreev.Crema.Services.Extensions.shproj", "{97AD6C00-3B71-4E83-97C3-0201BC035471}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.Services.Random", "share\Ntreev.Crema.Services.Random\Ntreev.Crema.Services.Random.shproj", "{1F4A20AE-F955-4231-8636-27B7A38EB4B3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "etc", "etc", "{7E9D059E-8B02-42D9-8AE8-9130003F775C}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		base.props = base.props
+		wpf.props = wpf.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

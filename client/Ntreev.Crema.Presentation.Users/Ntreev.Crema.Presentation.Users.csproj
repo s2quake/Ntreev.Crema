@@ -1,23 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <Import Project="..\..\wpf.props" />
-  <PropertyGroup>
+  <!--<PropertyGroup>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <OutputPath>..\..\bin\$(Configuration)\$(TargetFramework)\crema</OutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
-  </PropertyGroup>
+  </PropertyGroup>-->
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Presentation\Ntreev.Crema.Presentation.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Presentation.Home\Ntreev.Crema.Presentation.Home.csproj">
-      <Private>false</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Presentation.Framework\Ntreev.Crema.Presentation.Framework.csproj">
-      <Private>false</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\..\..\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework.csproj" />
+    <ProjectReference Include="..\..\common\Ntreev.Crema.Presentation\Ntreev.Crema.Presentation.csproj" />
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Home\Ntreev.Crema.Presentation.Home.csproj" />
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Framework\Ntreev.Crema.Presentation.Framework.csproj" />
   </ItemGroup>
+  <Target Name="CopyFiles" AfterTargets="AfterBuild">
+    <Copy SourceFiles="$(OutputPath)$(TargetName).*" DestinationFolder="..\..\bin\$(Configuration)\$(TargetFramework)\crema" SkipUnchangedFiles="true" />
+  </Target> 
+  <!--<Target Name="DeleteFiles" AfterTargets="AfterClean">
+    <Delete Files="..\..\bin\$(Configuration)\$(TargetFramework)\crema\$(TargetName)$(TargetExt)" />
+    <Delete Files="..\..\bin\$(Configuration)\$(TargetFramework)\crema\$(TargetName)$(TargetExt)" />
+  </Target>--> 
 </Project>

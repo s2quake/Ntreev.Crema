@@ -132,7 +132,7 @@ namespace Ntreev.Crema.ApplicationHost
                 this.SetPrompt();
                 this.terminal.AppendLine(Properties.Resources.Comment_Hello);
                 this.terminal.AppendLine(Properties.Resources.Comment_AvaliableCommands);
-                foreach (var item in this.commandContext.Node.Commands)
+                foreach (var item in this.commandContext.Node.Childs)
                 {
                     if (item.IsEnabled == false)
                         continue;
