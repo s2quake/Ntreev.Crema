@@ -41,7 +41,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <nmfc:ModernToolBar ItemsSource="{Binding ToolBarItems}">
+        <nmfc:ModernToolBar ItemsSource="{Binding ToolBarMenus}">
             <nmfc:IconButton x:Name="CollapseAll" Source="/Ntreev.Crema.Presentation.Framework;component/Images/collapse_all.png" />
             <nmfc:IconButton x:Name="NotifyMessage" Margin="0 0 1 0" Visibility="{nmfm:VisibilityBinding IsAdmin}"
                              ToolTip="{x:Static p:Resources.Tooltip_Notify}"

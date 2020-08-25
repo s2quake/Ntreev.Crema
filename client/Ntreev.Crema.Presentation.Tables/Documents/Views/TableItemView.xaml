@@ -68,7 +68,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
         <TextBlock Grid.Row="0" Text="{x:Static p:Resources.Message_IsReadOnly}" Style="{StaticResource ReadOnly_TextBlock_Style}" />
 
-        <nmfc:ModernToolBar Grid.Row="1" ItemsSource="{Binding ToolBarItems}">
+        <nmfc:ModernToolBar Grid.Row="1" ItemsSource="{Binding ToolBarMenus}">
             <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/new.png" Style="{StaticResource ToolBar_IconButton_Style}"
                              Command="{Binding InsertCommand}" />
             <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/insert-many.png" Style="{StaticResource ToolBar_IconButton_Style}"

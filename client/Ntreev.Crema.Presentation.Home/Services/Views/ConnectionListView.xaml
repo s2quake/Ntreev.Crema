@@ -10,7 +10,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
-        <nmfv:ColorToBrushConverter x:Key="colorToBrushConverter" />
+        <nmfv:ColorToBrushConverter x:Key="ColorToBrushConverter" />
 
         <ControlTemplate x:Key="ConnectionListBoxItem_Template" TargetType="{x:Type ListBoxItem}">
             <Grid>
@@ -38,16 +38,16 @@
             <ContentControl>
                 <Grid Width="157" Height="133">
                     <Path Data="F1 M0.5,0.5 L134.5,0.5 134.5,22.5 156.5,22.5 156.5,132.5 0.5,132.5 0.5,0.5 z M156.5,22.5 L134.5,22.5 156.5,22.5 z" 
-                      Stroke="{DynamicResource InputBorder}" Margin="-0.5,-0.5,0,0" 
-                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                          Stroke="{DynamicResource InputBorder}" Margin="-0.5,-0.5,0,0" 
+                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
                     <Path x:Name="themePath" Data="F1 M0.5,0.5 L0.5,22.5 22.5,22.5 z M22.5,22.5 L0.5,0.5 0.5,22.5 22.5,22.5 z" 
-                      Fill="Black"  Stroke="{DynamicResource InputBorder}" Margin="133.5,-0.5,0,0" 
-                      StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
-                      HorizontalAlignment="Left" VerticalAlignment="Top" />
+                          Fill="Black"  Stroke="{DynamicResource InputBorder}" Margin="133.5,-0.5,0,0" 
+                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                          HorizontalAlignment="Left" VerticalAlignment="Top" />
                     <Path Data="F1 M0.5,0.5 L20.5,0.5 20.5,132.5 0.5,132.5 0.5,0.5 z" 
-                      Fill="{Binding ThemeColor, Converter={StaticResource colorToBrushConverter}, FallbackValue=#1ba1e2}" 
-                      Stroke="{DynamicResource InputBorder}" Margin="-0.5,-0.5,69.5,-0.5" StrokeStartLineCap="Round" 
-                      StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+                          Fill="{Binding ThemeColor, Converter={StaticResource ColorToBrushConverter}, FallbackValue=#1ba1e2}" 
+                          Stroke="{DynamicResource InputBorder}" Margin="-0.5,-0.5,69.5,-0.5" StrokeStartLineCap="Round" 
+                          StrokeEndLineCap="Round" StrokeLineJoin="Round" />
                     <StackPanel Margin="25 10 2 2" Focusable="False" FocusVisualStyle="{x:Null}">
                         <StackPanel.Resources>
                             <Style TargetType="{x:Type nmfc:HighlightTextBlock}" BasedOn="{StaticResource {x:Type nmfc:HighlightTextBlock}}">
@@ -122,7 +122,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
     </UserControl.Resources>
 
     <ListBox x:Name="ListBox" ItemsSource="{Binding ConnectionItems}" SelectedItem="{Binding ConnectionItem, Mode=TwoWay, Delay=100}" />

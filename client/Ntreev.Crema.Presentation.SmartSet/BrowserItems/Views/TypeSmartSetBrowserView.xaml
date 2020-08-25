@@ -40,7 +40,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <nmfc:ModernToolBar ItemsSource="{Binding ToolBarItems}">
+        <nmfc:ModernToolBar ItemsSource="{Binding ToolBarMenus}">
             <nmfc:IconButton x:Name="CollapseAll" Source="/Ntreev.Crema.Presentation.Framework;component/Images/collapse_all.png" />
             <nmfc:IconButton x:Name="NewSmartSet" Source="/Ntreev.Crema.Presentation.Framework;component/Images/plus.png" />
         </nmfc:ModernToolBar>

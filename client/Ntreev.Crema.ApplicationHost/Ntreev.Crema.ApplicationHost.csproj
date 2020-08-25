@@ -5,12 +5,11 @@
     <OutputType>WinExe</OutputType>
     <AssemblyName>crema</AssemblyName>
     <Product>Crema</Product>
-    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <OutputPath>..\..\bin\$(Configuration)\$(TargetFramework)\crema</OutputPath>
-    <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
+    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\crema</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj" />
+    <ProjectReference Include="..\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.csproj" />
     <ProjectReference Include="..\Ntreev.Crema.Presentation.Home\Ntreev.Crema.Presentation.Home.csproj" />
   </ItemGroup>
 </Project>
