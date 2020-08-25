@@ -2,16 +2,26 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <Import Project="..\..\wpf.props" />
   <PropertyGroup>
-    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <OutputPath>..\..\bin\$(Configuration)\$(TargetFramework)\crema</OutputPath>
-    <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
+    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\crema</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Presentation\Ntreev.Crema.Presentation.csproj" />
-    <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Presentation.Framework\Ntreev.Crema.Presentation.Framework.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj" />
+    <ProjectReference Include="..\..\common\Ntreev.Crema.Presentation\Ntreev.Crema.Presentation.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Ntreev.Crema.Presentation.Framework\Ntreev.Crema.Presentation.Framework.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj">
+      <Private>false</Private>
+    </ProjectReference>
   </ItemGroup>
 </Project>

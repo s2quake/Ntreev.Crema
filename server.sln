@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "server", "server", "{8D8DC23A-F758-402E-ABA2-5C7C7268B378}"
+	ProjectSection(SolutionItems) = preProject
+		server\Directory.Build.props = server\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.ServiceHosts", "server\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.csproj", "{377A848E-B9B8-48B1-8D03-DB4D19AEE894}"
 EndProject
@@ -14,6 +17,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.RuntimeService", "server\Ntreev.Crema.RuntimeService\Ntreev.Crema.RuntimeService.csproj", "{A714CE01-2673-4363-A6EF-03B9B428B335}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{DE72D6B6-C9A3-416E-9949-38FA1A574264}"
+	ProjectSection(SolutionItems) = preProject
+		common\Directory.Build.props = common\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.ServiceModel", "common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj", "{257AA39C-962D-4CD0-BE7B-E35939082BD4}"
 EndProject
@@ -90,7 +96,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "etc", "etc", "{922B62F6-AB65-4A1A-80D6-79F3E839AD43}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		base.props = base.props
+		Directory.Build.props = Directory.Build.props
 		wpf.props = wpf.props
 	EndProjectSection
 EndProject

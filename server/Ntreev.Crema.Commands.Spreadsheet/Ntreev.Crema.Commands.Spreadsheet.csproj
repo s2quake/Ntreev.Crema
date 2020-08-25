@@ -1,11 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\base.props" />
   <Import Project="..\..\share\Ntreev.Crema.Commands.Spreadsheet\Ntreev.Crema.Commands.Spreadsheet.projitems" Label="Shared" />
   <PropertyGroup>
-    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <OutputPath>..\..\bin\$(Configuration)\$(TargetFramework)\cremaserver\plugins\Spreadsheet</OutputPath>
-    <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
+    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\cremaserver\plugins\Spreadsheet</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\Ntreev.Crema.Spreadsheet\Ntreev.Crema.Spreadsheet.csproj" />

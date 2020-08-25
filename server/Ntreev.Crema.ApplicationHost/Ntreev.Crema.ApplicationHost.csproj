@@ -5,9 +5,7 @@
     <OutputType>WinExe</OutputType>
     <AssemblyName>cremaserverApp</AssemblyName>
     <Product>Crema Server App</Product>
-    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <OutputPath>..\..\bin\$(Configuration)\$(TargetFramework)\cremaserverApp</OutputPath>
-    <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
+    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\cremaserverApp</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Caliburn.Micro" Version="4.0.105-alpha" />

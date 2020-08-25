@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\base.props" />
   <ItemGroup>
     <PackageReference Include="DiffPlex" Version="1.6.3" />
   </ItemGroup>

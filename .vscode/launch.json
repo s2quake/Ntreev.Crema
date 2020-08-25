@@ -9,19 +9,17 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build client",
-            "program": "${workspaceFolder}/bin/Debug/netcoreapp3.1/crema/crema.dll",
-            "cwd": "${workspaceFolder}/bin/Debug/netcoreapp3.1/crema",
-            "stopAtEntry": false,
-            "console": "externalTerminal"
+            "program": "${workspaceFolder}/exe/Debug/netcoreapp3.1/crema/crema.dll",
+            "cwd": "${workspaceFolder}/exe/Debug/netcoreapp3.1/crema",
+            "stopAtEntry": false
         },
         {
             "name": ".NET Core Launch (server)",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build server",
-            "program": "${workspaceFolder}/bin/Debug/netcoreapp3.1/cremaserverApp/cremaserverApp.dll",
-            "cwd": "${workspaceFolder}/bin/Debug/netcoreapp3.1/cremaserverApp",
-            "console": "externalTerminal",
+            "program": "${workspaceFolder}/exe/Debug/netcoreapp3.1/cremaserverApp/cremaserverApp.dll",
+            "cwd": "${workspaceFolder}/exe/Debug/netcoreapp3.1/cremaserverApp",
             "stopAtEntry": false
         },
         {
