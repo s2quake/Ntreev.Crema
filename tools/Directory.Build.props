@@ -2,10 +2,13 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
-    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
-    <BaseOutputPath>$(MSBuildThisFileDirectory)..\bin\tools\$(MSBuildProjectName)</BaseOutputPath>
-    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)..\obj\tools\$(MSBuildProjectName)</BaseIntermediateOutputPath>
-    <OutputPath>$(MSBuildThisFileDirectory)..\bin\$(Configuration)\$(TargetFramework)\tools\$(MSBuildProjectName)</OutputPath>
-    <IntermediateOutputPath>$(MSBuildThisFileDirectory)..\obj\$(Configuration)\$(TargetFramework)\tools\$(MSBuildProjectName)</IntermediateOutputPath>
+    <RootPath Condition="'$(SolutionDir)' != ''">$(SolutionDir)</RootPath>
+    <RootPath Condition="'$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)..\</RootPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <BaseOutputPath>$(RootPath)bin\tools\$(MSBuildProjectName)</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(RootPath)obj\tools\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+    <OutputPath>$(RootPath)bin\$(Configuration)\$(TargetFramework)\tools\$(MSBuildProjectName)</OutputPath>
+    <IntermediateOutputPath>$(RootPath)obj\$(Configuration)\$(TargetFramework)\tools\$(MSBuildProjectName)</IntermediateOutputPath>
+    <ExePath>$(RootPath)exe\$(Configuration)\$(TargetFramework)\</ExePath>
   </PropertyGroup>
 </Project>

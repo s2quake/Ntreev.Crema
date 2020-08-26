@@ -9,8 +9,8 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build client",
-            "program": "${workspaceFolder}/exe/Debug/netcoreapp3.1/crema/crema.dll",
-            "cwd": "${workspaceFolder}/exe/Debug/netcoreapp3.1/crema",
+            "program": "${workspaceFolder}/exe/Debug/netcoreapp3.1/client/application/crema.dll",
+            "cwd": "${workspaceFolder}/exe/Debug/netcoreapp3.1/client/application",
             "stopAtEntry": false
         },
         {
@@ -18,8 +18,8 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build server",
-            "program": "${workspaceFolder}/exe/Debug/netcoreapp3.1/cremaserverApp/cremaserverApp.dll",
-            "cwd": "${workspaceFolder}/exe/Debug/netcoreapp3.1/cremaserverApp",
+            "program": "${workspaceFolder}/exe/Debug/netcoreapp3.1/server/application/cremaserverApp.dll",
+            "cwd": "${workspaceFolder}/exe/Debug/netcoreapp3.1/server/application",
             "stopAtEntry": false
         },
         {

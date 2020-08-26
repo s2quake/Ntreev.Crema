@@ -5,7 +5,7 @@
     <OutputType>WinExe</OutputType>
     <AssemblyName>cremadesigner</AssemblyName>
     <Product>Crema Designer</Product>
-    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\cremadesigner</OutputPath>
+    <OutputPath>$(ExePath)etc\designer</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />

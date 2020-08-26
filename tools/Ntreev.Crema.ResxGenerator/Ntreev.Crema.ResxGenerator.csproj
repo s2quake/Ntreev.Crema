@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>cremaresx</AssemblyName>
     <Product>Crema Resx Generator</Product>
-    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\cremaresx</OutputPath>
+    <OutputPath>$(ExePath)etc\resx</OutputPath>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>

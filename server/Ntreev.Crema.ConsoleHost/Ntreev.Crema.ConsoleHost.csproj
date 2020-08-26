@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>cremaserver</AssemblyName>
     <Product>Crema Server</Product>
-    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\cremaserver</OutputPath>
+    <OutputPath>$(ExePath)server\console</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj" />

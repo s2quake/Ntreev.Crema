@@ -17,6 +17,7 @@
 
 using Ntreev.Crema.Services;
 using System;
+using System.ServiceProcess;
 
 namespace Ntreev.Crema.WindowsServiceHost
 {

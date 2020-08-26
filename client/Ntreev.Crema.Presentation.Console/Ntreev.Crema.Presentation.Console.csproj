@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <Import Project="..\..\wpf.props" />
   <PropertyGroup>
-    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\crema</OutputPath>
+    <OutputPath>$(ExePath)client\application</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\Ntreev.Crema.Presentation\Ntreev.Crema.Presentation.csproj">

@@ -5,7 +5,7 @@
     <OutputType>WinExe</OutputType>
     <AssemblyName>crema</AssemblyName>
     <Product>Crema</Product>
-    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\crema</OutputPath>
+    <OutputPath>$(ExePath)client\application</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj" />

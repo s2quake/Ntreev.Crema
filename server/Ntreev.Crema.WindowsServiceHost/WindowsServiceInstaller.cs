@@ -18,14 +18,16 @@
 using Ntreev.Crema.Services;
 using Ntreev.Library;
 using System.ComponentModel;
+using System.Configuration.Install;
+using System.ServiceProcess;
 
 namespace Ntreev.Crema.WindowsServiceHost
 {
     [RunInstaller(true)]
     public class WindowsServiceInstaller : Installer
     {
-        private ServiceProcessInstaller serviceProcessInstaller = new ServiceProcessInstaller();
-        private ServiceInstaller serviceInstaller = new ServiceInstaller();
+        private readonly ServiceProcessInstaller serviceProcessInstaller = new ServiceProcessInstaller();
+        private readonly ServiceInstaller serviceInstaller = new ServiceInstaller();
 
         public WindowsServiceInstaller()
         {
@@ -65,20 +67,18 @@ namespace Ntreev.Crema.WindowsServiceHost
             CremaLog.Debug("commit");
             base.OnCommitted(savedState);
             CremaLog.Debug("committed");
-            using (ServiceController controller = new ServiceController(serviceInstaller.ServiceName))
+            using ServiceController controller = new ServiceController(serviceInstaller.ServiceName);
+            try
             {
-                try
+                if (controller.Status != ServiceControllerStatus.Running)
                 {
-                    if (controller.Status != ServiceControllerStatus.Running)
-                    {
-                        controller.Start();
-                        controller.WaitForStatus(ServiceControllerStatus.Running);
-                    }
+                    controller.Start();
+                    controller.WaitForStatus(ServiceControllerStatus.Running);
                 }
-                catch
-                {
-                    throw;
-                }
+            }
+            catch
+            {
+                throw;
             }
         }
 

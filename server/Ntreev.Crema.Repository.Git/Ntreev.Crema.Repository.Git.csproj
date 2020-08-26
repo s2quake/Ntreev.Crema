@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\cremaserver\repo-modules\git</OutputPath>
+    <OutputPath>$(ExePath)server\application\repo-modules\git</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="YamlDotNet" Version="8.1.2" />

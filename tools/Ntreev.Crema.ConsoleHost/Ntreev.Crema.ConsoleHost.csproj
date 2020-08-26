@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>cremadev</AssemblyName>
     <Product>Crema Dev</Product>
-    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\cremadev</OutputPath>
+    <OutputPath>$(ExePath)dev\console</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />

@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\share\Ntreev.Crema.Commands.Spreadsheet\Ntreev.Crema.Commands.Spreadsheet.projitems" Label="Shared" />
   <PropertyGroup>
-    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\cremaserver\plugins\Spreadsheet</OutputPath>
+    <OutputPath>$(ExePath)server\application\plugins\Spreadsheet</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\Ntreev.Crema.Spreadsheet\Ntreev.Crema.Spreadsheet.csproj" />

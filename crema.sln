@@ -154,6 +154,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "etc", "etc", "{1F5FB141-283
 		wpf.props = wpf.props
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Communication", "..\JSSoft.Communication\JSSoft.Communication\JSSoft.Communication.csproj", "{DA4C52CD-107D-4A04-955B-67961EE26214}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		share\Ntreev.Crema.Commands.Spreadsheet\Ntreev.Crema.Commands.Spreadsheet.projitems*{05971a74-2d68-4781-9ceb-df2b48f8ba75}*SharedItemsImports = 13
@@ -395,6 +397,10 @@ Global
 		{D334A888-251A-42B5-8E6E-24F21FE99236}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D334A888-251A-42B5-8E6E-24F21FE99236}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D334A888-251A-42B5-8E6E-24F21FE99236}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA4C52CD-107D-4A04-955B-67961EE26214}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA4C52CD-107D-4A04-955B-67961EE26214}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA4C52CD-107D-4A04-955B-67961EE26214}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA4C52CD-107D-4A04-955B-67961EE26214}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -461,6 +467,7 @@ Global
 		{4E857C1F-3CA7-45B7-9B3F-2AF6D49071B2} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
 		{24ECBEE1-2859-4F09-969B-F382E6341814} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
 		{97AD6C00-3B71-4E83-97C3-0201BC035471} = {6694E6CE-60A0-475C-B4D5-B4A078388C2F}
+		{DA4C52CD-107D-4A04-955B-67961EE26214} = {7628581C-F073-411C-8D1D-CDEAEEC69C0D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {14FB22CB-2420-4F8B-9112-F64D7814E3EF}

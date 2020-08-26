@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>cremaconsole</AssemblyName>
     <Product>Crema Console</Product>
-    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\cremaconsole</OutputPath>
+    <OutputPath>$(ExePath)client\console</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.Targets" Version="3.0.0" PrivateAssets="all" />

@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <Import Project="..\..\wpf.props" />
   <PropertyGroup>
-    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\crema</OutputPath>
+    <OutputPath>$(ExePath)client\application</OutputPath>
   </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('netcoreapp3.'))">
     <PackageReference Include="Microsoft-WindowsAPICodePack-Core" Version="1.1.4" />

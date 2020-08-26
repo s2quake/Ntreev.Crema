@@ -20,6 +20,7 @@ using Ntreev.Library.Commands;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Configuration.Install;
 using System.IO;
 
 namespace Ntreev.Crema.WindowsServiceHost

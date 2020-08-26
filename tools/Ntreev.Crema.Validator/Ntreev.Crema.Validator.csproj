@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>cremavalidator</AssemblyName>
     <Product>Crema Validator</Product>
-    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\cremavalidator</OutputPath>
+    <OutputPath>$(ExePath)etc\validation</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />

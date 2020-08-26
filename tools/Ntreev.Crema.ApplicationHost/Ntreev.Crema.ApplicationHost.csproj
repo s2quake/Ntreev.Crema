@@ -5,7 +5,7 @@
     <OutputType>WinExe</OutputType>
     <AssemblyName>cremadevApp</AssemblyName>
     <Product>Crema Dev App</Product>
-    <OutputPath>..\..\exe\$(Configuration)\$(TargetFramework)\cremadevApp</OutputPath>
+    <OutputPath>$(ExePath)dev\application</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
