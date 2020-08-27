@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Differences.Documents.Views
+namespace JSSoft.Crema.Presentation.Differences.Documents.Views
 {
     /// <summary>
     /// TypeDocumentView.xaml에 대한 상호 작용 논리

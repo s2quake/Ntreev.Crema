@@ -18,13 +18,13 @@
 using DiffPlex;
 using DiffPlex.DiffBuilder;
 using DiffPlex.DiffBuilder.Model;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Library;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Ntreev.Crema.Data.Diff
+namespace JSSoft.Crema.Data.Diff
 {
     static class DiffInternalUtility
     {

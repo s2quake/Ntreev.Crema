@@ -15,12 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library.Commands;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Library.Commands;
+using JSSoft.Library.ObjectModel;
 using System;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Commands.Consoles
+namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceDescription("Resources", IsShared = true)]
@@ -50,7 +50,7 @@ namespace Ntreev.Crema.Commands.Consoles
         {
             var drive = this.CommandContext.GetDrive(path);
             if (drive == null)
-                throw new ArgumentException(string.Format(Ntreev.Library.Properties.Resources.Exception_InvalidPath_Format, path), nameof(path));
+                throw new ArgumentException(string.Format(JSSoft.Library.Properties.Resources.Exception_InvalidPath_Format, path), nameof(path));
             var absolutePath = this.CommandContext.GetAbsolutePath(path);
             var authentication = this.CommandContext.GetAuthentication(this);
             if (NameValidator.VerifyCategoryPath(absolutePath))

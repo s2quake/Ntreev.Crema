@@ -17,7 +17,7 @@
 
 using System.Windows;
 
-namespace Ntreev.Crema.Presentation.Assets
+namespace JSSoft.Crema.Presentation.Assets
 {
     public partial class DiffDataTypeControl : ResourceDictionary
     {

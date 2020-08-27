@@ -17,7 +17,7 @@
 
 using System.Security;
 
-namespace Ntreev.Crema.Services.Test
+namespace JSSoft.Crema.Services.Test
 {
     static class Utility
     {

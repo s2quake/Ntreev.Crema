@@ -1,15 +1,15 @@
-﻿using Ntreev.Crema.ServiceModel.Data;
-using Ntreev.Library;
-using Ntreev.Library.Extensions;
-using Ntreev.Library.Linq;
-using Ntreev.Library.Random;
+﻿using JSSoft.Crema.ServiceModel.Data;
+using JSSoft.Library;
+using JSSoft.Library.Extensions;
+using JSSoft.Library.Linq;
+using JSSoft.Library.Random;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.ServerService.Test
+namespace JSSoft.Crema.ServerService.Test
 {
     public static class CremaObjectGenerator
     {

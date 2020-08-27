@@ -16,9 +16,9 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Library.Random;
+using JSSoft.Library.Random;
 
-namespace Ntreev.Crema.Services.Test
+namespace JSSoft.Crema.Services.Test
 {
     [TestClass]
     public class ITableCategory_ComplexTest

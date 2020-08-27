@@ -1,4 +1,4 @@
-﻿namespace Ntreev.Crema.ApplicationHost
+﻿namespace JSSoft.Crema.ApplicationHost
 {
     public partial class App
     {

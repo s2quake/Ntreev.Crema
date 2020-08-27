@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     public static partial class ILogServiceExtensions
     {

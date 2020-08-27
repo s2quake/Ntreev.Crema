@@ -15,15 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Differences.Documents.ViewModels;
-using Ntreev.Crema.Presentation.Differences.Properties;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Presentation.Differences.Documents.ViewModels;
+using JSSoft.Crema.Presentation.Differences.Properties;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Library;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Presentation.Differences
+namespace JSSoft.Crema.Presentation.Differences
 {
     [Export(typeof(IContentService))]
     [InheritedExport(typeof(DifferencesServiceViewModel))]

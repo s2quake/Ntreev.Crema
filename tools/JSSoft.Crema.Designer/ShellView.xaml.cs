@@ -39,7 +39,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace Ntreev.Crema.Designer
+namespace JSSoft.Crema.Designer
 {
     /// <summary>
     /// Interaction logic for ModernWindow1.xaml

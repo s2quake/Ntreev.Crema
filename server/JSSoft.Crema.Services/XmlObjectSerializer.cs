@@ -15,11 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library.IO;
-using Ntreev.Library.Serialization;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Data.Xml;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Library.IO;
+using JSSoft.Library.Serialization;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -30,7 +30,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     [Export(typeof(IObjectSerializer))]
     class XmlObjectSerializer : IObjectSerializer

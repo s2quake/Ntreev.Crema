@@ -20,7 +20,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.ApplicationHost
+namespace JSSoft.Crema.ApplicationHost
 {
     class LogTextWriter : TextWriter
     {

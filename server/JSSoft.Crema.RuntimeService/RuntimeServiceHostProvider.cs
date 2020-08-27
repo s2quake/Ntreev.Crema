@@ -16,11 +16,11 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using JSSoft.Communication;
-using Ntreev.Crema.ServiceHosts;
-using Ntreev.Crema.Services;
+using JSSoft.Crema.ServiceHosts;
+using JSSoft.Crema.Services;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.RuntimeService
+namespace JSSoft.Crema.RuntimeService
 {
     [Export(typeof(IServiceHostProvider))]
     class RuntimeServiceHostProvider : IServiceHostProvider

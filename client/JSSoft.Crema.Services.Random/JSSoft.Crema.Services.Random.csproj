@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\share\Ntreev.Crema.Services.Random\Ntreev.Crema.Services.Random.projitems" Label="Shared" />
+  <Import Project="..\..\share\JSSoft.Crema.Services.Random\JSSoft.Crema.Services.Random.projitems" Label="Shared" />
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library.Random\Ntreev.Library.Random.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Services.Extentions\Ntreev.Crema.Services.Extentions.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj" />
+    <ProjectReference Include="..\..\..\JSSoft.Library\JSSoft.Library.Random\JSSoft.Library.Random.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Services.Extentions\JSSoft.Crema.Services.Extentions.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Services\JSSoft.Crema.Services.csproj" />
   </ItemGroup>
 </Project>

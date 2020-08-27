@@ -15,16 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.Services.Extensions;
-using Ntreev.Library.Random;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
+using JSSoft.Crema.Services.Extensions;
+using JSSoft.Library.Random;
 using System;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Bot.Tasks
+namespace JSSoft.Crema.Bot.Tasks
 {
     [Export(typeof(ITaskProvider))]
     [Export(typeof(ITableTask))]

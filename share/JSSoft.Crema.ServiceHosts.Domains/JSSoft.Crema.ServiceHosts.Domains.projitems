@@ -6,7 +6,7 @@
     <SharedGUID>f2688cf8-cc3e-48c9-a718-738f57388165</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>Ntreev.Crema.ServiceHosts.Domains</Import_RootNamespace>
+    <Import_RootNamespace>JSSoft.Crema.ServiceHosts.Domains</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Domains\IDomainContextEventCallback.cs" />

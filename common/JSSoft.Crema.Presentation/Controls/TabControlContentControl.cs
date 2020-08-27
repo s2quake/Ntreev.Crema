@@ -17,7 +17,7 @@
 
 using System.Windows.Controls.Primitives;
 
-namespace Ntreev.Crema.Presentation.Controls
+namespace JSSoft.Crema.Presentation.Controls
 {
     class TabControlContentControl : Selector
     {

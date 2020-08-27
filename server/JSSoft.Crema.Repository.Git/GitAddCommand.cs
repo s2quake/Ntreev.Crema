@@ -18,7 +18,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Ntreev.Crema.Repository.Git
+namespace JSSoft.Crema.Repository.Git
 {
     class GitAddCommand : GitCommand
     {

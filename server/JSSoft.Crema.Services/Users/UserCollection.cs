@@ -15,11 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Properties;
-using Ntreev.Crema.Services.Users.Serializations;
-using Ntreev.Library;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Properties;
+using JSSoft.Crema.Services.Users.Serializations;
+using JSSoft.Library;
+using JSSoft.Library.ObjectModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ using System.Linq;
 using System.Security;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services.Users
+namespace JSSoft.Crema.Services.Users
 {
     class UserCollection : ItemContainer<User, UserCategory, UserCollection, UserCategoryCollection, UserContext>,
         IUserCollection

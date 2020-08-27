@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Ntreev.Crema.Presentation.Tables.Properties {
+namespace JSSoft.Crema.Presentation.Tables.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

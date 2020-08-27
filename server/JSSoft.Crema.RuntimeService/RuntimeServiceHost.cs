@@ -16,10 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using JSSoft.Communication;
-using Ntreev.Crema.ServiceHosts.RuntimeService;
-using Ntreev.Crema.Services;
+using JSSoft.Crema.ServiceHosts.RuntimeService;
+using JSSoft.Crema.Services;
 
-namespace Ntreev.Crema.RuntimeService
+namespace JSSoft.Crema.RuntimeService
 {
     class RuntimeServiceHost : ServerServiceHostBase<IRuntimeService>
     {

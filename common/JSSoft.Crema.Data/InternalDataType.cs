@@ -15,10 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data.Properties;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library;
-using Ntreev.Library.IO;
+using JSSoft.Crema.Data.Properties;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Library;
+using JSSoft.Library.IO;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,7 +27,7 @@ using System.Data;
 using System.Linq;
 using System.Security.Cryptography;
 
-namespace Ntreev.Crema.Data
+namespace JSSoft.Crema.Data
 {
     class InternalDataType : InternalTableBase<InternalDataType, InternalDataTypeMember>
     {

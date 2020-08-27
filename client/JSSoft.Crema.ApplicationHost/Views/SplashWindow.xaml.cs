@@ -18,7 +18,7 @@
 using System.Windows;
 using System.Windows.Media;
 
-namespace Ntreev.Crema.ApplicationHost.Views
+namespace JSSoft.Crema.ApplicationHost.Views
 {
     /// <summary>
     /// SplashWindow.xaml에 대한 상호 작용 논리

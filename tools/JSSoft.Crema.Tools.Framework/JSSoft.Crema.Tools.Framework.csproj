@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <Import Project="..\..\wpf.props" />
-  <Import Project="..\..\share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.projitems" Label="Shared" />
+  <Import Project="..\..\share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.projitems" Label="Shared" />
   <ItemGroup>
     <ProjectReference Include="..\..\..\JSSoft.Communication\JSSoft.Communication\JSSoft.Communication.csproj" />
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Presentation\Ntreev.Crema.Presentation.csproj" />
-    <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Presentation\JSSoft.Crema.Presentation.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.ServiceModel\JSSoft.Crema.ServiceModel.csproj" />
   </ItemGroup>
 </Project>

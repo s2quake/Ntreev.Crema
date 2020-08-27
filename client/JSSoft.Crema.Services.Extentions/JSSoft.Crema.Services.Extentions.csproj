@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\share\Ntreev.Crema.Services.Extensions\Ntreev.Crema.Services.Extensions.projitems" Label="Shared" />
+  <Import Project="..\..\share\JSSoft.Crema.Services.Extensions\JSSoft.Crema.Services.Extensions.projitems" Label="Shared" />
   <ItemGroup>
-    <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Services\JSSoft.Crema.Services.csproj" />
   </ItemGroup>
 </Project>

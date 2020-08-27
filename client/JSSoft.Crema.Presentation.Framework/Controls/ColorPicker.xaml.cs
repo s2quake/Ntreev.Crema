@@ -30,7 +30,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Presentation.Framework.Controls
+namespace JSSoft.Crema.Presentation.Framework.Controls
 {
     public partial class ColorPicker : UserControl
     {

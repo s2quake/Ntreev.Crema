@@ -16,21 +16,21 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ====================================================================================================================-->
-<UserControl x:Class="Ntreev.Crema.Presentation.Home.Services.Views.CremaAppHostView"
+<UserControl x:Class="JSSoft.Crema.Presentation.Home.Services.Views.CremaAppHostView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:cal="http://www.caliburnproject.org"
-             xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-             xmlns:nmfm="clr-namespace:Ntreev.ModernUI.Framework.Markup;assembly=Ntreev.ModernUI.Framework"
-             xmlns:view="clr-namespace:Ntreev.Crema.Presentation.Home.Services.Views"
-             xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Home.Properties"
+             xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+             xmlns:jmfm="clr-namespace:JSSoft.ModernUI.Framework.Markup;assembly=JSSoft.ModernUI.Framework"
+             xmlns:view="clr-namespace:JSSoft.Crema.Presentation.Home.Services.Views"
+             xmlns:p="clr-namespace:JSSoft.Crema.Presentation.Home.Properties"
              mc:Ignorable="d" d:DesignHeight="694" d:DesignWidth="1022">
 
     <UserControl.Resources>
 
-        <Style x:Key="ErrorMessage_ErrorBlinker_Style" TargetType="{x:Type nmfc:ErrorBlinker}"  BasedOn="{StaticResource {x:Type nmfc:ErrorBlinker}}">
+        <Style x:Key="ErrorMessage_ErrorBlinker_Style" TargetType="{x:Type jmfc:ErrorBlinker}"  BasedOn="{StaticResource {x:Type jmfc:ErrorBlinker}}">
             <Setter Property="ErrorContent" Value="{Binding ErrorMessage}" />
             <Setter Property="Visibility" Value="Collapsed" />
             <Style.Triggers>
@@ -50,7 +50,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     </UserControl.Resources>
 
     <Grid>
-        <Grid x:Name="AccountGrid" RenderTransformOrigin="0.5, 0.5" Visibility="{nmfm:VisibilityBinding IsVisible, Inverse=True}">
+        <Grid x:Name="AccountGrid" RenderTransformOrigin="0.5, 0.5" Visibility="{jmfm:VisibilityBinding IsVisible, Inverse=True}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250" />
                 <ColumnDefinition Width="*" />
@@ -67,7 +67,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 </Grid.RowDefinitions>
                 <Border BorderThickness="0 0 0 1" BorderBrush="{DynamicResource Accent}">
                     <DockPanel Grid.Row="0">
-                        <nmfc:FilterBox x:Name="filterBox" DockPanel.Dock="Right" VerticalAlignment="Center" Width="200" BorderThickness="1 0 0 0"
+                        <jmfc:FilterBox x:Name="filterBox" DockPanel.Dock="Right" VerticalAlignment="Center" Width="200" BorderThickness="1 0 0 0"
                                         Text="{Binding FilterExpression, Delay=300, Mode=TwoWay}" 
                                         CaseSensitive="{Binding CaseSensitive, Delay=300, Mode=TwoWay}" 
                                         GlobPattern="{Binding GlobPattern, Delay=300, Mode=TwoWay}"/>
@@ -83,15 +83,15 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                             Width="100" Height="36" Content="{x:Static p:Resources.Button_Login}" IsDefault="True" Margin="0 4" />
                     <Grid HorizontalAlignment="Center">
                         <TextBlock FontWeight="Bold" Margin="10" TextAlignment="Center" TextWrapping="WrapWithOverflow" Text="{Binding ProgressMessage, FallbackValue=Message}" />
-                        <nmfc:ErrorBlinker Style="{StaticResource ErrorMessage_ErrorBlinker_Style}" />
+                        <jmfc:ErrorBlinker Style="{StaticResource ErrorMessage_ErrorBlinker_Style}" />
                     </Grid>
                 </StackPanel>
             </Grid>
-            <Grid Grid.Column="1" Width="200" Height="50" Visibility="{nmfm:VisibilityBinding Path=IsVisible, ElementName=content, Inverse=True}">
+            <Grid Grid.Column="1" Width="200" Height="50" Visibility="{jmfm:VisibilityBinding Path=IsVisible, ElementName=content, Inverse=True}">
                 <Button Content="{x:Static p:Resources.Label_AddConnectionItem}" cal:Message.Attach="AddConnectionItem" />
             </Grid>
         </Grid>
-        <ContentControl x:Name="DataBaseService" Visibility="{nmfm:VisibilityBinding IsOpened}" />
+        <ContentControl x:Name="DataBaseService" Visibility="{jmfm:VisibilityBinding IsOpened}" />
     </Grid>
     
 </UserControl>

@@ -16,11 +16,11 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Newtonsoft.Json;
-using Ntreev.Library.Serialization;
+using JSSoft.Library.Serialization;
 using System;
 using YamlDotNet.Serialization;
 
-namespace Ntreev.Crema.Commands
+namespace JSSoft.Crema.Commands
 {
     public static class TextSerializer
     {

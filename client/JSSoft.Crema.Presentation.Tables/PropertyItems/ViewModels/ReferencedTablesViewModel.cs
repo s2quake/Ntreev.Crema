@@ -15,25 +15,25 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
-using Ntreev.Crema.Presentation.Tables.Properties;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library;
-using Ntreev.Library.Linq;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Presentation.Tables.BrowserItems.ViewModels;
+using JSSoft.Crema.Presentation.Tables.Properties;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Library;
+using JSSoft.Library.Linq;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 
-namespace Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels
+namespace JSSoft.Crema.Presentation.Tables.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [Dependency("Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels.TypeInfoViewModel, Ntreev.Crema.Presentation.Types, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Presentation.Types.IPropertyService, Ntreev.Crema.Presentation.Types, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [Dependency("JSSoft.Crema.Presentation.Types.PropertyItems.ViewModels.TypeInfoViewModel, JSSoft.Crema.Presentation.Types, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("JSSoft.Crema.Presentation.Types.IPropertyService, JSSoft.Crema.Presentation.Types, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ReferencedTablesViewModel : PropertyItemBase, ISelector
     {
         private readonly Authenticator authenticator;

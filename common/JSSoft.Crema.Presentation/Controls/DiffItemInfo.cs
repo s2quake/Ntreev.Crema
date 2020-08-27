@@ -18,7 +18,7 @@
 using System.Collections.Generic;
 using Xceed.Wpf.DataGrid;
 
-namespace Ntreev.Crema.Presentation.Controls
+namespace JSSoft.Crema.Presentation.Controls
 {
     struct DiffItemInfo
     {

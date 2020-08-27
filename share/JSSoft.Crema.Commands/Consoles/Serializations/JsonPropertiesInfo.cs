@@ -18,7 +18,7 @@
 using Newtonsoft.Json.Schema;
 using System.Collections.Generic;
 
-namespace Ntreev.Crema.Commands.Consoles.Serializations
+namespace JSSoft.Crema.Commands.Consoles.Serializations
 {
     class JsonPropertiesInfo : Dictionary<string, object>
     {

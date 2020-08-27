@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Data
+namespace JSSoft.Crema.Data
 {
     public sealed class CremaDataTypeNewMemberEventArgs : EventArgs
     {

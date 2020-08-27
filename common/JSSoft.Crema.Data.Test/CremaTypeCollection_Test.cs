@@ -16,10 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Data.Xml.Schema;
+using JSSoft.Crema.Data.Xml.Schema;
 using System;
 
-namespace Ntreev.Crema.Data.Test
+namespace JSSoft.Crema.Data.Test
 {
     [TestClass]
     public class Test_CremaDataTypeCollection

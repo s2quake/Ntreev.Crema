@@ -15,13 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Services;
+using JSSoft.ModernUI.Framework;
 using System.ComponentModel.Composition;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Tables
+namespace JSSoft.Crema.Presentation.Tables
 {
     /// <summary>
     /// TableServiceView.xaml에 대한 상호 작용 논리

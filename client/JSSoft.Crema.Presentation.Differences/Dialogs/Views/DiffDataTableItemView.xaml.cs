@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Differences.Dialogs.Views
+namespace JSSoft.Crema.Presentation.Differences.Dialogs.Views
 {
     /// <summary>
     /// DiffDataTableItemView.xaml에 대한 상호 작용 논리

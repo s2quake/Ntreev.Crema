@@ -15,17 +15,17 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
-using Ntreev.Library;
-using Ntreev.Library.Linq;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
+using JSSoft.Library;
+using JSSoft.Library.Linq;
+using JSSoft.Library.ObjectModel;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.ServiceHosts.Data
+namespace JSSoft.Crema.ServiceHosts.Data
 {
     class DataBaseService : CremaServiceItemBase<IDataBaseEventCallback>, IDataBaseService
     {
@@ -127,7 +127,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var result = new ResultBase();
             try
             {
-                var categoryName = new Ntreev.Library.ObjectModel.CategoryName(categoryPath);
+                var categoryName = new JSSoft.Library.ObjectModel.CategoryName(categoryPath);
                 var category = await this.GetTableCategoryAsync(categoryName.ParentPath);
                 await category.AddNewCategoryAsync(this.authentication, categoryName.Name);
                 result.TaskID = GuidUtility.FromName(categoryPath);
@@ -586,7 +586,7 @@ namespace Ntreev.Crema.ServiceHosts.Data
             var result = new ResultBase();
             try
             {
-                var categoryName = new Ntreev.Library.ObjectModel.CategoryName(categoryPath);
+                var categoryName = new JSSoft.Library.ObjectModel.CategoryName(categoryPath);
                 var category = await this.GetTypeCategoryAsync(categoryName.ParentPath);
                 await category.AddNewCategoryAsync(this.authentication, categoryName.Name);
                 result.SignatureDate = this.authentication.SignatureDate;

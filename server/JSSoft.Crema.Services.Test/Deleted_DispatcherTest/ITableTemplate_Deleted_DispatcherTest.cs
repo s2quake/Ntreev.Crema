@@ -16,12 +16,12 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Library.Random;
+using JSSoft.Library.Random;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Ntreev.Crema.Services.Test.Deleted_DispatcherTest
+namespace JSSoft.Crema.Services.Test.Deleted_DispatcherTest
 {
     [TestClass]
     public class ITableTemplate_Deleted_DispatcherTest

@@ -15,15 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels;
-using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.SmartSet.Properties;
-using Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels;
+using JSSoft.Crema.Presentation.SmartSet.Dialogs.ViewModels;
+using JSSoft.Crema.Presentation.SmartSet.Properties;
+using JSSoft.Crema.Presentation.Tables.BrowserItems.ViewModels;
+using JSSoft.ModernUI.Framework;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Presentation.SmartSet.MenuItems
+namespace JSSoft.Crema.Presentation.SmartSet.MenuItems
 {
     [Export(typeof(IMenuItem))]
     [ParentType(typeof(TableTreeViewItemViewModel))]

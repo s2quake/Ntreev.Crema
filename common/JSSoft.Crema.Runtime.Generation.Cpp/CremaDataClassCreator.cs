@@ -22,9 +22,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
-using Ntreev.Crema.Runtime.Generation.Cpp.CodeDom;
+using JSSoft.Crema.Runtime.Generation.Cpp.CodeDom;
 
-namespace Ntreev.Crema.Runtime.Generation.Cpp
+namespace JSSoft.Crema.Runtime.Generation.Cpp
 {
     static class CremaDataClassCreator
     {

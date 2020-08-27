@@ -16,16 +16,16 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ====================================================================================================================-->
-<UserControl x:Class="Ntreev.Crema.Presentation.Framework.Controls.ColorPicker"
+<UserControl x:Class="JSSoft.Crema.Presentation.Framework.Controls.ColorPicker"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mui="clr-namespace:FirstFloor.ModernUI;assembly=FirstFloor.ModernUI"
-             xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-             xmlns:nmfv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework">
+             xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+             xmlns:jmfv="clr-namespace:JSSoft.ModernUI.Framework.Converters;assembly=JSSoft.ModernUI.Framework">
 
     <UserControl.Resources>
-        <nmfv:ColorToBrushConverter x:Key="colorToBrushConverter" />
-        <Style TargetType="{x:Type nmfc:ModernExpander}" BasedOn="{StaticResource {x:Type nmfc:ModernExpander}}">
+        <jmfv:ColorToBrushConverter x:Key="colorToBrushConverter" />
+        <Style TargetType="{x:Type jmfc:ModernExpander}" BasedOn="{StaticResource {x:Type jmfc:ModernExpander}}">
             <Setter Property="Background" Value="{Binding CurrentColor, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Converter={StaticResource colorToBrushConverter}}" />
         </Style>
         <Style x:Key="ButtonFocusVisual1">
@@ -161,7 +161,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     </UserControl.Resources>
     <Border BorderThickness="1">
         <StackPanel Orientation="Vertical">
-            <nmfc:ModernExpander IsExpanded="True" Header="Modern Colors" Padding="0 3">
+            <jmfc:ModernExpander IsExpanded="True" Header="Modern Colors" Padding="0 3">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Button Style="{StaticResource ColorButtonStyleFirstRow}" Background="#a4c400" CommandParameter="#a4c400" Margin="3" />
@@ -188,8 +188,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                         <Button Style="{StaticResource ColorButtonStyleFirstRow}" Background="#87794e" CommandParameter="#87794e" Margin="3" />
                     </StackPanel>
                 </StackPanel>
-            </nmfc:ModernExpander>
-            <nmfc:ModernExpander IsExpanded="True" Header="Theme Colors" Padding="0 3">
+            </jmfc:ModernExpander>
+            <jmfc:ModernExpander IsExpanded="True" Header="Theme Colors" Padding="0 3">
                 <StackPanel>
                     <StackPanel SnapsToDevicePixels="True" x:Name="FirstRow" Margin="2,0,0,0" Orientation="Horizontal">
                         <Button Style="{StaticResource ColorButtonStyleFirstRow}" Background="#d08f25" CommandParameter="#d08f25" Margin="3,4,3,4" />
@@ -264,7 +264,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                         <Button Style="{StaticResource ColorButtonStyle}" Background="#974806" CommandParameter="#974806" Margin="3,0,3,0" />
                     </StackPanel>
                 </StackPanel>
-            </nmfc:ModernExpander>
+            </jmfc:ModernExpander>
         </StackPanel>
     </Border>
 </UserControl>

@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Converters.Dialogs.Views
+namespace JSSoft.Crema.Presentation.Converters.Dialogs.Views
 {
     /// <summary>
     /// ExportInfoControl.xaml에 대한 상호 작용 논리

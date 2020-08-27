@@ -16,11 +16,11 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using JSSoft.Communication;
-using Ntreev.Crema.ServiceHosts.Properties;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
-using Ntreev.Library;
-using Ntreev.Library.Linq;
+using JSSoft.Crema.ServiceHosts.Properties;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
+using JSSoft.Library;
+using JSSoft.Library.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,7 +30,7 @@ using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.ServiceHosts
+namespace JSSoft.Crema.ServiceHosts
 {
     public class CremaService : ICremaService, IServiceProvider
     {
@@ -66,7 +66,7 @@ namespace Ntreev.Crema.ServiceHosts
         public async Task OpenAsync()
         {
             this.ValidateOpen();
-            this.ServiceState = Ntreev.Crema.Services.ServiceState.Opening;
+            this.ServiceState = JSSoft.Crema.Services.ServiceState.Opening;
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.OnOpening(EventArgs.Empty);
@@ -89,7 +89,7 @@ namespace Ntreev.Crema.ServiceHosts
             await this.StartServicesAsync();
             await this.Dispatcher.InvokeAsync(() =>
             {
-                this.ServiceState = Ntreev.Crema.Services.ServiceState.Open;
+                this.ServiceState = JSSoft.Crema.Services.ServiceState.Open;
                 this.OnOpened(EventArgs.Empty);
             });
         }
@@ -97,7 +97,7 @@ namespace Ntreev.Crema.ServiceHosts
         public async Task CloseAsync()
         {
             this.ValidateClose();
-            this.ServiceState = Ntreev.Crema.Services.ServiceState.Closing;
+            this.ServiceState = JSSoft.Crema.Services.ServiceState.Closing;
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.OnClosing(EventArgs.Empty);
@@ -114,7 +114,7 @@ namespace Ntreev.Crema.ServiceHosts
             await this.Dispatcher.InvokeAsync(() =>
             {
                 this.token = Guid.Empty;
-                this.ServiceState = Ntreev.Crema.Services.ServiceState.Closed;
+                this.ServiceState = JSSoft.Crema.Services.ServiceState.Closed;
                 this.OnClosed(new ClosedEventArgs(CloseReason.Shutdown, string.Empty));
             });
         }
@@ -123,11 +123,11 @@ namespace Ntreev.Crema.ServiceHosts
 
         public int Timeout { get; set; } = 60000;
 
-        public ServiceInfo ServiceInfo => this.ServiceState == Ntreev.Crema.Services.ServiceState.Open ? this.serviceInfo : ServiceInfo.Empty;
+        public ServiceInfo ServiceInfo => this.ServiceState == JSSoft.Crema.Services.ServiceState.Open ? this.serviceInfo : ServiceInfo.Empty;
 
         public CremaDispatcher Dispatcher { get; private set; }
 
-        public Ntreev.Crema.Services.ServiceState ServiceState { get; set; }
+        public JSSoft.Crema.Services.ServiceState ServiceState { get; set; }
 
         public event EventHandler Opening;
 
@@ -176,12 +176,12 @@ namespace Ntreev.Crema.ServiceHosts
                 this.configCommitter = this.cremaHost.GetService(typeof(IRepositoryConfiguration)) as IConfigurationCommitter;
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.ServiceState = Ntreev.Crema.Services.ServiceState.Opening;
+                    this.ServiceState = JSSoft.Crema.Services.ServiceState.Opening;
                 });
                 await this.StartServicesAsync();
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.ServiceState = Ntreev.Crema.Services.ServiceState.Open;
+                    this.ServiceState = JSSoft.Crema.Services.ServiceState.Open;
                 });
             }
         }
@@ -193,7 +193,7 @@ namespace Ntreev.Crema.ServiceHosts
             {
                 await this.Dispatcher.InvokeAsync(() =>
                 {
-                    this.ServiceState = Ntreev.Crema.Services.ServiceState.Closing;
+                    this.ServiceState = JSSoft.Crema.Services.ServiceState.Closing;
                 });
                 await this.StopServicesAsync();
             }
@@ -209,7 +209,7 @@ namespace Ntreev.Crema.ServiceHosts
                 {
                     this.configCommitter.Commit();
                     this.configCommitter = null;
-                    this.ServiceState = Ntreev.Crema.Services.ServiceState.Closed;
+                    this.ServiceState = JSSoft.Crema.Services.ServiceState.Closed;
                     this.OnClosed(e);
                 });
             }
@@ -252,14 +252,14 @@ namespace Ntreev.Crema.ServiceHosts
 
         private void ValidateOpen()
         {
-            if (this.ServiceState != Ntreev.Crema.Services.ServiceState.None)
+            if (this.ServiceState != JSSoft.Crema.Services.ServiceState.None)
                 throw new InvalidOperationException();
             this.ValidatePort(this.Port);
         }
 
         private void ValidateClose()
         {
-            if (this.ServiceState != Ntreev.Crema.Services.ServiceState.Open)
+            if (this.ServiceState != JSSoft.Crema.Services.ServiceState.Open)
                 throw new InvalidOperationException();
         }
 

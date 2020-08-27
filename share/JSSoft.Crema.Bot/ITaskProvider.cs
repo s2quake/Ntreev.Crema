@@ -18,7 +18,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Bot
+namespace JSSoft.Crema.Bot
 {
     public interface ITaskProvider
     {

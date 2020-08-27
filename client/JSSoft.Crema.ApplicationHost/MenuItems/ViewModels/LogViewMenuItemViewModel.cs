@@ -15,16 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ApplicationHost.Properties;
-using Ntreev.Crema.ApplicationHost.Views;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.ApplicationHost.Properties;
+using JSSoft.Crema.ApplicationHost.Views;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.ModernUI.Framework;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-namespace Ntreev.Crema.ApplicationHost.MenuItems.ViewModels
+namespace JSSoft.Crema.ApplicationHost.MenuItems.ViewModels
 {
     [Export(typeof(IMenuItem))]
     [ParentType(typeof(IToolMenuItem))]

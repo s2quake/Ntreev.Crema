@@ -15,16 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Console.Properties;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library;
-using Ntreev.Library.Commands;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Presentation.Console.Properties;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Library;
+using JSSoft.Library.Commands;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Presentation.Console
+namespace JSSoft.Crema.Presentation.Console
 {
     [Export(typeof(IContentService))]
     [InheritedExport(typeof(ConsoleViewModel))]

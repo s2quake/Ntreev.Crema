@@ -17,7 +17,7 @@
 
 using System.Data;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     public interface IExtendedProperties
     {

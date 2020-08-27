@@ -16,9 +16,9 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
+using JSSoft.Library;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.Dialogs.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,7 +26,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Comparer.Dialogs.ViewModels
+namespace JSSoft.Crema.Comparer.Dialogs.ViewModels
 {
     class OpenPathViewModel : ModalDialogBase
     {

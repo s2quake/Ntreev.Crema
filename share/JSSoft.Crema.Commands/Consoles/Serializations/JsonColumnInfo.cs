@@ -17,7 +17,7 @@
 
 using Newtonsoft.Json;
 
-namespace Ntreev.Crema.Commands.Consoles.Serializations
+namespace JSSoft.Crema.Commands.Consoles.Serializations
 {
     struct JsonColumnInfo
     {

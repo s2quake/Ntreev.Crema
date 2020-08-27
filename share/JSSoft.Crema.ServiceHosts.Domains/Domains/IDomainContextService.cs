@@ -16,11 +16,11 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using JSSoft.Communication;
-using Ntreev.Crema.ServiceModel;
+using JSSoft.Crema.ServiceModel;
 using System;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.ServiceHosts.Domains
+namespace JSSoft.Crema.ServiceHosts.Domains
 {
     [ServiceContract(PerPeer = true)]
     public interface IDomainContextService

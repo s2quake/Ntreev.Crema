@@ -15,9 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Reader.Binary;
-using Ntreev.Crema.Reader.Internal;
-using Ntreev.Crema.Reader.IO;
+using JSSoft.Crema.Reader.Binary;
+using JSSoft.Crema.Reader.Internal;
+using JSSoft.Crema.Reader.IO;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Ntreev.Crema.Reader
+namespace JSSoft.Crema.Reader
 {
     [Flags]
     public enum ReadOptions

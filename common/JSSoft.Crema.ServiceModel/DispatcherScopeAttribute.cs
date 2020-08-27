@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.ServiceModel
+namespace JSSoft.Crema.ServiceModel
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Event)]
     public class DispatcherScopeAttribute : Attribute

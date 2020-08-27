@@ -19,7 +19,7 @@ using System.ComponentModel.Composition;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Home.BrowserItems.Views
+namespace JSSoft.Crema.Presentation.Home.BrowserItems.Views
 {
     /// <summary>
     /// DomainsView.xaml에 대한 상호 작용 논리

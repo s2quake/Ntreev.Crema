@@ -21,7 +21,7 @@ using System.Linq;
 using System.Text;
 using System.CodeDom.Compiler;
 
-namespace Ntreev.Crema.Runtime.Generation.Cpp.CodeDom
+namespace JSSoft.Crema.Runtime.Generation.Cpp.CodeDom
 {
     public class NativeCCodeProvider : CodeDomProvider
     {

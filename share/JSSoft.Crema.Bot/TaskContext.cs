@@ -15,13 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services;
-using Ntreev.Library.Random;
+using JSSoft.Crema.Services;
+using JSSoft.Library.Random;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Ntreev.Crema.Bot
+namespace JSSoft.Crema.Bot
 {
     public sealed class TaskContext
     {

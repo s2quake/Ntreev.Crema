@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.Views
+namespace JSSoft.Crema.Presentation.SmartSet.Dialogs.Views
 {
     /// <summary>
     /// ColumnCountRuleView.xaml에 대한 상호 작용 논리

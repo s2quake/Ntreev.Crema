@@ -18,7 +18,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Types.Dialogs.Views
+namespace JSSoft.Crema.Presentation.Types.Dialogs.Views
 {
     /// <summary>
     /// NewMemberView.xaml에 대한 상호 작용 논리

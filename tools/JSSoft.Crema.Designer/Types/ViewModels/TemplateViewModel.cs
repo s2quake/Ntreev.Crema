@@ -15,10 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Designer.Properties;
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Designer.Properties;
+using JSSoft.Library;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Designer.Types.ViewModels
+namespace JSSoft.Crema.Designer.Types.ViewModels
 {
     public abstract class TemplateViewModel : ModalDialogBase
     {

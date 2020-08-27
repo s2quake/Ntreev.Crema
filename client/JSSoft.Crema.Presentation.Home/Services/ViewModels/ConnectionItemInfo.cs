@@ -19,7 +19,7 @@ using System;
 using System.Windows.Media;
 using System.Xml.Serialization;
 
-namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
+namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
 {
     public struct ConnectionItemInfo
     {

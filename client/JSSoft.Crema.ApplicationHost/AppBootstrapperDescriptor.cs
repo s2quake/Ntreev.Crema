@@ -16,10 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Library;
-using Ntreev.Library.Linq;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Library;
+using JSSoft.Library.Linq;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -29,7 +29,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Ntreev.Crema.ApplicationHost
+namespace JSSoft.Crema.ApplicationHost
 {
     class AppBootstrapperDescriptor : AppBootstrapperDescriptorBase, IServiceProvider
     {

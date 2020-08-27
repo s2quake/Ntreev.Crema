@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Data;
+using JSSoft.Crema.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -24,7 +24,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Designer.Tables.ViewModels
+namespace JSSoft.Crema.Designer.Tables.ViewModels
 {
     public class TableItemViewModel : PropertyChangedBase, IDisposable
     {

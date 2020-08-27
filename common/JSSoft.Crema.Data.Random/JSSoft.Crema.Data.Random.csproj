@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
-    <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library.Random\Ntreev.Library.Random.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
+    <ProjectReference Include="..\..\..\JSSoft.Library\JSSoft.Library\JSSoft.Library.csproj" />
+    <ProjectReference Include="..\..\..\JSSoft.Library\JSSoft.Library.Random\JSSoft.Library.Random.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Data\JSSoft.Crema.Data.csproj" />
   </ItemGroup>
 </Project>

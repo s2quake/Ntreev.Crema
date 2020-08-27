@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-//using Ntreev.Library.IO;
-//using Ntreev.Library;
+//using JSSoft.Library.IO;
+//using JSSoft.Library;
 //using System;
 //using System.Collections.Generic;
 //using System.Diagnostics;
@@ -24,10 +24,10 @@
 //using System.Linq;
 //using System.Text;
 //using System.Threading.Tasks;
-//using Ntreev.Library.Linq;
-//using Ntreev.Crema.Data;
+//using JSSoft.Library.Linq;
+//using JSSoft.Crema.Data;
 
-//namespace Ntreev.Crema.RuntimeService.Xml
+//namespace JSSoft.Crema.RuntimeService.Xml
 //{
 //    public abstract class CremaSerializerBase
 //    {

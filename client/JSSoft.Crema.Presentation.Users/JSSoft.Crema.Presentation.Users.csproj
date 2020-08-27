@@ -5,16 +5,16 @@
     <OutputPath>$(ExePath)client\application</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework.csproj">
+    <ProjectReference Include="..\..\..\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Presentation\Ntreev.Crema.Presentation.csproj">
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Presentation\JSSoft.Crema.Presentation.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Presentation.Home\Ntreev.Crema.Presentation.Home.csproj">
+    <ProjectReference Include="..\JSSoft.Crema.Presentation.Home\JSSoft.Crema.Presentation.Home.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Presentation.Framework\Ntreev.Crema.Presentation.Framework.csproj">
+    <ProjectReference Include="..\JSSoft.Crema.Presentation.Framework\JSSoft.Crema.Presentation.Framework.csproj">
       <Private>false</Private>
     </ProjectReference>
   </ItemGroup>

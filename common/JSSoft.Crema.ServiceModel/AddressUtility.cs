@@ -17,7 +17,7 @@
 
 using System.Text.RegularExpressions;
 
-namespace Ntreev.Crema.ServiceModel
+namespace JSSoft.Crema.ServiceModel
 {
     public static class AddressUtility
     {

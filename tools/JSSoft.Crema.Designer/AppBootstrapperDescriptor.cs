@@ -16,8 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Library.Linq;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Library.Linq;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -26,7 +26,7 @@ using System.ComponentModel.Composition.Primitives;
 using System.Linq;
 using System.Reflection;
 
-namespace Ntreev.Crema.Designer
+namespace JSSoft.Crema.Designer
 {
     public class AppBootstrapperDescriptor : AppBootstrapperDescriptorBase
     {

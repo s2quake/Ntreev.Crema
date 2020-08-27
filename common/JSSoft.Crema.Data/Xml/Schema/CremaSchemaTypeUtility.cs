@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Data.Xml.Schema
+namespace JSSoft.Crema.Data.Xml.Schema
 {
     public static class CremaSchemaTypeUtility
     {

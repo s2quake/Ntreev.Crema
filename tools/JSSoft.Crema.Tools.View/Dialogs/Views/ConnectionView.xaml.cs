@@ -30,7 +30,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Tools.View.Dialogs.Views
+namespace JSSoft.Crema.Tools.View.Dialogs.Views
 {
     /// <summary>
     /// ConnectionView.xaml에 대한 상호 작용 논리

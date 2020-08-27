@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Converters.Dialogs.Views
+namespace JSSoft.Crema.Presentation.Converters.Dialogs.Views
 {
     public partial class ImportView : UserControl
     {

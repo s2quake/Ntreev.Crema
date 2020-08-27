@@ -18,7 +18,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Users.Dialogs.Views
+namespace JSSoft.Crema.Presentation.Users.Dialogs.Views
 {
     /// <summary>
     /// KickView.xaml에 대한 상호 작용 논리

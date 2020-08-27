@@ -15,13 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Users.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.Users.Properties;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Presentation.Users.Dialogs.ViewModels;
+using JSSoft.Crema.Presentation.Users.Properties;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
+using JSSoft.Library;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -30,13 +30,13 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Presentation.Users.BrowserItems.ViewModels
+namespace JSSoft.Crema.Presentation.Users.BrowserItems.ViewModels
 {
     [Export(typeof(IBrowserItem))]
     [Export(typeof(UserBrowserViewModel))]
-    [ParentType("Ntreev.Crema.Presentation.Tables.IBrowserService, Ntreev.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Presentation.Types.IBrowserService, Ntreev.Crema.Presentation.Types, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Presentation.Home.IBrowserService, Ntreev.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("JSSoft.Crema.Presentation.Tables.IBrowserService, JSSoft.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("JSSoft.Crema.Presentation.Types.IBrowserService, JSSoft.Crema.Presentation.Types, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("JSSoft.Crema.Presentation.Home.IBrowserService, JSSoft.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class UserBrowserViewModel : TreeViewBase, IBrowserItem
     {
         private readonly Authenticator authenticator;

@@ -15,9 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services;
+using JSSoft.Crema.Services;
 
-namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
+namespace JSSoft.Crema.Presentation.Tables.BrowserItems.ViewModels
 {
     public class TableRootTreeViewItemViewModel : TableCategoryTreeViewItemViewModel
     {

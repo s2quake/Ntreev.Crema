@@ -1,5 +1,5 @@
-﻿using Ntreev.Crema.ServiceModel;
-using Ntreev.Library;
+﻿using JSSoft.Crema.ServiceModel;
+using JSSoft.Library;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Presentation.Framework.Controls
+namespace JSSoft.Crema.Presentation.Framework.Controls
 {
     /// <summary>
     /// UserControl1.xaml에 대한 상호 작용 논리

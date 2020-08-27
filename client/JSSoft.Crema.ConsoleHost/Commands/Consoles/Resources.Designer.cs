@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Ntreev.Crema.ConsoleHost.Commands.Consoles {
+namespace JSSoft.Crema.ConsoleHost.Commands.Consoles {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Ntreev.Crema.ConsoleHost.Commands.Consoles {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Ntreev.Crema.ConsoleHost.Commands.Consoles.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("JSSoft.Crema.ConsoleHost.Commands.Consoles.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

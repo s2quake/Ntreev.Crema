@@ -20,7 +20,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Ntreev.Crema.Presentation.Converters
+namespace JSSoft.Crema.Presentation.Converters
 {
     class FixedSizeToBorderThicknessConverter : IValueConverter
     {

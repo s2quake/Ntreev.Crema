@@ -18,7 +18,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Tables.Dialogs.Views
+namespace JSSoft.Crema.Presentation.Tables.Dialogs.Views
 {
     /// <summary>
     /// NewColumnView.xaml에 대한 상호 작용 논리

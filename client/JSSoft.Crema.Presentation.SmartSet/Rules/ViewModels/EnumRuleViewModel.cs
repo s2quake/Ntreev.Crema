@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
+namespace JSSoft.Crema.Presentation.SmartSet.Rules.ViewModels
 {
     abstract class EnumRuleViewModel : PropertyChangedBase, IRule
     {

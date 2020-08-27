@@ -30,7 +30,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Comparer.Tables.Views
+namespace JSSoft.Crema.Comparer.Tables.Views
 {
     /// <summary>
     /// TableDocumentItemView.xaml에 대한 상호 작용 논리

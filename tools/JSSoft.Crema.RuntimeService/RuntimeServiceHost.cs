@@ -16,9 +16,9 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using JSSoft.Communication;
-using Ntreev.Crema.Runtime.Generation;
-using Ntreev.Crema.Runtime.Serialization;
-using Ntreev.Crema.ServiceModel;
+using JSSoft.Crema.Runtime.Generation;
+using JSSoft.Crema.Runtime.Serialization;
+using JSSoft.Crema.ServiceModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +28,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Ntreev.Crema.RuntimeService
+namespace JSSoft.Crema.RuntimeService
 {
     class RuntimeServiceHost : ClientServiceHostBase<ServiceHosts.RuntimeService.IRuntimeService>
     {

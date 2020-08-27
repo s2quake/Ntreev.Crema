@@ -20,7 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Ntreev.Crema.Services.Test.DispatcherTest
+namespace JSSoft.Crema.Services.Test.DispatcherTest
 {
     [TestClass]
     public class IUserCollection_DispatcherTest

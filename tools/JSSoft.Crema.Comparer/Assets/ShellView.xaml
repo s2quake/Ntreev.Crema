@@ -21,9 +21,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     xmlns:cal="http://www.caliburnproject.org"
                     xmlns:mui="http://firstfloorsoftware.com/ModernUI"
                     xmlns:modernui="clr-namespace:FirstFloor.ModernUI;assembly=FirstFloor.ModernUI"
-                    xmlns:view="clr-namespace:Ntreev.Crema.Comparer"
-                    xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-                    xmlns:p="clr-namespace:Ntreev.Crema.Comparer.Properties">
+                    xmlns:view="clr-namespace:JSSoft.Crema.Comparer"
+                    xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+                    xmlns:p="clr-namespace:JSSoft.Crema.Comparer.Properties">
 
 
     <Style x:Key="ShellView_Style" TargetType="{x:Type view:ShellView}">
@@ -66,7 +66,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
                                     <!-- window content -->
                                     <ContentPresenter Grid.Row="1" Margin="{TemplateBinding Padding}" />
-                                    <nmfc:ProgressContent x:Name="progressContent" Grid.Row="1" Visibility="Hidden" Message="{Binding ProgressMessage}" />
+                                    <jmfc:ProgressContent x:Name="progressContent" Grid.Row="1" Visibility="Hidden" Message="{Binding ProgressMessage}" />
 
                                     <!-- title bar -->
                                     <Grid>

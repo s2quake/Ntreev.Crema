@@ -15,21 +15,21 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.ServiceHosts.Data;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Domains;
-using Ntreev.Crema.Services.Properties;
-using Ntreev.Crema.Services.Users;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library.Threading;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.ServiceHosts.Data;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Domains;
+using JSSoft.Crema.Services.Properties;
+using JSSoft.Crema.Services.Users;
+using JSSoft.Library.ObjectModel;
+using JSSoft.Library.Threading;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services.Data
+namespace JSSoft.Crema.Services.Data
 {
     class DataBase : DataBaseBase<Type, TypeCategory, TypeCollection, TypeCategoryCollection, TypeContext, Table, TableCategory, TableCollection, TableCategoryCollection, TableContext>,
         IDataBaseEventCallback, IDataBase, IInfoProvider, IStateProvider

@@ -4,7 +4,7 @@ using System.Windows.Data;
 using System.Windows.Markup;
 using Xceed.Wpf.DataGrid;
 
-namespace Ntreev.Crema.Presentation.Framework.Markup
+namespace JSSoft.Crema.Presentation.Framework.Markup
 {
     [MarkupExtensionReturnType(typeof(object))]
     public class EditingContentBindingExtension : MarkupExtension

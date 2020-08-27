@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Differences.BrowserItems.Views
+namespace JSSoft.Crema.Presentation.Differences.BrowserItems.Views
 {
     /// <summary>
     /// AddDifferenceItemView.xaml에 대한 상호 작용 논리

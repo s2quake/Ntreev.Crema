@@ -22,7 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Ntreev.Crema.ApplicationHost.Assets
+namespace JSSoft.Crema.ApplicationHost.Assets
 {
     partial class ModernMenu : ResourceDictionary
     {

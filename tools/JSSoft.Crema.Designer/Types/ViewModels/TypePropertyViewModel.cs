@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Designer.Types.ViewModels
+namespace JSSoft.Crema.Designer.Types.ViewModels
 {
     [Export]
     [Export(typeof(ITypePropertyService))]

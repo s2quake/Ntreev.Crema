@@ -17,14 +17,14 @@
 
 using JSSoft.Communication;
 using Microsoft.Win32;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.ServiceHosts;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Data;
-using Ntreev.Crema.Services.Domains;
-using Ntreev.Crema.Services.Properties;
-using Ntreev.Crema.Services.Users;
-using Ntreev.Library;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.ServiceHosts;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Data;
+using JSSoft.Crema.Services.Domains;
+using JSSoft.Crema.Services.Properties;
+using JSSoft.Crema.Services.Users;
+using JSSoft.Library;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -34,7 +34,7 @@ using System.Linq;
 using System.Security;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     [Export(typeof(ILogService))]
     [InheritedExport(typeof(ICremaHost))]

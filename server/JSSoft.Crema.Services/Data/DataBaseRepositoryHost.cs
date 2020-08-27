@@ -16,17 +16,17 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #pragma warning disable 0612
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library;
-using Ntreev.Library.IO;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Library;
+using JSSoft.Library.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Ntreev.Crema.Services.Data
+namespace JSSoft.Crema.Services.Data
 {
     sealed class DataBaseRepositoryHost : RepositoryHost
     {
@@ -94,7 +94,7 @@ namespace Ntreev.Crema.Services.Data
             {
                 try
                 {
-                    var dataSet = Ntreev.Crema.Data.CremaDataSet.ReadFromDirectory(this.dataBase.BasePath);
+                    var dataSet = JSSoft.Crema.Data.CremaDataSet.ReadFromDirectory(this.dataBase.BasePath);
                 }
                 catch (Exception e)
                 {

@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Runtime.Generation
+namespace JSSoft.Crema.Runtime.Generation
 {
     [Flags]
     public enum CodeGenerationOptions

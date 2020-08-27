@@ -22,7 +22,7 @@
 //using System.Text;
 //using System.Threading.Tasks;
 
-//namespace Ntreev.Crema.RuntimeService.Json
+//namespace JSSoft.Crema.RuntimeService.Json
 //{
 //    [SerializableAttribute]
 //    class JsonFormatter : IFormatter

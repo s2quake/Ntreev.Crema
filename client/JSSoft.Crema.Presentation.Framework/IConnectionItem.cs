@@ -18,7 +18,7 @@
 using System;
 using System.Windows.Media;
 
-namespace Ntreev.Crema.Presentation.Framework
+namespace JSSoft.Crema.Presentation.Framework
 {
     public interface IConnectionItem
     {

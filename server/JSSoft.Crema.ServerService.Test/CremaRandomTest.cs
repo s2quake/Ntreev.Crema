@@ -1,13 +1,13 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
-using Ntreev.Library.Random;
+using JSSoft.Library.Random;
 using System.Reflection;
 using System.Linq;
-using Ntreev.Crema.ServiceModel;
+using JSSoft.Crema.ServiceModel;
 using System.Collections.Generic;
 
-namespace Ntreev.Crema.ServerService.Test
+namespace JSSoft.Crema.ServerService.Test
 {
     [TestClass]
     public class CremaRandomTest

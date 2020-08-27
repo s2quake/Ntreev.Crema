@@ -16,8 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using FirstFloor.ModernUI.Windows;
-using Ntreev.Crema.Tools.Framework;
-using Ntreev.Library.IO;
+using JSSoft.Crema.Tools.Framework;
+using JSSoft.Library.IO;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -26,7 +26,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Ntreev.Crema.ApplicationHost
+namespace JSSoft.Crema.ApplicationHost
 {
     [Export]
     public class ContentLoader : DefaultContentLoader, IContentLoader

@@ -19,7 +19,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 
-namespace Ntreev.Crema.Commands
+namespace JSSoft.Crema.Commands
 {
     class DateTimeValueConverter : TypeConverter
     {

@@ -15,10 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Data;
+using JSSoft.Library;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-namespace Ntreev.Crema.Designer.Tables.ViewModels
+namespace JSSoft.Crema.Designer.Tables.ViewModels
 {
     class TableListBoxItemViewModel : ListBoxItemViewModel, ITableDescriptor
     {

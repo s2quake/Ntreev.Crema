@@ -15,12 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library;
+using JSSoft.Library;
 using System;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
-    public class ItemEventArgs<T> : Ntreev.Library.ObjectModel.ItemEventArgs<T>
+    public class ItemEventArgs<T> : JSSoft.Library.ObjectModel.ItemEventArgs<T>
     {
         public ItemEventArgs(Authentication authentication, T item)
             : this(authentication, item, null)

@@ -1,7 +1,7 @@
 ﻿using JSSoft.Communication;
-using Ntreev.Crema.ServiceHosts.Users;
+using JSSoft.Crema.ServiceHosts.Users;
 
-namespace Ntreev.Crema.Services.Users
+namespace JSSoft.Crema.Services.Users
 {
     class UserContextServiceHost : ClientServiceHostBase<IUserContextService, IUserContextEventCallback>
     {

@@ -19,7 +19,7 @@ using Caliburn.Micro;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Converters.Dialogs.Views
+namespace JSSoft.Crema.Presentation.Converters.Dialogs.Views
 {
     /// <summary>
     /// ProgressView.xaml에 대한 상호 작용 논리

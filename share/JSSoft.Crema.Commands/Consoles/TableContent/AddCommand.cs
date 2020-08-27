@@ -17,15 +17,15 @@
 
 #pragma warning disable 0618
 using Newtonsoft.Json.Schema;
-using Ntreev.Crema.Commands.Consoles.Serializations;
-using Ntreev.Crema.Services;
-using Ntreev.Library.Commands;
+using JSSoft.Crema.Commands.Consoles.Serializations;
+using JSSoft.Crema.Services;
+using JSSoft.Library.Commands;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Commands.Consoles.TableContent
+namespace JSSoft.Crema.Commands.Consoles.TableContent
 {
     [Export(typeof(IConsoleCommand))]
     [Category(nameof(ITableContent))]

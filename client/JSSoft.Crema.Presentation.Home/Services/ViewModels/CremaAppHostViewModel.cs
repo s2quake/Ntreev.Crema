@@ -15,13 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.Home.Properties;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Presentation.Home.Dialogs.ViewModels;
+using JSSoft.Crema.Presentation.Home.Properties;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
+using JSSoft.Library;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,7 +33,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
+namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
 {
     [Export(typeof(ICremaAppHost)), PartCreationPolicy(CreationPolicy.Shared)]
     [Export]
@@ -73,8 +73,8 @@ namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
 
         static CremaAppHostViewModel()
         {
-            Themes.Add("Dark", new Uri("/Ntreev.Crema.Presentation.Framework;component/Assets/CremaUI.Dark.xaml", UriKind.Relative));
-            Themes.Add("Light", new Uri("/Ntreev.Crema.Presentation.Framework;component/Assets/CremaUI.Light.xaml", UriKind.Relative));
+            Themes.Add("Dark", new Uri("/JSSoft.Crema.Presentation.Framework;component/Assets/CremaUI.Dark.xaml", UriKind.Relative));
+            Themes.Add("Light", new Uri("/JSSoft.Crema.Presentation.Framework;component/Assets/CremaUI.Light.xaml", UriKind.Relative));
         }
 
         public static Dictionary<string, Uri> Themes { get; } = new Dictionary<string, Uri>(StringComparer.CurrentCultureIgnoreCase);

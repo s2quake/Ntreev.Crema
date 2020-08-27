@@ -2,13 +2,13 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Linq;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library.Random;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Library.Random;
 using System.Collections.Generic;
-using Ntreev.Library;
-using Ntreev.Library.IO;
+using JSSoft.Library;
+using JSSoft.Library.IO;
 
-namespace Ntreev.Crema.ServerService.Test
+namespace JSSoft.Crema.ServerService.Test
 {
     [TestClass]
     public class TypeGuestPermissionTest

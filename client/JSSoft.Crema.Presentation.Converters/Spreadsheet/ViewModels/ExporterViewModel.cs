@@ -17,18 +17,18 @@
 
 using Caliburn.Micro;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Spreadsheet;
-using Ntreev.Library;
-using Ntreev.Library.IO;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Spreadsheet;
+using JSSoft.Library;
+using JSSoft.Library.IO;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 
-namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.ViewModels
+namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.ViewModels
 {
     [Export(typeof(IExporter))]
     class ExporterViewModel : Screen, IExporter

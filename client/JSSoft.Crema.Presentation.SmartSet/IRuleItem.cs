@@ -17,7 +17,7 @@
 
 using System.Xml.Serialization;
 
-namespace Ntreev.Crema.Presentation.SmartSet
+namespace JSSoft.Crema.Presentation.SmartSet
 {
     public interface IRuleItem : IXmlSerializable
     {

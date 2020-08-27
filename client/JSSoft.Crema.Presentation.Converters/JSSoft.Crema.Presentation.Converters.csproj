@@ -12,19 +12,19 @@
     <PackageReference Include="Microsoft.WindowsAPICodePack.Shell" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework.csproj">
+    <ProjectReference Include="..\..\..\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj">
+    <ProjectReference Include="..\..\common\JSSoft.Crema.ServiceModel\JSSoft.Crema.ServiceModel.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Spreadsheet\Ntreev.Crema.Spreadsheet.csproj">
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Spreadsheet\JSSoft.Crema.Spreadsheet.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Presentation.Framework\Ntreev.Crema.Presentation.Framework.csproj">
+    <ProjectReference Include="..\JSSoft.Crema.Presentation.Framework\JSSoft.Crema.Presentation.Framework.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj">
+    <ProjectReference Include="..\JSSoft.Crema.Services\JSSoft.Crema.Services.csproj">
       <Private>false</Private>
     </ProjectReference>
   </ItemGroup>

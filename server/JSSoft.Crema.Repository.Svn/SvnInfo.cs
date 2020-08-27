@@ -21,7 +21,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace Ntreev.Crema.Repository.Svn
+namespace JSSoft.Crema.Repository.Svn
 {
     struct SvnInfo
     {

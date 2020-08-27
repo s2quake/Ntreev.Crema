@@ -28,7 +28,7 @@ using System.Reflection;
 using System.Collections;
 using System.Globalization;
 
-namespace Ntreev.Crema.Runtime.Generation.Cpp.CodeDom
+namespace JSSoft.Crema.Runtime.Generation.Cpp.CodeDom
 {
     class NativeCCodeGenerator : System.CodeDom.Compiler.ICodeGenerator
     {

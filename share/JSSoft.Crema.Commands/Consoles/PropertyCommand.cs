@@ -17,18 +17,18 @@
 
 using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Schema.Generation;
-using Ntreev.Crema.Commands.Consoles.Properties;
-using Ntreev.Crema.Commands.Consoles.Serializations;
-using Ntreev.Crema.Services;
-using Ntreev.Library;
-using Ntreev.Library.Commands;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Crema.Commands.Consoles.Properties;
+using JSSoft.Crema.Commands.Consoles.Serializations;
+using JSSoft.Crema.Services;
+using JSSoft.Library;
+using JSSoft.Library.Commands;
+using JSSoft.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 
-namespace Ntreev.Crema.Commands.Consoles
+namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceDescription("Resources", IsShared = true)]

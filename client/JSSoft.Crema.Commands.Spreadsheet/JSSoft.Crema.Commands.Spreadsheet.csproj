@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\share\Ntreev.Crema.Commands.Spreadsheet\Ntreev.Crema.Commands.Spreadsheet.projitems" Label="Shared" />
+  <Import Project="..\..\share\JSSoft.Crema.Commands.Spreadsheet\JSSoft.Crema.Commands.Spreadsheet.projitems" Label="Shared" />
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Spreadsheet\Ntreev.Crema.Spreadsheet.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Spreadsheet\JSSoft.Crema.Spreadsheet.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Commands\JSSoft.Crema.Commands.csproj" />
   </ItemGroup>
 </Project>

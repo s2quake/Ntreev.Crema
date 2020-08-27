@@ -21,10 +21,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Data;
+using JSSoft.Library.ObjectModel;
+using JSSoft.Crema.Data;
 
-namespace Ntreev.Crema.Runtime.Generation.TypeScript
+namespace JSSoft.Crema.Runtime.Generation.TypeScript
 {
     static class ColumnInfoExtensions
     {

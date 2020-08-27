@@ -15,20 +15,20 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ConsoleHost.Commands.Consoles;
-using Ntreev.Crema.ConsoleHost.Properties;
-using Ntreev.Crema.Javascript;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
-using Ntreev.Library.Commands;
-using Ntreev.Library.IO;
+using JSSoft.Crema.ConsoleHost.Commands.Consoles;
+using JSSoft.Crema.ConsoleHost.Properties;
+using JSSoft.Crema.Javascript;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
+using JSSoft.Library.Commands;
+using JSSoft.Library.IO;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.ConsoleHost.Commands
+namespace JSSoft.Crema.ConsoleHost.Commands
 {
     [Export(typeof(ICommand))]
     [Export]

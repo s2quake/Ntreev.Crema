@@ -15,16 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services;
-using Ntreev.Library;
-using Ntreev.Library.Commands;
+using JSSoft.Crema.Services;
+using JSSoft.Library;
+using JSSoft.Library.Commands;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows;
 
-namespace Ntreev.Crema.ApplicationHost
+namespace JSSoft.Crema.ApplicationHost
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -52,9 +52,9 @@ namespace Ntreev.Crema.ApplicationHost
             var splash = new Views.SplashWindow()
             {
                 Title = AppUtility.ProductName,
-                ThemeColor = Ntreev.Crema.ApplicationHost.Properties.Settings.Default.ThemeColor,
-                Background = Ntreev.Crema.ApplicationHost.Properties.Settings.Default.Background,
-                Foreground = Ntreev.Crema.ApplicationHost.Properties.Settings.Default.Foreground
+                ThemeColor = JSSoft.Crema.ApplicationHost.Properties.Settings.Default.ThemeColor,
+                Background = JSSoft.Crema.ApplicationHost.Properties.Settings.Default.Background,
+                Foreground = JSSoft.Crema.ApplicationHost.Properties.Settings.Default.Foreground
             };
             splash.Show();
 

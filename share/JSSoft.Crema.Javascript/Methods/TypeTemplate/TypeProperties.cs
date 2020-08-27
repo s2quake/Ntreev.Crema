@@ -17,7 +17,7 @@
 
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Javascript.Methods.TypeTemplate
+namespace JSSoft.Crema.Javascript.Methods.TypeTemplate
 {
     [Category(nameof(TypeTemplate))]
     enum TypeProperties

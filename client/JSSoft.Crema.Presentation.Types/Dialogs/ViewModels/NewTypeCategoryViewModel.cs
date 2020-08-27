@@ -15,14 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Types.Properties;
-using Ntreev.Crema.Services;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Presentation.Types.Properties;
+using JSSoft.Crema.Services;
+using JSSoft.ModernUI.Framework.Dialogs.ViewModels;
 using System;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Presentation.Types.Dialogs.ViewModels
+namespace JSSoft.Crema.Presentation.Types.Dialogs.ViewModels
 {
     public class NewTypeCategoryViewModel : NewCategoryAsyncViewModel
     {

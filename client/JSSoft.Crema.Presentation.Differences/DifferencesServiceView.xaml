@@ -16,19 +16,19 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ====================================================================================================================-->
-<UserControl x:Class="Ntreev.Crema.Presentation.Differences.DifferencesServiceView"
+<UserControl x:Class="JSSoft.Crema.Presentation.Differences.DifferencesServiceView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:avalonDock="http://schemas.xceed.com/wpf/xaml/avalondock"
-             xmlns:avalonTheme="clr-namespace:Ntreev.Crema.Presentation.Assets;assembly=Ntreev.Crema.Presentation"
-             xmlns:ncpc="clr-namespace:Ntreev.Crema.Presentation.Controls;assembly=Ntreev.Crema.Presentation"
-             xmlns:ncfc="clr-namespace:Ntreev.Crema.Presentation.Framework.Controls;assembly=Ntreev.Crema.Presentation.Framework"
-             xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-             xmlns:vm="clr-namespace:Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels"
-             xmlns:local="clr-namespace:Ntreev.Crema.Presentation.Differences"
+             xmlns:avalonTheme="clr-namespace:JSSoft.Crema.Presentation.Assets;assembly=JSSoft.Crema.Presentation"
+             xmlns:ncpc="clr-namespace:JSSoft.Crema.Presentation.Controls;assembly=JSSoft.Crema.Presentation"
+             xmlns:ncfc="clr-namespace:JSSoft.Crema.Presentation.Framework.Controls;assembly=JSSoft.Crema.Presentation.Framework"
+             xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+             xmlns:vm="clr-namespace:JSSoft.Crema.Presentation.Differences.BrowserItems.ViewModels"
+             xmlns:local="clr-namespace:JSSoft.Crema.Presentation.Differences"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
 
@@ -41,20 +41,20 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         </Style>
 
         <!--<DataTemplate x:Key="{x:Type vm:BrowserViewModel}">
-            <nmfc:BrowserExpander x:Name="expander" Header="{Binding DisplayName}" IsExpanded="True" 
+            <jmfc:BrowserExpander x:Name="expander" Header="{Binding DisplayName}" IsExpanded="True" 
                                   CloseCommand="{Binding CloseCommand}"
                                   Loaded="Expander_Loaded"
                                   Unloaded="Expander_Unloaded">
                 <ContentControl cal:View.Model="{Binding}" />
-            </nmfc:BrowserExpander>
+            </jmfc:BrowserExpander>
         </DataTemplate>
 
         <DataTemplate x:Key="DefaultBrowserItemContentTemplate">
-            <nmfc:BrowserExpander x:Name="expander" Header="{Binding DisplayName}" IsExpanded="True" 
+            <jmfc:BrowserExpander x:Name="expander" Header="{Binding DisplayName}" IsExpanded="True" 
                                   Loaded="Expander_Loaded"
                                   Unloaded="Expander_Unloaded">
                 <ContentControl cal:View.Model="{Binding}" />
-            </nmfc:BrowserExpander>
+            </jmfc:BrowserExpander>
         </DataTemplate>-->
 
         <ItemsPanelTemplate x:Key="ItemsPanelTemplate">

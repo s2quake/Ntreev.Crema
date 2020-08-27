@@ -24,20 +24,20 @@ using Caliburn.Micro;
 using System.Collections.Specialized;
 using System.Windows.Input;
 using System.Threading.Tasks;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Data;
-using Ntreev.Library.Linq;
+using JSSoft.ModernUI.Framework;
+using JSSoft.Crema.Data;
+using JSSoft.Library.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
-using Ntreev.ModernUI.Framework.ViewModels;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Data.Xml.Schema;
+using JSSoft.ModernUI.Framework.ViewModels;
+using JSSoft.Library.ObjectModel;
+using JSSoft.Crema.Data.Xml.Schema;
 using System.Text.RegularExpressions;
-using Ntreev.Library;
-using Ntreev.Crema.Designer.Properties;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
+using JSSoft.Library;
+using JSSoft.Crema.Designer.Properties;
+using JSSoft.ModernUI.Framework.Dialogs.ViewModels;
 
-namespace Ntreev.Crema.Designer.Types.ViewModels
+namespace JSSoft.Crema.Designer.Types.ViewModels
 {
     public class CategoryTreeViewItemViewModel : TreeViewItemViewModel
     {

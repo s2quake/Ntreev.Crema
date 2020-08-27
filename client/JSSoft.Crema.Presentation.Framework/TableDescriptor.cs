@@ -15,16 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 
-namespace Ntreev.Crema.Presentation.Framework
+namespace JSSoft.Crema.Presentation.Framework
 {
     // TODO: 필드를 없애고 속성으로 바꾸는 바람에 변수 갱신이 되지 않음.
     public class TableDescriptor : DescriptorBase, ITableDescriptor, ITableItemDescriptor, ILockableDescriptor, IPermissionDescriptor, IAccessibleDescriptor

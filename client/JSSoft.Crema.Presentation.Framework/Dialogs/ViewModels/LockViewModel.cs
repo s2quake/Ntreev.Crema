@@ -15,10 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework.Properties;
+using JSSoft.Crema.Presentation.Framework.Properties;
 using System;
 
-namespace Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels
+namespace JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels
 {
     public abstract class LockViewModel : ModalDialogAppBase
     {

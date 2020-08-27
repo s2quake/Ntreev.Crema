@@ -16,20 +16,20 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ====================================================================================================================-->
-<UserControl x:Class="Ntreev.Crema.Presentation.Users.Dialogs.Views.NewUserView"
+<UserControl x:Class="JSSoft.Crema.Presentation.Users.Dialogs.Views.NewUserView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-             xmlns:nmfm="clr-namespace:Ntreev.ModernUI.Framework.Markup;assembly=Ntreev.ModernUI.Framework"
-             xmlns:view="clr-namespace:Ntreev.Crema.Presentation.Users.Dialogs.Views"
-             xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Users.Properties"
+             xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+             xmlns:jmfm="clr-namespace:JSSoft.ModernUI.Framework.Markup;assembly=JSSoft.ModernUI.Framework"
+             xmlns:view="clr-namespace:JSSoft.Crema.Presentation.Users.Dialogs.Views"
+             xmlns:p="clr-namespace:JSSoft.Crema.Presentation.Users.Properties"
              mc:Ignorable="d" Width="250" Loaded="UserControl_Loaded">
 
     <StackPanel>
-        <nmfc:PropertyItemsControl>
-            <Grid nmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_ID}">
+        <jmfc:PropertyItemsControl>
+            <Grid jmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_ID}">
                 <TextBox x:Name="ID">
                     <TextBox.Text>
                         <Binding Path="ID" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
@@ -40,16 +40,16 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     </TextBox.Text>
                 </TextBox>
             </Grid>
-            <PasswordBox x:Name="passwordBox1" nmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_Password}" 
-                         nmfc:PasswordBoxUtility.ValidationTarget="{Binding ElementName=passwordBox2}"
+            <PasswordBox x:Name="passwordBox1" jmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_Password}" 
+                         jmfc:PasswordBoxUtility.ValidationTarget="{Binding ElementName=passwordBox2}"
                          PasswordChanged="PasswordBox1_PasswordChanged" />
-            <PasswordBox x:Name="passwordBox2" nmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_PasswordConfirm}"
+            <PasswordBox x:Name="passwordBox2" jmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_PasswordConfirm}"
                          PasswordChanged="PasswordBox2_PasswordChanged" />
-            <ComboBox nmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_Authority}" 
+            <ComboBox jmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_Authority}" 
                       SelectedItem="{Binding Authority}" ItemsSource="{Binding Authorities}" />
-            <TextBox nmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_Name}" 
+            <TextBox jmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_Name}" 
                      Text="{Binding UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        </nmfc:PropertyItemsControl>
+        </jmfc:PropertyItemsControl>
         <Button x:Name="Create" Content="{x:Static p:Resources.Button_Create}" Style="{StaticResource Dialog_Button_Style}" IsDefault="True" />
     </StackPanel>
 

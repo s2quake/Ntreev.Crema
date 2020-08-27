@@ -17,8 +17,8 @@
 
 #pragma warning disable 0612
 
-using Ntreev.Library;
-using Ntreev.Library.IO;
+using JSSoft.Library;
+using JSSoft.Library.IO;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,7 +27,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
+namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
 {
     class ConnectionItemCollection : ObservableCollection<ConnectionItemViewModel>
     {

@@ -15,11 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library;
+using JSSoft.Library;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Ntreev.Crema.Services.Users.Serializations
+namespace JSSoft.Crema.Services.Users.Serializations
 {
     [CollectionDataContract(Name = "Category", Namespace = SchemaUtility.Namespace, ItemName = "Path")]
     public class UserCategorySerializationInfoList : List<string>

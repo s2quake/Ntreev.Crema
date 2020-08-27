@@ -17,7 +17,7 @@
 
 using JSSoft.Communication;
 
-namespace Ntreev.Crema.ServiceHosts.Users
+namespace JSSoft.Crema.ServiceHosts.Users
 {
     class UserContextServiceHost : ServerServiceHostBase<IUserContextService, IUserContextEventCallback>
     {

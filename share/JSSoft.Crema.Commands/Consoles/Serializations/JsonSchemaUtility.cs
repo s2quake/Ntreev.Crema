@@ -25,7 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Commands.Consoles.Serializations
+namespace JSSoft.Crema.Commands.Consoles.Serializations
 {
     static class JsonSchemaUtility
     {

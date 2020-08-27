@@ -17,7 +17,7 @@
 
 using System.IO;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     class LogServiceHost : ILogService
     {

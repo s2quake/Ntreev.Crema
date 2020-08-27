@@ -23,7 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Data.Json
+namespace JSSoft.Crema.Data.Json
 {
     public static class JsonSchemaUtility
     {

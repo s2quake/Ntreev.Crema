@@ -9,7 +9,7 @@
     <PackageReference Include="Microsoft.WindowsAPICodePack.Shell" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ntreev.Crema.RuntimeService\Ntreev.Crema.RuntimeService.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Tools.Framework\Ntreev.Crema.Tools.Framework.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.RuntimeService\JSSoft.Crema.RuntimeService.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Tools.Framework\JSSoft.Crema.Tools.Framework.csproj" />
   </ItemGroup>
 </Project>

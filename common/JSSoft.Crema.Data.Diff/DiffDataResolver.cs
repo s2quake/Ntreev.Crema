@@ -17,7 +17,7 @@
 
 using System.Linq;
 
-namespace Ntreev.Crema.Data.Diff
+namespace JSSoft.Crema.Data.Diff
 {
     public class DiffDataResolver
     {

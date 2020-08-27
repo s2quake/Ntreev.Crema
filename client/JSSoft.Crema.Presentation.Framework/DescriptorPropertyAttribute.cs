@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Presentation.Framework
+namespace JSSoft.Crema.Presentation.Framework
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public sealed class DescriptorPropertyAttribute : Attribute

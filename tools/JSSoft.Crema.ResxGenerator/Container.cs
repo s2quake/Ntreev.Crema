@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.ResxGenerator
+namespace JSSoft.Crema.ResxGenerator
 {
     static class Container
     {

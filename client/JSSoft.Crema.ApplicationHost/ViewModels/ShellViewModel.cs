@@ -15,11 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
-using Ntreev.Library;
-using Ntreev.Library.Linq;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Services;
+using JSSoft.Library;
+using JSSoft.Library.Linq;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -30,7 +30,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.ApplicationHost.ViewModels
+namespace JSSoft.Crema.ApplicationHost.ViewModels
 {
     [Export(typeof(IShell))]
     public class ShellViewModel : ScreenBase, IShell

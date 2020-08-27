@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\share\Ntreev.Crema.ServiceHosts.RuntimeService\Ntreev.Crema.ServiceHosts.RuntimeService.projitems" Label="Shared" />
-  <Import Project="..\..\share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.projitems" Label="Shared" />
+  <Import Project="..\..\share\JSSoft.Crema.ServiceHosts.RuntimeService\JSSoft.Crema.ServiceHosts.RuntimeService.projitems" Label="Shared" />
+  <Import Project="..\..\share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.projitems" Label="Shared" />
   <ItemGroup>
     <ProjectReference Include="..\..\..\JSSoft.Communication\JSSoft.Communication\JSSoft.Communication.csproj" />
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Runtime.Generation\Ntreev.Crema.Runtime.Generation.csproj" />
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Runtime.Serialization\Ntreev.Crema.Runtime.Serialization.csproj" />
-    <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Runtime.Generation\JSSoft.Crema.Runtime.Generation.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Runtime.Serialization\JSSoft.Crema.Runtime.Serialization.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.ServiceModel\JSSoft.Crema.ServiceModel.csproj" />
   </ItemGroup>
 </Project>

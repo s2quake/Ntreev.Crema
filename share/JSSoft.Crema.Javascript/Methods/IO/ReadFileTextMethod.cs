@@ -20,7 +20,7 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
 
-namespace Ntreev.Crema.Javascript.Methods.IO
+namespace JSSoft.Crema.Javascript.Methods.IO
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]

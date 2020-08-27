@@ -16,13 +16,13 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Newtonsoft.Json.Linq;
-using Ntreev.Crema.Services;
+using JSSoft.Crema.Services;
 using System;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Text;
 
-namespace Ntreev.Crema.ObjectSerializer.Json
+namespace JSSoft.Crema.ObjectSerializer.Json
 {
     [Export(typeof(IObjectSerializer))]
     class JsonObjectSerializer : IObjectSerializer

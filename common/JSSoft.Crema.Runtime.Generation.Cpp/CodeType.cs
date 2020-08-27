@@ -21,7 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Runtime.Generation.Cpp
+namespace JSSoft.Crema.Runtime.Generation.Cpp
 {
     [Flags]
     public enum CodeType

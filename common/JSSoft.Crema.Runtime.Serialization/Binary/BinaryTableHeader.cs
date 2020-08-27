@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Runtime.Serialization.Binary
+namespace JSSoft.Crema.Runtime.Serialization.Binary
 {
     public struct BinaryTableHeader
     {

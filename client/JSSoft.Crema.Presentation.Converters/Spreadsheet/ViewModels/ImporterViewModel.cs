@@ -16,14 +16,14 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.Spreadsheet;
-using Ntreev.Library;
-using Ntreev.Library.Linq;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Services;
+using JSSoft.Crema.Spreadsheet;
+using JSSoft.Library;
+using JSSoft.Library.Linq;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
@@ -33,7 +33,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.ViewModels
+namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.ViewModels
 {
     [Export(typeof(IImporter))]
     class ImporterViewModel : ViewAwareBase, IImporter

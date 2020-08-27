@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library.IO;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Library.IO;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,7 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace Ntreev.Crema.Tools.Runtime.ViewModels
+namespace JSSoft.Crema.Tools.Runtime.ViewModels
 {
     public class GenerationItemCollection : ObservableCollection<GenerationItemViewModel>
     {

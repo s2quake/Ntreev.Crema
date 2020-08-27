@@ -2,10 +2,10 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <Import Project="..\..\wpf.props" />
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
-    <ProjectReference Include="..\..\..\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework.DataGrid\Ntreev.ModernUI.Framework.DataGrid.csproj" />
-    <ProjectReference Include="..\..\..\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Data.Diff\Ntreev.Crema.Data.Diff.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
+    <ProjectReference Include="..\..\..\JSSoft.Library\JSSoft.Library\JSSoft.Library.csproj" />
+    <ProjectReference Include="..\..\..\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework.DataGrid\JSSoft.ModernUI.Framework.DataGrid.csproj" />
+    <ProjectReference Include="..\..\..\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Data.Diff\JSSoft.Crema.Data.Diff.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Data\JSSoft.Crema.Data.csproj" />
   </ItemGroup>
 </Project>

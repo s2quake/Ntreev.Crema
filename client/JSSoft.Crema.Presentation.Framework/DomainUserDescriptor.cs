@@ -15,12 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
 using System;
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Presentation.Framework
+namespace JSSoft.Crema.Presentation.Framework
 {
     public class DomainUserDescriptor : DescriptorBase, IDomainUserDescriptor
     {

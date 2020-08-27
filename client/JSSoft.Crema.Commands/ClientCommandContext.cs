@@ -1,14 +1,14 @@
-﻿//using Ntreev.Crema.Commands;
+﻿//using JSSoft.Crema.Commands;
 //using System;
 //using System.Collections.Generic;
 //using System.ComponentModel.Composition;
 //using System.Linq;
 //using System.Text;
 //using System.Threading.Tasks;
-//using Ntreev.Crema.Services;
-//using Ntreev.Library.Commands;
+//using JSSoft.Crema.Services;
+//using JSSoft.Library.Commands;
 
-//namespace Ntreev.Crema.Client.Commands
+//namespace JSSoft.Crema.Client.Commands
 //{
 //    [Export(typeof(ClientCommandContext))]
 //    [Export(typeof(CremaCommandContextBase))]

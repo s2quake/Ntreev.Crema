@@ -19,7 +19,7 @@ using System;
 using System.ComponentModel;
 using System.Xml;
 
-namespace Ntreev.Crema.Data.Xml
+namespace JSSoft.Crema.Data.Xml
 {
     public static class CremaXmlConvert
     {

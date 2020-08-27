@@ -15,14 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Services;
+using JSSoft.ModernUI.Framework;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels
+namespace JSSoft.Crema.Presentation.Tables.BrowserItems.ViewModels
 {
     public class TableCategoryTreeViewItemViewModel : TableCategoryTreeItemBase
     {

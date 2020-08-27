@@ -15,12 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.ModernUI.Framework;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Ntreev.Crema.Presentation.Types.Documents.Converters
+namespace JSSoft.Crema.Presentation.Types.Documents.Converters
 {
     public class ActiveDocumentConverter : IValueConverter
     {

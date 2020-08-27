@@ -19,7 +19,7 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Ntreev.Crema.Presentation.Framework.Converters
+namespace JSSoft.Crema.Presentation.Framework.Converters
 {
     public class LockableDescriptorToPropertyConverter : IValueConverter
     {

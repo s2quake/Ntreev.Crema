@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Ntreev.Crema.ServiceModel.Properties {
+namespace JSSoft.Crema.ServiceModel.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Ntreev.Crema.ServiceModel.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Ntreev.Crema.ServiceModel.Properties.EventResources", typeof(EventResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("JSSoft.Crema.ServiceModel.Properties.EventResources", typeof(EventResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

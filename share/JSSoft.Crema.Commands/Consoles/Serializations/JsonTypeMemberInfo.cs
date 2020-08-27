@@ -18,7 +18,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Schema;
-using Ntreev.Crema.ServiceModel;
+using JSSoft.Crema.ServiceModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -27,7 +27,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Ntreev.Crema.Commands.Consoles.Serializations
+namespace JSSoft.Crema.Commands.Consoles.Serializations
 {
     struct JsonTypeMemberInfo
     {

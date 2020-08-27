@@ -15,12 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Library.IO;
+using JSSoft.Library.ObjectModel;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -29,7 +29,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Ntreev.Crema.Designer.Types.ViewModels
+namespace JSSoft.Crema.Designer.Types.ViewModels
 {
     [Export]
     class TypeBrowserViewModel : TreeViewViewModel

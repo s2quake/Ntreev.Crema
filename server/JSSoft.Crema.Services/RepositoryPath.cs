@@ -15,14 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Library.IO;
+using JSSoft.Library.ObjectModel;
 using System;
 using System.IO;
 using System.Linq;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     struct RepositoryPath
     {
@@ -31,17 +31,17 @@ namespace Ntreev.Crema.Services
             this.Path = GeneratePath(basePath, path);
         }
 
-        internal RepositoryPath(Ntreev.Crema.Services.Users.UserContext userContext, string path)
+        internal RepositoryPath(JSSoft.Crema.Services.Users.UserContext userContext, string path)
         {
             this.Path = GeneratePath(userContext.BasePath, path);
         }
 
-        internal RepositoryPath(Ntreev.Crema.Services.Data.DataBase dataBase, string path)
+        internal RepositoryPath(JSSoft.Crema.Services.Data.DataBase dataBase, string path)
         {
             this.Path = GeneratePath(dataBase.BasePath, path);
         }
 
-        internal RepositoryPath(Ntreev.Crema.Services.Data.TypeContext typeContext, string path)
+        internal RepositoryPath(JSSoft.Crema.Services.Data.TypeContext typeContext, string path)
         {
             if (path.StartsWith(PathUtility.Separator + CremaSchema.TypeDirectory) == true ||
                 path.StartsWith(PathUtility.Separator + CremaSchema.TableDirectory) == true)
@@ -49,7 +49,7 @@ namespace Ntreev.Crema.Services
             this.Path = GeneratePath(typeContext.BasePath, path);
         }
 
-        internal RepositoryPath(Ntreev.Crema.Services.Data.TableContext tableContext, string path)
+        internal RepositoryPath(JSSoft.Crema.Services.Data.TableContext tableContext, string path)
         {
             if (path.StartsWith(PathUtility.Separator + CremaSchema.TypeDirectory) == true ||
                 path.StartsWith(PathUtility.Separator + CremaSchema.TableDirectory) == true)

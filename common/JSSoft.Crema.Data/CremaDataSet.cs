@@ -18,12 +18,12 @@
 //#if !DEBUG
 #define USE_PARALLEL
 //#endif
-using Ntreev.Crema.Data.Properties;
-using Ntreev.Crema.Data.Xml;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library;
-using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Crema.Data.Properties;
+using JSSoft.Crema.Data.Xml;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Library;
+using JSSoft.Library.IO;
+using JSSoft.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -36,7 +36,7 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
-namespace Ntreev.Crema.Data
+namespace JSSoft.Crema.Data
 {
     [Serializable]
     public class CremaDataSet : IListSource, IDisposable, IXmlSerializable, ISerializable

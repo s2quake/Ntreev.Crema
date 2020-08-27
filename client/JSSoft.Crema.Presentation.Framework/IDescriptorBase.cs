@@ -18,7 +18,7 @@
 using System;
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Presentation.Framework
+namespace JSSoft.Crema.Presentation.Framework
 {
     public interface IDescriptorBase : INotifyPropertyChanged, IDisposable
     {

@@ -15,18 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Data;
-using Ntreev.Crema.Services.Properties;
-using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Data;
+using JSSoft.Crema.Services.Properties;
+using JSSoft.Library.IO;
+using JSSoft.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services.Domains
+namespace JSSoft.Crema.Services.Domains
 {
     class DomainContext : ItemContext<Domain, DomainCategory, DomainCollection, DomainCategoryCollection, DomainContext>,
         IDomainContext, IServiceProvider

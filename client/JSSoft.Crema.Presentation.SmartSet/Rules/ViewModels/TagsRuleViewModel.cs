@@ -16,10 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Library;
+using JSSoft.Library;
 using System;
 
-namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
+namespace JSSoft.Crema.Presentation.SmartSet.Rules.ViewModels
 {
     public abstract class TagsRuleViewModel : PropertyChangedBase, IRule
     {

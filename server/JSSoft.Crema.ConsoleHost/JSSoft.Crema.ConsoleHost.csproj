@@ -7,8 +7,8 @@
     <OutputPath>$(ExePath)server\console</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Commands\JSSoft.Crema.Commands.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.csproj" />
   </ItemGroup>
 </Project>

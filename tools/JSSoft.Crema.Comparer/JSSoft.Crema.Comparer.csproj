@@ -18,8 +18,8 @@
     <PackageReference Include="Microsoft.WindowsAPICodePack.Shell" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework.csproj" />
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Presentation\Ntreev.Crema.Presentation.csproj" />
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Spreadsheet\Ntreev.Crema.Spreadsheet.csproj" />
+    <ProjectReference Include="..\..\..\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Presentation\JSSoft.Crema.Presentation.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Spreadsheet\JSSoft.Crema.Spreadsheet.csproj" />
   </ItemGroup>
 </Project>

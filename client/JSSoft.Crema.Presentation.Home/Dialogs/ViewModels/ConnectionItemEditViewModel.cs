@@ -15,17 +15,17 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.Properties;
-using Ntreev.Crema.Presentation.Home.Services.ViewModels;
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
+using JSSoft.Crema.Presentation.Home.Properties;
+using JSSoft.Crema.Presentation.Home.Services.ViewModels;
+using JSSoft.Library;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.Dialogs.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Presentation.Home.Dialogs.ViewModels
+namespace JSSoft.Crema.Presentation.Home.Dialogs.ViewModels
 {
     class ConnectionItemEditViewModel : ModalDialogBase
     {

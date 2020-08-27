@@ -17,7 +17,7 @@
 
 using System.Xml;
 
-namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
+namespace JSSoft.Crema.Presentation.SmartSet.Rules.ViewModels
 {
     class EnumRuleItemViewModel : RuleItem
     {

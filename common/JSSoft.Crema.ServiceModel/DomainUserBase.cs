@@ -19,7 +19,7 @@ using System;
 using System.ComponentModel;
 using System.Data;
 
-namespace Ntreev.Crema.ServiceModel
+namespace JSSoft.Crema.ServiceModel
 {
     internal abstract class DomainUserBase
     {

@@ -21,7 +21,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Presentation.Tables.Documents.Views
+namespace JSSoft.Crema.Presentation.Tables.Documents.Views
 {
     /// <summary>
     /// Interaction logic for TableEditorView.xaml

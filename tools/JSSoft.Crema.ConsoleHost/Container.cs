@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.ConsoleHost
+namespace JSSoft.Crema.ConsoleHost
 {
     static class Container
     {

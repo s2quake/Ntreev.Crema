@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using FirstFloor.ModernUI.Windows.Controls;
-using Ntreev.Crema.Comparer.Dialogs.ViewModels;
+using JSSoft.Crema.Comparer.Dialogs.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -39,7 +39,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace Ntreev.Crema.Comparer
+namespace JSSoft.Crema.Comparer
 {
     /// <summary>
     /// ShellView.xaml에 대한 상호 작용 논리

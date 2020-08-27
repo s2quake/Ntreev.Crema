@@ -15,26 +15,26 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
-using Ntreev.Crema.Presentation.Types.Properties;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library;
-using Ntreev.Library.Linq;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Presentation.Types.BrowserItems.ViewModels;
+using JSSoft.Crema.Presentation.Types.Properties;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Library;
+using JSSoft.Library.Linq;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using TypeDescriptor = Ntreev.Crema.Presentation.Framework.TypeDescriptor;
+using TypeDescriptor = JSSoft.Crema.Presentation.Framework.TypeDescriptor;
 
-namespace Ntreev.Crema.Presentation.Types.PropertyItems.ViewModels
+namespace JSSoft.Crema.Presentation.Types.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    [Dependency("Ntreev.Crema.Presentation.Tables.PropertyItems.ViewModels.TableInfoViewModel, Ntreev.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Presentation.Tables.IPropertyService, Ntreev.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [Dependency("JSSoft.Crema.Presentation.Tables.PropertyItems.ViewModels.TableInfoViewModel, JSSoft.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("JSSoft.Crema.Presentation.Tables.IPropertyService, JSSoft.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ReferencedTypesViewModel : PropertyItemBase, ISelector
     {
         private readonly Authenticator authenticator;

@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
-namespace Ntreev.Crema.Data
+namespace JSSoft.Crema.Data
 {
     public sealed class CremaDataRowCollection : IEnumerable<CremaDataRow>, ICollection
     {

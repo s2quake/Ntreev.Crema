@@ -18,24 +18,24 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 ====================================================================================================================-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
+                    xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
                     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-                    xmlns:vm="clr-namespace:Ntreev.Crema.Comparer.Templates.ViewModels">
+                    xmlns:vm="clr-namespace:JSSoft.Crema.Comparer.Templates.ViewModels">
 
     <HierarchicalDataTemplate DataType="{x:Type vm:TemplateTreeViewItemViewModel}" ItemsSource="{Binding Items}">
         <ContentControl Focusable="False">
             <DockPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" Margin="0 0 2 0">
-                    <nmfc:IconImage x:Name="resolveIcon" Source="/Ntreev.Crema.Presentation;component/Images/resolve.png" Visibility="Collapsed" />
-                    <nmfc:IconImage x:Name="problemsIcon" Source="/Ntreev.Crema.Presentation;component/Images/problem.png" Foreground="Red">
-                        <nmfc:IconImage.ToolTip>
+                    <jmfc:IconImage x:Name="resolveIcon" Source="/JSSoft.Crema.Presentation;component/Images/resolve.png" Visibility="Collapsed" />
+                    <jmfc:IconImage x:Name="problemsIcon" Source="/JSSoft.Crema.Presentation;component/Images/problem.png" Foreground="Red">
+                        <jmfc:IconImage.ToolTip>
                             <ItemsControl ItemsSource="{Binding UnresolvedItems}" />
-                        </nmfc:IconImage.ToolTip>
-                    </nmfc:IconImage>
+                        </jmfc:IconImage.ToolTip>
+                    </jmfc:IconImage>
                 </StackPanel>
                 <StackPanel x:Name="label" Orientation="Horizontal">
-                    <nmfc:IconImage Style="{StaticResource TemplateImage_Style}" Margin="0 0 4 0" />
-                    <nmfc:HighlightTextBlock x:Name="textBox" Margin="2 0" Text="{Binding DisplayName}" Padding="5 2" />
+                    <jmfc:IconImage Style="{StaticResource TemplateImage_Style}" Margin="0 0 4 0" />
+                    <jmfc:HighlightTextBlock x:Name="textBox" Margin="2 0" Text="{Binding DisplayName}" Padding="5 2" />
                 </StackPanel>
             </DockPanel>
         </ContentControl>

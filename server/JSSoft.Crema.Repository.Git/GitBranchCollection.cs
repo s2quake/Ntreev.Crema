@@ -19,7 +19,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Ntreev.Crema.Repository.Git
+namespace JSSoft.Crema.Repository.Git
 {
     class GitBranchCollection : IReadOnlyList<string>
     {

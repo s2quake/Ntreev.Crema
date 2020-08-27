@@ -15,23 +15,23 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.SmartSet.Properties;
-using Ntreev.Crema.Presentation.Types;
-using Ntreev.Crema.Presentation.Types.BrowserItems.ViewModels;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library;
-using Ntreev.Library.Linq;
-using Ntreev.Library.ObjectModel;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Presentation.SmartSet.Properties;
+using JSSoft.Crema.Presentation.Types;
+using JSSoft.Crema.Presentation.Types.BrowserItems.ViewModels;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Library;
+using JSSoft.Library.Linq;
+using JSSoft.Library.ObjectModel;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Threading;
 
-namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
+namespace JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
     [Export(typeof(IBrowserItem))]
     [Export(typeof(TypeSmartSetBrowserViewModel))]
@@ -43,7 +43,7 @@ namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
         private readonly Authenticator authenticator;
         private readonly TypeSmartSetContext smartSetContext;
         private readonly Lazy<ITypeBrowser> typeBrowser = null;
-        private readonly Lazy<Ntreev.Crema.Presentation.Types.IPropertyService> propertyService;
+        private readonly Lazy<JSSoft.Crema.Presentation.Types.IPropertyService> propertyService;
 
         [ImportingConstructor]
         public TypeSmartSetBrowserViewModel(Authenticator authenticator, ICremaAppHost cremaAppHost, [ImportMany] IEnumerable<IRule> rules, 

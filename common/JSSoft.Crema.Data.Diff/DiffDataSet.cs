@@ -18,13 +18,13 @@
 //#if !DEBUG
 //#define USE_PARALLEL
 //#endif
-using Ntreev.Library;
+using JSSoft.Library;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Data.Diff
+namespace JSSoft.Crema.Data.Diff
 {
     public class DiffDataSet
     {

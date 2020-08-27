@@ -19,11 +19,11 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:cal="http://www.caliburnproject.org"
-                    xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-                    xmlns:nmfm="clr-namespace:Ntreev.ModernUI.Framework.Markup;assembly=Ntreev.ModernUI.Framework"
-                    xmlns:nmfv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework"
-                    xmlns:ncpc="clr-namespace:Ntreev.Crema.Presentation.Controls"
-                    xmlns:ncfv="clr-namespace:Ntreev.Crema.Presentation.Converters">
+                    xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+                    xmlns:jmfm="clr-namespace:JSSoft.ModernUI.Framework.Markup;assembly=JSSoft.ModernUI.Framework"
+                    xmlns:jmfv="clr-namespace:JSSoft.ModernUI.Framework.Converters;assembly=JSSoft.ModernUI.Framework"
+                    xmlns:ncpc="clr-namespace:JSSoft.Crema.Presentation.Controls"
+                    xmlns:ncfv="clr-namespace:JSSoft.Crema.Presentation.Converters">
 
     <ControlTemplate x:Key="ContentServiceControl_ControlTemplate" TargetType="{x:Type ncpc:ContentServiceControl}">
         <DockPanel LastChildFill="True">
@@ -33,7 +33,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                IsExpanded="{TemplateBinding IsBrowserExpanded}" 
                                Content="{TemplateBinding BrowserContent}" >
             </ncpc:FlowExpander>
-            <ncpc:DockPanelSplitter x:Name="PART_BrowsersSplitter" DockPanel.Dock="Left" Visibility="{nmfm:VisibilityBinding IsExpanded, ElementName=PART_Browsers}" />
+            <ncpc:DockPanelSplitter x:Name="PART_BrowsersSplitter" DockPanel.Dock="Left" Visibility="{jmfm:VisibilityBinding IsExpanded, ElementName=PART_Browsers}" />
 
             <!-- Properties -->
             <ncpc:FlowExpander x:Name="PART_Properties" DockPanel.Dock="Right" ExpandDirection="Left" MinWidth="50"
@@ -41,7 +41,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                IsExpanded="{TemplateBinding IsPropertyExpanded}"
                                Content="{TemplateBinding PropertyContent}" >
             </ncpc:FlowExpander>
-            <ncpc:DockPanelSplitter x:Name="PART_PropertiesSplitter" DockPanel.Dock="Right" Visibility="{nmfm:VisibilityBinding IsExpanded, ElementName=PART_Properties}" />
+            <ncpc:DockPanelSplitter x:Name="PART_PropertiesSplitter" DockPanel.Dock="Right" Visibility="{jmfm:VisibilityBinding IsExpanded, ElementName=PART_Properties}" />
 
             <!-- Content -->
             <ContentPresenter ContentSource="Content" MinWidth="50" />

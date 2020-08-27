@@ -15,7 +15,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>  
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
+    <ProjectReference Include="..\..\..\JSSoft.Library\JSSoft.Library\JSSoft.Library.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Data\JSSoft.Crema.Data.csproj" />
   </ItemGroup>
 </Project>

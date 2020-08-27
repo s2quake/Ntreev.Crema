@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 
-namespace Ntreev.Crema.Presentation.Framework
+namespace JSSoft.Crema.Presentation.Framework
 {
     public static class ClipboardUtility
     {

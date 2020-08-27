@@ -30,7 +30,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Designer.Tables.Views
+namespace JSSoft.Crema.Designer.Tables.Views
 {
     /// <summary>
     /// TableView.xaml에 대한 상호 작용 논리

@@ -27,7 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Ntreev.Crema.ApplicationHost
+namespace JSSoft.Crema.ApplicationHost
 {
     /// <summary>
     /// Interaction logic for App.xaml

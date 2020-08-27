@@ -15,16 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services.Domains.Actions;
-using Ntreev.Crema.Services.Domains.Serializations;
-using Ntreev.Crema.Services.Users;
+using JSSoft.Crema.Services.Domains.Actions;
+using JSSoft.Crema.Services.Domains.Serializations;
+using JSSoft.Crema.Services.Users;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services.Domains
+namespace JSSoft.Crema.Services.Domains
 {
     class DomainRestorer
     {

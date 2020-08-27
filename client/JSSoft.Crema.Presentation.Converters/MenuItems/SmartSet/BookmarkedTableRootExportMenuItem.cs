@@ -15,21 +15,21 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.Converters.Properties;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Presentation.Converters.Dialogs.ViewModels;
+using JSSoft.Crema.Presentation.Converters.Properties;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System.ComponentModel.Composition;
 using System.Linq;
 
-namespace Ntreev.Crema.Presentation.Converters.MenuItems.SmartSet
+namespace JSSoft.Crema.Presentation.Converters.MenuItems.SmartSet
 {
     [Export(typeof(IMenuItem))]
-    [ParentType("Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels.BookmarkTableRootTreeViewItemViewModel, Ntreev.Crema.Presentation.SmartSet, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels.BookmarkTableCategoryTreeViewItemViewModel, Ntreev.Crema.Presentation.SmartSet, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels.BookmarkTableRootTreeViewItemViewModel, JSSoft.Crema.Presentation.SmartSet, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels.BookmarkTableCategoryTreeViewItemViewModel, JSSoft.Crema.Presentation.SmartSet, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class BookmarkedTableRootExportMenuItem : MenuItemBase
     {
         private readonly Authenticator authenticator;

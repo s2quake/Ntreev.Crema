@@ -15,11 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library.Commands;
+using JSSoft.Library.Commands;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Commands
+namespace JSSoft.Crema.Commands
 {
     [Export(typeof(CommandContext))]
     public class CommandContext : CommandContextBase

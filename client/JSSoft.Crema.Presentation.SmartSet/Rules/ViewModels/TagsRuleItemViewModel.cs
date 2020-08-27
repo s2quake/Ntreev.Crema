@@ -15,10 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library;
+using JSSoft.Library;
 using System.Xml;
 
-namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
+namespace JSSoft.Crema.Presentation.SmartSet.Rules.ViewModels
 {
     class TagsRuleItemViewModel : RuleItem
     {

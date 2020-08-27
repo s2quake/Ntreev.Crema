@@ -16,10 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using JSSoft.Communication;
-using Ntreev.Crema.ServiceHosts;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Users;
-using Ntreev.Library.Linq;
+using JSSoft.Crema.ServiceHosts;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Users;
+using JSSoft.Library.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,7 +32,7 @@ using System.Reflection;
 using System.Security;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     public class CremaBootstrapper : IServiceProvider, IDisposable
     {

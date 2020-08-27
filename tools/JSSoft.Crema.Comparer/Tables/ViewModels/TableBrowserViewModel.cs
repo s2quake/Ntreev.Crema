@@ -16,9 +16,9 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Ntreev.Crema.Spreadsheet;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Spreadsheet;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,7 +28,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Ntreev.Crema.Comparer.Tables.ViewModels
+namespace JSSoft.Crema.Comparer.Tables.ViewModels
 {
     [Export]
     class TableBrowserViewModel : TreeViewViewModel

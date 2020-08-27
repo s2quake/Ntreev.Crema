@@ -19,7 +19,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Ntreev.Crema.Presentation.Framework.Controls
+namespace JSSoft.Crema.Presentation.Framework.Controls
 {
     public class CremaSplashControl : Control
     {

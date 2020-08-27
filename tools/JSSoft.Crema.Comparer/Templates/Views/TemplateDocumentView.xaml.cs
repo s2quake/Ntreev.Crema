@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Controls;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Presentation.Controls;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +32,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Comparer.Templates.Views
+namespace JSSoft.Crema.Comparer.Templates.Views
 {
     /// <summary>
     /// TemplateDocumentView.xaml에 대한 상호 작용 논리

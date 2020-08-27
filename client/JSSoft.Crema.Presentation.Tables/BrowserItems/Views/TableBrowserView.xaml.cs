@@ -21,7 +21,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Presentation.Tables.BrowserItems.Views
+namespace JSSoft.Crema.Presentation.Tables.BrowserItems.Views
 {
     [Export]
     public partial class TableBrowserView : UserControl, IDisposable

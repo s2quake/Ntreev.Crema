@@ -19,8 +19,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid"
-                    xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-                    xmlns:ncpc="clr-namespace:Ntreev.Crema.Presentation.Controls">
+                    xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+                    xmlns:ncpc="clr-namespace:JSSoft.Crema.Presentation.Controls">
 
     <DataTemplate x:Key="DiffDataTableControl_TabControl_ContentTemplate">
         <ncpc:TabControlContentControl ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType={x:Type TabControl}}}" 

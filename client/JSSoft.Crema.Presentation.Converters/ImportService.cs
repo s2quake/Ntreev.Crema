@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 
-namespace Ntreev.Crema.Presentation.Converters
+namespace JSSoft.Crema.Presentation.Converters
 {
     [Export(typeof(IImportService))]
     class ImportService : IImportService

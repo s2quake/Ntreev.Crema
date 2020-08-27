@@ -15,12 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceHosts.Data;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Users;
-using Ntreev.Library;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library.Threading;
+using JSSoft.Crema.ServiceHosts.Data;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Users;
+using JSSoft.Library;
+using JSSoft.Library.ObjectModel;
+using JSSoft.Library.Threading;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services.Data
+namespace JSSoft.Crema.Services.Data
 {
     class DataBaseContext : ContainerBase<DataBase>, IDataBaseContext, IDataBaseContextEventCallback
     {

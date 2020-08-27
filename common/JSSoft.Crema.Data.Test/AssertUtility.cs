@@ -1,4 +1,4 @@
-﻿namespace Ntreev.Crema.Data.Test
+﻿namespace JSSoft.Crema.Data.Test
 {
     //static class AssertUtility
     //{

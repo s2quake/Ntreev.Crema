@@ -16,16 +16,16 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ====================================================================================================================-->
-<ResourceDictionary x:Class="Ntreev.Crema.Designer.Tables.Assets.TreeViewItem"
+<ResourceDictionary x:Class="JSSoft.Crema.Designer.Tables.Assets.TreeViewItem"
                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:vm="clr-namespace:Ntreev.Crema.Designer.Tables.ViewModels"
-                    xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-                    xmlns:nmfm="clr-namespace:Ntreev.ModernUI.Framework.Markup;assembly=Ntreev.ModernUI.Framework"
-                    xmlns:nmfv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework"
-                    xmlns:p="clr-namespace:Ntreev.Crema.Designer.Properties">
+                    xmlns:vm="clr-namespace:JSSoft.Crema.Designer.Tables.ViewModels"
+                    xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+                    xmlns:jmfm="clr-namespace:JSSoft.ModernUI.Framework.Markup;assembly=JSSoft.ModernUI.Framework"
+                    xmlns:jmfv="clr-namespace:JSSoft.ModernUI.Framework.Converters;assembly=JSSoft.ModernUI.Framework"
+                    xmlns:p="clr-namespace:JSSoft.Crema.Designer.Properties">
 
-    <nmfv:IsNullConverter x:Key="IsNotNullConverter" Inverse="True" />
+    <jmfv:IsNullConverter x:Key="IsNotNullConverter" Inverse="True" />
 
     <Style x:Key="TextBlock_Style" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
         <Style.Triggers>
@@ -35,7 +35,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="HighlightTextBlock_Style" TargetType="{x:Type nmfc:HighlightTextBlock}" BasedOn="{StaticResource {x:Type nmfc:HighlightTextBlock}}">
+    <Style x:Key="HighlightTextBlock_Style" TargetType="{x:Type jmfc:HighlightTextBlock}" BasedOn="{StaticResource {x:Type jmfc:HighlightTextBlock}}">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Tags.Color, Converter={StaticResource IsNotNullConverter}}" Value="True">
                 <Setter Property="TextElement.Foreground" Value="{Binding Tags.Color, TargetNullValue=Green}" />
@@ -43,25 +43,25 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         </Style.Triggers>
     </Style>
 
-    <nmfc:IconImage x:Key="folder_icon" Source="/Ntreev.ModernUI.Framework;component/Images/folder_c.png" />
-    <nmfc:IconImage x:Key="table_icon" Source="/Images/table.png" />
-    <nmfc:IconImage x:Key="delete_icon" Source="/Images/close.png" />
-    <nmfc:IconImage x:Key="find_icon" Source="/Ntreev.ModernUI.Framework;component/Images/magnify.png" />
-    <nmfc:IconImage x:Key="rename_icon" Source="/Images/rename.png" />
+    <jmfc:IconImage x:Key="folder_icon" Source="/JSSoft.ModernUI.Framework;component/Images/folder_c.png" />
+    <jmfc:IconImage x:Key="table_icon" Source="/Images/table.png" />
+    <jmfc:IconImage x:Key="delete_icon" Source="/Images/close.png" />
+    <jmfc:IconImage x:Key="find_icon" Source="/JSSoft.ModernUI.Framework;component/Images/magnify.png" />
+    <jmfc:IconImage x:Key="rename_icon" Source="/Images/rename.png" />
     
     <HierarchicalDataTemplate DataType="{x:Type vm:DataBaseTreeViewItemViewModel}" ItemsSource="{Binding Items}">
         <HierarchicalDataTemplate.Resources>
-            <nmfc:ModernContextMenu x:Key="DataBase_ContextMenu" ItemsSource="{Binding ContextMenus}">
+            <jmfc:ModernContextMenu x:Key="DataBase_ContextMenu" ItemsSource="{Binding ContextMenus}">
                 <MenuItem x:Name="NewFolder" Header="{x:Static p:Resources.MenuItem_NewFolder}" Icon="{StaticResource folder_icon}" />
                 <MenuItem x:Name="NewTable" Header="{x:Static p:Resources.MenuItem_NewTable}" Icon="{StaticResource table_icon}" />
                 <Separator />
                 <MenuItem x:Name="Find" Header="{x:Static p:Resources.MenuItem_Find}" Icon="{StaticResource find_icon}" />
-            </nmfc:ModernContextMenu>
+            </jmfc:ModernContextMenu>
         </HierarchicalDataTemplate.Resources>
         <ContentControl Focusable="False" Margin="2" ContextMenu="{StaticResource DataBase_ContextMenu}" ContextMenuOpening="ContentControl_ContextMenuOpening">
             <DockPanel Background="Transparent">
                 <StackPanel Orientation="Horizontal">
-                    <nmfc:IconImage Style="{StaticResource DataBaseImage_Style}" Margin="0 0 4 0" />
+                    <jmfc:IconImage Style="{StaticResource DataBaseImage_Style}" Margin="0 0 4 0" />
                     <TextBlock Text="{Binding DisplayName}" />
                 </StackPanel>
             </DockPanel>
@@ -70,7 +70,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
     <HierarchicalDataTemplate DataType="{x:Type vm:CategoryTreeViewItemViewModel}" ItemsSource="{Binding Items}">
         <HierarchicalDataTemplate.Resources>
-            <nmfc:ModernContextMenu x:Key="Category_ContextMenu" ItemsSource="{Binding ContextMenus}">
+            <jmfc:ModernContextMenu x:Key="Category_ContextMenu" ItemsSource="{Binding ContextMenus}">
                 <MenuItem x:Name="NewFolder" Header="{x:Static p:Resources.MenuItem_NewFolder}" Icon="{StaticResource folder_icon}" />
                 <MenuItem x:Name="NewTable" Header="{x:Static p:Resources.MenuItem_NewTable}" Icon="{StaticResource table_icon}" />
                 <Separator />
@@ -78,13 +78,13 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <MenuItem x:Name="Move" Header="{x:Static p:Resources.MenuItem_Move}" />
                 <MenuItem x:Name="Find" Header="{x:Static p:Resources.MenuItem_Find}" Icon="{StaticResource find_icon}" />
                 <MenuItem x:Name="Rename" Header="{x:Static p:Resources.MenuItem_Rename}" Icon="{StaticResource rename_icon}" InputGestureText="F2" />
-            </nmfc:ModernContextMenu>
+            </jmfc:ModernContextMenu>
         </HierarchicalDataTemplate.Resources>
         <ContentControl Focusable="False" Margin="2" ContextMenu="{StaticResource Category_ContextMenu}" ContextMenuOpening="ContentControl_ContextMenuOpening">
             <DockPanel Background="Transparent">
                 <StackPanel Orientation="Horizontal">
-                    <nmfc:IconImage Style="{StaticResource CategoryImage_Style}" Margin="0 0 4 0" />
-                    <nmfc:HighlightTextBlock x:Name="textBox" Text="{Binding DisplayName}" />
+                    <jmfc:IconImage Style="{StaticResource CategoryImage_Style}" Margin="0 0 4 0" />
+                    <jmfc:HighlightTextBlock x:Name="textBox" Text="{Binding DisplayName}" />
                 </StackPanel>
             </DockPanel>
         </ContentControl>
@@ -99,23 +99,23 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     
     <HierarchicalDataTemplate DataType="{x:Type vm:TableTreeViewItemViewModel}" ItemsSource="{Binding Items}">
         <HierarchicalDataTemplate.Resources>
-            <nmfc:ModernContextMenu x:Key="Table_ContextMenu" ItemsSource="{Binding ContextMenus}">
-                <MenuItem x:Name="EditContent" Header="{x:Static p:Resources.MenuItem_EditContent}" FontWeight="Bold" Visibility="{nmfm:VisibilityBinding CanEditContent}" />
+            <jmfc:ModernContextMenu x:Key="Table_ContextMenu" ItemsSource="{Binding ContextMenus}">
+                <MenuItem x:Name="EditContent" Header="{x:Static p:Resources.MenuItem_EditContent}" FontWeight="Bold" Visibility="{jmfm:VisibilityBinding CanEditContent}" />
                 <Separator />
-                <MenuItem x:Name="EditTemplate" Header="{x:Static p:Resources.MenuItem_EditTemplate}" Visibility="{nmfm:VisibilityBinding CanEditTemplate}" />
+                <MenuItem x:Name="EditTemplate" Header="{x:Static p:Resources.MenuItem_EditTemplate}" Visibility="{jmfm:VisibilityBinding CanEditTemplate}" />
                 <MenuItem x:Name="AddChildTable" Header="{x:Static p:Resources.MenuItem_AddChildTable}" Icon="{StaticResource table_icon}" />
                 <MenuItem x:Name="Copy" Header="{x:Static p:Resources.MenuItem_Copy}" />
                 <MenuItem x:Name="Inherit" Header="{x:Static p:Resources.MenuItem_Inherit}" />
                 <MenuItem x:Name="Delete" Header="{x:Static p:Resources.MenuItem_Delete}" Icon="{StaticResource delete_icon}" InputGestureText="Del" />
                 <MenuItem x:Name="Move" Header="{x:Static p:Resources.MenuItem_Move}" />
                 <MenuItem x:Name="Rename" Header="{x:Static p:Resources.MenuItem_Rename}" Icon="{StaticResource rename_icon}" InputGestureText="F2" />
-            </nmfc:ModernContextMenu>
+            </jmfc:ModernContextMenu>
         </HierarchicalDataTemplate.Resources>
         <ContentControl Focusable="False" Margin="2" ContextMenu="{StaticResource Table_ContextMenu}" ContextMenuOpening="ContentControl_ContextMenuOpening" >
             <DockPanel Background="Transparent">
                 <StackPanel x:Name="label" Orientation="Horizontal">
-                    <nmfc:IconImage Style="{StaticResource TableImage_Style}" Margin="0 0 4 0" />
-                    <nmfc:HighlightTextBlock x:Name="textBox" Text="{Binding DisplayName}" Style="{StaticResource HighlightTextBlock_Style}" />
+                    <jmfc:IconImage Style="{StaticResource TableImage_Style}" Margin="0 0 4 0" />
+                    <jmfc:HighlightTextBlock x:Name="textBox" Text="{Binding DisplayName}" Style="{StaticResource HighlightTextBlock_Style}" />
                 </StackPanel>
             </DockPanel>
         </ContentControl>

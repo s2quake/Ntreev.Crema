@@ -17,9 +17,9 @@
 
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Ntreev.Crema.Presentation;
-using Ntreev.Crema.Data;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Presentation;
+using JSSoft.Crema.Data;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,12 +32,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using FirstFloor.ModernUI.Presentation;
-using Ntreev.Library;
-using Ntreev.Library.IO;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Library;
+using JSSoft.Library.IO;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Library.ObjectModel;
 
-namespace Ntreev.Crema.Designer
+namespace JSSoft.Crema.Designer
 {
     [Export(typeof(IShell))]
     [Export]

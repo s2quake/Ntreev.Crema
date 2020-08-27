@@ -15,15 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Home.Services.ViewModels;
-using Ntreev.ModernUI.Framework.Controls;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Presentation.Home.Services.ViewModels;
+using JSSoft.ModernUI.Framework.Controls;
 using System.ComponentModel.Composition;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Presentation.Home.Services.Views
+namespace JSSoft.Crema.Presentation.Home.Services.Views
 {
     [Export]
     partial class CremaAppHostView : UserControl

@@ -1,4 +1,4 @@
-﻿namespace Ntreev.Crema.Services.Data
+﻿namespace JSSoft.Crema.Services.Data
 {
     class DataBaseClientContext : ClientContext
     {

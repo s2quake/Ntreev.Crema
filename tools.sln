@@ -8,68 +8,68 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{BA978207
 		tools\Directory.Build.props = tools\Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Reader", "tools\Ntreev.Crema.Reader\Ntreev.Crema.Reader.csproj", "{FE1D5C64-4C80-432D-90AE-287DAB9A99B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Reader", "tools\JSSoft.Crema.Reader\JSSoft.Crema.Reader.csproj", "{FE1D5C64-4C80-432D-90AE-287DAB9A99B3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{209A607F-B29F-41B4-A1F5-F14614894DB8}"
 	ProjectSection(SolutionItems) = preProject
 		common\Directory.Build.props = common\Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Runtime.Generation.TypeScript", "common\Ntreev.Crema.Runtime.Generation.TypeScript\Ntreev.Crema.Runtime.Generation.TypeScript.csproj", "{1C7D0C0E-1579-462E-B05C-9ED1F8F6E11D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Runtime.Generation.TypeScript", "common\JSSoft.Crema.Runtime.Generation.TypeScript\JSSoft.Crema.Runtime.Generation.TypeScript.csproj", "{1C7D0C0E-1579-462E-B05C-9ED1F8F6E11D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Runtime.Generation.Cpp", "common\Ntreev.Crema.Runtime.Generation.Cpp\Ntreev.Crema.Runtime.Generation.Cpp.csproj", "{15FE0102-EB6A-4F3D-85E9-862004EBFF69}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Runtime.Generation.Cpp", "common\JSSoft.Crema.Runtime.Generation.Cpp\JSSoft.Crema.Runtime.Generation.Cpp.csproj", "{15FE0102-EB6A-4F3D-85E9-862004EBFF69}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.ModernUI.Framework", "..\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework.csproj", "{A038CF85-776A-4815-BA9F-96EA2C122AD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.ModernUI.Framework", "..\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework.csproj", "{A038CF85-776A-4815-BA9F-96EA2C122AD5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Library", "..\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj", "{797AF4C7-A53D-454E-81D8-D24892927376}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Library", "..\JSSoft.Library\JSSoft.Library\JSSoft.Library.csproj", "{797AF4C7-A53D-454E-81D8-D24892927376}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Tools.Framework", "tools\Ntreev.Crema.Tools.Framework\Ntreev.Crema.Tools.Framework.csproj", "{CE338181-4663-4055-A5BB-5F594DA01B71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Tools.Framework", "tools\JSSoft.Crema.Tools.Framework\JSSoft.Crema.Tools.Framework.csproj", "{CE338181-4663-4055-A5BB-5F594DA01B71}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Library.Commands", "..\Ntreev.Library.Commands\Ntreev.Library.Commands\Ntreev.Library.Commands.csproj", "{A704EDC7-ED7B-4893-9565-F84B33CF0104}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Library.Commands", "..\JSSoft.Library.Commands\JSSoft.Library.Commands\JSSoft.Library.Commands.csproj", "{A704EDC7-ED7B-4893-9565-F84B33CF0104}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Validator", "tools\Ntreev.Crema.Validator\Ntreev.Crema.Validator.csproj", "{92831933-888B-420E-B94A-7D211409967D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Validator", "tools\JSSoft.Crema.Validator\JSSoft.Crema.Validator.csproj", "{92831933-888B-420E-B94A-7D211409967D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.RuntimeService", "tools\Ntreev.Crema.RuntimeService\Ntreev.Crema.RuntimeService.csproj", "{B4680CD9-0966-49E1-84CC-C4C1AB0C5303}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.RuntimeService", "tools\JSSoft.Crema.RuntimeService\JSSoft.Crema.RuntimeService.csproj", "{B4680CD9-0966-49E1-84CC-C4C1AB0C5303}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Runtime.Serialization", "common\Ntreev.Crema.Runtime.Serialization\Ntreev.Crema.Runtime.Serialization.csproj", "{9C762729-0038-48FE-BB12-6B99E0E97272}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Runtime.Serialization", "common\JSSoft.Crema.Runtime.Serialization\JSSoft.Crema.Runtime.Serialization.csproj", "{9C762729-0038-48FE-BB12-6B99E0E97272}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Runtime.Generation", "common\Ntreev.Crema.Runtime.Generation\Ntreev.Crema.Runtime.Generation.csproj", "{610C2327-903B-442A-9B2C-7B75FE4ADB6A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Runtime.Generation", "common\JSSoft.Crema.Runtime.Generation\JSSoft.Crema.Runtime.Generation.csproj", "{610C2327-903B-442A-9B2C-7B75FE4ADB6A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.ApplicationHost", "tools\Ntreev.Crema.ApplicationHost\Ntreev.Crema.ApplicationHost.csproj", "{D30575B4-2661-443E-8639-93DC470B5A9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.ApplicationHost", "tools\JSSoft.Crema.ApplicationHost\JSSoft.Crema.ApplicationHost.csproj", "{D30575B4-2661-443E-8639-93DC470B5A9B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Tools.Runtime", "tools\Ntreev.Crema.Tools.Runtime\Ntreev.Crema.Tools.Runtime.csproj", "{67A994ED-0384-450F-9B48-64A1A58E6DAB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Tools.Runtime", "tools\JSSoft.Crema.Tools.Runtime\JSSoft.Crema.Tools.Runtime.csproj", "{67A994ED-0384-450F-9B48-64A1A58E6DAB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Tools.View", "tools\Ntreev.Crema.Tools.View\Ntreev.Crema.Tools.View.csproj", "{102AB827-1743-4781-AD6C-592BA889DC8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Tools.View", "tools\JSSoft.Crema.Tools.View\JSSoft.Crema.Tools.View.csproj", "{102AB827-1743-4781-AD6C-592BA889DC8B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Commands", "tools\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj", "{EFB94840-5E7F-4530-BD6C-2CA580AC6D6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Commands", "tools\JSSoft.Crema.Commands\JSSoft.Crema.Commands.csproj", "{EFB94840-5E7F-4530-BD6C-2CA580AC6D6F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.ConsoleHost", "tools\Ntreev.Crema.ConsoleHost\Ntreev.Crema.ConsoleHost.csproj", "{2AF92821-5915-4535-8152-156513F03594}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.ConsoleHost", "tools\JSSoft.Crema.ConsoleHost\JSSoft.Crema.ConsoleHost.csproj", "{2AF92821-5915-4535-8152-156513F03594}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Data", "common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj", "{5501C735-288B-4437-92E8-2BF53B65156B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Data", "common\JSSoft.Crema.Data\JSSoft.Crema.Data.csproj", "{5501C735-288B-4437-92E8-2BF53B65156B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.ServiceModel", "common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj", "{439F78AA-4A1D-4B03-A7DD-D61C4AD26C04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.ServiceModel", "common\JSSoft.Crema.ServiceModel\JSSoft.Crema.ServiceModel.csproj", "{439F78AA-4A1D-4B03-A7DD-D61C4AD26C04}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Designer", "tools\Ntreev.Crema.Designer\Ntreev.Crema.Designer.csproj", "{4D4BFC02-C4AC-4E27-8373-025606DCAA1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Designer", "tools\JSSoft.Crema.Designer\JSSoft.Crema.Designer.csproj", "{4D4BFC02-C4AC-4E27-8373-025606DCAA1B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Presentation", "common\Ntreev.Crema.Presentation\Ntreev.Crema.Presentation.csproj", "{44871B0E-6DFE-4CA2-8B01-1EE1EBE43613}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Presentation", "common\JSSoft.Crema.Presentation\JSSoft.Crema.Presentation.csproj", "{44871B0E-6DFE-4CA2-8B01-1EE1EBE43613}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Comparer", "tools\Ntreev.Crema.Comparer\Ntreev.Crema.Comparer.csproj", "{130FB5A4-DE89-4038-9A4F-8ADF59D2BFB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Comparer", "tools\JSSoft.Crema.Comparer\JSSoft.Crema.Comparer.csproj", "{130FB5A4-DE89-4038-9A4F-8ADF59D2BFB2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.ResxGenerator", "tools\Ntreev.Crema.ResxGenerator\Ntreev.Crema.ResxGenerator.csproj", "{8FB2CFCC-9490-4620-98D8-CFB9713F47E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.ResxGenerator", "tools\JSSoft.Crema.ResxGenerator\JSSoft.Crema.ResxGenerator.csproj", "{8FB2CFCC-9490-4620-98D8-CFB9713F47E3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Spreadsheet", "common\Ntreev.Crema.Spreadsheet\Ntreev.Crema.Spreadsheet.csproj", "{12539D6C-57BF-4B2C-80A1-52B023B02C01}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Spreadsheet", "common\JSSoft.Crema.Spreadsheet\JSSoft.Crema.Spreadsheet.csproj", "{12539D6C-57BF-4B2C-80A1-52B023B02C01}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.ModernUI.Framework.DataGrid", "..\Ntreev.ModernUI.Framework\Ntreev.ModernUI.Framework.DataGrid\Ntreev.ModernUI.Framework.DataGrid.csproj", "{61953026-D9DF-46C4-B77D-5F23D79E5EBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.ModernUI.Framework.DataGrid", "..\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework.DataGrid\JSSoft.ModernUI.Framework.DataGrid.csproj", "{61953026-D9DF-46C4-B77D-5F23D79E5EBC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ntreev.Crema.Data.Diff", "common\Ntreev.Crema.Data.Diff\Ntreev.Crema.Data.Diff.csproj", "{E82F5825-8B98-44BA-BD3F-FD4DC3D66222}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Crema.Data.Diff", "common\JSSoft.Crema.Data.Diff\JSSoft.Crema.Data.Diff.csproj", "{E82F5825-8B98-44BA-BD3F-FD4DC3D66222}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSSoft.Communication", "..\JSSoft.Communication\JSSoft.Communication\JSSoft.Communication.csproj", "{EA6828AF-3721-42DE-AED6-E1859067ACAC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "share", "share", "{977C8A01-D8EB-4EBD-992F-23CA7E6B3170}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts", "share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.shproj", "{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.ServiceHosts", "share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.shproj", "{6BAF8A0B-5B3E-40EA-8E96-C667DF63516C}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Ntreev.Crema.ServiceHosts.RuntimeService", "share\Ntreev.Crema.ServiceHosts.RuntimeService\Ntreev.Crema.ServiceHosts.RuntimeService.shproj", "{7E5C7310-0DA2-4F46-896B-C8E871C22E37}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "JSSoft.Crema.ServiceHosts.RuntimeService", "share\JSSoft.Crema.ServiceHosts.RuntimeService\JSSoft.Crema.ServiceHosts.RuntimeService.shproj", "{7E5C7310-0DA2-4F46-896B-C8E871C22E37}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "etc", "etc", "{E6D34A44-8E74-476D-BD9B-08613C016077}"
 	ProjectSection(SolutionItems) = preProject
@@ -80,11 +80,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "etc", "etc", "{E6D34A44-8E7
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.projitems*{6baf8a0b-5b3e-40ea-8e96-c667df63516c}*SharedItemsImports = 13
-		share\Ntreev.Crema.ServiceHosts.RuntimeService\Ntreev.Crema.ServiceHosts.RuntimeService.projitems*{7e5c7310-0da2-4f46-896b-c8e871c22e37}*SharedItemsImports = 13
-		share\Ntreev.Crema.ServiceHosts.RuntimeService\Ntreev.Crema.ServiceHosts.RuntimeService.projitems*{b4680cd9-0966-49e1-84cc-c4c1ab0c5303}*SharedItemsImports = 5
-		share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.projitems*{b4680cd9-0966-49e1-84cc-c4c1ab0c5303}*SharedItemsImports = 5
-		share\Ntreev.Crema.ServiceHosts\Ntreev.Crema.ServiceHosts.projitems*{ce338181-4663-4055-a5bb-5f594da01b71}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.projitems*{6baf8a0b-5b3e-40ea-8e96-c667df63516c}*SharedItemsImports = 13
+		share\JSSoft.Crema.ServiceHosts.RuntimeService\JSSoft.Crema.ServiceHosts.RuntimeService.projitems*{7e5c7310-0da2-4f46-896b-c8e871c22e37}*SharedItemsImports = 13
+		share\JSSoft.Crema.ServiceHosts.RuntimeService\JSSoft.Crema.ServiceHosts.RuntimeService.projitems*{b4680cd9-0966-49e1-84cc-c4c1ab0c5303}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.projitems*{b4680cd9-0966-49e1-84cc-c4c1ab0c5303}*SharedItemsImports = 5
+		share\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.projitems*{ce338181-4663-4055-a5bb-5f594da01b71}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

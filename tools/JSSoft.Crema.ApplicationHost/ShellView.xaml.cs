@@ -18,8 +18,8 @@
 using FirstFloor.ModernUI.Presentation;
 using FirstFloor.ModernUI.Windows.Controls;
 using FirstFloor.ModernUI.Windows.Navigation;
-using Ntreev.Crema.Tools.Framework;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Tools.Framework;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -38,7 +38,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.ApplicationHost
+namespace JSSoft.Crema.ApplicationHost
 {
     /// <summary>
     /// Interaction logic for ShellView.xaml

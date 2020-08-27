@@ -30,7 +30,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Designer.Types.Views
+namespace JSSoft.Crema.Designer.Types.Views
 {
     /// <summary>
     /// ReferencedTypesView.xaml에 대한 상호 작용 논리

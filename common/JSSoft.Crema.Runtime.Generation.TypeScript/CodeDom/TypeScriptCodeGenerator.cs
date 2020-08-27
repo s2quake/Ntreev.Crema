@@ -28,7 +28,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Runtime.Generation.TypeScript.CodeDom
+namespace JSSoft.Crema.Runtime.Generation.TypeScript.CodeDom
 {
     static class wow
     {

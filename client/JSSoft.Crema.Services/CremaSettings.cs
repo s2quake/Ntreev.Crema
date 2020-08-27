@@ -17,7 +17,7 @@
 
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     [Export(typeof(CremaSettings))]
     class CremaSettings

@@ -16,12 +16,12 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Random;
-using Ntreev.Library.Random;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Random;
+using JSSoft.Library.Random;
 using System;
 
-namespace Ntreev.Crema.Services.Test.DispatcherTest
+namespace JSSoft.Crema.Services.Test.DispatcherTest
 {
     [TestClass]
     public class IDomain_DispatcherTest

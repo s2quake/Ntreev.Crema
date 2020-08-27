@@ -16,8 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using FirstFloor.ModernUI.Windows;
-using Ntreev.Crema.Presentation.Controls;
-using Ntreev.Crema.Data;
+using JSSoft.Crema.Presentation.Controls;
+using JSSoft.Crema.Data;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,12 +35,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel.Composition;
-using Ntreev.Crema.Designer.ViewModels;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Designer.ViewModels;
+using JSSoft.ModernUI.Framework;
 using System.ComponentModel.Composition.Hosting;
-using Ntreev.Library;
+using JSSoft.Library;
 
-namespace Ntreev.Crema.Designer.Tables.Views
+namespace JSSoft.Crema.Designer.Tables.Views
 {
     /// <summary>
     /// Tables.xaml에 대한 상호 작용 논리

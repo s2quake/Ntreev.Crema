@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Javascript
+namespace JSSoft.Crema.Javascript
 {
     public interface IScriptMethod
     {

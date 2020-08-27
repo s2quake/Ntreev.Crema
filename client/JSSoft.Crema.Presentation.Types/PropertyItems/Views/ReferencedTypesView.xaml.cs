@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Types.PropertyItems.Views
+namespace JSSoft.Crema.Presentation.Types.PropertyItems.Views
 {
     partial class ReferencedTypesView : UserControl
     {

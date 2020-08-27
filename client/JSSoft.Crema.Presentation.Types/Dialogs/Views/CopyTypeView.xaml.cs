@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Types.Dialogs.Views
+namespace JSSoft.Crema.Presentation.Types.Dialogs.Views
 {
     partial class CopyTypeView : UserControl
     {

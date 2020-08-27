@@ -20,7 +20,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 <!-- modified by s2quake -->
     
 <ResourceDictionary
-    x:Class="Ntreev.Crema.Presentation.Assets.AvalonDocks.Theme"
+    x:Class="JSSoft.Crema.Presentation.Assets.AvalonDocks.Theme"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:shell="clr-namespace:Microsoft.Windows.Shell;assembly=Xceed.Wpf.AvalonDock"
@@ -29,9 +29,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     xmlns:avalonDockControls="clr-namespace:Xceed.Wpf.AvalonDock.Controls;assembly=Xceed.Wpf.AvalonDock"
     xmlns:avalonDockConverters="clr-namespace:Xceed.Wpf.AvalonDock.Converters;assembly=Xceed.Wpf.AvalonDock"
     xmlns:avalonDockProperties="clr-namespace:Xceed.Wpf.AvalonDock.Properties;assembly=Xceed.Wpf.AvalonDock"
-    xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-    xmlns:nmfv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework"
-    xmlns:ncpc="clr-namespace:Ntreev.Crema.Presentation.Controls"
+    xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+    xmlns:jmfv="clr-namespace:JSSoft.ModernUI.Framework.Converters;assembly=JSSoft.ModernUI.Framework"
+    xmlns:ncpc="clr-namespace:JSSoft.Crema.Presentation.Controls"
     >
 
     <avalonDockConverters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
@@ -467,23 +467,23 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                 DropDownContextMenu="{Binding Model.Root.Manager.AnchorableContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
                                 DropDownContextMenuDataContext="{Binding Path=LayoutItem, RelativeSource={RelativeSource TemplatedParent}}"
                                 ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_CxMenu_Hint}">
-                                <nmfc:IconImage x:Name="PART_ImgMenuPin" Source="Images/PinMenu.png" />
+                                <jmfc:IconImage x:Name="PART_ImgMenuPin" Source="Images/PinMenu.png" />
                             </avalonDockControls:DropDownButton>
 
-                            <nmfc:IconButton x:Name="PART_AutoHidePin" Style="{StaticResource ToolBar_IconButton_Style}" Width="14"
+                            <jmfc:IconButton x:Name="PART_AutoHidePin" Style="{StaticResource ToolBar_IconButton_Style}" Width="14"
                                              Grid.Column="2" 
                                              Command="{Binding Path=LayoutItem.AutoHideCommand, RelativeSource={RelativeSource TemplatedParent}}" 
                                              Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                                              ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnAutoHide_Hint}"
                                              Source="Images/PinAutoHide.png">
-                            </nmfc:IconButton>
-                            <nmfc:IconButton x:Name="PART_HidePin" Style="{StaticResource ToolBar_IconButton_Style}" Width="14"
+                            </jmfc:IconButton>
+                            <jmfc:IconButton x:Name="PART_HidePin" Style="{StaticResource ToolBar_IconButton_Style}" Width="14"
                                              Grid.Column="3" 
                                              Command="{Binding Path=LayoutItem.HideCommand, RelativeSource={RelativeSource TemplatedParent}}" 
                                              Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                                              ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnClose_Hint}"
                                              Source="Images/PinClose.png">
-                            </nmfc:IconButton>
+                            </jmfc:IconButton>
 
                         </Grid>
                     </Border>
@@ -590,10 +590,10 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                     <Canvas x:Name="PART_DropTargetsContainer" Opacity="0.9">
                         <Path x:Name="PART_PreviewBox" Fill="{DynamicResource WindowBorder}" StrokeThickness="2" Stroke="Transparent" />
                         <Grid x:Name="PART_DockingManagerDropTargets" >
-                            <nmfc:IconImage x:Name="PART_DockingManagerDropTargetLeft" VerticalAlignment="Center" HorizontalAlignment="Left" Source="Images/DockAnchorableLeft.PNG" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
-                            <nmfc:IconImage x:Name="PART_DockingManagerDropTargetRight" VerticalAlignment="Center" HorizontalAlignment="Right" Source="Images/DockAnchorableRight.PNG" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
-                            <nmfc:IconImage x:Name="PART_DockingManagerDropTargetBottom" VerticalAlignment="Bottom" HorizontalAlignment="Center" Source="Images/DockAnchorableBottom.PNG" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
-                            <nmfc:IconImage x:Name="PART_DockingManagerDropTargetTop" VerticalAlignment="Top" HorizontalAlignment="Center" Source="Images/DockAnchorableTop.PNG" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
+                            <jmfc:IconImage x:Name="PART_DockingManagerDropTargetLeft" VerticalAlignment="Center" HorizontalAlignment="Left" Source="Images/DockAnchorableLeft.PNG" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
+                            <jmfc:IconImage x:Name="PART_DockingManagerDropTargetRight" VerticalAlignment="Center" HorizontalAlignment="Right" Source="Images/DockAnchorableRight.PNG" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
+                            <jmfc:IconImage x:Name="PART_DockingManagerDropTargetBottom" VerticalAlignment="Bottom" HorizontalAlignment="Center" Source="Images/DockAnchorableBottom.PNG" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
+                            <jmfc:IconImage x:Name="PART_DockingManagerDropTargetTop" VerticalAlignment="Top" HorizontalAlignment="Center" Source="Images/DockAnchorableTop.PNG" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
                         </Grid>
                         <Grid x:Name="PART_AnchorablePaneDropTargets">
                             <Grid Width="112" Height="112" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -607,21 +607,21 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                     <RowDefinition/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <nmfc:IconImage Grid.ColumnSpan="3" Grid.RowSpan="3" Source="Images/DockPaneEmpty.png" Stretch="None" Margin="0,0.5,0,-0.5" Foreground="{DynamicResource WindowBorderActive}" />
+                                <jmfc:IconImage Grid.ColumnSpan="3" Grid.RowSpan="3" Source="Images/DockPaneEmpty.png" Stretch="None" Margin="0,0.5,0,-0.5" Foreground="{DynamicResource WindowBorderActive}" />
                                 <Border Name="PART_AnchorablePaneDropTargetTop" Grid.Column="1" Grid.Row="0" Margin="0,3.5,0, 0">
-                                    <nmfc:IconImage Source="Images/DockDocumentAsAnchorableTop.png"  Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentAsAnchorableTop.png"  Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
                                 </Border>
                                 <Border Name="PART_AnchorablePaneDropTargetRight" Grid.Column="2" Grid.Row="1" Margin="2">
-                                    <nmfc:IconImage Source="Images/DockDocumentAsAnchorableRight.png"  Stretch="None"  Foreground="{DynamicResource WindowBorderActive}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentAsAnchorableRight.png"  Stretch="None"  Foreground="{DynamicResource WindowBorderActive}" />
                                 </Border>
                                 <Border Name="PART_AnchorablePaneDropTargetBottom" Grid.Column="1" Grid.Row="2" Margin="0,-0.5,0,0">
-                                    <nmfc:IconImage Source="Images/DockDocumentAsAnchorableBottom.png"  Stretch="None"  Foreground="{DynamicResource WindowBorderActive}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentAsAnchorableBottom.png"  Stretch="None"  Foreground="{DynamicResource WindowBorderActive}" />
                                 </Border>
                                 <Border Name="PART_AnchorablePaneDropTargetLeft" Grid.Column="0" Grid.Row="1" Margin="2">
-                                    <nmfc:IconImage Source="Images/DockDocumentAsAnchorableLeft.png"  Stretch="None"  Foreground="{DynamicResource WindowBorderActive}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentAsAnchorableLeft.png"  Stretch="None"  Foreground="{DynamicResource WindowBorderActive}" />
                                 </Border>
                                 <Border Name="PART_AnchorablePaneDropTargetInto" Grid.Column="1" Grid.Row="1" Margin="0,0.5,0,0">
-                                    <nmfc:IconImage Source="Images/DockDocumentInside.png"  Stretch="None"  Foreground="{DynamicResource WindowBorderActive}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentInside.png"  Stretch="None"  Foreground="{DynamicResource WindowBorderActive}" />
                                 </Border>
                             </Grid>
                         </Grid>
@@ -642,23 +642,23 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                           RenderTransform="1,0,0,1,.5,-.5"
                                            Fill="{DynamicResource WindowBackground}" Stroke="{DynamicResource WindowBorderActive}" Height="112" Canvas.Left="0" Canvas.Top="0" Width="112" />
                                 </Canvas>-->
-                                <nmfc:IconImage Grid.ColumnSpan="3" Grid.RowSpan="3" Source="Images/DockPaneEmpty.PNG" Stretch="None" 
+                                <jmfc:IconImage Grid.ColumnSpan="3" Grid.RowSpan="3" Source="Images/DockPaneEmpty.PNG" Stretch="None" 
                                                 Foreground="{DynamicResource WindowBorderActive}"
                                                 Background="{DynamicResource WindowBackground}" />
                                 <Border Name="PART_DocumentPaneDropTargetTop" Grid.Column="1" Grid.Row="0" Margin="2">
-                                    <nmfc:IconImage Source="Images/DockDocumentTop.png" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentTop.png" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneDropTargetRight" Grid.Column="2" Grid.Row="1" Margin="2">
-                                    <nmfc:IconImage Source="Images/DockDocumentRight.png" Stretch="None"  Foreground="{DynamicResource WindowBorderActive}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentRight.png" Stretch="None"  Foreground="{DynamicResource WindowBorderActive}" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneDropTargetBottom" Grid.Column="1" Grid.Row="2" Margin="2">
-                                    <nmfc:IconImage Source="Images/DockDocumentBottom.png" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentBottom.png" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneDropTargetLeft" Grid.Column="0" Grid.Row="1" Margin="2">
-                                    <nmfc:IconImage Source="Images/DockDocumentLeft.png" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentLeft.png" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneDropTargetInto" Grid.Column="1" Grid.Row="1">
-                                    <nmfc:IconImage Source="Images/DockDocumentInside.png" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentInside.png" Stretch="None" Foreground="{DynamicResource WindowBorderActive}" />
                                 </Border>
                             </Grid>
                         </Grid>
@@ -679,34 +679,34 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                     <RowDefinition/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <nmfc:IconImage Grid.ColumnSpan="5" Grid.RowSpan="5" Source="Images/DockPaneLargeEmpty.PNG" Stretch="None" Foreground="{DynamicResource Accent}" />
+                                <jmfc:IconImage Grid.ColumnSpan="5" Grid.RowSpan="5" Source="Images/DockPaneLargeEmpty.PNG" Stretch="None" Foreground="{DynamicResource Accent}" />
                                 <Border Name="PART_DocumentPaneFullDropTargetTop" Grid.Column="2" Grid.Row="1">
-                                    <nmfc:IconImage Source="Images/DockDocumentTop.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentTop.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneFullDropTargetRight" Grid.Column="3" Grid.Row="2">
-                                    <nmfc:IconImage Source="Images/DockDocumentRight.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentRight.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneFullDropTargetBottom" Grid.Column="2" Grid.Row="3">
-                                    <nmfc:IconImage Source="Images/DockDocumentBottom.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentBottom.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneFullDropTargetLeft" Grid.Column="1" Grid.Row="2">
-                                    <nmfc:IconImage Source="Images/DockDocumentLeft.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentLeft.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneFullDropTargetInto" Grid.Column="2" Grid.Row="2">
-                                    <nmfc:IconImage Source="Images/DockDocumentInside.png"  Stretch="None"  Foreground="{DynamicResource Accent}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentInside.png"  Stretch="None"  Foreground="{DynamicResource Accent}" />
                                 </Border>
 
                                 <Border Name="PART_DocumentPaneDropTargetTopAsAnchorablePane" Grid.Column="2" Grid.Row="0">
-                                    <nmfc:IconImage Source="Images/DockDocumentAsAnchorableTop.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentAsAnchorableTop.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneDropTargetRightAsAnchorablePane" Grid.Column="4" Grid.Row="2">
-                                    <nmfc:IconImage Source="Images/DockDocumentAsAnchorableRight.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentAsAnchorableRight.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneDropTargetBottomAsAnchorablePane" Grid.Column="2" Grid.Row="4">
-                                    <nmfc:IconImage Source="Images/DockDocumentAsAnchorableBottom.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentAsAnchorableBottom.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
                                 </Border>
                                 <Border Name="PART_DocumentPaneDropTargetLeftAsAnchorablePane" Grid.Column="0" Grid.Row="2">
-                                    <nmfc:IconImage Source="Images/DockDocumentAsAnchorableLeft.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
+                                    <jmfc:IconImage Source="Images/DockDocumentAsAnchorableLeft.png"  Stretch="None" Margin="2" Foreground="{DynamicResource Accent}" />
                                 </Border>
 
                             </Grid>
@@ -782,7 +782,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 Command="{Binding Path=NewHorizontalTabGroupCommand}" UseLayoutRounding="True"
                 Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
             <MenuItem.Icon>
-                <nmfc:IconImage Source="Images/HTabGroup.png" Stretch="Uniform" Width="14" Foreground="{DynamicResource WindowBorderActive}" 
+                <jmfc:IconImage Source="Images/HTabGroup.png" Stretch="Uniform" Width="14" Foreground="{DynamicResource WindowBorderActive}" 
                                 Loaded="IconImage_Loaded" />
             </MenuItem.Icon>
         </MenuItem>
@@ -791,7 +791,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 Command="{Binding Path=NewVerticalTabGroupCommand}" UseLayoutRounding="True"
                 Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
             <MenuItem.Icon>
-                <nmfc:IconImage Source="Images/VTabGroup.png" Stretch="Uniform" Width="14" Foreground="{DynamicResource WindowBorderActive}" 
+                <jmfc:IconImage Source="Images/VTabGroup.png" Stretch="Uniform" Width="14" Foreground="{DynamicResource WindowBorderActive}" 
                                 Loaded="IconImage_Loaded" />
             </MenuItem.Icon>
         </MenuItem>
@@ -1077,7 +1077,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                                     <Image x:Name="PART_ImgPinMenu" Stretch="None" Source="Images/PinMenu.png" Width="13" />
                                                 </avalonDockControls:DropDownButton>
 
-                                                <nmfc:IconButton Width="16" Height="16"
+                                                <jmfc:IconButton Width="16" Height="16"
                                                 x:Name="PART_PinMaximize"
                                                 shell:WindowChrome.IsHitTestVisibleInChrome="True"
                                                 Focusable="False"
@@ -1087,9 +1087,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                                 CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                                 ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
                                                 Grid.Column="2" Source="Images/PinMaximize.png" >
-                                                </nmfc:IconButton>
+                                                </jmfc:IconButton>
 
-                                                <nmfc:IconButton Width="16" Height="16"
+                                                <jmfc:IconButton Width="16" Height="16"
                                                 x:Name="PART_PinRestore"
                                                 shell:WindowChrome.IsHitTestVisibleInChrome="True"
                                                 Focusable="False"
@@ -1099,8 +1099,8 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                                 CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                                 ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
                                                 Grid.Column="2" Source="Images/PinRestore.png" >
-                                                </nmfc:IconButton>
-                                                <nmfc:IconButton Width="16" Height="16"
+                                                </jmfc:IconButton>
+                                                <jmfc:IconButton Width="16" Height="16"
                                                 x:Name="PART_PinClose"
                                                 shell:WindowChrome.IsHitTestVisibleInChrome="True"
                                                 Focusable="False"
@@ -1109,7 +1109,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                                 Command="{Binding Path=RootDocumentLayoutItem.CloseCommand, RelativeSource={RelativeSource TemplatedParent}}"
                                                 ToolTip="{x:Static avalonDockProperties:Resources.Document_Close}"
                                                 Grid.Column="3" Source="Images/PinClose.png" >
-                                                </nmfc:IconButton>
+                                                </jmfc:IconButton>
                                             </Grid>
                                         </Border>
                                         <ContentPresenter Content="{TemplateBinding Content}" Grid.Row="1" Grid.RowSpan="2" />
@@ -1228,7 +1228,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                             <Image x:Name="PART_ImgPinMenu" Stretch="None" Source="Images/PinMenu.png" Width="13" />
                                         </avalonDockControls:DropDownButton>
 
-                                        <nmfc:IconButton Width="16" Height="16"
+                                        <jmfc:IconButton Width="16" Height="16"
                                             x:Name="PART_PinMaximize"
                                             shell:WindowChrome.IsHitTestVisibleInChrome="True"
                                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InverseBoolToVisibilityConverter}}"
@@ -1237,9 +1237,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                             CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Maximize}"
                                             Grid.Column="2" Source="Images/PinMaximize.png">
-                                        </nmfc:IconButton>
+                                        </jmfc:IconButton>
 
-                                        <nmfc:IconButton Width="16" Height="16"
+                                        <jmfc:IconButton Width="16" Height="16"
                                             x:Name="PART_PinRestore"
                                             shell:WindowChrome.IsHitTestVisibleInChrome="True"
                                             Visibility="{Binding IsMaximized, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BoolToVisibilityConverter}}"
@@ -1248,9 +1248,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                             CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Window_Restore}"
                                             Grid.Column="2" Source="Images/PinRestore.png">
-                                        </nmfc:IconButton>
+                                        </jmfc:IconButton>
 
-                                        <nmfc:IconButton   Width="16" Height="16"
+                                        <jmfc:IconButton   Width="16" Height="16"
                                             x:Name="PART_PinClose"
                                             shell:WindowChrome.IsHitTestVisibleInChrome="True"
                                             Style="{StaticResource ToolBar_IconButton_Style}"
@@ -1258,7 +1258,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                             Command="{Binding HideWindowCommand, RelativeSource={RelativeSource TemplatedParent}}"
                                             ToolTip="{x:Static avalonDockProperties:Resources.Anchorable_BtnClose_Hint}"
                                             Grid.Column="3" Source="Images/PinClose.png">
-                                        </nmfc:IconButton>
+                                        </jmfc:IconButton>
                                     </Grid>
                                 </Border>
                                 <ContentPresenter Content="{TemplateBinding Content}" Grid.Row="1" />

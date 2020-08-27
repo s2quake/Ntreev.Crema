@@ -15,16 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Commands;
-using Ntreev.Crema.Services;
-using Ntreev.Library;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Crema.Commands;
+using JSSoft.Crema.Services;
+using JSSoft.Library;
+using JSSoft.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 
-namespace Ntreev.Crema.ApplicationHost
+namespace JSSoft.Crema.ApplicationHost
 {
     [Export(typeof(IConfigurationProperties))]
     class ConfigurationProperties : IConfigurationProperties

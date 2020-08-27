@@ -16,12 +16,12 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Jint;
-using Ntreev.Crema.Commands.Consoles;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
-using Ntreev.Library.Commands;
-using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Crema.Commands.Consoles;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
+using JSSoft.Library.Commands;
+using JSSoft.Library.IO;
+using JSSoft.Library.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,7 +30,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace Ntreev.Crema.Javascript.Consoles
+namespace JSSoft.Crema.Javascript.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceDescription("Resources", IsShared = true)]

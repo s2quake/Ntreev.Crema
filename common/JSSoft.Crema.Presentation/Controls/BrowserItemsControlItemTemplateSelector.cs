@@ -16,12 +16,12 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.ModernUI.Framework.Controls;
+using JSSoft.ModernUI.Framework.Controls;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace Ntreev.Crema.Presentation.Controls
+namespace JSSoft.Crema.Presentation.Controls
 {
     class BrowserItemsControlItemTemplateSelector : DataTemplateSelector
     {

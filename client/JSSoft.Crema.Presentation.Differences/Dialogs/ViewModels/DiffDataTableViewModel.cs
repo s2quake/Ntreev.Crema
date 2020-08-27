@@ -15,10 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data.Diff;
-using Ntreev.Crema.Presentation.Differences.Properties;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Data.Diff;
+using JSSoft.Crema.Presentation.Differences.Properties;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,7 +27,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
-namespace Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels
+namespace JSSoft.Crema.Presentation.Differences.Dialogs.ViewModels
 {
     public class DiffDataTableViewModel : ModalDialogBase
     {

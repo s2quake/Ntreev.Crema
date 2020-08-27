@@ -1,12 +1,12 @@
-﻿using Ntreev.Crema.SvnModule;
-using Ntreev.Library.IO;
+﻿using JSSoft.Crema.SvnModule;
+using JSSoft.Library.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.ServerService.Test
+namespace JSSoft.Crema.ServerService.Test
 {
     public static class TestCrema
     {

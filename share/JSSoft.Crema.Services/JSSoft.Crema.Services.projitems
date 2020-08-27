@@ -6,7 +6,7 @@
     <SharedGUID>24ecbee1-2859-4f09-969b-f382e6341814</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>Ntreev.Crema.Services</Import_RootNamespace>
+    <Import_RootNamespace>JSSoft.Crema.Services</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AuthenticationEventArgs.cs" />

@@ -11,8 +11,8 @@
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.RuntimeService\Ntreev.Crema.RuntimeService.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Data\JSSoft.Crema.Data.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Commands\JSSoft.Crema.Commands.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.RuntimeService\JSSoft.Crema.RuntimeService.csproj" />
   </ItemGroup>
 </Project>

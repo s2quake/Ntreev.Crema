@@ -15,14 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel.Properties;
-using Ntreev.Library;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Crema.ServiceModel.Properties;
+using JSSoft.Library;
+using JSSoft.Library.ObjectModel;
 using System;
 using System.ComponentModel;
 using System.Data;
 
-namespace Ntreev.Crema.ServiceModel
+namespace JSSoft.Crema.ServiceModel
 {
     internal abstract class DataBaseBase<_I1, _C1, _IC1, _CC1, _CT1, _I2, _C2, _IC2, _CC2, _CT2> : IAccessParent, ILockParent
         where _I1 : TypeBase<_I1, _C1, _IC1, _CC1, _CT1>

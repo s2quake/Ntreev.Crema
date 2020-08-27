@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Spreadsheet
+namespace JSSoft.Crema.Spreadsheet
 {
     public class ProgressEventArgs : EventArgs
     {

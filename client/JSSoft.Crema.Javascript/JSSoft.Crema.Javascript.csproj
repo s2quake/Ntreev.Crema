@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\share\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.projitems" Label="Shared" />
+  <Import Project="..\..\share\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.projitems" Label="Shared" />
   <ItemGroup>
     <PackageReference Include="Jint" Version="2.11.58" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Commands\JSSoft.Crema.Commands.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Services\JSSoft.Crema.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Jint.dll">

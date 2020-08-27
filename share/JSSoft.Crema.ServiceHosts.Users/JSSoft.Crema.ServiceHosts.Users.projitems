@@ -6,7 +6,7 @@
     <SharedGUID>4e857c1f-3ca7-45b7-9b3f-2af6d49071b2</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>Ntreev.Crema.ServiceHosts.Users</Import_RootNamespace>
+    <Import_RootNamespace>JSSoft.Crema.ServiceHosts.Users</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Users\IUserContextEventCallback.cs" />

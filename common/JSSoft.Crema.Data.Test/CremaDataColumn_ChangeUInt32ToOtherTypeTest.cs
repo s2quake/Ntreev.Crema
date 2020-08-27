@@ -19,7 +19,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 
-namespace Ntreev.Crema.Data.Test
+namespace JSSoft.Crema.Data.Test
 {
     [TestClass]
     public class CremaDataColumn_ChangeUInt32ToOtherTypeTest : CremaDataColumn_ChangeTypeTestBase

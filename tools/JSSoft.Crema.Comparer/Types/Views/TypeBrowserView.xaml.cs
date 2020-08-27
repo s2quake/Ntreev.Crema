@@ -30,7 +30,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.Comparer.Types.Views
+namespace JSSoft.Crema.Comparer.Types.Views
 {
     /// <summary>
     /// TypeBrowserView.xaml에 대한 상호 작용 논리

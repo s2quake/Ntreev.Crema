@@ -16,9 +16,9 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Designer.ViewModels;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Designer.ViewModels;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,7 +28,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Ntreev.Crema.Designer.Tables.ViewModels
+namespace JSSoft.Crema.Designer.Tables.ViewModels
 {
     class TableEditorViewModel : DocumentBase, IPartImportsSatisfiedNotification
     {

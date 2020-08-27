@@ -18,7 +18,7 @@
 using System;
 using System.IO;
 
-namespace Ntreev.Crema.Repository.Git
+namespace JSSoft.Crema.Repository.Git
 {
     class GitPath
     {

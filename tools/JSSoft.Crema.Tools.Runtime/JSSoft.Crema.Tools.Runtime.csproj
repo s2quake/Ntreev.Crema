@@ -9,10 +9,10 @@
     <PackageReference Include="Microsoft.WindowsAPICodePack.Shell" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Presentation\Ntreev.Crema.Presentation.csproj" />
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Runtime.Generation\Ntreev.Crema.Runtime.Generation.csproj" />
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Runtime.Serialization\Ntreev.Crema.Runtime.Serialization.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.RuntimeService\Ntreev.Crema.RuntimeService.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Tools.Framework\Ntreev.Crema.Tools.Framework.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Presentation\JSSoft.Crema.Presentation.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Runtime.Generation\JSSoft.Crema.Runtime.Generation.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Runtime.Serialization\JSSoft.Crema.Runtime.Serialization.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.RuntimeService\JSSoft.Crema.RuntimeService.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Tools.Framework\JSSoft.Crema.Tools.Framework.csproj" />
   </ItemGroup>
 </Project>

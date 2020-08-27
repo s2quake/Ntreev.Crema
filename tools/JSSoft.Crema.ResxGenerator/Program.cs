@@ -16,12 +16,12 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.CSharp;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Runtime.Serialization;
-using Ntreev.Crema.RuntimeService;
-using Ntreev.Library.Commands;
-using Ntreev.Library.IO;
-using Ntreev.Library.Linq;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Runtime.Serialization;
+using JSSoft.Crema.RuntimeService;
+using JSSoft.Library.Commands;
+using JSSoft.Library.IO;
+using JSSoft.Library.Linq;
 using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
@@ -33,7 +33,7 @@ using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.ResxGenerator
+namespace JSSoft.Crema.ResxGenerator
 {
     class Program
     {
@@ -129,7 +129,7 @@ namespace Ntreev.Crema.ResxGenerator
         //{
         //    var resxFileName = Path.Combine(outputPath, resxInfo.FileName);
         //    var designerFileName = Path.Combine(outputPath, resxInfo.ResgenFileName);
-        //    var ss = Ntreev.Library.StringUtility.SplitPath(Path.GetDirectoryName(resxInfo.FileName));
+        //    var ss = JSSoft.Library.StringUtility.SplitPath(Path.GetDirectoryName(resxInfo.FileName));
         //    var codeNamespace = $"{projectInfo.RootNamespace}.{string.Join(".", ss)}";
         //    var baseName = Path.GetFileNameWithoutExtension(resxInfo.FileName);
 

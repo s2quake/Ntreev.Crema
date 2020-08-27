@@ -17,7 +17,7 @@
 
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     public interface ITypeMember : IDispatcherObject
     {

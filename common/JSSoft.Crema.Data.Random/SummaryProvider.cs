@@ -20,7 +20,7 @@ using System.IO;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace Ntreev.Crema.Data.Random
+namespace JSSoft.Crema.Data.Random
 {
     class SummaryProvider
     {

@@ -16,11 +16,11 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Newtonsoft.Json;
-using Ntreev.Library;
+using JSSoft.Library;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Ntreev.Crema.Data.Json
+namespace JSSoft.Crema.Data.Json
 {
     public struct JsonTypeInfo
     {

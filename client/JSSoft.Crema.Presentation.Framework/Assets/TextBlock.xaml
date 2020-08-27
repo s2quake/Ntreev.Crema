@@ -18,9 +18,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 ====================================================================================================================-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:nmfv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework">
+                    xmlns:jmfv="clr-namespace:JSSoft.ModernUI.Framework.Converters;assembly=JSSoft.ModernUI.Framework">
 
-    <nmfv:IsNullConverter x:Key="IsNotNullConverter" Inverse="True" />
+    <jmfv:IsNullConverter x:Key="IsNotNullConverter" Inverse="True" />
     
     <Style x:Key="TableTextBlock_Style" TargetType="{x:Type TextBlock}">
         <Style.Triggers>

@@ -3,19 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2002
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ntreev-crema-reader-vc100", "Ntreev.Crema.Reader\vc100\ntreev-crema-reader-vc100.vcxproj", "{1B248D94-066F-4899-8CC2-157012C1DC36}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ntreev-crema-reader-vc100", "JSSoft.Crema.Reader\vc100\ntreev-crema-reader-vc100.vcxproj", "{1B248D94-066F-4899-8CC2-157012C1DC36}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ntreev-crema-reader-vc110", "Ntreev.Crema.Reader\vc110\ntreev-crema-reader-vc110.vcxproj", "{31BD19BC-E2E7-4FFF-AEDD-30CA13B1013C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ntreev-crema-reader-vc110", "JSSoft.Crema.Reader\vc110\ntreev-crema-reader-vc110.vcxproj", "{31BD19BC-E2E7-4FFF-AEDD-30CA13B1013C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ntreev-crema-reader-vc120", "Ntreev.Crema.Reader\vc120\ntreev-crema-reader-vc120.vcxproj", "{1B5D499E-6327-42FA-90A3-9C0B0C726AB3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ntreev-crema-reader-vc120", "JSSoft.Crema.Reader\vc120\ntreev-crema-reader-vc120.vcxproj", "{1B5D499E-6327-42FA-90A3-9C0B0C726AB3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ntreev-crema-reader-vc140", "Ntreev.Crema.Reader\vc140\ntreev-crema-reader-vc140.vcxproj", "{201F1E52-1905-4382-8C99-286ED279B24E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ntreev-crema-reader-vc140", "JSSoft.Crema.Reader\vc140\ntreev-crema-reader-vc140.vcxproj", "{201F1E52-1905-4382-8C99-286ED279B24E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ntreev-crema-reader-vc141", "Ntreev.Crema.Reader\vc141\ntreev-crema-reader-vc141.vcxproj", "{6E99E7EA-3D31-41A0-915E-BAAD46975193}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ntreev-crema-reader-vc141", "JSSoft.Crema.Reader\vc141\ntreev-crema-reader-vc141.vcxproj", "{6E99E7EA-3D31-41A0-915E-BAAD46975193}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ntreev.Crema.ReaderTest-vc141", "Ntreev.Crema.ReaderTest\vc141\Ntreev.Crema.ReaderTest.vcxproj", "{9A719D48-5982-45CE-B4E2-CF44D8C495EC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JSSoft.Crema.ReaderTest-vc141", "JSSoft.Crema.ReaderTest\vc141\JSSoft.Crema.ReaderTest.vcxproj", "{9A719D48-5982-45CE-B4E2-CF44D8C495EC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ntreev.Crema.CodeTest-vc141", "Ntreev.Crema.CodeTest\vc141\Ntreev.Crema.CodeTest-vc141.vcxproj", "{077F382F-499B-458F-B586-1B8FE218C422}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JSSoft.Crema.CodeTest-vc141", "JSSoft.Crema.CodeTest\vc141\JSSoft.Crema.CodeTest-vc141.vcxproj", "{077F382F-499B-458F-B586-1B8FE218C422}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

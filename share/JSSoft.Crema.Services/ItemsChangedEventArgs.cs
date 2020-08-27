@@ -17,7 +17,7 @@
 
 using System.Collections.Generic;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     public class ItemsChangedEventArgs<T> : ItemsEventArgs<T>
     {

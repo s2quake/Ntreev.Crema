@@ -1,7 +1,7 @@
 ﻿using JSSoft.Communication;
-using Ntreev.Crema.ServiceHosts;
+using JSSoft.Crema.ServiceHosts;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     class CremaHostServiceHost : ClientServiceHostBase<ICremaHostService, ICremaHostEventCallback>
     {

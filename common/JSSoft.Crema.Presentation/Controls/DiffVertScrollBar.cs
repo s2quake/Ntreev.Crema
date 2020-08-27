@@ -15,7 +15,7 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library.Linq;
+using JSSoft.Library.Linq;
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -25,7 +25,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using Xceed.Wpf.DataGrid;
 
-namespace Ntreev.Crema.Presentation.Controls
+namespace JSSoft.Crema.Presentation.Controls
 {
     [TemplatePart(Name = "PART_Line1", Type = typeof(FrameworkElement))]
     [TemplatePart(Name = "PART_Line2", Type = typeof(FrameworkElement))]

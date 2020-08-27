@@ -19,7 +19,7 @@ using System;
 using System.Diagnostics;
 using System.Text;
 
-namespace Ntreev.Crema.Services.Test
+namespace JSSoft.Crema.Services.Test
 {
     class CremaServeHost
     {

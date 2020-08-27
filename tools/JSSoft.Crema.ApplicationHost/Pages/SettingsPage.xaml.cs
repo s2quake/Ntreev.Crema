@@ -30,7 +30,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Ntreev.Crema.ApplicationHost.Pages
+namespace JSSoft.Crema.ApplicationHost.Pages
 {
     /// <summary>
     /// Interaction logic for SettingsPage.xaml

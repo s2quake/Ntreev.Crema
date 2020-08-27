@@ -15,10 +15,10 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-//using Ntreev.Crema.Data.Xml;
-//using Ntreev.Library.IO;
-//using Ntreev.Crema.ServiceModel;
-//using Ntreev.Crema.Data.Xml.Schema;
+//using JSSoft.Crema.Data.Xml;
+//using JSSoft.Library.IO;
+//using JSSoft.Crema.ServiceModel;
+//using JSSoft.Crema.Data.Xml.Schema;
 //using System;
 //using System.Collections.Generic;
 //using System.IO;
@@ -30,9 +30,9 @@
 //using System.Data;
 //using System.ComponentModel;
 //using Newtonsoft.Json;
-//using Ntreev.Crema.Data;
+//using JSSoft.Crema.Data;
 
-//namespace Ntreev.Crema.RuntimeService.Json
+//namespace JSSoft.Crema.RuntimeService.Json
 //{
 //    public class CremaJsonFormatter : IFormatter
 //    {

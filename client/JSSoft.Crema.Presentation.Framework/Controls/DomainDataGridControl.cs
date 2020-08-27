@@ -15,11 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.DataGrid.Controls;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.DataGrid.Controls;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -33,7 +33,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Xceed.Wpf.DataGrid;
 
-namespace Ntreev.Crema.Presentation.Framework.Controls
+namespace JSSoft.Crema.Presentation.Framework.Controls
 {
     public class DomainDataGridControl : ModernDataGridControl
     {

@@ -16,10 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using FirstFloor.ModernUI.Presentation;
-using Ntreev.Library;
+using JSSoft.Library;
 using System.Windows;
 
-namespace Ntreev.Crema.Presentation.Framework.Assets
+namespace JSSoft.Crema.Presentation.Framework.Assets
 {
     partial class CremaUIDark : ResourceDictionary
     {

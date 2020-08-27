@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Home.PropertyItems.Views
+namespace JSSoft.Crema.Presentation.Home.PropertyItems.Views
 {
     partial class DataBaseInfoView : UserControl
     {

@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Framework.Dialogs.Views
+namespace JSSoft.Crema.Presentation.Framework.Dialogs.Views
 {
     /// <summary>
     /// AccessView.xaml에 대한 상호 작용 논리

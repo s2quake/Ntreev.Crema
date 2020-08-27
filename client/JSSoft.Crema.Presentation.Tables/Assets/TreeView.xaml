@@ -18,31 +18,31 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 ====================================================================================================================-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:vm="clr-namespace:Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels"
-                    xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-                    xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Tables.Properties">
+                    xmlns:vm="clr-namespace:JSSoft.Crema.Presentation.Tables.BrowserItems.ViewModels"
+                    xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+                    xmlns:p="clr-namespace:JSSoft.Crema.Presentation.Tables.Properties">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/Ntreev.Crema.Presentation.Tables;component/Assets/MenuItem.xaml" />
+        <ResourceDictionary Source="/JSSoft.Crema.Presentation.Tables;component/Assets/MenuItem.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <HierarchicalDataTemplate DataType="{x:Type vm:TableRootTreeViewItemViewModel}" ItemsSource="{Binding Items}">
         <HierarchicalDataTemplate.Resources>
-            <nmfc:ModernContextMenu x:Key="DataBase_ContextMenu" ItemsSource="{Binding ContextMenus}">
+            <jmfc:ModernContextMenu x:Key="DataBase_ContextMenu" ItemsSource="{Binding ContextMenus}">
                 <MenuItem x:Name="NewFolder" Style="{StaticResource NewFolder_MenuItem_Style}" />
                 <MenuItem x:Name="NewTable" Style="{StaticResource NewTable_MenuItem_Style}" />
                 <Separator />
                 <MenuItem x:Name="Find" Style="{StaticResource Find_MenuItem_Style}" />
                 <Separator />
                 <MenuItem x:Name="ViewLog" Style="{StaticResource ViewLog_MenuItem_Style}" />
-            </nmfc:ModernContextMenu>
+            </jmfc:ModernContextMenu>
         </HierarchicalDataTemplate.Resources>
         <ContentControl Style="{StaticResource TableRootDescriptor_ContentControl_Style}" ContextMenu="{StaticResource DataBase_ContextMenu}" />
     </HierarchicalDataTemplate>
 
     <HierarchicalDataTemplate DataType="{x:Type vm:TableCategoryTreeViewItemViewModel}" ItemsSource="{Binding Items}">
         <HierarchicalDataTemplate.Resources>
-            <nmfc:ModernContextMenu x:Key="Category_ContextMenu" ItemsSource="{Binding ContextMenus}">
+            <jmfc:ModernContextMenu x:Key="Category_ContextMenu" ItemsSource="{Binding ContextMenus}">
                 <MenuItem x:Name="NewFolder" Style="{StaticResource NewFolder_MenuItem_Style}" />
                 <MenuItem x:Name="NewTable" Style="{StaticResource NewTable_MenuItem_Style}" />
                 <Separator />
@@ -52,14 +52,14 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <MenuItem x:Name="Rename" Style="{StaticResource Rename_MenuItem_Style}" InputGestureText="F2" />
                 <Separator />
                 <MenuItem x:Name="ViewLog" Style="{StaticResource ViewLog_MenuItem_Style}" />
-            </nmfc:ModernContextMenu>
+            </jmfc:ModernContextMenu>
         </HierarchicalDataTemplate.Resources>
         <ContentControl Style="{StaticResource TableCategoryDescriptor_ContentControl_Style}" ContextMenu="{StaticResource Category_ContextMenu}" />
     </HierarchicalDataTemplate>
 
     <HierarchicalDataTemplate DataType="{x:Type vm:TableTreeViewItemViewModel}" ItemsSource="{Binding Items}">
         <HierarchicalDataTemplate.Resources>
-            <nmfc:ModernContextMenu x:Key="Table_ContextMenu" ItemsSource="{Binding ContextMenus}">
+            <jmfc:ModernContextMenu x:Key="Table_ContextMenu" ItemsSource="{Binding ContextMenus}">
                 <MenuItem x:Name="EditTemplate" Style="{StaticResource EditTemplate_MenuItem_Style}" />
                 <MenuItem x:Name="ViewTemplate" Style="{StaticResource ViewTemplate_MenuItem_Style}" />
                 <MenuItem x:Name="NewTable" Style="{StaticResource NewChildTable_MenuItem_Style}" />
@@ -70,7 +70,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 <MenuItem x:Name="Rename" Style="{StaticResource Rename_MenuItem_Style}" InputGestureText="F2" />
                 <Separator />
                 <MenuItem x:Name="ViewLog" Style="{StaticResource ViewLog_MenuItem_Style}" />
-            </nmfc:ModernContextMenu>
+            </jmfc:ModernContextMenu>
         </HierarchicalDataTemplate.Resources>
         <ContentControl Style="{StaticResource TableDescriptor_ContentControl_Style}" ContextMenu="{StaticResource Table_ContextMenu}" />
     </HierarchicalDataTemplate>

@@ -15,12 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data.Diff;
-using Ntreev.ModernUI.Framework.DataGrid.Controls;
+using JSSoft.Crema.Data.Diff;
+using JSSoft.ModernUI.Framework.DataGrid.Controls;
 using System.Windows;
 using Xceed.Wpf.DataGrid;
 
-namespace Ntreev.Crema.Presentation.Controls
+namespace JSSoft.Crema.Presentation.Controls
 {
     class DiffColumnManagerCell : ModernColumnManagerCell
     {

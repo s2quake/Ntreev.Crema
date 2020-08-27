@@ -17,7 +17,7 @@
 
 using System.Windows;
 
-namespace Ntreev.Crema.Presentation.SmartSet.Assets
+namespace JSSoft.Crema.Presentation.SmartSet.Assets
 {
     partial class TreeView : ResourceDictionary
     {

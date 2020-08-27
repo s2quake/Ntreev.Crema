@@ -1,4 +1,4 @@
-﻿namespace Ntreev.Crema.WindowsServiceHost
+﻿namespace JSSoft.Crema.WindowsServiceHost
 {
     partial class WindowCremaService
     {

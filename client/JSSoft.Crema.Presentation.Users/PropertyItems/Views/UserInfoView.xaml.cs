@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Users.PropertyItems.Views
+namespace JSSoft.Crema.Presentation.Users.PropertyItems.Views
 {
     partial class UserInfoView : UserControl
     {

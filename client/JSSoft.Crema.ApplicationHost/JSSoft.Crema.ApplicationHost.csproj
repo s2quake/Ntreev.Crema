@@ -8,8 +8,8 @@
     <OutputPath>$(ExePath)client\application</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Presentation.Home\Ntreev.Crema.Presentation.Home.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Commands\JSSoft.Crema.Commands.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Presentation.Home\JSSoft.Crema.Presentation.Home.csproj" />
   </ItemGroup>
 </Project>

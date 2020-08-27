@@ -17,7 +17,7 @@
 
 using System.IO;
 
-namespace Ntreev.Crema.Runtime.Serialization
+namespace JSSoft.Crema.Runtime.Serialization
 {
     public interface IDataSerializer
     {

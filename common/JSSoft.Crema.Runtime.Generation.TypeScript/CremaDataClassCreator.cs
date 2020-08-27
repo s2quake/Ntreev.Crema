@@ -22,11 +22,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
-using Ntreev.Crema.Runtime.Generation.TypeScript.Properties;
+using JSSoft.Crema.Runtime.Generation.TypeScript.Properties;
 using System.Reflection;
 using System.IO;
 
-namespace Ntreev.Crema.Runtime.Generation.TypeScript
+namespace JSSoft.Crema.Runtime.Generation.TypeScript
 {
     static class CremaDataClassCreator
     {

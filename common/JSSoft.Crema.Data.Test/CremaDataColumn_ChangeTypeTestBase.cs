@@ -18,7 +18,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace Ntreev.Crema.Data.Test
+namespace JSSoft.Crema.Data.Test
 {
     public abstract class CremaDataColumn_ChangeTypeTestBase
     {

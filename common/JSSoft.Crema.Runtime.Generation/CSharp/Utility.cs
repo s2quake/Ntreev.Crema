@@ -17,7 +17,7 @@
 
 using System.CodeDom;
 
-namespace Ntreev.Crema.Runtime.Generation.CSharp
+namespace JSSoft.Crema.Runtime.Generation.CSharp
 {
     static class Utility
     {

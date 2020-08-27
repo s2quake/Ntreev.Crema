@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\share\Ntreev.Crema.Services\Ntreev.Crema.Services.projitems" Label="Shared" />
+  <Import Project="..\..\share\JSSoft.Crema.Services\JSSoft.Crema.Services.projitems" Label="Shared" />
   <PropertyGroup>
     <DefineConstants>SERVER</DefineConstants>
   </PropertyGroup>
@@ -10,8 +10,8 @@
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
-    <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj" />
-    <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Data\JSSoft.Crema.Data.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.ServiceModel\JSSoft.Crema.ServiceModel.csproj" />
+    <ProjectReference Include="..\..\..\JSSoft.Library\JSSoft.Library\JSSoft.Library.csproj" />
   </ItemGroup>
 </Project>

@@ -15,14 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Services;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.DataGrid.Controls;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Crema.Services;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.DataGrid.Controls;
 using System;
 using System.Windows;
 
-namespace Ntreev.Crema.Presentation.Tables.Documents.Assets
+namespace JSSoft.Crema.Presentation.Tables.Documents.Assets
 {
     partial class TableSourceControl : ResourceDictionary
     {
@@ -42,7 +42,7 @@ namespace Ntreev.Crema.Presentation.Tables.Documents.Assets
 
             var data = e.Data;
             var item = e.Item;
-            if (data.GetDataPresent(typeof(int)) == true && sender is Ntreev.Crema.Presentation.Tables.Documents.Views.TableSourceDataGridControl gridControl)
+            if (data.GetDataPresent(typeof(int)) == true && sender is JSSoft.Crema.Presentation.Tables.Documents.Views.TableSourceDataGridControl gridControl)
             {
                 var index = (int)data.GetData(typeof(int));
                 var authenticator = gridControl.Domain.GetService(typeof(Authenticator)) as Authenticator;

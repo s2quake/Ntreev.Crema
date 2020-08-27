@@ -1,6 +1,6 @@
-﻿using Ntreev.ModernUI.Framework;
+﻿using JSSoft.ModernUI.Framework;
 
-namespace Ntreev.Crema.Presentation.Differences.Documents.ViewModels
+namespace JSSoft.Crema.Presentation.Differences.Documents.ViewModels
 {
     class UndoService : UndoServiceBase
     {

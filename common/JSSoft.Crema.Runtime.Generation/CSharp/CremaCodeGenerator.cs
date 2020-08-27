@@ -16,8 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.CSharp;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library.IO;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Library.IO;
 using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
@@ -28,7 +28,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Ntreev.Crema.Runtime.Generation.CSharp
+namespace JSSoft.Crema.Runtime.Generation.CSharp
 {
     [Export(typeof(ICodeGenerator))]
     [Export(typeof(ICodeCompiler))]
@@ -121,7 +121,7 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
 
             foreach (var item in codes.ToArray())
             {
-                codes[item.Key] = item.Value.Replace("Ntreev.Crema.Reader", generationInfo.ReaderNamespace);
+                codes[item.Key] = item.Value.Replace("JSSoft.Crema.Reader", generationInfo.ReaderNamespace);
             }
 
             return codes;
@@ -143,7 +143,7 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
             //{
             //    var value = this.GetResourceString(item);
             //    var key = Regex.Replace(item, "(^" + this.GetType().Namespace + @"[.])(\S+)[.]cs", "$2").Replace('.', Path.DirectorySeparatorChar);
-            //    value = value.Replace("Ntreev.Crema.Reader", generationInfo.ReaderNamespace);
+            //    value = value.Replace("JSSoft.Crema.Reader", generationInfo.ReaderNamespace);
             //    codes.Add($"{generationInfo.RelativePath}{key}.cs", value);
             //}
 
@@ -155,8 +155,8 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var resourceName = string.Join(".", this.GetType().Namespace, "Code", "CremaBase.cs");
             var code = this.GetResourceString(resourceName);
-            code = code.Replace("namespace Ntreev.Crema.Code", "namespace " + generationInfo.BaseNamespace);
-            code = code.Replace("Ntreev.Crema.Reader", generationInfo.ReaderNamespace);
+            code = code.Replace("namespace JSSoft.Crema.Code", "namespace " + generationInfo.BaseNamespace);
+            code = code.Replace("JSSoft.Crema.Reader", generationInfo.ReaderNamespace);
             return code;
         }
 
@@ -165,8 +165,8 @@ namespace Ntreev.Crema.Runtime.Generation.CSharp
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
             var resourceName = string.Join(".", this.GetType().Namespace, "Code", "CremaReader.cs");
             var code = this.GetResourceString(resourceName);
-            code = code.Replace("namespace Ntreev.Crema.Code", "namespace " + generationInfo.BaseNamespace);
-            code = code.Replace("Ntreev.Crema.Reader", generationInfo.ReaderNamespace);
+            code = code.Replace("namespace JSSoft.Crema.Code", "namespace " + generationInfo.BaseNamespace);
+            code = code.Replace("JSSoft.Crema.Reader", generationInfo.ReaderNamespace);
             return code;
         }
 

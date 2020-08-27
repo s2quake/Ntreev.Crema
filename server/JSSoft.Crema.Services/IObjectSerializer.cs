@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     /// <summary>
     /// 경로로 표현되는 객체를 읽고 쓰도록 하는 인터페이스입니다.

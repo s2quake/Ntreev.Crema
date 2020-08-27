@@ -15,18 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Library;
+using JSSoft.ModernUI.Framework;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Presentation.Users.PropertyItems.ViewModels
+namespace JSSoft.Crema.Presentation.Users.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [RequiredAuthority(Authority.Guest)]
-    //[Dependency("Ntreev.Crema.Presentation.Home.PropertyItems.ViewModels.TableInfoViewModel, Ntreev.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
-    [ParentType("Ntreev.Crema.Presentation.Home.IPropertyService, Ntreev.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    //[Dependency("JSSoft.Crema.Presentation.Home.PropertyItems.ViewModels.TableInfoViewModel, JSSoft.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("JSSoft.Crema.Presentation.Home.IPropertyService, JSSoft.Crema.Presentation.Home, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     public class UserInfoViewModelOfCommon : UserInfoViewModel
     {
 

@@ -19,7 +19,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:mui="http://firstfloorsoftware.com/ModernUI"
-                    xmlns:ncfc="clr-namespace:Ntreev.Crema.Presentation.Framework.Controls">
+                    xmlns:ncfc="clr-namespace:JSSoft.Crema.Presentation.Framework.Controls">
 
     <mui:ToUpperConverter x:Key="ToUpperConverter" />
 

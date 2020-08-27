@@ -1,7 +1,7 @@
 ﻿using JSSoft.Communication;
-using Ntreev.Crema.ServiceHosts.Domains;
+using JSSoft.Crema.ServiceHosts.Domains;
 
-namespace Ntreev.Crema.Services.Domains
+namespace JSSoft.Crema.Services.Domains
 {
     class DomainContextServiceHost : ClientServiceHostBase<IDomainContextService, IDomainContextEventCallback>
     {

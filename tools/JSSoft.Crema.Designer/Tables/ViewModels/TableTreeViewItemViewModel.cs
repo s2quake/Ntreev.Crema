@@ -21,24 +21,24 @@ using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Threading;
 using System.Threading.Tasks;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Library.ObjectModel;
 using Caliburn.Micro;
 using System.ComponentModel.Composition;
 using System.Windows.Input;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Crema.Data;
-using Ntreev.Library.Linq;
+using JSSoft.ModernUI.Framework;
+using JSSoft.Crema.Data;
+using JSSoft.Library.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System.Collections;
-using Ntreev.Library;
+using JSSoft.Library;
 using System.ComponentModel;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library.IO;
+using JSSoft.ModernUI.Framework.Dialogs.ViewModels;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Library.IO;
 
-namespace Ntreev.Crema.Designer.Tables.ViewModels
+namespace JSSoft.Crema.Designer.Tables.ViewModels
 {
     public class TableTreeViewItemViewModel : TreeViewItemViewModel, ITableDescriptor
     {

@@ -6,7 +6,7 @@
     <SharedGUID>6baf8a0b-5b3e-40ea-8e96-c667df63516c</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>Ntreev.Crema.ServiceHosts</Import_RootNamespace>
+    <Import_RootNamespace>JSSoft.Crema.ServiceHosts</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ICremaHostEventCallback.cs" />

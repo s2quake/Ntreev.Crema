@@ -20,7 +20,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Presentation.Controls
+namespace JSSoft.Crema.Presentation.Controls
 {
     [TemplatePart(Name = "PART_Browsers", Type = typeof(FlowExpander))]
     [TemplatePart(Name = "PART_Properties", Type = typeof(FlowExpander))]

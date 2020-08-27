@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     [Flags]
     public enum LogVerbose

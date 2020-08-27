@@ -16,17 +16,17 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ====================================================================================================================-->
-<UserControl x:Class="Ntreev.Crema.Presentation.Tables.Dialogs.Views.NewRowView"
+<UserControl x:Class="JSSoft.Crema.Presentation.Tables.Dialogs.Views.NewRowView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-             xmlns:nmgc="clr-namespace:Ntreev.ModernUI.Framework.DataGrid.Controls;assembly=Ntreev.ModernUI.Framework.DataGrid"
+             xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+             xmlns:jmgc="clr-namespace:JSSoft.ModernUI.Framework.DataGrid.Controls;assembly=JSSoft.ModernUI.Framework.DataGrid"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-             xmlns:local="clr-namespace:Ntreev.Crema.Presentation.Tables.Dialogs.Views"
-             xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Tables.Properties"
+             xmlns:local="clr-namespace:JSSoft.Crema.Presentation.Tables.Dialogs.Views"
+             xmlns:p="clr-namespace:JSSoft.Crema.Presentation.Tables.Properties"
              mc:Ignorable="d" Width="400" Loaded="UserControl_Loaded">
 
     <UserControl.Resources>
@@ -65,43 +65,43 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         </DataTemplate>
 
         <DataTemplate x:Key="System.Single">
-            <nmgc:NumericTextBox NumberStyles="Float" NullValue="{x:Null}" Text="{Binding Value, StringFormat=R}" Loaded="PropertyItem_Loaded" />
+            <jmgc:NumericTextBox NumberStyles="Float" NullValue="{x:Null}" Text="{Binding Value, StringFormat=R}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.Double">
-            <nmgc:NumericTextBox NumberStyles="Float" NullValue="{x:Null}" Text="{Binding Value, StringFormat=R}" Loaded="PropertyItem_Loaded" />
+            <jmgc:NumericTextBox NumberStyles="Float" NullValue="{x:Null}" Text="{Binding Value, StringFormat=R}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.SByte">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
+            <jmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.Byte">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
+            <jmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.Int16">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
+            <jmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.UInt16">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
+            <jmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.Int32">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
+            <jmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.UInt32">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
+            <jmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.Int64">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
+            <jmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.UInt64">
-            <nmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
+            <jmgc:NumericTextBox NumberStyles="Integer" NullValue="{x:Null}" Text="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.DateTime">
@@ -109,14 +109,14 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         </DataTemplate>
 
         <DataTemplate x:Key="System.TimeSpan">
-            <nmgc:TimeSpanUpDown InternalValue="{Binding Value}" Loaded="PropertyItem_Loaded" />
+            <jmgc:TimeSpanUpDown InternalValue="{Binding Value}" Loaded="PropertyItem_Loaded" />
         </DataTemplate>
 
         <DataTemplate x:Key="System.Guid">
             <DockPanel>
-                <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/new.png" DockPanel.Dock="Right" Margin="4 0 0 0"
-                                 Command="{x:Static nmfc:GuidControl.NewCommand}" CommandTarget="{Binding ElementName=guidControl}" />
-                <nmfc:GuidControl x:Name="guidControl" Value="{Binding Value}" Loaded="PropertyItem_Loaded"  />
+                <jmfc:IconButton Source="/JSSoft.Crema.Presentation.Tables;component/Images/new.png" DockPanel.Dock="Right" Margin="4 0 0 0"
+                                 Command="{x:Static jmfc:GuidControl.NewCommand}" CommandTarget="{Binding ElementName=guidControl}" />
+                <jmfc:GuidControl x:Name="guidControl" Value="{Binding Value}" Loaded="PropertyItem_Loaded"  />
             </DockPanel>
         </DataTemplate>
 
@@ -126,14 +126,14 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         </DataTemplate>
 
         <DataTemplate x:Key="CremaFlagTypeSelector">
-            <nmfc:FlagControl Text="{Binding Value}" DisplayMemberPath="Name" NumericMemberPath="Value" ItemsSource="{Binding Items}" Loaded="PropertyItem_Loaded">
-                <nmfc:FlagControl.Resources>
+            <jmfc:FlagControl Text="{Binding Value}" DisplayMemberPath="Name" NumericMemberPath="Value" ItemsSource="{Binding Items}" Loaded="PropertyItem_Loaded">
+                <jmfc:FlagControl.Resources>
                     <Style TargetType="{x:Type Popup}">
                         <Setter Property="PlacementTarget" Value="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type HeaderedContentControl}}}" />
                         <Setter Property="Width" Value="{Binding Path=ActualWidth, RelativeSource={RelativeSource AncestorType={x:Type HeaderedContentControl}}}" />
                     </Style>
-                </nmfc:FlagControl.Resources>
-            </nmfc:FlagControl>
+                </jmfc:FlagControl.Resources>
+            </jmfc:FlagControl>
         </DataTemplate>
 
         <Style x:Key="ParentSelectorItem_Style" TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
@@ -155,7 +155,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     </UserControl.Resources>
 
     <StackPanel>
-        <nmfc:PropertyItemsControl x:Name="properties" ItemsSource="{Binding Items}" 
+        <jmfc:PropertyItemsControl x:Name="properties" ItemsSource="{Binding Items}" 
                                    ItemContainerStyle="{StaticResource ItemContainer_Style}"
                                    ContentTemplateSelector="{StaticResource newRowContentTemplateSelector}" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">

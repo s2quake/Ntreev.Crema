@@ -1,16 +1,16 @@
 ﻿//using Microsoft.VisualStudio.TestTools.UnitTesting;
-//using Ntreev.Library.Random;
+//using JSSoft.Library.Random;
 //using System;
 //using System.Collections.Generic;
 //using System.Linq;
 //using System.Text;
 //using System.Threading.Tasks;
-//using Ntreev.Library;
-//using Ntreev.Crema.ServiceModel;
-//using Ntreev.Library.Linq;
+//using JSSoft.Library;
+//using JSSoft.Crema.ServiceModel;
+//using JSSoft.Library.Linq;
 //using System.IO;
 
-//namespace Ntreev.Crema.ServerService.Test
+//namespace JSSoft.Crema.ServerService.Test
 //{
 //    [TestClass]
 //    public class CremaTest

@@ -20,7 +20,7 @@ using System.CodeDom;
 using System.IO;
 using System.Reflection;
 
-namespace Ntreev.Crema.Runtime.Generation.CSharp
+namespace JSSoft.Crema.Runtime.Generation.CSharp
 {
     static class CremaDataClassCreator
     {

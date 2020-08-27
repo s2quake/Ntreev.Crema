@@ -18,7 +18,7 @@
 using System.IO;
 using System.Linq;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     static class RepositoryHostExtentions
     {

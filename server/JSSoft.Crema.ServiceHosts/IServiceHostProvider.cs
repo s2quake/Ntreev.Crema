@@ -17,7 +17,7 @@
 
 using JSSoft.Communication;
 
-namespace Ntreev.Crema.ServiceHosts
+namespace JSSoft.Crema.ServiceHosts
 {
     public interface IServiceHostProvider
     {

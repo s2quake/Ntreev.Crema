@@ -18,7 +18,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace Ntreev.Crema.Services.Test.DispatcherTest
+namespace JSSoft.Crema.Services.Test.DispatcherTest
 {
     [TestClass]
     public class IDomainContext_DispatcherTest

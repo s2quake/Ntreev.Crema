@@ -19,7 +19,7 @@ using System;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     class PingTimer : IDisposable
     {

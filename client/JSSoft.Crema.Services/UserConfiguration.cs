@@ -15,13 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library;
-using Ntreev.Library.IO;
+using JSSoft.Library;
+using JSSoft.Library.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     public class UserConfiguration : ConfigurationBase, IUserConfiguration, IConfigurationCommitter
     {

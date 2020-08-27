@@ -15,11 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Library;
+using JSSoft.ModernUI.Framework;
 using System;
 
-namespace Ntreev.Crema.Presentation.SmartSet.Rules.ViewModels
+namespace JSSoft.Crema.Presentation.SmartSet.Rules.ViewModels
 {
     public abstract class StringCompareRuleViewModel : PropertyChangedBase, IRule
     {

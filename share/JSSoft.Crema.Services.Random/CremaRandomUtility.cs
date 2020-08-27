@@ -15,16 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Extensions;
-using Ntreev.Library;
-using Ntreev.Library.Random;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Extensions;
+using JSSoft.Library;
+using JSSoft.Library.Random;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services.Random
+namespace JSSoft.Crema.Services.Random
 {
     public static class CremaRandomUtility
     {

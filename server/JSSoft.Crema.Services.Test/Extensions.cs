@@ -19,7 +19,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 
-namespace Ntreev.Crema.Services.Test
+namespace JSSoft.Crema.Services.Test
 {
     static class Extensions
     {

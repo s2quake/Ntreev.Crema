@@ -18,6 +18,6 @@
     <PackageReference Include="Microsoft.WindowsAPICodePack.Shell" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Presentation\Ntreev.Crema.Presentation.csproj" />
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Presentation\JSSoft.Crema.Presentation.csproj" />
   </ItemGroup>
 </Project>

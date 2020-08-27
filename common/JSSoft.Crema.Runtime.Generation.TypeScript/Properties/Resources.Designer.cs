@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Ntreev.Crema.Runtime.Generation.TypeScript.Properties {
+namespace JSSoft.Crema.Runtime.Generation.TypeScript.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Ntreev.Crema.Runtime.Generation.TypeScript.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Ntreev.Crema.Runtime.Generation.TypeScript.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("JSSoft.Crema.Runtime.Generation.TypeScript.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

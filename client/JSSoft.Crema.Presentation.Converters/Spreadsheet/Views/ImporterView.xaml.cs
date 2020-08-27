@@ -19,7 +19,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.Views
+namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.Views
 {
     /// <summary>
     /// ImporterView.xaml에 대한 상호 작용 논리

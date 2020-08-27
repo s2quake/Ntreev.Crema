@@ -17,11 +17,11 @@
 
 //#define _PARALLEL
 
-//using Ntreev.Crema.Data;
-//using Ntreev.Crema.RuntimeService.Binary;
-//using Ntreev.Crema.ServiceModel;
-//using Ntreev.Crema.Data.Xml;
-//using Ntreev.Library.IO;
+//using JSSoft.Crema.Data;
+//using JSSoft.Crema.RuntimeService.Binary;
+//using JSSoft.Crema.ServiceModel;
+//using JSSoft.Crema.Data.Xml;
+//using JSSoft.Library.IO;
 //using System;
 //using System.Collections.Generic;
 //using System.Diagnostics;
@@ -36,7 +36,7 @@
 //using Newtonsoft.Json.Linq;
 
 
-//namespace Ntreev.Crema.RuntimeService.Json
+//namespace JSSoft.Crema.RuntimeService.Json
 //{
 //    public class CremaJsonSerializer
 //    {

@@ -1,13 +1,13 @@
-﻿using Ntreev.Crema.ServiceModel;
-using Ntreev.Library;
-using Ntreev.Library.Random;
+﻿using JSSoft.Crema.ServiceModel;
+using JSSoft.Library;
+using JSSoft.Library.Random;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.ServerService.Test
+namespace JSSoft.Crema.ServerService.Test
 {
     static class Extensions
     {

@@ -3,10 +3,10 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library.Random;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Library.Random;
 
-namespace Ntreev.Crema.ServerService.Test
+namespace JSSoft.Crema.ServerService.Test
 {
     class OnlineUserCollection : Dictionary<IUser, Authentication>
     {

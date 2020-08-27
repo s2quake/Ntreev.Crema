@@ -19,7 +19,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
-namespace Ntreev.Crema.Presentation.Controls
+namespace JSSoft.Crema.Presentation.Controls
 {
     [TemplatePart(Name = "PART_Button", Type = typeof(ButtonBase))]
     public class FlowExpander : Expander

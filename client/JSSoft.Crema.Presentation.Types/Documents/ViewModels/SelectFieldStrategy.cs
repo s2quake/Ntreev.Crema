@@ -17,7 +17,7 @@
 
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Presentation.Types.Documents.ViewModels
+namespace JSSoft.Crema.Presentation.Types.Documents.ViewModels
 {
     class SelectFieldStrategy
     {

@@ -15,17 +15,17 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data.Diff;
-using Ntreev.Crema.Presentation.Differences.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.Differences.Properties;
-using Ntreev.Crema.Presentation.Types.Dialogs.ViewModels;
-using Ntreev.Crema.Services;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Data.Diff;
+using JSSoft.Crema.Presentation.Differences.Dialogs.ViewModels;
+using JSSoft.Crema.Presentation.Differences.Properties;
+using JSSoft.Crema.Presentation.Types.Dialogs.ViewModels;
+using JSSoft.Crema.Services;
+using JSSoft.ModernUI.Framework;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Presentation.Differences.MenuItems
+namespace JSSoft.Crema.Presentation.Differences.MenuItems
 {
     [Export(typeof(IMenuItem))]
     [ParentType(typeof(LogInfoViewModel))]

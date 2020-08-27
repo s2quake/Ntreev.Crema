@@ -15,14 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Services;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
+namespace JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
-    class BookmarkTableTreeViewItemViewModel : Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels.TableTreeViewItemViewModel
+    class BookmarkTableTreeViewItemViewModel : JSSoft.Crema.Presentation.Tables.BrowserItems.ViewModels.TableTreeViewItemViewModel
     {
         public BookmarkTableTreeViewItemViewModel(Authentication authentication, ITableDescriptor descriptor, object owner)
             : base(authentication, new TableDescriptor(authentication, descriptor, true), owner)

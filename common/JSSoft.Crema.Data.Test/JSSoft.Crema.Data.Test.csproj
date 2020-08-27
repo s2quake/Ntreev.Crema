@@ -6,9 +6,9 @@
     <PackageReference Include="MSTest.TestFramework" Version="2.1.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library\Ntreev.Library.csproj" />
-    <ProjectReference Include="..\..\..\Ntreev.Library\Ntreev.Library.Random\Ntreev.Library.Random.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Data\Ntreev.Crema.Data.csproj" />
-    <ProjectReference Include="..\Ntreev.Crema.Data.Random\Ntreev.Crema.Data.Random.csproj" />
+    <ProjectReference Include="..\..\..\JSSoft.Library\JSSoft.Library\JSSoft.Library.csproj" />
+    <ProjectReference Include="..\..\..\JSSoft.Library\JSSoft.Library.Random\JSSoft.Library.Random.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Data\JSSoft.Crema.Data.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Data.Random\JSSoft.Crema.Data.Random.csproj" />
   </ItemGroup>
 </Project>

@@ -16,7 +16,7 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #pragma warning disable 0612
-using Ntreev.Library;
+using JSSoft.Library;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -25,7 +25,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Schema;
 
-namespace Ntreev.Crema.Data.Xml.Schema
+namespace JSSoft.Crema.Data.Xml.Schema
 {
     public static class CremaSchema
     {

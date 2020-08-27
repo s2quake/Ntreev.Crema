@@ -15,12 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Library.IO;
+using JSSoft.Library.ObjectModel;
 using System;
 
-namespace Ntreev.Crema.ServiceModel
+namespace JSSoft.Crema.ServiceModel
 {
     internal abstract class TableCategoryBase<_I, _C, _IC, _CC, _CT> : PermissionCategoryBase<_I, _C, _IC, _CC, _CT>
         where _I : TableBase<_I, _C, _IC, _CC, _CT>

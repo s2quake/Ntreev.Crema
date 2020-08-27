@@ -15,13 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Tables;
-using Ntreev.Crema.Services;
-using Ntreev.Library;
-using Ntreev.Library.Linq;
-using Ntreev.Library.ObjectModel;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Presentation.Tables;
+using JSSoft.Crema.Services;
+using JSSoft.Library;
+using JSSoft.Library.Linq;
+using JSSoft.Library.ObjectModel;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -32,7 +32,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Dispatcher = System.Windows.Threading.Dispatcher;
 
-namespace Ntreev.Crema.Presentation.SmartSet
+namespace JSSoft.Crema.Presentation.SmartSet
 {
     [Export]
     class TableSmartSetContext : ItemContext<TableSmartSet, TableSmartSetCategory, TableSmartSetCollection, TableSmartSetCategoryCollection, TableSmartSetContext>,

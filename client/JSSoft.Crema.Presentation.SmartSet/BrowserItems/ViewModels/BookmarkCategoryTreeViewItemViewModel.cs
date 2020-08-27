@@ -15,17 +15,17 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.SmartSet.Dialogs.ViewModels;
-using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Presentation.SmartSet.Dialogs.ViewModels;
+using JSSoft.Library.IO;
+using JSSoft.Library.ObjectModel;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.Dialogs.ViewModels;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels
+namespace JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels
 {
     abstract class BookmarkCategoryTreeViewItemViewModel : TreeViewItemViewModel
     {

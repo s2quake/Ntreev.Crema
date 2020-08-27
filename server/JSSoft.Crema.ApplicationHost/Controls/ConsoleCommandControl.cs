@@ -15,8 +15,8 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ApplicationHost.Commands.Consoles;
-using Ntreev.ModernUI.Framework.Controls;
+using JSSoft.Crema.ApplicationHost.Commands.Consoles;
+using JSSoft.ModernUI.Framework.Controls;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -24,7 +24,7 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 
-namespace Ntreev.Crema.ApplicationHost.Controls
+namespace JSSoft.Crema.ApplicationHost.Controls
 {
     class ConsoleCommandControl : TerminalControl
     {
@@ -38,7 +38,7 @@ namespace Ntreev.Crema.ApplicationHost.Controls
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
             base.OnRenderSizeChanged(sizeInfo);
-            Ntreev.Library.Commands.Terminal.BufferWidth = (int)sizeInfo.NewSize.Width / 6;
+            JSSoft.Library.Commands.Terminal.BufferWidth = (int)sizeInfo.NewSize.Width / 6;
         }
 
         protected override Inline[] GetPrompt(string prompt)

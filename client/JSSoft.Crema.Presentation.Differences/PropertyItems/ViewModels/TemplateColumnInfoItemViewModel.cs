@@ -15,12 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Diff;
-using Ntreev.Library;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Data.Diff;
+using JSSoft.Library;
+using JSSoft.Library.ObjectModel;
 
-namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
+namespace JSSoft.Crema.Presentation.Differences.PropertyItems.ViewModels
 {
     class TemplateColumnInfoItemViewModel
     {

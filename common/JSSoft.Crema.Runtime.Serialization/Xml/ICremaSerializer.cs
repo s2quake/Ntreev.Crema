@@ -21,7 +21,7 @@
 //using System.Linq;
 //using System.Text;
 
-//namespace Ntreev.Crema.RuntimeService.Binary
+//namespace JSSoft.Crema.RuntimeService.Binary
 //{
 //    public interface ICrema2Serializer
 //    {

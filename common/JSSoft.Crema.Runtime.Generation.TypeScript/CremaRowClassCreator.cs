@@ -22,12 +22,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
-using Ntreev.Crema.Runtime.Generation.TypeScript.Properties;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml.Schema;
+using JSSoft.Crema.Runtime.Generation.TypeScript.Properties;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Data.Xml.Schema;
 using System.Reflection;
 
-namespace Ntreev.Crema.Runtime.Generation.TypeScript
+namespace JSSoft.Crema.Runtime.Generation.TypeScript
 {
     static class CremaRowClassCreator
     {

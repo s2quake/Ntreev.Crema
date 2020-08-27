@@ -18,17 +18,17 @@
 using System;
 using System.Linq;
 using System.Windows;
-using Ntreev.Library.Linq;
+using JSSoft.Library.Linq;
 using Caliburn.Micro;
 using System.Collections.Generic;
 using System.ComponentModel.Composition.Hosting;
-using Ntreev.ModernUI.Framework;
-using Ntreev.Library.IO;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Data;
+using JSSoft.ModernUI.Framework;
+using JSSoft.Library.IO;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Crema.Data;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Designer.Tables.ViewModels
+namespace JSSoft.Crema.Designer.Tables.ViewModels
 {
     public class DataBaseTreeViewItemViewModel : CategoryTreeViewItemViewModel
     {

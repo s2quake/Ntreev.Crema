@@ -16,13 +16,13 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Data.Random;
-using Ntreev.Crema.Data.Xml;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library;
-using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Library.Random;
+using JSSoft.Crema.Data.Random;
+using JSSoft.Crema.Data.Xml;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Library;
+using JSSoft.Library.IO;
+using JSSoft.Library.ObjectModel;
+using JSSoft.Library.Random;
 using System;
 using System.IO;
 using System.Linq;
@@ -30,7 +30,7 @@ using System.Text;
 using System.Threading;
 using System.Xml;
 
-namespace Ntreev.Crema.Data.Test
+namespace JSSoft.Crema.Data.Test
 {
     [TestClass]
     public class CremaDataTable_ComplexTest : IDisposable

@@ -15,18 +15,18 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Designer.Properties;
+using JSSoft.Crema.Designer.Properties;
 using System.Linq;
 using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Threading;
-using Ntreev.Library.ObjectModel;
-using Ntreev.Crema.Data;
+using JSSoft.Library.ObjectModel;
+using JSSoft.Crema.Data;
 using System.Windows;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
+using JSSoft.ModernUI.Framework.Dialogs.ViewModels;
 
-namespace Ntreev.Crema.Designer.Types.ViewModels
+namespace JSSoft.Crema.Designer.Types.ViewModels
 {
     public class RenameTypeViewModel : RenameViewModel
     {

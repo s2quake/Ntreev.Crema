@@ -15,12 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Reader;
-using Ntreev.Crema.Runtime.Serialization;
-using Ntreev.Crema.RuntimeService;
-using Ntreev.Crema.Tools.Framework;
-using Ntreev.Crema.Tools.View.Views;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Reader;
+using JSSoft.Crema.Runtime.Serialization;
+using JSSoft.Crema.RuntimeService;
+using JSSoft.Crema.Tools.Framework;
+using JSSoft.Crema.Tools.View.Views;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Tools.View.ViewModels
+namespace JSSoft.Crema.Tools.View.ViewModels
 {
     [View(typeof(ItemsView))]
     class FileViewModel : ContentBase, IDisposable

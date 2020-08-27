@@ -18,7 +18,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Framework.Controls
+namespace JSSoft.Crema.Presentation.Framework.Controls
 {
     public static class PasswordHelper
     {

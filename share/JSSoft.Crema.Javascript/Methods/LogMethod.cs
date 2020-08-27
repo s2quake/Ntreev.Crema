@@ -20,7 +20,7 @@ using Newtonsoft.Json.Converters;
 using System;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Javascript.Methods
+namespace JSSoft.Crema.Javascript.Methods
 {
     [Export(typeof(IScriptMethod))]
     [PartCreationPolicy(CreationPolicy.NonShared)]

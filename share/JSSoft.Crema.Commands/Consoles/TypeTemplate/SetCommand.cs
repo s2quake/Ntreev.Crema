@@ -15,22 +15,22 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Commands;
-using Ntreev.Crema.Commands.Consoles;
-using Ntreev.Library.Commands;
+using JSSoft.Crema.Commands;
+using JSSoft.Crema.Commands.Consoles;
+using JSSoft.Library.Commands;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.Commands.Consoles.Serializations;
-using Ntreev.Crema.Commands.Consoles.Properties;
+using JSSoft.Crema.Services;
+using JSSoft.Crema.Commands.Consoles.Serializations;
+using JSSoft.Crema.Commands.Consoles.Properties;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Commands.Consoles.TypeTemplate
+namespace JSSoft.Crema.Commands.Consoles.TypeTemplate
 {
     [Export(typeof(ITemplateCommand))]
     [PartCreationPolicy(CreationPolicy.NonShared)]

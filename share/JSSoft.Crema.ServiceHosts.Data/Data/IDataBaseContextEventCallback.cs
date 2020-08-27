@@ -16,10 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using JSSoft.Communication;
-using Ntreev.Crema.ServiceModel;
+using JSSoft.Crema.ServiceModel;
 using System;
 
-namespace Ntreev.Crema.ServiceHosts.Data
+namespace JSSoft.Crema.ServiceHosts.Data
 {
     public interface IDataBaseContextEventCallback
     {

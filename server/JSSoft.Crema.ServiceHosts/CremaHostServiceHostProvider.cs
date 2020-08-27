@@ -18,7 +18,7 @@
 using JSSoft.Communication;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.ServiceHosts
+namespace JSSoft.Crema.ServiceHosts
 {
     [Export(typeof(IServiceHostProvider))]
     class CremaHostServiceHostProvider : IServiceHostProvider

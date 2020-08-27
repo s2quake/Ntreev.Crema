@@ -1,4 +1,4 @@
-﻿namespace Ntreev.Crema.ConsoleHost
+﻿namespace JSSoft.Crema.ConsoleHost
 {
     partial class Program
     {

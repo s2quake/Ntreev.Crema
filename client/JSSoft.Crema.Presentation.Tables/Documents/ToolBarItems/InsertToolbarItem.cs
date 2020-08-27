@@ -1,4 +1,4 @@
-﻿namespace Ntreev.Crema.Presentation.Tables.Documents.ToolBarItems
+﻿namespace JSSoft.Crema.Presentation.Tables.Documents.ToolBarItems
 {
     //[Export]
     //[Export(typeof(IToolBarItem))]
@@ -8,7 +8,7 @@
     //    public InsertToolbarItem()
     //    {
     //        this.DisplayName = "Insert...";
-    //        this.Icon = "/Ntreev.Crema.Presentation.Tables;component/Images/new.png";
+    //        this.Icon = "/JSSoft.Crema.Presentation.Tables;component/Images/new.png";
     //    }
 
     //    protected override async void OnExecute(object parameter)

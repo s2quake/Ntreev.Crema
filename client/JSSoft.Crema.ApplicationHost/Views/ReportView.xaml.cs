@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.ApplicationHost.Views
+namespace JSSoft.Crema.ApplicationHost.Views
 {
     partial class ReportView : UserControl
     {

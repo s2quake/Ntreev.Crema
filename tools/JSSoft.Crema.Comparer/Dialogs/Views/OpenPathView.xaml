@@ -16,30 +16,30 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ====================================================================================================================-->
-<UserControl x:Class="Ntreev.Crema.Comparer.Dialogs.Views.OpenPathView"
+<UserControl x:Class="JSSoft.Crema.Comparer.Dialogs.Views.OpenPathView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
+             xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
              mc:Ignorable="d" 
-             Width="400" Loaded="UserControl_Loaded" nmfc:DialogWindow.ProgressType="Bar">
+             Width="400" Loaded="UserControl_Loaded" jmfc:DialogWindow.ProgressType="Bar">
     <StackPanel>
-        <nmfc:PropertyItemsControl>
-            <DockPanel nmfc:PropertyItemsControl.Header="Path1">
+        <jmfc:PropertyItemsControl>
+            <DockPanel jmfc:PropertyItemsControl.Header="Path1">
                 <Button x:Name="SelectPath1" DockPanel.Dock="Right" Content="..." Margin="4 0 0 0" />
                 <TextBox x:Name="Path1" TabIndex="0" />
             </DockPanel>
-            <nmfc:IconButton x:Name="Swap" Source="/Images/swap.png" />
-            <DockPanel nmfc:PropertyItemsControl.Header="Path2">
+            <jmfc:IconButton x:Name="Swap" Source="/Images/swap.png" />
+            <DockPanel jmfc:PropertyItemsControl.Header="Path2">
                 <Button x:Name="SelectPath2" DockPanel.Dock="Right" Content="..." Margin="4 0 0 0" />
                 <TextBox x:Name="Path2" />
             </DockPanel>
-            <DockPanel nmfc:PropertyItemsControl.Header="Filter">
+            <DockPanel jmfc:PropertyItemsControl.Header="Filter">
                 <Button x:Name="EditFilterExpression" DockPanel.Dock="Right" Content="..." Margin="4 0 0 0" />
                 <TextBox x:Name="FilterExpression" />
             </DockPanel>
-        </nmfc:PropertyItemsControl>
+        </jmfc:PropertyItemsControl>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
             <Button x:Name="Open" Content="_Open" IsDefault="True" Style="{DynamicResource Dialog_Button_Style}" />
         </StackPanel>

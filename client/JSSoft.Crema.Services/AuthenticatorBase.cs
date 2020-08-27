@@ -15,13 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Properties;
-using Ntreev.Library;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Properties;
+using JSSoft.Library;
 using System;
 using System.Reflection;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     public abstract class AuthenticatorBase : IPlugin
     {

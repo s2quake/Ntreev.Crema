@@ -17,4 +17,4 @@
 
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Ntreev.Crema.Services")]
+[assembly: InternalsVisibleTo("JSSoft.Crema.Services")]

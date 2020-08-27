@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ntreev.Crema.ServiceModel
+namespace JSSoft.Crema.ServiceModel
 {
     public interface IColumnModel : IDisposable
     {

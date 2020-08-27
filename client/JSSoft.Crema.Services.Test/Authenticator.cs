@@ -17,7 +17,7 @@
 
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Services.Test
+namespace JSSoft.Crema.Services.Test
 {
     [Export(typeof(IPlugin))]
     [Export(typeof(Authenticator))]

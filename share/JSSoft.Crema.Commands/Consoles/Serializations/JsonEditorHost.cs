@@ -18,8 +18,8 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
-using Ntreev.Library;
-using Ntreev.Library.IO;
+using JSSoft.Library;
+using JSSoft.Library.IO;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,7 +27,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Commands.Consoles.Serializations
+namespace JSSoft.Crema.Commands.Consoles.Serializations
 {
     class JsonEditorHost : IDisposable
     {

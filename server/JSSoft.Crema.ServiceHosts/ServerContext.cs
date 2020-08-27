@@ -1,6 +1,6 @@
 ﻿using JSSoft.Communication;
 
-namespace Ntreev.Crema.ServiceHosts
+namespace JSSoft.Crema.ServiceHosts
 {
     class ServerContext : ServerContextBase
     {

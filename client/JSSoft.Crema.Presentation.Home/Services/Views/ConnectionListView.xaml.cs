@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-namespace Ntreev.Crema.Presentation.Home.Services.Views
+namespace JSSoft.Crema.Presentation.Home.Services.Views
 {
     /// <summary>
     /// ConnectionListView.xaml에 대한 상호 작용 논리

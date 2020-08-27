@@ -18,7 +18,7 @@
 using System.Windows;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Presentation.Framework.Dialogs.Views
+namespace JSSoft.Crema.Presentation.Framework.Dialogs.Views
 {
     /// <summary>
     /// AboutView.xaml에 대한 상호 작용 논리

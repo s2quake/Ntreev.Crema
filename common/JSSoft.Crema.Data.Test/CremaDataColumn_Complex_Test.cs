@@ -16,14 +16,14 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Data.Random;
-using Ntreev.Library;
-using Ntreev.Library.Random;
+using JSSoft.Crema.Data.Random;
+using JSSoft.Library;
+using JSSoft.Library.Random;
 using System;
 using System.Data;
 using System.Linq;
 
-namespace Ntreev.Crema.Data.Test
+namespace JSSoft.Crema.Data.Test
 {
     [TestClass]
     public class CremaDataColumn_Complex_Test

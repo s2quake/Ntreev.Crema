@@ -17,7 +17,7 @@
 
 using System.Windows;
 
-namespace Ntreev.Crema.Presentation.Framework.Assets
+namespace JSSoft.Crema.Presentation.Framework.Assets
 {
     partial class DomainDataGridControl : ResourceDictionary
     {

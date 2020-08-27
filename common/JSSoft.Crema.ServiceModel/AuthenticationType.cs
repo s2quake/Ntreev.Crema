@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.ServiceModel
+namespace JSSoft.Crema.ServiceModel
 {
     [Flags]
     internal enum AuthenticationType

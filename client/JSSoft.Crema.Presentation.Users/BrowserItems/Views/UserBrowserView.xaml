@@ -16,21 +16,21 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ====================================================================================================================-->
-<UserControl x:Class="Ntreev.Crema.Presentation.Users.BrowserItems.Views.UserBrowserView"
+<UserControl x:Class="JSSoft.Crema.Presentation.Users.BrowserItems.Views.UserBrowserView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-             xmlns:nmfm="clr-namespace:Ntreev.ModernUI.Framework.Markup;assembly=Ntreev.ModernUI.Framework"
-             xmlns:ncfc="clr-namespace:Ntreev.Crema.Presentation.Framework.Controls;assembly=Ntreev.Crema.Presentation.Framework"
-             xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Users.Properties"
+             xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+             xmlns:jmfm="clr-namespace:JSSoft.ModernUI.Framework.Markup;assembly=JSSoft.ModernUI.Framework"
+             xmlns:ncfc="clr-namespace:JSSoft.Crema.Presentation.Framework.Controls;assembly=JSSoft.Crema.Presentation.Framework"
+             xmlns:p="clr-namespace:JSSoft.Crema.Presentation.Users.Properties"
              mc:Ignorable="d" d:DesignWidth="300">
 
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Ntreev.Crema.Presentation.Users;component/Assets/TreeView.xaml" />
+                <ResourceDictionary Source="/JSSoft.Crema.Presentation.Users;component/Assets/TreeView.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -41,15 +41,15 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <nmfc:ModernToolBar ItemsSource="{Binding ToolBarMenus}">
-            <nmfc:IconButton x:Name="CollapseAll" Source="/Ntreev.Crema.Presentation.Framework;component/Images/collapse_all.png" />
-            <nmfc:IconButton x:Name="NotifyMessage" Margin="0 0 1 0" Visibility="{nmfm:VisibilityBinding IsAdmin}"
+        <jmfc:ModernToolBar ItemsSource="{Binding ToolBarMenus}">
+            <jmfc:IconButton x:Name="CollapseAll" Source="/JSSoft.Crema.Presentation.Framework;component/Images/collapse_all.png" />
+            <jmfc:IconButton x:Name="NotifyMessage" Margin="0 0 1 0" Visibility="{jmfm:VisibilityBinding IsAdmin}"
                              ToolTip="{x:Static p:Resources.Tooltip_Notify}"
-                             Source="/Ntreev.Crema.Presentation.Users;component/Images/message.png" />
-        </nmfc:ModernToolBar>
-        <nmfc:FilterBox x:Name="FilterBox" Grid.Row="1" Text="{Binding FilterExpression, Delay=300, Mode=TwoWay}" 
+                             Source="/JSSoft.Crema.Presentation.Users;component/Images/message.png" />
+        </jmfc:ModernToolBar>
+        <jmfc:FilterBox x:Name="FilterBox" Grid.Row="1" Text="{Binding FilterExpression, Delay=300, Mode=TwoWay}" 
                         CaseSensitive="{Binding CaseSensitive, Mode=TwoWay}" GlobPattern="{Binding GlobPattern, Mode=TwoWay}" />
-        <ncfc:BrowserTreeView x:Name="treeView" Grid.Row="2" nmfc:TreeViewUtility.SelectedItemBindingPath="SelectedItem"
+        <ncfc:BrowserTreeView x:Name="treeView" Grid.Row="2" jmfc:TreeViewUtility.SelectedItemBindingPath="SelectedItem"
                               ItemsSource="{Binding Items}">
             <ncfc:BrowserTreeView.InputBindings>
                 <KeyBinding Key="Delete" Command="{Binding DeleteCommand}" CommandParameter="{Binding SelectedItem, ElementName=treeView}" />

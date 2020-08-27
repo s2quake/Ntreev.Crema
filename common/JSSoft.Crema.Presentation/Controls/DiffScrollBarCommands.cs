@@ -17,7 +17,7 @@
 
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Presentation.Controls
+namespace JSSoft.Crema.Presentation.Controls
 {
     public static class DiffScrollBarCommands
     {

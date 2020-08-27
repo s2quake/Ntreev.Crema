@@ -16,8 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.CSharp;
-using Ntreev.Crema.Runtime.Generation.TypeScript.TypeScript;
-using Ntreev.Crema.Runtime.Generation.TypeScript.Properties;
+using JSSoft.Crema.Runtime.Generation.TypeScript.TypeScript;
+using JSSoft.Crema.Runtime.Generation.TypeScript.Properties;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -27,11 +27,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.CodeDom;
 using System.ComponentModel.Composition;
-using Ntreev.Library;
-using Ntreev.Library.IO;
+using JSSoft.Library;
+using JSSoft.Library.IO;
 using System.Reflection;
 
-namespace Ntreev.Crema.Runtime.Generation.TypeScript
+namespace JSSoft.Crema.Runtime.Generation.TypeScript
 {
     [Export(typeof(ICodeGenerator))]
     [Export(typeof(ICodeCompiler))]

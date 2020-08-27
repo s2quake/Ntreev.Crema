@@ -15,21 +15,21 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Diff;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Presentation.Framework.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Data.Diff;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Presentation.Framework.Dialogs.ViewModels;
+using JSSoft.Crema.Presentation.Home.Dialogs.ViewModels;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
+using JSSoft.Library;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels
+namespace JSSoft.Crema.Presentation.Differences.BrowserItems.ViewModels
 {
     [Export(typeof(IBrowserItem))]
     [ParentType(typeof(BrowserService))]

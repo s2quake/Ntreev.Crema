@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Comparer.Types.ViewModels
+namespace JSSoft.Crema.Comparer.Types.ViewModels
 {
     [Export]
     class TypePropertyViewModel : PropertyServiceBase 

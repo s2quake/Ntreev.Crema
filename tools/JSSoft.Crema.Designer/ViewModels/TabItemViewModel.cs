@@ -16,8 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.Data;
-using Ntreev.ModernUI.Framework.Controls;
+using JSSoft.Crema.Data;
+using JSSoft.ModernUI.Framework.Controls;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,7 +25,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Designer.ViewModels
+namespace JSSoft.Crema.Designer.ViewModels
 {
     class TabItemViewModel : PropertyChangedBase
     {

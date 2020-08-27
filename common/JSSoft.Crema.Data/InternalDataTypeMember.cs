@@ -15,12 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Library;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Library;
 using System;
 using System.Data;
 
-namespace Ntreev.Crema.Data
+namespace JSSoft.Crema.Data
 {
     class InternalDataTypeMember : InternalRowBase<InternalDataType, InternalDataTypeMember>
     {

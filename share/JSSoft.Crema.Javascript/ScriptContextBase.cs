@@ -18,8 +18,8 @@
 using Jint;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Ntreev.Crema.Services;
-using Ntreev.Library.Commands;
+using JSSoft.Crema.Services;
+using JSSoft.Library.Commands;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,7 +29,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Javascript
+namespace JSSoft.Crema.Javascript
 {
     public abstract class ScriptContextBase
     {

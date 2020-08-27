@@ -21,7 +21,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Xceed.Wpf.DataGrid;
 
-namespace Ntreev.Crema.Presentation.Controls
+namespace JSSoft.Crema.Presentation.Controls
 {
     [TemplatePart(Name = PART_Grid, Type = typeof(Grid))]
     public class DiffVertMinimap : Control

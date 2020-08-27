@@ -15,14 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services.Data;
-using Ntreev.Crema.Services.Domains;
-using Ntreev.Crema.Services.Properties;
-using Ntreev.Crema.Services.Users;
-using Ntreev.Library;
-using Ntreev.Library.Linq;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services.Data;
+using JSSoft.Crema.Services.Domains;
+using JSSoft.Crema.Services.Properties;
+using JSSoft.Crema.Services.Users;
+using JSSoft.Library;
+using JSSoft.Library.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -32,7 +32,7 @@ using System.Security;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     [Export(typeof(ILogService))]
     [InheritedExport(typeof(ICremaHost))]

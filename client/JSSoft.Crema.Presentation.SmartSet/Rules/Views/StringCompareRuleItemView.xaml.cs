@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.SmartSet.Rules.Views
+namespace JSSoft.Crema.Presentation.SmartSet.Rules.Views
 {
     /// <summary>
     /// StringCompareRuleItemView.xaml에 대한 상호 작용 논리

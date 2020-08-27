@@ -16,8 +16,8 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using JSSoft.Communication;
-using Ntreev.Crema.ServiceHosts;
-using Ntreev.Crema.ServiceModel;
+using JSSoft.Crema.ServiceHosts;
+using JSSoft.Crema.ServiceModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +27,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Ntreev.Crema.Tools.Framework
+namespace JSSoft.Crema.Tools.Framework
 {
     class CremaServiceContext : ClientContextBase
     {

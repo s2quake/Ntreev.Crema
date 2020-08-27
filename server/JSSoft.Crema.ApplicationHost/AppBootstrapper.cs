@@ -15,13 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.ModernUI.Framework;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 
-namespace Ntreev.Crema.ApplicationHost
+namespace JSSoft.Crema.ApplicationHost
 {
     class AppBootstrapper : AppBootstrapperBase
     {
@@ -29,8 +29,8 @@ namespace Ntreev.Crema.ApplicationHost
 
         static AppBootstrapper()
         {
-            themes.Add("dark", new Uri("/Ntreev.ModernUI.Framework;component/Assets/ModernUI.Dark.xaml", UriKind.Relative));
-            themes.Add("light", new Uri("/Ntreev.ModernUI.Framework;component/Assets/ModernUI.Light.xaml", UriKind.Relative));
+            themes.Add("dark", new Uri("/JSSoft.ModernUI.Framework;component/Assets/ModernUI.Dark.xaml", UriKind.Relative));
+            themes.Add("light", new Uri("/JSSoft.ModernUI.Framework;component/Assets/ModernUI.Light.xaml", UriKind.Relative));
         }
 
         public AppBootstrapper()

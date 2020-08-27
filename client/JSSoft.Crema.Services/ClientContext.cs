@@ -1,6 +1,6 @@
 ﻿using JSSoft.Communication;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     class ClientContext : ClientContextBase
     {

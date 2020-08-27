@@ -26,7 +26,7 @@ TestResults/
 /vscode/typescript/sample/*.js
 /vscode/typescript/sample/*.js.map
 /cpp/.vs
-/cpp/Ntreev.Crema.Reader/lib
+/cpp/JSSoft.Crema.Reader/lib
 /*.cremaresx
 /*.htm
 /build

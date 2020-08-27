@@ -18,13 +18,13 @@
 using System;
 using Xceed.Wpf.AvalonDock.Themes;
 
-namespace Ntreev.Crema.Presentation.Assets
+namespace JSSoft.Crema.Presentation.Assets
 {
     public class AvalonDockTheme : Theme
     {
         public override Uri GetResourceUri()
         {
-            return new Uri("/Ntreev.Crema.Presentation;component/Assets/AvalonDocks/Theme.xaml", UriKind.Relative);
+            return new Uri("/JSSoft.Crema.Presentation;component/Assets/AvalonDocks/Theme.xaml", UriKind.Relative);
         }
 
         public Uri Source

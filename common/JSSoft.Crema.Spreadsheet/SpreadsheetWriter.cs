@@ -16,15 +16,15 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using ClosedXML.Excel;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml.Schema;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Data.Xml.Schema;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Ntreev.Crema.Spreadsheet
+namespace JSSoft.Crema.Spreadsheet
 {
     public class SpreadsheetWriter : IDisposable
     {

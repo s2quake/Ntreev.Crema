@@ -18,7 +18,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services.Extensions
+namespace JSSoft.Crema.Services.Extensions
 {
     public static class DomainCollectionExtensions
     {

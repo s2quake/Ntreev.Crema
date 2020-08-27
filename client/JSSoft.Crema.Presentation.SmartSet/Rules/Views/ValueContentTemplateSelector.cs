@@ -19,7 +19,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.SmartSet.Rules.Views
+namespace JSSoft.Crema.Presentation.SmartSet.Rules.Views
 {
     class ValueContentTemplateSelector : DataTemplateSelector
     {

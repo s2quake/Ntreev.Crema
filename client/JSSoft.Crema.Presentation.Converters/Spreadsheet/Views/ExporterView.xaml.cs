@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.Views
+namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.Views
 {
     /// <summary>
     /// ExportInfoControl.xaml에 대한 상호 작용 논리

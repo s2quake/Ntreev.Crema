@@ -16,13 +16,13 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using FirstFloor.ModernUI.Presentation;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
 using System;
 using System.Collections.Generic;
 using System.Windows.Media;
 
-namespace Ntreev.Crema.Presentation.Framework
+namespace JSSoft.Crema.Presentation.Framework
 {
     public static class IDomainUserExtensions
     {

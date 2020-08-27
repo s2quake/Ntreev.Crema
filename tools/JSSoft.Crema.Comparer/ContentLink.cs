@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Comparer
+namespace JSSoft.Crema.Comparer
 {
     class ContentLink : Link
     {

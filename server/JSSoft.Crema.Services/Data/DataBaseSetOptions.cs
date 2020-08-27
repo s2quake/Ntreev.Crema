@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Services.Data
+namespace JSSoft.Crema.Services.Data
 {
     [Flags]
     enum DataBaseSetOptions

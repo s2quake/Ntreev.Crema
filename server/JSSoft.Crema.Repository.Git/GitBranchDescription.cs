@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Repository.Git
+namespace JSSoft.Crema.Repository.Git
 {
     struct GitBranchDescription
     {

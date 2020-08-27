@@ -22,11 +22,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Runtime.Generation.Cpp.CodeDom;
-using Ntreev.Crema.Data;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Crema.Runtime.Generation.Cpp.CodeDom;
+using JSSoft.Crema.Data;
 
-namespace Ntreev.Crema.Runtime.Generation.Cpp
+namespace JSSoft.Crema.Runtime.Generation.Cpp
 {
     static class CremaTableClassCreator
     {

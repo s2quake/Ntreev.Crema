@@ -23,7 +23,7 @@ using System.Windows.Input;
 using Xceed.Wpf.DataGrid;
 using Xceed.Wpf.DataGrid.Views;
 
-namespace Ntreev.Crema.Presentation.Controls
+namespace JSSoft.Crema.Presentation.Controls
 {
     public class DiffHorzScrollBar : ScrollBar
     {

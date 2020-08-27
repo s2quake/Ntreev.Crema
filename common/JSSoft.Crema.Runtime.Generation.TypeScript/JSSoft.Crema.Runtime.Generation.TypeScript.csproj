@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
  <ItemGroup>
-    <ProjectReference Include="..\Ntreev.Crema.Runtime.Generation\Ntreev.Crema.Runtime.Generation.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.Runtime.Generation\JSSoft.Crema.Runtime.Generation.csproj" />
   </ItemGroup>
 </Project>

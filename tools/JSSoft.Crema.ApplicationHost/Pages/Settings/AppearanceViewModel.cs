@@ -24,7 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace Ntreev.Crema.ApplicationHost.Pages.Settings
+namespace JSSoft.Crema.ApplicationHost.Pages.Settings
 {
     /// <summary>
     /// A simple view model for configuring theme, font and accent colors.

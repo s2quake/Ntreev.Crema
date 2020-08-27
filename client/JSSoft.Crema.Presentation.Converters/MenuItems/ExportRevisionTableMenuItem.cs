@@ -16,18 +16,18 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Ntreev.Crema.Presentation.Converters.Properties;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.Spreadsheet;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Presentation.Converters.Properties;
+using JSSoft.Crema.Services;
+using JSSoft.Crema.Spreadsheet;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Presentation.Converters.MenuItems
+namespace JSSoft.Crema.Presentation.Converters.MenuItems
 {
     [Export(typeof(IMenuItem))]
-    [ParentType("Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels.LogInfoViewModel, Ntreev.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels.LogInfoViewModel, JSSoft.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class ExportRevisionTableMenuItem : MenuItemBase
     {
         private readonly Authenticator authenticator;

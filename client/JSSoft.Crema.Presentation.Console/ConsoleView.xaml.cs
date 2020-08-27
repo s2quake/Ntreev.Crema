@@ -15,15 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Javascript;
-using Ntreev.Crema.Presentation.Framework;
+using JSSoft.Crema.Javascript;
+using JSSoft.Crema.Presentation.Framework;
 using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Console
+namespace JSSoft.Crema.Presentation.Console
 {
     /// <summary>
     /// ConsoleView.xaml에 대한 상호 작용 논리

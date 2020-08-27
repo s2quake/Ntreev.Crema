@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Presentation.SmartSet
+namespace JSSoft.Crema.Presentation.SmartSet
 {
     public interface IRule
     {

@@ -15,12 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Spreadsheet;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Spreadsheet;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System.Linq;
 
-namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.ViewModels
+namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.ViewModels
 {
     class SpreadsheetTreeViewItemViewModel : CheckableTreeViewItemViewModel
     {

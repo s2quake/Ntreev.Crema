@@ -15,9 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.ModernUI.Framework.ViewModels;
 
-namespace Ntreev.Crema.Presentation.Converters.Spreadsheet.ViewModels
+namespace JSSoft.Crema.Presentation.Converters.Spreadsheet.ViewModels
 {
     class SheetTreeViewItemViewModel : CheckableTreeViewItemViewModel
     {

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Ntreev.Library.Random;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library.IO;
+using JSSoft.Library.Random;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Library.IO;
 
-namespace Ntreev.Crema.ServerService.Test
+namespace JSSoft.Crema.ServerService.Test
 {
     static class CremaSimpleGenerator
     {

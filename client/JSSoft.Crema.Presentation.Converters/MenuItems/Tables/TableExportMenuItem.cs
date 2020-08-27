@@ -15,17 +15,17 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Converters.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.Converters.Properties;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Presentation.Converters.Dialogs.ViewModels;
+using JSSoft.Crema.Presentation.Converters.Properties;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.ModernUI.Framework;
 using System.ComponentModel.Composition;
 
-namespace Ntreev.Crema.Presentation.Converters.MenuItems.Tables
+namespace JSSoft.Crema.Presentation.Converters.MenuItems.Tables
 {
     [Export(typeof(IMenuItem))]
-    [ParentType("Ntreev.Crema.Presentation.Tables.BrowserItems.ViewModels.TableTreeViewItemViewModel, Ntreev.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+    [ParentType("JSSoft.Crema.Presentation.Tables.BrowserItems.ViewModels.TableTreeViewItemViewModel, JSSoft.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
     class TableExportMenuItem : MenuItemBase
     {
         private readonly Authenticator authenticator;

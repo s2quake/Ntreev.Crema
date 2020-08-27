@@ -15,13 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
-using Ntreev.Crema.Presentation.Differences.Properties;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Library;
-using Ntreev.Library.Linq;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Presentation.Differences.BrowserItems.ViewModels;
+using JSSoft.Crema.Presentation.Differences.Properties;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Library;
+using JSSoft.Library.Linq;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -29,7 +29,7 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 
-namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
+namespace JSSoft.Crema.Presentation.Differences.PropertyItems.ViewModels
 {
     [Export(typeof(IPropertyItem))]
     [ParentType(typeof(PropertyService))]

@@ -17,7 +17,7 @@
 
 using System.Reflection;
 
-namespace Ntreev.Crema.Runtime.Generation
+namespace JSSoft.Crema.Runtime.Generation
 {
     public interface ICodePropertyProvider
     {

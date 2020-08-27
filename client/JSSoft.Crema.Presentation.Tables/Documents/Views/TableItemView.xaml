@@ -16,21 +16,21 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ====================================================================================================================-->
-<UserControl x:Class="Ntreev.Crema.Presentation.Tables.Documents.Views.TableItemView"
+<UserControl x:Class="JSSoft.Crema.Presentation.Tables.Documents.Views.TableItemView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Ntreev.Crema.Presentation.Tables.Documents.Views"
-             xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-             xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Tables.Properties"
+             xmlns:local="clr-namespace:JSSoft.Crema.Presentation.Tables.Documents.Views"
+             xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+             xmlns:p="clr-namespace:JSSoft.Crema.Presentation.Tables.Properties"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="400">
 
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Ntreev.Crema.Presentation.Tables;component/Documents/Assets/TableSourceControl.xaml" />
+                <ResourceDictionary Source="/JSSoft.Crema.Presentation.Tables;component/Documents/Assets/TableSourceControl.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <Style x:Key="ReadOnly_TextBlock_Style" TargetType="{x:Type TextBlock}">
@@ -43,7 +43,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                 </Style.Triggers>
             </Style>
 
-            <Style x:Key="SelectParent_IconButton_Style" TargetType="{x:Type nmfc:IconButton}" BasedOn="{StaticResource ToolBar_IconButton_Style}">
+            <Style x:Key="SelectParent_IconButton_Style" TargetType="{x:Type jmfc:IconButton}" BasedOn="{StaticResource ToolBar_IconButton_Style}">
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding HasParent}" Value="False">
                         <Setter Property="Visibility" Value="Collapsed" />
@@ -68,13 +68,13 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
         <TextBlock Grid.Row="0" Text="{x:Static p:Resources.Message_IsReadOnly}" Style="{StaticResource ReadOnly_TextBlock_Style}" />
 
-        <nmfc:ModernToolBar Grid.Row="1" ItemsSource="{Binding ToolBarMenus}">
-            <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/new.png" Style="{StaticResource ToolBar_IconButton_Style}"
+        <jmfc:ModernToolBar Grid.Row="1" ItemsSource="{Binding ToolBarMenus}">
+            <jmfc:IconButton Source="/JSSoft.Crema.Presentation.Tables;component/Images/new.png" Style="{StaticResource ToolBar_IconButton_Style}"
                              Command="{Binding InsertCommand}" />
-            <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/insert-many.png" Style="{StaticResource ToolBar_IconButton_Style}"
+            <jmfc:IconButton Source="/JSSoft.Crema.Presentation.Tables;component/Images/insert-many.png" Style="{StaticResource ToolBar_IconButton_Style}"
                              Command="{x:Static local:TableItemView.InsertManyCommand}" />
-            <nmfc:IconButton Source="/Ntreev.Crema.Presentation.Tables;component/Images/parent.png" x:Name="SelectParent" Style="{StaticResource SelectParent_IconButton_Style}" />
-        </nmfc:ModernToolBar>
+            <jmfc:IconButton Source="/JSSoft.Crema.Presentation.Tables;component/Images/parent.png" x:Name="SelectParent" Style="{StaticResource SelectParent_IconButton_Style}" />
+        </jmfc:ModernToolBar>
         <Border Grid.Row="2" BorderThickness="0 1 0 0" BorderBrush="{DynamicResource ItemBorder}">
             <local:TableSourceControl x:Name="dataTableControl" 
                                       Loaded="DataTableControl_Loaded"

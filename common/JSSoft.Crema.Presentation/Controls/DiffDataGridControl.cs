@@ -15,11 +15,11 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data.Diff;
-using Ntreev.Crema.Presentation.Controls.Actions;
-using Ntreev.Library;
-using Ntreev.Library.Linq;
-using Ntreev.ModernUI.Framework.DataGrid.Controls;
+using JSSoft.Crema.Data.Diff;
+using JSSoft.Crema.Presentation.Controls.Actions;
+using JSSoft.Library;
+using JSSoft.Library.Linq;
+using JSSoft.ModernUI.Framework.DataGrid.Controls;
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -33,7 +33,7 @@ using System.Windows.Input;
 using Xceed.Wpf.DataGrid;
 using Xceed.Wpf.DataGrid.Views;
 
-namespace Ntreev.Crema.Presentation.Controls
+namespace JSSoft.Crema.Presentation.Controls
 {
     public class DiffDataGridControl : ModernDataGridControl
     {

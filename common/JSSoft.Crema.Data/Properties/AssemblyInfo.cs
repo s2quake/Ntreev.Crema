@@ -17,4 +17,4 @@
 
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Ntreev.Crema.Data.Diff")]
+[assembly: InternalsVisibleTo("JSSoft.Crema.Data.Diff")]

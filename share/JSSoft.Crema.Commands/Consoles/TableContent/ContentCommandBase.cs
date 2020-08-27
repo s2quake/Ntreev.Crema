@@ -16,12 +16,12 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Newtonsoft.Json.Schema;
-using Ntreev.Crema.Commands.Consoles.Serializations;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Services;
+using JSSoft.Crema.Commands.Consoles.Serializations;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Services;
 using System.Linq;
 
-namespace Ntreev.Crema.Commands.Consoles.TableContent
+namespace JSSoft.Crema.Commands.Consoles.TableContent
 {
     abstract class ContentCommandBase : ConsoleCommandAsyncBase
     {

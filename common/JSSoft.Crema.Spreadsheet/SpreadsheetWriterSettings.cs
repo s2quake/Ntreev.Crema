@@ -18,7 +18,7 @@
 using System;
 using System.Collections;
 
-namespace Ntreev.Crema.Spreadsheet
+namespace JSSoft.Crema.Spreadsheet
 {
     public class SpreadsheetWriterSettings
     {

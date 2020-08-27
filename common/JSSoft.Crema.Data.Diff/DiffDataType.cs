@@ -15,15 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data.Properties;
-using Ntreev.Library;
+using JSSoft.Crema.Data.Properties;
+using JSSoft.Library;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
 
-namespace Ntreev.Crema.Data.Diff
+namespace JSSoft.Crema.Data.Diff
 {
     public sealed class DiffDataType : INotifyPropertyChanged
     {

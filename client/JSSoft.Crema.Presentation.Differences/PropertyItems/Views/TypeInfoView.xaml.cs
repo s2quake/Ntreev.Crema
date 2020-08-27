@@ -15,9 +15,9 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.ModernUI.Framework.Controls;
+using JSSoft.ModernUI.Framework.Controls;
 
-namespace Ntreev.Crema.Presentation.Differences.PropertyItems.Views
+namespace JSSoft.Crema.Presentation.Differences.PropertyItems.Views
 {
     /// <summary>
     /// TypeInfoView.xaml에 대한 상호 작용 논리

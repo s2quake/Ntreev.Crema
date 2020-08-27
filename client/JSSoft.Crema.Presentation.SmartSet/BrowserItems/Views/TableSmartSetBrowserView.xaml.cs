@@ -19,7 +19,7 @@ using System.ComponentModel.Composition;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.SmartSet.BrowserItems.Views
+namespace JSSoft.Crema.Presentation.SmartSet.BrowserItems.Views
 {
     partial class TableSmartSetBrowserView : UserControl
     {

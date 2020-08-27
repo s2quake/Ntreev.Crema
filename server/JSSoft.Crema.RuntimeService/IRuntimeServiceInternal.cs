@@ -16,11 +16,11 @@
 ////OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 //using JSSoft.Communication;
-//using Ntreev.Crema.Runtime.Generation;
-//using Ntreev.Crema.Runtime.Serialization;
-//using Ntreev.Crema.ServiceModel;
+//using JSSoft.Crema.Runtime.Generation;
+//using JSSoft.Crema.Runtime.Serialization;
+//using JSSoft.Crema.ServiceModel;
 
-//namespace Ntreev.Crema.RuntimeService
+//namespace JSSoft.Crema.RuntimeService
 //{
 //    // [ServiceContract(Namespace = CremaService.Namespace)]
 //    [ServiceContract]

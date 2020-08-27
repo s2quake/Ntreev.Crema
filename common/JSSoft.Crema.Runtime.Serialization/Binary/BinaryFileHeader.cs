@@ -17,7 +17,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace Ntreev.Crema.Runtime.Serialization.Binary
+namespace JSSoft.Crema.Runtime.Serialization.Binary
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct BinaryFileHeader

@@ -15,22 +15,22 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Commands.Consoles.Properties;
-using Ntreev.Crema.Commands.Consoles.Serializations;
-using Ntreev.Crema.Commands.Consoles.TypeTemplate;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Crema.Services;
-using Ntreev.Crema.Services.Extensions;
-using Ntreev.Library;
-using Ntreev.Library.Commands;
-using Ntreev.Library.IO;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Crema.Commands.Consoles.Properties;
+using JSSoft.Crema.Commands.Consoles.Serializations;
+using JSSoft.Crema.Commands.Consoles.TypeTemplate;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Crema.Services;
+using JSSoft.Crema.Services.Extensions;
+using JSSoft.Library;
+using JSSoft.Library.Commands;
+using JSSoft.Library.IO;
+using JSSoft.Library.ObjectModel;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Commands.Consoles
+namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceDescription("Resources", IsShared = true)]

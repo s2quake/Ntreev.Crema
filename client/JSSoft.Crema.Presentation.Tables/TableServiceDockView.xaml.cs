@@ -18,7 +18,7 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.Presentation.Tables
+namespace JSSoft.Crema.Presentation.Tables
 {
     /// <summary>
     /// TableServiceDockView.xaml에 대한 상호 작용 논리

@@ -15,15 +15,15 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library.Commands;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Configuration.Install;
 using System.IO;
 
-namespace Ntreev.Crema.WindowsServiceHost
+namespace JSSoft.Crema.WindowsServiceHost
 {
     [Export(typeof(ICommand))]
     [Summary("윈도우 서비스 설치/제거를 위한 명령을 제공합니다.")]

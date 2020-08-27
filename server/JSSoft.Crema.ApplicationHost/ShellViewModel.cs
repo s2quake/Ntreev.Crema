@@ -16,11 +16,11 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Ntreev.Crema.ServiceHosts;
-using Ntreev.Crema.Services;
-using Ntreev.Library;
-using Ntreev.Library.IO;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.ServiceHosts;
+using JSSoft.Crema.Services;
+using JSSoft.Library;
+using JSSoft.Library.IO;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -28,7 +28,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.ApplicationHost
+namespace JSSoft.Crema.ApplicationHost
 {
     [Export(typeof(IShell))]
     class ShellViewModel : ScreenBase, IShell

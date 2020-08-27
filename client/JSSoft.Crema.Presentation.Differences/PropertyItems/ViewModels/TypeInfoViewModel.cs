@@ -15,13 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
-using Ntreev.Crema.Presentation.Differences.Properties;
-using Ntreev.Crema.Presentation.Framework;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Presentation.Differences.BrowserItems.ViewModels;
+using JSSoft.Crema.Presentation.Differences.Properties;
+using JSSoft.Crema.Presentation.Framework;
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
+namespace JSSoft.Crema.Presentation.Differences.PropertyItems.ViewModels
 {
     abstract class TypeInfoViewModel : PropertyItemBase
     {

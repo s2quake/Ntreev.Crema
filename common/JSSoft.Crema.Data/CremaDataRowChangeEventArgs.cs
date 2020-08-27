@@ -18,7 +18,7 @@
 using System;
 using System.Data;
 
-namespace Ntreev.Crema.Data
+namespace JSSoft.Crema.Data
 {
     public class CremaDataRowChangeEventArgs : EventArgs
     {

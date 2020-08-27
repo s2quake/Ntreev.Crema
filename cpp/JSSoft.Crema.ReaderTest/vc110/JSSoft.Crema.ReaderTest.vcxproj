@@ -61,7 +61,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\Ntreev.Crema.Reader\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\JSSoft.Crema.Reader\include</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
@@ -80,7 +80,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\Ntreev.Crema.Reader\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\JSSoft.Crema.Reader\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,7 +112,7 @@
     <None Include="..\data\sample.dat" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Ntreev.Crema.Reader\vc110\ntreev-crema-reader-vc110.vcxproj">
+    <ProjectReference Include="..\..\JSSoft.Crema.Reader\vc110\ntreev-crema-reader-vc110.vcxproj">
       <Project>{31bd19bc-e2e7-4fff-aedd-30ca13b1013c}</Project>
     </ProjectReference>
   </ItemGroup>

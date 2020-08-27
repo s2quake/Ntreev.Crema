@@ -15,13 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data.Diff;
-using Ntreev.Crema.Presentation.Differences.BrowserItems.ViewModels;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Crema.Data.Diff;
+using JSSoft.Crema.Presentation.Differences.BrowserItems.ViewModels;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System;
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Presentation.Differences.PropertyItems.ViewModels
+namespace JSSoft.Crema.Presentation.Differences.PropertyItems.ViewModels
 {
     public class TemplateUnresolvedItemListBoxItemViewModel : ListBoxItemViewModel
     {

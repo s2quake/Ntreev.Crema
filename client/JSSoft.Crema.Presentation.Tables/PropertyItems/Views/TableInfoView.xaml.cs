@@ -18,7 +18,7 @@
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace Ntreev.Crema.Presentation.Tables.PropertyItems.Views
+namespace JSSoft.Crema.Presentation.Tables.PropertyItems.Views
 {
     partial class TableInfoView : UserControl
     {

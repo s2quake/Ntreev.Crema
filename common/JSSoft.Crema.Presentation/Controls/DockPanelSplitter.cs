@@ -20,8 +20,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-/// 네임스페이스 변경 PropertyTools.Wpf -> Ntreev.Crema.Presentation.Controls
-namespace Ntreev.Crema.Presentation.Controls
+/// 네임스페이스 변경 PropertyTools.Wpf -> JSSoft.Crema.Presentation.Controls
+namespace JSSoft.Crema.Presentation.Controls
 //namespace PropertyTools.Wpf
 {
     /// <summary>

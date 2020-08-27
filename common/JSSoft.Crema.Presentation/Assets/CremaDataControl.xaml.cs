@@ -15,13 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Controls;
-using Ntreev.ModernUI.Framework.DataGrid.Controls;
+using JSSoft.Crema.Presentation.Controls;
+using JSSoft.ModernUI.Framework.DataGrid.Controls;
 using System;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Assets
+namespace JSSoft.Crema.Presentation.Assets
 {
     partial class CremaDataControl : ResourceDictionary
     {

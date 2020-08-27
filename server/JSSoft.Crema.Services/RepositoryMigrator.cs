@@ -15,16 +15,16 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Services.Properties;
-using Ntreev.Crema.Services.Users.Serializations;
-using Ntreev.Library;
-using Ntreev.Library.IO;
+using JSSoft.Crema.Services.Properties;
+using JSSoft.Crema.Services.Users.Serializations;
+using JSSoft.Library;
+using JSSoft.Library.IO;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     class RepositoryMigrator
     {
@@ -136,7 +136,7 @@ namespace Ntreev.Crema.Services
             this.logService.Info($" - export {CremaString.Users}.xml");
             this.Run($"export \"{userUrl}\" \"{this.basePath}\" --force");
 
-            var userContext = Ntreev.Library.Serialization.DataContractSerializerUtility.Read<UserContextSerializationInfo>(userPath);
+            var userContext = JSSoft.Library.Serialization.DataContractSerializerUtility.Read<UserContextSerializationInfo>(userPath);
             var tempPath = PathUtility.GetTempPath(true);
             try
             {

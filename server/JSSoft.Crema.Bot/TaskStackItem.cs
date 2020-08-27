@@ -1,4 +1,4 @@
-﻿namespace Ntreev.Crema.Bot
+﻿namespace JSSoft.Crema.Bot
 {
     public struct TaskStackItem
     {

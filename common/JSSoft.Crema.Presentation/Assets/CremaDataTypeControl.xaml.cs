@@ -17,7 +17,7 @@
 
 using System.Windows;
 
-namespace Ntreev.Crema.Presentation.Assets
+namespace JSSoft.Crema.Presentation.Assets
 {
     partial class CremaDataTypeControl : ResourceDictionary
     {

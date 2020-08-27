@@ -21,7 +21,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Designer.ViewModels
+namespace JSSoft.Crema.Designer.ViewModels
 {
     class TypeNameItemViewModel
     {

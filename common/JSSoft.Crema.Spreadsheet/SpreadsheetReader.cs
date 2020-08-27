@@ -18,14 +18,14 @@
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using Ntreev.Crema.Data;
-using Ntreev.Crema.Data.Xml.Schema;
+using JSSoft.Crema.Data;
+using JSSoft.Crema.Data.Xml.Schema;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Ntreev.Crema.Spreadsheet
+namespace JSSoft.Crema.Spreadsheet
 {
     public class SpreadsheetReader : IDisposable
     {

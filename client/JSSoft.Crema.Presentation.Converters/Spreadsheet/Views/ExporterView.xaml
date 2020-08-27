@@ -16,24 +16,24 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ====================================================================================================================-->
-<UserControl x:Class="Ntreev.Crema.Presentation.Converters.Spreadsheet.Views.ExporterView"
+<UserControl x:Class="JSSoft.Crema.Presentation.Converters.Spreadsheet.Views.ExporterView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-             xmlns:p="clr-namespace:Ntreev.Crema.Presentation.Converters.Properties"
+             xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+             xmlns:p="clr-namespace:JSSoft.Crema.Presentation.Converters.Properties"
              mc:Ignorable="d" d:DesignWidth="300">
 
-    <nmfc:PropertyItemsControl DockPanel.Dock="Top" HeaderWidth="auto">
-        <Grid nmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_Path}" >
+    <jmfc:PropertyItemsControl DockPanel.Dock="Top" HeaderWidth="auto">
+        <Grid jmfc:PropertyItemsControl.Header="{x:Static p:Resources.Label_Path}" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="4" />
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
             <TextBox Grid.Column="0" Text="{Binding OutputPath, Delay=600, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Stretch" />
-            <nmfc:ErrorBlinker x:Name="errorBlinker" Grid.Column="0" 
+            <jmfc:ErrorBlinker x:Name="errorBlinker" Grid.Column="0" 
                                Style="{StaticResource ImageErrorBlinker_Style}" />
             <Button x:Name="SelectPath" Grid.Column="2" Content="..." />
         </Grid>
@@ -59,6 +59,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         </Grid>
         <CheckBox IsChecked="{Binding Settings.OmitAttribute, Mode=TwoWay}" Content="{x:Static p:Resources.Label_OmitAttribute}" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
         <CheckBox IsChecked="{Binding Settings.OmitSignatureDate, Mode=TwoWay}" Content="{x:Static p:Resources.Label_OmitSignatureDate}" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
-    </nmfc:PropertyItemsControl>
+    </jmfc:PropertyItemsControl>
 
 </UserControl>

@@ -19,7 +19,7 @@ using System;
 using System.Collections;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Presentation.Framework
+namespace JSSoft.Crema.Presentation.Framework
 {
     public interface IShell
     {

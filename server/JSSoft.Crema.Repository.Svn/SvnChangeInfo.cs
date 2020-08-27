@@ -17,7 +17,7 @@
 
 using System.Xml.Linq;
 
-namespace Ntreev.Crema.Repository.Svn
+namespace JSSoft.Crema.Repository.Svn
 {
     struct SvnChangeInfo
     {

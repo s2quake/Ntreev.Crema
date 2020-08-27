@@ -1,5 +1,5 @@
-﻿using Ntreev.ModernUI.Framework.Controls;
-using Ntreev.ModernUI.Framework.DataGrid.Controls;
+﻿using JSSoft.ModernUI.Framework.Controls;
+using JSSoft.ModernUI.Framework.DataGrid.Controls;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,7 +23,7 @@ using System.Windows.Threading;
 using System.Xml.Linq;
 using Xceed.Wpf.DataGrid;
 
-namespace Ntreev.Crema.Presentation.Framework.Controls
+namespace JSSoft.Crema.Presentation.Framework.Controls
 {
     /// <summary>
     /// DataTableControl.xaml에 대한 상호 작용 논리

@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.SmartSet.Dialogs.Views
+namespace JSSoft.Crema.Presentation.SmartSet.Dialogs.Views
 {
     partial class AddBookmarkItemView : UserControl
     {

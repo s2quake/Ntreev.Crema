@@ -17,7 +17,7 @@
 
 using System.ComponentModel;
 
-namespace Ntreev.Crema.Javascript.Methods.TableTemplate
+namespace JSSoft.Crema.Javascript.Methods.TableTemplate
 {
     [Category(nameof(TableTemplate))]
     enum TableProperties

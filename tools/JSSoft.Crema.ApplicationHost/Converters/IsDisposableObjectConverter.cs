@@ -23,7 +23,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace Ntreev.Crema.ApplicationHost.Converters
+namespace JSSoft.Crema.ApplicationHost.Converters
 {
     class IsDisposableObjectConverter : IValueConverter
     {

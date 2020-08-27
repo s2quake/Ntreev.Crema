@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Tables.PropertyItems.Views
+namespace JSSoft.Crema.Presentation.Tables.PropertyItems.Views
 {
     partial class DerivedTablesView : UserControl
     {

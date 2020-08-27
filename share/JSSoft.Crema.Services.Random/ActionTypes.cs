@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Services.Random
+namespace JSSoft.Crema.Services.Random
 {
     [Flags]
     public enum ActionTypes

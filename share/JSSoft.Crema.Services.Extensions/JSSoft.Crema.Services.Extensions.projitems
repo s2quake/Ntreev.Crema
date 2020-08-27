@@ -6,7 +6,7 @@
     <SharedGUID>97ad6c00-3b71-4e83-97c3-0201bc035471</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>Ntreev.Crema.Services.Extensions</Import_RootNamespace>
+    <Import_RootNamespace>JSSoft.Crema.Services.Extensions</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)DataBaseContextExtensions.cs" />

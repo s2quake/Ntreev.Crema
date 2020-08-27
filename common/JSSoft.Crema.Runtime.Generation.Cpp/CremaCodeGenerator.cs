@@ -16,10 +16,10 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.CSharp;
-using Ntreev.Crema.Runtime.Generation;
-using Ntreev.Crema.Runtime.Generation.Cpp.Properties;
-using Ntreev.Library;
-using Ntreev.Library.IO;
+using JSSoft.Crema.Runtime.Generation;
+using JSSoft.Crema.Runtime.Generation.Cpp.Properties;
+using JSSoft.Library;
+using JSSoft.Library.IO;
 using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
@@ -32,7 +32,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Runtime.Generation.Cpp
+namespace JSSoft.Crema.Runtime.Generation.Cpp
 {
     [Export(typeof(ICodeGenerator))]
     sealed class CremaCodeGenerator : ICodeGenerator

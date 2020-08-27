@@ -5,22 +5,22 @@
     <OutputPath>$(ExePath)client\application</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.Presentation\Ntreev.Crema.Presentation.csproj">
+    <ProjectReference Include="..\..\common\JSSoft.Crema.Presentation\JSSoft.Crema.Presentation.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\common\Ntreev.Crema.ServiceModel\Ntreev.Crema.ServiceModel.csproj">
+    <ProjectReference Include="..\..\common\JSSoft.Crema.ServiceModel\JSSoft.Crema.ServiceModel.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Commands\Ntreev.Crema.Commands.csproj">
+    <ProjectReference Include="..\JSSoft.Crema.Commands\JSSoft.Crema.Commands.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Javascript\Ntreev.Crema.Javascript.csproj">
+    <ProjectReference Include="..\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Presentation.Framework\Ntreev.Crema.Presentation.Framework.csproj">
+    <ProjectReference Include="..\JSSoft.Crema.Presentation.Framework\JSSoft.Crema.Presentation.Framework.csproj">
       <Private>false</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Ntreev.Crema.Services\Ntreev.Crema.Services.csproj">
+    <ProjectReference Include="..\JSSoft.Crema.Services\JSSoft.Crema.Services.csproj">
       <Private>false</Private>
     </ProjectReference>
   </ItemGroup>

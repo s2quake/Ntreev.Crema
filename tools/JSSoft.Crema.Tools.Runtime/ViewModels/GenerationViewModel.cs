@@ -16,15 +16,15 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.WindowsAPICodePack.Dialogs;
-using Ntreev.Crema.Runtime.Generation;
-using Ntreev.Crema.Runtime.Serialization;
-using Ntreev.Crema.RuntimeService;
-using Ntreev.Crema.Tools.Framework;
-using Ntreev.Crema.Tools.Framework.Dialogs.ViewModels;
-using Ntreev.Library;
-using Ntreev.Library.IO;
-using Ntreev.ModernUI.Framework;
-using Ntreev.ModernUI.Framework.Dialogs.ViewModels;
+using JSSoft.Crema.Runtime.Generation;
+using JSSoft.Crema.Runtime.Serialization;
+using JSSoft.Crema.RuntimeService;
+using JSSoft.Crema.Tools.Framework;
+using JSSoft.Crema.Tools.Framework.Dialogs.ViewModels;
+using JSSoft.Library;
+using JSSoft.Library.IO;
+using JSSoft.ModernUI.Framework;
+using JSSoft.ModernUI.Framework.Dialogs.ViewModels;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,7 +35,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Tools.Runtime.ViewModels
+namespace JSSoft.Crema.Tools.Runtime.ViewModels
 {
     [Export(typeof(IContent))]
     class GenerationViewModel : ContentBase

@@ -17,7 +17,7 @@
 
 using System.Collections.Generic;
 
-namespace Ntreev.Crema.Presentation.Converters
+namespace JSSoft.Crema.Presentation.Converters
 {
     public interface IImportService
     {

@@ -17,7 +17,7 @@
 
 using JSSoft.Communication;
 
-namespace Ntreev.Crema.ServiceHosts.Data
+namespace JSSoft.Crema.ServiceHosts.Data
 {
     class DataBaseServiceHost : ServerServiceHostBase<IDataBaseService, IDataBaseEventCallback>
     {

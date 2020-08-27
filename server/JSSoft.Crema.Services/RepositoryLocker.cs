@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     class RepositoryLocker : IDisposable
     {

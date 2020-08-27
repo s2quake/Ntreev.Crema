@@ -16,14 +16,14 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Crema.ApplicationHost.Properties;
-using Ntreev.Crema.Presentation.Framework;
+using JSSoft.Crema.ApplicationHost.Properties;
+using JSSoft.Crema.Presentation.Framework;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Windows.Shell;
 
-namespace Ntreev.Crema.ApplicationHost.ViewModels
+namespace JSSoft.Crema.ApplicationHost.ViewModels
 {
     [Export(typeof(IStatusBarService))]
     class StatusBarViewModel : PropertyChangedBase, IStatusBarService

@@ -15,12 +15,12 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library;
-using Ntreev.Library.ObjectModel;
-using Ntreev.ModernUI.Framework.ViewModels;
+using JSSoft.Library;
+using JSSoft.Library.ObjectModel;
+using JSSoft.ModernUI.Framework.ViewModels;
 using System;
 
-namespace Ntreev.Crema.Presentation.Tables.Dialogs.ViewModels
+namespace JSSoft.Crema.Presentation.Tables.Dialogs.ViewModels
 {
     class PreviewTreeViewItemViewModelBuilder : TreeViewItemViewModelBuilder
     {

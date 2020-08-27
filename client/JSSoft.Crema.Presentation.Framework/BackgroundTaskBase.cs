@@ -15,14 +15,14 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Library;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Library;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Ntreev.Crema.Presentation.Framework
+namespace JSSoft.Crema.Presentation.Framework
 {
     public abstract class BackgroundTaskBase : PropertyChangedBase, IBackgroundTask
     {

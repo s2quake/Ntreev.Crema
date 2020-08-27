@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     static class EventLogBuilder
     {

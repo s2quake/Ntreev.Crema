@@ -15,13 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Data.Xml.Schema;
-using Ntreev.Crema.Presentation.Framework.Controls;
+using JSSoft.Crema.Data.Xml.Schema;
+using JSSoft.Crema.Presentation.Framework.Controls;
 using System.Windows;
 using System.Windows.Media;
 using Xceed.Wpf.DataGrid;
 
-namespace Ntreev.Crema.Presentation.Tables.Documents.Views
+namespace JSSoft.Crema.Presentation.Tables.Documents.Views
 {
     class TableSourceDataRow : DomainDataRow
     {

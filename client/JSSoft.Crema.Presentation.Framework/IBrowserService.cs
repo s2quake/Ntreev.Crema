@@ -17,7 +17,7 @@
 
 using System.Collections.Generic;
 
-namespace Ntreev.Crema.Presentation.Framework
+namespace JSSoft.Crema.Presentation.Framework
 {
     public interface IBrowserService
     {

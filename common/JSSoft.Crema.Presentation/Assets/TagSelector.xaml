@@ -18,9 +18,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 ====================================================================================================================-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:nmfv="clr-namespace:Ntreev.ModernUI.Framework.Converters;assembly=Ntreev.ModernUI.Framework"
-                    xmlns:ncpv="clr-namespace:Ntreev.Crema.Presentation.Converters"
-                    xmlns:ncpc="clr-namespace:Ntreev.Crema.Presentation.Controls">
+                    xmlns:jmfv="clr-namespace:JSSoft.ModernUI.Framework.Converters;assembly=JSSoft.ModernUI.Framework"
+                    xmlns:ncpv="clr-namespace:JSSoft.Crema.Presentation.Converters"
+                    xmlns:ncpc="clr-namespace:JSSoft.Crema.Presentation.Controls">
 
     <Geometry x:Key="Checkmark">M 15,21L 22,28L 32.9999,14.0001L 35.9999,17.0001L 22,34L 12.0001,24L 15,21 Z</Geometry>
 

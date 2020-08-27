@@ -16,11 +16,11 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ntreev.Crema.Services.Random;
-using Ntreev.Library;
+using JSSoft.Crema.Services.Random;
+using JSSoft.Library;
 using System.IO;
 
-namespace Ntreev.Crema.Services.Test
+namespace JSSoft.Crema.Services.Test
 {
     [TestClass]
     public class CremaHost_AssemblyInitializer

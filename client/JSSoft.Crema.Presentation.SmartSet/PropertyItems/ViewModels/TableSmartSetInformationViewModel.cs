@@ -21,20 +21,20 @@
 //using System.ComponentModel;
 //using System.ComponentModel.Composition;
 //using Caliburn.Micro;
-//using Ntreev.Crema.Presentation.Framework;
-//using Ntreev.Crema.Services;
-//using Ntreev.Crema.ServiceModel;
+//using JSSoft.Crema.Presentation.Framework;
+//using JSSoft.Crema.Services;
+//using JSSoft.Crema.ServiceModel;
 //using System.Reflection;
-//using Ntreev.ModernUI.Framework;
-//using Ntreev.Crema.Presentation.SmartSet.PropertyItems.Views;
-//using Ntreev.Crema.Presentation.SmartSet.BrowserItems.ViewModels;
+//using JSSoft.ModernUI.Framework;
+//using JSSoft.Crema.Presentation.SmartSet.PropertyItems.Views;
+//using JSSoft.Crema.Presentation.SmartSet.BrowserItems.ViewModels;
 
-//namespace Ntreev.Crema.Presentation.SmartSet.PropertyItems.ViewModels
+//namespace JSSoft.Crema.Presentation.SmartSet.PropertyItems.ViewModels
 //{
 //    [Export(typeof(IPropertyItem))]
 //    [RequiredAuthority(Authority.Guest)]
 //    [View(typeof(SmartSetInformationView))]
-//    [ParentType("Ntreev.Crema.Presentation.Tables.IPropertyService, Ntreev.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
+//    [ParentType("JSSoft.Crema.Presentation.Tables.IPropertyService, JSSoft.Crema.Presentation.Tables, Version=5.0.0.0, Culture=neutral, PublicKeyToken=null")]
 //    class TableSmartSetInformationViewModel : PropertyItemBase
 //    {
 //        private readonly ICremaHost cremaHost;

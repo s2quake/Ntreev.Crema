@@ -16,16 +16,16 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using FirstFloor.ModernUI.Windows.Controls;
-using Ntreev.Crema.ApplicationHost.Commands.Consoles;
-using Ntreev.Crema.ApplicationHost.Controls;
-using Ntreev.Crema.Services;
+using JSSoft.Crema.ApplicationHost.Commands.Consoles;
+using JSSoft.Crema.ApplicationHost.Controls;
+using JSSoft.Crema.Services;
 using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-namespace Ntreev.Crema.ApplicationHost
+namespace JSSoft.Crema.ApplicationHost
 {
     /// <summary>
     /// ShellView.xaml에 대한 상호 작용 논리

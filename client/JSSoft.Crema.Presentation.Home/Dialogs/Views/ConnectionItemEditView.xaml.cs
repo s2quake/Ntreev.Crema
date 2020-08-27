@@ -15,13 +15,13 @@
 //COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using Ntreev.Crema.Presentation.Home.Dialogs.ViewModels;
-using Ntreev.Crema.Presentation.Home.Services.ViewModels;
+using JSSoft.Crema.Presentation.Home.Dialogs.ViewModels;
+using JSSoft.Crema.Presentation.Home.Services.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace Ntreev.Crema.Presentation.Home.Dialogs.Views
+namespace JSSoft.Crema.Presentation.Home.Dialogs.Views
 {
     /// <summary>
     /// ConnectionItemEditView.xaml에 대한 상호 작용 논리

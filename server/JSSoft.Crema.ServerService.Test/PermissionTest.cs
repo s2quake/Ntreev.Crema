@@ -2,15 +2,15 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Linq;
-using Ntreev.Crema.ServiceModel;
-using Ntreev.Library.Random;
+using JSSoft.Crema.ServiceModel;
+using JSSoft.Library.Random;
 using System.Collections.Generic;
-using Ntreev.Library;
-using Ntreev.Library.IO;
-using Ntreev.Library.Linq;
-using Ntreev.Library.ObjectModel;
+using JSSoft.Library;
+using JSSoft.Library.IO;
+using JSSoft.Library.Linq;
+using JSSoft.Library.ObjectModel;
 
-namespace Ntreev.Crema.ServerService.Test
+namespace JSSoft.Crema.ServerService.Test
 {
     [TestClass]
     public class PermissionTest

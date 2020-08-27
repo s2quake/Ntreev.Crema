@@ -20,14 +20,14 @@ using log4net.Appender;
 using log4net.Core;
 using log4net.Layout;
 using log4net.Repository.Hierarchy;
-using Ntreev.Library;
+using JSSoft.Library;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     class LogService : IDisposable
     {

@@ -16,11 +16,11 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using FirstFloor.ModernUI.Windows.Controls;
-using Ntreev.Crema.Presentation.Framework;
-using Ntreev.Crema.Services;
-using Ntreev.Library;
-using Ntreev.Library.IO;
-using Ntreev.ModernUI.Framework;
+using JSSoft.Crema.Presentation.Framework;
+using JSSoft.Crema.Services;
+using JSSoft.Library;
+using JSSoft.Library.IO;
+using JSSoft.ModernUI.Framework;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -32,7 +32,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace Ntreev.Crema.ApplicationHost.Views
+namespace JSSoft.Crema.ApplicationHost.Views
 {
     [Export(typeof(ShellView))]
     public partial class ShellView : ModernWindow, INotifyPropertyChanged
@@ -162,9 +162,9 @@ namespace Ntreev.Crema.ApplicationHost.Views
             var background = this.FindResource("WindowBackground");
 
             if (foreground is SolidColorBrush)
-                Ntreev.Crema.ApplicationHost.Properties.Settings.Default.Foreground = foreground as SolidColorBrush;
+                JSSoft.Crema.ApplicationHost.Properties.Settings.Default.Foreground = foreground as SolidColorBrush;
             if (background is SolidColorBrush)
-                Ntreev.Crema.ApplicationHost.Properties.Settings.Default.Background = background as SolidColorBrush;
+                JSSoft.Crema.ApplicationHost.Properties.Settings.Default.Background = background as SolidColorBrush;
         }
 
         private void CremaAppHost_Unloaded(object sender, EventArgs e)

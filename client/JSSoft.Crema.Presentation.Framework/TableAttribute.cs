@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Presentation.Framework
+namespace JSSoft.Crema.Presentation.Framework
 {
     [Flags]
     public enum TableAttribute

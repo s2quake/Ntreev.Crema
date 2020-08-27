@@ -18,7 +18,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Ntreev.Crema.Services
+namespace JSSoft.Crema.Services
 {
     public interface IDomainCategoryCollection : IReadOnlyCollection<IDomainCategory>, IEnumerable<IDomainCategory>, IServiceProvider, IDispatcherObject
     {

@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Framework.Dialogs.Views
+namespace JSSoft.Crema.Presentation.Framework.Dialogs.Views
 {
     partial class LockView : UserControl
     {

@@ -18,9 +18,9 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 ====================================================================================================================-->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework">
+                    xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework">
 
-    <Style x:Key="TypeImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
+    <Style x:Key="TypeImage_Style" TargetType="{x:Type jmfc:IconImage}" BasedOn="{StaticResource {x:Type jmfc:IconImage}}">
         <Setter Property="Foreground" Value="{DynamicResource WindowText}" />
         <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
         <Setter Property="Source" Value="/cremacomparer;component/Images/type_enum.png" />
@@ -31,13 +31,13 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="TemplateImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
+    <Style x:Key="TemplateImage_Style" TargetType="{x:Type jmfc:IconImage}" BasedOn="{StaticResource {x:Type jmfc:IconImage}}">
         <Setter Property="Foreground" Value="{DynamicResource WindowText}" />
         <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
         <Setter Property="Source" Value="/cremacomparer;component/Images/template.png" />
     </Style>
 
-    <Style x:Key="TableImage_Style" TargetType="{x:Type nmfc:IconImage}" BasedOn="{StaticResource {x:Type nmfc:IconImage}}">
+    <Style x:Key="TableImage_Style" TargetType="{x:Type jmfc:IconImage}" BasedOn="{StaticResource {x:Type jmfc:IconImage}}">
         <Setter Property="Foreground" Value="{DynamicResource WindowText}" />
         <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
         <Setter Property="Source" Value="/cremacomparer;component/Images/table.png" />

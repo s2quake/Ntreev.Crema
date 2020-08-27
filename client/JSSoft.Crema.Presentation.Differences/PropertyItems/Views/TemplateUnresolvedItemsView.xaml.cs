@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Differences.PropertyItems.Views
+namespace JSSoft.Crema.Presentation.Differences.PropertyItems.Views
 {
     /// <summary>
     /// TemplateUnresolvedItemsView.xaml에 대한 상호 작용 논리

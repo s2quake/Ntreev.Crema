@@ -17,7 +17,7 @@
 
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Services.Random
+namespace JSSoft.Crema.Services.Random
 {
     public static class CremaDataCreator
     {

@@ -17,7 +17,7 @@
 
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Users.Dialogs.Views
+namespace JSSoft.Crema.Presentation.Users.Dialogs.Views
 {
     partial class SendMessageView : UserControl
     {

@@ -17,7 +17,7 @@
 
 using Caliburn.Micro;
 
-namespace Ntreev.Crema.Presentation.SmartSet.PropertyItems.ViewModels
+namespace JSSoft.Crema.Presentation.SmartSet.PropertyItems.ViewModels
 {
     public class RuleItemViewModel : PropertyChangedBase
     {

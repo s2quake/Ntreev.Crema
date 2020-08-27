@@ -16,9 +16,9 @@
 //OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Caliburn.Micro;
-using Ntreev.Library;
+using JSSoft.Library;
 
-namespace Ntreev.Crema.Presentation.Converters
+namespace JSSoft.Crema.Presentation.Converters
 {
     public class ExporterSettings : PropertyChangedBase
     {

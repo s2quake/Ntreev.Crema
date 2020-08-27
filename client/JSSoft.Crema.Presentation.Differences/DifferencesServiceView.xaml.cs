@@ -18,7 +18,7 @@
 using System.ComponentModel.Composition;
 using System.Windows.Controls;
 
-namespace Ntreev.Crema.Presentation.Differences
+namespace JSSoft.Crema.Presentation.Differences
 {
     /// <summary>
     /// DifferencesServiceView.xaml에 대한 상호 작용 논리

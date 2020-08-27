@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Runtime.Generation.TypeScript.CodeDom
+namespace JSSoft.Crema.Runtime.Generation.TypeScript.CodeDom
 {
     public class TypeScriptCodeProvider : CodeDomProvider
     {

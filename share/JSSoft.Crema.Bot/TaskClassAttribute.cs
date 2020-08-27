@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Bot
+namespace JSSoft.Crema.Bot
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class TaskClassAttribute : Attribute

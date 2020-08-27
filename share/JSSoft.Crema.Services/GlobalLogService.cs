@@ -18,7 +18,7 @@
 using System.ComponentModel.Composition;
 using System.IO;
 
-namespace Ntreev.Crema.Services.Log
+namespace JSSoft.Crema.Services.Log
 {
     [Export(typeof(ILogService))]
     class GlobalLogService : ILogService

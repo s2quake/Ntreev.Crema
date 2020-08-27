@@ -16,38 +16,38 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ====================================================================================================================-->
-<UserControl x:Class="Ntreev.Crema.Tools.View.Dialogs.Views.ConnectionView"
+<UserControl x:Class="JSSoft.Crema.Tools.View.Dialogs.Views.ConnectionView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:nmfc="clr-namespace:Ntreev.ModernUI.Framework.Controls;assembly=Ntreev.ModernUI.Framework"
-             xmlns:ntfc="clr-namespace:Ntreev.Crema.Tools.Framework.Controls;assembly=Ntreev.Crema.Tools.Framework"
+             xmlns:jmfc="clr-namespace:JSSoft.ModernUI.Framework.Controls;assembly=JSSoft.ModernUI.Framework"
+             xmlns:ntfc="clr-namespace:JSSoft.Crema.Tools.Framework.Controls;assembly=JSSoft.Crema.Tools.Framework"
              mc:Ignorable="d" Width="400">
     <StackPanel x:Name="options" VerticalAlignment="Center" Margin="10">
-        <nmfc:PropertyItemsControl>
-            <TextBox nmfc:PropertyItemsControl.Header="주소(_A)" x:Name="Address"  />
-            <Grid nmfc:PropertyItemsControl.Header="데이터 베이스">
+        <jmfc:PropertyItemsControl>
+            <TextBox jmfc:PropertyItemsControl.Header="주소(_A)" x:Name="Address"  />
+            <Grid jmfc:PropertyItemsControl.Header="데이터 베이스">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="6" />
                     <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="DataBase" nmfc:PropertyItemsControl.Header="데이터 베이스" />
+                <TextBox x:Name="DataBase" jmfc:PropertyItemsControl.Header="데이터 베이스" />
                 <Button x:Name="SelectDataBase" Content="..." Grid.Column="2" />
             </Grid>
-            <Grid nmfc:PropertyItemsControl.Header="필터">
+            <Grid jmfc:PropertyItemsControl.Header="필터">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="6" />
                     <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
-                <TextBox nmfc:PropertyItemsControl.Header="필터" x:Name="FilterExpression" />
+                <TextBox jmfc:PropertyItemsControl.Header="필터" x:Name="FilterExpression" />
                 <Button x:Name="EditFilterExpression" Content="..." Grid.Column="2" />
             </Grid>
-            <ntfc:TagSelector nmfc:PropertyItemsControl.Header="태그" Value="{Binding Tags, Mode=TwoWay}" />
-            <CheckBox x:Name="IsDevmode" nmfc:PropertyItemsControl.Header="개발 형식으로" HorizontalAlignment="Left" ToolTip="편집중인 테이블의 내용을 반영합니다." />
-        </nmfc:PropertyItemsControl>
+            <ntfc:TagSelector jmfc:PropertyItemsControl.Header="태그" Value="{Binding Tags, Mode=TwoWay}" />
+            <CheckBox x:Name="IsDevmode" jmfc:PropertyItemsControl.Header="개발 형식으로" HorizontalAlignment="Left" ToolTip="편집중인 테이블의 내용을 반영합니다." />
+        </jmfc:PropertyItemsControl>
         <Grid HorizontalAlignment="Center" Margin="0 10">
             <Button x:Name="Connect" Content="연결(_C)" IsDefault="True"  />
         </Grid>

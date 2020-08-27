@@ -21,7 +21,7 @@ using System.Runtime.Serialization;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.TypeInspectors;
 
-namespace Ntreev.Crema.ObjectSerializer.Yaml
+namespace JSSoft.Crema.ObjectSerializer.Yaml
 {
     class DataMemberInspector : TypeInspectorSkeleton
     {

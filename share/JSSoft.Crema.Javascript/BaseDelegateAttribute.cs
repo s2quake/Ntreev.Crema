@@ -17,7 +17,7 @@
 
 using System;
 
-namespace Ntreev.Crema.Javascript
+namespace JSSoft.Crema.Javascript
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = true)]
     public sealed class BaseDelegateAttribute : Attribute

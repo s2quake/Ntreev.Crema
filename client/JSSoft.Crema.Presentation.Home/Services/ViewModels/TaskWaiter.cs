@@ -18,7 +18,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Ntreev.Crema.Presentation.Home.Services.ViewModels
+namespace JSSoft.Crema.Presentation.Home.Services.ViewModels
 {
     class TaskWaiter
     {

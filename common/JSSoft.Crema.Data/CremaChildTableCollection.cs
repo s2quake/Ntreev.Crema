@@ -23,7 +23,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 
-namespace Ntreev.Crema.Data
+namespace JSSoft.Crema.Data
 {
     public sealed class CremaChildTableCollection : ICollection, IEnumerable<CremaDataTable>
     {

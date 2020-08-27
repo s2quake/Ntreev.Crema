@@ -23,7 +23,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Ntreev.Crema.Designer.Views
+namespace JSSoft.Crema.Designer.Views
 {
     public class ModernContentLoader : DefaultContentLoader, IContentLoader
     {

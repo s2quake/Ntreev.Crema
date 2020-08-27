@@ -20,7 +20,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using Xceed.Wpf.DataGrid;
 
-namespace Ntreev.Crema.Presentation.Framework.Controls
+namespace JSSoft.Crema.Presentation.Framework.Controls
 {
     public class DomainContentPresenter : ContentPresenter
     {
