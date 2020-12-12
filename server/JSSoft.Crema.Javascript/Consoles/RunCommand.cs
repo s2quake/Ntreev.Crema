@@ -33,13 +33,13 @@ namespace JSSoft.Crema.Javascript.Consoles
     [ResourceDescription("Resources", IsShared = true)]
     class RunCommand : ConsoleCommandBase
     {
-        [Import]
-        private readonly Lazy<ScriptContext> scriptContext = null;
+        private readonly Lazy<ScriptContext> scriptContext;
 
-        public RunCommand()
+        [ImportingConstructor]
+        public RunCommand(Lazy<ScriptContext> scriptContext)
             : base("run")
         {
-
+            this.scriptContext = scriptContext;
         }
 
         [CommandPropertyRequired]

@@ -30,13 +30,13 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
     [ResourceDescription("Resources", IsShared = true)]
     class ExitCommand : ConsoleCommandBase
     {
-        [Import]
-        private readonly Lazy<RunCommand> runCommand = null;
+        private readonly Lazy<RunCommand> runCommand;
 
-        public ExitCommand()
+        [ImportingConstructor]
+        public ExitCommand(Lazy<RunCommand> runCommand)
             : base("exit")
         {
-
+            this.runCommand = runCommand;
         }
 
         protected override void OnExecute()

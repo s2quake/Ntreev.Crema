@@ -33,10 +33,8 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
     [Export(typeof(ConsoleCommandContext))]
     public class ConsoleCommandContext : ConsoleCommandContextBase
     {
-        [Import]
-        private readonly Lazy<ICremaHost> cremaHost = null;
-        [Import]
-        private readonly Lazy<CremaApplication> cremaApp = null;
+        private readonly ICremaHost cremaHost;
+        private readonly CremaApplication cremaApp;
         private Authentication authentication;
 
         [ImportingConstructor]
@@ -45,6 +43,8 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             [ImportMany] IEnumerable<IConsoleCommand> commands)
             : base(rootItems, commands)
         {
+            this.cremaHost = cremaHost;
+            this.cremaApp = cremaHost.GetService(typeof(CremaApplication)) as CremaApplication;
             this.BaseDirectory = cremaHost.GetPath(CremaPath.Documents);
         }
 
@@ -79,10 +79,8 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             this.Release();
         }
 
-        public override ICremaHost CremaHost => this.cremaHost.Value;
+        public override ICremaHost CremaHost => this.cremaHost;
 
-        public override string Address => AddressUtility.GetDisplayAddress($"localhost:{this.CremaApp.Port}");
-
-        private CremaApplication CremaApp => this.cremaApp.Value;
+        public override string Address => AddressUtility.GetDisplayAddress($"localhost:{this.cremaApp.Port}");
     }
 }

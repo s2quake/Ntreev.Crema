@@ -32,4 +32,10 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
     <ProjectReference Include="..\..\..\JSSoft.Library\JSSoft.Library\JSSoft.Library.csproj" />
     <ProjectReference Include="..\JSSoft.Crema.Services\JSSoft.Crema.Services.csproj" />
   </ItemGroup>
+  <Target Name="CopyToConsole" AfterTargets="CopyFilesToOutputDirectory">
+	  <ItemGroup>
+		  <OutputFiles Include="$(OutputPath)**\*.*"></OutputFiles>
+	  </ItemGroup>
+    <Copy SourceFiles="@(OutputFiles)" DestinationFiles="@(OutputFiles -> '$(ExePath)server\console\repo-modules\git\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

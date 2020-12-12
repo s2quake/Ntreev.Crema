@@ -93,7 +93,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             set;
         }
 
-        [CommandProperty("prompt", 'p')]
+        [CommandPropertySwitch("prompt", 'p')]
         [CommandPropertyTrigger(nameof(ScriptPath), "")]
         public bool IsPromptMode
         {

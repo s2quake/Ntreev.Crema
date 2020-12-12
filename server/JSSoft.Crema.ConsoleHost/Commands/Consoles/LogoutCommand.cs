@@ -32,13 +32,13 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
     [ResourceDescription("Resources", IsShared = true)]
     class LogoutCommand : ConsoleCommandAsyncBase
     {
-        [Import]
-        private readonly Lazy<ConsoleCommandContext> commandContext = null;
+        private readonly Lazy<ConsoleCommandContext> commandContext;
 
-        public LogoutCommand()
+        [ImportingConstructor]
+        public LogoutCommand(Lazy<ConsoleCommandContext> commandContext)
             : base("logout")
         {
-
+            this.commandContext = commandContext;
         }
 
         public override bool IsEnabled => this.commandContext.Value.IsOnline;

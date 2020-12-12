@@ -33,13 +33,13 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
     [ResourceDescription("Resources", IsShared = true)]
     class OpenBasePathCommand : ConsoleCommandBase
     {
-        [Import]
-        private readonly Lazy<ICremaHost> cremaHost = null;
+        private readonly Lazy<ICremaHost> cremaHost;
 
-        public OpenBasePathCommand()
+        [ImportingConstructor]
+        public OpenBasePathCommand(Lazy<ICremaHost> cremaHost)
             : base("open-base-path")
         {
-
+            this.cremaHost = cremaHost;
         }
 
         protected override void OnExecute()
