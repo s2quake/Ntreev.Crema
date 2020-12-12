@@ -34,8 +34,7 @@ namespace JSSoft.Crema.ApplicationHost
 
         /// <summary>
         /// </summary>
-        [CommandProperty]
-        [DefaultValue("")]
+        [CommandProperty(InitValue = "")]
         public string BasePath
         {
             get; set;
@@ -56,8 +55,7 @@ namespace JSSoft.Crema.ApplicationHost
         /// <summary>
         /// light or dark
         /// </summary>
-        [CommandProperty]
-        [DefaultValue("")]
+        [CommandProperty(InitValue = "")]
         public string Theme
         {
             get; set;
@@ -66,18 +64,17 @@ namespace JSSoft.Crema.ApplicationHost
         /// <summary>
         /// color as #ffffff
         /// </summary>
-        [CommandProperty("color")]
-        [DefaultValue("")]
+        [CommandProperty("color", InitValue = "")]
         public string ThemeColor
         {
             get; set;
         }
 
-        [CommandProperty]
+
 #if DEBUG
-        [DefaultValue("en-US")]
+        [CommandProperty(InitValue = "en-US")]
 #else
-        [DefaultValue("")]
+        [CommandProperty(InitValue = "")]
 #endif
         public string Culture
         {

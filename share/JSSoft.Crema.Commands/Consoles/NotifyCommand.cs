@@ -23,6 +23,7 @@ using JSSoft.Crema.Services;
 using JSSoft.Library.Commands;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
@@ -58,7 +59,7 @@ namespace JSSoft.Crema.Commands.Consoles
             });
         }
 
-        protected override Task OnExecuteAsync()
+        protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             return this.UserContext.NotifyMessageAsync(authentication, this.Message);

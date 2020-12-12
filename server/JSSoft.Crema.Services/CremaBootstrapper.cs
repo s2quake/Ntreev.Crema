@@ -275,7 +275,11 @@ namespace JSSoft.Crema.Services
 
         public virtual IEnumerable<string> SelectPath()
         {
-            return SelectPath(AppDomain.CurrentDomain.BaseDirectory);
+            var items = SelectPath(AppDomain.CurrentDomain.BaseDirectory);
+            foreach (var item in items)
+            {
+                yield return item;
+            }
         }
 
         public static IEnumerable<string> SelectPath(string basePath)

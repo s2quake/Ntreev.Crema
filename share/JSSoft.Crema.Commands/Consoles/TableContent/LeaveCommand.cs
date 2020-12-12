@@ -24,6 +24,7 @@ using JSSoft.Library.Commands;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles.TableContent
@@ -52,7 +53,7 @@ namespace JSSoft.Crema.Commands.Consoles.TableContent
             get; set;
         }
 
-        protected override async Task OnExecuteAsync()
+        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             var leave = this.IsSilent == true || this.IsLeaveOnly == true || this.CommandContext.ReadYesOrNo("leave content edit. do you proceed?");
             if (leave == true)

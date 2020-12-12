@@ -30,6 +30,7 @@ using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost.Commands
@@ -40,14 +41,14 @@ namespace JSSoft.Crema.ConsoleHost.Commands
     class RunCommand : CommandAsyncBase
     {
         private readonly CremaApplication application;
-        [Import]
-        private readonly Lazy<ScriptContext> scriptContext = null;
+        private readonly Lazy<ScriptContext> scriptContext;
 
         [ImportingConstructor]
-        public RunCommand(CremaApplication application)
+        public RunCommand(CremaApplication application, Lazy<ScriptContext> scriptContext)
             : base("run")
         {
             this.application = application;
+            this.scriptContext = scriptContext;
         }
 
         public void Cancel()
@@ -63,19 +64,18 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             set;
         }
 
-        [CommandProperty("port")]
-        [DefaultValue(AddressUtility.DefaultPort)]
+        [CommandProperty("port", InitValue = AddressUtility.DefaultPort)]
         public int Port
         {
             get;
             set;
         }
 
-        [CommandProperty("timeout")]
+
 #if DEBUG
-        [DefaultValue(-1)]
+        [CommandProperty("timeout", InitValue = -1)]
 #else
-        [DefaultValue(60000)]
+        [CommandProperty("timeout", InitValue = 60000)]
 #endif
         public int Timeout
         {
@@ -101,8 +101,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             set;
         }
 
-        [CommandProperty]
-        [DefaultValue("")]
+        [CommandProperty(InitValue = "")]
         [CommandPropertyTrigger(nameof(IsPromptMode), false)]
         public string ScriptPath
         {
@@ -130,11 +129,10 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             set;
         }
 
-        [CommandProperty]
 #if DEBUG
-        [DefaultValue("en-US")]
+        [CommandProperty(InitValue = "en-US")]
 #else
-        [DefaultValue("")]
+        [CommandProperty(InitValue = "")]
 #endif
         public string Culture
         {
@@ -165,7 +163,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
         }
 #endif
 
-        protected override async Task OnExecuteAsync()
+        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             CremaLog.Verbose = this.Verbose ? LogVerbose.Debug : LogVerbose.Info;
             this.application.BasePath = this.Path;

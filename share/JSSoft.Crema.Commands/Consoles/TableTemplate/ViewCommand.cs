@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles.TableTemplate
@@ -41,7 +42,7 @@ namespace JSSoft.Crema.Commands.Consoles.TableTemplate
 
         public ITableTemplate Template => this.CommandContext.Template;
 
-        protected override Task OnExecuteAsync()
+        protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             var domain = this.Template.Domain;
             var template = domain.Source as CremaTemplate;

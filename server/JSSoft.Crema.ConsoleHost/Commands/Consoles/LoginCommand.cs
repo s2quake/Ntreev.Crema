@@ -24,6 +24,7 @@ using JSSoft.Library;
 using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel.Composition;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
@@ -54,7 +55,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 
         public new ConsoleCommandContext CommandContext => base.CommandContext as ConsoleCommandContext;
 
-        protected override async Task OnExecuteAsync()
+        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             try
             {

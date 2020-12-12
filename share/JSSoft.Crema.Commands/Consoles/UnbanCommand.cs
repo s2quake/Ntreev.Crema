@@ -21,6 +21,7 @@
 
 using JSSoft.Library.Commands;
 using System.ComponentModel.Composition;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
@@ -41,7 +42,7 @@ namespace JSSoft.Crema.Commands.Consoles
             get; set;
         }
 
-        protected override async Task OnExecuteAsync()
+        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             var user = await this.GetUserAsync(authentication, this.UserID);

@@ -30,7 +30,7 @@ using System.Linq;
 namespace JSSoft.Crema.Commands
 {
     [Export(typeof(ICommand))]
-    [Summary("사용할 수 있는 저장소 모듈의 목록을 표시합니다.")]
+    [CommandSummary("사용할 수 있는 저장소 모듈의 목록을 표시합니다.")]
     [Description("x86 혹은 x64 플랫폼 대상에 따라 여러 저장소 모듈이 지원됩니다. 저장소 모듈은 크레마 실행파일 위치내에 repo-modules폴더의 하위 폴더로 존재하며 별도의 설정 없을때는 자동으로 모듈을 선택합니다.")]
     class RepositoryModulesCommands : CommandBase
     {

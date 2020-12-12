@@ -23,6 +23,7 @@ using JSSoft.Crema.Commands.Consoles;
 using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel.Composition;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
@@ -42,7 +43,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 
         public override bool IsEnabled => this.commandContext.Value.IsOnline;
 
-        protected override Task OnExecuteAsync()
+        protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             return this.commandContext.Value.LogoutAsync();
         }

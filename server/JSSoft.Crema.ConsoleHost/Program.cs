@@ -23,6 +23,7 @@ using JSSoft.Crema.Commands;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost
 {
@@ -33,7 +34,7 @@ namespace JSSoft.Crema.ConsoleHost
 
         }
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             var excecuteName = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().CodeBase);
             if (args.Length == 0)
@@ -46,7 +47,7 @@ namespace JSSoft.Crema.ConsoleHost
                 using var application = new CremaApplication();
                 var configs = application.GetService(typeof(ConsoleConfiguration)) as ConsoleConfiguration;
                 var commandContext = application.GetService(typeof(CommandContext)) as CommandContext;
-                commandContext.Execute(Environment.CommandLine);
+                await commandContext.ExecuteAsync(Environment.CommandLine);
                 configs.Write();
             }
             catch (Exception e)

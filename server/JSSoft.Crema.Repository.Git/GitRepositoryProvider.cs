@@ -60,6 +60,8 @@ namespace JSSoft.Crema.Repository.Git
         public IRepository CreateInstance(RepositorySettings settings)
         {
             var baseUri = new Uri(settings.BasePath);
+            var workingUri = new Uri(settings.WorkingPath);
+            var originUri = UriUtility.MakeRelativeOfDirectory(workingUri, baseUri);
             var repositoryName = settings.RepositoryName == string.Empty ? "master" : settings.RepositoryName;
 
             if (Directory.Exists(settings.WorkingPath) == false)
@@ -83,6 +85,7 @@ namespace JSSoft.Crema.Repository.Git
 
                 var id = this.GetID(settings.BasePath, repositoryName);
                 this.SetID(settings.WorkingPath, repositoryName, id);
+                GitConfig.SetValue(settings.WorkingPath, "remote.origin.url", originUri);
                 var repositoryInfo = this.GetRepositoryInfo(settings.BasePath, repositoryName);
                 return new GitRepository(settings.LogService, settings.WorkingPath, settings.TransactionPath, repositoryInfo);
             }

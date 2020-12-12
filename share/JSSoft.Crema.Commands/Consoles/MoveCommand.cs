@@ -22,6 +22,7 @@
 using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel.Composition;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
@@ -59,7 +60,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.IsOnline;
 
-        protected override Task OnExecuteAsync()
+        protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             var sourcePath = this.CommandContext.GetAbsolutePath(this.SourcePath);
             var destPath = this.CommandContext.GetAbsolutePath(this.DestPath);

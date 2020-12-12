@@ -30,8 +30,13 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles.Properties
     [Export(typeof(IConfigurationPropertyProvider))]
     class LogProperties : IConfigurationPropertyProvider
     {
-        [Import]
-        private readonly Lazy<ConsoleTerminal> terminal = null;
+        private readonly Lazy<ConsoleTerminal> terminal;
+
+        [ImportingConstructor]
+        public LogProperties(Lazy<ConsoleTerminal> terminal)
+        {
+            this.terminal = terminal;
+        }
 
         public string Name => "log";
 

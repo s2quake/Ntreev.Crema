@@ -30,7 +30,7 @@ using System.IO;
 namespace JSSoft.Crema.WindowsServiceHost
 {
     [Export(typeof(ICommand))]
-    [Summary("윈도우 서비스 설치/제거를 위한 명령을 제공합니다.")]
+    [CommandSummary("윈도우 서비스 설치/제거를 위한 명령을 제공합니다.")]
     [Description("윈도우 서비스 설치/제거를 위한 명령을 제공합니다. 이 명령을 실행하기 위해서는 관리자 권한이 필요합니다.")]
     class ServiceCommand : CommandMethodBase
     {

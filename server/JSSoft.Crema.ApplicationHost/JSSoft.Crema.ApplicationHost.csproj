@@ -28,17 +28,16 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
     <OutputPath>$(ExePath)server\application</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Caliburn.Micro" Version="4.0.105-alpha" />
-    <PackageReference Include="Caliburn.Micro.Core" Version="4.0.105-alpha" />
+    <PackageReference Include="Caliburn.Micro" Version="4.0.136-rc" />
+    <PackageReference Include="Caliburn.Micro.Core" Version="4.0.136-rc" />
     <PackageReference Include="ModernUI.WPFCore" Version="2.0.0" />
+    <PackageReference Include="MahApps.Metro" Version="2.1.1" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('netcoreapp3.'))" >
-    <PackageReference Include="MahApps.Metro" Version="2.1.1" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Core" Version="1.1.4" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
   </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <PackageReference Include="MahApps.Metro" Version="1.6.5" />
     <PackageReference Include="Microsoft.WindowsAPICodePack.Shell" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>

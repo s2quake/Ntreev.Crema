@@ -23,6 +23,7 @@ using JSSoft.Crema.Services;
 using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel.Composition;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles.TableTemplate
@@ -42,7 +43,7 @@ namespace JSSoft.Crema.Commands.Consoles.TableTemplate
             get; set;
         }
 
-        protected override async Task OnExecuteAsync()
+        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             var terminal = new Terminal();
             var key = terminal.ReadKey("cancel template edit. do you proceed?(Y/N)", ConsoleKey.Y, ConsoleKey.N);

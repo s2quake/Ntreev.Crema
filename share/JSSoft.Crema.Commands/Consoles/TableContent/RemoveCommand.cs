@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles.TableContent
@@ -82,7 +83,7 @@ namespace JSSoft.Crema.Commands.Consoles.TableContent
             get; set;
         }
 
-        protected override async Task OnExecuteAsync()
+        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             var tableInfo = await this.Content.Dispatcher.InvokeAsync(() => this.Content.Table.TableInfo);
             var keys = tableInfo.Columns.Where(item => item.IsKey).ToArray();

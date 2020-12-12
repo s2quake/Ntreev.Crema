@@ -21,6 +21,7 @@
 
 using JSSoft.Library.Commands;
 using System.ComponentModel.Composition;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
@@ -60,7 +61,7 @@ namespace JSSoft.Crema.Commands.Consoles
             }
         }
 
-        protected override async Task OnExecuteAsync()
+        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             var lockable = await this.GetObjectAsync(authentication, this.GetAbsolutePath(this.Path));

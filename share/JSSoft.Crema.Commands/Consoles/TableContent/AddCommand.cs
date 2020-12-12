@@ -28,6 +28,7 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace JSSoft.Crema.Commands.Consoles.TableContent
 {
@@ -43,7 +44,7 @@ namespace JSSoft.Crema.Commands.Consoles.TableContent
 
         }
 
-        protected override async Task OnExecuteAsync()
+        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             var tableInfo = await this.Content.Dispatcher.InvokeAsync(() => this.Content.Table.TableInfo);
             var schema = new JSchema();
