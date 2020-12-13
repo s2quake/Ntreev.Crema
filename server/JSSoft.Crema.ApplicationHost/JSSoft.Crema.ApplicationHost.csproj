@@ -49,6 +49,22 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
     <ProjectReference Include="..\..\..\JSSoft.Library.Commands\JSSoft.Library.Commands\JSSoft.Library.Commands.csproj" />
     <ProjectReference Include="..\..\..\JSSoft.Library\JSSoft.Library\JSSoft.Library.csproj" />
     <ProjectReference Include="..\..\..\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.ObjectSerializer.Json\JSSoft.Crema.ObjectSerializer.Json.csproj">
+	    <Private>false</Private>
+	    <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+    </ProjectReference>
+    <ProjectReference Include="..\JSSoft.Crema.ObjectSerializer.Yaml\JSSoft.Crema.ObjectSerializer.Yaml.csproj">
+      <Private>false</Private>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+    </ProjectReference>
+    <ProjectReference Include="..\JSSoft.Crema.Repository.Git\JSSoft.Crema.Repository.Git.csproj">
+      <Private>false</Private>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+    </ProjectReference>
+    <ProjectReference Include="..\JSSoft.Crema.Repository.Svn\JSSoft.Crema.Repository.Svn.csproj">
+	    <Private>false</Private>
+	    <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+	  </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PluginsDir Include="$(OutputPath)\..\cremaserver\plugins\**\*" />

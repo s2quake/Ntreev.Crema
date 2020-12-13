@@ -30,5 +30,31 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
     <ProjectReference Include="..\JSSoft.Crema.Commands\JSSoft.Crema.Commands.csproj" />
     <ProjectReference Include="..\JSSoft.Crema.Javascript\JSSoft.Crema.Javascript.csproj" />
     <ProjectReference Include="..\JSSoft.Crema.ServiceHosts\JSSoft.Crema.ServiceHosts.csproj" />
+    <ProjectReference Include="..\JSSoft.Crema.ObjectSerializer.Json\JSSoft.Crema.ObjectSerializer.Json.csproj">
+	    <Private>false</Private>
+	    <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+    </ProjectReference>
+    <ProjectReference Include="..\JSSoft.Crema.ObjectSerializer.Yaml\JSSoft.Crema.ObjectSerializer.Yaml.csproj">
+      <Private>false</Private>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+    </ProjectReference>
+    <ProjectReference Include="..\JSSoft.Crema.Repository.Git\JSSoft.Crema.Repository.Git.csproj">
+      <Private>false</Private>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+    </ProjectReference>
+    <ProjectReference Include="..\JSSoft.Crema.Repository.Svn\JSSoft.Crema.Repository.Svn.csproj">
+	    <Private>false</Private>
+	    <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+	  </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <PluginsDir Include="$(OutputPath)\..\cremaserver\plugins\**\*" />
+    <RepoModuleDir Include="$(OutputPath)\..\cremaserver\repo-modules\**\*" />
+    <SerializerDir Include="$(OutputPath)\..\cremaserver\serializers\**\*" />
+  </ItemGroup>
+  <Target Name="Copy-Files" AfterTargets="CopyFilesToOutputDirectory">
+    <Copy SourceFiles="@(PluginsDir)" DestinationFiles="@(PluginsDir->'$(OutputPath)\plugins\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(RepoModuleDir)" DestinationFiles="@(RepoModuleDir->'$(OutputPath)\repo-modules\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(SerializerDir)" DestinationFiles="@(SerializerDir->'$(OutputPath)\serializers\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
 </Project>
