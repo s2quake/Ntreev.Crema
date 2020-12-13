@@ -22,6 +22,7 @@
 using JSSoft.Crema.Commands.Consoles.Properties;
 using JSSoft.Crema.ServiceModel;
 using JSSoft.Crema.Services;
+using JSSoft.Library;
 using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel.Composition;
@@ -31,7 +32,7 @@ using System.Threading.Tasks;
 namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources", IsShared = true)]
+    [ResourceDescription("Resources")]
     class DataBaseCommand : ConsoleCommandMethodBase, IConsoleCommand
     {
         private const string dataBaseNameParameter = "dataBaseName";
@@ -122,26 +123,38 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
-        public void List()
+        public async Task ListAsync()
         {
-            throw new NotImplementedException("dotnet");
-            // var items = this.DataBaseContext.Dispatcher.Invoke(() =>
-            // {
-            //     var query = from item in this.DataBaseContext
-            //                 where StringUtility.GlobMany(item.Name, FilterProperties.FilterExpression)
-            //                 select new ItemObject(item.Name, item.IsLoaded);
-            //     return query.ToArray();
-            // });
+            var items = await this.DataBaseContext.Dispatcher.InvokeAsync(() =>
+            {
+                var query = from item in this.DataBaseContext
+                            where StringUtility.GlobMany(item.Name, FilterProperties.FilterExpression)
+                            select new { item.IsLoaded, item.Name };
+                return query.ToArray();
+            });
 
-            // this.CommandContext.WriteList(items);
+            foreach (var item in items)
+            {
+                if (item.IsLoaded == false)
+                {
+                    using (TerminalColor.SetForeground(ConsoleColor.DarkGray))
+                    {
+                        this.Out.WriteLine(item.Name);
+                    }
+                }
+                else
+                {
+                    this.Out.WriteLine(item.Name);
+                }
+            }
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public void Info([CommandCompletion(nameof(GetDataBaseNames))] string dataBaseName)
+        public async Task InfoAsync([CommandCompletion(nameof(GetDataBaseNames))] string dataBaseName)
         {
             var dataBase = this.GetDataBase(dataBaseName);
-            var dataBaseInfo = dataBase.Dispatcher.Invoke(() => dataBase.DataBaseInfo);
+            var dataBaseInfo = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo);
             var props = dataBaseInfo.ToDictionary();
             this.CommandContext.WriteObject(props, FormatProperties.Format);
         }

@@ -27,7 +27,7 @@ using System.ComponentModel.Composition;
 namespace JSSoft.Crema.Presentation.Console.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources", IsShared = true)]
+    [ResourceDescription("Resources")]
     class ThemeCommand : ConsoleCommandBase
     {
         private readonly ICremaAppHost cremaAppHost;

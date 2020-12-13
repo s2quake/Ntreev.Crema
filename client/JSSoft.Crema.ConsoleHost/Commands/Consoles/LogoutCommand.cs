@@ -23,12 +23,13 @@ using JSSoft.Crema.Commands.Consoles;
 using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel.Composition;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources", IsShared = true)]
+    [ResourceDescription("Resources")]
     class LogoutCommand : ConsoleCommandAsyncBase
     {
         [ImportingConstructor]
@@ -40,7 +41,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.IsOnline;
 
-        protected override Task OnExecuteAsync()
+        protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             return this.CommandContext.LogoutAsync();
         }

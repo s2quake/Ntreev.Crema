@@ -26,6 +26,7 @@ using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost.Commands
@@ -61,11 +62,10 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             set;
         }
 
-        [CommandProperty]
 #if DEBUG
-        [DefaultValue("en-US")]
+        [CommandProperty(InitValue = "en-US")]
 #else
-        [DefaultValue("")]
+        [CommandProperty(InitValue = "")]
 #endif
         public string Culture
         {
@@ -85,7 +85,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
 
         public new ConsoleCommandContext CommandContext => base.CommandContext as ConsoleCommandContext;
 
-        protected override Task OnExecuteAsync()
+        protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             this.application.Culture = this.Culture;
             this.cremaHost.Closed += CremaHost_Closed;

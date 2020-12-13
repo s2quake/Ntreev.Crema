@@ -35,7 +35,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\DataBaseCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\DataBasesPath.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\DomainCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Consoles\IConsoleCommandProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\IConsoleCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\ConsoleDriveBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\IConsoleDrive.cs" />

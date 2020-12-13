@@ -25,7 +25,7 @@ using System.ComponentModel.Composition;
 namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources", IsShared = true)]
+    [ResourceDescription("Resources")]
     class ListDriveCommand : ConsoleCommandBase
     {
         public ListDriveCommand()

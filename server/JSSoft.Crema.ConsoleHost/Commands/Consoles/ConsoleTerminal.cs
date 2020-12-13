@@ -52,7 +52,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
                 await this.commandContext.LoginAsync(ss[0], ss[1]);
             }
             this.SetPrompt();
-            base.Start();
+            await base.StartAsync();
         }
 #else
         public new void Start()

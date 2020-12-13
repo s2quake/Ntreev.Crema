@@ -27,7 +27,7 @@ namespace JSSoft.Crema.Commands.Consoles
 {
     [ConsoleModeOnly]
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources", IsShared = true)]
+    [ResourceDescription("Resources")]
     class ResetCommand : ConsoleCommandBase
     {
         public ResetCommand()

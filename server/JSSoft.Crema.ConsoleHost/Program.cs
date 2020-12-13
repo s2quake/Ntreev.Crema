@@ -36,12 +36,6 @@ namespace JSSoft.Crema.ConsoleHost
 
         static async Task Main(string[] args)
         {
-            var excecuteName = Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().CodeBase);
-            if (args.Length == 0)
-            {
-                Console.WriteLine("Type '{0} help' for usage.", excecuteName.ToLower());
-                return;
-            }
             try
             {
                 using var application = new CremaApplication();

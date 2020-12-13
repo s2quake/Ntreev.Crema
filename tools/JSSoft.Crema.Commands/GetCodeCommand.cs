@@ -83,7 +83,7 @@ namespace JSSoft.Crema.Commands
             get; set;
         }
 
-        protected override async Task OnExecuteAsync()
+        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             if (this.Culture != string.Empty)
             {

@@ -54,9 +54,9 @@ namespace JSSoft.Crema.Presentation.Console
 
         public override string Address => this.CremaHost.Address;
 
-        private void CremaHost_Opened(object sender, EventArgs e)
+        private async void CremaHost_Opened(object sender, EventArgs e)
         {
-            this.Initialize(this.cremaHost.GetService(typeof(Authenticator)) as Authenticator);
+            await this.InitializeAsync(this.cremaHost.GetService(typeof(Authenticator)) as Authenticator);
         }
 
         private void CremaHost_Closed(object sender, ClosedEventArgs e)

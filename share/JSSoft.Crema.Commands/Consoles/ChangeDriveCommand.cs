@@ -23,7 +23,7 @@ using JSSoft.Library.Commands;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
-    [ResourceDescription("Resources", IsShared = true)]
+    [ResourceDescription("Resources")]
     // [UsageBrowsable(false)]
     class ChangeDriveCommand : ConsoleCommandBase
     {

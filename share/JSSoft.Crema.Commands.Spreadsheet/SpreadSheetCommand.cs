@@ -40,7 +40,7 @@ using System.Threading.Tasks;
 namespace JSSoft.Crema.Commands.Spreadsheet
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources", IsShared = true)]
+    [ResourceDescription("Resources")]
     class SpreadSheetCommand : ConsoleCommandMethodBase
     {
         private readonly ICremaHost cremaHost;

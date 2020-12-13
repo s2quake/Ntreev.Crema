@@ -117,10 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="@ctor" xml:space="preserve">
+  <data name="RunCommand" xml:space="preserve">
     <value>크레마 저장소 경로에서 크레마 서비스를 실행합니다.</value>
   </data>
-  <data name="ctor" xml:space="preserve">
+  <data name="d:RunCommand" xml:space="preserve">
     <value>설정된 크레마 저장소 경로에서 크레마 서비스를 실행합니다.
 
 일반적으로 실행된적이 없는 크레마 저장소 기본 구조는 아래와 같습니다.
@@ -161,19 +161,19 @@ working/serialization
 configs.xml
     크레마 서비스에 필요한 설정이 저장되는 파일입니다.</value>
   </data>
-  <data name="IsPromptMode" xml:space="preserve">
+  <data name="RunCommand.IsPromptMode" xml:space="preserve">
     <value>명령을 입력받을 수 있는 형태로 크레마 서비스를 실행합니다.</value>
   </data>
-  <data name="Path" xml:space="preserve">
+  <data name="RunCommand.Path" xml:space="preserve">
     <value>크레마 저장소 기본 경로를 나타냅니다.</value>
   </data>
-  <data name="Port" xml:space="preserve">
+  <data name="RunCommand.Port" xml:space="preserve">
     <value>포트를 나타냅니다. 기본값은 '4004' 입니다.</value>
   </data>
-  <data name="RepositoryModule" xml:space="preserve">
+  <data name="RunCommand.RepositoryModule" xml:space="preserve">
     <value>저장소 모듈을 나타냅니다. </value>
   </data>
-  <data name="RepositoryName" xml:space="preserve">
+  <data name="RunCommand.RepositoryName" xml:space="preserve">
     <value>크레마 저장소내에 데이터가 저장되는 경로의 이름을 설정합니다. 기본값은 'crema'입니다.</value>
   </data>
 </root>

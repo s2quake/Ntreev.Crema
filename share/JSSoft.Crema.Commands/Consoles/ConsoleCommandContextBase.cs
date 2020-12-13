@@ -31,6 +31,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
@@ -45,31 +46,7 @@ namespace JSSoft.Crema.Commands.Consoles
         protected ConsoleCommandContextBase(IEnumerable<IConsoleDrive> driveItems, IEnumerable<IConsoleCommand> commands)
             : base(ConcatCommands(driveItems, commands))
         {
-            // this.Name = string.Empty;
             this.DriveItems = driveItems.ToArray();
-            // foreach (var item in this.Commands)
-            // {
-            //     if (item is ConsoleCommandBase command)
-            //     {
-            //         command.CommandContext = this;
-            //     }
-            //     else if (item is ConsoleCommandAsyncBase asyncCommand)
-            //     {
-            //         asyncCommand.CommandContext = this;
-            //     }
-            //     else if (item is ConsoleCommandMethodBase commandMethod)
-            //     {
-            //         commandMethod.CommandContext = this;
-            //     }
-            // }
-
-            // foreach (var item in commandProviders)
-            // {
-            //     if (item is ConsoleCommandProviderBase provider)
-            //     {
-            //         provider.CommandContext = this;
-            //     }
-            // }
             foreach (var item in driveItems)
             {
                 if (item.Name == Uri.UriSchemeFile)
@@ -238,19 +215,8 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public Authentication GetAuthentication(IConsoleCommand command)
         {
-            if (this.commission != null)
-                throw new Exception("임시 인증이 발급되어 있습니다.");
-            this.commission = this.authentication.BeginCommission();
             return this.commission;
         }
-
-        // public Authentication GetAuthentication(IConsoleCommandProvider command)
-        // {
-        //     if (this.commission != null)
-        //         throw new Exception("임시 인증이 발급되어 있습니다.");
-        //     this.commission = this.authentication.BeginCommission();
-        //     return this.commission;
-        // }
 
         public void WriteObject(object value, TextSerializerType type)
         {
@@ -333,17 +299,17 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public event EventHandler PathChanged;
 
-        protected void Initialize(Authentication authentication)
+        protected async Task InitializeAsync(Authentication authentication)
         {
             this.authentication = authentication;
             this.authentication.Expired += Authentication_Expired;
-            this.Authority = GetAuthority();
+            this.Authority = await GetAuthorityAsync();
             this.path = PathUtility.Separator;
 
-            Authority GetAuthority()
+            Task<Authority> GetAuthorityAsync()
             {
                 var userContext = this.CremaHost.GetService(typeof(IUserContext)) as IUserContext;
-                return userContext.Dispatcher.Invoke(() => userContext.Users[authentication.ID].Authority);
+                return userContext.Dispatcher.InvokeAsync(() => userContext.Users[authentication.ID].Authority);
             }
         }
 
@@ -363,19 +329,36 @@ namespace JSSoft.Crema.Commands.Consoles
             this.PathChanged?.Invoke(this, e);
         }
 
-        // protected override bool OnExecute(ICommand command, string arguments)
-        // {
-        //     try
-        //     {
-        //         return base.OnExecute(command, arguments);
-        //     }
-        //     finally
-        //     {
-        //         if (this.commission != null)
-        //             this.authentication.EndCommission(this.commission);
-        //         this.commission = null;
-        //     }
-        // }
+        protected override void OnExecuted(EventArgs e)
+        {
+            base.OnExecuted(e);
+        }
+
+        internal void PreExecute()
+        {
+            if (this.commission != null)
+                throw new Exception("임시 인증이 발급되어 있습니다.");
+            if (this.authentication != null)
+                this.commission = this.authentication.BeginCommission();
+        }
+
+        internal void PostExecute()
+        {
+            if (this.commission != null)
+                this.authentication.EndCommission(this.commission);
+            this.commission = null;
+        }
+
+        internal static void Validate(SecureString value1, SecureString value2)
+        {
+            if (SecureStringToString(value1) != SecureStringToString(value2))
+                throw new Exception("암호가 일치하지 않습니다.");
+        }
+
+        internal Authentication GetAuthenticationInternal(IConsoleCommand command)
+        {
+            return this.authentication;
+        }
 
         private static string SecureStringToString(SecureString value)
         {
@@ -435,17 +418,6 @@ namespace JSSoft.Crema.Commands.Consoles
             this.drive.SetPathAsync(authentication, path);
             this.path = path;
             this.drivePaths[this.drive] = path;
-        }
-
-        internal static void Validate(SecureString value1, SecureString value2)
-        {
-            if (SecureStringToString(value1) != SecureStringToString(value2))
-                throw new Exception("암호가 일치하지 않습니다.");
-        }
-
-        internal Authentication GetAuthenticationInternal(IConsoleCommand command)
-        {
-            return this.authentication;
         }
     }
 }

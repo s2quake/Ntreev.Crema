@@ -25,7 +25,7 @@ using System.ComponentModel;
 
 namespace JSSoft.Crema.Commands.Consoles.Properties
 {
-    [ResourceDescription("../Resources", IsShared = true)]
+    [ResourceDescription("../Resources")]
     public static class DataSetTypeProperties
     {
         [CommandProperty]

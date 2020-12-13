@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources", IsShared = true)]
+    [ResourceDescription("Resources")]
     class PrivateCommand : AccessCommandBase, IConsoleCommand
     {
         public PrivateCommand()

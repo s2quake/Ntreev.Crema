@@ -97,6 +97,24 @@ namespace JSSoft.Crema.Commands.Consoles
             }
         }
 
+        protected void SetPrompt()
+        {
+            base.Prompt = this.commandContext.Prompt;
+        }
+
+        protected override bool OnPreviewExecute(string command)
+        {
+            var result = base.OnPreviewExecute(command);
+            this.commandContext.PreExecute();
+            return result;
+        }
+
+        protected override void OnExecuted(Exception e)
+        {
+            base.OnExecuted(e);
+            this.commandContext.PostExecute();
+        }
+
         private void CommandContext_Executed(object sender, EventArgs e)
         {
             this.SetPrompt();
@@ -105,11 +123,6 @@ namespace JSSoft.Crema.Commands.Consoles
         private void CommandContext_PathChanged(object sender, EventArgs e)
         {
             this.SetPrompt();
-        }
-
-        protected void SetPrompt()
-        {
-            base.Prompt = this.commandContext.Prompt;
         }
 
         private string PostfixInternal

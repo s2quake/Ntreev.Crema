@@ -32,7 +32,7 @@ using System.Threading.Tasks;
 namespace JSSoft.Crema.ApplicationHost.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources", IsShared = true)]
+    [ResourceDescription("Resources")]
     class ShutdownCommand : ConsoleCommandAsyncBase
     {
         [ImportingConstructor]

@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources", IsShared = true)]
+    [ResourceDescription("Resources")]
     class LogoutCommand : ConsoleCommandAsyncBase
     {
         private readonly Lazy<ConsoleCommandContext> commandContext;

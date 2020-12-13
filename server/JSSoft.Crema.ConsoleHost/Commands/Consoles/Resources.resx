@@ -117,18 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="@ExitCommand" xml:space="preserve">
+  <data name="ExitCommand" xml:space="preserve">
     <value>close terminal and exit application.</value>
   </data>
-  <data name="@LoginCommand" xml:space="preserve">
+  <data name="LoginCommand" xml:space="preserve">
     <value>login to crema service.</value>
     <comment>123</comment>
   </data>
-  <data name="@LogoutCommand" xml:space="preserve">
+  <data name="LogoutCommand" xml:space="preserve">
     <value>logout from crema service. this command is enabled only on logged in state.</value>
     <comment>123</comment>
   </data>
-  <data name="@ShutdownCommand" xml:space="preserve">
+  <data name="ShutdownCommand" xml:space="preserve">
     <value>shut down or restart crema service</value>
   </data>
   <data name="ShutdownCommand.IsCancelled" xml:space="preserve">

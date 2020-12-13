@@ -25,20 +25,18 @@ using System.IO;
 
 namespace JSSoft.Crema.Commands.Consoles.Properties
 {
-    [ResourceDescription("../Resources", IsShared = true)]
+    [ResourceDescription("../Resources")]
     public static class FilterProperties
     {
-        [CommandProperty("filter")]
+        [CommandProperty("filter", InitValue = "")]
         [CommandPropertyTrigger(nameof(FilterFile), "")]
-        [DefaultValue(null)]
         public static string Filter
         {
             get; set;
         }
 
-        [CommandProperty]
-        [CommandPropertyTrigger(nameof(Filter), null)]
-        [DefaultValue("")]
+        [CommandProperty(InitValue = "")]
+        [CommandPropertyTrigger(nameof(Filter), "")]
         public static string FilterFile
         {
             get; set;

@@ -34,7 +34,7 @@ namespace JSSoft.Crema.Commands.Consoles.TableContent
     [Category(nameof(ITableContent))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [CommandStaticProperty(typeof(ViewProperties))]
-    [ResourceDescription("../Resources", IsShared = true, Prefix = "TableContent")]
+    [ResourceDescription("../Resources")]
     class ViewCommand : ContentCommandBase
     {
         public ViewCommand()

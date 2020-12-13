@@ -23,7 +23,7 @@ using JSSoft.Library.Commands;
 
 namespace JSSoft.Crema.Commands.Consoles.Properties
 {
-    [ResourceDescription("../Resources", IsShared = true)]
+    [ResourceDescription("../Resources")]
     static class MessageProperties
     {
         [CommandPropertyRequired('m', AllowName = true, IsExplicit = true)]

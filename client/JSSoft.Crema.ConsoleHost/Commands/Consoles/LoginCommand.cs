@@ -24,12 +24,13 @@ using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources", IsShared = true)]
+    [ResourceDescription("Resources")]
     class LoginCommand : ConsoleCommandAsyncBase
     {
         [ImportingConstructor]
@@ -48,7 +49,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 
         public new ConsoleCommandContext CommandContext => base.CommandContext as ConsoleCommandContext;
 
-        protected override Task OnExecuteAsync()
+        protected override Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             var terminal = new Terminal();
             var userID = terminal.ReadString("UserID:");

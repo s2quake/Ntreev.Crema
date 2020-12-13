@@ -53,3 +53,4 @@ TestResults/
 .DS_Store
 .vs/
 .vscode/
+**/launchSettings.json

@@ -35,7 +35,7 @@ namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [Export(typeof(IConfigurationPropertyProvider))]
-    [ResourceDescription("Resources", IsShared = true)]
+    [ResourceDescription("Resources")]
     class LoggerCommand : ConsoleCommandMethodBase, IConsoleCommand, IConfigurationPropertyProvider
     {
         private readonly IEnumerable<Lazy<ILogService>> logServices;

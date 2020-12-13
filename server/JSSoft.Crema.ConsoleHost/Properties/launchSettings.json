@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "JSSoft.Crema.ConsoleHost": {
-      "commandName": "Project",
-      "commandLineArgs": "run \"D:\\CremaDataBase\\resource_repo\""
-    }
-  }
-}

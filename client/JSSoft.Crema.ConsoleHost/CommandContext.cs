@@ -32,7 +32,7 @@ namespace JSSoft.Crema.ConsoleHost
         public CommandContext([ImportMany] IEnumerable<ICommand> commands)
             : base(commands)
         {
-
+            this.IsNameVisible = true;
         }
     }
 }

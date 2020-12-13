@@ -63,7 +63,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             await this.CremaHost.Dispatcher.InvokeAsync(() => this.CremaHost.Closed += CremaHost_Closed);
             this.authenticator = this.CremaHost.GetService(typeof(Authenticator)) as Authenticator;
             this.address = address;
-            this.Initialize(this.authenticator);
+            await this.InitializeAsync(this.authenticator);
         }
 
         public async Task LogoutAsync()

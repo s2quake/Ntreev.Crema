@@ -25,6 +25,7 @@ using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
@@ -75,7 +76,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.IsOnline;
 
-        protected override async Task OnExecuteAsync()
+        protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             if (this.IsCancelled == true)
