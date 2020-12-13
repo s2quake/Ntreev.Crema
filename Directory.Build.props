@@ -37,7 +37,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
     <LangVersion>latest</LangVersion>
 	<DelaySign>true</DelaySign>
 	<AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)JSSoft.Crema.snk</AssemblyOriginatorKeyFile>
-	<SignAssembly>true</SignAssembly>
+	<SignAssembly Condition="'$(Configuration)' == 'Release'">true</SignAssembly>
 	<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 </Project>
