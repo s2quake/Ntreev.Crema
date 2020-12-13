@@ -23,12 +23,14 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
     <RootPath Condition="'$(SolutionDir)' != ''">$(SolutionDir)</RootPath>
-    <RootPath Condition="'$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)..\</RootPath>
+    <RootPath Condition="'$(SolutionDir)' == ''">$(MSBuildStartupDirectory)\</RootPath>
+    <ConfigurationType Condition="'$(Configuration)' == ''">Debug</ConfigurationType>
+    <ConfigurationType Condition="'$(Configuration)' != ''">$(Configuration)</ConfigurationType>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <BaseOutputPath>$(RootPath)bin\server\$(MSBuildProjectName)</BaseOutputPath>
     <BaseIntermediateOutputPath>$(RootPath)obj\server\$(MSBuildProjectName)</BaseIntermediateOutputPath>
-    <OutputPath>$(RootPath)bin\$(Configuration)\$(TargetFramework)\server\$(MSBuildProjectName)</OutputPath>
-    <IntermediateOutputPath>$(RootPath)obj\$(Configuration)\$(TargetFramework)\server\$(MSBuildProjectName)</IntermediateOutputPath>
-    <ExePath>$(RootPath)exe\$(Configuration)\$(TargetFramework)\</ExePath>
+    <OutputPath>$(RootPath)bin\$(ConfigurationType)\$(TargetFramework)\server\$(MSBuildProjectName)</OutputPath>
+    <IntermediateOutputPath>$(RootPath)obj\$(ConfigurationType)\$(TargetFramework)\server\$(MSBuildProjectName)</IntermediateOutputPath>
+    <ExePath>$(RootPath)exe\$(ConfigurationType)\$(TargetFramework)\</ExePath>
   </PropertyGroup>
 </Project>
