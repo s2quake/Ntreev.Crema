@@ -20,9 +20,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 Forked from https://github.com/NtreevSoft/Crema
 Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputPath>$(ExePath)server\application\repo-modules\svn</OutputPath>
-  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="YamlDotNet" Version="8.1.2" />
   </ItemGroup>
@@ -32,10 +29,4 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
     <ProjectReference Include="..\..\..\JSSoft.Library\JSSoft.Library\JSSoft.Library.csproj" />
     <ProjectReference Include="..\JSSoft.Crema.Services\JSSoft.Crema.Services.csproj" />
   </ItemGroup>
-  <Target Name="CopyToConsole" AfterTargets="CopyFilesToOutputDirectory">
-	  <ItemGroup>
-		  <OutputFiles Include="$(OutputPath)**\*.*"></OutputFiles>
-	  </ItemGroup>
-    <Copy SourceFiles="@(OutputFiles)" DestinationFiles="@(OutputFiles -> '$(ExePath)server\console\repo-modules\svn\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
-  </Target>
 </Project>

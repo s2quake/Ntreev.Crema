@@ -22,7 +22,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\share\JSSoft.Crema.Commands.Spreadsheet\JSSoft.Crema.Commands.Spreadsheet.projitems" Label="Shared" />
   <PropertyGroup>
-    <OutputPath>$(ExePath)server\application\plugins\Spreadsheet</OutputPath>
+    <PublishName>server\application\plugins\Spreadsheet</PublishName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\common\JSSoft.Crema.Spreadsheet\JSSoft.Crema.Spreadsheet.csproj" />

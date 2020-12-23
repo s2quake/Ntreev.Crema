@@ -25,7 +25,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
     <OutputType>WinExe</OutputType>
     <AssemblyName>cremaservice</AssemblyName>
     <Product>Crema Windows Service</Product>
-    <OutputPath>$(ExePath)server\service</OutputPath>
+    <PublishName>server\service</PublishName>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="3.1.1" />

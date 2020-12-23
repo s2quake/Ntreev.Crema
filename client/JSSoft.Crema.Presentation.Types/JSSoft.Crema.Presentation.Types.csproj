@@ -22,7 +22,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <Import Project="..\..\wpf.props" />
   <PropertyGroup>
-    <OutputPath>$(ExePath)client\application</OutputPath>
+    <PublishName>client\application</PublishName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\JSSoft.ModernUI.Framework\JSSoft.ModernUI.Framework.DataGrid\JSSoft.ModernUI.Framework.DataGrid.csproj">
