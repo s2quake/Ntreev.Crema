@@ -25,7 +25,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
     <OutputType>WinExe</OutputType>
     <AssemblyName>crema</AssemblyName>
     <Product>Crema</Product>
-    <PublishName>client\application</PublishName>
+    <PublishName>crema\client\application</PublishName>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\JSSoft.Crema.Commands\JSSoft.Crema.Commands.csproj" />

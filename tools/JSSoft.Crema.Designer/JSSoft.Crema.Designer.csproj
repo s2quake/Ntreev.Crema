@@ -25,7 +25,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
     <OutputType>WinExe</OutputType>
     <AssemblyName>cremadesigner</AssemblyName>
     <Product>Crema Designer</Product>
-    <PublishName>etc\designer</PublishName>
+    <PublishName>crema\etc\designer</PublishName>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.ComponentModel.Composition" Version="4.7.0" />

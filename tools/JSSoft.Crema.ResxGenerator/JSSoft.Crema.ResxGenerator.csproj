@@ -24,7 +24,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
     <OutputType>Exe</OutputType>
     <AssemblyName>cremaresx</AssemblyName>
     <Product>Crema Resx Generator</Product>
-    <PublishName>etc\resx</PublishName>
+    <PublishName>crema\etc\resx</PublishName>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>

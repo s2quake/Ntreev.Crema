@@ -24,7 +24,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
     <OutputType>Exe</OutputType>
     <AssemblyName>cremaconsole</AssemblyName>
     <Product>Crema Console</Product>
-    <PublishName>client\console</PublishName>
+    <PublishName>crema\client\console</PublishName>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.Targets" Version="3.0.0" PrivateAssets="all" />

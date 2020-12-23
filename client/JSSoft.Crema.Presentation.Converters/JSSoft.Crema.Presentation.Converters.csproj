@@ -21,9 +21,6 @@ Forked from https://github.com/NtreevSoft/Crema
 Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <Import Project="..\..\wpf.props" />
-  <PropertyGroup>
-    <PublishName>client\application</PublishName>
-  </PropertyGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('netcoreapp3.'))">
     <PackageReference Include="Microsoft-WindowsAPICodePack-Core" Version="1.1.4" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />

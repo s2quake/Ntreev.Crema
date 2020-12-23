@@ -22,7 +22,6 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <Import Project="..\..\wpf.props" />
   <PropertyGroup>
-    <PublishName>client\application</PublishName>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>

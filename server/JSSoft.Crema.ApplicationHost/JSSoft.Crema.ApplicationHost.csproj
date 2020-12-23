@@ -25,7 +25,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
     <OutputType>WinExe</OutputType>
     <AssemblyName>cremaserverApp</AssemblyName>
     <Product>Crema Server App</Product>
-    <PublishName>server\application</PublishName>
+    <PublishName>crema\server\application</PublishName>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Caliburn.Micro" Version="4.0.136-rc" />
