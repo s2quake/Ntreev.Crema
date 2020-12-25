@@ -21,4 +21,4 @@
 # Forked from https://github.com/NtreevSoft/Crema
 # Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-pwsh -executionpolicy remotesigned -File $(pwd)/$(dirname $0)/build.ps1 "$@"
+pwsh -executionpolicy remotesigned -File $(dirname $0)/build.ps1 "$@"
