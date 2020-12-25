@@ -21,4 +21,4 @@ REM OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE US
 REM Forked from https://github.com/NtreevSoft/Crema
 REM Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-powershell -executionpolicy remotesigned -File %~dp0\build.ps1 "%*"
+powershell -executionpolicy remotesigned -File %~dp0\build.ps1 %*
