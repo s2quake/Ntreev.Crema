@@ -33,7 +33,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
 {
     [Export(typeof(ICommand))]
     [Export]
-    [ResourceDescription]
+    [ResourceUsageDescription]
     class ConnectCommand : CommandAsyncBase
     {
         private readonly CremaBootstrapper application;

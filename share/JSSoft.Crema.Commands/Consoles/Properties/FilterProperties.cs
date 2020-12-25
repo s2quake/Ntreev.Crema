@@ -25,7 +25,7 @@ using System.IO;
 
 namespace JSSoft.Crema.Commands.Consoles.Properties
 {
-    [ResourceDescription("../Resources")]
+    [ResourceUsageDescription("../Resources")]
     public static class FilterProperties
     {
         [CommandProperty("filter", InitValue = "")]

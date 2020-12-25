@@ -27,3 +27,4 @@ obj/
 logs/
 .DS_Store
 **/launchSettings.json
+*.user

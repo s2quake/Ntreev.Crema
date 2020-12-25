@@ -27,7 +27,7 @@ using System.ComponentModel.Composition;
 namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources")]
+    [ResourceUsageDescription("Resources")]
     class ExitCommand : ConsoleCommandBase
     {
         private readonly Lazy<RunCommand> runCommand;

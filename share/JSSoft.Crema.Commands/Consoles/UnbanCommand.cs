@@ -27,7 +27,7 @@ using System.Threading.Tasks;
 namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources")]
+    [ResourceUsageDescription("Resources")]
     class UnbanCommand : UserCommandBase, IConsoleCommand
     {
         public UnbanCommand()

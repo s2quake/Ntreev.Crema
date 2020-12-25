@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources")]
+    [ResourceUsageDescription("Resources")]
     class BanCommand : UserCommandBase, IConsoleCommand
     {
         public BanCommand()

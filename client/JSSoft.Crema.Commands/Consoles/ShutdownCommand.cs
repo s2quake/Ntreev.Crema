@@ -31,7 +31,7 @@ using System.Threading.Tasks;
 namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription]
+    [ResourceUsageDescription]
     class ShutdownCommand : ConsoleCommandAsyncBase
     {
         private readonly ICremaHost cremaHost;

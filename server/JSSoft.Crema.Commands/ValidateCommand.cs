@@ -27,7 +27,7 @@ using System.ComponentModel.Composition;
 namespace JSSoft.Crema.Commands
 {
     [Export(typeof(ICommand))]
-    [ResourceDescription("Resources")]
+    [ResourceUsageDescription("Resources")]
     class ValidateCommand : CommandBase
     {
         private readonly CremaBootstrapper boot;
