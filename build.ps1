@@ -20,7 +20,7 @@
 # Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
 param(
-    [string]$OutputPath = "bin",
+    [string]$OutputPath = "",
     [string]$Framework = "netcoreapp3.1",
     [string]$KeyPath = "",
     [string]$LogPath = "",
