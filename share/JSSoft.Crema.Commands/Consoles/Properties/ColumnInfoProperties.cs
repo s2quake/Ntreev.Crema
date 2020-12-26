@@ -24,7 +24,7 @@ using System.ComponentModel;
 
 namespace JSSoft.Crema.Commands.Consoles.Properties
 {
-    [ResourceDescription("../Resources")]
+    [ResourceUsageDescription("../Resources")]
     static class ColumnInfoProperties
     {
         [CommandProperty]

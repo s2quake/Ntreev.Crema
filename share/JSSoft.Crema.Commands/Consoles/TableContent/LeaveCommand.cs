@@ -32,7 +32,7 @@ namespace JSSoft.Crema.Commands.Consoles.TableContent
     [Export(typeof(IConsoleCommand))]
     [Category(nameof(ITableContent))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    [ResourceDescription("../Resources")]
+    [ResourceUsageDescription("../Resources")]
     class LeaveCommand : ContentCommandBase
     {
         public LeaveCommand()

@@ -35,7 +35,7 @@ using System.Linq;
 namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources")]
+    [ResourceUsageDescription("Resources")]
     class PropertyCommand : ConsoleCommandMethodBase
     {
         private readonly ICremaHost cremaHost;

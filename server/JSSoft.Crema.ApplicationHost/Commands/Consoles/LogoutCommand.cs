@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 namespace JSSoft.Crema.ApplicationHost.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources")]
+    [ResourceUsageDescription("Resources")]
     class LogoutCommand : ConsoleCommandAsyncBase
     {
         public override bool IsEnabled => this.CommandContext.IsOnline;

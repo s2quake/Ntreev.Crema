@@ -30,7 +30,7 @@ using System.Diagnostics;
 namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources")]
+    [ResourceUsageDescription("Resources")]
     class OpenBasePathCommand : ConsoleCommandBase
     {
         private readonly Lazy<ICremaHost> cremaHost;

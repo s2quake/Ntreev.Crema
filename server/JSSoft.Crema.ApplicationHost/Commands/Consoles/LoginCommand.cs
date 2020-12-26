@@ -30,7 +30,7 @@ using System.Threading.Tasks;
 namespace JSSoft.Crema.ApplicationHost.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources")]
+    [ResourceUsageDescription("Resources")]
     class LoginCommand : ConsoleCommandAsyncBase
     {
         [CommandPropertyRequired(DefaultValue = "")]

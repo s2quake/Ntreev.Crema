@@ -29,7 +29,7 @@ using System.Linq;
 namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources")]
+    [ResourceUsageDescription("Resources")]
     class ListCommand : ConsoleCommandBase
     {
         public ListCommand()

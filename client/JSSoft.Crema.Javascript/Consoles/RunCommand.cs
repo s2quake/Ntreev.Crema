@@ -30,7 +30,7 @@ using System.IO;
 namespace JSSoft.Crema.Javascript.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources")]
+    [ResourceUsageDescription("Resources")]
     class RunCommand : ConsoleCommandBase
     {
         private readonly Lazy<ScriptContext> scriptContext;

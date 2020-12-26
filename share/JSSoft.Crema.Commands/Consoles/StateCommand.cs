@@ -30,7 +30,7 @@ using System.Threading.Tasks;
 namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
-    [ResourceDescription("Resources")]
+    [ResourceUsageDescription("Resources")]
     [CommandStaticProperty(typeof(FormatProperties))]
     class StateCommand : ConsoleCommandAsyncBase
     {

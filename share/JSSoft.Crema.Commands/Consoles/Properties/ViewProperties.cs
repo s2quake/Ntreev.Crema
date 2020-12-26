@@ -27,7 +27,7 @@ using System.IO;
 
 namespace JSSoft.Crema.Commands.Consoles.Properties
 {
-    [ResourceDescription("../Resources")]
+    [ResourceUsageDescription("../Resources")]
     static class ViewProperties
     {
         [CommandProperty('r')]

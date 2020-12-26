@@ -37,7 +37,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
 {
     [Export(typeof(ICommand))]
     [Export]
-    [ResourceDescription]
+    [ResourceUsageDescription]
     class RunCommand : CommandAsyncBase
     {
         private readonly CremaApplication application;

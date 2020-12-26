@@ -37,7 +37,7 @@ namespace JSSoft.Crema.Commands.Consoles.TableContent
     [Category(nameof(ITableContent))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     [CommandStaticProperty(typeof(TextEditorHost))]
-    [ResourceDescription("../Resources")]
+    [ResourceUsageDescription("../Resources")]
     class EditCommand : ContentCommandBase
     {
         public EditCommand()

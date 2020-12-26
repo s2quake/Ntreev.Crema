@@ -28,7 +28,7 @@ namespace JSSoft.Crema.Commands
 {
     [Export(typeof(ICommand))]
     [Export]
-    [ResourceDescription]
+    [ResourceUsageDescription]
     class UpgradeCommand : CommandBase
     {
         private readonly CremaBootstrapper boot;

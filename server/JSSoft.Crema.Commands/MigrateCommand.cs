@@ -27,7 +27,7 @@ namespace JSSoft.Crema.Commands
 {
     [Export(typeof(ICommand))]
     [Export]
-    [ResourceDescription]
+    [ResourceUsageDescription]
     class MigrateCommand : CommandBase
     {
         private readonly CremaBootstrapper boot;
