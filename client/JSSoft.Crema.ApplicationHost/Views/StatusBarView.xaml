@@ -67,7 +67,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
 
         <Style x:Key="Task_IconButton_Style" TargetType="{x:Type jmfc:IconButton}" BasedOn="{StaticResource {x:Type jmfc:IconButton}}">
             <Setter Property="Background" Value="{DynamicResource Accent}" />
-            <Setter Property="Source" Value="/crema;component/Images/task.png" />
+            <Setter Property="Source" Value="/cremaApp;component/Images/task.png" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Padding" Value="0" />
             <Style.Triggers>
