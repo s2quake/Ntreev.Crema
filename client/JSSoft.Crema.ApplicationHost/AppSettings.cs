@@ -26,18 +26,11 @@ namespace JSSoft.Crema.ApplicationHost
 {
     public class AppSettings
     {
-        [CommandProperty]
-        public string[] PluginsPath
-        {
-            get; set;
-        }
-
         /// <summary>
         /// crema://userID:password@localhost
         /// crema://userID:password@localhost/dataBase
         /// </summary>
-        [CommandProperty]
-        [DefaultValue("")]
+        [CommandProperty(InitValue = "")]
         public string Address
         {
             get; set;
@@ -46,8 +39,7 @@ namespace JSSoft.Crema.ApplicationHost
         /// <summary>
         /// light or dark
         /// </summary>
-        [CommandProperty]
-        [DefaultValue("")]
+        [CommandProperty(InitValue = "")]
         public string Theme
         {
             get; set;
@@ -56,27 +48,30 @@ namespace JSSoft.Crema.ApplicationHost
         /// <summary>
         /// color as #ffffff
         /// </summary>
-        [CommandProperty("color")]
-        [DefaultValue("")]
+        [CommandProperty("color", InitValue = "")]
         public string ThemeColor
         {
             get; set;
         }
 
-        [CommandProperty]
-        [DefaultValue(false)]
+        [CommandPropertySwitch]
         public bool ReportDetails
         {
             get; set;
         }
 
-        [CommandProperty]
 #if DEBUG
-        [DefaultValue("en-US")]
+        [CommandProperty(InitValue = "en-US")]
 #else
-        [DefaultValue("")]
+        [CommandProperty(InitValue = "")]
 #endif
         public string Culture
+        {
+            get; set;
+        }
+
+        [CommandPropertyArray]
+        public string[] PluginsPath
         {
             get; set;
         }

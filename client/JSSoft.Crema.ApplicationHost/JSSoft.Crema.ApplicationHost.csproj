@@ -23,7 +23,7 @@ Namespaces and files starting with "Ntreev" have been renamed to "JSSoft". -->
   <Import Project="..\..\wpf.props" />
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <AssemblyName>crema</AssemblyName>
+    <AssemblyName>cremaApp</AssemblyName>
     <Product>Crema</Product>
     <PublishName>crema\client\application</PublishName>
   </PropertyGroup>
