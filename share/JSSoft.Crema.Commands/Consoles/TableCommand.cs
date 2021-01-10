@@ -352,9 +352,8 @@ namespace JSSoft.Crema.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty("parent")]
+        [CommandProperty("parent", InitValue = "")]
         [CommandCompletion(nameof(GetPaths))]
-        [DefaultValue("")]
         public string ParentPath
         {
             get; set;

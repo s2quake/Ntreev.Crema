@@ -67,9 +67,8 @@ namespace JSSoft.Crema.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty("format")]
+        [CommandProperty("format", InitValue = TextSerializerType.Yaml)]
         [CommandPropertyTrigger(nameof(Information), true)]
-        [DefaultValue(TextSerializerType.Yaml)]
         public TextSerializerType FormatType
         {
             get; set;

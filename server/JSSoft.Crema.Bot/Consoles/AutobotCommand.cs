@@ -69,11 +69,11 @@ namespace JSSoft.Crema.Bot.Consoles
             }
         }
 
-        [CommandProperty]
+
 #if DEBUG
-        [DefaultValue(10)]
+        [CommandProperty(InitValue = 10)]
 #else
-        [DefaultValue(0)]
+        [CommandProperty]
 #endif
         public int Count
         {

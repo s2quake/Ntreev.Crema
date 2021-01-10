@@ -52,41 +52,37 @@ namespace JSSoft.Crema.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty("add")]
+        [CommandProperty("add", InitValue = "")]
         [CommandPropertyTrigger(nameof(MemberIDToSet), "", Group = 0)]
         [CommandPropertyTrigger(nameof(MemberIDToRemove), "", Group = 0)]
         [CommandPropertyTrigger(nameof(Information), false, Group = 0)]
-        [DefaultValue("")]
         public string MemberIDToAdd
         {
             get; set;
         }
 
-        [CommandProperty("set")]
+        [CommandProperty("set", InitValue = "")]
         [CommandPropertyTrigger(nameof(MemberIDToAdd), "", Group = 0)]
         [CommandPropertyTrigger(nameof(MemberIDToRemove), "", Group = 0)]
         [CommandPropertyTrigger(nameof(Information), false, Group = 0)]
-        [DefaultValue("")]
         public string MemberIDToSet
         {
             get; set;
         }
 
-        [CommandProperty("remove")]
+        [CommandProperty("remove", InitValue = "")]
         [CommandPropertyTrigger(nameof(MemberIDToAdd), "", Group = 0)]
         [CommandPropertyTrigger(nameof(MemberIDToSet), "", Group = 0)]
         [CommandPropertyTrigger(nameof(Information), false, Group = 0)]
-        [DefaultValue("")]
         public string MemberIDToRemove
         {
             get; set;
         }
 
-        [CommandProperty("type")]
+        [CommandProperty("type", InitValue = AccessType.Editor)]
         [CommandPropertyTrigger(nameof(MemberIDToAdd), "", IsInequality = true, Group = 0)]
         [CommandPropertyTrigger(nameof(MemberIDToSet), "", IsInequality = true, Group = 1)]
         [CommandPropertyTrigger(nameof(MemberIDToRemove), "", IsInequality = true, Group = 2)]
-        [DefaultValue(AccessType.Editor)]
         public AccessType AccessType
         {
             get; set;
@@ -101,9 +97,8 @@ namespace JSSoft.Crema.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty("format")]
+        [CommandProperty("format", InitValue = TextSerializerType.Yaml)]
         [CommandPropertyTrigger(nameof(Information), true)]
-        [DefaultValue(TextSerializerType.Yaml)]
         public TextSerializerType FormatType
         {
             get; set;

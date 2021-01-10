@@ -56,32 +56,28 @@ namespace JSSoft.Crema.WindowsServiceHost
             this.UninstallService(typeof(Program).Assembly.Location, basePath);
         }
 
-        [CommandProperty]
-        [DefaultValue(AddressUtility.DefaultPort)]
+        [CommandProperty(InitValue = AddressUtility.DefaultPort)]
         public int Port
         {
             get;
             set;
         }
 
-        [CommandProperty("comment", 'c')]
-        [DefaultValue("크레마 서비스를 제공합니다.")]
+        [CommandProperty("comment", 'c', InitValue = "크레마 서비스를 제공합니다.")]
         public string Comment
         {
             get;
             set;
         }
 
-        [CommandProperty("name")]
-        [DefaultValue("Crema")]
+        [CommandProperty("name", InitValue = "Crema")]
         public string ServiceName
         {
             get;
             set;
         }
 
-        [CommandProperty("display-name")]
-        [DefaultValue("")]
+        [CommandProperty("display-name", InitValue = "")]
         public string DisplayName
         {
             get;

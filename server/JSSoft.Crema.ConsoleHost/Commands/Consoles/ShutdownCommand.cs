@@ -66,8 +66,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             get; set;
         }
 
-        [CommandProperty('m')]
-        [DefaultValue("")]
+        [CommandProperty('m', InitValue = "")]
         public string Message
         {
             get; set;

@@ -42,17 +42,15 @@ namespace JSSoft.Crema.Javascript.Consoles
             this.scriptContext = scriptContext;
         }
 
-        [CommandPropertyRequired]
+        [CommandPropertyRequired(DefaultValue = "")]
         [CommandPropertyTrigger(nameof(Filename), "")]
         [CommandPropertyTrigger(nameof(List), false)]
-        [DefaultValue("")]
         public string Scripts
         {
             get; set;
         }
 
-        [CommandProperty()]
-        [DefaultValue("")]
+        [CommandProperty(InitValue = "")]
         [CommandPropertyTrigger(nameof(Scripts), "")]
         [CommandPropertyTrigger(nameof(List), false)]
         public string Filename
@@ -63,7 +61,6 @@ namespace JSSoft.Crema.Javascript.Consoles
         [CommandProperty("list", 'l')]
         [CommandPropertyTrigger(nameof(Scripts), "")]
         [CommandPropertyTrigger(nameof(Filename), "")]
-        [DefaultValue(false)]
         public bool List
         {
             get; set;

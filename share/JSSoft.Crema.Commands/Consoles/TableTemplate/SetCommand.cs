@@ -44,8 +44,7 @@ namespace JSSoft.Crema.Commands.Consoles.TableTemplate
 
         public Authentication Authentication => this.CommandContext.Authentication;
 
-        [CommandProperty]
-        [DefaultValue("")]
+        [CommandProperty(InitValue = "")]
         public string ColumnName
         {
             get; set;
