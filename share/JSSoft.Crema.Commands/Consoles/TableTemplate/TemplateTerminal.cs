@@ -40,7 +40,7 @@ namespace JSSoft.Crema.Commands.Consoles.TableTemplate
             var commands = (serviceProvider.GetService(typeof(IEnumerable<ITemplateCommand>)) as IEnumerable<ITemplateCommand>);
 
             var commandContext = new TemplateCommandContext(authentication, template, commands);
-            var terminal = new TemplateTerminal(commandContext, prompt) { Postfix = "$ " };
+            var terminal = new TemplateTerminal(commandContext, prompt);
 
             foreach (var item in commands)
             {

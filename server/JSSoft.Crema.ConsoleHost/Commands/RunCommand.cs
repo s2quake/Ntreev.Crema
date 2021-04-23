@@ -41,10 +41,11 @@ namespace JSSoft.Crema.ConsoleHost.Commands
     class RunCommand : CommandAsyncBase
     {
         private readonly CremaApplication application;
-        private readonly Lazy<ScriptContext> scriptContext;
+        private readonly ScriptContext scriptContext;
+        private CancellationTokenSource cancellation;
 
         [ImportingConstructor]
-        public RunCommand(CremaApplication application, Lazy<ScriptContext> scriptContext)
+        public RunCommand(CremaApplication application, ScriptContext scriptContext)
             : base("run")
         {
             this.application = application;
@@ -53,8 +54,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
 
         public void Cancel()
         {
-            var terminal = this.application.GetService(typeof(ConsoleTerminal)) as ConsoleTerminal;
-            terminal.Cancel();
+            this.cancellation.Cancel();
         }
 
         [CommandPropertyRequired("path")]
@@ -202,8 +202,9 @@ namespace JSSoft.Crema.ConsoleHost.Commands
             if (this.IsPromptMode == true)
             {
                 var terminal = this.application.GetService(typeof(ConsoleTerminal)) as ConsoleTerminal;
+                this.cancellation = new CancellationTokenSource();
 #if DEBUG
-                await terminal.StartAsync(this.LoginAuthentication);
+                await terminal.StartAsync(this.LoginAuthentication, this.cancellation.Token);
 #else
                 await Task.Delay(1);
                 terminal.Start();
@@ -218,7 +219,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands
                 {
                     DirectoryUtility.Prepare(basePath);
                     Directory.SetCurrentDirectory(basePath);
-                    this.ScriptContext.RunInternal(script, null);
+                    this.scriptContext.RunInternal(script, null);
                 }
                 finally
                 {
@@ -238,7 +239,5 @@ namespace JSSoft.Crema.ConsoleHost.Commands
                 }
             }
         }
-
-        private ScriptContext ScriptContext => this.scriptContext.Value;
     }
 }

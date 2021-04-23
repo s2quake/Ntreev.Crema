@@ -36,8 +36,13 @@
             "name": "launch-crema-server-console",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build server",
+            "preLaunchTask": "build server-console",
             "program": "${workspaceFolder}/server/JSSoft.Crema.ConsoleHost/bin/Debug/netcoreapp3.1/cremaserver.dll",
+            "args":[
+                "run",
+                "/Users/s2quake-mac/Projects/CremaDataBase/resource_repo",
+                "--prompt"
+            ],
             "cwd": "${workspaceFolder}/server/JSSoft.Crema.ConsoleHost/bin/Debug/netcoreapp3.1",
             "console": "integratedTerminal",
             "stopAtEntry": false

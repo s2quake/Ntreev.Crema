@@ -48,29 +48,31 @@ namespace JSSoft.Crema.Commands.Consoles.Properties
         {
             var count = 0;
 
-            writer.WriteLine();
-            writer.WriteLine(string.Empty.PadRight(Console.BufferWidth - 1, '='));
+            var tb = new TerminalStringBuilder();
+            tb.AppendLine();
+            tb.AppendLine(string.Empty.PadRight(Console.BufferWidth - 1, '='));
 
             foreach (var item in logs)
             {
                 if (LogProperties.Limit >= 0 && LogProperties.Limit <= count)
                     break;
 
-                using (TerminalColor.SetForeground(ConsoleColor.Cyan))
-                {
-                    writer.WriteLine($"Revision: {item.Revision}");
-                }
-                writer.WriteLine($"Author  : {item.UserID}");
-                writer.WriteLine($"Date    : {item.DateTime}");
+                tb.Foreground = TerminalColor.Red;
+                tb.AppendLine($"Revision: {item.Revision}");
+                tb.Foreground = null;
+                tb.AppendLine($"Author  : {item.UserID}");
+                tb.AppendLine($"Date    : {item.DateTime}");
                 if (IsQuiet == false)
                 {
-                    writer.WriteLine();
-                    writer.WriteLine(item.Comment);
+                    tb.AppendLine();
+                    tb.AppendLine(item.Comment);
                 }
-                writer.WriteLine(string.Empty.PadRight(Console.BufferWidth - 1, '='));
+                tb.AppendLine(string.Empty.PadRight(Console.BufferWidth - 1, '='));
                 count++;
             }
-            writer.WriteLine();
+            tb.AppendLine();
+
+            writer.Write(tb.ToString());
         }
     }
 }

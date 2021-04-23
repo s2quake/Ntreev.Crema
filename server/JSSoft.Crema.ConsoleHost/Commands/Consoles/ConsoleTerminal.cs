@@ -23,6 +23,7 @@ using JSSoft.Crema.Commands.Consoles;
 using JSSoft.Crema.Services;
 using JSSoft.Library;
 using System.ComponentModel.Composition;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
@@ -38,13 +39,13 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
             : base(commandContext)
         {
             this.cremaHost = cremaHost;
-            this.cremaHost.Opened += (s, e) => this.IsEnabled = true;
-            this.cremaHost.Closing += (s, e) => this.IsEnabled = false;
+            // this.cremaHost.Opened += (s, e) => this.IsEnabled = true;
+            // this.cremaHost.Closing += (s, e) => this.IsEnabled = false;
             this.commandContext = commandContext;
         }
 
 #if DEBUG
-        public async Task StartAsync(string authentication)
+        public async Task StartAsync(string authentication, CancellationToken cancellation)
         {
             if (authentication != null)
             {
@@ -52,7 +53,7 @@ namespace JSSoft.Crema.ConsoleHost.Commands.Consoles
                 await this.commandContext.LoginAsync(ss[0], ss[1]);
             }
             this.SetPrompt();
-            await base.StartAsync();
+            await base.StartAsync(cancellation);
         }
 #else
         public new void Start()

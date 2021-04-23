@@ -133,20 +133,22 @@ namespace JSSoft.Crema.Commands.Consoles
                 return query.ToArray();
             });
 
+            var tb = new TerminalStringBuilder();
             foreach (var item in items)
             {
                 if (item.IsLoaded == false)
                 {
-                    using (TerminalColor.SetForeground(ConsoleColor.DarkGray))
-                    {
-                        this.Out.WriteLine(item.Name);
-                    }
+                    tb.Foreground = TerminalColor.BrightBlack;
+                    tb.AppendLine(item.Name);
+                    tb.Foreground = null;
                 }
                 else
                 {
-                    this.Out.WriteLine(item.Name);
+                    tb.AppendLine(item.Name);
                 }
             }
+            tb.AppendEnd();
+            this.Out.WriteLine(tb.ToString());
         }
 
         [CommandMethod]

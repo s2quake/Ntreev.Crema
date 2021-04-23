@@ -38,7 +38,7 @@ namespace JSSoft.Crema.Commands.Consoles
             this.commandContext.PathChanged += CommandContext_PathChanged;
             this.commandContext.Executed += CommandContext_Executed;
             this.commandContext.Terminal = this;
-            this.Postfix = this.PostfixInternal;
+            // this.Postfix = this.PostfixInternal;
             this.IsCommandMode = true;
         }
 
@@ -47,55 +47,55 @@ namespace JSSoft.Crema.Commands.Consoles
             get; set;
         }
 
-        protected override void OnDrawPrompt(TextWriter writer, string prompt)
-        {
-            if (this.IsCommandMode == false)
-            {
-                base.OnDrawPrompt(writer, prompt);
-            }
-            else
-            {
-                if (prompt == string.Empty)
-                    return;
-                var postfixPattern = string.Join(string.Empty, this.Postfix.Select(item => $"[{item}]"));
-                if (this.commandContext.IsOnline == false)
-                {
-                    var match = Regex.Match(prompt, $"(.+)(?<postfix>{postfixPattern})$");
-                    using (TerminalColor.SetForeground(ConsoleColor.Green))
-                    {
-                        writer.Write(match.Groups[1].Value);
-                    }
-                    Console.ResetColor();
-                    writer.Write(match.Groups[2].Value);
-                }
-                else
-                {
-                    var p1 = prompt.TrimStart();
-                    var p2 = prompt.TrimEnd();
-                    var prefix = prompt.Substring(p1.Length);
-                    var postfix = prompt.Substring(p2.Length);
-                    var uri = new Uri(prompt.Trim());
-                    writer.Write(prefix);
-                    using (TerminalColor.SetForeground(ConsoleColor.Green))
-                    {
-                        writer.Write(uri.Scheme);
-                    }
-                    writer.Write(Uri.SchemeDelimiter);
-                    using (TerminalColor.SetForeground(ConsoleColor.Cyan))
-                    {
-                        writer.Write(uri.UserInfo);
-                    }
-                    writer.Write("@");
-                    using (TerminalColor.SetForeground(ConsoleColor.Cyan))
-                    {
-                        writer.Write(uri.Authority);
-                    }
-                    Console.ResetColor();
-                    writer.Write(uri.LocalPath);
-                    writer.Write(postfix);
-                }
-            }
-        }
+        // protected override void OnDrawPrompt(TextWriter writer, string prompt)
+        // {
+        //     if (this.IsCommandMode == false)
+        //     {
+        //         base.OnDrawPrompt(writer, prompt);
+        //     }
+        //     else
+        //     {
+        //         if (prompt == string.Empty)
+        //             return;
+        //         var postfixPattern = string.Join(string.Empty, this.Postfix.Select(item => $"[{item}]"));
+        //         if (this.commandContext.IsOnline == false)
+        //         {
+        //             var match = Regex.Match(prompt, $"(.+)(?<postfix>{postfixPattern})$");
+        //             using (TerminalColor.SetForeground(ConsoleColor.Green))
+        //             {
+        //                 writer.Write(match.Groups[1].Value);
+        //             }
+        //             Console.ResetColor();
+        //             writer.Write(match.Groups[2].Value);
+        //         }
+        //         else
+        //         {
+        //             var p1 = prompt.TrimStart();
+        //             var p2 = prompt.TrimEnd();
+        //             var prefix = prompt.Substring(p1.Length);
+        //             var postfix = prompt.Substring(p2.Length);
+        //             var uri = new Uri(prompt.Trim());
+        //             writer.Write(prefix);
+        //             using (TerminalColor.SetForeground(ConsoleColor.Green))
+        //             {
+        //                 writer.Write(uri.Scheme);
+        //             }
+        //             writer.Write(Uri.SchemeDelimiter);
+        //             using (TerminalColor.SetForeground(ConsoleColor.Cyan))
+        //             {
+        //                 writer.Write(uri.UserInfo);
+        //             }
+        //             writer.Write("@");
+        //             using (TerminalColor.SetForeground(ConsoleColor.Cyan))
+        //             {
+        //                 writer.Write(uri.Authority);
+        //             }
+        //             Console.ResetColor();
+        //             writer.Write(uri.LocalPath);
+        //             writer.Write(postfix);
+        //         }
+        //     }
+        // }
 
         protected void SetPrompt()
         {
