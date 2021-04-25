@@ -21,6 +21,8 @@
 
 using JSSoft.Library.Commands;
 using System.ComponentModel.Composition;
+using System.Linq;
+using System.Text;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
@@ -38,10 +40,10 @@ namespace JSSoft.Crema.Commands.Consoles
 
         protected override void OnExecute()
         {
-            foreach (var item in this.CommandContext.DriveItems)
-            {
-                this.CommandContext.Out.WriteLine($"{item.Name}:");
-            }
+            var sb = new StringBuilder();
+            var items = from item in this.CommandContext.DriveItems select $"{item.Name}:";
+            sb.AppendLine(items);
+            this.Out.Write(sb.ToString());
         }
     }
 }

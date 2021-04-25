@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Text;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
@@ -69,15 +70,18 @@ namespace JSSoft.Crema.Commands.Consoles
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         public void List()
         {
+            var sb = new StringBuilder();
             var props = new Dictionary<string, object>();
-            foreach (var item in this.Properties)
+            var query = from item in this.Properties
+                        where StringUtility.GlobMany(item.PropertyName, FilterProperties.FilterExpression)
+                        select item;
+            var format = FormatProperties.Format;
+            foreach (var item in query)
             {
-                if (StringUtility.GlobMany(item.PropertyName, FilterProperties.FilterExpression) == true)
-                {
-                    props.Add(item.PropertyName, item.Value);
-                }
+                props.Add(item.PropertyName, item.Value);
             }
-            this.CommandContext.WriteObject(props, FormatProperties.Format);
+            sb.AppendLine(props, format);
+            this.Out.Write(sb.ToString());
         }
 
         [CommandMethod]

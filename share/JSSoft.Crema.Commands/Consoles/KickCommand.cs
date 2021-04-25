@@ -35,13 +35,8 @@ namespace JSSoft.Crema.Commands.Consoles
 
         }
 
-        public override string[] GetCompletions(CommandCompletionContext completionContext)
-        {
-            return base.GetCompletions(completionContext);
-        }
-
         [CommandPropertyRequired]
-        [CommandCompletion(nameof(GetUserList))]
+        [CommandCompletion(nameof(GetUserListAsync))]
         public string UserID
         {
             get; set;

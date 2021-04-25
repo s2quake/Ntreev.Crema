@@ -64,11 +64,11 @@ namespace JSSoft.Crema.Commands.Consoles
             throw new NotImplementedException();
         }
 
-        protected string[] GetUserList()
+        protected Task<string[]> GetUserListAsync()
         {
             if (this.CommandContext.Drive is UsersConsoleDrive drive)
             {
-                return drive.GetUserList();
+                return drive.GetUserListAsync();
             }
             throw new NotImplementedException();
         }

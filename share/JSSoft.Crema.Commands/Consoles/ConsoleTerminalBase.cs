@@ -29,6 +29,7 @@ namespace JSSoft.Crema.Commands.Consoles
 {
     public abstract class ConsoleTerminalBase : CommandContextTerminal
     {
+        private static readonly string postfix = Terminal.IsWin32NT == true ? ">" : "$ ";
         private readonly ConsoleCommandContextBase commandContext;
 
         protected ConsoleTerminalBase(ConsoleCommandContextBase commandContext)
@@ -38,7 +39,6 @@ namespace JSSoft.Crema.Commands.Consoles
             this.commandContext.PathChanged += CommandContext_PathChanged;
             this.commandContext.Executed += CommandContext_Executed;
             this.commandContext.Terminal = this;
-            // this.Postfix = this.PostfixInternal;
             this.IsCommandMode = true;
         }
 
@@ -47,59 +47,55 @@ namespace JSSoft.Crema.Commands.Consoles
             get; set;
         }
 
-        // protected override void OnDrawPrompt(TextWriter writer, string prompt)
-        // {
-        //     if (this.IsCommandMode == false)
-        //     {
-        //         base.OnDrawPrompt(writer, prompt);
-        //     }
-        //     else
-        //     {
-        //         if (prompt == string.Empty)
-        //             return;
-        //         var postfixPattern = string.Join(string.Empty, this.Postfix.Select(item => $"[{item}]"));
-        //         if (this.commandContext.IsOnline == false)
-        //         {
-        //             var match = Regex.Match(prompt, $"(.+)(?<postfix>{postfixPattern})$");
-        //             using (TerminalColor.SetForeground(ConsoleColor.Green))
-        //             {
-        //                 writer.Write(match.Groups[1].Value);
-        //             }
-        //             Console.ResetColor();
-        //             writer.Write(match.Groups[2].Value);
-        //         }
-        //         else
-        //         {
-        //             var p1 = prompt.TrimStart();
-        //             var p2 = prompt.TrimEnd();
-        //             var prefix = prompt.Substring(p1.Length);
-        //             var postfix = prompt.Substring(p2.Length);
-        //             var uri = new Uri(prompt.Trim());
-        //             writer.Write(prefix);
-        //             using (TerminalColor.SetForeground(ConsoleColor.Green))
-        //             {
-        //                 writer.Write(uri.Scheme);
-        //             }
-        //             writer.Write(Uri.SchemeDelimiter);
-        //             using (TerminalColor.SetForeground(ConsoleColor.Cyan))
-        //             {
-        //                 writer.Write(uri.UserInfo);
-        //             }
-        //             writer.Write("@");
-        //             using (TerminalColor.SetForeground(ConsoleColor.Cyan))
-        //             {
-        //                 writer.Write(uri.Authority);
-        //             }
-        //             Console.ResetColor();
-        //             writer.Write(uri.LocalPath);
-        //             writer.Write(postfix);
-        //         }
-        //     }
-        // }
+        protected override string FormatPrompt(string prompt)
+        {
+            if (this.IsCommandMode == false)
+            {
+                return base.FormatPrompt(prompt);
+            }
+            else
+            {
+                var postfixPattern = string.Join(string.Empty, postfix.Select(item => $"[{item}]"));
+                var tb = new TerminalStringBuilder();
+                if (this.commandContext.IsOnline == false)
+                {
+                    var match = Regex.Match(prompt, $"(.+)(?<postfix>{postfixPattern})$");
+                    tb.Foreground = TerminalColor.BrightGreen;
+                    tb.Append(match.Groups[1].Value);
+                    tb.Foreground = null;
+                    tb.Append(match.Groups[2].Value);
+                }
+                else
+                {
+                    var p1 = prompt.TrimStart();
+                    var p2 = prompt.TrimEnd();
+                    var prefix = prompt.Substring(p1.Length);
+                    var postfix = prompt.Substring(p2.Length);
+                    var uri = new Uri(prompt.Trim());
+
+                    tb.Append(prefix);
+                    tb.Foreground = TerminalColor.BrightGreen;
+                    tb.Append(uri.Scheme);
+                    tb.Foreground = null;
+                    tb.Append(Uri.SchemeDelimiter);
+                    tb.Foreground = TerminalColor.BrightCyan;
+                    tb.Append(uri.UserInfo);
+                    tb.Foreground = null;
+                    tb.Append("@");
+                    tb.Foreground = TerminalColor.BrightCyan;
+                    tb.Append(uri.Authority);
+                    tb.Foreground = null;
+                    tb.Append(uri.LocalPath);
+                    tb.Append(postfix);
+                }
+                tb.AppendEnd();
+                return tb.ToString();
+            }
+        }
 
         protected void SetPrompt()
         {
-            base.Prompt = this.commandContext.Prompt;
+            base.Prompt = this.commandContext.Prompt + postfix;
         }
 
         protected override bool OnPreviewExecute(string command)
@@ -123,21 +119,6 @@ namespace JSSoft.Crema.Commands.Consoles
         private void CommandContext_PathChanged(object sender, EventArgs e)
         {
             this.SetPrompt();
-        }
-
-        private string PostfixInternal
-        {
-            get
-            {
-                if (Environment.OSVersion.Platform == PlatformID.Unix)
-                {
-                    return "$ ";
-                }
-                else
-                {
-                    return ">";
-                }
-            }
         }
     }
 }

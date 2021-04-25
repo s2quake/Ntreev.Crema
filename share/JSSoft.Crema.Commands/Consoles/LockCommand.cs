@@ -23,6 +23,7 @@ using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -76,14 +77,17 @@ namespace JSSoft.Crema.Commands.Consoles
 
         protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
+            var sb = new StringBuilder();
             var authentication = this.CommandContext.GetAuthentication(this);
             var lockable = await this.GetObjectAsync(authentication, this.GetAbsolutePath(this.Path));
+            var format = this.FormatType;
 
             if (this.Information == true)
             {
-                var lockInfo = this.Invoke(authentication, lockable, () => lockable.LockInfo);
+                var lockInfo = await this.InvokeAsync(authentication, lockable, () => lockable.LockInfo);
                 var prop = lockInfo.ToDictionary();
-                this.CommandContext.WriteObject(prop, this.FormatType);
+                sb.AppendLine(prop, format);
+                await this.Out.WriteAsync(sb.ToString());
             }
             else
             {

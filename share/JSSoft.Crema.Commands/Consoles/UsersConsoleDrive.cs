@@ -57,9 +57,9 @@ namespace JSSoft.Crema.Commands.Consoles
             return this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users[userID]);
         }
 
-        public string[] GetUserList()
+        public Task<string[]> GetUserListAsync()
         {
-            return this.UserContext.Dispatcher.Invoke(() => this.UserContext.Users.Select(item => item.ID).ToArray());
+            return this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.Users.Select(item => item.ID).ToArray());
         }
 
         public string Path { get; private set; }

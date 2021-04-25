@@ -40,7 +40,7 @@
             "program": "${workspaceFolder}/server/JSSoft.Crema.ConsoleHost/bin/Debug/netcoreapp3.1/cremaserver.dll",
             "args":[
                 "run",
-                "/Users/s2quake-mac/Projects/CremaDataBase/resource_repo",
+                "${workspaceFolder}/../resource_repo",
                 "--prompt"
             ],
             "cwd": "${workspaceFolder}/server/JSSoft.Crema.ConsoleHost/bin/Debug/netcoreapp3.1",

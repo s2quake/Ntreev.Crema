@@ -29,7 +29,6 @@ using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
-    // [Export(typeof(IConsoleCommandProvider))]
     [PartialCommand]
     class DomainDeleteCommand : ConsoleCommandMethodBase
     {
@@ -58,7 +57,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [CommandPropertyRequired(DefaultValue = "")]
         //[CommandPropertyTrigger(nameof(DataBaseName), null)]
-        [CommandCompletion(nameof(GetDomainIDs))]
+        [CommandCompletion(nameof(GetDomainIDsAsync))]
         public string DomainID
         {
             get; set;
@@ -78,7 +77,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [CommandPropertyRequired("database", IsExplicit = true)]
         [CommandPropertyTrigger(nameof(DomainID), "")]
-        [CommandCompletion(nameof(GetDataBaseNames))]
+        [CommandCompletion(nameof(GetDataBaseNamesAsync))]
         public string DataBaseName
         {
             get; set;
@@ -118,9 +117,9 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public IDomainContext DomainContext => this.cremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
 
-        private string[] GetDataBaseNames()
+        private Task<string[]> GetDataBaseNamesAsync()
         {
-            return this.DataBaseContext.Dispatcher.Invoke(() =>
+            return this.DataBaseContext.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in this.DataBaseContext
                             select item.Name;
@@ -128,9 +127,9 @@ namespace JSSoft.Crema.Commands.Consoles
             });
         }
 
-        private string[] GetDomainIDs()
+        private Task<string[]> GetDomainIDsAsync()
         {
-            return this.DomainContext.Dispatcher.Invoke(() =>
+            return this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
                 return this.DomainContext.Domains.Select(item => $"{item.ID}").ToArray();
             });

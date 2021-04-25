@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -216,12 +217,6 @@ namespace JSSoft.Crema.Commands.Consoles
         public Authentication GetAuthentication(IConsoleCommand command)
         {
             return this.commission;
-        }
-
-        public void WriteObject(object value, TextSerializerType type)
-        {
-            var text = TextSerializer.Serialize(value, type);
-            this.Out.WriteLine(text);
         }
 
         public bool IsOnline => this.authentication != null;

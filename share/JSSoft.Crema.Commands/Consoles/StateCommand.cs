@@ -24,6 +24,7 @@ using JSSoft.Crema.Services;
 using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel.Composition;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -66,11 +67,14 @@ namespace JSSoft.Crema.Commands.Consoles
 
         protected override async Task OnExecuteAsync(CancellationToken cancellationToken)
         {
+            var sb = new StringBuilder();
             var authentication = this.CommandContext.GetAuthentication(this);
             var drive = this.CommandContext.Drive;
             var provider = await this.GetObjectAsync(authentication, this.AbsolutePath);
-            var info = this.Invoke(provider, () => provider.State);
-            this.CommandContext.WriteObject(info, FormatProperties.Format);
+            var info = this.InvokeAsync(provider, () => provider.State);
+            var format = FormatProperties.Format;
+            sb.AppendLine(info, format);
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         private async Task<IStateProvider> GetObjectAsync(Authentication authentication, string path)
@@ -83,15 +87,15 @@ namespace JSSoft.Crema.Commands.Consoles
             throw new InvalidOperationException($"'{path}' does not have information.");
         }
 
-        private T Invoke<T>(IStateProvider provider, Func<T> func)
+        private Task<T> InvokeAsync<T>(IStateProvider provider, Func<T> func)
         {
             if (provider is IDispatcherObject dispatcherObject)
             {
-                return dispatcherObject.Dispatcher.Invoke(func);
+                return dispatcherObject.Dispatcher.InvokeAsync(func);
             }
             else
             {
-                return func();
+                return Task.Run(func);
             }
         }
     }

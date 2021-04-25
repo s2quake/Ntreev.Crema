@@ -23,6 +23,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\PrivateCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\UnlockCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\StateCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Consoles\StringBuilderExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\InformationCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\LockCommand.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Consoles\AuthorityAttribute.cs" />

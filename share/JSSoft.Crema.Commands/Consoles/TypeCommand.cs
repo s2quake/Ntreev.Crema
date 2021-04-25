@@ -32,6 +32,7 @@ using JSSoft.Library.ObjectModel;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
@@ -55,7 +56,7 @@ namespace JSSoft.Crema.Commands.Consoles
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             var category = await this.GetCategoryAsync(this.CategoryPath ?? this.GetCurrentDirectory());
-            var typeNames = this.GetTypeNames();
+            var typeNames = await this.GetTypeNamesAsync();
             var template = await category.NewTypeAsync(authentication);
             var typeName = NameUtility.GenerateNewName("Type", typeNames);
             var typeInfo = JsonTypeInfo.Default;
@@ -93,7 +94,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [ConsoleModeOnly]
         [CommandMethod]
-        public async Task EditAsync([CommandCompletion(nameof(GetTypeNames))] string typeName)
+        public async Task EditAsync([CommandCompletion(nameof(GetTypeNamesAsync))] string typeName)
         {
             var type = await this.GetTypeAsync(typeName);
             var template = type.Dispatcher.Invoke(() => type.Template);
@@ -121,7 +122,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task RenameAsync([CommandCompletion(nameof(GetTypeNames))] string typeName, string newTypeName)
+        public async Task RenameAsync([CommandCompletion(nameof(GetTypeNamesAsync))] string typeName, string newTypeName)
         {
             var type = await this.GetTypeAsync(typeName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -129,7 +130,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task MoveAsync([CommandCompletion(nameof(GetTypeNames))] string typeName, [CommandCompletion(nameof(GetCategoryPaths))] string categoryPath)
+        public async Task MoveAsync([CommandCompletion(nameof(GetTypeNamesAsync))] string typeName, [CommandCompletion(nameof(GetCategoryPaths))] string categoryPath)
         {
             var type = await this.GetTypeAsync(typeName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -137,7 +138,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task DeleteAsync([CommandCompletion(nameof(GetTypeNames))] string typeName)
+        public async Task DeleteAsync([CommandCompletion(nameof(GetTypeNamesAsync))] string typeName)
         {
             var type = await this.GetTypeAsync(typeName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -148,7 +149,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task SetTagsAsync([CommandCompletion(nameof(GetTypeNames))] string typeName, string tags)
+        public async Task SetTagsAsync([CommandCompletion(nameof(GetTypeNamesAsync))] string typeName, string tags)
         {
             var type = await this.GetTypeAsync(typeName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -168,7 +169,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodProperty(nameof(CategoryPath))]
-        public async Task CopyAsync([CommandCompletion(nameof(GetTypeNames))] string typeName, string newTypeName)
+        public async Task CopyAsync([CommandCompletion(nameof(GetTypeNamesAsync))] string typeName, string newTypeName)
         {
             var type = await this.GetTypeAsync(typeName);
             var categoryPath = this.CategoryPath ?? this.GetCurrentDirectory();
@@ -178,49 +179,61 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task ViewAsync([CommandCompletion(nameof(GetPaths))] string typeItemName, string revision = null)
+        public async Task ViewAsync([CommandCompletion(nameof(GetPathsAsync))] string typeItemName, string revision = null)
         {
+            var sb = new StringBuilder();
             var typeItem = await this.GetTypeItemAsync(typeItemName);
             var authentication = this.CommandContext.GetAuthentication(this);
             var dataSet = await typeItem.GetDataSetAsync(authentication, revision);
             var props = dataSet.ToDictionary(false, true);
-            this.CommandContext.WriteObject(props, FormatProperties.Format);
+            var format = FormatProperties.Format;
+            sb.AppendLine(props, format);
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task LogAsync([CommandCompletion(nameof(GetPaths))] string typeItemName, string revision = null)
+        public async Task LogAsync([CommandCompletion(nameof(GetPathsAsync))] string typeItemName, string revision = null)
         {
+            var sb = new StringBuilder();
             var typeItem = await this.GetTypeItemAsync(typeItemName);
             var authentication = this.CommandContext.GetAuthentication(this);
             var logs = await typeItem.GetLogAsync(authentication, revision);
-
+            var format = FormatProperties.Format;
             foreach (var item in logs)
             {
-                this.CommandContext.WriteObject(item.ToDictionary(), FormatProperties.Format);
-                this.CommandContext.Out.WriteLine();
+                var props = item.ToDictionary();
+                sb.AppendLine(props, format);
+                sb.AppendLine();
             }
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         [CommandMethodStaticProperty(typeof(TagsProperties))]
-        public void List()
+        public async Task ListAsync()
         {
-            var typeNames = this.GetTypeNames((TagInfo)TagsProperties.Tags, FilterProperties.FilterExpression);
+            var sb = new StringBuilder();
+            var typeNames = await this.GetTypeNamesAsync((TagInfo)TagsProperties.Tags, FilterProperties.FilterExpression);
             foreach (var item in typeNames)
             {
-                this.CommandContext.Out.WriteLine(item);
+                sb.AppendLine(item);
             }
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task InfoAsync([CommandCompletion(nameof(GetTypeNames))] string typeName)
+        public async Task InfoAsync([CommandCompletion(nameof(GetTypeNamesAsync))] string typeName)
         {
+            var sb = new StringBuilder();
             var type = await this.GetTypeAsync(typeName);
-            var typeInfo = type.Dispatcher.Invoke(() => type.TypeInfo);
-            this.CommandContext.WriteObject(typeInfo.ToDictionary(), FormatProperties.Format);
+            var typeInfo = await type.Dispatcher.InvokeAsync(() => type.TypeInfo);
+            var props = typeInfo.ToDictionary();
+            var format = FormatProperties.Format;
+            sb.AppendLine(props, format);
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [CommandProperty]
@@ -255,7 +268,7 @@ namespace JSSoft.Crema.Commands.Consoles
             return category;
         }
 
-        private async Task<ITypeItem> GetTypeItemAsync([CommandCompletion(nameof(GetPaths))] string typeItemName)
+        private async Task<ITypeItem> GetTypeItemAsync([CommandCompletion(nameof(GetPathsAsync))] string typeItemName)
         {
             var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
             var typeItem = await dataBase.Dispatcher.InvokeAsync(() =>
@@ -269,15 +282,15 @@ namespace JSSoft.Crema.Commands.Consoles
             return typeItem;
         }
 
-        private string[] GetTypeNames()
+        private Task<string[]> GetTypeNamesAsync()
         {
-            return GetTypeNames(TagInfo.All, null);
+            return GetTypeNamesAsync(TagInfo.All, null);
         }
 
-        private string[] GetTypeNames(TagInfo tags, string filterExpress)
+        private async Task<string[]> GetTypeNamesAsync(TagInfo tags, string filterExpress)
         {
-            var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            return dataBase.Dispatcher.Invoke(() =>
+            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
+            return await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in dataBase.TypeContext.Types
                             where StringUtility.GlobMany(item.Name, filterExpress)
@@ -301,10 +314,10 @@ namespace JSSoft.Crema.Commands.Consoles
             });
         }
 
-        private string[] GetPaths()
+        private async Task<string[]> GetPathsAsync()
         {
-            var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            return dataBase.Dispatcher.Invoke(() =>
+            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
+            return await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in dataBase.TypeContext.Categories
                             orderby item.Path

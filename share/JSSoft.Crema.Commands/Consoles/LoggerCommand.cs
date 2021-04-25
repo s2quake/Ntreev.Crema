@@ -30,6 +30,7 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
@@ -99,8 +100,10 @@ namespace JSSoft.Crema.Commands.Consoles
         [CommandMethodStaticProperty(typeof(FormatProperties))]
         public void List()
         {
+            var sb = new StringBuilder();
             if (DetailProperties.IsDetail == true)
             {
+                var format = FormatProperties.Format;
                 foreach (var item in this.GetLogList())
                 {
                     var props = new Dictionary<string, object>()
@@ -109,18 +112,16 @@ namespace JSSoft.Crema.Commands.Consoles
                         { nameof(ILogService.Verbose), item.Verbose},
                         { nameof(ILogService.FileName),item.FileName}
                     };
-                    this.CommandContext.WriteObject(props, FormatProperties.Format);
-                    this.CommandContext.Out.WriteLine();
+                    sb.AppendLine(props, format);
+                    sb.AppendLine();
                 }
             }
             else
             {
                 var names = this.GetLogList().Select(item => item.Name).ToArray();
-                foreach (var item in names)
-                {
-                    this.CommandContext.Out.WriteLine(item);
-                }
+                sb.AppendLine(names);
             }
+            this.Out.Write(sb.ToString());
         }
 
         [CommandMethod]

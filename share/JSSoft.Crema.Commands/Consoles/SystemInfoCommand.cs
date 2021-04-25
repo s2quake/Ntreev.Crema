@@ -24,6 +24,7 @@ using JSSoft.Library.Commands;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Text;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
@@ -40,12 +41,15 @@ namespace JSSoft.Crema.Commands.Consoles
 
         protected override void OnExecute()
         {
+            var sb = new StringBuilder();
             var items = new Dictionary<string, object>()
             {
                 { "Platform", Environment.OSVersion.Platform },
                 { "MachineName", Environment.MachineName },
             };
-            this.CommandContext.WriteObject(items, FormatProperties.Format);
+            var format = FormatProperties.Format;
+            sb.AppendLine(items, format);
+            this.Out.Write(sb.ToString());
         }
     }
 }

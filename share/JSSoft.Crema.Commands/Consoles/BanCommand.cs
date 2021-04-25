@@ -23,6 +23,7 @@ using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,7 +39,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandPropertyRequired]
-        [CommandCompletion(nameof(GetUserList))]
+        [CommandCompletion(nameof(GetUserListAsync))]
         public string UserID
         {
             get; set;
@@ -71,9 +72,12 @@ namespace JSSoft.Crema.Commands.Consoles
             var user = await this.GetUserAsync(authentication, this.UserID);
             if (this.Information == true)
             {
+                var sb = new StringBuilder();
+                var formatType = this.FormatType;
                 var banInfo = user.Dispatcher.Invoke(() => user.BanInfo);
                 var prop = banInfo.ToDictionary();
-                this.CommandContext.WriteObject(prop, this.FormatType);
+                sb.AppendLine(prop, formatType);
+                await this.Out.WriteAsync(sb.ToString());
             }
             else
             {

@@ -36,7 +36,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandPropertyRequired]
-        [CommandCompletion(nameof(GetUserList))]
+        [CommandCompletion(nameof(GetUserListAsync))]
         public string UserID
         {
             get; set;

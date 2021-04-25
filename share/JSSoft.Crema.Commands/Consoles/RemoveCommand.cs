@@ -24,12 +24,14 @@ using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceUsageDescription("Resources")]
-    class RemoveCommand : ConsoleCommandBase
+    class RemoveCommand : ConsoleCommandAsyncBase
     {
         public RemoveCommand()
             : base("rm")
@@ -58,13 +60,13 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.IsOnline;
 
-        protected override void OnExecute()
+        protected override Task OnExecuteAsync(CancellationToken cancellation)
         {
             var path = this.CommandContext.GetAbsolutePath(this.Path);
-            this.Remove(path);
+            return this.RemoveAsync(path);
         }
 
-        private void Remove(string path)
+        private async Task RemoveAsync(string path)
         {
             var drive = this.CommandContext.GetDrive(path);
             var absolutePath = this.CommandContext.GetAbsolutePath(path);
@@ -74,7 +76,7 @@ namespace JSSoft.Crema.Commands.Consoles
             if (this.CommandContext.ConfirmToDelete() == false)
                 return;
             var authentication = this.CommandContext.GetAuthentication(this);
-            drive.DeleteAsync(authentication, absolutePath).Wait();
+            await drive.DeleteAsync(authentication, absolutePath);
         }
     }
 }

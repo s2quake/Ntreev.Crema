@@ -80,17 +80,17 @@ namespace JSSoft.Crema.Commands.Consoles
             }
         }
 
-        protected T Invoke<T>(Authentication authentication, ILockable lockable, Func<T> func)
+        protected Task<T> InvokeAsync<T>(Authentication authentication, ILockable lockable, Func<T> func)
         {
             //using (UsingDataBase.Set(lockable as IServiceProvider, authentication, true))
             {
                 if (lockable is IDispatcherObject dispatcherObject)
                 {
-                    return dispatcherObject.Dispatcher.Invoke(func);
+                    return dispatcherObject.Dispatcher.InvokeAsync(func);
                 }
                 else
                 {
-                    return func();
+                    return Task.Run(func);
                 }
             }
         }

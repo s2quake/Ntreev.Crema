@@ -83,20 +83,16 @@ namespace JSSoft.Crema.Commands.Consoles
             }
         }
 
-        protected T Invoke<T>(Authentication authentication, IAccessible accessible, Func<T> func)
+        protected async Task<T> InvokeAsync<T>(Authentication authentication, IAccessible accessible, Func<T> func)
         {
-            var task = UsingDataBase.SetAsync(accessible as IServiceProvider, authentication);
-            task.Wait();
-            using (task.Result)
+            using var task = await UsingDataBase.SetAsync(accessible as IServiceProvider, authentication);
+            if (accessible is IDispatcherObject dispatcherObject)
             {
-                if (accessible is IDispatcherObject dispatcherObject)
-                {
-                    return dispatcherObject.Dispatcher.Invoke(func);
-                }
-                else
-                {
-                    return func();
-                }
+                return await dispatcherObject.Dispatcher.InvokeAsync(func);
+            }
+            else
+            {
+                return await Task.Run(func);
             }
         }
     }

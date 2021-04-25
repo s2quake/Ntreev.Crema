@@ -35,6 +35,7 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Spreadsheet
@@ -250,14 +251,16 @@ namespace JSSoft.Crema.Commands.Spreadsheet
 
         private void WriteFooter(string path, SpreadsheetWriterSettings settings)
         {
+            var sb = new StringBuilder();
             var props = new Dictionary<string, object>();
             foreach (var item in settings.Properties.Keys)
             {
                 props.Add($"{item}", settings.Properties[item]);
             }
             props.Add("Path", path);
-            this.Out.WriteLine();
-            this.CommandContext.WriteObject(props, TextSerializerType.Yaml);
+            sb.AppendLine();
+            sb.AppendLine(props, TextSerializerType.Yaml);
+            this.Out.WriteAsync(sb.ToString());
         }
 
         private void Writer_Progress(object sender, ProgressEventArgs e)

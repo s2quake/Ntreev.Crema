@@ -24,13 +24,16 @@ using JSSoft.Crema.Services;
 using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel.Composition;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceUsageDescription("Resources")]
     [CommandStaticProperty(typeof(FormatProperties))]
-    class InformationCommand : ConsoleCommandBase
+    class InformationCommand : ConsoleCommandAsyncBase
     {
         [ImportingConstructor]
         public InformationCommand()
@@ -63,34 +66,37 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.IsOnline;
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync(CancellationToken cancellation)
         {
+            var sb = new StringBuilder();
             var authentication = this.CommandContext.GetAuthentication(this);
             var drive = this.CommandContext.Drive;
-            var provider = this.GetObject(authentication, this.AbsolutePath);
-            var info = this.Invoke(provider, () => provider.Info);
-            this.CommandContext.WriteObject(info, FormatProperties.Format);
+            var provider = await this.GetObjectAsync(authentication, this.AbsolutePath);
+            var info = await this.InvokeAsync(provider, () => provider.Info);
+            var format = FormatProperties.Format;
+            sb.AppendLine(info, format);
+            await this.Out.WriteAsync(sb.ToString());
         }
 
-        private IInfoProvider GetObject(Authentication authentication, string path)
+        private async Task<IInfoProvider> GetObjectAsync(Authentication authentication, string path)
         {
             var drive = this.CommandContext.Drive;
-            if (drive.GetObjectAsync(authentication, path) is IInfoProvider provider)
+            if (await drive.GetObjectAsync(authentication, path) is IInfoProvider provider)
             {
                 return provider;
             }
             throw new InvalidOperationException($"'{path}' does not have information.");
         }
 
-        private T Invoke<T>(IInfoProvider provider, Func<T> func)
+        private Task<T> InvokeAsync<T>(IInfoProvider provider, Func<T> func)
         {
             if (provider is IDispatcherObject dispatcherObject)
             {
-                return dispatcherObject.Dispatcher.Invoke(func);
+                return dispatcherObject.Dispatcher.InvokeAsync(func);
             }
             else
             {
-                return func();
+                return Task.Run(func);
             }
         }
     }

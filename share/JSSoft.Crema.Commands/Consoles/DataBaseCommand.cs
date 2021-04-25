@@ -27,6 +27,7 @@ using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
@@ -60,7 +61,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public Task RenameAsync([CommandCompletion(nameof(GetDataBaseNames))] string dataBaseName, string newDataBaseName)
+        public Task RenameAsync([CommandCompletion(nameof(GetDataBaseNamesAsync))] string dataBaseName, string newDataBaseName)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -68,7 +69,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task DeleteAsync([CommandCompletion(nameof(GetDataBaseNames))] string dataBaseName)
+        public async Task DeleteAsync([CommandCompletion(nameof(GetDataBaseNamesAsync))] string dataBaseName)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -81,7 +82,7 @@ namespace JSSoft.Crema.Commands.Consoles
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(MessageProperties))]
         [CommandMethodProperty(nameof(Force))]
-        public async Task CopyAsync([CommandCompletion(nameof(GetDataBaseNames))] string dataBaseName, string newDataBaseName)
+        public async Task CopyAsync([CommandCompletion(nameof(GetDataBaseNamesAsync))] string dataBaseName, string newDataBaseName)
         {
             var dataBase = GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -89,7 +90,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task LoadAsync([CommandCompletion(nameof(GetDataBaseNames))] string dataBaseName)
+        public async Task LoadAsync([CommandCompletion(nameof(GetDataBaseNamesAsync))] string dataBaseName)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -97,7 +98,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task UnloadAsync([CommandCompletion(nameof(GetDataBaseNames))] string dataBaseName)
+        public async Task UnloadAsync([CommandCompletion(nameof(GetDataBaseNamesAsync))] string dataBaseName)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -106,7 +107,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(MessageProperties))]
-        public async Task LockAsync([CommandCompletion(nameof(GetDataBaseNames))] string dataBaseName)
+        public async Task LockAsync([CommandCompletion(nameof(GetDataBaseNamesAsync))] string dataBaseName)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -114,7 +115,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task UnlockAsync([CommandCompletion(nameof(GetDataBaseNames))] string dataBaseName)
+        public async Task UnlockAsync([CommandCompletion(nameof(GetDataBaseNamesAsync))] string dataBaseName)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -153,16 +154,19 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task InfoAsync([CommandCompletion(nameof(GetDataBaseNames))] string dataBaseName)
+        public async Task InfoAsync([CommandCompletion(nameof(GetDataBaseNamesAsync))] string dataBaseName)
         {
+            var sb = new StringBuilder();
             var dataBase = this.GetDataBase(dataBaseName);
             var dataBaseInfo = await dataBase.Dispatcher.InvokeAsync(() => dataBase.DataBaseInfo);
             var props = dataBaseInfo.ToDictionary();
-            this.CommandContext.WriteObject(props, FormatProperties.Format);
+            var format = FormatProperties.Format;
+            sb.AppendLine(props, format);
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [CommandMethod]
-        public async Task RevertAsync([CommandCompletion(nameof(GetDataBaseNames))] string dataBaseName, string revision)
+        public async Task RevertAsync([CommandCompletion(nameof(GetDataBaseNamesAsync))] string dataBaseName, string revision)
         {
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -172,30 +176,35 @@ namespace JSSoft.Crema.Commands.Consoles
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(LogProperties))]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task LogAsync([CommandCompletion(nameof(GetDataBaseNames))] string dataBaseName, string revision = null)
+        public async Task LogAsync([CommandCompletion(nameof(GetDataBaseNamesAsync))] string dataBaseName, string revision = null)
         {
+            var sb = new StringBuilder();
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
             var logs = await dataBase.GetLogAsync(authentication, revision);
-
+            var format = FormatProperties.Format;
             foreach (var item in logs)
             {
-                this.CommandContext.WriteObject(item.ToDictionary(), FormatProperties.Format);
-                this.Out.WriteLine();
+                var props = item.ToDictionary();
+                sb.AppendLine(props, format);
             }
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
         [CommandMethodStaticProperty(typeof(DataSetTypeProperties))]
-        public async Task ViewAsync([CommandCompletion(nameof(GetDataBaseNames))] string dataBaseName, string revision = null)
+        public async Task ViewAsync([CommandCompletion(nameof(GetDataBaseNamesAsync))] string dataBaseName, string revision = null)
         {
+            var sb = new StringBuilder();
             var dataBase = this.GetDataBase(dataBaseName);
             var authentication = this.CommandContext.GetAuthentication(this);
             var dataSet = await dataBase.GetDataSetAsync(authentication, DataSetTypeProperties.DataSetType, FilterProperties.FilterExpression, revision);
             var props = dataSet.ToDictionary(DataSetTypeProperties.TableOnly == true, DataSetTypeProperties.TypeOnly == true);
-            this.CommandContext.WriteObject(props, FormatProperties.Format);
+            var format = FormatProperties.Format;
+            sb.AppendLine(props, format);
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [CommandProperty('f', AllowName = true)]
@@ -206,9 +215,9 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.Drive is DataBasesConsoleDrive && this.CommandContext.IsOnline == true;
 
-        private string[] GetDataBaseNames()
+        private Task<string[]> GetDataBaseNamesAsync()
         {
-            return this.DataBaseContext.Dispatcher.Invoke(() =>
+            return this.DataBaseContext.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in this.DataBaseContext
                             select item.Name;

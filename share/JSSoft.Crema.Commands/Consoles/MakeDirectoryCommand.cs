@@ -23,12 +23,14 @@ using JSSoft.Library.Commands;
 using JSSoft.Library.ObjectModel;
 using System;
 using System.ComponentModel.Composition;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
     [Export(typeof(IConsoleCommand))]
     [ResourceUsageDescription("Resources")]
-    class MakeDirectoryCommand : ConsoleCommandBase
+    class MakeDirectoryCommand : ConsoleCommandAsyncBase
     {
         public MakeDirectoryCommand()
             : base("mkdir")
@@ -44,13 +46,13 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public override bool IsEnabled => this.CommandContext.IsOnline;
 
-        protected override void OnExecute()
+        protected override async Task OnExecuteAsync(CancellationToken cancellation)
         {
             var path = this.CommandContext.GetAbsolutePath(this.Path);
-            this.MakeDirectory(path);
+            await this.MakeDirectoryAsync(path);
         }
 
-        private void MakeDirectory(string path)
+        private async Task MakeDirectoryAsync(string path)
         {
             var drive = this.CommandContext.GetDrive(path);
             if (drive == null)
@@ -60,12 +62,12 @@ namespace JSSoft.Crema.Commands.Consoles
             if (NameValidator.VerifyCategoryPath(absolutePath))
             {
                 var categoryName = new CategoryName(absolutePath);
-                drive.CreateAsync(authentication, categoryName.ParentPath, categoryName.Name).Wait();
+                await drive.CreateAsync(authentication, categoryName.ParentPath, categoryName.Name);
             }
             else
             {
                 var itemName = new ItemName(absolutePath);
-                drive.CreateAsync(authentication, itemName.CategoryPath, itemName.Name).Wait();
+                await drive.CreateAsync(authentication, itemName.CategoryPath, itemName.Name);
             }
         }
     }

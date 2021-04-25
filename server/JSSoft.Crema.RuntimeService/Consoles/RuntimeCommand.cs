@@ -72,7 +72,7 @@ namespace JSSoft.Crema.RuntimeService.Consoles
 
             var serviceItem = this.runtimeService.GetServiceItem(dataBaseID);
             var info = serviceItem.Dispatcher.Invoke(() => serviceItem.DataServiceItemInfo);
-            this.CommandContext.WriteObject(info.ToDictionary(), FormatProperties.Format);
+            this.CommandContext.WriteObjectAsync(info.ToDictionary(), FormatProperties.Format);
         }
 
         public override bool IsEnabled => this.cremaHost.ServiceState == ServiceState.Open;

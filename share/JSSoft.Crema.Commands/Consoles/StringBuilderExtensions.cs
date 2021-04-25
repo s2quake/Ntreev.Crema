@@ -19,24 +19,31 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
-using JSSoft.Library.Commands;
-using System.ComponentModel.Composition;
+using System.Collections.Generic;
+using System.Text;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
-    [Export(typeof(IConsoleCommand))]
-    [ResourceUsageDescription("Resources")]
-    class PrintWorkingDirectoryCommand : ConsoleCommandBase
+    public static class StringBuilderExtensions
     {
-        public PrintWorkingDirectoryCommand()
-            : base("pwd")
+        public static void Append(this StringBuilder sb, object value, TextSerializerType type)
         {
-
+            var text = TextSerializer.Serialize(value, type);
+            sb.Append(text);
         }
 
-        protected override void OnExecute()
+        public static void AppendLine(this StringBuilder sb, object value, TextSerializerType type)
         {
-            this.Out.WriteLine(this.CommandContext.Path);
+            var text = TextSerializer.Serialize(value, type);
+            sb.AppendLine(text);
+        }
+
+        public static void AppendLine(this StringBuilder sb, IEnumerable<string> items)
+        {
+            foreach (var item in items)
+            {
+                sb.AppendLine(item);
+            }
         }
     }
 }

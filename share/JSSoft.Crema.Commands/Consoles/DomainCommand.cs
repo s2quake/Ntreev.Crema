@@ -28,6 +28,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
@@ -79,9 +81,10 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [CommandMethod("list")]
         [CommandMethodProperty(nameof(DataBaseName))]
-        public void List()
+        public async Task ListAsync()
         {
-            var domainInfos = this.DomainContext.Dispatcher.Invoke(() =>
+            var sb = new StringBuilder();
+            var domainInfos = await this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
                 var domainInfoList = new List<DomainInfo>();
                 foreach (var item in this.DomainContext.Domains)
@@ -92,7 +95,7 @@ namespace JSSoft.Crema.Commands.Consoles
                 return domainInfoList.ToArray();
             });
 
-            var dataBaseInfos = this.CremaHost.Dispatcher.Invoke(() =>
+            var dataBaseInfos = await this.CremaHost.Dispatcher.InvokeAsync(() =>
             {
                 return this.DataBaseContext.Select(item => item.DataBaseInfo).ToArray();
             });
@@ -107,28 +110,30 @@ namespace JSSoft.Crema.Commands.Consoles
             {
                 foreach (var item in query)
                 {
-                    this.CommandContext.Out.WriteLine($"{item.Key}:");
-                    foreach (var i in item)
-                    {
-                        this.CommandContext.Out.WriteLine(i);
-                    }
-                    this.CommandContext.Out.WriteLine();
+                    sb.AppendLine($"{item.Key}:");
+                    sb.AppendLine(item.AsEnumerable());
+                    sb.AppendLine();
                 }
             }
             else
             {
-                this.CommandContext.Out.WriteLine("no domains");
+                sb.AppendLine("no domains");
             }
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public void Info([CommandCompletion(nameof(GetDomainIDs))] Guid domainID)
+        public async Task InfoAsync([CommandCompletion(nameof(GetDomainIDsAsync))] Guid domainID)
         {
-            var domain = this.GetDomain(domainID);
+            var sb = new StringBuilder();
+            var domain = await this.GetDomainAsync(domainID);
             var authentication = this.CommandContext.GetAuthentication(this);
-            var domainInfo = domain.Dispatcher.Invoke(() => domain.DomainInfo);
-            this.CommandContext.WriteObject(domainInfo.ToDictionary(), FormatProperties.Format);
+            var domainInfo = await domain.Dispatcher.InvokeAsync(() => domain.DomainInfo);
+            var props = domainInfo.ToDictionary();
+            var format = FormatProperties.Format;
+            sb.AppendLine(props, format);
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         //[CommandProperty("cancel", 'c')]
@@ -144,7 +149,7 @@ namespace JSSoft.Crema.Commands.Consoles
         //}
 
         [CommandProperty("database", InitValue = "")]
-        [CommandCompletion(nameof(GetDataBaseNames))]
+        [CommandCompletion(nameof(GetDataBaseNamesAsync))]
         public string DataBaseName
         {
             get; set;
@@ -154,9 +159,9 @@ namespace JSSoft.Crema.Commands.Consoles
 
         public IDomainContext DomainContext => this.CremaHost.GetService(typeof(IDomainContext)) as IDomainContext;
 
-        private string[] GetDataBaseNames()
+        private Task<string[]> GetDataBaseNamesAsync()
         {
-            return this.DataBaseContext.Dispatcher.Invoke(() =>
+            return this.DataBaseContext.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in this.DataBaseContext
                             select item.Name;
@@ -164,9 +169,9 @@ namespace JSSoft.Crema.Commands.Consoles
             });
         }
 
-        private string[] GetDomainIDs()
+        private Task<string[]> GetDomainIDsAsync()
         {
-            return this.DomainContext.Dispatcher.Invoke(() =>
+            return this.DomainContext.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in this.DomainContext.Domains
                             let domainID = item.ID.ToString()
@@ -175,9 +180,9 @@ namespace JSSoft.Crema.Commands.Consoles
             });
         }
 
-        private IDomain GetDomain(Guid domainID)
+        private async Task<IDomain> GetDomainAsync(Guid domainID)
         {
-            var domain = this.DomainContext.Dispatcher.Invoke(() => this.DomainContext.Domains[domainID]);
+            var domain = await this.DomainContext.Dispatcher.InvokeAsync(() => this.DomainContext.Domains[domainID]);
             if (domain == null)
                 throw new DomainNotFoundException(domainID);
             return domain;

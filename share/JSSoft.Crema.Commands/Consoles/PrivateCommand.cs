@@ -23,6 +23,7 @@ using JSSoft.Crema.ServiceModel;
 using JSSoft.Library.Commands;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -123,8 +124,12 @@ namespace JSSoft.Crema.Commands.Consoles
             }
             else if (this.Information == true)
             {
-                var accessInfo = this.Invoke(authentication, accessible, () => accessible.AccessInfo);
-                this.CommandContext.WriteObject(accessInfo.ToDictionary(), this.FormatType);
+                var sb = new StringBuilder();
+                var accessInfo = await this.InvokeAsync(authentication, accessible, () => accessible.AccessInfo);
+                var props = accessInfo.ToDictionary();
+                var format = this.FormatType;
+                sb.AppendLine(props, format);
+                await this.Out.WriteAsync(sb.ToString());
             }
             else
             {

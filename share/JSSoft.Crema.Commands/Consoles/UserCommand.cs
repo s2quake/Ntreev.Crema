@@ -28,6 +28,7 @@ using JSSoft.Library.Commands;
 using System;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
@@ -49,6 +50,7 @@ namespace JSSoft.Crema.Commands.Consoles
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         public async Task ListAsync()
         {
+            var sb = new StringBuilder();
             var authentication = this.CommandContext.GetAuthentication(this);
             var metaData = await this.UserContext.Dispatcher.InvokeAsync(() => this.UserContext.GetMetaData(authentication));
             var query = from item in metaData.Users
@@ -57,19 +59,15 @@ namespace JSSoft.Crema.Commands.Consoles
                         where StringUtility.GlobMany(userID, FilterProperties.FilterExpression)
                         where this.IsOnline == false || item.UserState == UserState.Online
                         where this.IsBanned == false || item.BanInfo.Path == item.Path
-                        // select new TerminalUserItem(userID, item.BanInfo, item.UserState);
-                        select userID;
+                        select FormatUserID(userID, item.BanInfo, item.UserState);
 
-            var metaItems = query.ToArray();
-            foreach (var item in metaItems)
-            {
-                this.Out.WriteLine(item);
-            }
+            sb.AppendLine(query);
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [CommandMethod]
         [CommandMethodProperty(nameof(Message))]
-        public async Task KickAsync([CommandCompletion(nameof(GetOnlineUserIDs))] string userID)
+        public async Task KickAsync([CommandCompletion(nameof(GetOnlineUserIDsAsync))] string userID)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -78,7 +76,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodProperty(nameof(Message))]
-        public async Task BanAsync([CommandCompletion(nameof(GetUnbannedUserIDs))] string userID)
+        public async Task BanAsync([CommandCompletion(nameof(GetUnbannedUserIDsAsync))] string userID)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -86,7 +84,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task UnbanAsync([CommandCompletion(nameof(GetBannedUserIDs))] string userID)
+        public async Task UnbanAsync([CommandCompletion(nameof(GetBannedUserIDsAsync))] string userID)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -94,7 +92,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task PasswordAsync([CommandCompletion(nameof(GetUserIDs))] string userID)
+        public async Task PasswordAsync([CommandCompletion(nameof(GetUserIDsAsync))] string userID)
         {
             var user = await this.GetUserAsync(userID);
             var password1 = this.CommandContext.ReadSecureString("Password1:");
@@ -105,7 +103,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task RenameAsync([CommandCompletion(nameof(GetUserIDs))] string userID, string newName = null)
+        public async Task RenameAsync([CommandCompletion(nameof(GetUserIDsAsync))] string userID, string newName = null)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -114,7 +112,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task MoveAsync([CommandCompletion(nameof(GetUserIDs))] string userID, [CommandCompletion(nameof(GetCategoryPaths))] string categoryPath)
+        public async Task MoveAsync([CommandCompletion(nameof(GetUserIDsAsync))] string userID, [CommandCompletion(nameof(GetCategoryPathsAsync))] string categoryPath)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -122,7 +120,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod("authority")]
-        public async Task SetAuthorityAsync([CommandCompletion(nameof(GetUserIDs))] string userID, Authority authority)
+        public async Task SetAuthorityAsync([CommandCompletion(nameof(GetUserIDsAsync))] string userID, Authority authority)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -131,11 +129,15 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task InfoAsync([CommandCompletion(nameof(GetUserIDs))] string userID)
+        public async Task InfoAsync([CommandCompletion(nameof(GetUserIDsAsync))] string userID)
         {
+            var sb = new StringBuilder();
             var user = await this.GetUserAsync(userID);
             var userInfo = await user.Dispatcher.InvokeAsync(() => user.UserInfo);
-            this.CommandContext.WriteObject(userInfo.ToDictionary(), FormatProperties.Format);
+            var props = userInfo.ToDictionary();
+            var format = FormatProperties.Format;
+            sb.AppendLine(props, format);
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [ConsoleModeOnly]
@@ -144,7 +146,7 @@ namespace JSSoft.Crema.Commands.Consoles
         public async Task CreateAsync()
         {
             var schema = JsonSchemaUtility.CreateSchema(typeof(JsonUserInfo));
-            schema.SetEnums(nameof(JsonUserInfo.CategoryPath), this.GetCategoryPaths());
+            schema.SetEnums(nameof(JsonUserInfo.CategoryPath), await this.GetCategoryPathsAsync());
 
             var userInfo = JsonUserInfo.Default;
             userInfo.CategoryPath = this.CategoryPath;
@@ -161,7 +163,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task DeleteAsync([CommandCompletion(nameof(GetUserIDs))] string userID)
+        public async Task DeleteAsync([CommandCompletion(nameof(GetUserIDsAsync))] string userID)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -172,20 +174,20 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod("message")]
-        public async Task SendMessageAsync([CommandCompletion(nameof(GetUserIDs))] string userID, string message)
+        public async Task SendMessageAsync([CommandCompletion(nameof(GetUserIDsAsync))] string userID, string message)
         {
             var user = await this.GetUserAsync(userID);
             var authentication = this.CommandContext.GetAuthentication(this);
             await user.SendMessageAsync(authentication, message);
         }
 
-        [CommandProperty("online", 'o')]
+        [CommandPropertySwitch("online", 'o')]
         public bool IsOnline
         {
             get; set;
         }
 
-        [CommandProperty("banned")]
+        [CommandPropertySwitch("banned", 'b')]
         public bool IsBanned
         {
             get; set;
@@ -198,7 +200,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandProperty]
-        [CommandCompletion(nameof(GetCategoryPaths))]
+        [CommandCompletion(nameof(GetCategoryPathsAsync))]
         public string CategoryPath
         {
             get; set;
@@ -230,9 +232,9 @@ namespace JSSoft.Crema.Commands.Consoles
             });
         }
 
-        private string[] GetUserIDs()
+        private Task<string[]> GetUserIDsAsync()
         {
-            return this.UserContext.Dispatcher.Invoke(() =>
+            return this.UserContext.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in this.UserContext.Users
                             orderby item.ID
@@ -241,9 +243,9 @@ namespace JSSoft.Crema.Commands.Consoles
             });
         }
 
-        private string[] GetCategoryPaths()
+        private Task<string[]> GetCategoryPathsAsync()
         {
-            return this.UserContext.Dispatcher.Invoke(() =>
+            return this.UserContext.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in this.UserContext.Categories
                             orderby item.Path
@@ -252,9 +254,9 @@ namespace JSSoft.Crema.Commands.Consoles
             });
         }
 
-        private string[] GetOnlineUserIDs()
+        private Task<string[]> GetOnlineUserIDsAsync()
         {
-            return this.UserContext.Dispatcher.Invoke(() =>
+            return this.UserContext.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in this.UserContext.Users
                             where item.UserState.HasFlag(UserState.Online)
@@ -263,9 +265,9 @@ namespace JSSoft.Crema.Commands.Consoles
             });
         }
 
-        private string[] GetUnbannedUserIDs()
+        private Task<string[]> GetUnbannedUserIDsAsync()
         {
-            return this.UserContext.Dispatcher.Invoke(() =>
+            return this.UserContext.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in this.UserContext.Users
                             where item.BanInfo.Path != item.Path
@@ -274,9 +276,9 @@ namespace JSSoft.Crema.Commands.Consoles
             });
         }
 
-        private string[] GetBannedUserIDs()
+        private Task<string[]> GetBannedUserIDsAsync()
         {
-            return this.UserContext.Dispatcher.Invoke(() =>
+            return this.UserContext.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in this.UserContext.Users
                             where item.BanInfo.Path == item.Path
@@ -285,48 +287,20 @@ namespace JSSoft.Crema.Commands.Consoles
             });
         }
 
-        // #region classes
-
-        // class TerminalUserItem : TerminalTextItem
-        // {
-        //     private readonly string userID;
-        //     private readonly BanInfo banInfo;
-        //     private readonly UserState userState;
-
-        //     public TerminalUserItem(string userID, BanInfo banInfo, UserState userState)
-        //         : base(userID)
-        //     {
-        //         this.userID = userID;
-        //         this.banInfo = banInfo;
-        //         this.userState = userState;
-        //     }
-
-        //     protected override void OnDraw(TextWriter writer, string text)
-        //     {
-        //         if (this.banInfo.Path != string.Empty)
-        //         {
-        //             using (TerminalColor.SetForeground(ConsoleColor.Red))
-        //             {
-        //                 base.OnDraw(writer, text);
-        //             }
-        //         }
-        //         else if (this.userState != UserState.Online)
-        //         {
-        //             //using (TerminalColor.SetForeground(ConsoleColor.Gray))
-        //             {
-        //                 base.OnDraw(writer, text);
-        //             }
-        //         }
-        //         else
-        //         {
-        //             using (TerminalColor.SetForeground(ConsoleColor.Blue))
-        //             {
-        //                 base.OnDraw(writer, text);
-        //             }
-        //         }
-        //     }
-        // }
-
-        // #endregion
+        private static string FormatUserID(string userID, BanInfo banInfo, UserState userState)
+        {
+            if (banInfo.Path != string.Empty)
+            {
+                return TerminalStrings.Foreground(userID, TerminalColor.Red);
+            }
+            else if (userState != UserState.Online)
+            {
+                return TerminalStrings.Foreground(userID, TerminalColor.BrightBlack);
+            }
+            else
+            {
+                return userID;
+            }
+        }
     }
 }

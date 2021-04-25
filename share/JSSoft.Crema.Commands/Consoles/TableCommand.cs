@@ -35,6 +35,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace JSSoft.Crema.Commands.Consoles
@@ -55,7 +56,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task RenameAsync([CommandCompletion(nameof(GetTableNames))] string tableName, string newTableName)
+        public async Task RenameAsync([CommandCompletion(nameof(GetTableNamesAsync))] string tableName, string newTableName)
         {
             var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -63,7 +64,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task MoveAsync([CommandCompletion(nameof(GetTableNames))] string tableName, [CommandCompletion(nameof(GetCategoryPaths))] string categoryPath)
+        public async Task MoveAsync([CommandCompletion(nameof(GetTableNamesAsync))] string tableName, [CommandCompletion(nameof(GetCategoryPaths))] string categoryPath)
         {
             var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -71,7 +72,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task DeleteAsync([CommandCompletion(nameof(GetTableNames))] string tableName)
+        public async Task DeleteAsync([CommandCompletion(nameof(GetTableNamesAsync))] string tableName)
         {
             var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -82,7 +83,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandMethod]
-        public async Task SetTagsAsync([CommandCompletion(nameof(GetTableNames))] string tableName, string tags)
+        public async Task SetTagsAsync([CommandCompletion(nameof(GetTableNamesAsync))] string tableName, string tags)
         {
             var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -102,7 +103,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodProperty(nameof(CategoryPath), nameof(CopyContent))]
-        public async Task CopyAsync([CommandCompletion(nameof(GetTableNames))] string tableName, string newTableName)
+        public async Task CopyAsync([CommandCompletion(nameof(GetTableNamesAsync))] string tableName, string newTableName)
         {
             var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -112,7 +113,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodProperty(nameof(CategoryPath), nameof(CopyContent))]
-        public async Task InheritAsync([CommandCompletion(nameof(GetTableNames))] string tableName, string newTableName)
+        public async Task InheritAsync([CommandCompletion(nameof(GetTableNamesAsync))] string tableName, string newTableName)
         {
             var table = await this.GetTableAsync(tableName);
             var authentication = this.CommandContext.GetAuthentication(this);
@@ -122,84 +123,100 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task ViewAsync([CommandCompletion(nameof(GetPaths))] string tableItemName, string revision = null)
+        public async Task ViewAsync([CommandCompletion(nameof(GetPathsAsync))] string tableItemName, string revision = null)
         {
+            var sb = new StringBuilder();
             var tableItem = await this.GetTableItemAsync(tableItemName);
             var authentication = this.CommandContext.GetAuthentication(this);
             var dataSet = await tableItem.GetDataSetAsync(authentication, revision);
             var props = dataSet.ToDictionary(true, false);
-            this.CommandContext.WriteObject(props, FormatProperties.Format);
+            var format = FormatProperties.Format;
+            sb.AppendLine(props, format);
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task LogAsync([CommandCompletion(nameof(GetPaths))] string tableItemName, string revision = null)
+        public async Task LogAsync([CommandCompletion(nameof(GetPathsAsync))] string tableItemName, string revision = null)
         {
+            var sb = new StringBuilder();
             var tableItem = await this.GetTableItemAsync(tableItemName);
             var authentication = this.CommandContext.GetAuthentication(this);
             var logs = await tableItem.GetLogAsync(authentication, revision);
-
+            var format = FormatProperties.Format;
             foreach (var item in logs)
             {
-                this.CommandContext.WriteObject(item.ToDictionary(), FormatProperties.Format);
-                this.Out.WriteLine();
+                var props = item.ToDictionary();
+                sb.AppendLine(props, format);
+                sb.AppendLine();
             }
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         [CommandMethodStaticProperty(typeof(TagsProperties))]
-        public void List()
+        public async Task ListAsync()
         {
-            var tableNames = this.GetTableNames((TagInfo)TagsProperties.Tags, FilterProperties.FilterExpression);
+            var sb = new StringBuilder();
+            var tableNames = await this.GetTableNamesAsync((TagInfo)TagsProperties.Tags, FilterProperties.FilterExpression);
             foreach (var item in tableNames)
             {
-                this.Out.WriteLine(item);
+                sb.AppendLine(item);
             }
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task InfoAsync([CommandCompletion(nameof(GetTableNames))] string tableName)
+        public async Task InfoAsync([CommandCompletion(nameof(GetTableNamesAsync))] string tableName)
         {
+            var sb = new StringBuilder();
             var table = await this.GetTableAsync(tableName);
-            var tableInfo = table.Dispatcher.Invoke(() => table.TableInfo);
+            var tableInfo = await table.Dispatcher.InvokeAsync(() => table.TableInfo);
             var props = tableInfo.ToDictionary(true);
-            this.CommandContext.WriteObject(props, FormatProperties.Format);
+            var format = FormatProperties.Format;
+            sb.AppendLine(props, format);
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
-        public async Task ColumnList([CommandCompletion(nameof(GetTableNames))] string tableName)
+        public async Task ColumnList([CommandCompletion(nameof(GetTableNamesAsync))] string tableName)
         {
+            var sb = new StringBuilder();
             var table = await this.GetTableAsync(tableName);
-            var tableInfo = table.Dispatcher.Invoke(() => table.TableInfo);
+            var tableInfo = await table.Dispatcher.InvokeAsync(() => table.TableInfo);
             var columnList = tableInfo.Columns.Where(item => StringUtility.GlobMany(item.Name, FilterProperties.FilterExpression))
                                               .Select(item => item).ToArray();
 
             foreach (var item in columnList)
             {
-                this.Out.WriteLine(item);
+                sb.AppendLine($"{item}");
             }
+            this.Out.Write(sb.ToString());
         }
 
         [CommandMethod]
         [CommandMethodStaticProperty(typeof(FormatProperties))]
         [CommandMethodStaticProperty(typeof(FilterProperties))]
-        public async Task ColumnInfo([CommandCompletion(nameof(GetTableNames))] string tableName)
+        public async Task ColumnInfo([CommandCompletion(nameof(GetTableNamesAsync))] string tableName)
         {
+            var sb = new StringBuilder();
             var table = await this.GetTableAsync(tableName);
-            var tableInfo = table.Dispatcher.Invoke(() => table.TableInfo);
+            var tableInfo = await table.Dispatcher.InvokeAsync(() => table.TableInfo);
             var columns = new Dictionary<string, object>(tableInfo.Columns.Length);
-            foreach (var item in tableInfo.Columns)
+            var format = FormatProperties.Format;
+            var query = from item in tableInfo.Columns
+                        where StringUtility.GlobMany(item.Name, FilterProperties.FilterExpression)
+                        select item;
+            foreach (var item in query)
             {
-                if (StringUtility.GlobMany(item.Name, FilterProperties.FilterExpression))
-                {
-                    columns.Add(item.Name, item.ToDictionary());
-                }
+                columns.Add(item.Name, item.ToDictionary());
             }
-            this.CommandContext.WriteObject(columns, FormatProperties.Format);
+            sb.AppendLine(columns, format);
+            await this.Out.WriteAsync(sb.ToString());
         }
 
         [ConsoleModeOnly]
@@ -208,7 +225,7 @@ namespace JSSoft.Crema.Commands.Consoles
         public async Task CreateAsync()
         {
             var authentication = this.CommandContext.GetAuthentication(this);
-            var tableNames = this.GetTableNames();
+            var tableNames = this.GetTableNamesAsync();
             var template = await CreateTemplateAsync();
 
             var dataTypes = template.Dispatcher.Invoke(() => template.SelectableTypes);
@@ -288,7 +305,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [ConsoleModeOnly]
         [CommandMethod]
-        public async Task EditTemplateAsync([CommandCompletion(nameof(GetTableNames))] string tableName)
+        public async Task EditTemplateAsync([CommandCompletion(nameof(GetTableNamesAsync))] string tableName)
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             var table = await this.GetTableAsync(tableName);
@@ -319,7 +336,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         [ConsoleModeOnly]
         [CommandMethod]
-        public async Task EditAsync([CommandCompletion(nameof(GetTableNames))] string tableName)
+        public async Task EditAsync([CommandCompletion(nameof(GetTableNamesAsync))] string tableName)
         {
             var authentication = this.CommandContext.GetAuthentication(this);
             var table = await this.GetTableAsync(tableName);
@@ -353,7 +370,7 @@ namespace JSSoft.Crema.Commands.Consoles
         }
 
         [CommandProperty("parent", InitValue = "")]
-        [CommandCompletion(nameof(GetPaths))]
+        [CommandCompletion(nameof(GetPathsAsync))]
         public string ParentPath
         {
             get; set;
@@ -428,15 +445,15 @@ namespace JSSoft.Crema.Commands.Consoles
             return tableItem;
         }
 
-        private string[] GetTableNames()
+        private Task<string[]> GetTableNamesAsync()
         {
-            return GetTableNames(TagInfo.All, null);
+            return GetTableNamesAsync(TagInfo.All, null);
         }
 
-        private string[] GetTableNames(TagInfo tags, string filterExpress)
+        private Task<string[]> GetTableNamesAsync(TagInfo tags, string filterExpress)
         {
             var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            return dataBase.Dispatcher.Invoke(() =>
+            return dataBase.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in dataBase.TableContext.Tables
                             where StringUtility.GlobMany(item.Name, filterExpress)
@@ -448,10 +465,10 @@ namespace JSSoft.Crema.Commands.Consoles
             });
         }
 
-        private string[] GetCategoryPaths()
+        private async Task<string[]> GetCategoryPaths()
         {
-            var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            return dataBase.Dispatcher.Invoke(() =>
+            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
+            return await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in dataBase.TableContext.Categories
                             orderby item.Path
@@ -460,10 +477,10 @@ namespace JSSoft.Crema.Commands.Consoles
             });
         }
 
-        private string[] GetPaths()
+        private async Task<string[]> GetPathsAsync()
         {
-            var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            return dataBase.Dispatcher.Invoke(() =>
+            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
+            return await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in dataBase.TableContext.Categories
                             orderby item.Path

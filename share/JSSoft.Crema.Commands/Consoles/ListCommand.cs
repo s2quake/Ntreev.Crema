@@ -25,6 +25,7 @@ using JSSoft.Library.IO;
 using System;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Text;
 
 namespace JSSoft.Crema.Commands.Consoles
 {
@@ -55,6 +56,7 @@ namespace JSSoft.Crema.Commands.Consoles
 
         protected override void OnExecute()
         {
+            var sb = new StringBuilder();
             var allPath = this.CommandContext.Drive.GetPaths();
             var path = this.PathName == string.Empty ? this.CommandContext.Path : this.CommandContext.GetAbsolutePath(this.PathName);
 
@@ -74,8 +76,9 @@ namespace JSSoft.Crema.Commands.Consoles
 
             foreach (var item in query)
             {
-                this.Out.WriteLine(item);
+                sb.AppendLine(item);
             }
+            this.Out.Write(sb.ToString());
         }
 
         //#region classes
