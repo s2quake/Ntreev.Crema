@@ -169,7 +169,8 @@ namespace JSSoft.Crema.Repository.Svn
                     (SvnPath)this.BasePath,
                     new SvnCommandItem("patch-compatible")
                 };
-                diffCommand.WriteAllText(this.transactionPatchPath);
+                var output = diffCommand.ReadLine();
+                File.WriteAllText(this.transactionPatchPath, output);
                 this.transactionMessageList.Add(comment);
                 this.transactionPropertyList.AddRange(properties);
                 return;

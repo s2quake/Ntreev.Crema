@@ -19,40 +19,48 @@
 // Forked from https://github.com/NtreevSoft/Crema
 // Namespaces and files starting with "Ntreev" have been renamed to "JSSoft".
 
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using JSSoft.Library.IO;
 
 namespace JSSoft.Crema.Repository.Git
 {
-    class GitAddCommand : GitCommand
+    class GitAddCommand
     {
-        private readonly List<GitPath> items;
+        private readonly List<GitCommand> commandList;
 
         public GitAddCommand(string basePath, GitPath[] items)
-            : base(basePath, "add")
         {
-            this.items = new List<GitPath>(items);
-        }
-
-        protected override void OnRun()
-        {
-            var itemList = new Queue<string>(this.items.Select(item => $"{item}"));
-            var commandLength = this.ToString().Length;
+            var itemList = new Queue<string>(items.Select(item => $"{item}"));
+            var commandList = new List<GitCommand>();
+            var command = new GitCommand(basePath, "add");
+            var commandLength = command.ToString().Length;
 
             while (itemList.Any())
             {
                 var item = itemList.Dequeue();
                 if (commandLength + item.Length + 1 > 1024)
                 {
-                    base.OnRun();
-                    this.Clear();
-                    commandLength = this.ToString().Length;
+                    commandList.Add(command);
+                    command = new GitCommand(basePath, "add");
+                    commandLength = command.ToString().Length;
                 }
                 commandLength += item.Length + 1;
-                this.Add(item);
+                command.Add(item);
             }
 
-            base.OnRun();
+            commandList.Add(command);
+            this.commandList = commandList;
+        }
+
+        public void Run()
+        {
+            foreach (var item in this.commandList)
+            {
+                item.Run();
+            }
         }
     }
 }

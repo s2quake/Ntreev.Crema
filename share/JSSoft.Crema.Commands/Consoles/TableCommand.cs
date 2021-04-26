@@ -450,10 +450,10 @@ namespace JSSoft.Crema.Commands.Consoles
             return GetTableNamesAsync(TagInfo.All, null);
         }
 
-        private Task<string[]> GetTableNamesAsync(TagInfo tags, string filterExpress)
+        private async Task<string[]> GetTableNamesAsync(TagInfo tags, string filterExpress)
         {
-            var dataBase = this.DataBaseContext.Dispatcher.Invoke(() => this.DataBaseContext[this.Drive.DataBaseName]);
-            return dataBase.Dispatcher.InvokeAsync(() =>
+            var dataBase = await this.DataBaseContext.Dispatcher.InvokeAsync(() => this.DataBaseContext[this.Drive.DataBaseName]);
+            return await dataBase.Dispatcher.InvokeAsync(() =>
             {
                 var query = from item in dataBase.TableContext.Tables
                             where StringUtility.GlobMany(item.Name, filterExpress)

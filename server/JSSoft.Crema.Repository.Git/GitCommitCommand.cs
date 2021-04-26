@@ -35,11 +35,10 @@ namespace JSSoft.Crema.Repository.Git
             this.Add(GitCommandItem.FromMessage(message));
         }
 
-        protected override void OnRun()
+        protected override void OnBeforeRun()
         {
             GitConfig.SetValue(this.basePath, "user.email", this.author.Email == string.Empty ? "<>" : this.author.Email);
             GitConfig.SetValue(this.basePath, "user.name", this.author.Name);
-            base.OnRun();
         }
     }
 }
